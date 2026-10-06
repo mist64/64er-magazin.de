@@ -91,6 +91,55 @@ Three further shapes this rule never named, all met on 8612:
 
 A `Bild N` referenced in the body that is NONE of the above *and* has no crop is a gap, not a no-op: log it to `LOG.md` (as with a referenced-but-missing table) rather than silently skipping.
 
+### A NUMBERED SERIES IS ALL TYPESET OR ALL CROPPED — decide for the series
+
+The decision above is per-caption, and that splits a series. SH8604's **Bild
+6a-6j** is the case: some members are plain grids (this rule typesets them),
+some carry arrows and circled numbers (r150 crops them), so the page ended up
+half typeset and half image, in one numbered run, looking like two different
+things. **Look at the whole series first. If ANY member has to be cropped,
+the whole series goes on r150's crop worklist and this step typesets none of
+it.** Consistency within the series beats the per-caption rule.
+
+The same question with the opposite answer: **a small box captioned only
+"Tabelle N" that is really a DRAWING** (SH8604's KI Tabelle 1-6 — arrows,
+circled numbers) is a crop, whatever the caption calls it. The caption names
+the series; the ink decides the medium.
+
+### WHEN A TYPESET BOX AND A CROPPED ONE ARE INTERLEAVED IN THE OCR
+
+"Leave the drawing's garbage in place" is right only while every box on the
+page is cropped. SH8604's p10 wove one typeset Bild (6h) and two drawings (6g,
+6i) through the same paragraphs, so leaving the garbage left a **duplicate of
+the text that was also typeset**. Where a page mixes the two, the OCR run of
+the TYPESET box is removed with it; only a cropped box's garbage stays.
+
+### THREE PRINTED SHAPES WITH NO NAME
+
+- **Line-number documentation** — `10-30  Hier wird …`, `40-90  …` — is the
+  dominant table shape in a course issue (6× in one SH8604 article alone) and
+  was covered only by the generic *Text printed as a table* section. It is a
+  **two-column `table.plain`**, line range and description. **Re-read every
+  label off the crop**: the OCR systematically drops or misplaces them, and a
+  dropped line range looks like prose.
+- **A label printed inside the figure box, apart from its caption** ("Die
+  komplett sortierte Datei."), and an **intro line printed in the box above a
+  series**: both are part of the box, so they go inside the `<figure>` — the
+  label as the first line of the box's content, the intro as a `<p>` before
+  the first member. Neither is a `<figcaption>`; the caption is the printed
+  "Bild N." line.
+- **A long unlabelled typewriter-face data box** — SH8604's 176-record
+  Texte-Datei, the `A AB ADRESSE` printout — is neither a table nor a Bild:
+  it is machine output with no header row and no number. `<pre>`.
+
+### A PAGE POINTER INSIDE A CAPTION IS STILL DROPPED
+
+r170's rule drops a standalone "… auf Seite N" pointer, and r130 already says
+r170 wins where both touch a caption. It holds here too: "Die Erklärung finden
+Sie auf Seite 34." inside a `Tabelle N.` caption is a typesetting pointer to a
+page the reader does not have, so the sentence goes and the rest of the caption
+stays verbatim.
+
 ## `<code>` ALONE DOES NOT RENDER MONOSPACE — it needs `class="mono"`
 
 `issues/style.css` does not merely leave `<code>` alone — it **sets
@@ -176,7 +225,11 @@ magick <tmp>/masters600/NNN.png -crop <WxH+X+Y> +repage \
   -colorspace Gray -blur 0x1.5 -threshold 57% png:- \
   | tesseract - - -l deu --psm 6
 #    The blur fills the screen dots, the threshold then separates type from
-#    tint; 55-60% is the usable band. On 8612 all six uncaptioned tables came
+#    tint; 55-60% is the usable band -- EXCEPT WHEN IT IS NOT.  On SH8604's
+#    p60 the 55-60% band dropped a whole column and 50% recovered it, so the
+#    band is a starting point to sweep, not a setting: try 50, 55, 57, 60 and
+#    compare what each returns before concluding a column is not there.
+#    On 8612 all six uncaptioned tables came
 #    from the visual walk and NONE from a sweep -- the same as 8611.
 ```
 
@@ -308,6 +361,12 @@ SCOPE* applies.
 
 ## An element you cannot place does NOT go at the end
 
+**A printed table the prose never references is exactly this case**, not an
+exception to it: with no mention to anchor it, there is no "first mention" to
+insert after, and SH8604's KI Tabelle 3 went to the article tail, away from
+Tabellen 2 and 4 which sit beside it on the page. A numbered series member
+goes between its neighbours.
+
 Owner, 2026-10-06. A table, figure or listing whose print position cannot be
 determined is placed **where it fits best** — for a numbered series, between
 its neighbours — never appended to the bottom of the article, which reads as
@@ -381,7 +440,21 @@ for f in sorted(os.listdir(d)):
     # on SH8603, which is a gate that can never reach zero.  A Bild is r150's,
     # and r150's own mapping check is what covers it.  OCR damage still puts
     # ']', 'l' or 'I' where the digit was ("Tabelle ]"), found on 8612.
-    refs = {m.group(1) for m in re.finditer(r'\bTabelle ([\d\]lI]+)\b', s)}
+    # TWO THINGS \b GOT WRONG, both on SH8604's Kuenstliche Intelligenz.
+    # (a) A COMPOUND IS NOT A REFERENCE.  `\bTabelle` matches the tail of
+    #     "Schluesselwort-Tabelle", and the sentence continues "... Tabelle
+    #     I AM und I'M aufgefuehrt werden" -- so the check demanded a placed
+    #     "Tabelle I".  Hence the lookbehind: no word character and no hyphen
+    #     before it.
+    # (b) A DAMAGE TOKEN IS A LOOK, NOT A REFERENCE.  ']', 'l' and 'I' stand
+    #     in for a digit the OCR lost, but they are also words, so they
+    #     cannot be demanded of a placed table.  Report them to be read off
+    #     the crop instead.
+    refs = {m.group(1) for m in
+            re.finditer(r'(?<![\w-])Tabelle (\d+)\b', s)}
+    for m in re.finditer(r'(?<![\w-])Tabelle ([\]lI]+)\b', s):
+        items.append('%s: "Tabelle %s" -- digit lost to OCR? read the crop'
+                     % (f, m.group(1)))
     placed = set(re.findall(r'<figcaption>(?:Tabelle|Bild) ([\d\]lI]+)', s)) | \
              set(re.findall(r'-t(\d+)\.png', s))
     for n in sorted(refs - placed):

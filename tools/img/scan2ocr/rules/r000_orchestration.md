@@ -771,11 +771,18 @@ procedural detail.
 When the completion notification arrives:
 
 1. Read the sub-agent's summary message.
-2. Run the rule's `## Verification` block in the main session.
-3. Read a few sample touched files (3–5 is usually enough).
-4. Diff `git status --short` against the expected set of changes:
+2. **`ls` every file the summary says it wrote.** A report that names an
+   output is a claim, not evidence. On SH8604 a 160 sub-agent reported
+   recording two `reviewed/` baselines with `R.record` — naming both paths,
+   and quoting a re-run that said "all previously reviewed" — and neither
+   file existed anywhere, in the repo or under `<tmp>`. Nothing downstream
+   notices: a missing baseline reads as an empty one, which is exactly what a
+   first run looks like. Check the path, and check the mtime.
+3. Run the rule's `## Verification` block in the main session.
+4. Read a few sample touched files (3–5 is usually enough).
+5. Diff `git status --short` against the expected set of changes:
    files that should have been touched, and only those.
-5. Report to the user with: sub-agent summary + verification result
+6. Report to the user with: sub-agent summary + verification result
    + suggested next action (commit / re-dispatch / decision needed).
 
 ## Commit & staging discipline (MANDATORY)
