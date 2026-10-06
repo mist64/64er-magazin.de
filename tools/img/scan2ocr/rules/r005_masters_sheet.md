@@ -337,8 +337,8 @@ scan_dir/NNN.png
   -> drop bed components that touch the frame AND lie mostly outside the page
   -> the traced page must match one of PAGE_CLASSES          [the size gate]
   -> separate to CMYK with tools/img/cmyk_reconstruction     [not reimplemented]
-  -> two renders off that ONE separation: masters600 carries the black-point
-     curve (there is no separate uncurved render -- see below)
+  -> ONE render off that ONE separation, UNCURVED (the curve was removed; see
+     below -- there is no second render and nothing to compare against)
   -> masters600/NNN.png + NNN.stamp.txt, sheets600/NNN.png,
      cmyk2400/NNN.tif + NNN.colors.txt, debug600/NNN.png
 ```
@@ -639,12 +639,8 @@ The two consumers want different images, so both come off **one** separation:
 
 | render | for | wants |
 |---|---|---|
-| `masters600/NNN.png` | `r010` OCR | contrast: type to solid black. The ICC render **with the black-point curve on it**. Clipping is a feature |
+| `masters600/NNN.png` | `r010` OCR, `r145` figure cuts | the straight ICC render, **uncurved**. It was to carry a black-point curve for the OCR's sake; `undo_gcr()` fixes the problem the curve existed for, at the source, so there is nothing left for it to do — and one render serves both readers |
 | ~~`figures600/NNN.png`~~ | — | **DOES NOT EXIST.** The code writes no `figures600` and has no `OUT_FIGURE`; this row described a second, UNCURVED render that was to feed the figure cuts. **It is void because THE CURVE ITSELF WAS REMOVED** (`r005_masters_sheet.py`: "there is no OCR contrast curve, and that is deliberate"; every stamp reads "ONE master, uncurved"). So there is one render and nothing to compare it against. MEASURED on SH8603: `sheets600` and `masters600` give the same glyph p50 (21/24/19/20 on 050/100/120/150) — because NEITHER is curved, not because both are. Reported on SH8602, reported again on SH8603, harvested 2026-10-05, corrected 2026-10-05 after SH8604 caught the inverted reading. |
-
-**Verification 6 therefore measures nothing and should be read as retired**, not
-as a passing check: it compared the curved master against the uncurved figure
-render, and neither term exists.
 
 **And checks 4 and 6 read `masters600`, not `sheets600`.** `sheets600` is the
 UNCROPPED sheet and is offset from the master by the stamp's `sheet-box`
@@ -652,48 +648,29 @@ UNCROPPED sheet and is offset from the master by the stamp's `sheet-box`
 slicing `[:ph, :pw]` off it reads the wrong region. The master is the canvas
 every band in these checks is expressed in.
 
-Ink at ~66 is not a bug, it is honesty: 100% SWOP black is not RGB 0. The OCR
-master boosts it anyway — tesseract binarises, so the boost costs nothing there
-— which is exactly why there are two renders and not one.
+Ink at ~66 is not a bug, it is honesty: 100 % SWOP black is not RGB 0, and
+tesseract binarises, so it does not need to be.
 
-**The curve is one issue-wide constant, never per page.** ImageMagick's
-`-level 30%,100%`, and exactly that arithmetic:
+### THERE IS NO BLACK-POINT CURVE — the sections that described one are gone
 
-```
-out = clamp((in - 0.30 * 255) / (0.70 * 255) * 255)
-```
+This rule used to carry three of them: *The curve is one issue-wide constant*
+with its `-level 30%,100%` arithmetic, the 30 %-chosen-on-the-worst-page table,
+and *And the figure render must not have it*. **All three described code that
+no longer exists** (`r005_masters_sheet.py`, *there is no OCR contrast curve,
+and that is deliberate*): the curve was there to fix contrast that GCR had
+flattened, `undo_gcr()` now fixes that at the source, and a curve on the OCR
+master would be a curve on the only master `r145` has to cut figures from.
+Every stamp reads `render ONE master, uncurved`.
 
-The prototype measured a black point per page — the 2nd percentile of that
-page's own ink — and stretched to it. That makes the same grey mean a different
-thing on every page: a page whose darkest pixel is a photograph gets a different
-transfer from the text page beside it, and nothing downstream can see that it
-happened.
+They are deleted rather than left with a note, because a rule that describes a
+transfer function nobody applies invites the next build to look for it — and
+because this is the third issue to report them (SH8602, SH8603, SH8604). The
+numbers are in the commit history if a curve is ever wanted again.
 
-**30 % was chosen on the worst page, measured on all four.** "glyph p50" is the
-median level of the pixels a glyph is made of in a body-text window — 0 is solid
-black — and "paper p50" is the median of the paper beside it:
-
-| level | none | 20 % | 25 % | 30 % | 35 % |
-|---|---|---|---|---|---|
-| glyph p50, 006 | 69 | 28 | 14 | **1** | 0 |
-| glyph p50, 041 | 54 | 8 | 1 | **0** | 0 |
-| glyph p50, 056 | 53 | 5 | 0 | **0** | 0 |
-| glyph p50, 092 | 72 | 32 | 18 | **4** | 0 |
-| paper p50 | 255/255/254/254 | — | — | unchanged | 041's paper starts to drop |
-
-30 % is where the worst page's type goes solid black while the paper floor is
-still untouched. 35 % buys nothing — the type is already there — and starts
-eating paper, which is the one thing a black-point curve must never do.
-
-**And the figure render must not have it.** A black-point curve crushes a
-photograph: measured on p006's cover photo, this level drives the pure-black
-area of the picture from **25 % to 42 %**. Type wants the crush; pictures do
-not. (`r145` was to cut its pictures from `figures600`, which is why that render stays
-straight.
-
-(The implementation is four lines of numpy rather than a `magick` call, so the
-curve costs no extra pass over a 110 megapixel image. It agrees with
-`magick -level 30%,100%` to within one level — verified against it.)
+**Verification 6 goes with them.** It compared the curved master against the
+uncurved figure render; neither term exists, so it measured nothing and read
+as a passing check. If a contrast check is wanted, it is "glyph p50 on
+`masters600`", one render, no comparison.
 
 ### THE LEVELS ARE NOT TRUSTED, THEY ARE PROVEN
 
@@ -770,7 +747,7 @@ profile      (none -- the built-in anchors, identity levels)
 | `sheets600/NNN.png` | PNG `Comment` |
 | `cmyk2400/NNN.tif` | TIFF `ImageDescription` |
 | `cmyk2400/NNN.colors.txt` | the profile file the separator was **actually run with**, kept rather than deleted with the scratch directory |
-| the run's log | the whole block once at the top, and `grade <sha> level 30%` on every page line |
+| the run's log | the whole block once at the top, and `grade <sha>` on every page line (it used to read `grade <sha> level 30%`, from the curve that is gone) |
 
 Three copies because each survives a different accident: the chunk survives the
 file being copied out of `masters600/`, the sidecar survives not wanting to
@@ -831,21 +808,56 @@ p117's paper mask sees only the cream panel inside a full-bleed dark ground, so
 its jitter measurement means nothing. It fails the **size** gate two steps
 later, which is the check that can say what is actually wrong with it.
 
-**THESE NUMBERS ARE FROM 2400 dpi FRAMES AND DO NOT TRANSFER TO 600 dpi ONES.**
-The whole measurement rests on a torn edge jittering from row to row — and at
-600 dpi the frame can cut THROUGH the torn fringe at x = 0, so the torn side
-shows no jitter at all and the clean guillotined edge against the bed wins the
-comparison. MEASURED on SH8604 (160 of 168 pages at 600 dpi): the gate fired on
-**93 pages** — 75 odd pages reading "right", 18 even reading "left", ratios
-2.6-8.5 — and not one was misfiled. Sizes and overlays were normal throughout;
-p041 shows the frame cutting the fringe.
+### SH8604 READS THE OPPOSITE SIDE FROM SH8601 — AN OPEN QUESTION, NOT A BUG
 
-So on a 600 dpi issue the gate is not evidence. Re-measure the floor against
-this issue's own thumbs before trusting it, or treat a parity disagreement as a
-LOOK AT rather than a failure and let the size gate two steps later decide. A
-gate that fires on 55% of an issue has stopped being read (r000).
+**This paragraph used to blame the 600 dpi frame, and the numbers do not
+support that.** It said the tighter frame cuts through the torn fringe at
+x = 0, so the torn side shows no jitter and the clean edge wins. Two things
+were then tried in `torn_side()` on that theory and **both are reverted**;
+what follows is why, so that nobody re-derives them.
 
-The SH8601 numbers above remain correct for a 2400 dpi issue.
+The gate fired on **93 of SH8604's 160** interior pages — 75 odd reading
+"right", 18 even reading "left", ratios 2.6-8.5 — against **0 of SH8601's
+150**. Frame-to-paper margins, median / p95 in mm:
+
+| issue | pages | left p50 / p95 | right p50 / p95 |
+|---|---|---|---|
+| SH8601 | 150 | 0.34 / 1.02 | 4.23 / 7.45 |
+| SH8602 | 165 | 0.00 / 0.17 | 4.06 / 5.42 |
+| SH8603 | 181 | 0.17 / 0.34 | 5.59 / 7.11 |
+| SH8604 | 165 | 0.17 / 0.64 | 5.25 / 7.25 |
+
+**Every issue is near-flush on the left, SH8601 included** — and SH8601's gate
+agrees with parity on 149 of 150. So the margin is not the variable, and
+suppressing the gate on a flush frame would silence a working check on three
+issues to quieten one.
+
+The jitter is the variable, and it points the other way. Even pages, where
+parity expects *right*:
+
+| issue | left jitter p50 | right jitter p50 | reads | parity |
+|---|---|---|---|---|
+| SH8601 | 0.06 px | 0.29 px | right — torn | agrees |
+| SH8604 | **0.35 px** | 0.20 px | **left** — torn | disagrees |
+
+SH8604's left edge is not a clipped edge with no jitter. It is **six times
+jitterier than SH8601's** and it is the torn one. So SH8604's sheets really do
+present the opposite side, consistently across the issue, and the gate is
+reporting something true.
+
+**What it means is the owner's question:** a real difference in how this issue
+was bound and torn, or the whole issue mirrored or rotated 180° in the scan.
+**Normal traced sizes and correct overlays do not settle it** — that was the
+build's reason for concluding "none is misfiled", and both survive a
+consistent re-orientation. Carry it to PAUSE 1 with these numbers.
+
+Until it is answered: a disagreement is a NOTE, as the code has always done,
+and the size gate two steps later is the check that can say what is wrong with
+an individual page. Do not re-tune `TORN_CONFIDENT_RATIO` to make the count
+go down — the ratios are 2.6-8.5, i.e. the measurement is confident, not
+marginal.
+
+The SH8601 numbers above remain correct for SH8601.
 
 ## The debug overlay
 
@@ -964,27 +976,41 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
           "|", re.search(r"^edge-finder\s+(.*)$", side, re.M).group(1))
 PY
 
-# 6. THE CURVE: the OCR master's type is black and its paper is untouched, and
-#    the FIGURE render did not get the curve.  A body-text window per page, in
-#    mm from the traced page's top-left corner; "glyph" is the INTERIOR of the
-#    strokes, chosen on the uncurved render and then measured in both.
-python3 - <<'PY'
-import numpy as np
+# 6. CONTRAST, on the one render there is.  This check used to compare the
+#    curved OCR master against the uncurved FIGURE render -- and BOTH of its
+#    Image.open() calls already read OUT_MASTER, so it compared a file to
+#    itself and the two columns were identical by construction.  Neither term
+#    exists now (there is no curve and no figures600), so there is nothing to
+#    compare: what is left worth measuring is whether the type is dark enough
+#    and the paper floor untouched, ABSOLUTELY, on masters600.
+#
+#    Pick the windows on THIS issue -- they are mm from the traced page's
+#    top-left corner and they must land on body text.  "glyph" is the INTERIOR
+#    of the strokes (eroded), which is what an OCR threshold sees.
+$PY - <<'PY'
+import numpy as np, sys
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
 from PIL import Image
 from scipy import ndimage as ND
 import r005_masters_sheet as R
 Image.MAX_IMAGE_PIXELS = None
-WINDOWS = {"006": (14, 100, 58, 180), "041": (16, 60, 60, 140),
-           "056": (20, 60, 90, 140), "092": (12, 150, 45, 260)}
+WINDOWS = {"041": (16, 60, 60, 140)}      # <- this issue's body-text windows
 for stem, mm in sorted(WINDOWS.items()):
     box = tuple(int(v * R.MM) for v in mm)
-    fig = np.array(Image.open(R.OUT_MASTER / f"{stem}.png").crop(box).convert("L"), float)
-    ocr = np.array(Image.open(R.OUT_MASTER / f"{stem}.png").crop(box).convert("L"), float)
-    glyph = ND.binary_erosion(fig < 128, np.ones((3, 3)))
-    paper = fig > 200
+    a = np.array(Image.open(R.OUT_MASTER / f"{stem}.png").crop(box)
+                 .convert("L"), float)
+    glyph = ND.binary_erosion(a < 128, np.ones((3, 3)))
+    paper = a > 200
+    if not glyph.any():
+        print(f"p{stem}: NO GLYPHS in {mm} mm -- wrong window"); continue
     print(f"p{stem} window {mm} mm | ink {glyph.mean():5.1%} | "
-          f"glyph p50 {np.median(fig[glyph]):5.1f} -> {np.median(ocr[glyph]):5.1f} | "
-          f"paper p50 {np.median(fig[paper]):5.1f} -> {np.median(ocr[paper]):5.1f}")
+          f"glyph p50 {np.median(a[glyph]):5.1f} | "
+          f"paper p50 {np.median(a[paper]):5.1f}")
+    # The gate: tesseract binarises, so ~66 for 100 % SWOP black is fine;
+    # what must not happen is the PAPER moving off its floor.
+    if np.median(a[paper]) < 250:
+        print(f"  FAIL p{stem}: paper p50 {np.median(a[paper]):.0f} < 250 -- "
+              f"something is eating the paper")
 PY
 ```
 
@@ -1018,10 +1044,17 @@ a printed orange banner. On the ink/bed pages the real prop cannot be there at
 all: it is part of the bed mask that found the sheet in the first place.
 
 **5.** Twelve of twelve masters carry `grade-sha 2b29e17a6be4`, the sha of the
-current `colors.txt` plus `OCRLEVEL 30 100`; the PNG chunk equals the sidecar on
-all twelve.
+`colors.txt` of the day plus `OCRLEVEL 30 100`; the PNG chunk equals the
+sidecar on all twelve. (The `OCRLEVEL` term is gone from the fingerprint with
+the curve, so a master built today has a different sha for the same
+`colors.txt` — which is correct: the fingerprint answers "were these pixels
+made with these numbers".)
 
-**6.** The curve, measured on the published pair:
+**6.** — **HISTORICAL. This row recorded the black-point curve, which no
+longer exists**, and the figures below cannot be reproduced by the check as it
+now stands (nor, as it turns out, by the check as it stood: both of its
+`Image.open()` calls read `OUT_MASTER`, so the two columns were the same file).
+Kept as the record of what the curve did when there was one:
 
 | page | ink in window | glyph p50 figure → master | paper p50 figure → master |
 |---|---|---|---|
@@ -1029,14 +1062,6 @@ all twelve.
 | 041 | 5.1 % | 95 → **26** | 255 → 255 |
 | 056 | 10.3 % | 79 → **3** | 255 → 255 |
 | 092 | 4.0 % | 87 → **15** | 255 → 255 |
-
-Type goes from a mid-grey to near-black and the paper floor does not move at
-all — which is the whole claim of `-level 30%,100%`. (These are higher than the
-figures in the constant's own table because the glyph *set* is defined
-differently: this check takes stroke interiors on the uncurved render and
-measures the same pixels in both, which keeps the two columns comparable at the
-cost of including more of the stroke's shoulder. The conclusion — worst page
-solid, paper untouched — is the same either way, and both are recorded.)
 
 **p117 fails, and nothing was published for it** — see below.
 

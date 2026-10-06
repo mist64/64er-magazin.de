@@ -43,9 +43,10 @@ The pipeline:
       -> fill everything outside the traced page with paper white
       -> drop bed components that touch the frame AND lie mostly outside the page
       -> separate to CMYK with tools/img/cmyk_reconstruction  (see THE GRADE)
-      -> two renders off that ONE separation: the OCR master carries a
-         black-point curve, the figure master is the straight ICC render
-      -> <tmp>/masters600/NNN.png, <tmp>/figures600/NNN.png,
+      -> ONE render off that ONE separation, UNCURVED -- see "there is no OCR
+         contrast curve, and that is deliberate" below.  There is no
+         figures600 and no OUT_FIGURE.
+      -> <tmp>/masters600/NNN.png, <tmp>/sheets600/NNN.png,
          <tmp>/cmyk2400/NNN.tif, <tmp>/debug600/NNN.png, and beside each master
          the STAMP that says which profile produced it
 
@@ -219,6 +220,33 @@ SKEW_RESIDUAL_MAX = 0.10                      # deg
 # its jitter measurement means nothing; it fails the size gate two steps later,
 # which is the check that can actually say what is wrong with it.
 TORN_CONFIDENT_RATIO = 2.5
+# WHY NO "OUT OF FRAME" ESCAPE HATCH: measured, and it would be wrong.
+# SH8604's parity gate fires on 93 of 160 pages, and the build read that as
+# the 600 dpi frame cutting through the torn fringe so the clipped side shows
+# no jitter.  The numbers say otherwise.  Frame-to-paper margins, median/p95
+# in mm over every gradeable interior page:
+#
+#   issue     pages   left p50/p95      right p50/p95
+#   SH8601     150    0.34 / 1.02       4.23 / 7.45
+#   SH8602     165    0.00 / 0.17       4.06 / 5.42
+#   SH8603     181    0.17 / 0.34       5.59 / 7.11
+#   SH8604     165    0.17 / 0.64       5.25 / 7.25
+#
+# Every one of them is near-flush on the left, SH8601 included -- and SH8601's
+# gate agrees with parity on 149 of 150.  So the margin is not the variable.
+# The jitter is, and it points the other way.  EVEN pages (parity: right):
+#
+#   SH8601   left jitter p50 0.06 px   right 0.29 px   -> right torn, agrees
+#   SH8604   left jitter p50 0.35 px   right 0.20 px   -> LEFT torn, disagrees
+#
+# SH8604's left edge is not a clipped edge with no jitter; it is six times
+# jitterier than SH8601's and it is the torn one.  So SH8604's sheets really
+# do present the opposite side from SH8601's, consistently across the issue.
+# That is a question about the SCANS -- a real binding difference, or the
+# whole issue mirrored or rotated 180 deg -- and normal traced sizes and
+# correct overlays do not settle it, because both survive a consistent
+# re-orientation.  The gate is RIGHT to ask, so it keeps asking; see "The
+# parity gate" in the rule.
 
 # --- the paper mask --------------------------------------------------------
 # A pixel is paper if its city-block distance from the profile's paper white is
@@ -901,6 +929,16 @@ def torn_side(mask, mm_px):
 
     A guillotined edge is straight to within a pixel row; a torn edge jitters.
     See TORN_CONFIDENT_RATIO for what was measured over all 152 thumbs.
+
+    SH8604 READS THE OPPOSITE SIDE FROM SH8601, CONSISTENTLY AND LOUDLY, and
+    that is an open question about the SCANS, not a defect in this function --
+    see "The parity gate" in the rule.  Two things were tried here and
+    reverted, so nobody tries them again: suppressing the gate where the frame
+    is flush against the paper (SH8601's margins are just as small and its
+    gate is right), and treating a clipped fringe as unmeasurable (SH8604's
+    left jitter is 0.35 px against SH8601's 0.06 -- it is not clipped, it is
+    torn).  The gate asks the question; it is not this function's job to
+    answer it.
     """
     rows, starts, ends, _, _, _ = boundaries(mask)
 
@@ -1566,7 +1604,24 @@ def ask_text(unanswered):
         L += [""]
 
     # --- how to answer -----------------------------------------------------
+    # THE PRE-FILL CAN CONTAIN A FALSE POSITIVE, NOT ONLY MISS PAGES.  A low
+    # paper fraction says the mask cannot see the stock; it does not say the
+    # stock is white, and a FULL-BLEED TINT blinds the mask just as well.
+    #
+    # A GATE ON THE OWN WHITE WAS TRIED AND IS NOT SHIPPED, because on this
+    # corpus it cannot separate the two cases.  Measured on SH8604, against an
+    # interior own-white p50 of 208 179 166: the cover p001 is genuinely card
+    # and sits 40 away, while the tinted interior p060 sits 30 away.  They are
+    # adjacent, so any threshold either keeps the tint or throws out the
+    # cover -- and PAPER_DIST (110) throws out the cover.  The card pages the
+    # mask DOES see (164-168) are 85-91 away, which is the separation this
+    # measurement really has, and those pages are not on this list anyway.
+    #
+    # So the distance is PRINTED beside each hit and the operator decides.
     high = [p for p, f, _ in rows if f < FULLBLEED_PAPER_FRAC] if rows else []
+    rest_r = [r for r in rows if r[1] >= FULLBLEED_PAPER_FRAC] if rows else []
+    own_med = (np.median(np.array([c for _, _, c in rest_r]), axis=0)
+               if rest_r else None)
     L += ["-" * 78,
           f"TO ANSWER: put this in issues/{ISSUE}/issue.json and run this step",
           "again.  The page numbers are the PRINTED ones, 1-based, cover as 1.",
@@ -1579,10 +1634,26 @@ def ask_text(unanswered):
           "    \"high_pages\": [%s] }" % ", ".join(str(p) for p in high),
           "",
           "  (high_pages is pre-filled above with the pages the edge-finder",
-          "   evidence points at -- CHECK IT AGAINST THE COPY.  It is your",
-          "   answer that gets recorded, not this step's guess: a bound-in card",
-          "   the mask happens to see would not appear in that list.)",
-          "-" * 78, ""]
+          "   evidence points at -- CHECK EVERY ONE AGAINST THE COPY.  It is",
+          "   your answer that gets recorded, not this step's guess: a bound-in",
+          "   card the mask happens to see would not appear in that list, AND a",
+          "   full-bleed TINT on an interior page puts one there that does not",
+          "   belong.  The list is a place to look, in both directions.)"]
+    if high and own_med is not None:
+        L += ["",
+              f"  Each pre-filled page's own white against the interior p50 "
+              f"({own_med[0]:.0f} {own_med[1]:.0f} {own_med[2]:.0f}).",
+              "  A SMALL distance means the page is printed on the interior's",
+              "  own stock and something else blinded the mask -- but the",
+              "  numbers do not separate the cases by themselves (see the",
+              "  comment in ask_text): read the copy."]
+        by_page = {p: (f, c) for p, f, c in rows}
+        L += [f"     p{pg:03d}  frac {by_page[pg][0]:.3f}   own white "
+              f"{by_page[pg][1][0]:3.0f} {by_page[pg][1][1]:3.0f} "
+              f"{by_page[pg][1][2]:3.0f}   city-block "
+              f"{abs(by_page[pg][1] - own_med).sum():3.0f}"
+              for pg in high]
+    L += ["-" * 78, ""]
     return "\n".join(L)
 
 
