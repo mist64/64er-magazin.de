@@ -869,7 +869,10 @@ PY
 ```
 
 MEASURED on SH8604: p040 foots `40` left / `64'er` right, p041 foots `64'er`
-left / `41` right. **The folio is at the outer edge on both, so the scans are
+left / `41` right. Swept over the whole issue by OCR'ing the four outer
+corners and keeping only pages where exactly one corner reads the page's own
+number — **odd: 57 right, 0 left; even: 64 left, 1 right**, 28 of 150 not
+readable. **121 of 122 put the folio at the outer edge, so the scans are
 correctly oriented and nothing is misfiled or rotated.** Which means the gate's
 own sentence is the thing that is wrong here: what it measures is which
 physical edge is rougher, and that is a property of how THIS issue's sheets
