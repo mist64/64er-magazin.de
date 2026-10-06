@@ -38,6 +38,16 @@ entirely (don't leave empty `content=""`, don't leave `XXX`) for:
 - Other contest announcements (»Wettbewerb: Bewegte Grafik«, etc.)
 - **»Wie schicke ich meine Programme ein?«** (submission rules)
 - House ads / Sonderheft promos with no body byline (Eigenanzeigen)
+- **… and any NORMAL ARTICLE whose page carries no byline at all.** This
+  list is rubrics, which made an unsigned normal article look like Case D
+  ("a real name or remove") and invited a guess. A course's chapters are the
+  usual shape: SH8604's Künstliche Intelligenz and Super-Grafik are unsigned
+  instalments of a series whose other parts are signed. **Read the article's
+  last page first** — a missing byline is more often a lost line (see *A
+  missing byline means LOOK AT THE PAGE*) — and only then remove the meta.
+  Precedent: SH8505/3, SH8506/3, SH8507/6. Check 3 flags these every run,
+  because they are not on the rubric list; that is the check working, and the
+  answer goes in `reviewed/`, not into an invented author.
 
 **Case C — editorial gets the chief editor.** The editorial column
 is *unsigned-feeling* (no `(initials)` byline at the end), but the
@@ -131,7 +141,15 @@ The sub-agent must:
    formula connectives like `(und)`, `(oder)`), convert to
    `<address class="author">(…)</address>` and update the meta if
    needed.
-5. Beautify touched files.
+5. Beautify touched files — **`-z`, because the filenames are not ASCII**:
+   ```bash
+   git diff --name-only -z -- 'issues/<ID>/*.html' \
+     | xargs -0 npx js-beautify --type html -r
+   ```
+   Without `-z`, git QUOTES any name containing `–` or `ü` (as
+   `"issues/\342\200\246"`), and js-beautify is handed a path with literal
+   quotes in it and refuses the file. Most of this issue's filenames have
+   one.
 6. **Do not commit.** Return per-file action table: file → action
    (FILLED with content="…", REMOVED, NO CHANGE), plus any
    deviations from the planned action (e.g. "planned FILL but
@@ -162,14 +180,33 @@ Impressum defines every staff initial as `xx = Name`. Compare the two sets
 d=issues/<YYMM>
 imp=$(ls "$d"/*Impressum*.html | head -1)
 grep -oE '\b[a-z]{2} = [A-ZÄÖÜ]' "$imp" | cut -d' ' -f1 | sort -u > /tmp/imp
-grep -ho '<address class="author">([a-z]*)</address>' "$d"/*.html \
-  | sed 's/.*(\(.*\)).*/\1/' | sort -u > /tmp/byl
+# ([a-z]*) ONLY captures an initials-only byline.  On a Sonderheft almost
+# every byline is "Name/xx", so this read an empty set and both comm lines
+# were meaningless -- measured on SH8604.  Take the LAST slash-separated
+# token of any byline and keep it only when it is a two-letter code.
+grep -ho '<address class="author">(\([^)]*\))</address>' "$d"/*.html \
+  | sed 's/.*(\(.*\)).*/\1/' | awk -F/ '{print $NF}' \
+  | grep -xE '[a-z]{2}' | sort -u > /tmp/byl
 echo "SILENT:    $(comm -23 /tmp/imp /tmp/byl)"   # in Impressum, no byline
 echo "UNDEFINED: $(comm -13 /tmp/imp /tmp/byl)"   # byline, not in Impressum
 ```
 
 Anchor on `<address class="author">`, not on `(xx)` anywhere in the text:
 body prose contains parenthesised lowercase words and they flood the set.
+
+**THIS CHECK IS MONTHLY-ONLY, and on a Sonderheft it lies.** A Sonderheft's
+Impressum does not define the initials, so `imp` comes back EMPTY and every
+byline code lands in UNDEFINED — which reads as a page full of guest authors.
+MEASURED over the corpus: all 33 monthlies carry the `xx = Name` key, and
+**0 of 12 Sonderhefte do**. SH8604's four codes (`bs`, `cg`, `dm`, `gk`) are
+all staff and all came out UNDEFINED. So:
+
+```bash
+[ -s /tmp/imp ] || { echo "no initials key in $imp -- check cannot run"; }
+```
+
+On a Sonderheft, check the codes against the **previous monthly's** Impressum
+instead, and say in the report which issue's key was used.
 
 This is a triage list, not a gate. Read it like this:
 

@@ -40,6 +40,22 @@ numbers IS the program. So it does not stay as page text — it goes into
 | A **monitor dump** (TEDMON, VC-20 monitor, C64 monitor) | assemble the bytes at their printed addresses, write `prg/<name>.prg` | `<pre>` carrying the dump **as printed** — not `data-mse`, which would render MSE's row format and addresses the magazine never set |
 | A dump in the **program's own format with a row sum** | same, and verify every row sum | as printed |
 
+**`-l <addr>` IS THE ADDRESS THE ARTICLE'S OWN POKES SET, not `$0801`.** The
+table says `-l <addr>` and left the address to be assumed, and `0801` is what
+gets assumed. A program that relocates BASIC says so in its own text: SH8604's
+*"POKE 43,1: POKE 44,32: POKE 8192,0: NEW"* puts the start of BASIC at
+`$2001`, so the file tokenises with `-l 2001` and tokenising it at `0801`
+produces a file that loads and runs wrongly while every printed checksum
+still matches — the sums cover the line bytes, not the link addresses. Read
+the POKEs before choosing, and put the address in the report.
+
+**THE DISK BINARY MAY CARRY BYTES PAST THE LOADER'S END POINTER.** "Where the
+listing's DATA is a known binary, the bytes equal it" (below) has to say WHICH
+bytes: compare only up to the end address the loader itself declares. A disk
+file is a whole number of blocks and often holds trailing bytes after that
+point — they are not part of the program and their absence from the print is
+not a divergence.
+
 **Two more things prove a transcription, and the table used to list only MSE
 and Checksummer.** The rule's *prove it* assumes a printed checksum, so a
 format without one looked unprovable:
@@ -105,6 +121,25 @@ decisions, both seen on SH8604:
 
 Padding adds bytes to the PRINT. Anything else is a real divergence and goes
 to the owner.
+
+### THIS PRINT IS A PROGRAM ANOTHER ISSUE ALREADY PROVED — how to use that
+
+A reprinted program (Checksummer, MSE, a course's framework) has a transcription
+that has already been proven somewhere in `issues/`. **Do not re-transcribe it,
+and do not copy it either.** The method:
+
+1. Tokenise the PRECEDENT: `petcat -w2 -l <addr>` on the earlier issue's
+   `prg/<name>.txt`.
+2. Check **every printed sum on THIS page** against that file. If they all
+   match, this print is that program.
+3. **Compare the spacing by eye.** The sums are computed over the tokenised
+   bytes and a BASIC line's internal spaces are not all tokenised, so two
+   files can agree on every checksum and still differ in layout. The printed
+   listing is the authority for what the reader sees.
+
+What this buys is a proof, not a shortcut: a single differing sum means this
+is a *different* print of the program, and the difference goes to the owner
+under r300.
 
 **Prove it before you write it**, and say so in the report: the recomputed sums
 equal every printed one, and where the listing's DATA is a known binary, the
@@ -513,3 +548,10 @@ Keep the instruction ("bitte mit dem MSE eingeben"), drop the page pointer
 Same for standalone continuation pointers in the body — `Listing und
 Beschreibung ab Seite 54`, `Fortsetzung auf Seite …` — these are layout
 navigation and are omitted entirely.
+
+**A continuation caption can carry real content, and then only the pointer
+goes.** A listing running over two pages is captioned twice, and the second
+one — "… (Schluß)" — sometimes adds an instruction sentence that appears
+nowhere else. Drop `(Schluß)` and the page pointer, keep the sentence, and
+fold it into the ONE `<figcaption>` the one listing gets (r130, *a caption
+repeated on every page*).
