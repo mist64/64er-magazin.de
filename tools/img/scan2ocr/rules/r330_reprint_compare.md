@@ -302,16 +302,26 @@ not a problem to explain away.
 
 ## Step 5 — disposition every difference
 
-Every `D-NNN` gets exactly one disposition. The vocabulary is closed — four
+Every `D-NNN` gets exactly one disposition. The vocabulary is closed — six
 values, so the whole issue's outcome is greppable and so nobody invents a
-fifth that means "I did not look":
+seventh that means "I did not look":
 
 | disposition | means | what happens |
 |---|---|---|
 | `PRINT` | both sides faithfully transcribe what their own page prints; the printed pages differ | **nothing.** Closed. This is the common case. |
 | `OURS` | this issue's transcription misread its own printed page | fixed **here**, in `issues/<ID>/`, word-level only |
 | `THEIRS` | the monthly's published transcription misread **its** printed page | **reported, not fixed** — see step 6 |
+| `MOVED` | both sides carry the SAME WORDS, in a different place on the page — the aligner cannot pair them, so the prose between them comes out unpaired on both sides as `BLOCK ONLY IN` | **nothing.** Closed, like `PRINT` |
+| `MARKUP` | the words are the same and only the tagging differs — one side wraps a run in `<code>`, the other does not | **nothing.** Closed |
 | `UNRESOLVED` | the scan could not settle it (page not in the corpus, region illegible, original issue not imported) | stays open in `LOG.md` as a known gap |
+
+**Why the two new values exist.** The four above all assert something about a
+TRANSCRIPTION, and neither of these is one. SH8604's 93 produced 14
+differences of which **8** were a single table placed at a different point in
+the two articles: the words are identical, so `PRINT` is false (the pages do
+not differ), `OURS` and `THEIRS` are false (nobody misread anything), and
+`UNRESOLVED` is false (the scan settled it completely). Forcing one of the
+four on such a block is how a disposition stops meaning anything.
 
 **Each disposition must cite the evidence that produced it**, and the evidence
 is always a printed page:
@@ -326,6 +336,18 @@ is always a printed page:
 A `PRINT` disposition needs evidence from **both** sides — that is precisely the
 claim it makes. `OURS` needs our page. `THEIRS` needs theirs. A disposition with
 no page behind it is `UNRESOLVED`, whatever it looks like.
+
+**WHICH ORIGINAL TO CREDIT WHEN A HOUSE TEXT RAN MANY TIMES.** The
+Checksummer and MSE articles are reprinted every few issues — 8603/55,
+SH8602/6, SH8507/6, SH8603/76 are all the same text — and step 7's credit
+line needs one of them. **Credit the MONTHLY original**, i.e. the earliest
+monthly appearance, which is what SH8602 does; a Sonderheft reprint is not
+the source of a later Sonderheft reprint. Record the chain in `LOG.md` so the
+choice is visible.
+
+And note for the dispatch brief: **step 7's credit line is part of this rule**,
+not an extra. A brief that says "apply only the OURS fixes" has silently
+dropped it; SH8603 is the precedent for including it.
 
 Never reason from the other transcription ("8506 says `Rasterbildschirm`, so
 ours is wrong"). That is the same shape as the `internsiv` regression: a related
@@ -868,9 +890,22 @@ git status --short -uno issues/ | grep -v "^.\{2\} \"\?issues/$ID/" && {
   echo "  a published issue was edited by this rule -- must be reported, not slipped in"; fail=1; }
 
 # 3. Every THEIRS line carries its disposition word.
-grep -n '^- D-[0-9]\{3,\} THEIRS' "issues/$ID/LOG.md" \
-  | grep -v -E 'REPORTED|APPLIED|declined' && {
-  echo "  THEIRS finding with no REPORTED/APPLIED/declined state"; fail=1; }
+#    READ THE WHOLE ENTRY, NOT THE ONE LINE.  This grepped the `- D-NNN
+#    THEIRS` line alone, and this rule's OWN LOG examples wrap the state onto
+#    the following line -- so a correctly recorded finding failed the check.
+#    An entry runs to the next `- D-` or to a blank line.
+$PY - "issues/$ID/LOG.md" <<'PY' || fail=1
+import re, sys
+s = open(sys.argv[1], encoding='utf-8').read()
+bad = 0
+for m in re.finditer(r'^- D-\d{3,} THEIRS\b.*?(?=^- D-|\n\n|\Z)',
+                     s, re.M | re.S):
+    if not re.search(r'REPORTED|APPLIED|declined', m.group(0)):
+        print('  THEIRS finding with no REPORTED/APPLIED/declined state:')
+        print('   ', m.group(0).splitlines()[0][:90])
+        bad = 1
+sys.exit(bad)
+PY
 
 # 4. Every UNRESOLVED is a known gap the end-of-issue sweep will see.
 grep -c '^- D-[0-9]\{3,\} UNRESOLVED' "issues/$ID/LOG.md"

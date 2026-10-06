@@ -98,9 +98,15 @@ listing had **21 printed lines missing** and every other gate was green.
 
 Two things that can only be checked mechanically:
 
-- **Monospace spacing, by glyph column.** `TAB(15) "B"` against `TAB(15)  "B"`
-  is invisible in prose reading and obvious when the columns are lined up
-  against the crop. Compare column positions, not words.
+- **Monospace spacing, by glyph column — and the method is MEASURED, not
+  estimated.** `TAB(15) "B"` against `TAB(15)  "B"` is invisible in prose
+  reading and obvious when the columns are lined up against the crop. "Compare
+  column positions" left the how open, and eye estimates were wrong more than
+  once on SH8604. Get the **glyph pitch** instead: either the x-step between
+  consecutive tesseract character boxes on the line, or the spacing of ink
+  segments in a column-sum profile of the crop. MEASURED on SH8604's
+  typewriter face: **~41.6 px at 600 dpi**. With the pitch in hand, a column
+  index is `round((x - x0) / pitch)` and a missing space is arithmetic.
 - **A run of repeated characters must be COUNTED.** Two agents disagreed 20
   against 21 on a run of colons in one BASIC line. Count them in the crop
   programmatically; do not eyeball a run of more than about four.
@@ -200,6 +206,27 @@ see r300.
 **You do not add one.** Reading is how candidates are found; adding one is the
 issue owner's call, case by case. Record the passage, what appears wrong, and
 the crop — then move on. A list of candidates is a report, never a worklist.
+
+**FIRST, RE-READ THE GLYPHS THE CLAIM RESTS ON. RUNNING IT PROVES NOTHING
+ABOUT THE PRINT.** SH8604's p71 `51103 IF 01<>0 AND 02<>0 …` was reported as
+printed with digit zeros, and "confirmed" by running the line as transcribed in
+x64sc, where it misbehaves — which is exactly what you would expect, because
+the transcription was wrong. The print is `O1`/`O2` and correct: on the crop
+at 2-3× the letter measures 113-115 px against 106-107 px for the digits on
+the same line, and is visibly rounder. The signal was there all along — the
+raw OCR read `01<>0O`, a digit AND a letter at one position.
+
+So, before a candidate goes on the list:
+
+- **Re-read every glyph the claim depends on, at ≥ 3× on the crop**, and
+  **measure** the ambiguous ones — `O` vs `0`, `1` vs `l` vs `I`, `S` vs `$`,
+  `8` vs `B` — against known instances of both on the SAME LINE, where the
+  face and the exposure are the same.
+- **A candidate whose only evidence is our own transcription is a candidate
+  OCR ERROR first.** Running the transcribed text shows that THAT TEXT fails;
+  it says nothing about what the page prints. Where the two readings behave
+  differently, the one that behaves as the article DESCRIBES is the likelier
+  print.
 
 Two things make that report decidable, and both are the reporter's job:
 

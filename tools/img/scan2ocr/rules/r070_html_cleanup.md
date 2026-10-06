@@ -41,6 +41,19 @@ transcript — and PETSCII has no curly quote to print. `PRINT "…"` can only
 contain characters the machine has. The question is worth asking and the
 answer is closed, so this pass needs no exception.
 
+### ANY STEP THAT ADDS TEXT AFTER 070 RUNS 070'S PASSES ON WHAT IT ADDS
+
+070 is a one-time sweep, and the chain does not stop adding text at 070.
+Steps 160 and 190 typeset tables and boxes from **fresh OCR**, i.e. text this
+step has never seen. MEASURED on SH8604: 160 typeset 81's Texte-Datei `<pre>`
+after 070 had run, and **four curly `”` survived into PETSCII text** —
+exactly the defect the paragraph above explains cannot be real.
+
+So: **160, 190, 170 and any other step that introduces text apply 070's quote
+fold and dash pass to their own additions**, not to the file. It is the same
+two substitutions, on a few lines, and it is cheaper than a sweep that has to
+re-decide every quote in the issue.
+
 ### Where the straightening then goes wrong: the magazine's own name
 
 `64'er` and `128'er` take an **apostrophe**. OCR reads it as a double quote

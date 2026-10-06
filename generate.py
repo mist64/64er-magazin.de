@@ -2568,11 +2568,24 @@ if __name__ == '__main__':
         class Handler(http.server.SimpleHTTPRequestHandler):
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, directory=OUT_DIRECTORY, **kwargs)
-        with socketserver.TCPServer(("", PORT), Handler) as httpd:
-            url = f"http://localhost:{PORT}/{BASE_DIR}"
-            print(url)
-            subprocess.run(f"open {url}", check=True, text=True, shell=True)
-            httpd.serve_forever()
+        try:
+            httpd = socketserver.TCPServer(("", PORT), Handler)
+        except OSError as e:
+            # A BUSY PORT IS NOT A FAILED BUILD.  The site is already written
+            # by the time we get here, and an unhandled bind error ended the
+            # run with a traceback and a non-zero exit -- so every rebuild
+            # read as a failure and completion had to be proved by counting
+            # regenerated files.  Something else holding :8000 is the usual
+            # case (a server from an earlier session, or a sibling build).
+            print(f"port {PORT} busy ({e.strerror}) -- build complete, "
+                  f"not serving")
+        else:
+            with httpd:
+                url = f"http://localhost:{PORT}/{BASE_DIR}"
+                print(url)
+                subprocess.run(f"open {url}", check=True, text=True,
+                               shell=True)
+                httpd.serve_forever()
     else:
       port = 8000
       url = f"http://localhost:{port}/{CONFIG.base_dir}"

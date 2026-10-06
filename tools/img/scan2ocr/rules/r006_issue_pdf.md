@@ -601,6 +601,24 @@ bytes have to come from the bilevel pages instead. 8610 measured **118 of its
 200 pages colour-free**, 57.3 MB of the 99.1 MB JPEG payload -- which is the
 prize the mixed build collects.
 
+### COPY THE FINISHED PDF OUT OF `<tmp>` THE MOMENT IT IS BUILT
+
+`<tmp>` is durable for INPUTS. It is not a safe home for a deliverable waiting
+for review. On SH8604 **both** built PDFs disappeared from `<tmp>` within 27
+minutes of being built — logs intact, cause never found — and rebuilding them
+pixel-identically was possible only because the caches and one earlier render
+happened to still exist.
+
+So, as the last action of the build:
+
+```bash
+cp "<tmp>/$(basename "$PDF")" "issues/$ISSUE/"
+shasum -a 256 "issues/$ISSUE/$(basename "$PDF")" >> "issues/$ISSUE/LOG.md"
+```
+
+Uncommitted is fine — the point is a second copy outside `<tmp>` and a hash
+the next reader can check a replacement against.
+
 ### The whole procedure, in order
 
 Written out because SH8601 was rebuilt SIX times before it was right, and every

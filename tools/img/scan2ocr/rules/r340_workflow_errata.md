@@ -13,6 +13,24 @@ landed, and the commits carry the detail.
 Owner, 2026-10-04: "we also collect. we apply the errata at the END" and "when
 applied, delete all errata md files".
 
+### A HARVEST THAT CHANGES A CLAIM GREPS FOR THE OLD ONE
+
+Rules cross-reference each other, and a rule's claim is usually repeated in a
+code comment somewhere. Changing it in one place leaves the chain
+self-contradictory, which is worse than the original defect because the next
+build gets two answers. **After each harvest edit, grep the whole rule set
+AND the code comments for the statement you just replaced.**
+
+MEASURED: checking SH8604's entries against HEAD at finalisation turned up
+four such leftovers from harvests that had landed elsewhere — r000's hand-over
+table still called the cover crop a reduction of `masters600/001.png` after
+4408be0e made it `<A4>`; `r005_masters_sheet.py:195` still called a confident
+parity disagreement "a failure" after the rule had changed it to NOTED;
+r005's rule pre-filled `high_pages` from the union of witnesses while the code
+used the edge finder alone; and r005's Verification 4 comment still said it
+reads `sheets600` after the check had moved to `masters600`. All four were
+found by reading, not by a check — the grep is the check..
+
 **Applies to:** all — every issue is run by an agent reading these files, so
 every issue is also a test of them.
 
