@@ -845,17 +845,54 @@ jitterier than SH8601's** and it is the torn one. So SH8604's sheets really do
 present the opposite side, consistently across the issue, and the gate is
 reporting something true.
 
-**What it means is the owner's question:** a real difference in how this issue
-was bound and torn, or the whole issue mirrored or rotated 180° in the scan.
-**Normal traced sizes and correct overlays do not settle it** — that was the
-build's reason for concluding "none is misfiled", and both survive a
-consistent re-orientation. Carry it to PAUSE 1 with these numbers.
+**IT IS NOT AN OWNER QUESTION — THE PAGE ANSWERS IT. READ THE FOLIO.**
+(Owner, 2026-10-06, when it was put to them: *"i dont have an answer for you,
+there is no way for me to know this."* Quite right: nobody can tell from a
+copy in the hand which way a scanner saw it. The print can.)
 
-Until it is answered: a disagreement is a NOTE, as the code has always done,
-and the size gate two steps later is the check that can say what is wrong with
-an individual page. Do not re-tune `TORN_CONFIDENT_RATIO` to make the count
-go down — the ratios are 2.6-8.5, i.e. the measurement is confident, not
-marginal.
+A 64'er page foots with the **folio at the OUTER edge** — so a recto carries it
+bottom-right and a verso bottom-left — and the **`64'er` logo in the opposite
+corner**, with `SONDERHEFT N/YY` centred between them. That is a fact about the
+typesetting, independent of the scan, so it tells you directly whether a page
+is the parity its number claims. Cut the bottom ~4 % of the A4 page full width
+and look at it:
+
+```bash
+$PY - <<'PY'
+from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
+for pg in (40, 41):                      # one even, one odd
+    im = Image.open(f"<A4>/{pg:03d}.png").convert("L")
+    w, h = im.size
+    im.crop((0, int(h * .955), w, h)).reduce(3).save(f"/tmp/foot_{pg}.png")
+PY
+```
+
+MEASURED on SH8604: p040 foots `40` left / `64'er` right, p041 foots `64'er`
+left / `41` right. **The folio is at the outer edge on both, so the scans are
+correctly oriented and nothing is misfiled or rotated.** Which means the gate's
+own sentence is the thing that is wrong here: what it measures is which
+physical edge is rougher, and that is a property of how THIS issue's sheets
+were separated — SH8601's rough edge is the gutter side, SH8604's is the fore
+edge. Neither is evidence about filing.
+
+**So, when the gate fires on a run of pages: check the folio once, on one odd
+and one even page.** If the folio is at the outer edge, record "orientation
+confirmed from the folio, torn side is the fore edge on this issue" in
+`LOG.md` and carry on — the disagreement is a NOTE and nothing more. If the
+folio is at the INNER edge, you really do have mirrored or rotated scans, and
+THAT goes to the owner.
+
+Do not re-tune `TORN_CONFIDENT_RATIO` to make the count go down — the ratios
+are 2.6-8.5, i.e. the measurement is confident, not marginal — and do not
+suppress the gate; it is cheap and one day it will catch a real misfile.
+
+**Do not use a corner ink-fraction as a shortcut for the folio.** It reads
+BACKWARDS: the `64'er` logo is a dense black blob and the folio is a few thin
+digits, so the corner with more ink is the LOGO's. Measured over SH8604's 150
+interior pages, median foot-corner ink: odd pages left 0.0381 / right 0.0173,
+even pages left 0.0182 / right 0.0379 — consistent across the issue, and
+exactly inverted from where the numbers are. Look at the strip.
 
 The SH8601 numbers above remain correct for SH8601.
 
