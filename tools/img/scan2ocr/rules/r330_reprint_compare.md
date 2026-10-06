@@ -89,7 +89,16 @@ SH8602: it had no `REPRINTS.md` and reprints **nine** articles (Checksummer
 0.92, MSE 0.96, Debugging 0.83, Ordnung 0.74, …). "Zero leads" would have been
 recorded for an issue that reprints a quarter of itself.
 
-So **measure the leads before step 1**, after 280 and before 325:
+**FIRST, READ `issues/<ID>/reprints.txt` IF IT EXISTS.** r140 says this step
+reads it and this step never mentioned it, so SH8604's file — two confirmed
+reprints, `93 Checksummer… → 8603/checksummer` and `94 MSE… → 8602/mse` —
+sat unread while Step 0 derived the same list again. Whichever step runs the
+overlap pass first writes that file (r140, *Check 4 CANNOT see a reprint*);
+`REPRINTS.md` **extends** it with the leads this step's own pass adds, and
+never replaces it. A lead already in `reprints.txt` has been confirmed against
+the page and does not go back through step 1.
+
+Then **measure the leads before step 1**, after 280 and before 325:
 
 > For every article of this issue, compute the 8-word-shingle overlap of its
 > normalised text against every article in `issues/`. Anything above ~0.5 is a
