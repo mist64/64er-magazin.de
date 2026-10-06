@@ -92,6 +92,21 @@ For each `<figure>` block in `prg.txt`, in order:
 
    When in doubt, ask what a reader would do with it: type it to USE it (end),
    or read it to UNDERSTAND the text (inline).
+
+   **AND THE CONSEQUENCE, which the ruling did not spell out: PRINT ORDER
+   WINS, so from the first listing placed at the END, every LATER-NUMBERED
+   listing goes there too.** An article's listings are one sequence, and
+   splitting it means the end block starts at a lower number than the inline
+   ones that follow it. SH8604's 81 is the case: Listing 1 is the 372-line
+   Gerüst, a program in its own right, so it is end-placed — and then 2
+   onwards cannot go inline. Dateiverwaltung hit the same wall from the other
+   side and produced "Listing 16 after 26", which is check 4 reporting the
+   ruling working as intended, not a defect in the article.
+
+   **Follow the PRINT over first mention when the two disagree.** SH8604's
+   Listing 14b is first named after 15's anchor but printed directly under 14;
+   first-mention placement would have moved it past 15. The page is the
+   evidence (r000: CONSISTENCY WITH THE PAGE BEATS CONSISTENCY WITH ITSELF).
 3. **Fill `data-name`.** Use the user-visible program name from the
    article body, not the raw on-disk filename
    (e.g. `data-name="Vectors"`, not `data-name="vectors.boot"`).
@@ -250,6 +265,40 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
   with the verbatim caption, so the gap is visible in the build.
   Never silently drop a printed Listing N.
 
+## SHAPES THE RULE DID NOT NAME — measured on SH8604
+
+- **A data file of a "nur auf Diskette" program is a HIDDEN
+  `binary_download`, named by its C64 filename — never an MSE `<pre>`.**
+  Room files, texts, charsets and save games are not listings and have no
+  printed dump. SH8604's disk C holds 101 of them and the `prg.txt` template
+  wraps every raw file in an MSE `<pre>`, so the pile arrives pre-proposed
+  wrongly (see r120, *A DATA FILE TYPED `prg`*). Also say in the body which
+  single file the reader LOADs; with 101 names in the directory, nothing else
+  does.
+- **`data-checksummer` exists and this rule never mentioned it.** SH8602 uses
+  it 9 times; 8611 and 8612 never do. Look at how the issue you are on prints
+  its checksums before deciding.
+- **The evidence requirement assumes the body says "Listing".** 6 of SH8604's
+  11 placement articles never use the word, and 4 have no separate byline to
+  place an end block after. Where there is no "Listing N" mention, the evidence
+  is the printed ADJACENCY — which page, which column, above or below what —
+  and that is what goes in the report.
+- **`data-name` for a course listing the body never names**: take the
+  caption's short form. SH8604's 81 Listing 3 and 58 Listings 9/10 have no
+  name in the body at all (58's was in text the OCR lost).
+- **One listing, one caption repeated on every page it runs across.**
+  SH8604's Odyssey prints "Listing. »Odyssey« (Fortsetzung auf Seite 97)" and
+  then "… (Schluß)". Take the FIRST occurrence, drop the continuation
+  pointer per r170, and keep a print typo such as the bare "Listing." as
+  printed — captions are verbatim.
+- **One listing with two unrelated captions on two pages** (SH8604 Listing 16,
+  p20 and p21) and **a binary whose MSE file is longer than the printed span**
+  (2 bytes, which `data-range` cannot express) are both print/disk differences.
+  They go to the owner under the section below, not into a judgement here.
+- **Check 5 cannot run mid-chain**: the build dies on the missing `title.png`.
+  Copy the issue to a scratch directory with a stand-in `title.png` and run it
+  there.
+
 ## A print/disk difference is the OWNER's call — see r300
 
 Where a figure, a caption, a line range or a listing on the page disagrees with the disk file this step is placing, **stop and report it with the evidence**; it is a PAUSE 2 decision and not this step's. The full ruling, with the three shapes it covers, is in r300 under *EVERY PRINT/DISK DIFFERENCE IS AN OWNER DECISION, ALWAYS*. Do not take a previous issue's answer as a precedent.
@@ -312,20 +361,32 @@ PY
 
 # 4. Listing-N captions in each article are in print order. Grep ONLY
 #    figcaptions (like verifier #7) — a bare `Listing [0-9]+` grep also
-#    matches body prose ("siehe Listing 3") and false-flags out-of-order:
-python3 - "$dir" <<'PY'
+#    matches body prose ("siehe Listing 3") and false-flags out-of-order.
+#
+#    THE INLINE AND END BLOCKS ARE TWO SEQUENCES, NOT ONE.  The 2026-10-04
+#    ruling puts a long self-contained listing at the end, after the byline,
+#    and leaves short explanatory ones inline -- so an article with both has
+#    a lower number after a higher one BY CONSTRUCTION.  Comparing across the
+#    byline reported "Listing 16 after 26" on SH8604's Dateiverwaltung, which
+#    is the ruling working.  Split at the byline and order each side.
+$PY - "$dir" <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
-    prev = 0
-    for m in re.finditer(r'<figcaption[^>]*>(?:<[^>]+>)*\s*Listing\s+(\d+)',
-                         s, re.IGNORECASE):
-        n = int(m.group(1))
-        if n < prev:
-            print(f"{f}: Listing {n} after {prev} (out of order)"); break
-        prev = n
+    # the LAST byline ends the prose; everything after it is the end block
+    cut = max([m.end() for m in
+               re.finditer(r'</address>', s)] or [0])
+    for part, where in ((s[:cut], 'inline'), (s[cut:], 'end block')):
+        prev = 0
+        for m in re.finditer(r'<figcaption[^>]*>(?:<[^>]+>)*\s*Listing\s+(\d+)',
+                             part, re.IGNORECASE):
+            n = int(m.group(1))
+            if n < prev:
+                print(f"{f}: {where}: Listing {n} after {prev} (out of order)")
+                break
+            prev = n
 PY
 
 # 5. Build the issue and confirm no listing-related errors:
@@ -377,10 +438,28 @@ d = sys.argv[1]
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
-    nums = sorted(set(
-        int(m.group(1))
-        for m in re.finditer(r'<figcaption[^>]*>(?:<[^>]+>)*\s*Listing\s+(\d+)',
-                             s, re.IGNORECASE)))
+    # ALSO FLAG DUPLICATES.  sorted(set(...)) collapses them, so a
+    # renumbering that leaves the set gap-free -- {1,2,2,3} -- passed the
+    # gap test while the article printed two Listing 2s.  Count first --
+    # and count the LABEL, `14` and `14b`, not the integer: SH8604's
+    # Dateiverwaltung prints both, and an integer-only count calls them a
+    # duplicate.  The gap test below stays on the integers, where 14b is
+    # correctly not a number of its own.
+    labels = [m.group(1).lower()
+              for m in re.finditer(
+                  r'<figcaption[^>]*>(?:<[^>]+>)*\s*Listing\s+(\d+[a-z]?)',
+                  s, re.IGNORECASE)]
+    # A DUPLICATE CAN BE CORRECT: the magazine prints two MACHINE VARIANTS
+    # under one number -- 8408/151 has "Listing 1 … (C 64)" and "Listing 1
+    # … (VC 20)", likewise Listing 2.  That is the page, so it is not a
+    # defect; record it under r000_reviewed.py (key r130-dup-listing) rather
+    # than weakening the test.  MEASURED over the corpus: 2 articles report,
+    # one of them this legitimate shape.
+    dup = sorted({x for x in labels if labels.count(x) > 1})
+    if dup:
+        print(f"  {f}: DUPLICATE listing numbers {dup}")
+    all_n = [int(re.match(r'\d+', x).group()) for x in labels]
+    nums = sorted(set(all_n))
     if nums and nums != list(range(min(nums), max(nums)+1)):
         missing = [n for n in range(min(nums), max(nums)+1) if n not in nums]
         print(f"  {f}: listing-number gaps {missing}")
