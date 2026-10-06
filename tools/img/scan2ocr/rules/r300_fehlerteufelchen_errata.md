@@ -741,6 +741,22 @@ reason**, so the distinction survives the aside.
     </aside>
 ```
 
+**AND THERE IS A FOURTH STATE: THE OWNER HAS NOT RULED YET.** *Every aside
+carries a disposition comment* has no word for it, and the three above all
+assert a conclusion. The state is real and common — a print/disk difference is
+always the owner's call (below), so between finding one and hearing back there
+is nothing legitimate to write. The answer is the one the `xref 7.0` paragraph
+already arrived at, stated as the rule rather than left as a worked example:
+
+> **An erratum whose disposition the owner has not decided STAYS UNMARKED.**
+> No comment at all — not an invented fourth word, and not one of the three
+> chosen as the closest fit. The open decision is named in `LOG.md` and carried
+> to PAUSE 2; the aside gets its comment when the answer comes back.
+
+An unmarked aside is therefore a legitimate intermediate state, and a build
+that ends with one is not finished. Do not let a checklist that counts
+disposition comments push you into writing a conclusion you do not have.
+
 The three are mutually exclusive and the choice is a **finding, not a guess**:
 
 - for a `.txt` listing, diff the erratum's corrected lines against the file

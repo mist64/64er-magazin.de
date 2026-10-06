@@ -733,7 +733,23 @@ grep -hoE '\b[a-zA-Z]+[A-Z]+[a-z]+\b' "$dir"/*.html | sort -u | sed -n '1,12p;$p
 #                which OCR gave as "fehlerbehandlung c Programmabbhru ohne")
 CANARY="<the corrected string, from this issue>"
 grep -h "$CANARY" "$dir"/*.html >/dev/null && echo "  canary fix landed ✓"
+
+# 4. THE ALL-LOWERCASE JAM, WHICH CHECKS 1-3 CANNOT SEE AT ALL.
+#    `bestehtaus` has no hyphen and no capital, so a planted one passed all
+#    three greps above and only Pass 3 found it. Pass 3 IS the check:
+#    It takes the issue DIRECTORY, not a glob, and it never fails a build --
+#    every finding needs a human. Report its count.
+$PY tools/img/scan2ocr/rules/r280_word_jams.py "$dir"
 ```
+
+Two things about the sample lines above, both found on SH8604:
+
+- **`sed -n '1,12p;$p'` prints the 12th entry twice when there are exactly
+  13** — `$p` is line 13 only when the set is longer. Read the printed COUNT,
+  not the length of the sample.
+- The evidence command for a reported jam assumes `labels.json`'s text is
+  line-split. It is not always; take the page and bbox from the block index
+  and crop, rather than grepping the JSON.
 
 ## Notes / lessons
 

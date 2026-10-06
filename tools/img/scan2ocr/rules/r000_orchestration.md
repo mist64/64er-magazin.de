@@ -2053,5 +2053,32 @@ routine:
   do not — SH8507's 9550 and 20100 are only reached from deeper menu actions —
   record that limit with the result rather than reporting "tested".
 
+  **AND WHEN THE PATCHED LINE IS NOT ON THAT PATH, DRIVE IT DIRECTLY.** The
+  autostart cannot reach a line like SH8604's 115. Direct mode can: boot the
+  emulator with the file, let it stop, set by hand whatever the line reads, and
+  `GOTO` it.
+
+  ```bash
+  # one keyboard script; -keybuf feeds it after the autoload completes
+  x64sc -warp -autostart /tmp/t.prg -limitcycles 120M \
+        -keybuf $'\nq=1:n$="x"\ngoto115\n' \
+        -exitscreenshot /tmp/t.png
+  ```
+
+  Read the screenshot. This proves the patched line EXECUTES, which the
+  autostart does not; it does not prove the program reaches that line on its
+  own. Say which of the two you did.
+
+  **Three traps met while building such a test, all on SH8604:**
+
+  - **`c1541 -write` into a copied D64 fails SILENTLY.** The masters are mode
+    `r-x`, so the copy is too: `chmod u+w` the copy, and **read the file back
+    out** before believing the write.
+  - **A true-drive `LOAD` of a 100-block file exceeds 60M cycles.** Either
+    raise `-limitcycles` or autostart the `.prg` directly, which is what the
+    recipe above does.
+  - A scratch D64 is a scratch file: it goes under `<tmp>`, never beside
+    `issues/<ID>/prg/`.
+
 The default remains: record the errata state, do not patch. Patch only when the
 user asks for it.

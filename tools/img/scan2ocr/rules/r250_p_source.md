@@ -254,19 +254,48 @@ Critical guardrails:
 
 ## Verification
 
-```bash
-dir=issues/<YYMM>
+**AN ISSUE WITH NO SOURCE NOTES IS A VALID NO-OP.** A Sonderheft carries no
+vendor footers at all — SH8604 has none — so a clean run of this step
+legitimately changes nothing, and the report says so rather than hunting for
+something to tag. Two shapes that are **not** source notes and must not be
+qualified: an inline series marker such as `(SH2/85)`, and the Impressum,
+whose whole body is addresses.
 
-# 1. label-words still tagged as plain <p> — flag for review
-grep -nE '<p>(Info|Bezug|Hersteller|Vertrieb|Anbieter|Kontakt|Adresse|Preis|Literatur|Buchtitel):' \
-  "$dir"/*.html && echo "  WARN: label-word <p> not tagged as source"
+```bash
+: "${ISSUE:?set ISSUE}"
+dir=issues/$ISSUE
+PY=${PYTHON:-.venv/bin/python}
+rc=0                       # THE BLOCK EXITS 1 ON ANY FINDING.  It printed
+                           # WARN and exited 0, so planted faults passed and
+                           # nothing that reads the exit status saw them.
+
+# 1. label-words still tagged as plain <p> — flag for review.
+#    THE LABEL CAN BE WRAPPED, AND IT CAN BE MORE THAN ONE WORD.  The old
+#    pattern wanted `<p>Preis:` and SH8604's only shapes are
+#    `<p><strong>Preis:</strong>` and `<p>Vertrieb Handelsauflage:` -- so the
+#    check found nothing on the one issue it had to look at.
+#    NO DIGIT IN THE LABEL TAIL.  Widening to wrapped labels also caught the
+#    run-in heads of a memory-map article -- SH8603/31 has four
+#    `<p><strong>Adresse 43-56:</strong>`, which are documentation labels and
+#    not vendor notes.  A source label carries no number; `Vertrieb
+#    Handelsauflage:` and `Preis:` still match.
+#    AND THE IMPRESSUM IS EXCLUDED, because its whole body is exactly these
+#    labels -- `Vertriebsleitung:`, `Preis:`, `Vertrieb Handelsauflage:`.
+#    With the wrapped-label fix above and without this, the check fires on
+#    every issue forever, which is the gate that stops being read.
+grep -nE '<p>(<strong>|<em>|<b>)?(Info|Bezug|Hersteller|Vertrieb|Anbieter|Kontakt|Adresse|Preis|Literatur|Buchtitel)[^:<0-9]{0,30}:' \
+  --exclude='*mpressum*' "$dir"/*.html \
+  && { echo "  WARN: label-word <p> not tagged as source"; rc=1; }
+#    `--exclude`, NOT `$(ls … | grep -v …)`: the filenames carry spaces, and
+#    the command substitution split "104 Der Kampf ums Ueberleben.html" into
+#    five unreadable paths.
 
 # 2. spot-check source-tagged paragraphs are real footers (look at
 #    sample to eyeball)
 grep -hE '<p class="source">' "$dir"/*.html | head -20
 
 # 3. balanced tags
-python3 -c "$(cat <<'PY'
+$PY -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
@@ -277,8 +306,9 @@ for f in sorted(os.listdir(d)):
         nxt = s.find('</p>', m.end())
         if nxt < 0:
             print(f"  unclosed source p in {f} at offset {m.start()}")
+            sys.exit(1)
 PY
-)" "$dir"
+)" "$dir" || rc=1
 
 # 4. mechanical section-tail trigger: every <p class="source"> must
 #    have its next sibling block be <h2>, <h3>, <aside>, </aside>,
@@ -345,11 +375,18 @@ for f in sorted(os.listdir(d)):
             re.match(r'<address\b', t) or
             re.match(r'</section>', t) or
             re.match(r'</article>', t) or
-            re.match(r'<p class="source"', t)):
+            re.match(r'<p class="source"', t) or
+            # ...and a source note CONTINUED AS A LIST is still the tail.
+            # 8603/8 "Die Wueste Lebt" has <ul class="plain source"> right
+            # after one, which this reported as mid-section.
+            re.match(r'<[uo]l class="[^"]*source', t)):
             continue
         print(f"  {f}: mid-section <p class=\"source\"> followed by {t!r}")
+        sys.exit(1)
 PY
-)" "$dir"
+)" "$dir" || rc=1
+
+exit $rc
 ```
 
 ## Evidence-in-report requirement

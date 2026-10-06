@@ -32,6 +32,12 @@ Structural overrides that DO apply:
   merely for sitting in a callout — but `<h3>` when the aside would otherwise
   hold the file's ONLY `<h2>`, or would outrank a body built from `<h3>`.
 
+  **The "one below" is an exception, not an alternative.** Where the body has
+  `<h2>` sections, sitting at that level cannot outrank them, so `<h3>` is
+  simply wrong there — SH8604's 94 shipped that way because check 2 accepted
+  "at or below". `<h3>` is for a body built from `<h3>` or for a file whose
+  only `<h2>` would be the aside's.
+
   This bullet used to open "**ONE LEVEL BELOW** the article's highest section
   heading", which its own next clause then contradicts: `h2` beside body `h2`
   is the SAME level, not one below. SH8603 read the heading literally, found
@@ -233,6 +239,14 @@ for f in sorted(os.listdir(d)):
                 why = 'the file\'s ONLY h2 is in an aside -- demote to h3'
             elif top is not None and lvl < top:
                 why = f'outranks the body, whose top section is h{top}'
+            # ...AND BELOW THE BODY'S LEVEL IS WRONG TOO, when the body has
+            # h2 sections.  The rule says an aside's heading sits AT the body's
+            # top level and one below ONLY where sitting there would outrank
+            # the body -- which cannot happen at h2.  Accepting "at or below"
+            # passed SH8604's 94, an h3 aside in an h2 body.
+            elif top == 2 and lvl > top:
+                why = (f'h{lvl} under an h2 body -- an aside sits AT the '
+                       f'body\'s top level; h3 is only for a body of h3+')
             else:
                 continue
             bad += 1
