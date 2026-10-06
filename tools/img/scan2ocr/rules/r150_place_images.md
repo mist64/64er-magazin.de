@@ -61,6 +61,45 @@ That last one is the only one that changes an existing convention, and it has
 to: a figure named for the page it was printed on would land in the
 Checksummer's sequence and be placed in the wrong article.
 
+**Four more from SH8604**, same rule: the name follows the print, and it is
+lowercase because Verification 1 matches `[0-9]+-[0-9a-z_]+\.png` and the
+corpus has **0** PNG names with a capital in them.
+
+| shape | name | why |
+|---|---|---|
+| an **uncaptioned boxed table** | `<page>-ta`, `-tb`, … | it is a table, so it joins the `t` series, but it has no printed number to take — letters keep it out of the numbered run |
+| an **uncaptioned non-lead picture** | `<page>-p<n>` | not a Bild (no printed number), not the lead (`-00`). A portrait beside a byline is the usual case |
+| a numbered Bild the owner has **already typeset** | no file — listed `typeset` in the worklist | owner-crop-wins in reverse: where the typeset version is the delivered one, there is no PNG, and the worklist says so rather than leaving a gap that reads as a lost image |
+
+**And `-t0` is the rule, not `-t1`.** SH8603's worklist HEADER says an
+unnumbered "Tabelle." takes `-t1`; the table above says `-t0`, and the table
+is right — `t0` leaves `t1` free for the first table the print does actually
+number. A worklist header copied from a previous issue carries the wrong name
+with it; write the header from this rule, not from the last issue's file.
+
+### A crop that covers SEVERAL Bild numbers is ONE figure
+
+A single cut frame holding more than one numbered Bild is named for all of
+them — `10-6abc.png`, and SH8601's `26-5_9.png` — and it becomes **one
+`<figure>`, at the FIRST member's printed position, with each printed caption
+on its own line** (`<br>`-separated inside the one `<figcaption>`). Not one
+figure per number: there is one image.
+
+### PROSE PRINTED INSIDE A CUT FRAME GOES WITH THE CROP
+
+*Owner crop wins* named tables and listings. It covers **any text the crop's
+frame contains**: where the owner's PNG includes a line of prose — SH8604's
+p33 box line — the HTML does not also carry that line as a paragraph. One
+or the other, never both, and the delivered crop is the one.
+
+### A CROP THAT CONTAINS ITS OWN PRINTED CAPTION GOES BACK FOR A RE-CUT
+
+SH8604's `10-2` and `81-1` include the printed "Bild N. …" line inside the
+frame, so the page shows the caption twice — once as pixels, once as the
+`<figcaption>`. Do not drop the `<figcaption>` to compensate: it is the
+accessible and searchable copy. Report it to the owner as a re-cut (SH8603's
+`31-3` is the precedent), and leave the figure in place meanwhile.
+
 ## NEVER LEAVE AN ORPHAN AT THE END — place it where it fits best
 
 **Owner, 2026-10-06:** *"could not be placed so it's at the end. it's clearly
@@ -430,6 +469,12 @@ grep -nE 'XXXXXXXXX' "$dir"/*.html && echo "  FAIL: placeholder caption survived
 # 4. each <img> has a non-empty alt (with the documented exception:
 #    title images may have alt="" by design — they have no caption
 #    and the title is the heading itself)
+#
+#    ESCAPE `<` AND `>` IN ALT TEXT.  An unescaped one passes this check --
+#    it only looks for emptiness -- while breaking every downstream
+#    `<img [^>]*>` regex, which stops at the wrong `>`.  MEASURED: the corpus
+#    has 2, both `alt="Michael Scharfenberger, Chefredakteur<"` (8604/8 and
+#    8606/8), so the second clause below exists to find them.
 python3 -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
@@ -444,6 +489,8 @@ for f in sorted(os.listdir(d)):
             mm = re.match(r'\d+-0[0-9a]*$', base)
             if not mm:
                 print(f"  empty alt: {f}  {src}")
+        if '<' in alt or '>' in alt:
+            print(f"  UNESCAPED </> in alt: {f}  {src}  {alt!r}")
 PY
 )" "$dir"
 
