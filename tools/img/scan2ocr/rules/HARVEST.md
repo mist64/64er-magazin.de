@@ -307,3 +307,66 @@ measured first.
 retitled SH8602's article 3 to "Einleitung" after the running-head banner, on
 my relay; the owner's final ruling is that the **printed Inhalt** names an
 article. The rule in r080 is the TOC, not the banner.
+
+
+# Harvest of SH8604's WORKFLOW_ERRATA.md
+
+54 proposal entries at finalisation: 15 already harvested during the build, 1
+superseded, 9 partly, 29 outstanding. All of them are applied now, in chain
+order, one commit per group:
+
+| `92fea5f8` | the 190 cluster, and 005 read cold by SH8605 |
+| `e9600042` | 005b, 080, 090, 120 |
+| `d7c4cc72` | 130, and two checks seen to fail |
+| `65f6b80f` | the two 140 entries, and r330 Step 0 |
+| `1dde4e4c` | 150: four names, grouped crops, alt escaping |
+| `5f6c0b6e` | the 160 cluster, and an unverified claim in r000 |
+| `e259e471` | 170 and 180 |
+| `e439d8d9` | 210 and 220 |
+| `d1b6059c` | 250, 280, 290, 300, and r000's direct-mode test |
+| `fc1e404f` | 006, 070, 325, 330, 340, generate.py |
+| `c5438ce7` | the four PARTLY 005 entries |
+
+**Two entries came out differently from what they proposed, and the difference
+is the point:**
+
+- **005, the paper pre-fill.** The entry asked for the pre-fill to be GATED on
+  the own-white measurement. Measured, no threshold works: against SH8604's
+  interior own-white p50 of 208 179 166, the cover is genuinely card at
+  distance 40 and the tinted interior sits at 30. The gate was written and
+  **not shipped**; the distance is printed beside each pre-filled page instead.
+- **005, the parity gate.** The entry diagnosed SH8604's 93 firings as the
+  600 dpi frame clipping the torn fringe. It is not: every Sonderheft is
+  near-flush on the left (SH8601 0.34 mm, SH8604 0.17 mm) and SH8601's gate
+  agrees on 149 of 150, so the margin is not the variable; and SH8604's left
+  jitter is 0.35 px against SH8601's 0.06, so that edge is not clipped, it is
+  **torn**. SH8604's sheets present the opposite side, consistently. Two
+  suppressions were written and reverted. **This is an open owner question for
+  PAUSE 1**, recorded in r005 with the numbers.
+
+**Checks changed in this harvest, every one seen to fail before it shipped:**
+r130 check 4 (split at the byline) and check 7 (duplicates, corrected once
+when it called "Listing 14" and "14b" a duplicate); r140 check 4 (same machine,
+bound variables); r150 check 4 (unescaped `<`/`>` in alt); r160 check 5 (a
+compound is not a reference; a damage token is a look); r210 check 3 (fails on
+a closed machine name); r220's routing check (a row matching no article; a
+forward misroute); r250's whole block (exits 1; the wrapped label, minus the
+Impressum and minus digit labels); r280 check 4 (Pass 3 finds the lowercase
+jam the greps cannot); r290 check 2 (an aside below an h2 body); r330 check 3
+(reads the whole entry); r005 Verification 6 (rewritten: it compared a file to
+itself).
+
+**Two checks were written and deliberately NOT shipped**, because they fired on
+correct data: r210's "does this look like a machine label" (flagged 8612's
+`C 16, Plus/4` on 2 of 3 issues) and the r005 own-white gate above. Both are
+recorded where they would have gone.
+
+**Found in old issues while verifying, reported and NOT fixed** (owner's call):
+8609 x2 and SH8601 x10 asides levelled below an h2 body; 8408/151's duplicate
+Listing 1/2, which is CORRECT (C 64 and VC 20 variants share a number) and is
+recorded in r130's check as a reviewed/ case; SH8506/116's Listing 1/2, which
+looks like a genuine double emission; `alt="Michael Scharfenberger,
+Chefredakteur<"` in 8604/8 and 8606/8; and one row of
+`Gesamtinhaltsverzeichnis Sonderhefte.csv` keyed `4/86` that belongs to SH8504
+(4/85) — `Sprite+Grafik-Basic`, page 42, which matches SH8504's article
+exactly.

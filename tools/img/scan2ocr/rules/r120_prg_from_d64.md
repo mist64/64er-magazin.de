@@ -176,9 +176,31 @@ lines, and if they are space-only lines you are done.
 All three found on SH8603, with its own evidence:
 
 1. **petcat's round-trip is not symmetric.** `$9A` detokenises to `{blu}` and
-   re-tokenises under `-w3` to `$1F`. SH8604 met the same class three times
-   (`1985_1986`, `lader`, `der kl. hobbit`). A re-tokenise that differs is not
+   re-tokenises under `-w3` to `$1F`. A re-tokenise that differs is not
    automatically a transcription error.
+
+   **BUT EACH DIFFERENCE GOES TO THE OWNER WITH ITS OWN BYTE-LEVEL CAUSE —
+   NEVER GROUPED UNDER A SHARED LABEL.** This is the one entry in SH8604's
+   errata where **a reader's download was wrong**, and the grouping is how it
+   happened. Three files round-tripped differently (`1985_1986`, `lader`, `der
+   kl. hobbit`); they were filed together as "petcat asymmetries"; the cause
+   offered for all three — a space-only line body — is true of the first two
+   only. The owner closed all three on that cause, and the third shipped: `der
+   kl. hobbit` lines 10000 and 60000 end a REM banner in `$A0`, the shifted
+   space, which is also the token for `CLOSE`, so petcat wrote `close` into the
+   `.txt` and the re-tokenise put **five literal bytes where the program has
+   one**. The symptom was shared; the cause was not. Report each one with the
+   hex of the disk bytes beside the hex of the re-tokenised bytes, and let the
+   owner rule on each.
+
+   **And a difference inside a REM or a quoted string where the disk byte is
+   ≥ `$80` is a TRANSCRIPTION ERROR in a file we publish, until proven
+   otherwise** — not an asymmetry. Above `$80` the byte is a token everywhere
+   except inside REM/string, which is exactly where petcat's context is
+   ambiguous (see *OUTSIDE A QUOTED STRING, petcat INTERPRETS NO BRACE ESCAPE
+   AT ALL*). Treat it as our bug first and look for the proof, because
+   `generate.py` re-tokenises our `.txt` to build the reader's download: a
+   wrong `.txt` is a wrong `.prg` on the site.
 2. **A BASIC extension petcat has no dialect for at all** — SH8603's *19
    Grafik-Befehle* for the VC 20. There is no flag to pass; the tokens have to
    be decoded from the article's own table.
