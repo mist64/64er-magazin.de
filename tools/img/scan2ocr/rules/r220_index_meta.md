@@ -58,12 +58,17 @@ its 29 articles because this rule was skipped as `not applicable — kind`.
 Published; not fixed retroactively (owner, 2026-10-03). Do not repeat it.
 
 **The apply script HAS a Sonderheft reader** — `parse_sonderheft_csv` in
-`r220_index_meta_apply.py`, which keys on column 4. This paragraph used to say
-it "reads only the monthly layout … write one as part of this step", so
-SH8603 set out to write a parser that already existed. What remains true is
-below; the monthly path is `line.startswith(f"{code},")`
-and `parts[1]` pages / `parts[2]` category / `parts[4]` title). A Sonderheft
-needs its own reader for the columns above; write one as part of this step.
+`r220_index_meta_apply.py`, which keys on **column 3**, exactly as stated
+above and as the function's own docstring says. (This paragraph said column 4,
+which is the PAGE; and it used to say the script "reads only the monthly
+layout … write one as part of this step", so SH8603 set out to write a parser
+that already existed. **Nothing is to be written here.**) The monthly path is
+`line.startswith(f"{code},")` with `parts[1]` pages / `parts[2]` category /
+`parts[4]` title.
+
+**Every cell is `.strip()`ed before it is compared or written.** The file has
+trailing empty fields and inconsistent spacing around the key, and an
+unstripped `" 4/86"` matches nothing while reporting zero rows as a pass.
 
 Each row: `YYMM,pages,category,subcategory,title`. Pages use em-dash
 `—` as range separator. Category + subcategory become
@@ -128,8 +133,12 @@ its CSV argument is relative to that cwd, and so is the Verification block below
 # The rule used to say "run from the issue directory" while its Verification
 # used repo-root paths.
 cd /Users/mist/Documents/git/64er-magazin.de
-python3 ../../tools/img/scan2ocr/rules/r220_index_meta_apply.py <YYMM> \
-  "../../Jahresinhaltsverzeichnis <YYYY>.csv"
+# $PY, not bare python3 (r000).  And from the repo root the CSV is NOT ../../ :
+( cd issues/$ISSUE && $PY ../../tools/img/scan2ocr/rules/r220_index_meta_apply.py \
+    "$ISSUE" "../../Jahresinhaltsverzeichnis <YYYY>.csv" )
+# ...or, for a Sonderheft, the OTHER file:
+( cd issues/$ISSUE && $PY ../../tools/img/scan2ocr/rules/r220_index_meta_apply.py \
+    "$ISSUE" "../../Gesamtinhaltsverzeichnis Sonderhefte.csv" )
 ```
 
 ## Briefing for the sub-agent
@@ -265,9 +274,19 @@ for f in sorted(glob.glob(os.path.join(d, '*.html'))):
     tm = re.search(r'<title>(.*?)</title>', s)
     if tm: titles.setdefault(tm.group(1), []).append(f)
 bad = 0
+orphans = []
 for page, title in rows:
     fs = titles.get(title) or titles.get(title.replace('&', '&amp;'))
-    if not fs: continue
+    # A ROW WHOSE TITLE IS IN NO ARTICLE OF THIS ISSUE WAS SKIPPED, AND THAT
+    # IS HOW A FOREIGN ROW GETS IN.  The CSV is hand-kept and a row can carry
+    # the wrong issue key: "Sprite+Grafik-Basic,4/86,42" is SH8504's article
+    # (4/85, also p42), so the apply script's nearest-preceding-start
+    # fallback put it into SH8604's 40 Kuenstliche Intelligenz, printed OK,
+    # and BOTH gates agreed -- this check said 0 of 17 and the count said
+    # 17 = 17.  Only deleting the row by hand made the count disagree.
+    if not fs:
+        orphans.append((page, title))
+        continue
     f = fs[0]
     # A row whose title IS the article's own title was routed by title, not by
     # page, and the title is the stronger evidence. 8610's "Mini-Hardcopy für
@@ -279,6 +298,15 @@ for page, title in rows:
     # and the nearer article must actually COVER the row's page -- a one-page
     # item that merely starts closer cannot own it. 8607's "9 DFÜ-News" looked
     # like a misroute for 8 Aktuelles' p11 rows until this was added.
+    # AND A ROW ROUTED FORWARD IS A MISROUTE TOO.  The test below looks for
+    # an article starting BETWEEN this one's start and the row's page, which
+    # finds nothing at all when the article starts AFTER the page -- a planted
+    # forward move was silent.  An article cannot own a page before it begins.
+    if starts[f] > page:
+        print(f"  MISROUTE  p{page} {title[:34]:<36} -> "
+              f"{os.path.basename(f)[:30]}  (which starts at p{starts[f]})")
+        bad += 1
+        continue
     closer = [g for g, st in starts.items()
               if starts[f] < st <= page and g != f
               and any(lo <= page <= hi for lo, hi in spans[g])]
@@ -288,6 +316,20 @@ for page, title in rows:
               f"  (p{starts[best]} {os.path.basename(best)[:26]} starts closer)")
         bad += 1
 print(f"{bad} of {len(rows)} rows routed past a nearer article")
+# AS A DELTA.  A row whose title merely READS differently from the article's
+# heading is a legitimate permanent entry, so this is an open list the
+# operator walks item by item, not a gate.  MEASURED: SH8602 and SH8603 have
+# 0, SH8604 has the 1 real foreign row, the monthlies 8609/8610 have 1 each
+# and 8612 has 3 -- all title wordings.  (SH8601 has 22 because it shipped
+# with no index metadata at all; see the top of this rule.)
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import r000_reviewed as R
+items = ['p%d %s' % (pg, t) for pg, t in orphans]
+new = R.delta(d, 'r220-orphan-rows', items)
+if R.report('rows matching no article', new, len(items), d, 'r220-orphan-rows'):
+    print('    -- for each: grep -ril <distinctive word> issues/  '
+          'A row found in ANOTHER issue carries the wrong issue key and is')
+    print('       that issue\'s row; report it, do not apply it here.')
 # LETTERED SIBLINGS CANNOT BE SEPARATED BY PAGE, because they share one.  The
 # nearest-preceding-start rule is silent between 21a and 21b, so say so and
 # name them: those rows are routed by TITLE and have to be read.

@@ -28,6 +28,16 @@ Two short lines at the very top of a typical 64'er interior page:
   thin gap measures neither way, and the issue ended with both forms in it.
   Read the band for the WORDS and the slashes; set the spacing from this rule.
 
+  **AN ALL-CAPS BAND IS WRITTEN IN NORMAL GERMAN CAPITALISATION.** Many issues
+  set the running head in caps — every one of SH8604's bands is — and the
+  meta is not a facsimile of the typesetting. `ADVENTURE-PROGRAMMIERTECHNIK`
+  becomes `Adventure-Programmiertechnik`, `KÜNSTLICHE INTELLIGENZ` becomes
+  `Künstliche Intelligenz`: each part of a hyphenated compound takes a
+  capital, a plural keeps the stem's case, and a machine name keeps its own
+  form (`C 64`, above). SH8603 title-cased its caps bands and is the
+  precedent. Caps are a typeface decision, which is exactly the class of thing
+  the spacing rule above already says not to copy.
+
 Both come from the OCR / vision read of the top ~250 px of the
 rendered page. Anti-memory: never compose either value from the
 article's category — the print is the source.
@@ -37,6 +47,12 @@ article's category — the print is the source.
 Where r080 has given two articles the same start page as `NNNa` and `NNNb`,
 there is **one** printed band on that page, and it sits above the `a` article.
 It is still the band for both: the page's running head describes the page.
+
+**AND A SHARED START PAGE THAT IS *NOT* LETTERED IS THE SAME CASE.** r080 now
+says a page holding one article's tail and the next one's start is not the
+lettered case (SH8604's 126, 133) — but there is still one band on that page,
+and *the band describes the page*, so the starting article takes it. The
+lettering is about `64er.pages`; the band is about ink position.
 
 So read it once and write it to both, unless the `b` article continues onto a
 page of its own whose band differs — then the `b` article takes ITS page's
@@ -132,7 +148,12 @@ echo "  front matter (band present or not is a per-page fact, read the crop):"
 for f in "$dir"/*.html; do
   id=$(grep -oE '64er\.id" content="[^"]*"' "$f" | sed 's/.*content="//;s/"//')
   case "$id" in
-    editorial|vorwort|impressum|inhalt|vorschau)
+    # NACHSCHAU is a Sonderheft's Vorschau, and was not on the list.
+    # And the list keys on the ID, so a SECOND front-matter piece whose id
+    # is something else -- SH8604's p6 Einleitung, id `kurs` -- is invisible
+    # here and silently counts as a missed article in the arithmetic below.
+    # Where the issue has one, name it in the report; the crop decides.
+    editorial|vorwort|impressum|inhalt|vorschau|nachschau)
       h=$(grep -c '64er\.head1' "$f")
       printf '    %-10s head1=%s  %s\n' "$id" "$h" "$(basename "$f")" ;;
   esac
@@ -160,11 +181,19 @@ for f in sorted(os.listdir(d)):
 PY
 )" "$dir"
 
-# 3. machine label sanity: head2 values look like a C-something
+# 3. machine label sanity. THIS USED TO ONLY PRINT THE VALUES, so a closed
+#    `C64` passed unless somebody read the list -- and r000 says a gate that
+#    always reports stops being read.  It FAILS now: the spacing is a rule
+#    (above), so it is checkable.
 grep -hE '64er\.head2" content=' "$dir"/*.html | \
-  sed -E 's/.*content="([^"]*)".*/\1/' | \
-  sort -u | head -20
-# eyeball — every line should look like a Commodore machine label.
+  sed -E 's/.*content="([^"]*)".*/\1/' | sort -u | tee /tmp/head2
+grep -nE '(^|[^A-Za-z ])(C|VC)[0-9]' /tmp/head2 \
+  && echo "  FAIL: closed machine name -- C 64, C 128, C 16, C 116, VC 20, Plus 4"
+# The printed list above stays for the eye.  A SECOND regex asking "does this
+# look like a machine label" was written and NOT shipped: it flagged 8612's
+# `C 16, Plus/4` and `C 64, Plus/4`, which are correct, on 2 of the 3 issues
+# it was tried on.  The vocabulary is open (`VC 20 + 8 KByte`), so the closed
+# -name test is the part that can be a gate.
 ```
 
 ## Evidence-in-report requirement
