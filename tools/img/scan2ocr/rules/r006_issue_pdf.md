@@ -246,6 +246,46 @@ defects shipped on 8612 before the owner's review caught them:
   promotion of p178 has the same cause, which makes it a second cause besides
   SH8602's K anchor — see r005, *EXCEPT K*.
 
+**BUT THE LARGEST BLOB ALONE MISSES LINE-ART COLOUR, which its own outlines cut
+into crumbs.** A small coloured cartoon drawn in black outline — a running-head
+mascot, a row of little computers — is colour the reader sees and a dozen blobs
+none of which reaches 50 mm². MEASURED on SH8605: the blob measure gave 31
+colour pages and missed **p007 (8.5 mm²)** and **p031 (38.3 mm²)**, both of
+which would have shipped as JBIG2 without their colour. So:
+
+> **Colour = largest blob ≥ 50 mm² OR strong-chroma AREA ≥ ~10 mm²**, the area
+> being chroma ≥ 60 after the same 3×3 opening with the same edge band excluded.
+
+The second test is deliberately a different shape from the first: a HIGH chroma
+bar over a SUMMED area, where the first is a low bar over one connected
+component. Strong chroma is what fringing and browning do not have, so summing
+is safe there, and summing is what finds colour that is cut up. MEASURED on
+SH8605: it read **12.3** and **88 mm²** on p007 and p031, and **0 on every
+other interior page** except p194's browned fore-edge (34.8 mm²) — so it is
+not a second set of false promotions. **Look by eye at every page the two tests
+disagree on, before forcing it bilevel.** The contact sheet is how SH8605's two
+were found.
+
+**AND THE TWO BED GUARDS ARE NOT INTERCHANGEABLE, which this rule says they
+are** (*"Either guard alone was enough on SH8603; both were agreed"*). The
+figures above were measured WITH the paper mask. Re-measured here on the same
+masters with the **4 mm edge band alone**:
+
+| page | largest blob, paper mask | largest blob, edge band only | strong chroma, edge band only |
+|---|---|---|---|
+| 007 | 8.5 mm² (missed) | **56.0 mm² (caught)** | 12.6 mm² |
+| 031 | 38.3 mm² (missed) | 33.0 mm² (missed) | 90.7 mm² |
+| 194 | — | 235.6 mm² | 8.0 mm² |
+| 040, 060, 100, 150 | — | 0.9–1.6 mm² | **0.0 mm²** |
+
+So p007 is missed by one guard and caught by the other, and p194's browning
+reads 235.6 mm² under the edge band where the paper mask removes it. **Say
+which guard a figure came from, every time**, and **calibrate the ~10 mm² bar
+against the issue's own most-browned page rather than carrying it as a
+constant** — p194 reads 34.8 mm² with the mask and 8.0 without, which straddles
+it. The strong-chroma test's zeros on the mono controls hold either way, which
+is why it is the robust half of the OR.
+
 MEASURED on 8612 — total / largest / blob count:
 
 | page | total | largest | blobs | |
@@ -746,7 +786,7 @@ default `TITLE_PNG` points into the scans dir, where the cover does not live;
 pass it explicitly or the build now refuses:
 
 ```sh
-TITLE_PNG=<repo>/issues/<ID>/title.png \
+TITLE_PNG=<repo>/issues/<ID>/title.png JOBS=28 \
   tools/img/issue_pdf/make_issue_pdf.sh <A4> <tmp>/scratch.pdf "<tag>"
 ```
 
@@ -774,8 +814,28 @@ let the search run for a first build or after a grading change:
 
 ```sh
 TITLE_PNG=<repo>/issues/<ID>/title.png QMIN=95 QMAX=95 \
+  FORCE_CONTONE="007 031" FORCE_BILEVEL="003 004 …" JOBS=28 \
   tools/img/issue_pdf/make_issue_pdf_mixed.sh <A4> <tmp>/<name>.pdf "Sonderheft NN/YY"
 ```
+
+**EVERY PAGE DECIDED COLOUR AGAINST THE CLASSIFIER GOES IN `FORCE_CONTONE`,
+EXPLICITLY.** Leaving it off the bilevel list is NOT enough: the mixed build
+runs its own classifier over every page the force lists do not name, and that
+classifier has the same blind spot as the blob measure above. SH8605 forced the
+167 bilevel pages, left `FORCE_CONTONE` empty on the assumption that everything
+else would stay colour, and shipped p007 as JBIG2 — **168 / 32 against the
+approved 167 / 33.** Two independent guards had failed in the same direction.
+
+**And then check the COUNT, as a named step rather than a habit.** The only
+thing that caught it was the summary line `bilevel N pages @600dpi JBIG2,
+contone M pages @150dpi` read against the approved counts — no measurement
+inside the build could have, because both guards agreed. So: read N and M
+against the list you approved, and `pdfimages -list` the pages you overrode.
+
+`JOBS` defaults to r000's lane cap (cores − 4; 28 on this box). SH8605 ran 32
+tesseract jobs because the script took `NCPU`, which is the same
+over-subscription that killed step 030 in that build when two heavy steps
+overlapped. It survived only because it ran alone.
 
 Watch for `[cover] page 001 carries .../title.png (N grey levels)` in the log.
 Its absence means the build died — check the log, not the exit status of a

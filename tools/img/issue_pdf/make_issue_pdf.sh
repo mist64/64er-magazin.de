@@ -75,6 +75,13 @@ ENCODER="${ENCODER:-guetzli}"
 if [[ "$ENCODER" == "fast" ]]; then QMIN=70; QMAX=95; else QMIN=84; QMAX=97; fi
 LANG="deu"; PSM=3; OEM=3; OCRSCALE=67; DPITAG=402; IMGSCALE=25
 NCPU="$(sysctl -n hw.ncpu)"
+# JOBS, not NCPU: r000's lane rule reserves 4 cores so a heavy step does not
+# starve whatever else is running.  SH8605 ran 32 tesseract jobs here where
+# lanes() gives 28; it survived because it ran alone, and the same
+# over-subscription had already killed step 030 earlier in that build when two
+# heavy steps overlapped.  Pass JOBS explicitly for a RAM-bound run --
+# r000_issue.lanes(lane_gb) is the number.
+JOBS="${JOBS:-$(( NCPU > 5 ? NCPU - 4 : 1 ))}"
 CREATOR="tesseract 5 + guetzli + Ghostscript"      # honest
 AUTHOR="Markt & Technik"
 TITLE="64'er $TAG"
@@ -116,7 +123,7 @@ for n in $pages; do
   ( magick "$src" -resize ${OCRSCALE}% +repage -strip "$CACHE/${n}_o.png"
     tesseract "$CACHE/${n}_o.png" "$CACHE/$n" -l "$LANG" --psm "$PSM" --oem "$OEM" --dpi "$DPITAG" pdf 2>/dev/null
     rm -f "$CACHE/${n}_o.png"; echo "[ocr] $n" ) &
-  while (( $(jobs -r | wc -l) >= NCPU )); do wait -n; done
+  while (( $(jobs -r | wc -l) >= JOBS )); do wait -n; done
 done; wait
 
 # ---- Phase 2: 150dpi rasters (page 1 = title.png, matched to page-1 dims), cached ----
@@ -174,12 +181,12 @@ build_at() {  # $1=quality
     else
       ( guetzli --quality "$q" "$CACHE/${n}_150.png" "$qd/$n.jpg" 2>/dev/null ) &
     fi
-    while (( $(jobs -r | wc -l) >= NCPU )); do wait -n; done
+    while (( $(jobs -r | wc -l) >= JOBS )); do wait -n; done
   done; wait
   for n in $pages; do
     [[ -s "$qd/${n}_g.pdf" ]] && continue
     ( "$PYBIN" "$SWAP" "$CACHE/$n.pdf" "$qd/$n.jpg" "$qd/${n}_g.pdf" ) &
-    while (( $(jobs -r | wc -l) >= NCPU )); do wait -n; done
+    while (( $(jobs -r | wc -l) >= JOBS )); do wait -n; done
   done; wait
   local gp=(); for n in $pages; do gp+=("$qd/${n}_g.pdf"); done
   gs -q -o "$qd/merged.pdf" -sDEVICE=pdfwrite -dAutoRotatePages=/None -dPassThroughJPEGImages=true "${gp[@]}" 2>/dev/null

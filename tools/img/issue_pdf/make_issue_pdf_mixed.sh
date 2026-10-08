@@ -61,6 +61,13 @@ LIMIT=$((100*1000*1000))
 # hours of guetzli.  The search is still the default and still what a keeper gets.
 QMIN="${QMIN:-84}"; QMAX="${QMAX:-97}"
 NCPU="$(sysctl -n hw.ncpu)"
+# JOBS, not NCPU: r000's lane rule reserves 4 cores so a heavy step does not
+# starve whatever else is running.  SH8605 ran 32 tesseract jobs here where
+# lanes() gives 28; it survived because it ran alone, and the same
+# over-subscription had already killed step 030 earlier in that build when two
+# heavy steps overlapped.  Pass JOBS explicitly for a RAM-bound run --
+# r000_issue.lanes(lane_gb) is the number.
+JOBS="${JOBS:-$(( NCPU > 5 ? NCPU - 4 : 1 ))}"
 # We already run NCPU jobs in parallel; letting each magick use all cores too
 # drove the load to ~900 and stalled for 25+ min on 8612.  With this it is
 # minutes.  (r000's lanes rule, in script form.)
@@ -155,7 +162,7 @@ if [[ ! -s "$CLASS" ]]; then
     printf "%s\t%.5f\t%.5f\n" "$n" "$c" "$h"
   }
   export -f classify_one
-  for n in $pages; do src_of "$n"; done | xargs -P "$NCPU" -I{} bash -c 'classify_one {}' \
+  for n in $pages; do src_of "$n"; done | xargs -P "$JOBS" -I{} bash -c 'classify_one {}' \
       | sort > "$CLASS"
 fi
 echo "  classified $(wc -l < "$CLASS" | tr -d ' ') pages"
@@ -197,7 +204,7 @@ for n in $bilevel; do
     magick identify -format "%w %h" "$JB/$n.pbm" > "$JB/$n.dim"
     rm -f "$JB/$n.pbm"
     echo "[jbig2] $n $(stat -f%z "$JB/$n.jb2") bytes" ) &
-  while (( $(jobs -r | wc -l) >= NCPU )); do wait -n; done
+  while (( $(jobs -r | wc -l) >= JOBS )); do wait -n; done
 done; wait
 
 # ---- Phase 4: quality search over the contone pages ---------------------------------------------
@@ -210,7 +217,7 @@ build_at() {  # $1=quality -> byte size of the assembled PDF
     # total size to the byte.  The plain script already does this for its cache.
     [[ -s "$qd/$n.jpg" && ! "$CACHE/${n}_150.png" -nt "$qd/$n.jpg" ]] && continue
     ( guetzli --quality "$q" "$CACHE/${n}_150.png" "$qd/$n.jpg" 2>/dev/null ) &
-    while (( $(jobs -r | wc -l) >= NCPU )); do wait -n; done
+    while (( $(jobs -r | wc -l) >= JOBS )); do wait -n; done
   done; wait
   : > "$man"
   for n in $pages; do
