@@ -738,6 +738,13 @@ def cut(page, win, rec, out_dir=None):
                f"\n  fabricated {100.0 * fab:.2f}% of the delivered page lies "
                f"outside the traced page, of which "
                f"{100.0 * off / (A4_W * A4_H):.2f}% is off the master canvas\n")
+    # THE WINDOW'S OWN NOTE, which nothing used to emit.  unify_inserts() writes
+    # it, and it went to <tmp>/a4win/a4_windows.json and nowhere a reader of the
+    # DELIVERY would ever see it -- so an insert page that really had been padded
+    # +19/+24 px carried a stamp that said nothing about it (SH8608).  The stamp
+    # is what a later build can still read; the json is scratch.
+    if win.get("note"):
+        stamp += f"  {win['note']}\n"
     if fill_rep is not None:
         mm = 25.4 / DPI
         bands = "  ".join(
@@ -856,8 +863,9 @@ def unify_inserts(wins):
             # (SH8608).  The builder's first instinct was to add the line to the
             # stamps by hand, which is the wrong direction: a stamp is the
             # record of what the program did, so the program says it.
-            w["note"] = (w.get("note", "") + " padded %+d/%+d px to the insert's "
-                         "common size %dx%d" % (dw, dh, W, H)).strip()
+            w["note"] = (w.get("note", "") + " UNIFIED (ONE INSERT IS ONE "
+                         "OBJECT): padded %+d/%+d px to the insert's common "
+                         "size %dx%d" % (dw, dh, W, H)).strip()
         print("insert pages %d-%d unified to %dx%d px (%.2f x %.2f mm)" % (
             run[0], run[-1], W, H, W * 25.4 / DPI, H * 25.4 / DPI), flush=True)
 
