@@ -541,6 +541,36 @@ PAPER_PROBE_MIN_FRAC = 0.05
 # support a fit gets an IDENTITY field, and that is WRITTEN DOWN in a field
 # file of its own rather than silently skipped -- see r005_field.py,
 # FIELD_MIN_PAGES.
+#
+# AND IT HAS TWO TERMS, NOT ONE: THE SHAPE WITHIN A PAGE, AND THE PAGE'S LEVEL.
+# The four profiles are the SHAPE of the browning, one shape for the whole
+# class, and for a long time they were the whole correction -- the fit computed
+# a per-page term and threw it away.  The front of a magazine really is browner
+# than its middle: air and light reach the outside of the stack.  MEASURED over
+# all 346 pages of SH8606 and SH8608, the raw paper cast (R-B) of the first
+# ~15 % of the book against the middle: +2.64 DN on SH8606 and +2.47 on SH8608,
+# of which the profiles alone removed only 30-55 % (residual +1.88 and +1.14),
+# because a shape cannot say how much.  So the field file also carries ONE
+# SCALAR PER PAGE PER CHANNEL -- `page-gain NNN R G B`, normalised so that the
+# class's MEDIAN page is exactly 1.0 -- and it multiplies in on top of the
+# profiles, through the same FIELD_ALPHA.
+#
+# The median and not the mean, and normalised at all, for one reason: this term
+# must move the pages RELATIVE TO EACH OTHER and must not move the class's
+# overall level.  That level is the grade's job, it is anchored on the measured
+# white point, and a field that quietly shifted it would be a tone change
+# nothing downstream could attribute.
+#
+# AND 89 % OF THE TERM IS NOT BROWNING -- MEASURED, SH8608, 158 pages.  Browning
+# is chromatic; this term is mostly grey (grey share of the log-gain variance
+# 0.89), it correlates +0.42 with a page's raw ink coverage and -0.43 with its
+# darkest-ink level, and SH8608's four heaviest pages (063-066) would be lifted
+# +20 to +44 DN.  It halves the page-to-page cast spread (3.68 -> 1.81) and
+# overshoots the front-vs-middle cast through zero (+3.07 -> -1.38), while
+# moving the class's mean level +0.74 DN.  The chromatic part alone does better
+# on both and leaves the level alone.  Restricting it is an OWNER DECISION and
+# has not been taken: see r005_masters_sheet.md, "MEASURED, AND IT IS 89 % NOT
+# BROWNING", and check 7f.
 
 # THE SWITCH.  True is the default and the owner's decision (2026-10-08).
 # False applies nothing at all, on every class, and says so in every stamp:
@@ -550,6 +580,36 @@ PAPER_PROBE_MIN_FRAC = 0.05
 # invents a tone the scanner did not record: it must be possible to make the
 # page without it and compare.
 FIELD_CORRECTION = True
+# THE PER-PAGE TERM, AND IT IS OFF.  r005_field.py fits a `page` factor beside
+# the positional profiles and writes it as `page-gain` lines; this decides what
+# this file does with them.  MEASURED on SH8608's `low` class, 158 pages, and
+# the measurement is why it is off:
+#
+#   grey (achromatic) share of the term's variance        0.888
+#   corr(grey part, this page's ink coverage)             +0.54
+#   corr(chromatic part, this page's ink coverage)        +0.23
+#   largest achromatic lifts   p063 1.176  p064 1.164  p066 1.127  p065 1.089
+#
+# The term is NOT mostly browning.  `b(ink)` is identified WITHIN a page, from
+# its blocks' own coverage, so it cannot absorb how heavily inked one page is
+# against another -- and that lands here instead.  063-066 are consecutive
+# listing pages at 37-41 % coverage, and the full term would lift them by up to
+# +44 DN for having ink on them.  Browning is chromatic (the profiles' own
+# signature is B moving ~30x as far as R), so the half of this term that IS
+# browning is the chromatic half.
+#
+#   "off"        the lines are parsed, checked and stamped, and change no pixel
+#   "chromatic"  apply only the per-channel part, with the grey level removed:
+#                the half uncorrelated with ink.  Measured on the independent
+#                witness of 158 pages' raw centre paper, it halves the
+#                page-to-page cast disagreement (sd 3.68 -> 1.57 DN) and leaves
+#                the class level alone (192.19 against 192.22 raw).
+#   "full"       the term as fitted.  Do not, without re-reading the above.
+#
+# It OVERSHOOTS either way -- the front-vs-middle cast goes +3.07 -> -1.75 DN --
+# so it buys consistency between pages, not a correct mean.  That is why the
+# default is the one that changes nothing.
+FIELD_PAGE_GAIN = "off"            # "off" | "chromatic" | "full"
 # ...and the amplitude, which is NOT a knob to taste.  MEASURED over 7 SH8605
 # pages (text recto, text verso, photo, dark, colour, and two controls) and all
 # four edges: the mean |R-B| gap between the ink-free edge bands and the page's
@@ -901,7 +961,8 @@ def field_box_complaint(w_mm, h_mm):
             f"{wlo:g}-{whi:g} x {hlo:g}-{hhi:g} mm a field can be anchored on")
 
 
-def field_text(mode, step=None, half=None, centre=None, floor=None, prof=None):
+def field_text(mode, step=None, half=None, centre=None, floor=None, prof=None,
+               page_gain=None):
     """The field's NUMBERS, and nothing else -- the text `field-sha` is over.
 
     Same discipline as profile_text(): ONE function produces this text and
@@ -922,6 +983,21 @@ def field_text(mode, step=None, half=None, centre=None, floor=None, prof=None):
     centre (1.00000 by construction) and the last is the page edge.  Linear
     gain and not log, because this file is read by people and 1.33 is the
     number in the reports.
+
+    A `page-gain` line is ONE PAGE's own scalar, `page-gain NNN R G B`, in the
+    same linear-gain convention: how much browner that page is than the class
+    MEDIAN page, which the four profiles cannot say because they are the SHAPE
+    of the browning within a page and one shape serves the whole class.  The
+    median page is 1.00000 by construction, so these lines move pages relative
+    to each other and never move the class's level -- that is the grade's job
+    and is anchored on the grade's own white point.
+
+    A page with NO LINE HERE gets no per-page gain: a page the fit rejected, a
+    page outside the fitted set, and every field file written before these
+    lines existed.  All three are the same statement -- nobody measured this
+    page's own level -- and all three must produce the pixels the profiles
+    alone produce, which is why the lines are emitted only when there are any
+    and an old file's digest is unchanged by this addition.
     """
     L = ["version 1", f"mode {mode}"]
     if mode == "identity":
@@ -938,6 +1014,11 @@ def field_text(mode, step=None, half=None, centre=None, floor=None, prof=None):
         for side in FIELD_SIDES:
             L.append(f"gain {cn} {side} "
                      + " ".join("%.5f" % v for v in prof[cn][side]))
+    # Sorted by page, and %03d, so that one set of per-page gains has exactly
+    # one spelling -- the round-trip in _parse() is what `field-sha` rests on.
+    for page in sorted(page_gain or {}):
+        L.append(f"page-gain {page:03d} "
+                 + " ".join("%.5f" % v for v in page_gain[page]))
     return "\n".join(L) + "\n"
 
 
@@ -1008,6 +1089,10 @@ class FlatField:
         self.centre_paper = None
         self.ink_floor = None
         self.logprof = {}
+        # page -> the page's own linear gain, (3,).  Empty is the normal state
+        # for an identity field, for a field file written before `page-gain`
+        # existed, and for any page the fit did not reach; see field_text().
+        self.page_gain = {}
         self.provenance = []
         if identity_because is not None:
             # ONE PAGE's field, turned off for a reason about that page.  The
@@ -1026,7 +1111,8 @@ class FlatField:
             self._parse(self.path.read_text(encoding="utf-8"))
         self.text = (field_text("identity") if self.mode == "identity" else
                      field_text("fitted", self.step, self.half,
-                                self.centre_paper, self.ink_floor, self.gain))
+                                self.centre_paper, self.ink_floor, self.gain,
+                                self.page_gain))
         self.sha = hashlib.sha1(self.text.encode("utf-8")).hexdigest()[:12]
 
     def _parse(self, raw):
@@ -1049,6 +1135,24 @@ class FlatField:
                                      f"{' '.join(line[:3])}")
                 self.gain[line[1]][line[2]] = np.array(
                     [float(v) for v in line[3:]], float)
+            elif line[0] == "page-gain":
+                # `page-gain NNN R G B`.  Checked as strictly as a gain line and
+                # for the same reason: this one multiplies every pixel of ONE
+                # page, so a line this reader half-understands must stop the
+                # run rather than make a page nobody can reproduce.  A
+                # duplicate page is a conflict, not a last-one-wins.
+                if len(line) != 5 or not line[1].isdigit():
+                    raise SystemExit(f"r005: {self.path}: bad page-gain line "
+                                     f"{' '.join(line[:3])}")
+                page = int(line[1])
+                if page in self.page_gain:
+                    raise SystemExit(f"r005: {self.path}: page {page:03d} has "
+                                     f"two page-gain lines")
+                g = np.array([float(v) for v in line[2:]], float)
+                if not np.all(g > 0.0):
+                    raise SystemExit(f"r005: {self.path}: page-gain "
+                                     f"{line[1]} is not positive: {g}")
+                self.page_gain[page] = g
             else:
                 vals[line[0]] = line[1:]
         if vals.get("version", ["?"])[0] != "1":
@@ -1056,6 +1160,14 @@ class FlatField:
                              f"{vals.get('version', ['(absent)'])[0]}, not 1")
         self.mode = vals.get("mode", ["?"])[0]
         if self.mode == "identity":
+            # An identity field touches no pixel, so it cannot carry a per-page
+            # gain: a file that does is not an identity field and must not be
+            # read as one (the digest would say "no field at all" over numbers
+            # that are a field).
+            if self.page_gain:
+                raise SystemExit(f"r005: {self.path}: mode identity, but it "
+                                 f"carries {len(self.page_gain)} page-gain "
+                                 f"line(s)")
             return
         if self.mode != "fitted":
             raise SystemExit(f"r005: {self.path}: mode {self.mode!r} is neither "
@@ -1080,7 +1192,30 @@ class FlatField:
         if self.mode == "identity":
             return f"identity -- {self.why}"
         return (f"{self.why} (fitted, step {self.step:g} mm, "
+                f"{len(self.page_gain)} per-page gain(s), "
                 f"alpha {FIELD_ALPHA:.2f})")
+
+    def page_log_gain(self, page):
+        """log of ONE page's own gain, (3,).  Zeros for a page with no entry.
+
+        The zero is not a default standing in for a number that should have
+        been there: see field_text(), a page with no `page-gain` line is a page
+        nobody measured the level of, and it must come out of apply() exactly as
+        it did before these lines existed.
+        """
+        g = self.page_gain.get(page)
+        if g is None or FIELD_PAGE_GAIN == "off":
+            return np.zeros(3)
+        lg = np.log(g)
+        if FIELD_PAGE_GAIN == "chromatic":
+            # Drop the achromatic level and keep only the per-channel part.
+            # See FIELD_PAGE_GAIN: the grey part is 0.888 of this term's
+            # variance and tracks the page's INK coverage, not its browning.
+            lg = lg - lg.mean()
+        elif FIELD_PAGE_GAIN != "full":
+            raise SystemExit(f"r005: FIELD_PAGE_GAIN {FIELD_PAGE_GAIN!r} is not "
+                             f"one of 'off', 'chromatic', 'full'")
+        return lg
 
     def _d(self, cn, side):
         return np.arange(len(self.logprof[cn][side])) * self.step
@@ -1127,22 +1262,39 @@ class FlatField:
                         np.interp(a, self._d(cn, "bottom"), self.logprof[cn]["bottom"]),
                         np.interp(a, self._d(cn, "top"), self.logprof[cn]["top"]))
 
-    def gain_at(self, sx_mm, sy_mm, recto=True, alpha=None):
-        """exp(alpha*(gy + gx)) as an (len(sy), len(sx), 3) array."""
+    def gain_at(self, sx_mm, sy_mm, recto=True, alpha=None, page=None):
+        """exp(alpha*(gy + gx + page)) as an (len(sy), len(sx), 3) array.
+
+        `page` adds that page's own scalar, through the SAME alpha as the
+        profiles -- it is one more log gain in the same sum, not a separate
+        decision, so FIELD_ALPHA scales the whole correction or none of it.
+        With `page=None` (the default) this is the class's profile alone, which
+        is what a question about the SHAPE of the field wants to ask.
+        """
         a = FIELD_ALPHA if alpha is None else alpha
+        lp = self.page_log_gain(page)
         G = np.empty((len(np.atleast_1d(sy_mm)), len(np.atleast_1d(sx_mm)), 3))
         for c, cn in enumerate("RGB"):
             G[..., c] = np.exp(a * (self.gy(cn, np.atleast_1d(sy_mm))[:, None]
-                                    + self.gx(cn, np.atleast_1d(sx_mm), recto)[None, :]))
+                                    + self.gx(cn, np.atleast_1d(sx_mm), recto)[None, :]
+                                    + lp[c]))
         return G
 
-    def apply(self, full, box, reduce, recto, pc, k):
+    def apply(self, full, box, reduce, recto, pc, k, page=None):
         """Flatten `full` IN PLACE, in stripes.  See the two anchors above.
 
         `full` is the LEVELLED scan at its own resolution, which is the image
         the separator is about to be handed; `box` is the traced page in
         MASTER_DPI pixels, which is where the geometry was decided, so the
         centre is scaled by `reduce` and the millimetre comes from MM*reduce.
+
+        `page` is the page's NUMBER, and it brings in that page's own gain from
+        the field file -- how browned this page is against the class median
+        page, which the four profiles cannot say.  It is passed separately from
+        `recto` although `recto` is derived from it, so the two are checked
+        against each other here: a caller that passes a page and the other
+        parity would mirror the horizontal profiles of a page while scaling it
+        by its own level, and nothing downstream could see that.
 
         IT IS APPLIED TO THE WHOLE SHEET, not only inside the traced page.  The
         profiles are monotone and clamp at the half-page, so beyond the trim the
@@ -1153,12 +1305,20 @@ class FlatField:
         master they are replaced by paper white, and on the sheet they are what
         they always were, scanner furniture.
         """
+        if page is not None and (page % 2 == 1) != bool(recto):
+            raise SystemExit(f"r005: field.apply: page {page} is a "
+                             f"{'recto' if page % 2 == 1 else 'verso'} and "
+                             f"recto={recto} was passed")
         W, H = full.size
         x0, y0, x1, y1 = box
         cx, cy = 0.5 * (x0 + x1) * reduce, 0.5 * (y0 + y1) * reduce
         mmpx = MM * reduce
         sx = (np.arange(W) - cx) / mmpx
         gx = np.stack([self.gx(cn, sx, recto) for cn in "RGB"], 1)
+        # THIS PAGE's own level, as one more log gain in the same sum.  Zeros
+        # for a page the field file does not name, which is how a page the fit
+        # rejected keeps exactly the pixels the profiles alone give it.
+        lp = self.page_log_gain(page)[None, None, :]
         # float32 from here down, and deliberately: the per-pixel arrays are
         # the only thing in this step whose size is set by the SCAN, and at
         # 2400 dpi one stripe's worth of value, gain and result in float64 is
@@ -1175,7 +1335,7 @@ class FlatField:
             bot = min(H, top + FIELD_STRIPE_ROWS)
             sy = (np.arange(top, bot) - cy) / mmpx
             gy = np.stack([self.gy(cn, sy) for cn in "RGB"], 1)
-            g = np.exp(FIELD_ALPHA * (gy[:, None, :] + gx[None, :, :])
+            g = np.exp(FIELD_ALPHA * (gy[:, None, :] + gx[None, :, :] + lp)
                        ).astype(np.float32)
             v = np.asarray(full.crop((0, top, W, bot)), np.float32)
             ploc = pc / g
@@ -1950,6 +2110,13 @@ def process(page):
                      f"{field_box_complaint(page_w_mm, page_h_mm)}")
     field_pc = field_k = None
     field_anchors = "(none -- " + field.summary + ")"
+    # THIS PAGE's own gain, written into the stamp beside the anchors and for
+    # the same reason: the field file carries one line per page and the stamp
+    # must say which of them -- if any -- made these pixels.
+    pgain = field.page_gain.get(page) if field.mode != "identity" else None
+    field_page_gain = ("(none -- this page has no `page-gain` line)"
+                       if pgain is None else
+                       "%.5f %.5f %.5f" % tuple(pgain))
     if field.mode != "identity":
         field_pc, field_k, how = page_anchors(arr, keep, t.box, field)
         field_anchors = (f"Pc {field_pc[0]:.1f}/{field_pc[1]:.1f}/{field_pc[2]:.1f}"
@@ -1988,6 +2155,10 @@ def process(page):
         # the pixels and neither is in the field file, because both are
         # measured on this page.
         "field-anchors": field_anchors,
+        # ...and the per-page gain the field file gave THIS page.  It is in the
+        # file and so in `field-sha`, but the stamp is what a human reads, and
+        # "which of 158 lines was mine" is not a question a digest answers.
+        "field-page-gain": field_page_gain,
     })
 
     with tempfile.TemporaryDirectory(prefix=f"r005_{ISSUE}_{stem}_") as work:
@@ -2012,7 +2183,8 @@ def process(page):
         # the ink ratio are all statements about.  The published pixels all
         # come through `full`.
         if field.mode != "identity":
-            field.apply(full, t.box, reduce, page % 2 == 1, field_pc, field_k)
+            field.apply(full, t.box, reduce, page % 2 == 1, field_pc, field_k,
+                        page)
         full.save(src_png)
         # A 600 dpi scan has no 2400 dpi sheet: its full-resolution render IS
         # sheets600, so it is rendered into the scratch directory and not

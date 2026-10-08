@@ -81,6 +81,59 @@ is here because getting it wrong was tried and cost something.
 (5) MIRROR BY PARITY, at application time: an odd page is a recto (fore edge
     right), an even page a verso (fore edge left).
 
+(6) THE `page` TERM IS PART OF THE ANSWER, NOT A NUISANCE PARAMETER.  The four
+    profiles are the SHAPE of the browning within a page; `page_m` is how
+    browned THAT page is.  For its first two issues this file fitted `page_m`
+    and threw it away, and the correction therefore flattened each page about
+    its own level and left the pages disagreeing with each other.
+
+    MEASURED over all 346 pages of SH8606 and SH8608: the front of a magazine
+    is browner than its middle -- air and light reach the outside of the stack
+    -- and the raw paper cast (R-B) of the first ~15 % of the book against the
+    middle is +2.64 DN on SH8606 and +2.47 on SH8608.  With the profiles alone
+    applied, +1.88 and +1.14 of that survived into the published masters: a
+    shape cannot say how much.
+
+    So the fit writes ONE SCALAR PER PAGE PER CHANNEL, `page-gain NNN R G B`,
+    normalised so that the class's MEDIAN page is exactly 1.0, and
+    r005_masters_sheet.py multiplies it in on top of the profiles at the same
+    FIELD_ALPHA.  The median normalisation is not cosmetic: this term must move
+    the pages RELATIVE TO EACH OTHER and must not touch the class's overall
+    level, which is the grade's job and is anchored on the measured white point.
+
+    AND THEN IT WAS MEASURED, AND 89 % OF IT IS NOT BROWNING.  READ THIS BEFORE
+    RE-FITTING A LIVE ISSUE'S FIELD.  On SH8608's `low` class, 158 pages, the
+    page term tracks each page's own centre paper as measured independently by
+    r005_masters_sheet (corr of log gain against -log Pc: +0.76/+0.82/+0.86) --
+    so it is a real measurement.  But browning is CHROMATIC (the profiles move
+    B about 30x as far as R), and this term is not: splitting each page's gain
+    into its grey part (the geometric mean over RGB) and the rest,
+
+        grey share of the log-gain variance        0.89
+        corr(log grey, raw ink coverage)          +0.42
+        corr(log grey, darkest-ink level)         -0.43
+        corr(chromatic part, raw ink coverage)    -0.05
+
+    b(ink) is identified WITHIN a page and absorbs coverage there; it does not
+    absorb how heavily inked one page is against another, and that lands here.
+    The nine SH8608 pages beyond +-5 % name themselves: 063-066, consecutive,
+    coverage 37-41 % and darkest-ink level 14-16 against the issue's typical
+    49, would be lifted +20 to +44 DN.  All four trace, skew and size cleanly:
+    what fails is "the brightest 15 % of each block is clean paper".
+
+    Front against middle, on the stamps' own Pc: raw cast +3.07 DN (which
+    CONFIRMS the diagnosis), full gain -1.38, chromatic part alone -1.75; the
+    page-to-page cast spread falls 3.68 -> 1.81 (full) / 1.57 (chroma).  The
+    full gain also moves the class mean level +0.74 DN and the front band
+    +2.15, which is what the median normalisation exists to prevent.
+
+    So the correction is better than nothing on the cast and worse than nothing
+    on the level, and the half that works is the chromatic half.  Restricting
+    the term to it is an OWNER DECISION and has not been taken; see
+    r005_masters_sheet.md, "MEASURED, AND IT IS 89 % NOT BROWNING", and check
+    7f, which reports the grey share and names every page beyond +-5 %.
+    (Measured 2026-10-08 on SH8608.)
+
 The amplitude, the application (an ink-anchored affine map and NOT a multiply),
 and the two per-page anchors are r005_masters_sheet.py's -- see FIELD_ALPHA and
 FlatField.apply() there.
@@ -435,10 +488,27 @@ def fit_axis(dsig, y, D):
 
 
 def fit_class(stats):
-    """The four monotone half-profiles per channel, from a class's pages.
+    """The four monotone half-profiles per channel, AND each page's own level.
 
     `stats` is the list measure_page() produced, already filtered to the pages
-    that may be fitted.  Returns (profiles, half, centre, floor, report lines).
+    that may be fitted.  Returns
+    (profiles, half, centre, floor, page_gain, report lines).
+
+    TWO TERMS COME OUT OF ONE FIT, and for a long time only one of them was
+    kept.  `polish4` estimates a page factor `page_m` beside the positional
+    factors, because it has to: a page that is browner overall would otherwise
+    be absorbed into v and h and bend the shape.  That factor was computed and
+    discarded, so the correction removed how the browning VARIES ACROSS a page
+    and not how browned a page is -- and the front of a magazine is browner
+    than its middle, measured at +2.64 / +2.47 DN of raw R-B cast on SH8606 and
+    SH8608.  `page_gain` is that factor, carried through.
+
+    The CONVENTION, and it is the one place a sign can be got wrong silently:
+    the profiles are fitted on `-h` / `-v`, i.e. they are gains that UNDO the
+    level the model found, so a browner place gets a gain above 1.  The page
+    term follows exactly that -- exp(-page_m) -- and is then divided by its own
+    median, so the class's MEDIAN PAGE is 1.0 by construction and the fit moves
+    pages relative to each other without moving the class.
     """
     pages = np.array([s["page"] for s in stats])
     paper = np.array([s["paper"] for s in stats], np.float64)
@@ -473,11 +543,19 @@ def fit_class(stats):
     inkbin = np.clip(np.searchsorted(edges, np.nan_to_num(ink, nan=0.0),
                                      side="right") - 1, 0, len(edges) - 1)
 
-    prof, rep = {}, []
+    prof, rep, pgain = {}, [], {}
     for c, cn in enumerate("RGB"):
         with np.errstate(all="ignore"):
             L = np.log(paper[..., c])
         cst, pg, v, h, b = polish4(L, inkbin, len(edges))
+        # The page term, in the profiles' own convention: a gain that undoes
+        # the level, normalised on the class median page.  polish4 already
+        # re-centres pg on its median every iteration, so the division is small
+        # -- it is here because "already 1.0 to five places" and "1.0 by
+        # construction" are different claims and the verification checks the
+        # second one.
+        g = np.exp(-pg)
+        pgain[cn] = g / np.median(g)
         ddx, p_gut, p_fore, _ = fit_axis(XC, -h, Dx)
         ddy, p_top, p_bot, _ = fit_axis(YC, -v, Dy)
         gx = np.arange(0.0, Dx + 0.5 * STEP_MM, STEP_MM)
@@ -492,12 +570,18 @@ def fit_class(stats):
                    f"ink term b(ink) in DN at a 200 level: "
                    + " ".join(f"{edges[kk]:.2f}:{200 * (math.exp(b[kk]) - 1):+.1f}"
                               for kk in range(0, len(edges), 4)))
+        q = np.percentile(pgain[cn], (0, 10, 50, 90, 100))
+        rep.append(f"{cn}: per-page gain p0/p10/p50/p90/p100 "
+                   + " ".join("%.4f" % v for v in q)
+                   + f" (1.0 = the class median page)")
 
+    page_gain = {int(p): np.array([pgain["R"][m], pgain["G"][m], pgain["B"][m]])
+                 for m, p in enumerate(pages)}
     centre = np.median(np.array([s["pc"] for s in stats
                                  if s["pc"] is not None]), axis=0)
     floor = np.median(np.array([s["k"] for s in stats
                                 if s["k"] is not None]), axis=0)
-    return prof, (Dx, Dy), centre, floor, rep
+    return prof, (Dx, Dy), centre, floor, page_gain, rep
 
 
 def edge_table(prof, half, step=STEP_MM):
@@ -654,7 +738,7 @@ def do_class(klass, pages):
                    f"{FIELD_MIN_PAGES}",
             extra=["rejected:"] + [f"  p{p:03d}  {w}" for p, w in rejected])
 
-    prof, half, centre, floor, rep = fit_class(stats)
+    prof, half, centre, floor, page_gain, rep = fit_class(stats)
     prov = [f"measured {date.today().isoformat()} by r005_field.py",
             "",
             f"{len(stats)} page(s) of class `{name}` fitted; "
@@ -682,7 +766,25 @@ def do_class(klass, pages):
             "before pooling, and r005_masters_sheet.py mirrors them back by "
             "page parity.",
             "",
-            "the ink term, per channel:"] \
+            "TWO TERMS.  The profiles are the SHAPE of the browning within a "
+            "page, one shape for the whole",
+            "class.  The `page-gain NNN R G B` lines below are the `page` term "
+            "of the same fit -- how browned",
+            "THAT page is against the class's MEDIAN page, which is 1.0 by "
+            "construction.  The front of a",
+            "magazine is browner than its middle (air and light reach the "
+            "outside of the stack): measured over",
+            "SH8606 and SH8608, the raw paper cast (R-B) of the first ~15 % of "
+            "the book against the middle is",
+            "+2.64 and +2.47 DN, and the profiles alone removed only 30-55 % "
+            "of it.  r005_masters_sheet.py",
+            "multiplies the page's own scalar in on top of the profiles, "
+            "through the same FIELD_ALPHA.  A page",
+            "with no line of its own -- rejected, or not in this fit -- is "
+            "corrected by the profiles alone.",
+            "",
+            "the fitted terms, per channel -- the ink covariate, and the "
+            "spread of the per-page gain:"] \
         + [f"  {line}" for line in rep] \
         + ["",
            f"half-page: {half[0]:.2f} x {half[1]:.2f} mm "
@@ -697,7 +799,8 @@ def do_class(klass, pages):
         + ([f"no scan or thumb: " + " ".join(f"{p:03d}" for p in missing)]
            if missing else [])
 
-    body = R.field_text("fitted", STEP_MM, half, centre, floor, prof)
+    body = R.field_text("fitted", STEP_MM, half, centre, floor, prof,
+                        page_gain)
     dest = R.field_path(grade)
     R.write_field(dest, grade, body, prov)
     print("\n".join("            " + l for l in edge_table(prof, half)),

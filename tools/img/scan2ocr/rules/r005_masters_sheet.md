@@ -913,6 +913,111 @@ behind each of its five decisions; the short version is:
    2–4 DN. Worth paying rather than inventing a ring.
 5. **Mirrored by parity** at application time — an odd page is a recto (fore
    edge right), an even page a verso.
+6. **The `page` term of that same fit is kept**, as one scalar per page per
+   channel — see the next section.
+
+#### Two terms: the shape within a page, and the page's own level
+
+The four profiles are the **shape** of the browning, and one shape serves the
+whole class. For its first two issues that was the whole correction: `polish4`
+estimated a page factor beside the positional ones — it has to, or a page that
+is browner overall bends the shape — and `fit_class()` **threw it away**. So
+the field flattened every page about **its own** level and left the pages still
+disagreeing with each other.
+
+**The front of a magazine is browner than its middle.** Air and light reach the
+outside of the stack. MEASURED over all 346 pages of SH8606 and SH8608, the raw
+paper cast (R − B) of the first ~15 % of the book against the middle:
+
+| | raw scans, front − middle | surviving into the masters, profiles only |
+|---|---|---|
+| SH8606 | **+2.64 DN** | +1.88 |
+| SH8608 | **+2.47 DN** | +1.14 |
+
+A shape cannot say *how much*, so 30–55 % of it was all the profiles could
+remove. The field file therefore also carries one line per page —
+
+```
+page-gain NNN R G B
+```
+
+— in the same linear-gain convention as the `gain` lines, and
+`FlatField.apply()` multiplies that page's scalar in on top of the profiles,
+through the same `FIELD_ALPHA`. Because the affine map's fixed point is the
+page's own measured `Pc`, a gain of *g* lifts that page's paper to `Pc·g` to
+first order: the page is moved onto the class's level, which is what the one
+white point in the grade has always assumed.
+
+**The class's MEDIAN page is 1.0 by construction**, and that normalisation is
+not cosmetic. This term must move the pages *relative to each other* and must
+not touch the class's overall level: the level is the grade's job, it is
+anchored on the measured white point, and a field that quietly shifted it would
+be a tone change nothing downstream could attribute. It follows that the
+per-page term **cannot** fix a class whose interior sits at the wrong level
+overall — that is the grade under-lifting a darker stock, a separate defect.
+
+**A page with no `page-gain` line of its own gets the profiles alone**, exactly
+as before this term existed: a page the fit rejected, a page outside the fitted
+set, and every field file written before these lines. All three are the same
+statement — nobody measured this page's level — and the lines are emitted only
+when there are any, so an older field file's `field-sha` is unchanged by the
+addition. A field file that *does* carry them is legitimately a different field
+and gets a different digest, so a class that gains them has every master of
+that class to rebuild.
+
+#### MEASURED, AND IT IS 89 % NOT BROWNING — do not ship a re-fitted field without reading this
+
+The term was carried through and then measured, on SH8608's `low` class refitted
+over its 158 fittable pages against the **158 existing stamps' own `Pc`** — each
+page's raw centre paper, measured by the production code before this term
+existed. It is a real per-page measurement: `corr(log page-gain, −log Pc)` is
+**+0.76 / +0.82 / +0.86** in R/G/B. What it is *not* is browning.
+
+**Browning is chromatic.** The profiles' own signature is B moving about 30× as
+far as R (1.37 against 1.01 at the foot of the sheet). Split each page's gain
+into its grey part (the geometric mean over RGB) and the rest:
+
+| | measured, SH8608 `low`, 158 pages |
+|---|---|
+| grey share of the log-gain variance | **0.89** |
+| grey part, sd | 0.0267 (robust/MAD 0.0119) |
+| chromatic part, sd of log(gB/gR) | 0.0223 |
+| corr(log grey, raw ink coverage) | **+0.42** |
+| corr(log grey, the page's darkest-ink level) | **−0.43** — a darker page gets a bigger lift |
+| corr(chromatic part, raw ink coverage) | −0.05 |
+
+So `b(ink)` absorbs coverage *within* a page, where it is identified, and does
+**not** absorb how heavily inked one page is against another — that lands in the
+page factor. Nine pages are beyond ±5 % on the **grey** part (fourteen on any
+one channel, which is what 7f lists), and they name themselves: **063, 064, 065, 066**
+(consecutive, coverage 37–41 %, darkest-ink level 14–16 against the issue's
+typical 49) would be lifted **+20 to +44 DN**, and **003, 020, 021, 025, 034**
+are the other end. None of those four dark pages has a bad box, a bad trace or a
+bad skew; they are simply pages whose "brightest 15 % of each block" is not clean
+paper any more.
+
+**What the term does deliver**, front of the book against the middle, taking the
+stamps' `Pc` as the page's level and applying the gain to it:
+
+| | raw | full gain | chromatic part only |
+|---|---|---|---|
+| cast (R−B) front − middle | **+3.07 DN** | −1.38 | −1.75 |
+| page-to-page cast spread, sd | 3.68 | 1.81 | **1.57** |
+| class mean level | 192.22 | **192.96** | 192.19 |
+| front band level | 191.23 | **193.38** | 191.15 |
+
+The +3.07 confirms the diagnosis — the front of this book *is* browner, and
++2.47 was measured independently on the raw scans. But the full gain
+**overshoots it through zero**, and it moves the class's mean level by +0.74 DN
+and the front band's by +2.15, which is the one thing this term was normalised
+not to do. The **chromatic part alone** does better on every column *and* leaves
+the level alone, because it is the half that is uncorrelated with the ink.
+
+**So: the numbers are written to the file and applied, and a field re-fitted
+today will apply all of it.** Before re-fitting a live issue's field, the owner
+has to rule on whether the term is restricted to its chromatic part. Check 7f
+reports the grey share and names every page beyond ±5 % for exactly this
+reason. *(Measured 2026-10-08, SH8608.)*
 
 #### It is not a multiply
 
@@ -1068,9 +1173,15 @@ measured per page and are therefore not in the field file:
 ```
 grade-sha    f02fda38752c
 field-sha    59bbbe19fc02
-field        .../issues/SH8605/field_low.txt (fitted, step 0.5 mm, alpha 1.00)
+field        .../issues/SH8605/field_low.txt (fitted, step 0.5 mm, 190 per-page gain(s), alpha 1.00)
 field-anchors Pc 211.2/190.8/179.3  K 24.8/22.3/21.5  (Pc own centre, K own floor)
+field-page-gain 1.00412 0.99834 0.98716
 ```
+
+`field-page-gain` is this page's own line out of the field file. It *is* inside
+`field-sha`, unlike the anchors — but the digest is over all of a class's
+hundred-odd lines at once, and *"which of them was mine"* is not a question a
+digest answers. A page with no line of its own says so in words.
 
 A page the field could **not** be anchored on carries the *identity* digest and
 `field  identity -- NOT APPLIED -- <why>`, never the fitted one: the stamp must
@@ -1427,14 +1538,17 @@ for stem, mm in sorted(WINDOWS.items()):
               f"something is eating the paper")
 PY
 
-# 7. THE PAPER-YELLOWING FIELD.  Five checks, and each of them has been seen to
+# 7. THE PAPER-YELLOWING FIELD.  Six checks, and each of them has been seen to
 #    FAIL against a deliberately planted fault before it was trusted -- the
 #    faults and what they printed are recorded under "What check 7 read" below.
 #
 # 7a. EVERY PAPER CLASS HAS A FIELD FILE, IT PARSES, AND IT ROUND-TRIPS.
 #     FlatField re-emits the body through field_text() instead of digesting the
 #     bytes it read, so this also catches a file this reader cannot reproduce
-#     exactly -- which is the only way `field-sha` can lie.
+#     exactly -- which is the only way `field-sha` can lie.  The per-page gains
+#     go through the same re-emission, so a `page-gain` line this reader
+#     half-understands fails HERE: it is counted below, and a file with none
+#     (one written before they existed) is legitimate and says 0.
 $PY - <<'PY'
 import r005_masters_sheet as R
 for klass, f in sorted(R.FIELDS.items(), key=lambda kv: str(kv[0])):
@@ -1449,7 +1563,7 @@ for klass, f in sorted(R.FIELDS.items(), key=lambda kv: str(kv[0])):
         assert body == f.text, "the field file does not re-emit identically"
         print(f"       half-page {f.half[0]:.2f} x {f.half[1]:.2f} mm, step "
               f"{f.step:g} mm, {len(f.gain['R']['bottom'])} samples/profile, "
-              f"round-trips")
+              f"{len(f.page_gain)} per-page gain(s), round-trips")
 PY
 
 # 7b. THE STAMP: every master names the FIELD that made it, and it is the
@@ -1479,10 +1593,15 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
 assert not bad, f"{len(bad)} master(s) do not name the current field: {bad}"
 PY
 
-# 7c. CENTRE GAIN IS EXACTLY 1.0, per channel and either parity.  The whole
-#     correction is defined relative to the page's own centre -- Pc is measured
-#     there -- so a centre gain other than 1.0 is a global tone shift wearing a
-#     flat field's clothes, and nothing downstream could see it.
+# 7c. THE PROFILES' CENTRE GAIN IS EXACTLY 1.0, per channel and either parity.
+#     The whole correction is defined relative to the page's own centre -- Pc is
+#     measured there -- so a centre gain other than 1.0 is a global tone shift
+#     wearing a flat field's clothes, and nothing downstream could see it.
+#
+#     It is asked WITHOUT a page (`page=None`), deliberately: this is the
+#     question about the SHAPE of the field.  A real page's centre gain is its
+#     own `page-gain` and is NOT 1.0 -- that is the point of it -- and 7f is
+#     the check on that term.
 $PY - <<'PY'
 import numpy as np
 import r005_masters_sheet as R
@@ -1591,6 +1710,95 @@ assert mean <= MEAN_MAX, (f"the paper at the page edges is {mean:.2f} DN off "
                           f"the page's own centre -- the field is not working")
 assert abs(worst[3]) <= WORST_MAX, f"band {worst[:3]} is {abs(worst[3]):.2f} DN off"
 PY
+
+# 7f. THE PER-PAGE TERM, AND HOW MUCH OF IT IS BROWNING.  The profiles are the
+#     SHAPE of the browning; this is how browned each page is -- or so the term
+#     is meant to be, and on SH8608 it measurably is not, which is what this
+#     check is for.  Five things, and each is a way the term could be something
+#     else:
+#
+#       * the class MEDIAN page is exactly 1.0 -- otherwise the field is
+#         shifting the class's whole level, which is the grade's job and is
+#         anchored on the measured white point;
+#       * every page named belongs to this class -- a line for a page of the
+#         other stock would scale it by a level measured on paper it is not
+#         printed on;
+#       * BROWNING IS CHROMATIC.  The profiles' own signature is B moving ~30x
+#         as far as R (1.37 against 1.01 at the foot).  Split each page's gain
+#         into its grey part (the geometric mean over RGB) and what is left,
+#         and report the GREY SHARE of the variance.  A term that is mostly
+#         grey is a per-page LEVEL term, and on this corpus a level term is
+#         partly the page's ink: MEASURED on SH8608, grey share 0.89,
+#         corr(log grey, raw ink coverage) +0.42, corr with the page's
+#         darkest-ink level -0.43.  See "Two terms", above;
+#       * HARD_BAND is the outer bound of anything paper can do.  SH8608's own
+#         worst page needs 1.21 in R (+44 DN), and that is already a
+#         mismeasured page and not a browned one;
+#       * the stamp beside each master carries that page's own line, so a
+#         master and the field file cannot disagree about which scalar made it.
+#
+#     A class with NO per-page gains is reported and skipped, not failed: an
+#     identity field has none by definition, and a field file written before
+#     these lines existed is legitimate (see "Two terms", above).
+$PY - <<'PY'
+import os, re
+import numpy as np
+import r005_masters_sheet as R
+HARD_BAND, FLAG = 0.25, 0.05     # refuse / list for inspection
+for klass, f in sorted(R.FIELDS.items(), key=lambda kv: str(kv[0])):
+    if f.mode != "fitted" or not f.page_gain:
+        print(f"{str(klass):6s} {f.mode}, {len(f.page_gain)} per-page gain(s) "
+              f"-- nothing to check")
+        continue
+    pages = sorted(f.page_gain)
+    G = np.array([f.page_gain[p] for p in pages])
+    LG = np.log(G)
+    for c, cn in enumerate("RGB"):
+        q = np.percentile(G[:, c], (0, 10, 50, 90, 100))
+        print(f"{str(klass):6s} {cn} min/p10/p50/p90/max "
+              + " ".join("%.5f" % v for v in q)
+              + f"   sd {G[:, c].std():.5f}")
+        assert abs(np.median(G[:, c]) - 1.0) < 5e-6, \
+            f"{cn}: the class median page is {np.median(G[:, c]):.6f}, not 1.0"
+        assert np.abs(G[:, c] - 1.0).max() <= HARD_BAND, \
+            f"{cn}: a page needs {np.abs(G[:, c] - 1.0).max():.4f} of gain"
+    wrong = [p for p in f.page_gain if R.grade_for(p).klass != klass]
+    assert not wrong, f"pages of another class in {klass}'s field: {wrong}"
+    lgrey = LG.mean(1)
+    print(f"{str(klass):6s} GREY SHARE of the variance "
+          f"{lgrey.var() * 3 / LG.var(0).sum():.2f}  "
+          f"(1.00 = a pure level term, 0 = pure browning); grey sd "
+          f"{lgrey.std():.4f}, chromatic log(gB/gR) sd "
+          f"{(LG[:, 2] - LG[:, 0]).std():.4f}")
+    loud = [p for p, g in zip(pages, G) if np.abs(g - 1.0).max() > FLAG]
+    print(f"{str(klass):6s} {len(f.page_gain)} page(s), median 1.0, all in "
+          f"class; {len(loud)} beyond {FLAG:.0%}: {loud}")
+    print(f"{str(klass):6s} ^ CHECK THOSE PAGES BY EYE before publishing them: "
+          f"on SH8608 they were the darkest, heaviest-inked pages and the "
+          f"gain was an ink artefact, not browning.")
+bad = []
+for fn in sorted(os.listdir(R.OUT_MASTER)):
+    if not fn.endswith(".stamp.txt"):
+        continue
+    s = (R.OUT_MASTER / fn).read_text()
+    page = int(fn[:3])
+    said = re.search(r"^field-page-gain\s+(.*)$", s, re.M)
+    if said is None:
+        continue                      # a master built before this line existed
+    g = R.field_for(page).page_gain.get(page)
+    want = ("(none -- this page has no `page-gain` line)" if g is None
+            else "%.5f %.5f %.5f" % tuple(g))
+    # A page the field was not applied to at all stamps identity, and then the
+    # per-page gain it does NOT carry is the honest answer too.
+    if "identity" in re.search(r"^field\s+(.*)$", s, re.M).group(1):
+        want = "(none -- this page has no `page-gain` line)"
+    if said.group(1) != want:
+        bad.append((fn, said.group(1), want))
+print(f"{len(bad)} stamp(s) disagree with the field file about the page gain")
+for fn, got, want in bad:
+    print(f"  {fn}: stamp {got!r}, field file {want!r}")
+assert not bad
+PY
 ```
 
 ### What it read, on the twelve pages verified
@@ -1646,7 +1854,7 @@ Kept as the record of what the curve did when there was one:
 
 ### What check 7 read, and the fault each check was seen to catch
 
-**A check that has never been seen to fail is not a check.** Every one of 7a–7e
+**A check that has never been seen to fail is not a check.** Every one of 7a–7f
 was run twice: once against a real build, and once against a deliberately
 planted fault. Measured on SH8605 — `field_low.txt` fitted on 190 pages,
 `field_high.txt` identity, and masters built for 099, 120, 114, 162, 008 and
@@ -1661,6 +1869,10 @@ planted fault. Measured on SH8605 — `field_low.txt` fitted on 190 pages,
 | **7c** centre gain is 1.0 | `1.000000 / 1.000000 / 1.000000`, both parities | the whole `gain B fore` profile × 1.003 | `AssertionError: centre gain is not 1.0` |
 | **7d** four monotone profiles | worst step `+0.00000` on all twelve | one mid-profile sample of `gain B bottom` pushed down by 0.004 | `B bottom  centre 1.00000 -> edge 1.35234  worst step -0.00400` then `AssertionError: B bottom is not monotone outward` |
 | **7e** paper neutrality at the edges | mean \|d(R−B)\| **0.58 DN**, worst band 2.87 | the same five pages built with `FIELD_CORRECTION = False` | `ALL BANDS: mean |d(R-B)| 6.12 DN (max 2.0), worst band p099 bottom 2 mm 28.83 DN` then `AssertionError: the paper at the page edges is 6.12 DN off the page's own centre -- the field is not working` |
+| **7f** the per-page term *(measured on SH8608's refitted `low`, 158 pages)* | median 1.000000 per channel, all pages in class, grey share 0.89, 14 pages beyond ±5 % listed | every `page-gain` × 1.01 | `AssertionError: R: the class median page is 1.010000, not 1.0` |
+| | | p063 (already the class's highest, so the median cannot move) pushed to 1.30 | `AssertionError: R: a page needs 0.3000 of gain` |
+| | | a correctly spelled unit-gain line added for p001, which is on the `high` stock | `AssertionError: pages of another class in low's field: [1]` |
+| | | one `page-gain` line respelled, duplicated, left with two channels, or given a negative gain | `r005: …/field_low.txt: bad page-gain line …` / `… page 077 has two page-gain lines` / `… page-gain 077 is not positive` / 7a's `the field file does not re-emit identically` |
 
 A centre gain other than 1.0 is necessarily a profile that does not start at
 1.0, so 7c's fault trips 7d as well; the reverse is not true, which is what the
