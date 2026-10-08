@@ -342,3 +342,9 @@ open question, introduce it by WHAT MADE IT HARD (here: the piece shares a page
 with a third article and its figures sit on another article's page), never by
 its subject. A question scoped by subject catches every later issue that shares
 the subject and none of the difficulty."
+
+## 080 — the splitter wrapper also calls bare `python3`
+
+Same class as r060's entry: r080_split.sh's embedded splitter runs as bare
+`python3`. It worked only because it is stdlib-only. **Suggested.** the same
+`PY=` line in every wrapper, and r000's census to cover wrapper bodies.
