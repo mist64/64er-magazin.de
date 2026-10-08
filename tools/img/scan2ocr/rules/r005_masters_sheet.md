@@ -109,6 +109,17 @@ Two stronger witnesses, both free:
    candidate, and read it as "this page is colour", never as "this page is on
    the good stock".
 
+   **And not even quite that: read it as "the owner SAW colour here".** A page
+   the owner's copy carries a felt-tip or highlighter MARKING on looks colour to
+   the eye and so was scanned at 2400 — owner, priming SH8608: *"careful, some
+   pages have manual color markings, these pages dont count as color!"* The
+   marking is not the plate (r000, *WHAT WE PUBLISH IS THE ORIGINAL PRINTING
+   PLATE, NOT THIS COPY*), so such a page is `low` stock AND bilevel; r006 has
+   the plate-vs-hand table and the `FORCE_BILEVEL` consequence. For THIS step it
+   changes nothing — the page was `low` either way — but it is the reason the
+   witness must not be re-promoted to "2400 means colour" the next time it looks
+   convenient.
+
    **Read the dpi from the PNG header, not from `identify`.** These scans carry
    `pHYs` in pixels per METRE, and `identify -format '%x'` converts to pixels
    per CENTIMETRE: a 2400 dpi page prints `944.88`, a 600 dpi page `236.22`. A

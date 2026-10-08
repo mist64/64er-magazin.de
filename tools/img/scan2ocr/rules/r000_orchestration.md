@@ -188,6 +188,35 @@ printed type at 3x (pen is grey, uneven, and sits off the type's baseline), and
 say in the report which it was. Every reader of this issue's scan should be
 told to look for it.
 
+### WHAT WE PUBLISH IS THE ORIGINAL PRINTING PLATE, NOT THIS COPY
+
+Owner, 2026-10-08: ***"we always want the original printing plate info, no notes
+or markings."*** The pen above is one instance of a general rule, and it reaches
+further than text:
+
+- **A hand's COLOUR marking is not colour.** The owner scans colour pages at
+  2400 dpi, so a page marked in felt-tip or highlighter looks exactly like a
+  colour page to the dpi witness and may measure as colour to r006's
+  classifier. Owner, priming SH8608: *"careful, some pages have manual color
+  markings, these pages dont count as color!"* **A page whose only colour is a
+  marking is a BILEVEL page** — `FORCE_BILEVEL` it, and say why in the log.
+- **A hand's correction is not print.** r280/r300 keep what the plate printed,
+  errors included, and a reader's fix is not an erratum (see
+  *print errors: leave as printed*).
+
+**AND IF A NOTE OR MARKING SURVIVES INTO THE PDF, FLAG IT TO THE OWNER.** Owner,
+2026-10-08: *"if you encounter notes or markings that survive into the PDF, flag
+this for me — i need to patch the input master file."* The fix belongs upstream,
+in the scan, not in our pixels: **do not retouch it in the chain, and do not
+ship it silently.** This is one of the few findings that goes to the owner
+rather than being settled by the rules, because only they can repaint the
+master. Report the page, what the mark is, and where on the page.
+
+Every step that reads the page therefore has to attribute what it sees to the
+PLATE or exclude it: the colour classifier (r006), the dpi witness (r005), and
+every transcribing step. Corroborate a suspected mark against the disk file or
+the issue's own printed erratum, as SH8605's p95 was.
+
 **NEVER COPY THE PREVIOUS ISSUE'S DESCRIPTOR.** `binding` and `paper` are
 properties of the PHYSICAL COPY in the owner's hands, and the next issue in a
 series is not bound or printed the same way just because it is next. 8612's

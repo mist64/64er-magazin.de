@@ -303,6 +303,32 @@ converse is weak — plenty of colour pages are scanned at 600. MEASURED on
 SH8605: **1** page in the first direction and **10** in the second, and the one
 was real while all ten were fine.
 
+**AND THE 2400 DPI WITNESS CAN BE A HAND, NOT THE PRESS.** The owner scans what
+looks colour to the eye, and a page carrying a felt-tip or highlighter MARKING
+looks colour to the eye. Owner, priming SH8608: *"careful, some pages have
+manual color markings, these pages dont count as color!"* So the first
+direction's question is not "is there colour on this page" but **"is the colour
+on this page the PLATE's"** — see r000, *WHAT WE PUBLISH IS THE ORIGINAL
+PRINTING PLATE, NOT THIS COPY*. The two are easy to tell apart at 3x:
+
+| | the plate | a hand |
+|---|---|---|
+| structure | a halftone SCREEN — regular dots at a fixed pitch and angle | a continuous stroke, no screen |
+| registration | sits inside the type's own boundaries | runs across type, into the gutter, past a rule |
+| edges | sharp, repeating | soft, uneven, with a start and an end |
+| where | where a figure or a tint belongs | wherever a reader wanted to point |
+
+**A page whose only colour is a marking is BILEVEL**: `FORCE_BILEVEL` it, and
+record in the log that the 2400 dpi was a marking, so the next reader of the
+cross-check does not re-promote it.
+
+**And then flag the mark itself to the owner — it must not reach the PDF.** Owner,
+2026-10-08: *"if you encounter notes or markings that survive into the PDF, flag
+this for me — i need to patch the input master file."* `FORCE_BILEVEL` only
+stops the page being rastered as colour; the stroke is still there, in grey. Do
+NOT retouch it here. Report the page, what the mark is and where, and leave the
+pixels alone: the repair is a new scan.
+
 That one page is **p032**, and it is why this check exists. The largest-blob
 measure cannot see it: its colour survives the 3x3 opening as 55 crumbs whose
 biggest is **35.2 mm²** against the 50 mm² threshold. Neither guard misfired —
@@ -434,6 +460,19 @@ void — it says what the review set WOULD have to show, and that is still the
 specification for the artefact you hand over. Generate the review set if it
 costs nothing, mention where it is, and keep going; the one thing you must not
 do is wait.
+
+**ONE THING DOES GO TO THE OWNER WITH THE PDF: a note or marking that survived
+into it.** The waiver is about the owner not wanting to inspect our
+intermediates — it is not a licence to hand over a page with a previous
+reader's felt-tip on it and let them find it. Owner, 2026-10-08: *"if you
+encounter notes or markings that survive into the PDF, flag this for me — i
+need to patch the input master file."* So before handing the PDF over, look at
+every page the colour cross-check put in the first direction (a marking is why
+some of them are at 2400 dpi) and every page whose stamp or log mentions a
+mark, and list what you found: page, what the mark is, where on the page.
+**Flag it; do not retouch it.** The repair is a new scan, which is the owner's
+to make — see r000, *WHAT WE PUBLISH IS THE ORIGINAL PRINTING PLATE, NOT THIS
+COPY*. That list goes in the handover message, not only into LOG.md.
 
 ### The reasoning, kept — why a review set has to show both paths
 
