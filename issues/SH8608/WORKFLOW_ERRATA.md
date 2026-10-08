@@ -159,3 +159,84 @@ first. lanes(19) = 9 on this box today.
 `seq 1 N | OMP_NUM_THREADS=1 xargs -P $("$PY" -c 'import r000_issue;
 print(r000_issue.lanes(19))') -n 1 "$PY" r005_masters_sheet.py` — and queue the
 2400 dpi pages first; 19 GB is their peak, a 600 dpi page needs far less."
+
+## 005b — Verification checks 3 and 4 have no heredoc terminator, so they cannot run
+
+**What the rule says.** r005_a4_window.md, *Verification*: check 3 opens
+`$PY - <<'PY'` and ends at `"a detector outlier whose opposite edge ALSO moved
+-- that is registration"` with no `PY` line; check 4 likewise ends at
+`assert not bad, f"these pages are more than 5% invented: {bad}"` with no `PY`.
+4 openers, 2 terminators in the block.
+
+**What I did.** Ran the block as extracted. Check 3's Python received check 4's
+comment lines and its `$PY - <<'PY'` and died `SyntaxError: invalid syntax`;
+same again from 4 into 5. Added the two `PY` lines in a scratch copy and ran:
+check 3 spread 0/0 px both parities (149 logo pages), check 4 body fabricated
+max 2.16 % (p162). Both pass once they can run. So the two checks that prove
+005b's purpose — registration and invention — have probably never run to the
+end on a build that pasted the block.
+
+**What it cost.** ~5 min, three commands.
+
+**Suggested.** Add the two missing `PY` lines, and in r000's *A CHECK SHIPS
+ONLY ONCE IT HAS BEEN SEEN TO FAIL*: "count `<<'PY'` against `^PY$` in every
+Verification fence; they must be equal."
+
+## 005b — check 1 asks for a `UNIFIED` tag the program never writes
+
+**What the rule says.** Check 1: an off-size page passes only if its stamp
+carries `UNIFIED` or `OVERRIDE`, "MEASURED on SH8605: … 197-200 at 3551x4923,
+… each stamp carrying UNIFIED or OVERRIDE".
+
+**What I did.** 165/166 (the Zahlkarte) were delivered at 3386x4921 and check 1
+FAILED on both. `grep UNIFIED r005_a4_window.py` finds only the print line
+`insert pages %d-%d unified to …`; `unify_inserts()` writes a stamp note only
+when it PADS (`if not (dw or dh): continue`), and both sides of this card traced
+the same size. So a correct, unpadded unification is undocumented in the stamp
+and fails the check. Appended a factual `UNIFIED` line to both stamps (sidecar
+and PNG chunk), saying the size, that no padding was needed, and that the
+stamp's alpha/fabricated are the A4 window's.
+
+**What it cost.** ~5 min.
+
+**Suggested.** In `unify_inserts()`, write `UNIFIED insert A-B at WxH` into
+every member's note, padded or not, and recompute alpha/fabricated after the cut
+(the rule already asks for the latter).
+
+## 005b — Recovery C does not say what to do when the sheet is tilted
+
+**What the rule says.** Recovery C: "cut from row and column luminance
+profiles"; Recovery A's anchoring advice: "on whichever edges ARE measurable".
+
+**What I did.** p009 and p142 traced at 005 as `uncropped`, and 005b's
+automatic paper-edge windows were wrong — p009's at x=150 cut 6.3 mm of left
+content (the summary showed fabricated 0.00 %, exactly as the rule warns). On
+p009 the profiles gave a clean right edge (4975, page → bed 3) and foot (7028,
+an edge shadow, then prop); left/top flush with the frame; window (14, 12).
+On p142 the dark ground (lum 5-9) vs bed (2-3) was just separable by mean+std,
+but the PROP showed the sheet tilted ~0.25 deg to the levelled type: ramps
+0→30 px left, 0→21 px top, 7018→7060 foot. An axis-aligned A4 does not fit
+inside it (usable ~4939 x 6996). Centred the window on the deficit (20, 12)
+and painted only the prop wedge connected to the window border white (0.09 %).
+
+**What it cost.** ~25 min, ~10 commands, including one misleading montage of
+my own making.
+
+**Suggested.** Recovery C: "measure the prop fraction per column/row at each
+edge, not only luminance: a ramp means the sheet is tilted against the type.
+Then A4 will not fit; centre the window on the deficit and paint only the
+border-connected prop/bed with paper white (FILL paint), recording the painted
+fraction as fabricated." And: "the colour test for the prop DOES still work on
+the graded master (G−B > 60, lum > 120) — it is the dark ground vs bed that is
+hard, not the prop."
+
+## 005 — Verification 4: the footer bar reads as "dark" on most pages
+
+**What happened.** Check 4's bottom 6 mm band reads 2-9 % dark on many pages
+(p032 8.7 %, p044 8.2 %). Cropped p032's foot: the printed "SONDERHEFT 8/86"
+bar ends ~5 mm above the trim, inside the 6 mm band; no bed below it. The rule
+accounts for "the printed footer rule, 5–6 mm inside the trim" on SH8601 only.
+
+**Suggested.** In check 4's notes: "on SH8608-style footers the black
+SONDERHEFT bar itself sits inside the 6 mm band, so bottom dark 2-9 % with 0 %
+prop is the bar; crop one page to confirm and move on."
