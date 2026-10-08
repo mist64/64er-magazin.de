@@ -203,3 +203,25 @@ Run them with `bash <<'EOF' … EOF` (or `bash -c`), never pasted into an
 interactive zsh: zsh does not word-split `$VAR` in `for x in $VAR`, so a loop
 over a space-separated list runs once and reports nothing." And quote the
 list literally where the rule can (`for slug in impressum checksummer …`).
+
+## 120 — check 4 reads the `.txt` as UTF-8 while generate.py tokenises it as latin-1
+
+**What the rule says.** Verification check 4: `listing = open(…, encoding="utf-8",
+errors="replace").read()` … `petcat … input=listing.encode()`; and the same
+rule's *A `.txt` IS BYTES* section: "`generate.py` reads the listing and pipes
+it to petcat as **latin-1** rather than UTF-8", citing `der kl. hobbit`'s `$A0`
+after REM as a byte that only a raw latin-1 byte can express.
+
+**What happened.** The 120 sub-agent ran check 4 both ways on SH8606 (same
+result here, 32/19, because apfel_bas's `$CD` could be expressed in petcat's
+own text convention) and noted that a `.txt` carrying a raw byte ≥ $80 — the
+exact fix the rule prescribes for the Hobbit — cannot pass check 4 as written:
+`errors="replace"` turns the byte into U+FFFD and `.encode()` emits three UTF-8
+bytes. The check contradicts the remediation it sits beside.
+
+**What it cost.** Nothing on this issue; it is a trap for the next one with a
+`$A0` REM banner.
+
+**Suggested.** Check 4 opens and encodes the listing as `latin-1`, exactly as
+`generate.py:petcat2prg` does, "so a pass here is a pass on the site" (the
+rule's own words two lines above the code).
