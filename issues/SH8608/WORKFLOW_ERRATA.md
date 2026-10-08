@@ -348,3 +348,21 @@ the subject and none of the difficulty."
 Same class as r060's entry: r080_split.sh's embedded splitter runs as bare
 `python3`. It worked only because it is stdlib-only. **Suggested.** the same
 `PY=` line in every wrapper, and r000's census to cover wrapper bodies.
+
+## 090 — three small defects the sub-agent hit
+
+**Procedure step 1's fence is broken:** the `for p in 6 7; do` loop is cut off
+by a nested ```bash block (the venv/SRC recipe pasted inside it), so the page
+loop cannot be copied as written.
+
+**Verification check 2 counts the commented-out placeholder** `<!-- <meta
+name="64er.toc_category" content="XXX"> -->` that 080 writes, so before step 100
+it always prints `missing from toc.txt: 'XXX'` — a check that fails on correct
+output at the step it belongs to. Strip comments before matching (r000, *A check
+that matches MARKUP also matches comments ABOUT markup*).
+
+**"record both" is ambiguous** for a Sonderheft with no printed Rubriken box:
+it does not say whether `Rubriken` goes into `toc.txt` for the Impressum. The
+agent followed SH8602-05 (it does, last). **Suggested.** "A Sonderheft with no
+Rubriken box still lists `Rubriken` last in toc.txt, for the Impressum (SH8602-
+SH8605, SH8608); toc_entries.txt gets no line for it, since nothing is printed."
