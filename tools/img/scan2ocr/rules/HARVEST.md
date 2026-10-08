@@ -457,3 +457,59 @@ process is now itself a source of defects, which is worth watching.
   all -- the same unrunnable-check defect at twenty-three times the reported
   scale. Every harvest entry is a sample, not a census: COUNT IT.
 
+
+# ============================================================
+# A FAILURE MODE OF THIS PROCESS: THE OVER-GENERALISED CLAIM
+# 2026-10-08, from the SH8605 harvest and the two builds that followed
+# ============================================================
+
+The SH8605 round recorded that *"three entries are my own half-landed changes…
+the harvest process is now itself a source of defects, which is worth
+watching."* Watching it produced a sharper and more common failure, and it is
+worth naming separately because the REMEDY IS DIFFERENT. A half-landed change
+needs finishing. An over-generalised one needs the claim CUT BACK to what was
+actually measured — finishing it makes it worse.
+
+**The shape: a number or a conclusion carried past the set it was true of.**
+Seven instances in one day, five of them mine, and every one looked like
+evidence at the time:
+
+| the claim | the set it was true of | what it was applied to |
+|---|---|---|
+| "a 2400 dpi page may be a hand MARKING" | SH8605, where the markings happened to be at 2400 | the dpi witness in general — SH8608's marking is at **600** |
+| "NEVER RUN TWO MODEL-CALLING STEPS AT ONCE" | one SH8605 collision | a standing constraint, which was never the owner's to pay for |
+| r080's "Eingabehinweise beside the Checksummer" open question | SH8603's ENTANGLED geometry | every later issue sharing the SUBJECT |
+| "fifteen or more precedents for splitting" | Checksummer + **MSE** | Checksummer + **Eingabehinweise**, a different pair |
+| "the master is clean, 255 neutral" | the canvas PADDING around the page | the printed page, which is `page-px` inside `canvas-px` |
+| "front-of-book residual +1.88 DN" | a band that included the COLOUR WRAPPER | the interior stock; interior-only it is **+0.17** |
+| "the re-sweep rewrites sheets600, so the owner's title is stale" | the `low` class the fix touched | the cover, which is `high` and never read that file |
+
+**Why it is hard to see from the inside.** Each claim was *true*, measured, and
+written down honestly. What was wrong was the quantifier, and a quantifier is
+invisible in the sentence that carries it: "the dpi witness can be a marking"
+and "SH8605's markings were at 2400 dpi" read identically when you are the one
+who just measured the second.
+
+**The habit that catches it, and it is one line of work:**
+
+> **Name the set, then check the thing you are worried about is IN it.**
+
+Every artefact in this chain already carries its own set membership and will
+answer in one grep — a master's stamp says `paper-class`, a field file says its
+class, a page says its `64er.pages`, a measurement says which pages it pooled.
+The cover/`high` error took one `grep paper-class` to settle after an hour of
+measuring the wrong thing. The padding error took one look at
+`page-px 4989 7034` inside `canvas-px 5457 7181`.
+
+**And the corollary, which is the SH8605 round's lesson in a second form:** a
+tally of the wrong set reads exactly like evidence, and is more persuasive than
+no evidence at all. Both r080 corrections are this — the first replaced an
+over-scoped question with an over-scoped count, and only a builder checking its
+supervisor's citation against the corpus caught it.
+
+**Where it was caught mattered more than that it was caught.** Six of the seven
+were caught by MEASUREMENT or by a builder, after the claim had already been
+written into a rule and acted on. The cheapest was the only one caught before it
+shipped: SH8608 re-checking a ruling it had been given, at a step where it
+happened to have the tooling, and coming back rather than building on it.
+
