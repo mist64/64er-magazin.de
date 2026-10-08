@@ -79,21 +79,21 @@
 
         <p>Dieser für die Dateibehandlung grundlegende Basic-Befehl kann leider nur mit großem Aufwand in die entsprechenden Maschinenbefehle umgesetzt werden. Sollten Sie annehmen, daß hierzu der Aufruf einer einzigen Betriebssystemroutine ausreicht, muß ich Sie leider enttäuschen. Im Betriebssystem existiert zwar eine Routine mit dem Namen OPEN. Bevor diese Routine aufgerufen werden kann, müssen zuvor zwei Vorbereitungsroutinen aufgerufen werden, mit denen die benötigten Dateiparameter übergeben werden.</p>
 
-        <p>Mit der zuerst aufzurufenden Routine SETFLS ($FFBA) werden die Parameter logische Filenummer, Geräteadresse und Sekundäradresse übergeben. Anschließend wird die Routine SETNAM ($FFBD) aufgerufen, die für die Übergabe des Dateinamens zuständig ist (inklusive der Zusätze Typ und Modus). Erst nach dieser Vorbereitung kann die OPEN-Routine ($FFCO) aufgerufen werden.</p>
+        <p>Mit der zuerst aufzurufenden Routine SETFLS ($FFBA) werden die Parameter logische Filenummer, Geräteadresse und Sekundäradresse übergeben. Anschließend wird die Routine SETNAM ($FFBD) aufgerufen, die für die Übergabe des Dateinamens zuständig ist (inklusive der Zusätze Typ und Modus). Erst nach dieser Vorbereitung kann die OPEN-Routine ($FFC0) aufgerufen werden.</p>
 
-        <p>SETFLS ($FFBA): Fileparameter setzen</p>
+        <h3>SETFLS ($FFBA): Fileparameter setzen</h3>
 
         <p>Der erste Schritt zum Öffnen einer Datei – gleich ob zum Lesen oder Schreiben von Daten – ist die Übergabe der Parameter logische Filenummer, Geräteadresse und Sekundäradresse mit der Routine SETFLS.</p>
 
         <p>Als logische Filenummer kann eine beliebige Zahl zwischen 1 und 255 angegeben werden.</p>
 
-        <p>Die Geräteadresse liegt üblicherweise zwischen Null und Acht (O=Tastatur; 1=Datasette; 3=Bildschirm; 4=Drucker; 8=Floppy). In den folgenden Programmbeispielen werde ich immer (!) die Geräteadresse Eins verwenden, da die Datasette wohl das am häufigsten in Verbindung mit demC 16 verwendete Peripheriegerät ist.</p>
+        <p>Die Geräteadresse liegt üblicherweise zwischen Null und Acht (0=Tastatur; 1=Datasette; 3=Bildschirm; 4=Drucker; 8=Floppy). In den folgenden Programmbeispielen werde ich immer (!) die Geräteadresse Eins verwenden, da die Datasette wohl das am häufigsten in Verbindung mit dem C 16 verwendete Peripheriegerät ist.</p>
 
-        <p>Die Bedeutung der Sekundäradresse istje nach verwendetem Peripheriegerät völlig unterschiedlich. Soll eine Diskettendatei geöffnet werden, kann eine beliebige Sekundäradresse zwischen 2 und 14 angegeben werden.</p>
+        <p>Die Bedeutung der Sekundäradresse ist je nach verwendetem Peripheriegerät völlig unterschiedlich. Soll eine Diskettendatei geöffnet werden, kann eine beliebige Sekundäradresse zwischen 2 und 14 angegeben werden.</p>
 
         <p>Bei Druckern bestimmt die angegebene Sekundäradresse häufig den Druckmodus, ob zum Beispiel im Groß-/Grafik- oder im Klein-/Großmodus gedruckt werden soll. Mit welcher Sekundäradresse welcher Druckmodus angesprochen wird, ist von Drucker zu Drucker unterschiedlich und muß daher im zugehörigen Druckerhandbuch nachgelesen werden.</p>
 
-        <p>Beim Öffnen einer Datasettendatei kann eine Sekundäradresse zwischen Null und Zwei angegeben werden. Null bedeutet, daß anschließend Daten vom Band gelesen werden sollen, 1 geben Sie an, wenn Schreibzugriffe erfolgen sollen. Die Angabe einer 2 bedeutet ebenfalls, daß anschlieBend Schreibzugriffe erfolgen. Zusätzlich wird eine sogenannte »EOT«-Markierung auf das Band geschrieben, eine Markierung, die angibt, daß sich die Datei am Bandende befindet undkeine weitere Datei folgt. Sinn und Zweck dieser Markierung blieb mir persönlich jedoch etwas schleierhaft, da ich sie in meinen Programmen noch nie benötigt habe. Auch in den folgenden Beispielprogrammen werde ich daher ausschließlich die Sekundäradressen Null und Eins verwenden.</p>
+        <p>Beim Öffnen einer Datasettendatei kann eine Sekundäradresse zwischen Null und Zwei angegeben werden. Null bedeutet, daß anschließend Daten vom Band gelesen werden sollen, 1 geben Sie an, wenn Schreibzugriffe erfolgen sollen. Die Angabe einer 2 bedeutet ebenfalls, daß anschließend Schreibzugriffe erfolgen. Zusätzlich wird eine sogenannte »EOT«-Markierung auf das Band geschrieben, eine Markierung, die angibt, daß sich die Datei am Bandende befindet undkeine weitere Datei folgt. Sinn und Zweck dieser Markierung blieb mir persönlich jedoch etwas schleierhaft, da ich sie in meinen Programmen noch nie benötigt habe. Auch in den folgenden Beispielprogrammen werde ich daher ausschließlich die Sekundäradressen Null und Eins verwenden.</p>
 
         <p>Sie wissen nun, welche Parameter der Routine SETFLS übergeben werden müssen, nicht jedoch wie. Alle drei Parameter werden mit Hilfe der Prozessorregister übergeben:</p>
 
@@ -119,21 +119,22 @@
 
         <p>Wenn wir zum Beispiel Daten in eine Datasettendatei schreiben wollen, übergeben wir der Routine SETFLS folgende Parameter:</p>
 
-        <pre><code>LDA #801 ;LOGISCHE FILENUMMER 1
+        <pre><code>LDA #$01 ;LOGISCHE FILENUMMER 1
 LDX #$01 ;GERÄTEADRESSE 1 = DATASETTE
-LDY #$01 ;SEKUNDÄRADRESSE 1 = DATEN AUF BAND
-SCHREIBEN
+LDY #$01 ;SEKUNDÄRADRESSE 1 = DATEN AUF BAND SCHREIBEN
 JSR $FFBA ;SETFLS AUFRUFEN
 </code></pre>
 
 
         <p>Wenn wir Daten vom Band lesen wollen, genügt es, den Befehl LDY #$01 abzuändern in LDY #$00.</p>
 
-        <p>SETNAM ($FFBD): Dateinamen (+Zusätze) übergeben</p>
+        <h3>SETNAM ($FFBD): Dateinamen (+Zusätze) übergeben</h3>
 
         <p>Der Dateiname darf aus maximal 16 Zeichen bestehen. Unter »Zusatz« sind die Angaben »Typ« und »Modus« zu verstehen. Beide Angaben werden nur bei Diskettendateien benötigt, um zum Beispiel mit dem Befehl</p>
 
-        <p>OPEN 2,8,2, "TEST,S,W" die sequentielle Datei »test« zum Schreiben zu öffnen.</p>
+        <pre><code>OPEN 2,8,2,"TEST,S,W"</code></pre>
+
+        <p>die sequentielle Datei »test« zum Schreiben zu öffnen.</p>
 
         <table class="plain">
             <tbody>
@@ -152,35 +153,31 @@ JSR $FFBA ;SETFLS AUFRUFEN
 
         <p>Die Angabe des Dateityps wird bei Datasettendateien nicht benötigt, da die Datasette nur eine einzige Form der Datendatei kennt, den sequentiellen Typ.</p>
 
-        <p>Die Angabe der Zugriffsart, des Modus, ist bei Verwendung der Datasette ebenfalls überflüssig, da diese Angabe bereits beim Aufruf von SETFLS erfolgte (Sekundäradresse O bis 2). Da wir im folgenden nur mit der Datasette arbeiten werden, können wir uns auf die Angabe des Dateinamens beschränken.</p>
+        <p>Die Angabe der Zugriffsart, des Modus, ist bei Verwendung der Datasette ebenfalls überflüssig, da diese Angabe bereits beim Aufruf von SETFLS erfolgte (Sekundäradresse 0 bis 2). Da wir im folgenden nur mit der Datasette arbeiten werden, können wir uns auf die Angabe des Dateinamens beschränken.</p>
 
         <p>Bei Verwendung der Datasette muß übrigens nicht unbedingt ein Dateiname angegeben werden. Die angelegte Datei erhält dann natürlich keinen Namen. In den folgenden Beispielen werde ich dennoch immer Dateinamen verwenden. Sollten Sie jemals von der Datasette auf eine Floppy umsteigen, bleibt Ihnen dadurch die Umgewöhnung an Dateinamen erspart.</p>
 
-        <p>Die Parameter für SETNAM werden teilweise ebenfalls mit Hilfe der Prozessorregister übergeben. Zusätzlich muß jedoch in einem beliebigen Speicherbereich, im Programm selbst, in der Zeropage, oder an einem beliebigen anderen Ort der Dateiname in ASCII-Form abgelegt sein. Wenn Sie die RS232-Schnittstelle nicht benutzen (um zum Beispiel ein Modem zu betreiben), bietet sich der Bereich $03F7 bis $0436 (dezimal: 1015 bis 1078) an, der ausschließlich von dieser Schnittstelle verwendet wird. Wenn der Dateiname in diesem Bereich abgelegt wurde, wird der Akku mit der Länge des Namens geladen. Das X- beziehungsweise Y-Register enthält einen Zeiger auf die Adresse, an der sich der Name befindet (X-Register=Low-Byte der Adresse; Y-Register=</p>
+        <p>Die Parameter für SETNAM werden teilweise ebenfalls mit Hilfe der Prozessorregister übergeben. Zusätzlich muß jedoch in einem beliebigen Speicherbereich, im Programm selbst, in der Zeropage, oder an einem beliebigen anderen Ort der Dateiname in ASCII-Form abgelegt sein. Wenn Sie die RS232-Schnittstelle nicht benutzen (um zum Beispiel ein Modem zu betreiben), bietet sich der Bereich $03F7 bis $0436 (dezimal: 1015 bis 1078) an, der ausschließlich von dieser Schnittstelle verwendet wird. Wenn der Dateiname in diesem Bereich abgelegt wurde, wird der Akku mit der Länge des Namens geladen. Das X- beziehungsweise Y-Register enthält einen Zeiger auf die Adresse, an der sich der Name befindet (X-Register=Low-Byte der Adresse; Y-Register=High-Byte):</p>
 
-        <p>High-Byte):</p>
-
-        <p>LDA #804 ; LÄNGE DES NAMENS: 4 ZEICHEN</p>
-
-        <p>LDX #$F7 ;LOW-BYTE DER ADRESSE $03F7</p>
-
-        <p>LDY #803 ;HIGH-BYTE DER ADRESSE $03F7</p>
-
-        <p>JSR $FFBD ;SETNAM AUFRUFEN</p>
+        <pre><code>LDA #$04 ;LÄNGE DES NAMENS: 4 ZEICHEN
+LDX #$F7 ;LOW-BYTE DER ADRESSE $03F7
+LDY #$03 ;HIGH-BYTE DER ADRESSE $03F7
+JSR $FFBD ;SETNAM AUFRUFEN</code></pre>
 
         <p>Diese Routine ist nur dann lauffähig, wenn zuvor ein Dateiname mit einer Länge von vier Zeichen in ASCII-Form ab $03F7 abgelegt wurde.</p>
 
-        <p>OPEN ($FFCO0): Datei öffnen</p>
+        <h3>OPEN ($FFC0): Datei öffnen</h3>
 
-        <p>Nach diesen langwierigen Vorbereitungen kann endlich die OPEN-Routine des Betriebssystems aufgerufen werden. Der Aufruf mit JISR $FFCO genügt, da ausnahmsweise keine weiteren Parameter übergeben werden müssen. Die logische Datei wird nun geöffnet. Dabei ist es jedoch möglich, daß ein Fehler auftritt, zum Beispiel wenn auf Band geschrieben werden soll und die Datasette noch im Schrank liegt. In diesem Fall tritt ein »device not present error« auf.</p>
+        <p>Nach diesen langwierigen Vorbereitungen kann endlich die OPEN-Routine des Betriebssystems aufgerufen werden. Der Aufruf mit JSR $FFC0 genügt, da ausnahmsweise keine weiteren Parameter übergeben werden müssen. Die logische Datei wird nun geöffnet. Dabei ist es jedoch möglich, daß ein Fehler auftritt, zum Beispiel wenn auf Band geschrieben werden soll und die Datasette noch im Schrank liegt. In diesem Fall tritt ein »device not present error« auf.</p>
 
         <p>Wenn Sie wirklich professionell programmieren wollen, dürfen Sie eventuell auftretende Fehler selbstverständlich nicht einfach ignorieren, sondern benötigen eine sogenannte »Fehlerbehandlungsroutine«, zu der Ihr Programm in einem solchen Fall verzweigt (zum Beispiel, um den Benutzer aufzufordern, endlich die Floppy einzuschalten oder eine Diskette einzulegen). Übrigens: Da ich nicht von mir behaupte, professionell zu programmieren, habe ich es mir erlaubt, in der noch vorzustellenden INPUT #-Routine auf eine solche Fehlerbehandlung zu verzichten. Sollten Sie weniger bequem veranlagt sein, dürfen Sie das Programm jedoch gern entsprechend erweitern (und mir natürlich die erweiterte Version zuschicken).</p>
 
-        <p>Ob beim Öffnen einer Datei ein Fehler autrat, erkennen Sie am Carry-Flag. Bei fehlerfreiem Öffnen der Datei ist es nach der Rückkehr aus der OPEN-Routine gelöscht. Tratein Fehler auf, ist das Carry-Flag gesetzt und im Akku wird die Nummer des Fehlers übergeben. Bei gesetztem Carry-Flag sollte Ihr Programm daher zu einer Fehlerbehandlungsroutine verzweigen:</p>
+        <p>Ob beim Öffnen einer Datei ein Fehler autrat, erkennen Sie am Carry-Flag. Bei fehlerfreiem Öffnen der Datei ist es nach der Rückkehr aus der OPEN-Routine gelöscht. Trat ein Fehler auf, ist das Carry-Flag gesetzt und im Akku wird die Nummer des Fehlers übergeben. Bei gesetztem Carry-Flag sollte Ihr Programm daher zu einer Fehlerbehandlungsroutine verzweigen:</p>
 
-        <p>JISR $FFCO ;OPEN AUFRUFEN</p>
+        <pre><code>JSR $FFC0 ;OPEN AUFRUFEN
+BCS $???? ;ADRESSE DER FEHLERBEHANDLUNGSROUTINE</code></pre>
 
-        <p>BCS $???? ;ADRESSE DER FEHLERBEHANDLUNGSROUTINE Die Fehlernummern haben folgende Bedeutung:</p>
+        <p>Die Fehlernummern haben folgende Bedeutung:</p>
 
         <table class="plain">
             <tbody>
@@ -239,7 +236,7 @@ JSR $FFBA ;SETFLS AUFRUFEN
 
         <p>Die Fehler 3, 6 und 7 sind beim Öffnen einer Datei bedeutungslos. Sie können nur nach Lese- oder Schreibversuchen auftreten. Ein Fehler wie zum Beispiel »missing filename« ist dagegen gerätespezifisch. Bei Verwendung der Datasette müssen Sie nicht unbedingt einen Dateinamen angeben, daher kann auch dieser Fehler nicht auftreten.</p>
 
-        <p>CHKIN ($FFC6) und CKOUT ($FFC9): Ein-/Ausgaben umleiten</p>
+        <h3>CHKIN ($FFC6) und CKOUT ($FFC9): Ein-/Ausgaben umleiten</h3>
 
         <p>Ich habe behauptet, daß das Maschinenspracheäquivalent zum Basic-Befehl OPEN die Routinen SETFLS, SETNAM und der anschließende Aufruf der OPEN-Routine sei. Leider müssen wir noch zwei weitere Routinen besprechen, bevor wir zur eigentlichen Datenein- beziehungsweise -ausgabe kommen, die Routinen CHKIN und CKOUT.</p>
 
@@ -247,145 +244,130 @@ JSR $FFBA ;SETFLS AUFRUFEN
 
         <p>Das Umlenken der Eingabe von der Tastatur auf die mit der OPEN-Routine geöffnete Datei erfolgt mit der Routine CHKIN, der im X-Register die beim Aufruf von SETFLS verwendete logische Filenummer übergeben wird, zum Beispiel die 1:</p>
 
-        <p>LDX #801 ;LOGISCHE FILENUMMER</p>
-
-        <p>JSR $FFC6 ;AUFRUF VON CHKIN</p>
+        <pre><code>LDX #$01 ;LOGISCHE FILENUMMER
+JSR $FFC6 ;AUFRUF VON CHKIN</code></pre>
 
         <p>Um in eine geöffnete Datei Daten zu schreiben, muß die Ausgabe vom Standardgerät Bildschirm zuvor auf die geöffnete logische Datei umgeleitet werden. Der zuständigen Routine CKOUT wird ebenfalls im X-Register die verwendete logische Filenummer übergeben:</p>
 
-        <p>LDX #$01 ;LOGISCHE FILENUMMER</p>
-
-        <p>JISR $FFCY ;AUFRUF VON CKOUT</p>
+        <pre><code>LDX #$01 ;LOGISCHE FILENUMMER
+JSR $FFC9 ;AUFRUF VON CKOUT</code></pre>
 
         <p>Beide Routinen zeigen auftretende Fehler ebenso wie die OPEN-Routine durch ein gesetztes Carry-Flag an. Trat ein Fehler auf, wird die Fehlernummer ebenfalls im Akku übergeben.</p>
 
-        <p>Demoprogramm 1: Datei in Maschinensprache öffnen</p>
+        <h3>Demoprogramm 1: Datei in Maschinensprache öffnen</h3>
 
         <p>Wir sind nun endlich soweit, das theoretisch erworbene Wissen in ein Programm umzusetzen. Mit den besprochenen Routinen können wir ein Demonstrationsprogramm schreiben, das in Maschinensprache eine logische Datei zum Schreiben von Daten auf Band öffnet. Als Dateinamen verwenden wir »test«, als logische Filenummer eine Eins. Da eine Datasettendatei zum Schreiben geöffnet werden soll, müssen wir die Geräteadresse Eins (=Datasette) und die Sekundäradresse Eins (=Schreiben) verwenden.</p>
 
-        <p>Zum Schreiben der Daten verwenden wir ein kleines Basic-Programm, das zusätzlich die Aufgabe übernehmen soll, den Dateinamen »test« in ASCII-Form in den RS232-Puffer zu POKENn, bevor es unsere »Dateiöffnungsroutine« aufruft und anschließend Daten in die – durch die Maschinenroutine geöffnete – Datei schreibt:</p>
+        <p>Zum Schreiben der Daten verwenden wir ein kleines Basic-Programm, das zusätzlich die Aufgabe übernehmen soll, den Dateinamen »test« in ASCII-Form in den RS232-Puffer zu POKEn, bevor es unsere »Dateiöffnungsroutine« aufruft und anschließend Daten in die – durch die Maschinenroutine geöffnete – Datei schreibt:</p>
 
-        <p>100 REM *%** DATEN SCHREIBEN *%**</p>
-
-        <p>110 DN$="TEST":REM DATEINAME</p>
-
-        <p>120 FOR I=1 TO LEN(DN$)</p>
-
-        <p>130 : POKE 1014+I,ASC(MID$(DN$,I,1)) 140 NEXT</p>
-
-        <p>150 SYS 1630:REM MASCHINENROUT. AUFRUFEN 160 PRINT#1,"DIES IST"</p>
-
-        <pre><code>.170 PRINT#1,"EIN TEST"
-</code></pre>
-
-
-        <pre><code>180 CLOSE 1
+        <pre><code>100 REM *** DATEN SCHREIBEN ***
+110 DN$="TEST":REM DATEINAME
+120 FOR I=1 TO LEN(DN$)
+130 : POKE 1014+I,ASC(MID$(DN$,I,1))
+140 NEXT
+150 SYS 1630:REM MASCHINENROUT.AUFRUFEN
+160 PRINT#1,"DIES IST"
+170 PRINT#1,"EIN TEST"
+180 CLOSE 1
 190 :
 200 :
-210 REM *%%*% DATEN LESEN %%%* 220 PRINT"BAND BITTE ZURUECKSPULEN" 230 PRINT"DANACH 'RETURN' DRUECKEN" 240 GET A$:IF A$&lt; &gt;CHR$(13) THEN 240 250 SCNCLR:
+210 REM *** DATEN LESEN ***
+220 PRINT"BAND BITTE ZURUECKSPULEN"
+230 PRINT"DANACH 'RETURN' DRUECKEN"
+240 GET A$:IF A$&lt;&gt;CHR$(13) THEN 240
+250 SCNCLR:
 260 :
-270 OPEN 1,1,0, "TEST":REM DATEI OEFFNEN 280 INPUT#1,A$:PRINT A$
+270 OPEN 1,1,0,"TEST":REM DATEI OEFFNEN
+280 INPUT#1,A$:PRINT A$
 290 INPUT#1,B$:PRINT B$
-300 CLOSE 1
-</code></pre>
+300 CLOSE 1</code></pre>
 
-
-        <p>Die Maschinenroutine geben Sie bitte mit demim C 16 integrierten Monitor ab $065E (dezimal 1630) ein:</p>
+        <p>Die Maschinenroutine geben Sie bitte mit dem im C 16 integrierten Monitor ab $065E (dezimal 1630) ein:</p>
 
         <pre><code>. 065e LDA #$01 ;LOGISCHE FILENUMMER 1
 . 0660 LDX #$01 ;GERAETEADRESSE 1 = DATASETTE
-. 0662 LDY #$01 ;SEKUNDAERADRESSE 1 =
-DATEN SCHREIBEN
+. 0662 LDY #$01 ;SEKUNDAERADRESSE 1 = DATEN SCHREIBEN
 . 0664 JSR $FFBA ;SETFLS AUFRUFEN
-. 0667 IDA #$04 ;LAENGE DES NAMENS: 4 ZEICHEN
-. 0669 IDX #$F7 ;LOW-BYTE DER ADRESSE $03F7
-. 066b LIDY #803 ;HIGH-BYTE DER ADRESSE $03f7
+. 0667 LDA #$04 ;LAENGE DES NAMENS: 4 ZEICHEN
+. 0669 LDX #$F7 ;LOW-BYTE DER ADRESSE $03F7
+. 066b LDY #$03 ;HIGH-BYTE DER ADRESSE $03f7
 . 066d JSR $FFBD ;SETNAM AUFRUFEN
-. 0670 JSR $FFCO ;OPEN AUFRUFEN
-</code></pre>
-
-
-        <pre><code>. 0673 LDX #301
-. 0675 JSR $FFCY
-. 0678 RTS
-</code></pre>
-
-
-        <pre><code>;LOGISCHE FILENUMMER ;AUFRUF VON CKOUT ;ZURUECK ZUM BASIC
-</code></pre>
-
+. 0670 JSR $FFC0 ;OPEN AUFRUFEN
+. 0673 LDX #$01 ;LOGISCHE FILENUMMER
+. 0675 JSR $FFC9 ;AUFRUF VON CKOUT
+. 0678 RTS ;ZURUECK ZUM BASIC</code></pre>
 
         <p>Das Maschinenprogramm besteht im Grunde nur aus einer Zusammenfassung der bereits beschriebenen Teile, das heißt aus dem Aufruf von SETFLS, SETNAM, OPEN und CKOUT. Beachten Sie bitte, daß eventuell auftretende Fehler ignoriert werden (Carry-Flag nach OPEN und CKOUT abfragen).</p>
 
         <p>Geben Sie dieses Programm bitte mit dem Monitor ein (lassen Sie die Kommentare jedoch weg und versuchen Sie nicht, die einzelnen Programmteile wie abgebildet durch Leerzeilen optisch zu unterteilen!), geben Sie anschließend das Basic-Programm ein und starten Sie es mit</p>
 
-        <p>RUN Zum Programmablauf: In den Zeilen 110 bis 140 werdenmit --einer Schleife die ASCII-Codes der einzelnen Zeichen des Dateinamens »test« nach 1015 bis 1018 gePOKEt. AnschließBend wird unsere Maschinenroutine aufgerufen, die eine Datasettendatei für Schreibzugriffe mit der logischen Filenummer 1 öffnet (Zeile 150). Unter Angabe dieser Filenummer schreibt das Basic-Programm nun zwei Strings in die Datei, bevor sie wieder geschlossen wird (Zeilen 160 bis 180).</p>
+        <pre><code>RUN</code></pre>
+
+        <p>Zum Programmablauf: In den Zeilen 110 bis 140 werden mit einer Schleife die ASCII-Codes der einzelnen Zeichen des Dateinamens »test« nach 1015 bis 1018 gePOKEt. Anschließend wird unsere Maschinenroutine aufgerufen, die eine Datasettendatei für Schreibzugriffe mit der logischen Filenummer 1 öffnet (Zeile 150). Unter Angabe dieser Filenummer schreibt das Basic-Programm nun zwei Strings in die Datei, bevor sie wieder geschlossen wird (Zeilen 160 bis 180).</p>
 
         <p>Vor dem Wiedereinlesen der Daten fordert Sie das Basic-Programm auf, zum Dateianfang zurückzuspulen und anschließend</p>
 
-        <p>RETURN zu drücken. Nach RETURN wird die Warteschleife in Zeile 240 verlassen und der Bildschirm gelöscht, bevor die Datei »test« zum Lesen geöffnet wird (Zeilen 240 bis 270). Die beiden Strings werden eingelesen, auf dem Bildschirm ausgegeben und die Datei geschlossen.</p>
+        <pre><code>RETURN</code></pre>
 
-        <p>Wie Sie sehen, ist es zweifellos bequemer, einen Basic-Befehl zum Öffnen einer Datei zu verwenden, als ein Maschinenprogramm, das an mehrere Routinen die verschiedensten Parameter übergeben muß, um die gleiche Funktion zu erfüllen. Die im Laufe dieses Kapitels vorgestellte INPUT #-Routine entschädigt Sie jedoch für diesen Aufwand. In Basic könnte diese Routine nur mit einem kleinen Unterprogramm unter Verwendung von GET #.erstellt werden und wäre weitaus langsamer als die entsprechende Maschinenroutine. (Versuchen Sie einmal, 20 Strings mit einer Länge von jeweils 100 Zeichen mit GET# nach und nach einzulesen. Sie werden staunen, wie langsam Ihre Datasette plötzlich wird.)</p>
+        <p>zu drücken. Nach RETURN wird die Warteschleife in Zeile 240 verlassen und der Bildschirm gelöscht, bevor die Datei »test« zum Lesen geöffnet wird (Zeilen 240 bis 270). Die beiden Strings werden eingelesen, auf dem Bildschirm ausgegeben und die Datei geschlossen.</p>
 
-        <p>BSOUT ($FFD2): Datenausgabe auf logische Datei</p>
+        <p>Wie Sie sehen, ist es zweifellos bequemer, einen Basic-Befehl zum Öffnen einer Datei zu verwenden, als ein Maschinenprogramm, das an mehrere Routinen die verschiedensten Parameter übergeben muß, um die gleiche Funktion zu erfüllen. Die im Laufe dieses Kapitels vorgestellte INPUT #-Routine entschädigt Sie jedoch für diesen Aufwand. In Basic könnte diese Routine nur mit einem kleinen Unterprogramm unter Verwendung von GET # erstellt werden und wäre weitaus langsamer als die entsprechende Maschinenroutine. (Versuchen Sie einmal, 20 Strings mit einer Länge von jeweils 100 Zeichen mit GET# nach und nach einzulesen. Sie werden staunen, wie langsam Ihre Datasette plötzlich wird.)</p>
 
-        <p>Wir können nun zwar in Maschinensprache beliebige Dateien öffnen, bisher jedoch weder Daten ausgeben noch einlesen. Sie alle wissen sicherlich, daß mit der Routine BSOUT Daten auf dem Bildschirm ausgegeben werden können. BSOUT gibt ein im Akku übergebenes Zeichen (ASCIl-Code!) auf dem Bildschirm aus, und zwar an der aktuellen Cursorposition.</p>
+        <h3>BSOUT ($FFD2): Datenausgabe auf logische Datei</h3>
+
+        <p>Wir können nun zwar in Maschinensprache beliebige Dateien öffnen, bisher jedoch weder Daten ausgeben noch einlesen. Sie alle wissen sicherlich, daß mit der Routine BSOUT Daten auf dem Bildschirm ausgegeben werden können. BSOUT gibt ein im Akku übergebenes Zeichen (ASCII-Code!) auf dem Bildschirm aus, und zwar an der aktuellen Cursorposition.</p>
 
         <p>BSOUT ist jedoch keineswegs eine speziell zur Ausgabe auf dem Bildschirm gedachte Routine, sondern erfüllt die weitaus allgemeinere Funktion, Daten in eine beliebige logische Datei zu schreiben. Diese Datei ist normalerweise der Bildschirm, wir können mit BSOUT jedoch auch Zeichen in eine Datasetten-, Disketten- oder Druckerdatei schreiben.</p>
 
-        <p>Die benötigten Vorbereitungsroutinen kennen wir bereits. Zuerst wird eine logische Datei geöffnet, anschließend die Datenausgabe mit CKOUT auf diese Datei umgeleitet. Wenn nun BSOUT aufgerufen wird, werden die im Akku übergebenen Zeichen dank der Umleitung nicht auf dem Bildschirm ausgegeben, sondern in die angegebene Datei geschrieben. ;DATASETTENDATEI ZUM</p>
+        <p>Die benötigten Vorbereitungsroutinen kennen wir bereits. Zuerst wird eine logische Datei geöffnet, anschließend die Datenausgabe mit CKOUT auf diese Datei umgeleitet. Wenn nun BSOUT aufgerufen wird, werden die im Akku übergebenen Zeichen dank der Umleitung nicht auf dem Bildschirm ausgegeben, sondern in die angegebene Datei geschrieben.</p>
 
-        <p>;SCHREIBEN OEFFNEN</p>
+        <pre><code>... ;DATASETTENDATEI ZUM
+... ;SCHREIBEN OEFFNEN
+... ;EINGABE AUF DIE DATEI LEGEN
+LDA #$41 ;ASCII-CODE VON »A«
+JSR $FFD2 ;»A« IN DIE DATEI SCHREIBEN
+...
+...</code></pre>
 
-        <pre><code>LDA #$41 JSR $FFD2
-</code></pre>
-
-
-        <pre><code>;EINGABE AUF DIE DATEI LEGEN ;ASCII-CODE VON »A« ;»A« IN DIE DATEI SCHREIBEN
-</code></pre>
-
-
-        <p>BASIN ($FFCF): Dateneingabe von logischer Datei</p>
+        <h3>BASIN ($FFCF): Dateneingabe von logischer Datei</h3>
 
         <p>BASIN erfüllt die entgegengesetzte Funktion, das Einlesen von Daten aus einer beliebigen logischen Datei. Wenn die Zeichen nicht vom Standardgerät Tastatur gelesen werden sollen, muß ebenfalls eine logische Datei zum Lesen geöffnet und die Eingabe mit CHKIN auf diese Datei umgelenkt werden. Nun kann mit BASIN Zeichen für Zeichen aus dieser Datei gelesen werden. Die eingelesenen Zeichen werden im Akku übergeben.</p>
 
-        <p>.. ;DATASETTENDATEI ZUM</p>
+        <pre><code>... ;DATASETTENDATEI ZUM
+... ;LESEN OEFFNEN
+... ;EINGABE AUF DIE DATEI LEGEN
+JSR $FFCF ;EIN ZEICHEN AUS DER DATEI LESEN
+STA $xxx1 ;ZEICHEN SPEICHERN
+JSR $FFCF ;NAECHSTES ZEICHEN LESEN
+STA $xxx2 ;EBENFALLS SPEICHERN
+...</code></pre>
 
-        <p>;LESEN OEFFNEN</p>
+        <h3>CLRCH ($FFCC): Standardein-/-ausgabegeräte setzen</h3>
 
-        <p>;EINGABE AUF DIE DATEI LEGEN ;EIN ZEICHEN AUS DER DATEI LESEN ;ZEICHEN SPEICHERN</p>
+        <p>Nach beendeter Ein- beziehungsweise Ausgabe von Daten sollte die Routine CLRCH aufgerufen werden, die die Eingabe wieder auf das Standardgerät Tastatur und die Ausgabe auf den Bildschirm umleitet. Es werden keinerlei Vorbereitungsroutinen oder Übergabeparameter benötigt.</p>
 
-        <p>;NAECHSTES ZEICHEN LESEN</p>
+        <pre><code>... ;LOGISCHE DATEI OEFFNEN
+... ;EIN- ODER AUSGABE UMLENKEN
+... ;DATEN LESEN ODER SCHREIBEN
+JSR $FFCC ;STANDARDEIN-/-AUSGABEGERAETE SETZEN
+... ;(TASTATUR/BILDSCHIRM)
+...</code></pre>
 
-        <p>;EBENFALLS SPEICHERN</p>
-
-        <pre><code>JISR $FFCF STA $xxx1 JISR $FFCF STA $xxx2
-</code></pre>
-
-
-        <p>CLRCH ($FFCC): Standardein-/-ausgabegeräte setzen</p>
-
-        <p>Nach beendeter Ein- beziehungsweise Ausgabe von Daten sollte die Routine CLRCH aufgerufen werden, die die Eingabe wieder auf das Standardgerät Tastatur und die Ausgabe auf den Bildschirm umleitet. Es werden keinerlei Vorbereitungsroutinen oder Übergabeparameter benötigt. ;LOGISCHE DATEI OEFFNEN</p>
-
-        <p>;EIN- ODER AUSGABE UMLENKEN ... ;DATEN LESEN ODER SCHREIBEN JISR $FFCC ;STANDARDEIN-/-AUSGABEGERAETE SETZEN —— ; (TASTATUR/BILDSCHIRM)</p>
-
-        <p>CLOSE ($FFC3): Logische Datei schließen</p>
+        <h3>CLOSE ($FFC3): Logische Datei schließen</h3>
 
         <p>CLRCH leitet weitere Ein- oder Ausgaben zwar wieder auf die Tastatur beziehungsweise den Bildschirm um, die zuvor geöffnete logische Datei wird jedoch nicht automatisch geschlossen! Zum Abschluß jeder Schreib- oder Leseroutine sollte daher die Routine CLOSE aufgerufen werden, die die angegebene logische Datei schließt, wobei die Filenummer im Akku übergeben werden muß.</p>
 
-        <p>;DATEI MIT LOGISCHER FILENUMMER 1 OEFFNEN ;EIN-/AUSGABE UMLEITEN</p>
+        <pre><code>... ;DATEI MIT LOGISCHER FILENUMMER 1 OEFFNEN
+... ;EIN-/AUSGABE UMLEITEN
+... ;DATEN LESEN ODER SCHREIBEN
+JSR $FFCC ;EIN-/AUSGABE AUF STANDARDGERAETE
+LDA #$01 ;LOGISCHE FILENUMMER
+JSR $FFC3 ;LOGISCHE DATEI SCHLIESSEN
+...
+...
+...</code></pre>
 
-        <p>... ;DATEN LESEN ODER SCHREIBEN JISR $FFCC</p>
-
-        <pre><code>;EIN-/AUSGABE AUF STANDARDGERAEFTE LDA #$01 ;LOGISCHE FILENUMMER
-</code></pre>
-
-
-        <pre><code>JSR $FFC3 ;LOGISCHE DATEI SCHLIESSEN
-</code></pre>
-
-
-        <p>READST ($FFB7): Status abfragen</p>
+        <h3>READST ($FFB7): Status abfragen</h3>
 
         <p>Ein Problem müssen wir noch lösen, bevor wir ausschließlich in Maschinensprache Dateiverwaltung betreiben können, und zwar die Abfrage des Dateiendes. Das Einlesen einer Datei muß beendet werden, wenn das Dateiende erreicht wurde. In Basic können wir dazu die Statusvariable ST abfragen, die den Wert 64 annimmt, wenn das Dateiende erreicht wurde.</p>
 
@@ -393,23 +375,16 @@ DATEN SCHREIBEN
 
         <p>Nach dem Aufruf von READST wird der aktuelle Status im Akku übergeben. Bei Erreichen des Dateiendes wird Bit 6 gesetzt (da dieses Bit den dezimalen Wert 64 besitzt, wird die Analogie zur Basic-Variablen ST deutlich).</p>
 
-        <pre><code>LABEL JSR $FFCF JSR $FFB7 AND #840
-</code></pre>
-
-
-        <pre><code>;DATEN LESEN ;READST AUFRUFEN
-</code></pre>
-
-
-        <pre><code>BEQ LABEL
-</code></pre>
-
-
-        <pre><code>;ALLE BITS AUSSER BIT 6
-AUSMASKIEREN
-;WEITERLESEN, WENN NICHT DATEIENDE
-</code></pre>
-
+        <pre><code>...
+...
+...
+LABEL JSR $FFCF ;DATEN LESEN
+      JSR $FFB7 ;READST AUFRUFEN
+      AND #$40 ;ALLE BITS AUSSER BIT 6 AUSMASKIEREN
+      BEQ LABEL ;WEITERLESEN, WENN NICHT DATEIENDE
+...
+...
+...</code></pre>
 
         <h2>Demoprogramm 2: Daten in Maschinensprache schreiben und lesen</h2>
 
@@ -417,45 +392,42 @@ AUSMASKIEREN
 
         <p>Aus reiner Bequemlichkeit wird zusätzlich ein kleines Basic-Programm verwendet, das den Dateinamen »TEST« ab 1015 und die zu schreibenden Strings ab 1019 in den Speicher POKEt, die Routine zum Schreiben der Strings aufruft, danach die Meldung »ZURUECKSPULEN...« ausgibt, auf die Taste RETURN wartet und zuletzt die Leseroutine aufruft, die beide Strings aus der Datei einliest und auf dem Bildschirm ausgibt.</p>
 
-        <p>100 REM %%%* STRINGS VORBEREITEN *#** 110 FOR I=1 TO 4:POKE 1014+I,ASC(MID$( "TEST",I,1)) :NEXT</p>
-
-        <p>A$="DIES IST"+CHR$(13)+"EIN TEST"+CHR$(13) +CHR$(0)</p>
-
-        <p>FOR I=1 TO LEN(A$):POKE 1018+I,ASC (MID$(A$,I,1)) :NEXT</p>
-
-        <pre><code>120 130 140 150
-</code></pre>
-
-
-        <pre><code>160 170
-</code></pre>
-
-
-        <p>REM %%*%* STRINGS SCHREIBEN/LESEN %**%* SYS 1630:REM STRINGS SCHREIBEN</p>
-
-        <p>PRINT "ZURUECKSPULEN + "RETURN! DRUECKEN" GET A$:IF A$&lt;>CHR$(13) THEN 180 190 SYS 1678:REM STRINGS LESEN/AUSGEBEN</p>
+        <pre><code>100 REM *** STRINGS VORBEREITEN ***
+110 FOR I=1 TO 4:POKE 1014+I,ASC(MID$("TEST",I,1)):NEXT
+120 A$="DIES IST"+CHR$(13)+"EIN TEST"+CHR$(13)+CHR$(0)
+130 FOR I=1 TO LEN(A$):POKE 1018+I,ASC(MID$(A$,I,1)):NEXT
+140 :
+150 REM *** STRINGS SCHREIBEN/LESEN ***
+160 SYS 1630:REM STRINGS SCHREIBEN
+170 PRINT"ZURUECKSPULEN + 'RETURN' DRUECKEN"
+180 GET A$:IF A$&lt;&gt;CHR$(13) THEN 180
+190 SYS 1678:REM STRINGS LESEN/AUSGEBEN</code></pre>
 
         <p>Beachten Sie bitte, daß bei der zeichenweisen Ausgabe mit BSOUT im Gegensatz zur Basic-Ausgabe mit PRINT # nicht automatisch nach jedem String das Zeichen CHR$(13) (Carriage Return oder auch Zeilenvorschub) auf das Band geschrieben wird. Die Basic-Routine fügt dieses Zeichen daher an das Ende beider Zeichenketten an (Zeile 120). Als letztes Zeichen wird ein CHR$(0) als Endemarke angehängt, an dem unsere Maschinenroutine das Ende des auszugebenden Strings erkennen soll.</p>
 
-        <p>Teil 1: Daten schreiben</p>
+        <h3>Teil 1: Daten schreiben</h3>
 
         <pre><code>. 065e LDA #$01 ;LOGISCHE FILENUMMER
 . 0660 LDX #$01 ;GERAETEADRESSE
 . 0662 LDY #$01 ;SEKUNDAERADRESSE (1=WRITE)
 . 0664 JSR $ffBA ;SETLFS AUFRUFEN
+
 . 0667 LDA #$04 ;LAENGE DES DATEINAMENS
 . 0669 LDX #$f7 ;LOW-BYTE ADRESSE DATEINAME
 . 066b LDY #$03 ;HIGH-BYTE ADRESSE DATEINAME
 . 066d JSR $FFBD ;SETNAM AUFRUFEN
-. 0670 JSR $FFCO ;OPEN AUFRUFEN
-. 0673 LDX #$01 ;LOGISCHE FILENUMMER .
-. 0675 JSR $FFC9_ ;CKOUT AUFRUFEN
-. 0678 LDX #$00. ;ZEIGER INITIALISIEREN
+
+. 0670 JSR $FFC0 ;OPEN AUFRUFEN
+. 0673 LDX #$01 ;LOGISCHE FILENUMMER
+. 0675 JSR $FFC9 ;CKOUT AUFRUFEN
+
+. 0678 LDX #$00 ;ZEIGER INITIALISIEREN
 . 067A LDA $03FB,X ;ERSTES ZEICHEN HOLEN
 . 067D BEQ $0685 ;FERTIG, WENN ENDEMARKE
 . 067f JSR $FFD2 ;ZEICHEN IN DATEI SCHREIBEN
 . 0682 INX ;ZEIGER AUF NAECHSTES ZEICHEN
 . 0683 BNE $067A ;ZUM SCHLEIFENANFANG (IMMER!)
+
 . 0685 JSR $FFCC ;STANDARDGERAETE SETZEN
 . 0688 LDA #$01 ;LOGISCHE FILENUMMER
 . 068a JSR $FFC3 ;LOGISCHE DATEI SCHLIESSEN
@@ -465,23 +437,30 @@ AUSMASKIEREN
 
         <h3>Teil 2: Daten lesen/ausgeben</h3>
 
-        <pre><code>. 068e . 0690
-</code></pre>
+        <pre><code>. 068e LDA #$01 ;LOGISCHE FILENUMMER
+. 0690 LDX #$01 ;GERAETEADRESSE
+. 0692 LDY #$00 ;SEKUNDAERADRESSE (0=READ)
+. 0694 JSR $FFBA ;SETLFS AUFRUFEN
 
+. 0697 LDA #$04 ;LAENGE DES DATEINAMENS
+. 0699 LDX #$F7 ;LOW-BYTE ADRESSE DATEINAME
+. 069b LDY #$03 ;HIGH-BYTE ADRESSE DATEINAME
+. 069D JSR $FFBD ;SETNAM AUFRUFEN
 
-        <pre><code>LDA #3$01 LDX #$01
-</code></pre>
+. 06A0 JSR $FFC0 ;OPEN AUFRUFEN
+. 06A3 LDX #$01 ;LOGISCHE FILENUMMER
+. 06A5 JSR $FFC6 ;CHKIN AUFRUFEN
 
+. 06A8 JSR $FFCF ;BASIN AUFRUFEN
+. 06AB JSR $FFD2 ;ZEICHEN AUSGEBEN
+. 06AE JSR $FFB7 ;READST AUFRUFEN
+. 06B1 AND # $40 ;ALLE AUSSER BIT 6 AUSMASKIEREN
+. 06B3 BEQ $06A8 ;WEITER, WENN NICHT DATEIENDE
 
-        <pre><code>;LOGISCHE FILENUMMER ;GERAETEADRESSE
-</code></pre>
-
-
-        <p>. 06B5 JSR $FFCC ;STANDARDGERAETE SETZEN</p>
-
-        <p>. 06B8 LDA # %01 ;LOGISCHE FILENUMMER</p>
-
-        <p>. 06BA JSR $FFC3 ;LOGISCHE DATEI SCHLIESSEN . 06BD RTS ;RUECKKEHR ZUM BASIC</p>
+. 06B5 JSR $FFCC ;STANDARDGERAETE SETZEN
+. 06B8 LDA # $01 ;LOGISCHE FILENUMMER
+. 06BA JSR $FFC3 ;LOGISCHE DATEI SCHLIESSEN
+. 06BD RTS ;RUECKKEHR ZUM BASIC</code></pre>
 
         <p>Dieses Programm dürfte gut verständlich sein, da es unter Verzicht auf Programmkürze in aller Ausführlichkeit programmiert wurde. Mit dem Öffnen und Schließen der Dateien im ersten und zweiten Programmteil sollten Sie nun vertraut sein.</p>
 
@@ -495,19 +474,25 @@ AUSMASKIEREN
 
         <p>Vorher muß ich jedoch kurz auf verschiedene Routinen des Basic-Interpreters eingehen, die für unsere Routine unbedingt benötigt werden. Da der Aufruf dem normalen INPUT #-Befehl entsprechen soll (INPUT # (logische Filenummer), (Übergabestring)), muß unser Programm in der Lage sein, die Filenummer aus dem Basic-Text zu lesen und auf den angegebenen String zuzugreifen, in dem die eingelesenen Daten gespeichert werden sollen.</p>
 
-        <p>Unsere Routine wird im RAM-Bereich $065E bis $06EB (dezimal 1630 bis 1771) liegen und wie folgt aufgerufen: SYS 1630, (LOGISCHE FILENUMMER) , (ÜBERGABESTRING) zum Beispiel:</p>
+        <p>Unsere Routine wird im RAM-Bereich $065E bis $06EB (dezimal 1630 bis 1771) liegen und wie folgt aufgerufen:</p>
 
-        <p>SYS 1630,1,a$ oder</p>
+        <pre><code>SYS 1630,(LOGISCHE FILENUMMER),(ÜBERGABESTRING)</code></pre>
 
-        <p>SYS 1630,2,X$(7)</p>
+        <p>zum Beispiel:</p>
 
-        <p>Da die einzelnen Parameter durch Kommata getrennt sind, benötigen wir zuerst eine Routine, die in der Lage ist, Kommatas aus dem Basic-Programm einzulesen. Diese Routine wird CHKKOM ($9491) genannt. Der Basic-Interpreter führt ständig einen Zeiger auf die momentan bearbeitete Textstelle mit sich. Nach dem SYS-Aufruf weist dieser Zeiger auf das erste Zeichen hinter der angegebenen Adresse, das heißt auf das Komma. :</p>
+        <pre><code>SYS 1630,1,a$</code></pre>
 
-        <p>Der Aufruf von CHKKOM liest dieses Zeichen ein, setzt den .»Textpointer« auf das nächste Zeichen im Basic-Programm und überprüft, ob tatsächlich ein Komma gelesen wurde. Wenn ja, endet CHKKOM mit einem RTS-Befehl, sonst wird ein »Syntax error in ...« ausgegeben.</p>
+        <p>oder</p>
+
+        <pre><code>SYS 1630,2,X$(7)</code></pre>
+
+        <p>Da die einzelnen Parameter durch Kommata getrennt sind, benötigen wir zuerst eine Routine, die in der Lage ist, Kommatas aus dem Basic-Programm einzulesen. Diese Routine wird CHKKOM ($9491) genannt. Der Basic-Interpreter führt ständig einen Zeiger auf die momentan bearbeitete Textstelle mit sich. Nach dem SYS-Aufruf weist dieser Zeiger auf das erste Zeichen hinter der angegebenen Adresse, das heißt auf das Komma.</p>
+
+        <p>Der Aufruf von CHKKOM liest dieses Zeichen ein, setzt den »Textpointer« auf das nächste Zeichen im Basic-Programm und überprüft, ob tatsächlich ein Komma gelesen wurde. Wenn ja, endet CHKKOM mit einem RTS-Befehl, sonst wird ein »Syntax error in ...« ausgegeben.</p>
 
         <p>Wenn mit CHKKOM das erste Trennzeichen eingelesen wurde, muß anschließend die angegebene Filenummer von unserem Programm gelesen werden. Die Routine GETBYT ($9D84) liest einen beliebigen Ein-Byte-Wert aus dem Basic-Text und übergibt ihn im X-Register. Der Wert muß übrigens nicht direkt als Zahl angegeben werden, da GETBYT auch Variable verarbeitet, so daß zum Beispiel folgender Aufruf möglich ist:</p>
 
-        <p>LF=1:SYS 1630,LF,A$</p>
+        <pre><code>LF=1:SYS 1630,LF,A$</code></pre>
 
         <p>Bevor wir an die eigentliche Programmerstellung gehen können, muß ein weiteres Problem gelöst werden: Wo speichern wir die eingelesenen Zeichen? In welcher Form sollen die eingelesenen Daten im Speicher abgelegt werden? Am komfortabelsten ist die Benutzung unserer Routine, wenn sie die eingelesenen Zeichen als String anlegt, auf den das aufrufende Basic-Programm direkt zugreifen kann. Der Name des Übergabestrings sollte ebenso wie beim INPUT #-Befehl beim Aufruf angegeben werden können.</p>
 
@@ -517,66 +502,65 @@ AUSMASKIEREN
 
         <p>STRPOS übergibt einen Zeiger auf diese Descriptoren des angegebenen Strings (und zwar nicht auf das erste Descriptoren-Byte (das erste Namens-Byte), sondern auf das Längen-Byte) und legt ihn an, wenn er bisher noch nicht existiert. Wenn der Aufruf zum Beispiel lautet:</p>
 
-        <p>SYS 1630, A$(7) und unsere Routine zuerst CHKKOM und anschließend STRPOS aufruft, erhalten wir in $47 und $48 einen Pointer, der auf den Längendescriptor des Strings A$(7) zeigt.</p>
+        <pre><code>SYS 1630,A$(7)</code></pre>
+
+        <p>und unsere Routine zuerst CHKKOM und anschließend STRPOS aufruft, erhalten wir in $47 und $48 einen Pointer, der auf den Längendescriptor des Strings A$(7) zeigt.</p>
 
         <p>Die letzte benötigte Routine heißt STRRES ($A906). Diese Routine reserviert Speicherplatz für den anzulegenden String. Ein Beispiel: Wir wollen einen String mit einer Länge von 10 Zeichen anlegen. Zuerst muß der Akku mit der Stringlänge geladen werden, anschließend wird STRRES aufgerufen:</p>
 
-        <p>LDA #80A ;STRINGLAENGE: 10 ZEICHEN</p>
-
-        <p>JSR $A906 ;AUFRUF VON STRRES</p>
+        <pre><code>LDA #$0A ;STRINGLAENGE: 10 ZEICHEN
+JSR $A906 ;AUFRUF VON STRRES</code></pre>
 
         <p>In $33 und $34 befindet sich ein Pointer auf den Anfang des sogenannten »Stringstacks«, das heißt auf das erste Zeichen des zuletzt angelegten Strings. Nach dem Aufruf von STRRES mit der Stringlänge Zehn im Akku wird dieser Pointer um den Wert Zehn (+2, wie wir noch sehen werden!) erniedrigt. Der dazukommende String kann nun vor (!) dem zuletzt angelegten gespeichert werden (denken Sie bitte daran, daß die Strings vom Speicherende ausgehend abwärts (!) angelegt werden).</p>
 
-        <p>Bevor STRRES den Pointer auf den Anfang der Strings um die übergebene Stringlänge (+2) vermindert, wird jedoch überprüft, ob überhaupt ausreichend Platz vorhanden ist, oder ob der nach unten wachsende Stringstack mit dem Basic-Programm kollidieren und dieses überschreiben würde. Wenn nicht ausreichend Platz vorhanden ist, wird eine Garbage Collection durchgeführt, das heißt nicht mehr benötigter Stringmüll beseitigt. Ist auch anschließend noch nicht ausreichend Platz für den anzulegenden String vorhanden, gibt STRRES die Fehlermeldung »out of memory error« aus. Endlich: Die INPUT #-Routine</p>
+        <p>Bevor STRRES den Pointer auf den Anfang der Strings um die übergebene Stringlänge (+2) vermindert, wird jedoch überprüft, ob überhaupt ausreichend Platz vorhanden ist, oder ob der nach unten wachsende Stringstack mit dem Basic-Programm kollidieren und dieses überschreiben würde. Wenn nicht ausreichend Platz vorhanden ist, wird eine Garbage Collection durchgeführt, das heißt nicht mehr benötigter Stringmüll beseitigt. Ist auch anschließend noch nicht ausreichend Platz für den anzulegenden String vorhanden, gibt STRRES die Fehlermeldung »out of memory error« aus.</p>
+
+        <h3>Endlich: Die INPUT #-Routine</h3>
 
         <p>Nun können wir uns endlich an die eigentliche Programmierung wagen. Im Gegensatz zu den bisher verwendeten Monitorlistings werde ich die Entwicklung der INPUT #-Routine anhand von Assemblerlistings demonstrieren, da die Routine doch etwas komplexer als die bisherigen Programmbeispiele ist und Assemblerlistings einfacher zu durchschauen sind. Da Sie jedoch kaum über einen Assembler für den C 16 verfügen, finden Sie am Ende dieses Artikels wieder das gewohnte Monitorlisting, das Sie problemlos mit dem integrierten Monitor eingeben können.</p>
 
-        <p>ZRRÄRKÄRRRÄRRRRRÄRRKRRRRRRR</p>
+        <pre><code>;*************************
+;* INPUT# FUER C16/C116 *
+;* (C) SAID BALOUI, 1986 *
+;*************************
 
-        <p>;* INPUT# FUER C16/C116 *</p>
+        .BA $065E        ;PROGRAMMSTART
+        .OS              ;OBJECTCODE GENERIEREN
 
-        <p>;* (C) SAID BALOUI, 1986 *</p>
-
-        <pre><code>.BA $065E ;PROGRAMMSTART
-.0S ;OBJECTCODE GENERIEREN
 ;
-LENGTH .DE $DO ;STRINGLAENGE
-POINTR .DE $D1 ;HILFSPOINTER
-DESCR .DE $D3 ;STRINGDESCRIPTOREN
-DESPOI .DE $47 ;POINTER AUF DESCRIPTOREN
-CHKKOM .DE $9491 ;KOMMA EINLESEN
-GETBYT .DE $9D84 ;BYTEWERT LESEN
-CHKIN .DE $FFC6 ;INPUT AUF LOGISCHE DATEI
-CLRCH _.DE $FFCC ;STANDARDGERAETE SETZEN
-BASIN .DE $FFCF ;ZEICHEN AUS LOG.DATEI LESEN
-STREND .DE $33 ;POINTER AUF STRINGSTACK
-STRPOS .DE $964A5 ;STRINGVARIABLE LESEN
-.DE $A906 ;STRINGPLATZ RESERVIEREN
-</code></pre>
-
-
-        <pre><code>STRRES
-</code></pre>
-
-
-        <p>'</p>
-
-        <p>*%*%* PLATZ RESERVIEREN ***</p>
-
-        <p>LDA #255 ;255 BYTE</p>
-
-        <p>JSR STRRES ;RESERVIEREN</p>
+LENGTH  .DE $D0          ;STRINGLAENGE
+POINTR  .DE $D1          ;HILFSPOINTER
+DESCR   .DE $D3          ;STRINGDESCRIPTOREN
+DESPOI  .DE $47          ;POINTER AUF DESCRIPTOREN
+CHKKOM  .DE $9491        ;KOMMA EINLESEN
+GETBYT  .DE $9D84        ;BYTEWERT LESEN
+CHKIN   .DE $FFC6        ;INPUT AUF LOGISCHE DATEI
+CLRCH   .DE $FFCC        ;STANDARDGERAETE SETZEN
+BASIN   .DE $FFCF        ;ZEICHEN AUS LOG.DATEI LESEN
+STREND  .DE $33          ;POINTER AUF STRINGSTACK
+STRPOS  .DE $96A5        ;STRINGVARIABLE LESEN
+STRRES  .DE $A906        ;STRINGPLATZ RESERVIEREN
+;
+;
+*** PLATZ RESERVIEREN ***
+        LDA #255         ;255 BYTE
+        JSR STRRES       ;RESERVIEREN</code></pre>
 
         <p>Diese beiden Befehle reservieren Platz für den einzulesenden String mit einer Maximallänge von 255 Zeichen. Dank der Verwendung von STRRES wird sich das Programm keinesfalls »aufhängen«. Sollte das Basic-Programm, in dem Sie die INPUT #-Routine verwenden, zu umfangreich und daher nicht ausreichend Platz vorhanden sein, wird es sich mit »out of memory error« verabschieden.</p>
 
-        <p>**%* STRING EINLESEN %%**</p>
-
-        <pre><code>JSR CHKKOM ; LOGISCHE FILENUMMER JSR GETBYT ;EINLESEN (X-REGISTER) JSR CHKIN ;EINGABE AUF LOGISCHE DATEI IDY #0
-INPUT JSR BASIN
-CMP #13 ;LESEN BIS &gt; &gt;RETURN&lt;&lt; BEQ LIESEND ;UND AB STREND/STREND+1 STA (STREND),Y ;IM STRINGSTACK ABLEGEN INY
-BNE INPUT ;UNBEDINGTER SPRUNG (!) LIESEND STY LENGTH ;STRINGLAENGE MERKEN JSR CLRCH ;STANDARDGERAETE SETZEN
-</code></pre>
-
+        <pre><code>*** STRING EINLESEN ***
+        JSR CHKKOM       ;LOGISCHE FILENUMMER
+        JSR GETBYT       ;EINLESEN (X-REGISTER)
+        JSR CHKIN        ;EINGABE AUF LOGISCHE DATEI
+        LDY #0
+INPUT   JSR BASIN
+        CMP #13          ;LESEN BIS &gt;&gt;RETURN&lt;&lt;
+        BEQ LIESEND      ;UND AB STREND/STREND+1
+        STA (STREND),Y   ;IM STRINGSTACK ABLEGEN
+        INY
+        BNE INPUT        ;UNBEDINGTER SPRUNG (!)
+LIESEND STY LENGTH       ;STRINGLAENGE MERKEN
+        JSR CLRCH        ;STANDARDGERAETE SETZEN</code></pre>
 
         <p>Der Programmteil zum Einlesen des Strings liest zuerst das als Trennzeichen verwendete Komma und die angegebene Filenummer aus dem Basic-Text ein. GETBYT übergibt wie erwähnt die Filenummer im X-Register, in dem sich die Filenummer auch beim Aufruf von CHKIN befinden muß, so daß diese Routine ohne weitere Vorbereitung aufgerufen und die Eingabe auf die geöffnete Datei umgelenkt werden kann.</p>
 
@@ -584,121 +568,80 @@ BNE INPUT ;UNBEDINGTER SPRUNG (!) LIESEND STY LENGTH ;STRINGLAENGE MERKEN JSR CL
 
         <p>Das Y-Register wird nun mit Null initialisiert und Zeichen für Zeichen aus der Datei eingelesen und ab dem neuen Anfang des Stringstacks gespeichert, bis das Zeichen RETURN gelesen wird, das das Stringende kennzeichnet. Die in Y enthaltene Stringlänge wird in LENGTH zur späteren Verwendung zwischengespeichert. Durch Aufruf von CLRCH werden wieder die Standardgeräte (Tastatur, Bildschirm) gesetzt.</p>
 
-        <p>**%* POINTER AUF STRINGANFANG %%*%*</p>
+        <pre><code>*** POINTER AUF STRINGANFANG ***
+        LDA STREND+1     ;POINTR(+1)=
+        STA POINTR+1     ;ECHTER STRINGANFANG,
+        LDA #255         ;D.H. MOMENTANER
+        SEC              ;ANFANG (STREND)
+        SBC LENGTH       ;+ DIE DIFFERENZ
+        CLC              ;ZWISCHEN DER
+        ADC STREND       ;RESERVIERTEN LAENGE
+        STA POINTR       ;255 ZEICHEN UND
+        BCC NOINC        ;DER TATSAECHLICHEN
+        INC POINTR+1     ;LAENGE DES STRINGS</code></pre>
 
-        <p>LDA STREND+1 ;POINTR(+1)=</p>
+        <p>Die eingelesenen Zeichen wurden ab der Adresse gespeichert, auf die STREND weist. STREND weist durch die Stringreservierung 255 Zeichen (+2) vor den Beginn des nächsten Strings im Stringstack. Um die unglaubliche Platzverschwendung zu vermeiden, wenn zwar 255 Zeichen reserviert wurden, der eingelesene String tatsächlich jedoch zum Beispiel nur 20 oder 30 Zeichen lang ist, wird nach beendetem Einlesen der String nach oben verschoben, um den Leerraum zwischen dem eingelesenen und dem nächsten String im Stringstack wiederzugewinnen. Dazu wird zuerst anhand der tatsächlichen Stringlänge LENGTH und der daraus resultierenden Differenz zum reservierten Speicherplatz ein Pointer POINTR errechnet, der auf die korrekte Adresse weist, an die der String verschoben werden muß.</p>
 
-        <p>STA POINTR+1 ;ECHTER STRINGANFANG,</p>
+        <pre><code>;*** STRING VERSCHIEBEN ***
+NOINC   LDY LENGTH       ;STRING VON:
+        DEY              ;STREND BIS STREND+LENGTH
+COPY    LDA (STREND),Y   ;NACH:
+        STA (POINTR),Y   ;POINTR BIS POINTR+LENGTH
+        DEY              ;KOPIEREN
+        CPY #255
+        BNE COPY</code></pre>
 
-        <pre><code>LDA #255 ;D.H. MOMENTANER
-SEC ;ANFANG (STREND)
-SBC LENGTH ;+ DIE DIFFERENZ
-CLC ;ZWISCHEN DER
-ADC STREND ;RESERVIERTEN LAENGE
-STA POINTR ;255 ZEICHEN UND
-BCC NOINC ;DER TATSAECHLICHEN
-</code></pre>
+        <p>Das zeichenweise Kopieren des Strings dürfte problemlos zu verstehen sein. Der String befindet sich an der korrekten Adresse und unsere Routine wäre beendet, doch leider kann das Basic-Programm noch nicht auf den angelegten String zugreifen. Zuvor müssen noch mehrere Pointer korrigiert werden.</p>
 
-
-        <pre><code>INC POINTR+1 ;LAENGE DES STRINGS
-</code></pre>
-
-
-        <p>Die eingelesenen Zeichen wurden ab der Adresse gespeichert, auf die STREND weist. STREND weist durch die Stringreservierung 255 Zeichen (+2) vor den Beginn des nächsten Strings im Stringstack. Um die unglaubliche Platzverschwendung zu vermeiden, wenn zwar 255 Zeichen reserviert wurden, der eingelesene String tatsächlich jedoch zum Beispiel nur 20 oder 30 Zeichen lang ist, wird nach beendetem Einlesen der String nach oben verschoben, um denLeerraum zwischen dem eingelesenen und dem nächsten String im Stringstack wiederzugewinnen. Dazu wird zuerst anhand der tatsächlichen Stringlänge LENGTH und der daraus resultierenden Differenz zum reservierten Speicherplatz ein Pointer POINTR errechnet, der auf die korrekte Adresse weist, an die der String verschoben werden muß.</p>
-
-        <pre><code>;*%%%* STRING VERSCHIEBEN *%*%*
-</code></pre>
-
-
-        <pre><code>NOINC LDY LENGTH ;STRING VON:
-DEY ;STREND BIS STREND+LENGTH COPY LDA (STREND),Y ;NACH: -
-</code></pre>
-
-
-        <pre><code>STA (POINTR),Y ;POINTR BIS POINTR+LENGTH DEY ;KOPIEREN
-CPY #255
-BNE COPY
-</code></pre>
-
-
-        <p>Das zeichenweise Kopieren des Strings dürfte problemlos zu verstehen sein. Der String befindet sich an der korrekten Adresse und unsere Routine wäre beendet, dochleider kann das Basic-Programm noch nicht auf den angelegten String zugreifen. Zuvor müssen noch mehrere Pointer korrigiert werden.</p>
-
-        <pre><code>;%%% STRINGDESCRIPTOREN HOLEN *%*%*
-</code></pre>
-
-
-        <pre><code>JSR CHKKOM ;POINTER AUF DIE
-JSR STRPOS ;DESCRIPTOREN DES
-IDY #2 ;BEIM AUFRUF ANGEGEBENEN
-</code></pre>
-
-
-        <pre><code>DESCOPY LDA (DESPOI),Y ;STRINGS HOLEN ($47 UND $48)
-STA DESCR,Y ;UND DIE DESCRIPTOREN
-DEY ; (LAENGE/ADRESSE(LOW/HIGH) )
-BPL DESCOPY ;NACH DESCR BIS DESCR+2
-</code></pre>
-
+        <pre><code>;*** STRINGDESCRIPTOREN HOLEN ***
+        JSR CHKKOM       ;POINTER AUF DIE
+        JSR STRPOS       ;DESCRIPTOREN DES
+        LDY #2           ;BEIM AUFRUF ANGEGEBENEN
+DESCOPY LDA (DESPOI),Y   ;STRINGS HOLEN ($47 UND $48)
+        STA DESCR,Y      ;UND DIE DESCRIPTOREN
+        DEY              ;(LAENGE/ADRESSE(LOW/HIGH))
+        BPL DESCOPY      ;NACH DESCR BIS DESCR+2</code></pre>
 
         <p>Mit CHKKOM wird das der Filenummer folgende Komma gelesen und STRPOS übergibt in DESPOI ($47 und $48) einen Pointer auf den beim Aufruf angegebenen String. Die Descriptoren dieses Strings werden in einer Schleife nach DESCR (Länge), DESCR+1 (Adresse Low) und DESCR+2 (Adresse high) kopiert.</p>
 
-        <pre><code>;%%%* RUECKPOINTER BEHANDELN *%**
-</code></pre>
-
-
-        <pre><code>LDA DESCR ;WENN ALTER STRING EXISTIERT
-BEQ ANLEG ;(DAS HEISST WENN LAENGE &lt;&gt;0),
-TAY ;WIRD ER UNGUELTIG GEMACHT
-</code></pre>
-
-
-        <pre><code>STA (DESCR+1),Y ; (RUECKPOINTER=LAENGE,
-</code></pre>
-
-
-        <pre><code>INY ;RUECKPOINTER+1=$FF) LDA #$FF
-STA (DESCR+1),Y
+        <pre><code>;*** RUECKPOINTER BEHANDELN ***
+        LDA DESCR        ;WENN ALTER STRING EXISTIERT
+        BEQ ANLEG        ;(DAS HEISST WENN LAENGE &lt;&gt;0),
+        TAY              ;WIRD ER UNGUELTIG GEMACHT
+        STA (DESCR+1),Y  ;(RUECKPOINTER=LAENGE,
+        INY              ;RUECKPOINTER+1=$FF)
+        LDA #$FF
+        STA (DESCR+1),Y
 ;
-ANLEG LDY LENGTH ;RUECKPOINTER/RUECKPOINTER +1
-LDA DESPOI ;wWIRD DIE ADRESSE
-STA (POINTR),Y ;DES LAENGENDESCRIPTORS INY ; ZUGEWIESEN
-</code></pre>
+ANLEG   LDY LENGTH       ;RUECKPOINTER/RUECKPOINTER+1
+        LDA DESPOI       ;WIRD DIE ADRESSE
+        STA (POINTR),Y   ;DES LAENGENDESCRIPTORS
+        INY              ;ZUGEWIESEN
+        LDA DESPOI+1
+        STA (POINTR),Y</code></pre>
 
+        <p>Diesen Programmteil können Sie nicht verstehen, ohne zu wissen, daß der Basic-Interpreter des C 16 am Ende jedes Strings einen Pointer anlegt, der auf den zugehörigen Stringdescriptor, genauer: auf den Längendescriptor des Strings, »zurückweist«. Das heißt, daß nicht nur ein Pointer in der Variablentabelle (die beiden Bytes des Adressendescriptors) auf den String im Stringstack weist, sondern ein weiterer Pointer von diesem String auf die Descriptoren dieses Strings zurückweist. Dieser zusätzliche Pointer hat nur für die Garbage Collection eine Bedeutung, die dadurch erheblich beschleunigt wird.</p>
 
-        <pre><code>LDA DESPOI+1 STA (POINTR),Y
-</code></pre>
+        <p>Entscheidend für uns ist jedoch, daß unsere Routine außer dem eigentlichen String ebenfalls diesen »Rückdescriptor« anlegen muß. Platz dafür ist am Stringende vorhanden, da STRRES den Pointer STREND nicht nur um die angegebene Stringlänge vermindert, sondern – wie bereits von mir angedeutet wurde – um zusätzliche zwei Byte für den ebenfalls anzulegenden Rückdescriptor.</p>
 
-
-        <p>Diesen Programmteil können Sie nicht verstehen, ohne zu wissen, daß der Basic-Interpreter des C 16 am Ende jedes Strings einen Pointer anlegt, der auf den zugehörigen Stringdescriptor, genauer: auf den Längendescriptor des Strings, »zurückweist«. Das heißt, daß nicht nur ein Pointer in der Variablentabelle (die beiden Bytes des Adressendescriptors) auf den String im Stringstack weist, sondern ein weiterer Pointer von diesem String auf die Descriptoren dieses Strings zurückweist. Dieser zusätzliche Pointer hat nur für die Garbage Collection eine Bedeutung, die dadurch erheblich beschleunigt wird. :</p>
-
-        <p>Entscheidend für uns istjedoch, daß unsere Routine außer dem eigentlichen String ebenfalls diesen »Rückdescriptor« anlegen muß. Platz dafür ist am Stringende vorhanden, da STRRES den Pointer STREND nicht nur um die angegebene Stringlänge vermindert, sondern – wie bereits von mir angedeutet wurde – um zusätzliche zwei Byte für den ebenfalls anzulegenden Rückdescriptor.</p>
-
-        <p>Die Routine »Rückpointer behandeln« prüft zuerst, ob bereits ein String unter dem angegebenen Namen existierte, das heißt ob der Längendescriptor nicht gleich Null ist. Ist dies der Fall, muß der alte String ungültig gemacht werden, dader Basic-Interpreter sonst bei der nächsten Garbage Collection durcheinanderkommt, weil das Low-Byte des Rückpointers die alte Stringlänge und das High-Byte den Wert $FF als Kennzeichen für einen ungültigen String enthält.</p>
+        <p>Die Routine »Rückpointer behandeln« prüft zuerst, ob bereits ein String unter dem angegebenen Namen existierte, das heißt ob der Längendescriptor nicht gleich Null ist. Ist dies der Fall, muß der alte String ungültig gemacht werden, da der Basic-Interpreter sonst bei der nächsten Garbage Collection durcheinanderkommt, weil das Low-Byte des Rückpointers die alte Stringlänge und das High-Byte den Wert $FF als Kennzeichen für einen ungültigen String enthält.</p>
 
         <p>Anschließend enthält der neu anzulegende Rückpointer die Adresse der zugehörigen Descriptoren. Er muß auf den Längendescriptor weisen.</p>
 
-        <pre><code>;%*%% DESCRIPTOREN/STREND BEHANDELN *%*%*
-</code></pre>
+        <pre><code>;*** DESCRIPTOREN/STREND BEHANDELN ***
+        LDY #0           ;DESCRIPTOREN AKTUALISIEREN
+        LDA LENGTH       ;(LAENGENDESCRIPTOR MIT DER
+        STA (DESPOI),Y   ;STRINGLAENGE UND ADRESSEN-
+        INY              ;DESCRIPTOREN MIT DER STRING-
+        LDA POINTR       ;ADRESSE VERSEHEN
+        STA (DESPOI),Y   ;AUSSERDEM STREND/STREND+1
+        STA STREND       ;ENTSPRECHEND DER GEAENDERTEN
+        INY              ;STRINGADRESSE KORRIGIEREN
+        LDA POINTR+1
+        STA (DESPOI),Y
+        STA STREND+1
 
-
-        <pre><code>IDY #0 ;DESCRIPTOREN AKTUALISIEREN
-LDA LENGTH ; (LAENGENDESCRIPTOR MIT DER
-STA (DESPOI),Y ;STRINGLAENGE UND ADRESSEN-
-INY ;DESCRIPTOREN MIT DER STRING-
-LDA POINTR ;ADRESSE VERSEHEN
-STA (DESPOI),Y ;AUSSERDEM STREND/STREND+1
-STA STREND ;ENTSPRECHEND DER GEAENDERTEN
-INY ;STRINGADRESSE KORRIGIEREN
-</code></pre>
-
-
-        <pre><code>LDA POINTR+1 STA (DESPOI),Y STA STREND+1
-</code></pre>
-
-
-        <pre><code>RTS ;ZURUECK ZUM BASIC
-</code></pre>
-
+        RTS              ;ZURUECK ZUM BASIC</code></pre>
 
         <p>Dem Längendescriptor des Strings wird nun die Länge LENGTH und den beiden Adressendescriptoren (Low/High) die geänderte Startadresse POINTR/POINTR+1 zugewiesen. Da der von den reservierten 255 Zeichen unbenutzte Bereich durch das Verschieben des Strings wieder freigegeben wurde, muß natürlich auch STREND/STREND+1 entsprechend der endgültigen Stringadresse korrigiert werden.</p>
 

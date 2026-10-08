@@ -17,31 +17,32 @@
         <h1>Wühlereien im Betriebssystem</h1>
         <p class="intro">Für alle Assembler-Programmierer zeigt der folgende Artikel die Verwendung der wichtigsten ROM-Routinen im C 16.</p>
 
-        <p>B:- wir anfangen können, müssen wir noch ein paar Dinge klären.</p>
+        <p>Bevor wir anfangen können, müssen wir noch ein paar Dinge klären.</p>
 
         <p>1) Dieser Artikel geht davon aus, daß Sie Maschinensprachekenntnisse haben.</p>
 
         <p>2) Die vorgestellten Listings werden mit dem integrierten Monitor TEDMON eingegeben. Sie beginnen im Speicher bei $1001, dem Anfang des Basic-Speichers. Damit unsere Programme dort einigermaßen sicher sind, geben Sie bitte im Monitor folgende Befehle ein:</p>
 
-        <p>>002B 01 11 (setzt Basic-Start herauf)</p>
+        <pre><code>&gt;002B 01 11 (setzt Basic-Start herauf)
+&gt;1100 00</code></pre>
 
-        <p>>1100 00</p>
+        <p>3) Die Programme werden von Basic aus gestartet:</p>
 
-        <p>3) Die Programme werden von Basic aus gestartet: SYS DEC(."1001")</p>
+        <pre><code>SYS DEC("1001")</code></pre>
 
-        <p>Kernel-Einsprünge</p>
+        <h3>Kernel-Einsprünge</h3>
 
-        <p>Ab $FF81 stehen im Speicher die sogenannten Kernel-Einsprünge. Diese sind in der Wirkung bei allen Commodore-Computern gleich, was ein eventuell anfallendes Umschreiben (zum Beispiel auf den C 64 oder den Plus/4) erleichtert. Wir besprechen hier in Kurzform die wichtigsten; einige . davon kennen Sie schon aus besagtem Artikel im C 16-Sonderheft 3, 1986.</p>
+        <p>Ab $FF81 stehen im Speicher die sogenannten Kernel-Einsprünge. Diese sind in der Wirkung bei allen Commodore-Computern gleich, was ein eventuell anfallendes Umschreiben (zum Beispiel auf den C 64 oder den Plus/4) erleichtert. Wir besprechen hier in Kurzform die wichtigsten; einige davon kennen Sie schon aus besagtem Artikel im C 16-Sonderheft 3, 1986.</p>
 
-        <p>VIRES ($FF81)</p>
+        <h3>VIRES ($FF81)</h3>
 
         <p>»VIRES« initialisiert den Video-Chip und den Bildschirm-Editor. Diese Routine wird einfach über »JSR $FF81« aufgerufen und benötigt keinerlei Parameter.</p>
 
-        <p>IORES ($FF84)</p>
+        <h3>IORES ($FF84)</h3>
 
         <p>»IORES« initialisiert die Ein-/Ausgabe-Bausteine des C 16. Auch hier sind keine Parameter notwendig.</p>
 
-        <p>STMSG ($FF90)</p>
+        <h3>STMSG ($FF90)</h3>
 
         <p>Mit dieser Routine können Sie die Ausgabe von Systemmeldungen (Fehlermeldungen etc.) teilweise oder ganz unterdrücken.</p>
 
@@ -81,45 +82,52 @@
 
         <p>So kann man also alle Meldungen ausschalten:</p>
 
-        <p>LDA #$C0</p>
+        <pre><code>LDA #$C0
+JSR $FF90</code></pre>
 
-        <p>JSR $FF9O</p>
-
-        <p>SETLFS ($FFBA)</p>
+        <h3>SETLFS ($FFBA)</h3>
 
         <p>Diese Routine muß man vor »OPEN«, »LOAD« oder »SAVE« zur Angabe der Fileparameter aufrufen. Sie wurde bereits im Sonderheft 3, 1986 vorgestellt.</p>
 
-        <p>SETNAM ($FFBD)</p>
+        <h3>SETNAM ($FFBD)</h3>
 
         <p>Es gilt das gleiche wie für »SETLFS«.</p>
 
-        <p>OPEN ($FFCO)</p>
+        <h3>OPEN ($FFC0)</h3>
 
-        <p>Diese Routine dient dem Öffnen eines Files, das vorher durch »SETLFS« und »SETNAM« (wie vor »LOAD«) bestimmt wurde. In den Registern übergibt man keine Parameter. CLOSE ($FFC3)</p>
+        <p>Diese Routine dient dem Öffnen eines Files, das vorher durch »SETLFS« und »SETNAM« (wie vor »LOAD«) bestimmt wurde. In den Registern übergibt man keine Parameter.</p>
+
+        <h3>CLOSE ($FFC3)</h3>
 
         <p>Gegenstück zu »OPEN«. Damit schließt man ein File wieder. Im Akku muß beim Aufruf die logische Filenummer stehen.</p>
 
-        <p>CHKIN ($FFC6)</p>
+        <h3>CHKIN ($FFC6)</h3>
 
         <p>Mit dieser Routine kann man alle Eingaben von »BASIN« oder »GETIN« statt von der Tastatur von einem vorher geöffneten File erfolgen lassen. Im X-Register übergibt man der »CHKIN«-Routine die logische Filenummer dieses neuen Eingabe-Files.</p>
 
-        <p>CKOUT ($FFC9)</p>
+        <h3>CKOUT ($FFC9)</h3>
 
         <p>Wie »CHKIN«, nur daß das Ausgabegerät für »BSOUT« gesetzt wird. Im X-Register übergibt man die Filenummer der Ausgabedatei.</p>
 
-        <p>CLRCH ($FFCC)</p>
+        <h3>CLRCH ($FFCC)</h3>
 
-        <p>Wenn »CHKIN« oder »CKOUT« verwendet wurde, kann man über »CLRCH« wieder die normalen Ein-/Ausgabegeräte (Eingabe: Tastatur; Ausgabe: Bildschirm) einstellen lassen. BASIN ($FFCF)</p>
+        <p>Wenn »CHKIN« oder »CKOUT« verwendet wurde, kann man über »CLRCH« wieder die normalen Ein-/Ausgabegeräte (Eingabe: Tastatur; Ausgabe: Bildschirm) einstellen lassen.</p>
+
+        <h3>BASIN ($FFCF)</h3>
 
         <p>Wurde schon im Sonderheft 3, 1986 vorgestellt. Es erfolgt die Eingabe über Tastatur oder dem über »CHKIN« angewählten Gerät.</p>
 
-        <p>BSOUT ($FFD2)</p>
+        <h3>BSOUT ($FFD2)</h3>
 
-        <p>Wurde auch schon vorgestellt. Ein Zeichen, das im Akku übergeben wird, wird auf dem Bildschirm oder dem über »CKOUTR eingestellten Gerät ausgegeben. Listing 1 und 2 zeigen Beispiele mit den Ausgabe-Routinen. LOAD ($FFD5)</p>
+        <p>Wurde auch schon vorgestellt. Ein Zeichen, das im Akku übergeben wird, wird auf dem Bildschirm oder dem über »CKOUT« eingestellten Gerät ausgegeben. Listing 1 und 2 zeigen Beispiele mit den Ausgabe-Routinen.</p>
+
+        <h3>LOAD ($FFD5)</h3>
 
         <p>Auch nichts Neues. Zu dieser Load-Routine soll an dieser Stelle aber noch ein Hinweis gegeben werden.</p>
 
-        <p>Wenn man ein Basic-Programm laden will, muß man: a) dessen Endadresse dem Computer mitteilen und b) die Linkpointer (siehe Artikel »Durchblick mit dem Monitor« in diesem Heft) neu berechnen lassen.</p>
+        <p>Wenn man ein Basic-Programm laden will, muß man:<br>
+            a) dessen Endadresse dem Computer mitteilen und<br>
+            b) die Linkpointer (siehe Artikel »Durchblick mit dem Monitor« in diesem Heft) neu berechnen lassen.</p>
 
         <p>Um beides zu bewerkstelligen, läßt man dem Aufruf der Load-Routine unmittelbar folgende Befehle folgen:</p>
 
@@ -157,41 +165,41 @@ JSR $8818 ;Linkpointer berechnen lassen
         </figure>
         <div class="binary_download" data-filename="l1.$1001-$1037.prg" data-name="Beispieltext auf Drucker"></div>
 
-        <p>SAVE ($FFD8)</p>
+        <h3>SAVE ($FFD8)</h3>
 
         <p>Siehe Sonderheft 3, 1986.</p>
 
-        <p>STOP ($FFEI) .</p>
+        <h3>STOP ($FFE1)</h3>
 
         <p>Mit »JSR $FFE1« fragt man die Stop-Taste ab. Wurde sie gedrückt, ist das Zero-Flag im Prozessor-Statusregister gesetzt, das heißt ein BEQ-Befehl würde ausgeführt werden. Das Programm in Listing 3 wartet, bis die Stop-Taste gedrückt wird.</p>
 
-        <p>GETIN ($FFEA4)</p>
+        <h3>GETIN ($FFE4)</h3>
 
         <p>Siehe Sonderheft 3, 1986.</p>
 
-        <p>CLALL ($FFE7)</p>
+        <h3>CLALL ($FFE7)</h3>
 
-        <p>Diese Routine schließt alle offenen Kanäle. Dabeiistjedoch zu beachten, daß dies nicht wie bei »CLOSE« geschieht. Die entsprechenden Geräte werden von »CLALL« nicht angesprochen, das heißt die Kanäle werden nur innerhalb des Computers geschlossen, während ein File auf Diskette/Kassette für das entsprechende Gerät nach wie vor offenbleibt.</p>
+        <p>Diese Routine schließt alle offenen Kanäle. Dabei ist jedoch zu beachten, daß dies nicht wie bei »CLOSE« geschieht. Die entsprechenden Geräte werden von »CLALL« nicht angesprochen, das heißt die Kanäle werden nur innerhalb des Computers geschlossen, während ein File auf Diskette/Kassette für das entsprechende Gerät nach wie vor offenbleibt.</p>
 
         <p>Diese Routine kann man am Anfang eines Programms verwenden, nicht aber als Ersatz für »CLOSE« ($FFC3) betrachten.</p>
 
-        <p>PLOT ($FFF0)</p>
+        <h3>PLOT ($FFF0)</h3>
 
         <p>Siehe Sonderheft 3, 1986.</p>
 
         <p>Die bisherige Aufzählung sollte nur eine grobe Zusammenfassung sein. Auf einige Routinen gehen wir nun näher ein.</p>
 
-        <p>Eine Anwendung der Routinen »CLALL«, »SETPAR«, »SETNAM«, »OPEN«, »CKOUTK, »BSOUT, »CLRCH« und »CLOSEK« ist Listing 1. Zunächst werden alle noch offenen Kanäle geschlossen ($1001). Dann werden 1 als Filenummer, 4 (Drucker) als Gerätenummer und O als Sekundäradresse gesetzt ($1004-$100A). Bei $100D/$100F wird dem Computer mitgeteilt, daß wir keinen Filenamen wollen (Länge des Filenamens = O0).</p>
+        <p>Eine Anwendung der Routinen »CLALL«, »SETPAR«, »SETNAM«, »OPEN«, »CKOUT«, »BSOUT«, »CLRCH« und »CLOSE« ist Listing 1. Zunächst werden alle noch offenen Kanäle geschlossen ($1001). Dann werden 1 als Filenummer, 4 (Drucker) als Gerätenummer und 0 als Sekundäradresse gesetzt ($1004-$100A). Bei $100D/$100F wird dem Computer mitgeteilt, daß wir keinen Filenamen wollen (Länge des Filenamens = 0).</p>
 
-        <p>Das File kann geöffnet ($1012) und die Ausgabe des Computers darauf umgeleitet werden ($1015/$1017). Eine kleine Schleife gibt den Text ab $102F über »BSOUT« aus ($101A-$1025). »CLRCH« ($1027) setzt wieder den Bildschirm als Ausgabegerät. Schließlich wird das File geschlossen ($102A/$102C) und das Programm beendet (»JMP $FFC3« entspricht »JSR $FFC3« und »RTSe).</p>
+        <p>Das File kann geöffnet ($1012) und die Ausgabe des Computers darauf umgeleitet werden ($1015/$1017). Eine kleine Schleife gibt den Text ab $102F über »BSOUT« aus ($101A-$1025). »CLRCH« ($1027) setzt wieder den Bildschirm als Ausgabegerät. Schließlich wird das File geschlossen ($102A/$102C) und das Programm beendet (»JMP $FFC3« entspricht »JSR $FFC3« und »RTS«).</p>
 
-        <p>Wie die anderen Beispielprogramme, wird Listing 1 mit SYS-DEC( "1001") gestartet.</p>
+        <p>Wie die anderen Beispielprogramme, wird Listing 1 mit SYS-DEC("1001") gestartet.</p>
 
-        <p>Erleichterte Bildschirmausgabe</p>
+        <h3>Erleichterte Bildschirmausgabe</h3>
 
-        <p>Wie wir wissen, gibt »BSOUT« das im Akku übermittelte Zeichen auf das aktuelle Ausgabegerät aus; dieses ist der Bildschirm, solange nicht über »CKOUTs ein anderes Ausgabegerät gesetzt ist. Will man gleichzeitig Texte aus dem Bildschirm und das über »CKOUT« eingesetzte Gerät ausgeben, hilft die Routine</p>
+        <p>Wie wir wissen, gibt »BSOUT« das im Akku übermittelte Zeichen auf das aktuelle Ausgabegerät aus; dieses ist der Bildschirm, solange nicht über »CKOUT« ein anderes Ausgabegerät gesetzt ist. Will man gleichzeitig Texte aus dem Bildschirm und das über »CKOUT« eingesetzte Gerät ausgeben, hilft die Routine</p>
 
-        <p>BSOUTSCREEN ($DC49)</p>
+        <h3>BSOUTSCREEN ($DC49)</h3>
 
         <p>Diese Routine arbeitet wie »BSOUT«, aber die Ausgabe erfolgt hier in jedem Fall auf dem Bildschirm.</p>
 
@@ -201,21 +209,37 @@ JSR $8818 ;Linkpointer berechnen lassen
 
         <p>ist eine Abkürzung für</p>
 
-        <p>LDA #893 ;$93 = 147 = Code für »Clear Home«). JSR $FFD2 und ist – wie »BSOUTSCREEN« – von »CKOUT« unabhängig. HOME ($D89A) ist eine Abkürzung für</p>
+        <pre><code>LDA #$93 ;$93 = 147 = Code für »Clear Home«)
+JSR $FFD2</code></pre>
 
-        <p>LDA #313 ;$13 =</p>
+        <p>und ist – wie »BSOUTSCREEN« – von »CKOUT« unabhängig.</p>
 
-        <p>JSR $FFD2 und ist wie »CLEAR« von »CKOUT« unabhängig. = Code für »Home«) SETCR ($D83B) ist eine Abkürzung für</p>
+        <h3>HOME ($D89A)</h3>
 
-        <p>CLC</p>
+        <p>ist eine Abkürzung für</p>
 
-        <p>JSR PLOT und setzt somit den Cursor an die in X und Y angegebene Position.</p>
+        <pre><code>LDA #$13 ;$13 = 19 = Code für »Home«)
+JSR $FFD2</code></pre>
 
-        <p>GETCR ($D849) ist eine Abkürzung für</p>
+        <p>und ist wie »CLEAR« von »CKOUT« unabhängig.</p>
 
-        <p>SEC</p>
+        <h3>SETCR ($D83B)</h3>
 
-        <p>JSR PLOT und holt die Cursorposition nach X und Y.</p>
+        <p>ist eine Abkürzung für</p>
+
+        <pre><code>CLC
+JSR PLOT</code></pre>
+
+        <p>und setzt somit den Cursor an die in X und Y angegebene Position.</p>
+
+        <h3>GETCR ($D849)</h3>
+
+        <p>ist eine Abkürzung für</p>
+
+        <pre><code>SEC
+JSR PLOT</code></pre>
+
+        <p>und holt die Cursorposition nach X und Y.</p>
 
         <p>Diese neuen Routinen zur Bildschirmausgabe werden in Listing 2 angewendet, um den Text »(C)64'ER« in die Mitte des Bildschirms zu schreiben.</p>
 
@@ -247,29 +271,41 @@ JSR $8818 ;Linkpointer berechnen lassen
         </figure>
         <div class="binary_download" data-filename="l3.$1001-$1007.prg" data-name="Run/Stop-Taste"></div>
 
-        <p>Jetzt haben Sie die wichtigsten Betriebssystemroutinen kennengelernt. Nicht so bekannt sind vier recht interessante Routinen des TEDMON. Diese Routinen kann man zur hexadezimalen Ausgabe von Zahlen verwenden. PUTHEX ($FB10)</p>
+        <p>Jetzt haben Sie die wichtigsten Betriebssystemroutinen kennengelernt. Nicht so bekannt sind vier recht interessante Routinen des TEDMON. Diese Routinen kann man zur hexadezimalen Ausgabe von Zahlen verwenden.</p>
 
-        <p>Im Akku übergeben wir.einen Byte-Wert, der dann über JSR $FB10 zweistellig hexadezimal ausgegeben wird. Beispiel:</p>
+        <h3>PUTHEX ($FB10)</h3>
 
-        <p>LDA #$D5</p>
+        <p>Im Akku übergeben wir einen Byte-Wert, der dann über JSR $FB10 zweistellig hexadezimal ausgegeben wird.</p>
 
-        <p>ISR $FB10</p>
+        <p>Beispiel:</p>
+
+        <pre><code>LDA #$D5
+JSR $FB10</code></pre>
 
         <p>Auf dem Bildschirm erscheint »D5«.</p>
 
-        <h3>PUTHXS ($FB05) Diese Routine entspricht »PUTHEX«, allerdings wird nach der Hex-Darstellung des Bytes noch ein Leerzeichen ausgegeben.</h3>
+        <h3>PUTHXS ($FB05)</h3>
 
-        <h3>MAKHEX ($FB20) Die Routinen »PUTHEX« und »PUTHXS« bedienen sich dieser Routine.</h3>
+        <p>Diese Routine entspricht »PUTHEX«, allerdings wird nach der Hex-Darstellung des Bytes noch ein Leerzeichen ausgegeben.</p>
 
-        <h3>Im Akku übergibt man »MAKHEX« den umzurechnenden Wert. Man erhält dann im Akku den ASCII-Code der ersten Stelle der zweistelligen Hex-Zahl, im X-Register die zweite Stelle als ASCII-Code zurück.</h3>
+        <h3>MAKHEX ($FB20)</h3>
 
-        <h3>Beispiel:</h3>
+        <p>Die Routinen »PUTHEX« und »PUTHXS« bedienen sich dieser Routine.</p>
 
-        <h3>LDA #345 JSR $FB20 Im Akku steht dann $41 (ASCIl-Code von A), im X-Register $35 (ASCIlI-Code von 5).</h3>
+        <p>Im Akku übergibt man »MAKHEX« den umzurechnenden Wert. Man erhält dann im Akku den ASCII-Code der ersten Stelle der zweistelligen Hex-Zahl, im X-Register die zweite Stelle als ASCII-Code zurück.</p>
 
-        <h3>PUTWRD ($FAFF) Mit dieser Routine ist auch die Ausgabe von 2-Byte-Werten kein Problem. Im Akku wird das Low-Byte, im X-Register das High-Byte der Zahl, die vierstellig hexadezimal ausgegeben werden soll, übergeben.</h3>
+        <p>Beispiel:</p>
 
-        <h3>Listing 4 wendet die aufgezeigten TEDMON-Routinen an.</h3>
+        <pre><code>LDA #$A5
+JSR $FB20</code></pre>
+
+        <p>Im Akku steht dann $41 (ASCII-Code von A), im X-Register $35 (ASCII-Code von 5).</p>
+
+        <h3>PUTWRD ($FAFF)</h3>
+
+        <p>Mit dieser Routine ist auch die Ausgabe von 2-Byte-Werten kein Problem. Im Akku wird das Low-Byte, im X-Register das High-Byte der Zahl, die vierstellig hexadezimal ausgegeben werden soll, übergeben.</p>
+
+        <p>Listing 4 wendet die aufgezeigten TEDMON-Routinen an.</p>
 
         <figure>
             <pre>. 1001  A9 34    LDA #$34
@@ -285,7 +321,11 @@ JSR $8818 ;Linkpointer berechnen lassen
         </figure>
         <div class="binary_download" data-filename="l4.$1001-$1017.prg" data-name="TEDMON-Routinen"></div>
 
-        <h3>Der letzte ROM-Einsprung, mit dem wir uns genauer beschäftigen wollen, ist RESET ($FFF9) »JMP $FFF%« hat die gleiche Wirkung wie das Drücken der Reset-Taste. Es erfolgt ein Sprung zum Reset-Vektor, wodurch der Einschaltzustand hergestellt wird.</h3>
+        <p>Der letzte ROM-Einsprung, mit dem wir uns genauer beschäftigen wollen, ist</p>
+
+        <h3>RESET ($FFF9)</h3>
+
+        <p>»JMP $FFF9« hat die gleiche Wirkung wie das Drücken der Reset-Taste. Es erfolgt ein Sprung zum Reset-Vektor, wodurch der Einschaltzustand hergestellt wird.</p>
 
         <p>Die Tabelle in Bild 1 zeigt Ihnen noch einmal alle ROM-Routinen zusammengefaßt. Viel Spaß und viel Erfolg bei deren Anwendung.</p>
         <address class="author">(Florian Müller/ks)</address>
