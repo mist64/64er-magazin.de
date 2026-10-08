@@ -438,3 +438,24 @@ stayed spanning `<th>`. Both readings are reasonable; neither is stated.
 the `<figure>`, before the table. Section labels inside ONE ruled box under ONE
 caption are spanning `<th>` rows — the heading rule is for labels that sit
 between separate tables."
+
+## 170 — an emulator test of a loader that WRITES to disk needs true drive emulation
+
+**What happened.** With VICE's default fast-disk traps, the VC 20 format
+loader printed `DATAS OK` but wrote 4 wrong bytes (+2 each at offsets 91, 273,
+596, 816). With `-drive8truedrive` the written file is byte-identical to the disk.
+A passing screen message over a corrupted output file.
+
+**Suggested.** In r000's emulator recipe: "a program that writes a file is tested
+with `-drive8truedrive`, and the written file is read back with c1541 and
+compared — the screen alone does not prove the write."
+
+## 170 — two listing types the table does not name, and VC 20 load addresses
+
+r170's table of what becomes a disk file names Checksummer BASIC / MSE hex /
+monitor dump / own format with row sum. SH8608 also had a DATA loader with ONE
+total sum (79) and an input program with no sums (110); both were made prg files.
+And the corpus is inconsistent for VC 20 BASIC load addresses (SH8501 $1201,
+SH8503/SH8505 $1001/$0801, SH8603 tacco $0801). **Suggested.** add "a printed
+BASIC program the disk lacks" as the general row, and "VC 20 + ≥8K BASIC at
+$1201 unless the article POKEs otherwise".
