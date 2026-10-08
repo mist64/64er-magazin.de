@@ -188,6 +188,18 @@ unverified too. Do not diff any of it, but if this issue's scan of one of those
 articles obviously reproduces a monthly you recognise, say so in the report as a
 **new lead** — do not act on it.
 
+### WHEN THE LEAD'S ORIGINAL IS NEAR THIS ISSUE'S COVER DATE, SETTLE DIRECTION FIRST
+
+Before confirming anything else about such a lead, ask **who prints whose
+errata** — an issue that carries another's Fehlerteufelchen necessarily came
+out after it, and step 300 has already put that input in your hands. It is the
+strongest direction test there is, and it is cheap. MEASURED on SH8605: lane A
+credited 114's tables as reprinted FROM 8606/160 and 8607/92 because the site
+pubdates say so, and both monthlies print SH8605's errata — so both are
+younger and the credit had the direction of copying backwards, on its way into
+reader-facing text. See *`pubdate.txt` IS A REPUBLICATION DATE* and the
+`REVERSED` verdict below.
+
 ## Step 2 — locate the original article
 
 The lead is `<YYMM>/<page>`, e.g. `8506/16`. The issue directory is
@@ -359,6 +371,16 @@ eighth that means "I did not look":
 | `CROP` | one side publishes the content as a delivered owner CROP (*owner crop wins*) and the other as text. Same printed content, different **medium** | **nothing.** Closed |
 | `UNRESOLVED` | the scan could not settle it (page not in the corpus, region illegible, original issue not imported) — **and neither could anything else: see r325, *"the glyphs are identical" means the glyph cannot decide*. Improving the render, the series the item sits in, a redundant encoding in the artefact, the external standard and the language all come first, and the entry says which were tried** | stays open in `LOG.md` as a known gap |
 
+**A `PRINT` LINE MUST NOT CARRY A `THEIRS` CANDIDATE IN ITS PROSE.** The
+disposition is the one the evidence supports, or `UNRESOLVED` — never the
+closing one with the open question written underneath it, because `PRINT` is
+*closed* and nothing will come back to the sentence. MEASURED on SH8605: D-274
+in `155 ← 8404/14` was filed `PRINT` with the note that 8404's
+»vorbeziehungsweise« looked wrong; the owner's render settled it as a plain
+line-end hyphen, i.e. a real `THEIRS`, which had been sitting under a closed
+label. If the evidence is not yet good enough to choose, that is what
+`UNRESOLVED` is for.
+
 **`CROP` is not `MARKUP`, and the difference is the point.** `MARKUP` says *the
 words are the same*; on the cropped side there are no words at all, only
 pixels. That is what a reader of the LOG needs to know, because it means our
@@ -489,6 +511,19 @@ issues/*/LOG.md` and re-run `verify` on every issue that names it.** Either
 remap those tables in the same commit, or do the applying after every affected
 issue's 330 is final — but know which issues are affected before you start,
 not afterwards.
+
+**AND THE FORWARD COST: APPLY ONLY AFTER THIS ISSUE'S 330 IS FINAL** — figures
+placed, last difference dispositioned, `verify` clean. Applying earlier is
+allowed and costs a full remap of every pair it touches, because each applied
+item REMOVES a difference and the `D` numbers are positional. MEASURED on
+SH8605: 31 approved corrections plus one sweep hit were applied while the issue
+was still building, and together with step 150's figures (which also shift the
+numbering on OUR side) `verify` failed **72 problems in 36 pairs**, every one of
+which had to be remapped by content. Nothing in that remap was instructive.
+
+The two radii are not equally visible, which is why the backward one is the more
+important half: **a forward cost is paid by the build that caused it, a backward
+one is invisible to everybody until a later `verify` trips over it.**
 
 ## Step 6 — a `THEIRS` finding is REPORTED, never applied
 
@@ -733,7 +768,18 @@ grep -l 'Nachdruck aus' "issues/$ID"/*.html | sed 's|.*/||' | sort -u > /tmp/cre
 # -circuits, and the stale file survives.  Build the exclusion list, then filter.
 grep -lE '64er\.id" content="(mse|checksummer|abtippen)"' "issues/$ID"/*.html 2>/dev/null \
   | sed 's|.*/||' | sort -u > /tmp/standing.txt
-comm -23 /tmp/rows.txt /tmp/standing.txt > /tmp/rows_x.txt
+# AND THE DELIBERATELY UNCREDITED PARTIALS, which are a second, per-issue
+# exclusion.  Without it this check reports a correct record as broken: on
+# SH8605 it named 20, 77, 90 and 188 -- four rows that are correctly PARTIAL
+# (the tables really are reprinted, and the diff is a good OCR cross-check)
+# and correctly uncredited.  Changing the verdict to make the check pass would
+# falsify the record; leaving it red makes the check useless as a gate.  So the
+# omission is DECLARED, in REPRINTS.md, and read from there.
+sed -n '/^Recorded, not credited:/s/^[^:]*: *//p' "issues/$ID/REPRINTS.md" 2>/dev/null \
+  | tr ',' '\n' | sed 's/^ *//;s/ *$//;s/^`//;s/`$//;s|.*/||' | grep . | sort -u \
+  > /tmp/nocredit.txt
+cat /tmp/standing.txt /tmp/nocredit.txt | sort -u > /tmp/excluded.txt
+comm -23 /tmp/rows.txt /tmp/excluded.txt > /tmp/rows_x.txt
 diff /tmp/rows_x.txt /tmp/creds.txt || echo "  credit set != CONFIRMED/PARTIAL set"
 
 # b. every link target resolves to exactly one article in the target issue
@@ -749,8 +795,23 @@ grep -ho 'href="\.\./[A-Za-z0-9]\{4,6\}/[^"]*\.html"' "issues/$ID"/*.html | sort
     done
 
 # c. the credit is invisible to the diff -- verify must be unchanged by it
-python3 tools/img/scan2ocr/rules/r330_reprint_compare.py verify "issues/$ID"
+$PY tools/img/scan2ocr/rules/r330_reprint_compare.py verify "issues/$ID"
 ```
+
+**A PARTIAL WHOSE REUSE IS A TABLE, A FIGURE OR A SINGLE ITEM GETS NO CREDIT.**
+Owner, 2026-10-07 (SH8605 D87): credit only where the BODY TEXT is substantially
+reprinted; table-only or single-item reuse is recorded and not credited. The
+verdict stays PARTIAL — the reuse is real and the diff is worth having — and
+the article carries no `Nachdruck aus` box. Declare those files in
+`REPRINTS.md` on one line so check (a) can read them:
+
+```
+Recorded, not credited: `20 Die Ports des C 64.html`, `77 Rezepte für Grafik-Diners.html`
+```
+
+so that a deliberate omission is distinguishable from a forgotten credit. That
+is the whole point of the line: without it the two look identical to every
+check and to every later reader.
 
 Check (a) fails when a confirmed reprint has no credit **or** an article that is
 not a reprint has one. Check (b) is the one that catches a credit written from
@@ -1029,7 +1090,7 @@ fail=0
 #    one disposition from the closed vocabulary, and every file the LOG names
 #    exists.  Re-runs the diff, so the numbering it checks is the numbering the
 #    next reader will see -- not the one the sub-agent happened to have.
-python3 "$R" verify "issues/$ID" || fail=1
+"$PY" "$R" verify "issues/$ID" || fail=1
 
 # 2. Nothing outside this issue was touched.  A THEIRS finding is REPORTED;
 #    if the user approved a fix it is its own commit, so the tree is clean here.
@@ -1080,6 +1141,53 @@ far more of it than the chosen one does — a first-hit pick wearing a rejection
 line as cover. The scores never decide which article is the original; they only
 refuse to let the recorded decision contradict the text unexamined. When it
 fires, re-read both printed pages.
+
+**A PAIR `verify` DID NOT REPORT AS `OK` IS NOT VERIFIED.** A pair is
+(lead × our file), not a lead, and a Sonderheft drawing two articles from one
+monthly is ordinary. `verify` used to skip any row whose LEAD already appeared
+in a problem, so a failure in one pair silently took its sibling with it:
+MEASURED on SH8605, 77 and 90 both compare against 8404/119, and with 77's pair
+failing in a scratch LOG, 90's pair reported neither OK nor FAIL — it took
+removing 77's row from a second scratch copy to see
+`OK: 90 … 704 difference(s)`. It now scopes the skip to the pair's own problems
+and prints a `NOT CHECKED` list. **Re-run after fixing the pair that shares its
+lead**, and read the `NOT CHECKED` list as failure.
+
+**AND THE FINAL LINE USED TO OVER-COUNT.** It printed the number of ROWS, not
+the number of pairs it had checked — so `OK: 59 pair(s) verified` on SH8605 was
+four short of the truth and nothing said which four. The count is now the pairs
+that actually reported. Two verdicts legitimately report without a diff and are
+counted as reported: **`NOT-A-REPRINT`** (nothing to diff by verdict — SH8605
+has four: `142 ← 8410/67`, `30 ← 8601/21`, `155 ← 8610/23`,
+`155 ← 8611/29`) and **`UNRESOLVED`** (its candidates are the record). Keeping
+those out of the `NOT CHECKED` list is the whole difference between a list worth
+reading and a gate that always reports — the first version of this fix put all
+four of SH8605's `NOT-A-REPRINT` rows in it.
+
+**SCOPE A REMAP FROM THE PAIRS THAT FAIL, NOT FROM A TALLY OF ONE LINE.** Every
+`table says D=…, the diff reports …` line names a pair, and so does every
+`N difference(s) with no disposition` line — a remap sized from only the second
+kind misses any pair whose symptom is the first. MEASURED on SH8605: sizing the
+72-problem remap by the undispositioned-D lines gave 36 pairs and missed
+`90 ← 8404/119` entirely, whose only line was `table says D=701, the diff
+reports 704`. That pair needed remapping for two independent reasons at once
+(figures placed at 150, and a THEIRS fix to 8404/119), and a lane found it only
+because its own `verify` run listed the remaining failures.
+
+**And a pair whose D count does not change can still carry stale THEIRS lines.**
+`155 ← 8412/14` took two applied corrections with the count unchanged, so
+`verify` passed it while its prose still described the old text. So after any
+THEIRS commit, re-check **every pair whose ORIGINAL file that commit touched** —
+not only the pairs `verify` names.
+
+**A four-cell table anywhere in the `## Step 330` section used to be read as a
+lead row.** The per-pair "THEIRS applied" table written as
+`| was | is | commit | original D |` therefore failed with
+`verdict 'was' not one of […]`. `verify` now parses only the table whose header
+row begins with `verdict`, and a table ends at the first line that is not a `|`
+row — so the three-cell OURS and THEIRS-applied tables are ignored here
+whatever their shape. Write the THEIRS-applied table with **three** cells,
+`| was | is | original D, commit |`, as the OURS tables already do.
 
 Spot-check by hand, per r000's re-entry procedure: re-run one `diff` and read
 three of its dispositions against the `LOG.md` lines.

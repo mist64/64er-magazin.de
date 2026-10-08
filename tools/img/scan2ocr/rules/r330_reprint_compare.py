@@ -91,9 +91,37 @@ TITLE_TAG = re.compile(r"<title>(.*?)</title>", re.I | re.S)
 # but it FABRICATES a difference wherever the block exists on one side only, and
 # it makes the diff read as our error where the HTML is right.  MEASURED on
 # SH8601 r330.  The list is the closed set of words that can follow one.
+# THE SUSPENDED-HYPHEN SET.  A hyphen before one of these words is REAL -- it
+# is a suspended compound ("Text- und Grafikmodus", "Vier- bis Fuenffache") --
+# and joining it destroys the word on OUR side while leaving a published
+# original's genuine defect normalising to the SAME string, so the diff reports
+# NOTHING.  MEASURED on SH8605: 138's standfirst prints "Vier- bis Fuenffache",
+# `bis` was not in this set, so our side became "Vierbis" and SH8505's
+# published HTML -- which really has the defect "Vierbis Fuenffache" -- matched
+# it exactly.  A THEIRS transcription error hidden by the normaliser, found
+# only because a sub-agent read the page.
+#
+# So the set is MEASURED over the corpus, not guessed.  Counts of the word
+# following a line-end hyphen + space across all 41 published issues:
+#   und 3567 · oder 770 · beziehungsweise 150 · als 84 · bis 63 · in 30 ·
+#   wie 21 · noch 16 · auf 11 · sowie 6 · sondern 6 · bzw 5 · aber 3 ·
+#   auch 3 · zu 2 · etc 1 · usw 0
+# Eight were missing and every one of them is a real suspension in print:
+# "RGB- als", "Ein- bis", "Ringmodulations- noch", "ein- sondern",
+# "Sammel- aber auch", "Basic- auch", "Ausgangs- zu Eingangsamplitude",
+# "Programme vom 1541- auf das 8250-Format".
+#
+# `in` is deliberately NOT here: 30 hits, and most are OCR noise across a table
+# cell ("ange- " + "in") rather than a suspension, though "Umrechnung einer
+# Hexadezimal- in eine Dezimalzahl" is one.  Check it by eye when it appears.
+#
+# The two errors are not symmetric, which is why this set errs toward NOT
+# joining: a missed join shows up as a spurious difference, which somebody
+# dispositions, while a wrong join hides a real one and nothing reports it.
 SOFT_HYPHEN = re.compile(
     r"(\w)[-‐­]\s+"
-    r"(?!(?:und|oder|bzw|beziehungsweise|sowie|wie|etc|usw)\b)"
+    r"(?!(?:und|oder|bzw|beziehungsweise|sowie|wie|etc|usw"
+    r"|bis|als|noch|sondern|aber|auch|zu|auf)\b)"
     r"([a-zäöüßéèàçñ])"
 )
 
@@ -512,12 +540,28 @@ def verify(repo, issue_dir):
         print(f"FAIL: {log} has no '## Step 330 …' section")
         return 1
 
+    # PARSE ONLY THE LEADS TABLE.  This used to take EVERY line in the Step 330
+    # section with four or more cells, so any other four-column table here was
+    # read as a lead row: a per-pair "THEIRS applied" table written as
+    # `| was | is | commit | original D |` failed with
+    # `verdict 'was' not one of [...]`.  The leads table is the one whose header
+    # row starts with `verdict`; a table ends at the first line that is not a
+    # `|` row.  (The three-cell OURS and THEIRS-applied tables are then ignored
+    # here whatever their shape, which is the point.)
     rows = []
+    in_leads = False
     for line in section.splitlines():
-        if not line.strip().startswith("|"):
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            in_leads = False
             continue
         c = _cells(line)
-        if len(c) < 4 or c[0] in ("verdict",) or set(c[0]) <= set("-: "):
+        if c and c[0] == "verdict":
+            in_leads = True
+            continue
+        if not in_leads:
+            continue
+        if len(c) < 4 or set(c[0]) <= set("-: "):
             continue
         rows.append(c)
 
@@ -555,10 +599,24 @@ def verify(repo, issue_dir):
             return section[m.end():end]
         return None
 
+    # A PAIR IS (lead x OUR FILE), NOT A LEAD.  A Sonderheft drawing two
+    # articles from one monthly is ordinary -- SH8605's 77 and 90 both compare
+    # against 8404/119 -- and the skip below used to test whether the LEAD
+    # appeared in ANY problem so far, so a failure in 77's pair meant 90's pair
+    # was never checked and reported neither OK nor FAIL.  It took removing
+    # 77's row from a scratch LOG to see `OK: 90 ... 704 difference(s)`.
+    # `mark` scopes the skip to THIS pair's own problems, and every pair that
+    # is skipped is named at the end with its reason.
+    # Derive NOT CHECKED from what was actually REPORTED, not from one exit
+    # point: a row can bail out at any of half a dozen `continue`s above, and a
+    # list built at only the last of them is itself a check that cannot see.
+    pairs, ok_pairs = [], set()
     for r in rows:
+        mark = len(problems)
         verdict, sh_file, lead = r[0], r[1], r[2]
         monthly = r[3] if len(r) > 3 else "—"
         key = os.path.basename(sh_file)
+        pairs.append((lead, key))
         if verdict not in VERDICTS:
             problems.append(f"{lead}: verdict {verdict!r} not one of {sorted(VERDICTS)}")
             continue
@@ -592,10 +650,18 @@ def verify(repo, issue_dir):
                     f"{lead}: resolves to {len(cands)} candidate(s) but the subsection lists "
                     f"{len(listed)} -- every candidate considered must be named for review")
             else:
+                ok_pairs.add((lead, key))
                 print(f"OK: {key} ← {lead} — UNRESOLVED, {len(cands)} candidate(s) reported")
             continue
 
         if verdict == "NOT-A-REPRINT":
+            # Nothing to diff BY VERDICT, which is not the same as "not
+            # reached": say so, and keep it out of the NOT CHECKED list below,
+            # or that list becomes a gate that always reports.  MEASURED on
+            # SH8605: four of its 59 rows are NOT-A-REPRINT (142 ← 8410/67,
+            # 30 ← 8601/21, 155 ← 8610/23, 155 ← 8611/29).
+            ok_pairs.add((lead, key))
+            print(f"OK: {key} ← {lead} — NOT-A-REPRINT, no diff by verdict")
             continue
 
         # CONFIRMED / PARTIAL: the named monthly must be one the page actually
@@ -649,7 +715,7 @@ def verify(repo, issue_dir):
         for p in (sh_file, monthly):
             if not os.path.isfile(os.path.join(repo, p)):
                 problems.append(f"{lead}: file named in the LOG table does not exist: {p}")
-        if problems and any(lead in p for p in problems):
+        if len(problems) > mark:
             continue
         buf = io.StringIO()
         n = diff_report(os.path.join(repo, sh_file), os.path.join(repo, monthly), out=buf)
@@ -720,14 +786,24 @@ def verify(repo, issue_dir):
                         f"D | " + " | ".join(BUCKETS_7) + " (12 cells)")
 
         if len(problems) == before:
+            ok_pairs.add((lead, key))
             print(f"OK: {key} ← {lead} — {n} difference(s), all dispositioned")
 
+    # NAME EVERY PAIR THAT WAS NOT CHECKED.  A pair verify did not report as OK
+    # is NOT verified, and silence used to be indistinguishable from a pass.
+    skipped = [pr for pr in pairs if pr not in ok_pairs]
+    if skipped:
+        print(f"\nNOT CHECKED: {len(skipped)} of {len(pairs)} pair(s) -- "
+              f"re-run after fixing the problems below")
+        for lead, key in skipped:
+            print(f"  {key} ← {lead}")
     if problems:
         print(f"\nFAIL: {len(problems)} problem(s)")
         for p in problems:
             print(f"  {p}")
         return 1
-    print(f"\nOK: {len(rows)} pair(s) verified")
+    print(f"\nOK: {len(ok_pairs)} pair(s) verified"
+          + (f", {len(skipped)} NOT CHECKED" if skipped else ""))
     return 0
 
 

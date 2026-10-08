@@ -370,3 +370,90 @@ Chefredakteur<"` in 8604/8 and 8606/8; and one row of
 `Gesamtinhaltsverzeichnis Sonderhefte.csv` keyed `4/86` that belongs to SH8504
 (4/85) — `Sprite+Grafik-Basic`, page 42, which matches SH8504's article
 exactly.
+
+
+# ============================================================
+# Harvest of SH8605's WORKFLOW_ERRATA.md -- 2026-10-08
+# ============================================================
+
+**47 entries** at finalisation, against SH8604's 63. Eight landed during the
+build (the rules moved under it, r340's blocking-defect exception), five needed
+no rule change, and the rest are applied here in chain order, one commit per
+group:
+
+| `350fb7b0` | r000 -- the human's note in the scan dir, the previous reader's PEN, no two model-calling steps at once, the wrapper-header recipe, `port busy` as a PASS |
+| `dee19473` | r005 and 005b -- the dpi witness, the pre-fill warning, `$PY`, 005b's Run section and a Verification that runs |
+| `67ac89b9` | the PLATE principle: notes and markings are not print, and one that survives into the PDF goes to the owner |
+| `62303323` | r006 -- line-art colour, FORCE_CONTONE, the count check, and JOBS in the two PDF scripts |
+| `01d07774` | r020, r040, r060, r070, r080, r120, r140 |
+| `544f58fc` | r080, r190, r200, r220, r250, and r000's header-vs-body rule |
+| `6b7a503d` | the owner's four defaults, r310's two checks, r150's captions |
+
+## What this harvest says about the rules
+
+**The dominant class, by a long way: a check that cannot see the defect it is
+named for.** Nine of the 47, and every one of them had been passing quietly for
+issues:
+
+- r310's "the closing run is a unit" could never fire at all -- `\b` after a
+  quote has no word boundary -- so it had been silent on every page ever built.
+- r005's Verification could not RUN: `$PY` was defined in none of the four
+  fences that use it. When it was made to run it was already red, on two pages.
+- r120 check 3's orphan count only sees files before the FIRST separator.
+- r040's bold-pair count cannot span the escaped `\*` between two literals.
+- r080 check 4's character class accepted the spaced separator its own rule
+  forbids.
+- r140 check 3 piped its findings into `head -5`.
+- r220's routing check compared the CSV title unstripped.
+- r330's `verify` read any four-cell table as a lead row, and skipped a pair
+  whose LEAD was already in a problem.
+- r150's `figure_captions.txt` matched the whole article text, issue-wide.
+
+**The second class: a check that fails on a CORRECT issue** -- r060's
+`<br/> > 0`, r200's three hard-coded Leserforum metas, r250's missing `table`
+continuation, r005's uniform-master-size assert, r330's step 7 credit set. Each
+one invites the builder to "fix" the transform.
+
+**The third: a rule whose header and body disagree** (r200), which is now a
+principle in r000, and **an `Applies to:` whose evidence is an absence the rule
+itself caused**, which is void.
+
+**The fourth, and the one the owner named: no default, so everything became a
+question.** Futureteufelchen candidates, print/disk divergences, heading levels
+and line-end hyphens -- four rules that were clear about HOW to decide and
+silent about what the answer usually is. 66 + 14 + 1 + 1 owner questions that
+the rules should have settled.
+
+**Four entries record a rule that SAVED the build**: r005's one-sided-pre-fill
+warning (caught p198), r006's colour cross-check (caught p007), generate.py's
+busy-port fix, and 005b's "the summary cannot see this failure".
+
+**Three entries are my own half-landed changes** -- a vocabulary changed without
+its tool (r330's dispositions), a corpus count taken from a proposal without
+counting (r150's `-x` names), and this harvest's own failure mode. The harvest
+process is now itself a source of defects, which is worth watching.
+
+## Measured while harvesting, not taken from the errata
+
+- r006's two bed guards are NOT interchangeable, which the rule said they were:
+  p007's largest blob is 8.5 mm2 with the paper mask and 56.0 mm2 with the 4 mm
+  edge band -- missed by one, caught by the other.
+- r005's field prose said skipping `r005_field.py` "is not an error" while its
+  check 7a asserts a field file for every paper class. The yellowing correction
+  could have been skipped with the rule's apparent blessing.
+- r020's proposed strengthening does NOT work: all 8 masthead labels are in both
+  the block index and the kept text of the very issue whose Impressum was wrong.
+  Recorded as a dead end so it is not re-attempted.
+- SH8605's p033 is correctly registered: its bbox RIGHT edge is 740 against
+  741-742: the errata recorded the 16 px as 0.68 mm out of register in the
+  delivery, and the opposite edge disproves it.
+- r330's suspended-hyphen set was missing EIGHT words, not one. Counts over all
+  41 published issues are in the code.
+- r330's `verify` final line COUNTED ROWS, not pairs it had checked, so
+  SH8605's `OK: 59 pair(s) verified` was four short and nothing said which four.
+  Found by the fix for the shared-lead skip, not by the errata.
+- The bare-`python3` entry was reported for r005 and "r010 too". It is
+  **64 invocations in 23 rule files**, 14 of them in fences with no `PY=` at
+  all -- the same unrunnable-check defect at twenty-three times the reported
+  scale. Every harvest entry is a sample, not a census: COUNT IT.
+
