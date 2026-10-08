@@ -1382,29 +1382,27 @@ measurement; take the real number off the next run and put it in.
 
 ### NOT for model-call steps
 
-**THE ACCOUNT LIMIT IS THE OWNER'S TO MANAGE — DO NOT SCHEDULE AROUND IT.**
-Owner, 2026-10-08: *"do not worry about session limits … i am in charge of the
-limit, i'll handle it."* So **do not serialise steps, throttle, delay or stagger
-work to protect the limit, and do not ask about it.** Run the chain at the pace
-the work wants. Two issues building in parallel both run their model steps when
-they reach them.
+**THE ACCOUNT LIMIT CHANGES NOTHING ABOUT HOW YOU WORK.** Owner, 2026-10-08:
+*"do not worry about session limits … i am in charge of the limit, i'll handle
+it"*, and *"if it happens, it happens. you'll get the chance to continue. and it
+MUST not change anything about your behavior."*
 
-This paragraph used to say NEVER RUN TWO MODEL-CALLING STEPS AT ONCE. The
-measurement behind it stands and is worth keeping, because it says what a
-limit's failure LOOKS like: on SH8605, 020's evaluation (about 200 vision
-calls) ran alongside 030, hit the session limit **148 times**, and **killed 030
-in `dehyphenate`**. What was wrong was the conclusion, not the observation.
+So it is not a consideration at any level. **Do not serialise, throttle, delay,
+stagger, batch or re-order work because of it; do not ask about it; do not
+mention it; do not treat being cut off as an event that needs handling.** If a
+step is interrupted, you will be given the chance to continue — continue, the
+same way you would after any interruption, by r000's ordinary re-entry
+procedure. Two issues building in parallel both run their model steps when they
+reach them.
 
-So the rule is about the FAILURE, not about avoiding it:
-
-- **A step killed by a rate limit is a STOP AND REPORT, not a retry loop and
-  not something to have prevented by scheduling.** Say which step died, where,
-  and what it had finished.
-- **Know whether your step is resumable before you start it**, because that is
-  what decides whether a kill costs minutes or the whole step. 030 died
-  mid-`dehyphenate` and had to be re-run.
-- The steps that fan out over model calls are 020 classify, 020 evaluate, 030
-  and 145 judge. They share one credential, so a kill can land on any of them.
+This paragraph used to say NEVER RUN TWO MODEL-CALLING STEPS AT ONCE, harvested
+from SH8605 where 020's evaluation ran alongside 030, met the limit 148 times
+and ended 030 in `dehyphenate`. **That was a symptom generalised into a
+standing constraint, and the constraint was never the owner's.** The
+observation is kept only because it is a plain fact about the chain: these
+steps share one credential, so an interruption can land on any of them, and
+step 030 is one that has to be re-run from its start rather than resumed. That
+is worth knowing about 030. It is not a reason to schedule anything.
 
 020 classify, 020 evaluate and 145 judge fan out over **model calls**, and they
 are bound by rate limits and by the credential race in `r000_llm.py` — four
