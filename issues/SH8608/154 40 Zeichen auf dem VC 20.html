@@ -17,7 +17,7 @@
         <h1>40 Zeichen auf dem VC 20</h1>
         <p class="intro">Gut lesbare 40 Zeichen pro Zeile sind ein alter Wunsch für VC 20-Besitzer. Durch einen frei definierbaren Zeichensatz ist das Programm selbst 40-Zeichen-Karten überlegen. 10 neue Befehle unterstützen die Programmierung.</p>
 
-        <p>xtended Screen V 4.0 wird vom DATA-Lader (siehe Listing) im Modulbereich ab $A000 (RAM-Erweiterung!) abgelegt und setzt daher einen voll ausgebauten VC 20 voraus. Das Programm ergänzt das Commodore Basic um insgesamt 10 neue Befehle, die alle dazu dienen, die Bildschirmdarstellung des VC 20 auf 22 Zeilen &amp; 40 Zeichen zu erweitern (Bild 1 und 2). Hierzu werden im Bereich 1000 bis 1F00 ein Grafikbildschirm und eine Bit-Map eingerichtet, in die die Zeichen später hineinkopiert werden. Die neuen Zeichen erhalten dabei eine Matrix von 8 x 4 Bildpunkten, sind also genauso hoch, jedoch nur halb so breit wie die Zeichen des normalen Bildschirms.</p>
+        <p>Extended Screen V 4.0 wird vom DATA-Lader (siehe Listing) im Modulbereich ab $A000 (RAM-Erweiterung!) abgelegt und setzt daher einen voll ausgebauten VC 20 voraus. Das Programm ergänzt das Commodore Basic um insgesamt 10 neue Befehle, die alle dazu dienen, die Bildschirmdarstellung des VC 20 auf 22 Zeilen &amp; 40 Zeichen zu erweitern (Bild 1 und 2). Hierzu werden im Bereich 1000 bis 1F00 ein Grafikbildschirm und eine Bit-Map eingerichtet, in die die Zeichen später hineinkopiert werden. Die neuen Zeichen erhalten dabei eine Matrix von 8 x 4 Bildpunkten, sind also genauso hoch, jedoch nur halb so breit wie die Zeichen des normalen Bildschirms.</p>
 
         <p>Um die neuen Befehle ins Basic einzubinden, wird der Vektor für Basic-Befehlsadresse (0308/0309) auf eine Routine gerichtet, die vor der Ermittlung einer Befehlsadresse zunächst überprüft, ob ein Befehl mit vorangestelltem Ausrufungszeichen vorliegt. Ist dies der Fall, so wird in eine neue Auswertungsroutine verzweigt. Ebenfalls verändert werden müssen: der Vektor für Fehlermeldung (0300/0301), der IRQ-Vektor (0314/0315), der BRK-Vektor (0316/0317) und der NMI-Vektor (0318/0319). Die neue Routine zur Fehlerausgabe löscht vor jeder Meldung zunächst den Bildschirmspeicher und schaltet in den 22-Zeichen-Modus um, damit eventuelle Fehler nicht dadurch unerkannt bleiben, daß sich die entsprechende Meldung irgendwo in der Bit-Map des 40-Zeichen-Modus verliert. Die neue IRQ-Routine hält den Basic-Start ständig über 1F00, um Basic-Programme so vor einer Zerstörung durch das Einschalten des 40-Zeichen-Modus zu schützen.</p>
 
@@ -25,51 +25,61 @@
 
         <h2>Die neuen Befehle</h2>
 
-        <p>IF (Fourty)</p>
+        <h3>!F (Fourty)</h3>
 
-        <p>Schaltetin den 40-Zeichen-Modus um. In diesem Modus darf nur mit Hilfe der neuen Befehle gedruckt werden! Dazu steht jedoch nicht der gesamte Zeichensatz des VC 20 zur Verfügung. Der 40-Zeichen-Modus kennt lediglich die CHR$-Codes 32-95, 18 und 146. Dieses Manko wird jedoch durch den Befehl !D mehr als ausgeglichen. !T (Twenty)</p>
+        <p>Schaltet in den 40-Zeichen-Modus um. In diesem Modus darf nur mit Hilfe der neuen Befehle gedruckt werden! Dazu steht jedoch nicht der gesamte Zeichensatz des VC 20 zur Verfügung. Der 40-Zeichen-Modus kennt lediglich die CHR$-Codes 32-95, 18 und 146. Dieses Manko wird jedoch durch den Befehl !D mehr als ausgeglichen.</p>
 
-        <p>Schaltet zurück in den 22-Zeichen-Modus. Bei diesem, wie auch bei dem !F-Befehl sollte man gleichzeitig die Befehle !IH und IS einsetzen, um ein flimmerfreies Umschalten zu erzielen.</p>
+        <h3>!T (Twenty)</h3>
 
-        <p>!H (Hide)</p>
+        <p>Schaltet zurück in den 22-Zeichen-Modus. Bei diesem, wie auch bei dem !F-Befehl sollte man gleichzeitig die Befehle !H und !S einsetzen, um ein flimmerfreies Umschalten zu erzielen.</p>
+
+        <h3>!H (Hide)</h3>
 
         <p>Schaltet den Bildschirm ab.</p>
 
-        <p>IS (Show)</p>
+        <h3>!S (Show)</h3>
 
-        <p>Schaltet den Bildschirm wieder ein und zentriert ihn je nachdem, ob er im 40- oder 22-Zeichen-Modus eingesetzt wird. !P (Print) ... !Px,y,string</p>
+        <p>Schaltet den Bildschirm wieder ein und zentriert ihn je nachdem, ob er im 40- oder 22-Zeichen-Modus eingesetzt wird.</p>
 
-        <p>Schreibt den »string« im 40-Zeichen-Modus an die Bildschirmposition »x/y«. Für »x« darf entweder eine Zahl zwischen O und 39, eine Variable oder ein Ausdruck stehen. Für »y« gilt das gleiche, nur muß hier die Zahl zwischen O und 21 liegen. Für »string« steht entweder ein Text in Anführungszeichen, eine Stringvariable oder ein Ausdruck. Zahlen müssen über die STR-Funktion in einen String umgewandelt werden. Wird !P im 22-Zeichen-Modus eingesetzt, so quittiert der Computer dies mit einem »?BAD MODE ERROR«. IM (Middle) ... !My,string</p>
+        <h3>!P (Print) ... !Px,y,string</h3>
+
+        <p>Schreibt den »string« im 40-Zeichen-Modus an die Bildschirmposition »x/y«. Für »x« darf entweder eine Zahl zwischen 0 und 39, eine Variable oder ein Ausdruck stehen. Für »y« gilt das gleiche, nur muß hier die Zahl zwischen 0 und 21 liegen. Für »string« steht entweder ein Text in Anführungszeichen, eine Stringvariable oder ein Ausdruck. Zahlen müssen über die STR-Funktion in einen String umgewandelt werden. Wird !P im 22-Zeichen-Modus eingesetzt, so quittiert der Computer dies mit einem »?BAD MODE ERROR«.</p>
+
+        <h3>!M (Middle) ... !My,string</h3>
 
         <p>Druckt den »string« im 40-Zeichen-Modus in der in »y« angegebenen Zeile zentrisch, also genau in der Zeilenmitte. Für »y« und »string« gilt das gleiche wie unter !P erwähnt. Auch dieser Befehl verursacht im 22-Zeichen-Modus einen »?BAD MODE ERROR«. Der String darf höchstens 40 Zeichen lang sein!</p>
 
-        <p>II (Inkey) ... !Ix, y,e,stringvariable</p>
+        <h3>!I (Inkey) ... !Ix, y,e,stringvariable</h3>
 
         <p>Mit diesem Befehl können Texteingaben im 40-Zeichen-Modus vorgenommen werden. Für x und y gilt das gleiche wie unter !P erwähnt. Für »I« steht eine Zahl, eine numerische Variable oder ein Ausdruck. »I« gibt die maximale erlaubte Länge des einzugebenden Strings an. »stringvariable« steht für die Variable, in der der eingegebene String später stehen soll. Für !I gilt genau wie für alle anderen Befehle, daß ein auszudruckender String nie den rechten Bildschirmrand überschreiten darf.</p>
 
-        <p>Beim !I-Befehl werden alle Tasten mit CHR$-Code 32-95, 20 und 13 akzeptiert; eine Cursormanipulation ist also nicht möglich. Ist bei einer Eingabe die in »I« angegebene Höchstlänge erreicht, so werden nur noch die Tasten &lt;RETURN &gt; und &lt;DEL&gt; akzeptiert! Zu beachten ist noch, daß die Summe aus x + | immer kleiner als 40 sein muß! IC (Color) ... !Cf</p>
+        <p>Beim !I-Befehl werden alle Tasten mit CHR$-Code 32-95, 20 und 13 akzeptiert; eine Cursormanipulation ist also nicht möglich. Ist bei einer Eingabe die in »I« angegebene Höchstlänge erreicht, so werden nur noch die Tasten &lt;RETURN &gt; und &lt;DEL&gt; akzeptiert! Zu beachten ist noch, daß die Summe aus x + I immer kleiner als 40 sein muß!</p>
 
-        <p>Verändert die Druckfarbe entsprechend »f«, wobei für »f«eine Zahl zwischen O und 7, eine numerische Variable oder ein Ausdruck stehen kann. Zu beachten ist, daß die Druckfarbe immer auf 'dem gesamten Bildschirm gleich ist. Beim Umschalten in den 40-Zeichen-Modus wird eine Druckfarbe dem Wert in 0286 (aktueller Farbcode) entsprechend eingestellt.</p>
+        <h3>!C (Color) ... !Cf</h3>
 
-        <p>!D (Define) ... !Dz,w1,w2,w3,w4,w5,w6,Ww7,w8 Hierbei handelt es sich um einen Befehl, den wohl die wenigsten 40-Zeichen-Karten bieten dürften. Er ermöglicht das Definieren eigener Sonderzeichen für den 40-Zeichen-Modus! Für »z« steht entweder eine Zahl zwischen 32 und 95, eine numerische Variable oder ein Ausdruck. »z« gibt den CHR$-Code des Zeichens, das umdefiniert werden soll. »w1« bis »w&amp;« sind jeweils Zahlen zwischen O und 15, numerische Variablen oder Ausdrücke. Sie geben die neue Matrix des Zeichens an undeerrechnen sich genau wie beim Umdefinieren eines Zeichens des normalen Zeichensatzes. IR (Re-define)</p>
+        <p>Verändert die Druckfarbe entsprechend »f«, wobei für »f« eine Zahl zwischen 0 und 7, eine numerische Variable oder ein Ausdruck stehen kann. Zu beachten ist, daß die Druckfarbe immer auf dem gesamten Bildschirm gleich ist. Beim Umschalten in den 40-Zeichen-Modus wird eine Druckfarbe dem Wert in 0286 (aktueller Farbcode) entsprechend eingestellt.</p>
+
+        <h3>!D (Define) ... !Dz,w1,w2,w3,w4,w5,w6,w7,w8</h3>
+
+        <p>Hierbei handelt es sich um einen Befehl, den wohl die wenigsten 40-Zeichen-Karten bieten dürften. Er ermöglicht das Definieren eigener Sonderzeichen für den 40-Zeichen-Modus! Für »z« steht entweder eine Zahl zwischen 32 und 95, eine numerische Variable oder ein Ausdruck. »z« gibt den CHR$-Code des Zeichens, das umdefiniert werden soll. »w1« bis »w8« sind jeweils Zahlen zwischen 0 und 15, numerische Variablen oder Ausdrücke. Sie geben die neue Matrix des Zeichens an und errechnen sich genau wie beim Umdefinieren eines Zeichens des normalen Zeichensatzes.</p>
+
+        <h3>!R (Re-define)</h3>
 
         <p>Stellt den normalen Zeichensatz der 40-Zeichen-Karte wieder her.</p>
 
         <h2>Frei definierbarer Zeichensatz</h2>
 
-        <p>Für die Assembler-Freaks sei noch erwähnt, wie man die neuen Befehle auch mit Assembler nutzen kann. Dies ist leider nicht bei jedem Befehl direkt möglich. Die Inkey-Routine zum Beispiel endet mit dem Übertragen des eingegebenen Textes in die angegebene Variable, deren Name zu diesem Zweck aus dem Basic-Text gelesen wird. Wenn man diese Routine nun vom Assembler aufrufen würde, so würde sie immer mit einem »?SYNTAX ERROR« enden, dajakein Basic-Text vorhanden wäre, aus dem sie einen Variablennamen lesen könnte. Ähnlich verhält es sich auch mit dem Define-Befehl. Er liest während der Abarbeitung immer wieder die zur Umdefinierung eines Zeichens nötigen Werte aus dem Basic-Text.</p>
+        <p>Für die Assembler-Freaks sei noch erwähnt, wie man die neuen Befehle auch mit Assembler nutzen kann. Dies ist leider nicht bei jedem Befehl direkt möglich. Die Inkey-Routine zum Beispiel endet mit dem Übertragen des eingegebenen Textes in die angegebene Variable, deren Name zu diesem Zweck aus dem Basic-Text gelesen wird. Wenn man diese Routine nun vom Assembler aufrufen würde, so würde sie immer mit einem »?SYNTAX ERROR« enden, da ja kein Basic-Text vorhanden wäre, aus dem sie einen Variablennamen lesen könnte. Ähnlich verhält es sich auch mit dem Define-Befehl. Er liest während der Abarbeitung immer wieder die zur Umdefinierung eines Zeichens nötigen Werte aus dem Basic-Text.</p>
 
         <p>Doch nun zu nutzbaren Routinen:</p>
 
-        <p>Umschalten in den 40-Zeichen-Modus: JSR $ AIOE Umschalten in den 22-Zeichen-Modus: JSR $ A180 Bildschirm abschalten: JSR $ A1B6</p>
-
-        <p>Bildschirm einschalten: JSR $ AIBF</p>
-
-        <p>Druckfarbe ändern:</p>
-
-        <p>LDA #$ (Farbcode O0 bis 07)</p>
-
-        <p>JSR $ A174</p>
+        <pre><code>Umschalten in den 40-Zeichen-Modus: JSR $ A10E
+Umschalten in den 22-Zeichen-Modus: JSR $ A180
+Bildschirm abschalten: JSR $ A1B6
+Bildschirm einschalten: JSR $ A1BF
+Druckfarbe ändern:
+LDA #$ (Farbcode 00 bis 07)
+JSR $ A174</code></pre>
 
         <pre><code>String an Position x/y ausgeben:
 LDX #$ (X-Koordinate)
@@ -79,9 +89,10 @@ STY $ 02AB
 JSR $ A415
 LDX $ 62
 LDY $ 63
-STX $ O2AE
-STY $ O2AF
-LDA #$ (Länge des auszugebenden Strings) LDX #$ (LSB der Adresse, an der der String im Speicher steht)
+STX $ 02AE
+STY $ 02AF
+LDA #$ (Länge des auszugebenden Strings)
+LDX #$ (LSB der Adresse, an der der String im Speicher steht)
 LDY #$ (MSB der Adresse, an der der String im Speicher steht)
 JSR $ A4B4
 </code></pre>
@@ -90,7 +101,8 @@ JSR $ A4B4
         <pre><code>String zentrisch in Zeile y ausgeben:
 LDY #$ (Y-Koordinate)
 STY $ 02AB
-LDA #$ (Länge des auszugebenden Strings) LDX #$ (LSB der Adresse, an der der String im Speicher steht)
+LDA #$ (Länge des auszugebenden Strings)
+LDX #$ (LSB der Adresse, an der der String im Speicher steht)
 LDY #$ (MSB der Adresse, an der der String im Speicher steht)
 JSR $ A5E3
 </code></pre>
