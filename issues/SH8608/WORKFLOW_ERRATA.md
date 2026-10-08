@@ -240,3 +240,28 @@ accounts for "the printed footer rule, 5–6 mm inside the trim" on SH8601 only.
 **Suggested.** In check 4's notes: "on SH8608-style footers the black
 SONDERHEFT bar itself sits inside the 6 mm band, so bottom dark 2-9 % with 0 %
 prop is the bar; crop one page to confirm and move on."
+
+## 005b — the UNIFIED fix (1d449a34) writes its note where no stamp reads it
+
+**Correction to my own entry above.** I had appended a UNIFIED line to the
+165/166 stamps by hand. Control: a stamp is the record of what the PROGRAM did,
+so a failing check on a correct build is fixed in the check or the program,
+never in the record. Reverted by re-running r005_a4_window.py (6 min 25 s) and
+re-applying the recoveries from `<tmp>/recover_005b.py`, which now carries both
+p009 and p142 (p142's wedge paint had been an inline run, so it was not
+reproducible either; it refuses to run on a4600 that already holds a recovery).
+
+**What the fixed code does.** `unify_inserts()` now sets `w["note"]`
+unconditionally, but `cut()`'s stamp writer never reads `win["note"]`: the only
+note it emits is `fill_rep["note"]`, and that exists only under `FILL=mirror`.
+The note goes to `<tmp>/a4win/a4_windows.json` and nowhere else — there it
+reads `padded +0/+0 px …` for one side and `padded +19/+24 px …` for the
+other, so one side of the card WAS padded and its stamp does not say so either.
+Check 1 is therefore still red on 165/166 after the fix, honestly.
+
+**What it cost.** ~15 min, 6 commands, plus the 6.5 min re-run.
+
+**Suggested.** In `cut()`, emit `win.get("note")` as a stamp line (`UNIFIED
+insert A-B at WxH: padded …`), and make check 1 look for the tag the program
+writes. Then verify by re-running 005b and reading 165's stamp — the step that
+was skipped for 1d449a34.
