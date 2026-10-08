@@ -477,3 +477,28 @@ recurring rubrics by exact title.
 (`xx = Name` or `Name (xx)`); only if it has none, the nearest monthly's. Split
 every slash token, not only the last. For a Sonderheft, PREV_DIR is the
 previous Sonderheft, and match recurring rubrics by id, not title."
+
+## 190 — two internal contradictions, reported independently by all three 190 agents
+
+**1. Aside heading level.** *Set-off boxes*: "The aside's heading is an
+**`<h2>`**". Later: "An aside's heading is one level below the article's highest
+section heading … `h3` when the aside would otherwise be the only `h2`". All
+three agents quoted both; it happened not to matter (10, 47, 94 have `<h2>`
+sections). **Suggested.** delete the absolute sentence; keep the relative one.
+
+**2. Dash lists.** Step 4: "Convert prose-looking enumeration to `<ul>`/`<ol>`
+**only** when the print shows a real bullet glyph" — read literally, a printed
+"–" IS a glyph. *Where PRINT and CORPUS PRECEDENT disagree*: dash lists stay
+`<p>— …</p>` (8609–8611, the 8612 ruling). All three followed the precedent.
+**Suggested.** step 4: "…only when the print shows a bullet (•); a printed dash
+list stays `<p>— …</p>`, a numbered list interrupted by prose becomes numbered
+run-in paragraphs".
+
+**3. The closing-run check cannot express "the printed text ENDS in a table".**
+157's Plachetta item ends in two tables then its byline, exactly as on p158; the
+check (and r310) call it "table splits the byline from its text". Moving the
+tables would separate them from the sentence they belong to. **Suggested.**
+"a table that IS the last printed element before the byline stays; adjudicate
+it, citing the page".
+
+**What it cost.** Nothing to rework; each agent spent time quoting the conflict.
