@@ -274,6 +274,7 @@ print(f"captions bound below their figure and in its column: {len(rows) - len(ba
 for n, c in bad:
     print(f"   MISBOUND {n} {c!r}")
 BIND
+```
 
 **Then LOOK at them.** The counts above cannot tell a photograph from a data
 table, which is the whole difficulty of this step. Open

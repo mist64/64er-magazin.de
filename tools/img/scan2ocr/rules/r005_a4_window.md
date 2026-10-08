@@ -330,6 +330,7 @@ for par in (0, 1):
     assert not rigid, f"the window is not rigid on parity {par}: {rigid}"
     assert all(abs(c_ - st.mode(ctl)) <= 2 for *_, c_ in detect_), \
         "a detector outlier whose opposite edge ALSO moved -- that is registration"
+PY
 
 # 4. alpha is a thin border, not a chunk, and the per-page figure is recorded.
 #    Read it back out of the stamps rather than trusting the run's summary --
@@ -378,6 +379,7 @@ for name, rows in (("body", body), ("full-bleed", fullbleed),
           f"({max(rows, key=lambda r: r[2])[0]})")
 bad = [r for r in body + fullbleed if r[2] > 5.0]
 assert not bad, f"these pages are more than 5% invented: {bad}"
+PY
 
 # 5. AFTER A REGRADE, the window must not have moved.  The field moves no
 #    pixels, so a window that moves between runs is a MATCHER artefact, not a

@@ -1442,6 +1442,60 @@ concurrent processes sharing one OAuth file once took out pages 84-176 of an
 overnight run. Their `LANES = 4` is a different constant answering a different
 question. Leave it alone.
 
+## Cross-cutting rule: EVERY BASH FENCE IN EVERY RULE MUST PARSE
+
+A `## Verification` block ships as TEXT, so nothing compiles it and a broken one
+fails at the shell, mid-build, on somebody else's time. **Two were broken for
+exactly that reason**, both found by a builder rather than by the author:
+
+- r005_a4_window's checks 3 and 4 had **no closing `PY`**, so check 3 swallowed
+  check 4's text and both died with a SyntaxError. Neither could ever have run
+  to completion. They were written during the SH8605 harvest -- by the session
+  whose whole subject was checks that cannot run.
+- r145's long fence was **never closed**, so 105 lines of prose, headings and
+  two tables from *Known limits* onward rendered as code.
+
+Run this after touching any `.md` in this directory. It takes seconds and it is
+the cheapest check in the chain:
+
+```bash
+cd tools/img/scan2ocr/rules
+PY=${PYTHON:-../../../../.venv/bin/python}
+"$PY" - <<'FENCECHECK'
+import glob, re, subprocess, sys
+PH = re.compile(r'<([A-Za-z0-9_][^<>\n]{0,40})>')      # <YYMM>, <ID>, <A4> ...
+bad = 0
+for p in sorted(glob.glob('r[0-9]*.md')):
+    lines = open(p, encoding='utf-8').read().split('\n')
+    i = k = 0
+    while i < len(lines):
+        if lines[i].startswith('```bash') or lines[i].startswith('```sh'):
+            j = i + 1
+            while j < len(lines) and not lines[j].startswith('```'):
+                j += 1
+            k += 1
+            body = '\n'.join(lines[i + 1:j])
+            # A PLACEHOLDER IS A VALUE HERE, NOT A REDIRECT.  Substitute it, or
+            # every fence carrying one is a false positive: 38 of 141 "fail"
+            # without this, every one of them spurious, and a check with a 27 %
+            # false-positive rate is one nobody runs twice.
+            body = PH.sub(lambda m: 'PH_' + re.sub(r'[^A-Za-z0-9]', '_',
+                                                   m.group(1))[:20], body)
+            r = subprocess.run(['bash', '-n'], input=body, text=True,
+                               capture_output=True)
+            if r.returncode:
+                bad += 1
+                print(f"  {p} fence {k}: {r.stderr.strip().splitlines()[0]}")
+            i = j
+        i += 1
+print(f"{bad} fence(s) do not parse")
+sys.exit(1 if bad else 0)
+FENCECHECK
+```
+
+MEASURED: **141 fences** across the rules, **0 failing** once the two above were
+fixed.
+
 ## Cross-cutting rule: PREFLIGHT the free space, before step 005
 
 Step 005 is the only step that writes at the scan's full resolution, and the
