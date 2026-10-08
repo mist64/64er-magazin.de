@@ -1,0 +1,42 @@
+
+
+;hires-grafik.prg ==1c01==
+   10 rem **** hires - grafik ****
+   20 poke 53280,0:poke53281,0
+   30 def fn a(x) = 50*sin(x/30)+100
+   40 rem --- basic begrenzen ---
+   50 poke 52,32:poke 56,32
+   60 rem --- farbabfrage -------
+   70 printchr$(147)chr$(30)"hintergrundfarbe";:input hf
+   80 print"vordergrundfarbe";:input zf
+   90 f = 16*zf + hf
+  100 printchr$(147)
+  110 rem --- bitmapmodus einschalten ---
+  120 poke 53265,peek(53265) or 32
+  130 rem --- bitmapstart auf 8192 ------
+  140 poke 53272,peek(53272) or 8
+  150 rem --- bitmap loeschen (geduld!) -
+  160 b = 8192
+  170 for i=0 to 7999
+  180 :poke b+i,0
+  190 next i
+  200 rem --- farbgebung (nochmal geduld!)
+  210 c = 1024
+  220 for i=0 to 999
+  230 :poke c+i,f
+  240 next i
+  250 rem --- punkte zeichnen -----------
+  260 for x=0 to 319
+  270 :y = fna(x)
+  280 :by = (x and 504) + 40*(y and 248) + (y and 7)
+  290 :bi = 7 - (x and 7)
+  300 :poke b+by,peek(b+by) or (2^bi)
+  310 next x
+  320 rem --- warten auf taste ----------
+  330 get a$:if a$="" then 330
+  340 rem --- normalmodus einschalten ---
+  350 poke 53272,peek(53272) and (255-8)
+  360 poke 53265,peek(53265) and (255-32)
+  370 printchr$(147)
+  380 end
+

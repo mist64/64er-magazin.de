@@ -228,6 +228,68 @@ So, before a candidate goes on the list:
   differently, the one that behaves as the article DESCRIBES is the likelier
   print.
 
+### "THE GLYPHS ARE IDENTICAL" MEANS THE GLYPH CANNOT DECIDE — NOT THAT THE FACT IS UNKNOWN
+
+Owner, 2026-10-07: *"you can research the truth."*
+
+When two readings look the same on the paper, that is a statement about the
+ink, and it is where the work starts rather than where it stops. **Before
+recording anything as unresolvable, go through these.** They are ordered by
+cost, and each has settled a real case:
+
+1. **Improve the evidence.** A low-resolution original is not a dead end: a
+   150 ppi PDF page rendered at 300 dpi, greyscale, autocontrast, cropped at
+   3-6x is legible. It settled 7 claims against 8404's Tabelle 1 — and
+   REFUTED all 7. See r330, *no 2400 dpi scan is not a dead end*.
+2. **Look at the SERIES the item belongs to.** 8407's Bild 3 pinout has a
+   `D0`/`DO` ambiguity, and the same table lists `D1` through `D7`. A
+   Centronics connector's data lines are D0-D7. The series decides; the glyph
+   never had to.
+3. **Look for a REDUNDANT ENCODING in the artefact itself.** 8607's ESC/P
+   table prints each command beside its decimal code, so the table checks
+   itself: *Linken Rand setzen* is `ESC l`, because the row's own code cannot
+   be 27 49 when `ESC 1` already is. **49 of its 55 rows are self-consistent,
+   which is also what makes the other 6 findable** — see below.
+4. **Consult the external standard.** ESC/P, ASCII, BASIC syntax, a PETSCII
+   table, a connector pinout. These are published and knowable, and the
+   magazine was describing them rather than inventing them.
+
+   **But CITE it, do not recall it.** Routes 2 and 3 are self-validating: the
+   series and the redundant encoding are both ON THE PAGE, so the check is
+   cheap, certain and repeatable by the next reader. Route 4 is a different
+   confidence class — it rests on what you believe the standard says, and
+   nothing in the artefact contradicts you if you are wrong. Use it for ONE
+   doubt you can state and support, with the source named. **Do not sweep a
+   whole table against a standard you are reciting from memory**: 122 rows of
+   recalled semantics will produce confident findings at some unknown error
+   rate, and there is no blind second reading for "is this what ESC/P says".
+   Without a citable reference to hand, the honest outcome is to leave the
+   remaining rows alone and say so.
+5. **Let the LANGUAGE decide.** SH8505's `ln solchen oder ähnlichen Fällen`
+   is optically undecidable — measured, the bar is h57 against a known `l` at
+   h58, and cap-height equals ascender-height in that face — but `ln` is not a
+   German word and the sentence opens a paragraph. Applied on that basis, and
+   recorded as linguistic rather than optical evidence.
+
+**Record WHICH of these you tried.** "Unresolvable" with nothing behind it is
+a guess wearing a disposition's clothes. And say which kind of evidence
+settled it, because a reader needs to know whether they are being told about
+the paper or about ESC/P.
+
+### A SELF-CHECKING TABLE CHECKS THE WHOLE TABLE, NOT JUST YOUR ONE DOUBT
+
+Once you find that an artefact carries a redundant encoding, run it over
+EVERY row, not only the cell you were asked about. MEASURED on 8607's ESC/P
+table: checking all 55 commands against their printed decimal codes confirmed
+49 and found **6 disagreements** — `ESC !` 27 94 (should be 33), `ESC 2` 27 60
+(50), `ESC l` 27 49 (108), `ESC \` 27 47 (92), `ESC %` 27 97 (37), `ESC u`
+27 115 (117). Three of the six have the shape of an OCR digit slip (6/5, 9/3,
+5/7) and three do not, so some are probably ours and some probably the
+magazine's — which the scan decides, and which is the difference between a
+THEIRS finding and a Futureteufelchen candidate.
+
+The cost was one pass over a table that was already open.
+
 Two things make that report decidable, and both are the reporter's job:
 
 - **Say what a reader who typed it in would EXPERIENCE**, and order the list by

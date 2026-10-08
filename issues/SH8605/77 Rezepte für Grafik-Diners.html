@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Rezepte für Grafik-Diners</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heimo Ponnath, cg">
+    <meta name="64er.issue" content="Sonderheft 5/86">
+    <meta name="64er.pages" content="77-89">
+    <meta name="64er.head1" content="Software-Grundlagen">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Software-Grundlagen">
+    <meta name="64er.toc_title" content="Grafik nutzen">
+    <meta name="64er.index_category" content="Software-Grundlagen|Grafik">
+    <meta name="64er.id" content="grafik">
+</head>
+
+<body>
+    <article>
+        <h1>Rezepte für Grafik-Diners</h1>
+        <p class="intro">Die interessantesten Grafik-Befehle verschweigt Ihnen Ihr Handbuch! Wollen Sie Ihren Computer wirklich kennenlernen? Wollen Sie wissen, wie man seine Fähigkeiten vollständig ausreizt, um die berühmte Grafik-Vielfalt des C 64 auf den Schirm zu kriegen? Dann lesen Sie!</p>
+
+        <p>Es geht wohl fast jedem Einsteiger so: Ein Grund für den Erwerb des C 64 waren die Angaben über die guten Grafik-Eigenschaften dieses Computers. Sind dann die ersten Hürden des Handbuches genommen, entsteht der Wunsch, nun auch mal in schönen Bildern oder exakten Graphen zu schwelgen. Und dann folgt die Enttäuschung: Das Handbuch schweigt sich weitgehend aus, das Basic 2.0 enthält keinerlei Grafik-Befehle! Sie haben nun drei Möglichkeiten, mit dieser Erkenntnis umzugehen: Lassen Sie die Grafik Grafik sein (würde ich nicht empfehlen), kaufen Sie sich eine der vielen auf dem Markt angebotenen Basic-Erweiterungen zur Grafik-Unterstützung (dann haben Sie eine Reihe von neuen Basic-Befehlen zur Verfügung, mit denen Sie beispielsweise zeichnen oder malen können, sind aber andererseits oft eingeschränkt: Ihr Computer kann meistens noch viel mehr!) oder Weg drei: Fassen Sie sich ein Herz und steigen Sie unerschrocken in die Labyrinthe der Ebenen unter der Hochsprache Basic. Das kann ein richtiges Abenteuer werden, die Register des Videochip und anderer Bausteine kennenzulernen und die weiten Ebenen des RAM zu durchstreifen, ungewöhnlichen Zahlen zu begegnen und anderes mehr. Sie brauchen diese Kreuzzüge nicht alleine durchzuführen. Tatkräftige Helfer stehen Ihnen in Form von Literatur zur Seite. Der vorliegende Artikel soll Ihnen in einem Schnellverfahren einfache Rezepte vorstellen, mit deren Hilfe Sie grafische Aufgabenstellungen lösen können. Falls Ihnen dann aber der Sinn nach mehr steht, bedienen Sie sich einiger der nachfolgend vorgestellten literarischen Mitstreiter:</p>
+
+        <p>1) H. Ponnath, »C 64-Wunderland der Grafik«, München 1985: Markt&amp;Technik Verlag, MT 756 (Umfassende Einführung inklusive Diskette mit allen Beispielen, unter anderem auch mit einer Befehlserweiterung für Grafik-Programmierung).</p>
+
+        <p>2) S. Krute, »Grafik &amp; Musik auf dem C 64«, München 1984: Markt&amp;Technik Verlag, MT 743 (Legt Schwergewicht auf die Sprites und Musik).</p>
+
+        <h2>Prinzip der Grafikprogrammierung</h2>
+
+        <p>Bevor wir ans Kochen der verschiedenen Grafik-Gerichte gehen, sollten Sie noch etwas über das Handwerkszeug und die Küche erfahren. Wir sind gezwungen, unterhalb der Ebene der Hochsprache Basic zu operieren. Dafür wäre die geeignete Computersprache eigentlich Assembler. Viele Grafik-Programme bedienen sich daher auch dieser Sprache, was aber für Sie als Einsteiger den Nachteil mit sich brächte, daß Sie zuerst noch Assembler lernen müßten, um zu verstehen, was hier geschieht. Es gibt aber einige Basic-Befehle, die gewissermaßen zwischen den Ebenen verkehren. Dazu gehören vor allem POKE und PEEK. Mittels POKE kann man einen Wert direkt in eine Speicherstelle eintragen, mittels PEEK kann andererseits festgestellt werden, welcher Wert in einer Speicherstelle enthalten ist. Genau das erfordert die Grafik-Programmierung. Bestimmte Werte müssen in Register oder spezielle Speicherbereiche geschrieben oder aus diesen gelesen werden. Wir werden also Basic-Programme mit allerlei solchen POKE- und PEEK-Kommandos verwenden. Was sind Register? Grafikprogrammierung beim C 64 ist eigentlich in der Hauptsache die Programmierung eines besonderen Bausteines unseres Computers, nämlich des VIC-II-Chip. VIC ist die Abkürzung von »Video-Interface-Controller«, was bedeutet, daß es sich hierbei um den Baustein handelt, der die Kooperation des Computers mit dem Bildschirm kontrolliert. Die Programmierung eines solchen Chips geschieht fast ausschließlich durch bestimmte Speicherstellen (für den VIC sind das die zwischen 53248 und 53294), die man eben Register nennt. Je nach Inhalt dieser Register nimmt der VIC unterschiedliche Betriebszustände an, und weil mit diesen Registern die Grafikprogrammierung steht oder fällt, finden Sie sie in der Tabelle 1 alle aufgeführt.</p>
+        <figure>
+            <table>
+                <tr>
+                    <th>Register</th>
+                    <th>Adresse</th>
+                    <th>Bit 7</th>
+                    <th>Bit 6</th>
+                    <th>Bit 5</th>
+                    <th>Bit 4</th>
+                    <th>Bit 3</th>
+                    <th>Bit 2</th>
+                    <th>Bit 1</th>
+                    <th>Bit 0</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>53248</td>
+                    <td colspan="8">X-Position des Sprite Nr. 0. Dazu muß Register 16 beachtet werden</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>53249</td>
+                    <td colspan="8">Y-Position des Sprite Nr. 0</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>53250</td>
+                    <td colspan="8">X-Position des Sprite Nr. 1. Auch dazu, wie zu allen folgenden Sprites, muß Register 16 beachtet werden.</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>53251</td>
+                    <td colspan="8">Y-Position des Sprite Nr. 1</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>53252</td>
+                    <td colspan="8">X-Position des Sprite Nr. 2. s. o.</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>53253</td>
+                    <td colspan="8">Y-Position des Sprite Nr. 2</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>53254</td>
+                    <td colspan="8">X-Position des Sprite Nr. 3. s. o.</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>53255</td>
+                    <td colspan="8">Y-Position des Sprite Nr. 3</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>53256</td>
+                    <td colspan="8">X-Position des Sprite Nr. 4. s. o.</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>53257</td>
+                    <td colspan="8">Y-Position des Sprite Nr. 4</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>53258</td>
+                    <td colspan="8">X-Position des Sprite Nr. 5. s. o.</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>53259</td>
+                    <td colspan="8">Y-Position des Sprite Nr. 5</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>53260</td>
+                    <td colspan="8">X-Position des Sprite Nr. 6. s. o.</td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td>53261</td>
+                    <td colspan="8">Y-Position des Sprite Nr. 6</td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td>53262</td>
+                    <td colspan="8">X-Position des Sprite Nr. 7. s. o.</td>
+                </tr>
+                <tr>
+                    <td>15</td>
+                    <td>53263</td>
+                    <td colspan="8">Y-Position des Sprite Nr. 7</td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>53264</td>
+                    <td class="center">Spr. 7, msb X-Pos.</td>
+                    <td class="center">Spr. 6, msb X-Pos.</td>
+                    <td class="center">Spr. 5, msb X-Pos.</td>
+                    <td class="center">Spr. 4, msb X-Pos.</td>
+                    <td class="center">Spr. 3, msb X-Pos.</td>
+                    <td class="center">Spr. 2, msb X-Pos.</td>
+                    <td class="center">Spr. 1, msb X-Pos.</td>
+                    <td class="center">Spr. 0, msb X-Pos.</td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td>53265</td>
+                    <td class="center">msb des Rasterregisters (Reg. 18)</td>
+                    <td class="center">Schaltbit für veränderten Hintergrundfarbmodus<br>1 = eingeschaltet</td>
+                    <td class="center">Schaltbit für Hochauflösungsmodus<br>1 = eingeschaltet</td>
+                    <td class="center">Schaltbit für Bildschirm »aus«<br>0 = normaler Bildschirm<br>1 = Bildschirmfarbe gleich Hintergrundfarbe</td>
+                    <td class="center">Schaltbit für Zeilenzahl<br>0 = 24 Zeilen<br>1 = 25 Zeilen</td>
+                    <td colspan="3" class="center">Wert der Zeilenverschiebung in Y-Richtung beim Smooth Scrolling</td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>53266</td>
+                    <td colspan="8">Rasterregister. Dazu kommt das msb in Bit 7, Register 17</td>
+                </tr>
+                <tr>
+                    <td>19</td>
+                    <td>53267</td>
+                    <td colspan="8">Lichtgriffel X-Position</td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td>53268</td>
+                    <td colspan="8">Lichtgriffel Y-Position</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">21</td>
+                    <td rowspan="2">53269</td>
+                    <td colspan="8">Ein- und Ausschalten von Sprites. 0 = Sprite aus. 1 = Sprite an</td>
+                </tr>
+                <tr class="center">
+                    <td>Sprite 7</td>
+                    <td>Sprite 6</td>
+                    <td>Sprite 5</td>
+                    <td>Sprite 4</td>
+                    <td>Sprite 3</td>
+                    <td>Sprite 2</td>
+                    <td>Sprite 1</td>
+                    <td>Sprite 0</td>
+                </tr>
+                <tr>
+                    <td>22</td>
+                    <td>53270</td>
+                    <td class="center"></td>
+                    <td class="center"></td>
+                    <td class="center">Reset-Bit, muß 0 sein, damit VIC-II-Chip arbeitet</td>
+                    <td class="center">Schaltbit für Mehrfarbmodus<br>1 = eingeschaltet</td>
+                    <td class="center">Schaltbit für Spaltenzahl<br>0=38 Spalten<br>1=40 Spalten</td>
+                    <td colspan="3" class="center">Wert der Spaltenverschiebung in X-Richtung beim Smooth Scrolling</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">23</td>
+                    <td rowspan="2">53271</td>
+                    <td colspan="8">Sprite-Vergrößerung in Y-Richtung. 0 = normale Größe. 1 = doppelte Größe.</td>
+                </tr>
+                <tr class="center">
+                    <td>Sprite 7</td>
+                    <td>Sprite 6</td>
+                    <td>Sprite 5</td>
+                    <td>Sprite 4</td>
+                    <td>Sprite 3</td>
+                    <td>Sprite 2</td>
+                    <td>Sprite 1</td>
+                    <td>Sprite 0</td>
+                </tr>
+                <tr>
+                    <td>24</td>
+                    <td>53272</td>
+                    <td colspan="4" class="center">Startadresse des Bildschirmspeichers</td>
+                    <td colspan="4" class="center">— Startadresse des Speicherbereichs, in dem die Zeichen als Punktmatrizen abzurufen sind.<br>— Startadresse der Bit-Map</td>
+                </tr>
+                <tr>
+                    <td>25</td>
+                    <td>53273</td>
+                    <td colspan="4" class="center">Interrupt-Flaggen-Register<br>Interrupt</td>
+                    <td class="center">Lichtgriffel-Interrupt-Flagge</td>
+                    <td class="center">Sprite/Sprite-Kollision</td>
+                    <td class="center">Sprite/Hintergrund-Kollision</td>
+                    <td class="center">Raster-Interrupt-Flagge</td>
+                </tr>
+                <tr>
+                    <td>26</td>
+                    <td>53274</td>
+                    <td colspan="4" class="center">Interrupt-Masken-Register<br>Interrupt</td>
+                    <td class="center">Lichtgriffel-Interrupt-Maske</td>
+                    <td class="center">Sprite/Sprite-Koll.-Maske</td>
+                    <td class="center">Sprite/Hintergrund-Kollision Maske</td>
+                    <td class="center">Raster-Interrupt-Maske</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">27</td>
+                    <td rowspan="2">53275</td>
+                    <td colspan="8">Sprite/Hintergrund-Prioritätenregister. 0 = Sprite hat Priorität. 1 = Hintergrund hat Priorität</td>
+                </tr>
+                <tr class="center">
+                    <td>Sprite 7</td>
+                    <td>Sprite 6</td>
+                    <td>Sprite 5</td>
+                    <td>Sprite 4</td>
+                    <td>Sprite 3</td>
+                    <td>Sprite 2</td>
+                    <td>Sprite 1</td>
+                    <td>Sprite 0</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">28</td>
+                    <td rowspan="2">53276</td>
+                    <td colspan="8">Sprite-Mehrfarbmodus-Register. 0 = Normaldarstellung. 1 = Mehrfarbmodus-Darstellung</td>
+                </tr>
+                <tr class="center">
+                    <td>Sprite 7</td>
+                    <td>Sprite 6</td>
+                    <td>Sprite 5</td>
+                    <td>Sprite 4</td>
+                    <td>Sprite 3</td>
+                    <td>Sprite 2</td>
+                    <td>Sprite 1</td>
+                    <td>Sprite 0</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">29</td>
+                    <td rowspan="2">53277</td>
+                    <td colspan="8">Sprite-Vergrößerung in X-Richtung. 0 = normale Größe. 1 = doppelte Größe</td>
+                </tr>
+                <tr class="center">
+                    <td>Sprite 7</td>
+                    <td>Sprite 6</td>
+                    <td>Sprite 5</td>
+                    <td>Sprite 4</td>
+                    <td>Sprite 3</td>
+                    <td>Sprite 2</td>
+                    <td>Sprite 1</td>
+                    <td>Sprite 0</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">30</td>
+                    <td rowspan="2">53278</td>
+                    <td colspan="8">Sprite/Sprite-Kollision. 0 = keine Berührung. 1 = Berührung</td>
+                </tr>
+                <tr class="center">
+                    <td>Sprite 7</td>
+                    <td>Sprite 6</td>
+                    <td>Sprite 5</td>
+                    <td>Sprite 4</td>
+                    <td>Sprite 3</td>
+                    <td>Sprite 2</td>
+                    <td>Sprite 1</td>
+                    <td>Sprite 0</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">31</td>
+                    <td rowspan="2">53279</td>
+                    <td colspan="8">Sprite/Hintergrund-Kollision. 0 = keine Berührung. 1 = Berührung</td>
+                </tr>
+                <tr class="center">
+                    <td>Sprite 7</td>
+                    <td>Sprite 6</td>
+                    <td>Sprite 5</td>
+                    <td>Sprite 4</td>
+                    <td>Sprite 3</td>
+                    <td>Sprite 2</td>
+                    <td>Sprite 1</td>
+                    <td>Sprite 0</td>
+                </tr>
+                <tr>
+                    <td>32</td>
+                    <td>53280</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Farbe des Bildschirmrahmens</td>
+                </tr>
+                <tr>
+                    <td>33</td>
+                    <td>53281</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Hintergrundfarbe Nr. 0 (normale Hintergrundfarbe)</td>
+                </tr>
+                <tr>
+                    <td>34</td>
+                    <td>53282</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Hintergrundfarbe Nr. 1</td>
+                </tr>
+                <tr>
+                    <td>35</td>
+                    <td>53283</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Hintergrundfarbe Nr. 2</td>
+                </tr>
+                <tr>
+                    <td>36</td>
+                    <td>53284</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Hintergrundfarbe Nr. 3</td>
+                </tr>
+                <tr>
+                    <td>37</td>
+                    <td>53285</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite-Mehrfarben-Register Nr. 0</td>
+                </tr>
+                <tr>
+                    <td>38</td>
+                    <td>53286</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite-Mehrfarben-Register Nr. 1</td>
+                </tr>
+                <tr>
+                    <td>39</td>
+                    <td>53287</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite 0, Farbe</td>
+                </tr>
+                <tr>
+                    <td>40</td>
+                    <td>53288</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite 1, Farbe</td>
+                </tr>
+                <tr>
+                    <td>41</td>
+                    <td>53289</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite 2, Farbe</td>
+                </tr>
+                <tr>
+                    <td>42</td>
+                    <td>53290</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite 3, Farbe</td>
+                </tr>
+                <tr>
+                    <td>43</td>
+                    <td>53291</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite 4, Farbe</td>
+                </tr>
+                <tr>
+                    <td>44</td>
+                    <td>53292</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite 5, Farbe</td>
+                </tr>
+                <tr>
+                    <td>45</td>
+                    <td>53293</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite 6, Farbe</td>
+                </tr>
+                <tr>
+                    <td>46</td>
+                    <td>53294</td>
+                    <td colspan="4" class="center">unbenutzt</td>
+                    <td colspan="4">Sprite 7, Farbe</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Registerübersicht des VIC-II-Chips</figcaption>
+        </figure>
+
+
+        <p>Die Möglichkeiten, die uns der VIC-II-Chip grafisch eröffnet, sind immens. Sechs davon werden Ihnen nachfolgend als Kochrezepte vorgestellt:</p>
+
+        <p>Blockgrafik<br>Zeichensatzänderungen<br>mehrfarbige Zeichen<br>Sprites<br>hochauflösende Grafik<br>Mehrfarbengrafik</p>
+
+        <p>So! Nun wollen wir die Töpfe, Pfannen und Kochlöffel schwingen zum ersten grafischen Gericht:</p>
+
+        <h2>Blockgrafik</h2>
+
+        <p>Unter Blockgrafik versteht man die Art Grafik, die mit den Zeichen realisiert wird, die unsere Tastatur hergibt. Reine Grafikzeichen findet man hier zwischen CHR$(96) und CHR$(127) sowie von CHR$(161) bis CHR$(254). Abgesehen von den Spielkartenzeichen CHR$(97), CHR$(115), CHR$(120) und CHR$(122) oder Bällen CHR$(113), CHR$(119) oder einfach durch eine Reihe von PRINT-Befehlen aufgebaute Abbildungen können durchaus auch ernsthafte und nützliche Dinge mit Blockgrafik betrieben werden. Beispielsweise gibt es vereinzelt in Fachzeitschriften Programme zu Kurvendiskussionen, die einen Kurvenverlauf mittels der sogenannten Viertelblockgrafik zeichnen (dazu gehören beispielsweise die Zeichen CHR$(187) und andere). Manchmal hört man hier auch den Begriff »Grafik mittlerer Auflösung«, weil man bei geschickter Programmierung aus den 40 horizontalen Positionen 80 und aus den 25 vertikalen 50 hervorzaubern kann. Aber auch mit der niedrigen Auflösung von 40 mal 25 Bildschirmpositionen lassen sich sinnvolle Anwendungen realisieren. Wir wollen hier ein Programm zur Erstellung von Säulendiagrammen entwickeln, das bis zu 12 Werte in horizontalen Säulen übersichtlich abbildet (Listing 1). Hier ein Kommentar zu den Programminhalten:</p>
+
+        <figure>
+            <pre data-filename="saeulen" data-name="Säulendiagramme" data-checksummer="3"></pre>
+            <figcaption>Listing 1. »Säulendiagramme«</figcaption>
+        </figure>
+
+        <table class="plain nobreak0">
+            <tr>
+                <td>20</td>
+                <td>Rahmenfarbe schwarz, Hintergrund grau.</td>
+            </tr>
+            <tr>
+                <td>30</td>
+                <td>Zeichenfarbe grün, Bildschirm löschen.</td>
+            </tr>
+            <tr>
+                <td>40</td>
+                <td>Liste aller Variablen</td>
+            </tr>
+            <tr>
+                <td>50</td>
+                <td>Erzeugung zweier Strings für einen Vertikaltabulator.<br>DN$ = 24mal Cursor down<br>UP$ = 24mal Cursor up.</td>
+            </tr>
+            <tr>
+                <td>65</td>
+                <td>Hier gibt es die Möglichkeit, entweder einen eingebauten Test oder aber eigene Daten abbilden zu lassen. Wenn Sie später den Test nicht mehr benötigen, löschen Sie einfach die Zeilen 65, 67 und 400 bis 460.</td>
+            </tr>
+            <tr>
+                <td>70</td>
+                <td>Abfrage auf die Anzahl der Werte. Zulässig ist hier eins bis zehn.</td>
+            </tr>
+            <tr>
+                <td>80</td>
+                <td>Falls die Anzahl außerhalb des erlaubten Bereiches liegt, wird erneut abgefragt.</td>
+            </tr>
+            <tr>
+                <td>90</td>
+                <td>Zwei Felder werden dimensioniert. W(N) enthält die Werte, W$(N) eine Kenn-Bezeichnung für diese Werte.</td>
+            </tr>
+            <tr>
+                <td>100</td>
+                <td>Eine Kopfzeile für die Eingabe der Werte wird gedruckt.</td>
+            </tr>
+            <tr>
+                <td>110</td>
+                <td>Eingabeschleife.</td>
+            </tr>
+            <tr>
+                <td>120</td>
+                <td>Abfrage der Kenn-Bezeichnung. Nur die beiden ersten Zeichen werden gespeichert.</td>
+            </tr>
+            <tr>
+                <td>130</td>
+                <td>Abfrage des Wertes.</td>
+            </tr>
+            <tr>
+                <td>140</td>
+                <td>Jeder Wert wird verglichen mit einem Maximalwert MA. Ist der aktuelle Wert größer als MA, dann wird er zu MA. Am Ende der Eingabeschleife befindet sich der größte Wert in MA.</td>
+            </tr>
+            <tr>
+                <td>150</td>
+                <td>Ende der Eingabeschleife.</td>
+            </tr>
+            <tr>
+                <td>160</td>
+                <td>Hier muß eine Kopfzeile, ein Titel des Diagrammes, eingegeben werden.</td>
+            </tr>
+            <tr>
+                <td>170</td>
+                <td>Falls diese Kopfzeile kürzer als 40 Zeichen ist, wird ihr noch ein Cursor down angehängt.</td>
+            </tr>
+            <tr>
+                <td>190</td>
+                <td>30 horizontale Positionen werden für den Maximalwert reserviert. Jede Position entspricht nun einem Differenzwert DX. Die 22 freien Vertikalen (25-2 für den Kopf und -1 für die letzte Zeile) werden auf die Anzahl der Werte aufgeteilt.</td>
+            </tr>
+            <tr>
+                <td>210</td>
+                <td>Bildschirm rollt hinauf, Cursor in Home-Position, Hintergrund schwarz.</td>
+            </tr>
+            <tr>
+                <td>220-240</td>
+                <td>Eine vertikale Linie erscheint als Grundlinie auf dem Bildschirm.</td>
+            </tr>
+            <tr>
+                <td>250</td>
+                <td>Cursor in Home-Position, Drucken des Titels.</td>
+            </tr>
+            <tr>
+                <td>260</td>
+                <td>Die Zeichenschleife beginnt hier.</td>
+            </tr>
+            <tr>
+                <td>265</td>
+                <td>Der vertikale Tabulator setzt den Cursor entsprechend der Werteanzahl abwärts.</td>
+            </tr>
+            <tr>
+                <td>270</td>
+                <td>Drucken der Kennbezeichnung, Reversmodus einschalten, Zeichenfarbe rot, Linie überspringen.</td>
+            </tr>
+            <tr>
+                <td>280-300</td>
+                <td>Aus reversen Spacezeichen wird in dieser Schleife ein waagerechter Balken gezeichnet. Seine Länge hängt ab vom Verhältnis des aktuellen Wertes zum Differenzwert DX.</td>
+            </tr>
+            <tr>
+                <td>310</td>
+                <td>Reversmodus ausschalten, Zeichenfarbe grün und Drucken des Wertes ab Position 33. Zu beachten ist, daß der Wert nicht mehr als sechs Ziffern (inklusive Dezimalpunkt) enthält, weil sonst in der nächsten Zeile weitergeschrieben wird. Hier könnte das Programm noch eine Veränderung ertragen. Probieren Sie es doch mal aus!</td>
+            </tr>
+            <tr>
+                <td>330</td>
+                <td>Ende der Zeichenschleife.</td>
+            </tr>
+            <tr>
+                <td>340</td>
+                <td>Das Bild bleibt bis zu einem Tastendruck eingefroren.</td>
+            </tr>
+            <tr>
+                <td>400-</td>
+                <td>Das ist der Eingabeteil für den Fall, daß Sie den Testlauf wählen. Wie Sie – beispielsweise aus dem Kommentar zu Zeile 310 – feststellen können, ist dieses Programm durchaus noch erweiterungsfähig. Zum einen ist es nämlich nicht ganz wasserdicht: Man kann durch bestimmte Eingaben eine Fehlermeldung und den Programmabschluß erzwingen. Das darf bei professioneller Software natürlich nicht passieren. Zum anderen aber könnte man die – jetzt sehr grobe – Darstellung verfeinern, indem man außer den reversen Spaces auch noch andere Zeichen (beispielsweise CHR$(161)) einplant. Daran können Sie sich ja mal erproben. Dieses Rezept verhilft uns zunächst lediglich zu einer leichten Vorspeise. Ein weiteres Gericht hat ebenfalls mit den Zeichen zu tun.</td>
+            </tr>
+        </table>
+
+        <h2>Zeichenmusteränderung</h2>
+
+        <p>Der Computer hat für jedes Zeichen, das er auf dem Bildschirm zeigen kann, acht Speicherstellen, in denen er sich merkt, wie das Zeichen aussehen soll. All diese Zeichenmuster bewahrt er im sogenannten Zeichen-ROM auf. Beispielsweise ist dort das Zeichen A so gespeichert, wie es Bild 1 zeigt:</p>
+        <figure>
+            <img src="77-1.png" alt="Raster aus 8 mal 8 Kästchen, Bit 7 bis 0, mit schraffiertem Buchstaben A und den Speicherstellen 53256 bis 53263">
+            <figcaption>Bild 1. Das Zeichenmuster des Buchstaben A</figcaption>
+        </figure>
+
+        <p>Bevor wir weitermachen, müssen noch ein paar Begriffe erklärt werden:</p>
+
+        <table class="plain">
+            <tr>
+                <td>ROM</td>
+                <td>Speicher, aus dem nur gelesen werden kann.</td>
+            </tr>
+            <tr>
+                <td>RAM</td>
+                <td>Speicher, der Schreiben und Lesen erlaubt.</td>
+            </tr>
+            <tr>
+                <td>Bit</td>
+                <td>Das ist die kleinste Informationseinheit. Ein Bit kann entweder 1 oder 0 enthalten. Man kann sich das vorstellen wie eine Lampe, die entweder angeschaltet (also 1) oder ausgeschaltet (also 0) sein kann.</td>
+            </tr>
+            <tr>
+                <td>Byte</td>
+                <td>Acht Bits werden zusammengefaßt und bekommen den Namen Byte. In unserem Computer paßt in jede Speicherstelle genau ein Byte.</td>
+            </tr>
+            <tr>
+                <td>Page</td>
+                <td>256 solcher Bytes nennt man eine Page. Vier Pages nennt man 1 KByte. Das sind dann genau 1024 Bytes. Vorsicht: 1 KByte darf nicht verwechselt werden mit 1 kByte, denn das letztere wird ein Kilobyte genannt und entspricht genau 1000 Bytes!</td>
+            </tr>
+        </table>
+
+        <p>In Bild 1 sehen Sie die acht Bytes, die in den Speicherstellen 53256 bis 53263 des Zeichen-ROM den Buchstaben A als Muster enthalten. Jedes Kreuz entspricht einem gesetzten Bit (also einem Bit mit dem Inhalt 1), die anderen enthalten 0. Das Betriebssystem liest in dem Moment, wo ein A auf dem Bildschirm erscheinen soll, dieses Zeichenmuster und legt es in den Bildschirmspeicher. Der Bildschirm ist nämlich ein RAM-Bereich und dort hinein kann ja geschrieben werden. Überall dort, wo nun ein gesetztes Bit im Bildschirmspeicher zu finden ist, leuchtet ein Bildpunkt auf. An allen anderen Stellen bleibt die Hintergrundfarbe erhalten. In welcher Farbe der Bildpunkt aufleuchten soll, erkennt unser Computer an einem weiteren RAM-Bereich, der genauso angeordnet ist wie der Bildschirm, nämlich dem Bildschirmfarbspeicher. Im Handbuch sind beide Speicherbereiche beschrieben und abgebildet. Nun wissen wir also, wie die normalen Zeichenmuster vom Computer benutzt werden. Weil diese sich im ROM befinden, kann man sie nicht verändern, denn dazu müßte man dort ja andere Muster hineinschreiben. Schreiben kann man aber nur in RAM-Bereiche. Deshalb kopiert man nun einfach den Inhalt des Zeichen-ROM in einen RAM-Bereich. Der VIC-II-Chip bietet außerdem die Möglichkeit, anzugeben, woher die Zeichenmuster geholt werden sollen. Damit steht uns im Prinzip der Weg zum Verändern der Muster offen. Wie findet nun das eigentliche Verändern statt? Dazu muß man wissen, daß jedem Byte eines solchen Zeichenmusters eine Zahl zugeordnet werden kann. Die berechnet man so, daß man jedem gesetzten Bit je nach seiner Bitnummer einen bestimmten Wert zuordnet. All diese Werte zählt man schließlich zusammen. Welche Werte zu welcher Bitnummer gehören, zeigt Ihnen Bild 2:</p>
+        <figure>
+            <img src="77-2.png" alt="Zeile mit den Bitnummern 7 bis 0 und darunter ihren Werten 128, 64, 32, 16, 8, 4, 2, 1">
+            <figcaption>Bild 2. Die Werte der Bits</figcaption>
+        </figure>
+
+        <p>Ein Beispiel sehen Sie in Bild 3. Wie Sie beim Vergleichen mit Bild 1 erkennen werden, handelt es sich um den Inhalt der Speicherstelle 53256, das erste Byte des Zeichenmusters von A also. Eine Veränderung erreicht man nun durch Einschreiben eines anderen Wertes.</p>
+        <figure>
+            <img src="77-3.png" alt="Bitreihe 7 bis 0, in der die Bits 4 und 3 angekreuzt sind, darunter »16 + 8« und »= 24«">
+            <figcaption>Bild 3. Ein Bitmuster wird zur Zahl</figcaption>
+        </figure>
+
+        <p>Wir werden nun Schritt für Schritt ein Rezept entwickeln, mit dem wir einem Zeichen, beispielsweise dem Buchstaben A, ein völlig neues Aussehen verleihen können. Das so entwickelte Programm ist natürlich jederzeit ausbaufähig für weitere Zeichenmusteränderungen.</p>
+
+        <p>Schritt 1: Wir packen den Inhalt des Zeichen-ROM ins RAM ab Speicherstelle 12288. Dies ist normalerweise ein Bereich, in dem lange Basic-Programme oder deren Variable, Felder oder Strings auftauchen können. Dadurch aber würde unser Zeichensatz überschrieben werden. Es gibt die Möglichkeit, den Basic-Speicher so einzuschränken, daß er nur noch bis 12287 reicht. Das machen wir mit:</p>
+
+        <pre><code>40 POKE 52,48:POKE 56,48</code></pre>
+
+        <p>Schritt 2: Unser C 64 enthält ein ständig nebenher laufendes – von uns nicht bemerktes – Maschinenprogramm, das den normalen Betrieb möglich macht. Beispielsweise steuert dieses Programm das Blinken des Cursors, es sorgt für das Weiterlaufen der internen Uhr (TI$) und schaltet blitzschnell verschiedene ROM-Bausteine – auch das Zeichen-ROM – an oder aus. Wenn wir den Inhalt des Zeichen-ROM kopieren wollen, dürfen wir natürlich währendessen nicht unterbrochen werden. Es gibt eine Speicherstelle im sogenannten CIA 1, mit deren Inhalt man solche Unterbrechungen aus- und einschalten kann. Wir schalten diesen Störenfried ab:</p>
+
+        <pre><code>60 POKE 56334,PEEK(56334) AND 254</code></pre>
+
+        <p>Nebenbei bemerkt: Sie werden sich natürlich fragen, wie es denn zu all diesen Zahlenangaben kommt und was beispielsweise die Operation AND an dieser Stelle bedeutet. Im Verlauf dieses Artikels werden sich diese und weitere Fragen noch häufen. Wenn Sie – wie in diesem Schnellkurs vorgesehen – nicht nur nachkochen möchten, sondern auch verstehen, was hier geschieht, dann verweise ich Sie nochmal auf die eingangs genannte Literatur. Unser Artikel würde mit allen zu erklärenden Grundlagen über 100 Seiten Umfang annehmen.</p>
+
+        <p>Schritt 3: Weil wir nach dem Abschalten der Unterbrechung gar nicht wissen, ob das Zeichen-ROM gerade eingeschaltet war oder nicht, schalten wir es sicherheitshalber einfach ein. Der sogenannte Prozessorport in Speicherstelle 1 dient solchen Zwecken:</p>
+
+        <pre><code>80 POKE 1,PEEK(1) AND 251</code></pre>
+
+        <p>Schritt 4: Wir sind nun bereit zum Kopieren. Das Zeichen-ROM beginnt bei Adresse 53248. Wir kopieren 4096 Byte, was 512 Zeichenmustern entspricht. Die Tabelle 2 zeigt Ihnen die Anordnung der verschiedenen Zeichenmuster im ROM:</p>
+        <figure>
+            <table>
+                <tr>
+                    <th>Block</th>
+                    <th>Adressenbereich</th>
+                    <th>Zeichen</th>
+                    <th>Muster abrufbar im Programm mit Code</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>53248-53759</td>
+                    <td>Satz 1 von 0 bis 63 (0 bis ?)</td>
+                    <td>0-63</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>53760-54271</td>
+                    <td>Satz 1 von 64 bis 127 (Grafikz.)</td>
+                    <td>64-127</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>54272-54783</td>
+                    <td>Satz 1 von 0 bis 63 (Reversed)</td>
+                    <td>128-191</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>54784-55295</td>
+                    <td>Satz 1 von 64 bis 127 (Reversed)</td>
+                    <td>192-255</td>
+                </tr>
+                <tr>
+                    <td class="separator">1</td>
+                    <td class="separator">55296-55807</td>
+                    <td class="separator">Satz 2 von 0 bis 63 (kleine Buchst.)</td>
+                    <td class="separator">256-319</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>55808-56319</td>
+                    <td>Satz 2 von 64 bis 127 (Großbuchst.+Grafikz.)</td>
+                    <td>320-383</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>56320-56831</td>
+                    <td>Satz 2 von 0 bis 63 (Reversed)</td>
+                    <td>384-447</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>56832-57343</td>
+                    <td>Satz 2 von 64 bis 127 (Reversed)</td>
+                    <td>448-511</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Inhalt des Zeichen-ROM</figcaption>
+        </figure>
+
+
+        <p>Als Zieladresse haben wir in Schritt 1 uns auf 12288 festgelegt. Eigentlich bräuchten wir nun nur zu programmieren:</p>
+
+        <pre><code>Zeilennummer  FOR I=0 TO 4095:POKE 12288+I,PEEK(53248+I):NEXT</code></pre>
+
+        <p>Wenn wir nachher das gesamte Programm vorliegen haben, können Sie ja mal spaßeshalber anstelle der Zeilen 90 bis 180 diese Programmzeile verwenden. Es funktioniert! Aber das Kopieren damit dauert so lange, daß man in der Zwischenzeit gemütlich eine Tasse Tee trinken kann. Dasselbe – nur erheblich schneller – leistet ein Maschinenprogramm, das die beiden folgenden Zeilen ab Speicherstelle 49152 erzeugt:</p>
+
+        <pre><code>100 FOR I=49152 TO 49158:READ A:POKE I,A:NEXT I
+110 DATA 133,95,134,96,76,191,163</code></pre>
+
+        <p>Bevor wir dann das Maschinenprogramm zum Kopieren aufrufen, müssen ihm noch die Adressen des Quell- und des Zielspeicherbereiches übergeben werden. Hier legen wir zunächst die Anfangs- und die Endadresse des Zeichen-ROM fest:</p>
+
+        <pre><code>130 QS = 53248:QE = QS + 4096</code></pre>
+
+        <p>Des weiteren verlangt das verwendete Maschinenprogramm noch die Endadresse des Zielspeicherbereiches:</p>
+
+        <pre><code>140 ZE = 12288 + 4096</code></pre>
+
+        <p>Die Adressenübergabe geschieht in einer bestimmten Form (im sogenannten LSB/MSB-Format) über festgelegte Speicherstellen:</p>
+
+        <pre><code>150 A = INT(QS/256):POKE 781,A:POKE 780,QS-256*A
+160 A = INT(QE/256):POKE 91,A:POKE 90,QE-256*A
+170 A = INT(ZE/256):POKE 89,A:POKE 88,ZE-256*A</code></pre>
+
+
+        <p>Nach all diesen Vorbereitungen rufen wir das Maschinenprogramm zum Kopieren nun auf:</p>
+
+        <pre><code>180 SYS 49152</code></pre>
+
+        <p>Schritt 5: Nach all diesen Eingriffen stellen wir den Normalzustand unseres Computers wieder her. Das Zeichen-ROM wird zuerst wieder abgeschaltet:</p>
+
+        <pre><code>200 POKE 1,PEEK(1) OR 4</code></pre>
+
+        <p>Dann erlauben wir wieder die Unterbrechungen:</p>
+
+        <pre><code>210 POKE 56334,PEEK(56334) OR 1</code></pre>
+
+        <p>Schritt 6: Noch liest unser Computer alle seine Zeichenmuster aus dem Zeichen-ROM. Das soll nun anders werden! Eine Speicherstelle im VIC-II-Chip steuert den Zugriff auf die Zeichenmusterquellen. Dort verändern wir nun den Inhalt derart, daß künftig diese Muster aus unserer Kopie ab 12288 gelesen werden:</p>
+
+        <pre><code>230 POKE 53272,(PEEK(53272) AND 240) OR 12</code></pre>
+
+        <p>Wenn Sie bis hierher das Programm abgetippt haben und es nun durch RUN starten, dann werden Sie überhaupt keinen Unterschied zum vorherigen Zustand feststellen. Das ist auch richtig so, denn wir haben ja noch kein Zeichen verändert. Das geschieht erst jetzt im nächsten Schritt.</p>
+
+        <p>Schritt 7: Wir legen zuerst einmal fest, welches Zeichen wir ändern möchten und bei welcher Speicherstelle sein Muster beginnt. Den Buchstaben A haben wir uns ausgesucht, zu dem der POKE-Code 1 gehört (diese Codes finden Sie im Handbuch):</p>
+
+        <pre><code>250 C = 1
+260 S = 12288 + 8*C</code></pre>
+
+        <p>Als nächstes folgt eine kleine Schleife, die aus DATA-Zeilen die neuen Byte-Werte herausliest und sie dann in die zu A gehörigen Speicherstellen unseres Zeichen-RAM hineinschreibt:</p>
+
+        <pre><code>270 FOR I=0 TO 7
+280 :READ A:POKE S+I,A
+290 NEXT</code></pre>
+
+        <p>Spätestens jetzt sollten wir uns überlegen, wie unser neues A aussehen soll. Das geschieht im nächsten Schritt.</p>
+
+        <p>Schritt 8: Wir zeichnen uns dazu ein 8 mal 8 Raster, in das wir das neue Muster eintragen. Jede horizontale Reihe entspricht einem Byte, dessen Wert wir nun auf die oben beschriebene Weise (siehe Bilder 2 und 3) berechnen. Ein Beispiel zeigt Ihnen Bild 4:</p>
+        <figure>
+            <img src="77-4.png" alt="Raster aus 8 mal 8 Kästchen mit angekreuzten Bits und der Spalte »Wert« mit 102, 0, 24, 24, 129, 102, 60, 0">
+            <figcaption>Bild 4. Das neue A</figcaption>
+        </figure>
+
+        <p>Diese 8 Werte legen wir in eine DATA-Zeile:</p>
+
+        <pre><code>300 DATA 102,0,24,24,129,102,60,0</code></pre>
+
+        <p>Haben Sie alles abgetippt? Dann geben Sie nun einmal RUN ein und freuen sich über unser freundliches A. Als Programm »Abrakadabra« (Listing 2) finden Sie alles noch einmal zusammengefaßt und etwas ergänzt hier abgedruckt:</p>
+
+        <aside>
+            <h2>Hinweise zum Abtippen</h2>
+            <p>Im folgenden Listing tauchen eventuell unterstrichene oder überstrichene Zeichen auf. Diese sind folgendermaßen einzugeben:<br>
+                unterstrichen: SHIFT-Taste und Buchstabe<br>
+                überstrichen: COMMODORE-Taste und Buchstabe<br>
+                Bei Begriffen in geschweiften Klammern, zum Beispiel {CLR}, muß die Taste SHIFT und CLR gedrückt werden und weder die Klammer noch das Wort CLR.<br>
+                Die &lt;Zahl&gt; am Ende jeder Basic-Zeile darf nicht eingegeben werden.<br>
+                <strong>Genaueres steht im Beitrag Checksummer 64 auf Seite 135.</strong>
+            </p>
+        </aside>
+
+        <figure>
+            <pre data-filename="abrakadabra" data-name="Abrakadabra" data-checksummer="3"></pre>
+            <figcaption>Listing 2. »Abrakadabra«</figcaption>
+        </figure>
+
+        <p>Die Ergänzungen bestehen aus der Zeile 30, in der der Bildschirm gelöscht und das Wort ABRAKADABRA gedruckt wird, sowie aus dem Schlußteil. Das Programm meldet sich nämlich bei Zeile 320 mit einer BREAK-Mitteilung. Sie können nun mit dem neuen Zeichen herumexperimentieren (beispielsweise das ganze Programm mal LISTen). Falls Sie dann irgendwann CONT eingeben, wird auch noch die Zeile 330 durchlaufen, in der zunächst der VIC-II-Chip wieder auf das Zeichen-ROM gerichtet und dann auch die Begrenzung des Speichers rückgängig gemacht wird. Dieses unser zweites Rezept führt zu einem recht vielseitig verwendbaren Gericht. Brauchen Sie für irgendwelche Zwecke mal griechische Buchstaben? Dann nehmen Sie doch einfach den Bereich für die Reverse-Zeichen und erstellen darin griechische Zeichenmuster. Durch Einschalten des Reverse-Modus schreiben Sie dann griechisch. Benötigen Sie spezielle Grafikzeichen, die nicht auf der Tastatur vorgegeben sind? Sie wissen nun, wie Sie sie erzeugen und benutzen können. Größere grafische Objekte setzen Sie sich einfach aus mehreren verschiedenen veränderten Zeichen zusammen. Durch eine Anzahl von PRINT-Befehlen können Sie sie dann jederzeit erzeugen. Bleiben wir noch ein wenig bei den Zeichen im nächsten Rezept.</p>
+
+        <h2>Zeichen im Mehrfarbenmodus</h2>
+
+        <p>Erinnern wir uns: Auf dem Bildschirm wird ein Zeichen so abgebildet, wie es im Zeichenmuster gespeichert wurde. Überall dort, wo ein gesetztes Bit vorhanden ist, leuchtet ein Bildpunkt auf. Die Farbe des Bildpunktes entspricht dem Farbcode, der in der zur Bildschirmspeicherstelle gehörigen Bildschirmfarbspeicherstelle enthalten ist. Bild 5 verdeutlicht die Zusammenhänge:</p>
+        <figure>
+            <img src="77-5.png" alt="Drei gestaffelte Raster: »Farb-RAM«, »Bildschirmspeicher« mit dem Code 1 und »sichtbares Bild« mit dem Buchstaben A, durch Pfeile verbunden">
+            <figcaption>Bild 5. Das Zusammenspiel von Bildschirm und Bildschirmfarbspeicher</figcaption>
+        </figure>
+
+        <p>Die Farbe der Stellen, an denen kein gesetztes Bit vorliegt, stammt aus der Speicherstelle 53281. Das ist der Normalfall. Für Farbgourmets sehen wir uns nun ein Rezept an, das uns hilft, bunte Zeichen zu servieren. Es gibt nämlich einen Betriebszustand des VIC-II-Chip, in dem dieser die Zeichenmuster zur Farbgebung auf veränderte Weise liest. Hier entscheiden nicht mehr einzelne Bit-Inhalte, sondern immer Bit-Paare über die zu zeigende Farbe. Sehen wir uns das nochmal am Muster für den Buchstaben A an, das wir nun paarweise zusammenfassen (siehe Bild 6):</p>
+        <figure>
+            <img src="77-6.png" alt="Raster aus 8 mal 8 Feldern, Bit 7 bis 0, mit den Nullen und Einsen des Buchstaben A">
+            <figcaption>Bild 6. Das Zeichenmuster des Buchstaben A paarweise interpretiert</figcaption>
+        </figure>
+
+        <p>Es tauchen vier verschiedene Kombinationen auf: 00, 01, 10 und 11. Sie vermuten richtig, wenn Sie nun annehmen, daß wir vier verschiedene Farben in unseren Zeichen darstellen können. Die Kombination 00 entspricht dabei der 0 im normalen Modus: An dieser Stelle leuchtet kein Bildpunkt auf, die Farbe entstammt dem VIC-Register 53281 für die Hintergrundfarbe. An Stellen, an denen sich eine Kombination 01 befindet, leuchtet der Bildschirm auf. Als Farbinformation wird der Inhalt der Speicherstelle 53282 verwendet. Das ist ein VIC-Register, das Hintergrundfarbe 1 genannt wird. Auch an den Stellen mit der Kombination 10 leuchtet der Bildschirm auf. Die Farbinformation stammt hier aus dem VIC-Register 53283 (Hintergrundfarbe 2). Etwas komplizierter verhält sich das mit der Paarung 11. Hier wird jeweils die Farbe verwendet, die im dazugehörigen Bildschirmfarbspeicher (also in dem Speicher, der für die Farbe der Zeichen im Normalmodus eine Rolle spielt, ab 55296) angegeben ist. Allerdings findet hier nur ein Teil dieses Farbcodes Verwendung. Man kann zwar alle 16 möglichen Farbcodes (siehe Handbuch) eingeben, aber tatsächlich treten im Ergebnis nur die Codes 0 bis 7 auf: Die Codes werden als MODULO(8) gedeutet (MODULO(8) bedeutet, daß der Rest nach einer Division durch 8 verwendet wird). Auf diesen Code aber kommen wir gleich nochmal zurück. Bisher wissen Sie ja noch gar nicht, wie wir unseren Computer dazu bringen können, die Zeichenmuster auf diese extravagante Weise zu lesen. Des Rätsels Lösung liegt in einem VIC-II-Chip-Register, nämlich 53270. Man schaltet diesen Mehrfarbenmodus ein mittels:</p>
+
+        <pre><code>POKE 53270,PEEK(53270) OR 16</code></pre>
+
+        <p>In den Normalmodus zurück gelangt man durch:</p>
+
+        <pre><code>POKE 53270,PEEK(53270) AND 239</code></pre>
+
+        <p>Falls Sie das einfach mal ganz direkt ausprobieren, dann werden Sie feststellen, daß das Ergebnis (mehrfarbige Zeichen oder nicht) außer von diesem Register und natürlich dem Inhalt der beiden Speicherstellen 53282 und 53283 auch noch stark von der aktuellen Zeichenfarbe abhängt. Da haben wir nämlich die zweite Voraussetzung für die Erzeugung von Mehrfarbenzeichen: Die aktuelle Zeichenfarbe muß einen Code aufweisen, der größer als 7 ist. Ist der Code (steuerbar durch POKE 646,Farbcode) kleiner oder gleich 7, dann ändert sich zwar die Farbe gemäß dem eingegebenen Code, aber weit und breit ist nichts vom Mehrfarbenmodus zu sehen. Sobald wir aber auf einen Code ab 8 kommen, wird es bunt. Wie das aussieht, können Sie nachvollziehen durch das Programm »Bunte Zeichen« (Listing 3):</p>
+
+        <figure>
+            <pre data-filename="bunte zeichen" data-name="Bunte Zeichen" data-checksummer="3"></pre>
+            <figcaption>Listing 3. »Bunte Zeichen«</figcaption>
+        </figure>
+
+        <p>Nach dem RUN erscheint zunächst die Schrift im Normalmodus. Das ist der Fall, weil hier der Farbcode der Zeichen noch kleiner als 8 ist, nämlich 1. Danach sehen Sie die bunten Zeichen. Der Farbcode wird nämlich in Zeile 90 auf 10 eingestellt. Mit den Farben ist das übrigens immer ein kleines Glücksspiel: Nahezu jeder Monitor (vom Farbfernseher ganz zu schweigen) erzeugt andere Farben. Um die für Ihr Gerät günstigste Kombination auszuprobieren, sollten Sie einfach mal in den Zeilen 30 und 90 andere Farbcodes ausprobieren. So! Nach all diesen Vorspeisen kommen nun die Hauptgerichte. Als erstes ein Rezept für Sprites:</p>
+
+        <h2>Sprites</h2>
+
+        <p>Sprites sind ungewöhnliche grafische Objekte. Sie kümmern sich überhaupt nicht darum, ob unser VIC-II-Chip gerade den Textmodus oder einen grafischen Modus verwaltet. Wie seltsam das ist, werden Sie später bemerken, wenn wir feststellen, daß die gleichzeitige Darstellung von Text und Grafik (wenn es keine Grafik aus den Tastaturzeichen ist) nur schwer möglich ist. In Bild 7 finden Sie einen Plan der Kochvorschrift, mit deren Hilfe jedes Sprite programmiert werden kann.</p>
+        <figure>
+            <img src="77-7.png" alt="Flussdiagramm von »Sprite progr.« über Entwurf, Spritedatenspeicher, Spritezeiger, Farbe, Vergrößerung und Priorität bis »Fertig«">
+            <figcaption>Bild 7. Kochvorschrift fürs fertige Sprite</figcaption>
+        </figure>
+
+        <p>Diesem Schema werden wir nun Schritt für Schritt folgen bis zum fertigen Sprite-Programm. Der krönende Abschluß dieses Rezeptes wird dann ein kleines Programm sein, das Ihnen erklärt, weshalb der fliegende Holländer – der in früheren Jahrhunderten ständig die Weltmeere unsicher machte – seit vielen Jahrzehnten keine Schlagzeilen mehr in der Presse verursacht. Wo ist er geblieben? Dazu später.</p>
+
+        <h3>Schritt 1: Grobplanung</h3>
+
+        <p>Der erste Schritt erfordert etwas Planung: Wofür brauchen wir die Sprites? Ist es sinnvoll, einen einfarbigen – dafür aber feiner strukturierten – oder besser einen mehrfarbigen (drei Spritefarben + Hintergrundfarbe) zu benutzen, der allerdings dann weniger Details aufweist? Von dieser Entscheidung hängen einige weitere in späteren Schritten ab. Wir werden hier einfach zwei Sprites verwenden, von denen einer ein- und der andere mehrfarbig ist.</p>
+
+        <h3>Schritt 2: Die kreative Phase</h3>
+
+        <p>Wir spitzen den Bleistift und zeichnen uns auf kariertem Papier ein Rechteck mit 24 Kästchen waagerecht und 21 senkrecht. Das ist unser Sprite-Entwurfsblatt. Genau diese Ausdehnung – in Bildpunkten statt Kästchen – hat ein normales Sprite. Es folgt dann – hoffentlich – der beflügelnde Kuß der Musen. Hat Sie die Inspiration gepackt, dann kommt es darauf an, ob sie ein ein- oder ein mehrfarbiges Sprite kreieren.</p>
+
+        <p>a) Beim Einfarbigen plazieren Sie an jede Stelle, an der ein Bildpunkt leuchten soll, ein Kreuzchen: das sieht dann einem Stickmuster sehr ähnlich. Auf diese Weise ergibt sich auch unser erstes Sprite in Bild 8.</p>
+        <figure>
+            <img src="77-8.png" alt="Sprite-Entwurfsblatt mit 24 mal 21 Kästchen, angekreuzte Punkte bilden das Sprite, rechts die Spalte »Codes« mit drei Zahlen je Zeile">
+            <figcaption>Bild 8. Entwurf eines einfarbigen Sprites</figcaption>
+        </figure>
+
+        <p>Etwas komplexer verhält sich das beim mehrfarbigen Sprite. Ähnlich wie bei den mehrfarbigen Zeichen, werden auch hier die Bits paarweise interpretiert. Dabei gibt es wieder vier verschiedene Kombinationsmöglichkeiten und daher auch vier Farben: 00 erzeugt die Hintergrundfarbe, 01, 10 und 11 führen jeweils zu verschiedenen Vordergrundfarben. Hier legt man sich am besten drei verschiedene Farbstifte bereit und füllt nun Bitpaar für Bitpaar mit der gewünschten Farbe aus. Zuvor ordnet man noch jeder Kombination eine Farbe zu. Unser Beispielssprite mit mehreren Farben ergibt sich auf diese Weise wie in Bild 9 gezeigt:</p>
+        <figure>
+            <img src="77-9.png" alt="Sprite-Entwurfsblatt mit Nullen und Einsen in Bitpaaren, rechts die Spalte »Codes« mit drei Zahlen je Zeile">
+            <figcaption>Bild 9. Entwurf eines mehrfarbigen Sprites</figcaption>
+        </figure>
+
+        <h3>Schritt 3: Die Rechenphase</h3>
+
+        <p>Damit ist die schöpferische Arbeit zunächst einmal beendet, und wir wenden uns profaner Mathematik zu. Ähnlich wie wir es schon im Rezept zu den eigenen Zeichenmustern getan haben, wandeln wir nun die Muster in einen Zahlencode um. Dazu unterteilen wir das Sprite-Entwurfsblatt durch zwei senkrechte Linien in drei Spalten zu je 8 Kästchen. Diese entsprechen jeweils drei Byte in einer Zeile. Jedem Kreuzchen in Bild 8 (oder jeder 1 in Bild 9) entspricht wieder ein bestimmter Zahlenwert. Zur Hilfe bedienen Sie sich bitte wieder des Bildes 2, wo diese Werte den Bitnummern zugeordnet sind. Alle Werte eines Bytes werden dann addiert (wie beispielsweise in Bild 3 gezeigt). So ergeben sich pro Zeile drei Codes und insgesamt 63 Codezahlen pro Sprite. In den Bildern 8 und 9 sind die sich ergebenden Codes rechts neben dem Entwurfsblatt gezeigt.</p>
+
+        <h3>Schritt 4: Spritedatenspeicher aussuchen</h3>
+
+        <p>Genauso wie unser Computer Zeichen nur dann darstellen kann, wenn sie als Muster (das sind ja die Codes) im Speicher zu finden sind, braucht er auch das Spritemuster im Speicher. Wo wir die 63 Byte eines Spritemusters plazieren, diese Überlegung ist nun unser nächster Schritt. Zwei Regeln gilt es zu beachten bei der Auswahl von Speicherplätzen zu diesem Zweck:</p>
+
+        <p>1) Der Spritespeicher muß im gleichen 16 KByte-Bereich liegen wie der Bildschirm. Das ist im Normalfall dann der Speicherraum von 0 bis 16383.</p>
+
+        <p>2) Die Startadresse der Spritedaten muß glatt durch 64 teilbar sein. Daneben sollte man natürlich darauf achten, daß man die Daten nicht in Speicherbereiche packt, die das Betriebssystem oder der Basic-Interpreter braucht. Kritisch sind da vor allem die ersten 1023 Speicherplätze. Gleichwohl bieten sich hier vier Orte an für vier Sprites:</p>
+
+        <table class="plain right0">
+            <tr>
+                <td>704 - 767</td>
+                <td>1. Sprite</td>
+            </tr>
+            <tr>
+                <td>832 - 895</td>
+                <td>2. Sprite</td>
+            </tr>
+            <tr>
+                <td>896 - 959</td>
+                <td>3. Sprite</td>
+            </tr>
+            <tr>
+                <td>960 - 1023</td>
+                <td>4. Sprite</td>
+            </tr>
+        </table>
+
+        <p>Die drei letzten davon gehören teilweise zum Kassettenpuffer. Falls Sie also während eines Spriteprogrammes auf die Kassette zugreifen müssen, dann ist es nötig, daß Sie danach die Spritedaten wieder in diesen Puffer zurückschreiben. Wenn Sie mehr als vier Sprites benötigen (habe ich Ihnen schon erzählt, daß Sie bis zu 8 davon gleichzeitig auf dem Bildschirm zeigen können?), dann läßt es sich wohl nicht umgehen, auch den Basic-Speicher dafür zu benutzen, der bei 2048 beginnt. Ich verwende in solchen Fällen meistens den Raum am oberen Ende des 16 KByte-Abschnittes, also knapp unter 16383. Eine andere – aber auch etwas umständlichere – Methode ist es, den Basic-Start höher zu legen. In dem Fall können dann die Spritemuster an den Bildschirmspeicher anschließen. Wir wollen uns aber in dieser kleinen Einführung nicht mit diesen Details belasten, sondern gehen einfach davon aus, daß wir mit nur zwei Sprites arbeiten, die wir nach 704 (für das einfarbige Sprite) und 832 (für das bunte Sprite) legen.</p>
+
+        <h3>Schritt 5: Spritedaten einlesen</h3>
+
+        <p>Nun beginnen wir zu programmieren. Wir legen die Spritedaten in DATA-Zeilen (und zwar jeweils 63 Zahlen plus eine 0, also 64 Zahlen). Im Programm SPRITES sind das dann die Zeilen ab 620. Außerdem brauchen wir zwei Einleseschleifen:</p>
+
+        <pre><code>70 FOR I = 704 TO 767:READ A:POKE I,A:NEXT I
+80 FOR I = 832 TO 895:READ A:POKE I,A:NEXT I</code></pre>
+        <figure>
+            <img src="77-10.png" alt="Koordinatenfeld mit den X-Werten 24, 128, 344, 360, 511 und den Y-Werten 50, 120, 190, 250, 255; ein dick umrandetes Rechteck für den sichtbaren Bildschirm und zwei Sprites mit Gesichtern">
+            <figcaption>Bild 10. In diesem Feld können sich Sprites aufhalten. Dick umrandet ist der sichtbare Bildschirm.</figcaption>
+        </figure>
+
+
+        <p>Damit hätten wir den aufwendigsten Teil der Sprite-Programmierung hinter uns.</p>
+
+        <h3>Schritt 6: Wo liegen die Daten?</h3>
+
+        <p>Dem Computer muß nun mitgeteilt werden, wo er die Spritemuster finden kann. Dazu gibt es direkt oberhalb des Bildschirmspeichers acht Adressen (ab 2040), in die eine Kennzahl der Spritedaten-Startadresse gepackt wird. Die Zuordnung zu einer solchen Speicherstelle legt gleichzeitig auch die Spritenummer fest. So zeigt die Kennzahl in 2040 automatisch immer auf das Sprite mit der Nummer 0, die in 2041 auf Sprite 1 und so weiter. Die Kennzahl ergibt sich aus der Startadresse des Spritemusters, dividiert durch 64: Kennzahl = Startadresse / 64</p>
+
+        <p>Für unser einfarbiges Sprite wählen wir die Nummer 0 und schreiben nach 2040 nun 704/64 = 11. Für das andere Sprite wählen wir die Nummer 1 und für die Kennzahl gilt hier 832/64 = 13. Im folgenden soll immer N diese Spritenummer sein. Im Programm Sprites (Listing 4) findet diese Festlegung in Zeile 100 statt:</p>
+
+        <figure>
+            <pre data-filename="sprites" data-name="Sprites" data-checksummer="3"></pre>
+            <figcaption>Listing 4. »Sprite«</figcaption>
+        </figure>
+
+        <p>Für jedes Sprite, das in eine Kollision verwickelt wurde, ist dort dann ein Bit auf 1 gesetzt. Wenn also beispielsweise das Sprite 0 mit Bildschirmzeichen zusammenstößt, dann findet man in Register 53279 den Wert 1. Die Berechnung des zu erwartenden Wertes kann wieder mittels der Bitwerttabelle in Bild 2 geschehen. Sind mehrere Sprites in eine Kollision verwickelt, addiert man die Bitwerte. Das Auslesen dieser Register geschieht einfach durch PEEK. Allerdings ist dieses Auslesen so gründlich, daß ein weiteres PEEK dort nichts mehr finden würde, denn durch den PEEK-Befehl wird der Inhalt der beiden Kollisionsregister gelöscht. Braucht man diesen Inhalt aber noch – beispielsweise für eine Untersuchung, welche Sprites zusammengestoßen sind –, dann muß man den Registerinhalt beim Auslesen gleich in eine Variable packen. Man schreibt dann beispielsweise A = PEEK(53278) und kann dann A weiterverarbeiten. Im Programm SPRITES wird diese Radikalkur verwendet, um das fragliche Register (hier ist es 53278, weil wir an der Sprite/Sprite-Kollision interessiert sind) zu löschen. Zeile 260 dient dazu:</p>
+
+        <pre><code>260 A = PEEK(53278)</code></pre>
+
+        <p>Uns interessiert weiterhin gar nicht, welche Sprites zusammenstoßen – wir haben ja nur die beiden – Sprite 0 und 1. Deshalb untersuchen wir in Zeile 370 lediglich, ob im Register 53278 überhaupt ein Wert, der von Null verschieden ist, auftaucht:</p>
+
+        <pre><code>370 IF PEEK(53278) THEN 400</code></pre>
+
+        <p>Falls Ihnen diese Schreibweise etwas ungewöhnlich vorkommt, dann lassen Sie sich sagen, daß damit das gleiche erreicht wird wie durch eine Abfrage IF PEEK(53278) &lt; > 0 THEN... . Ist dann ein Zusammenstoß erfolgt, passiert durch die Zeile 370 zweierlei: Erstens befindet sich im Register 53278 dann der Wert 3, der ja von Null verschieden ist und zur Verzweigung des Programmes nach Zeile 400 führt. Zum anderen aber wird durch das PEEKen dieses Register gleich wieder gelöscht und steht bereit für weitere Kollisionsabfragen. Sind Sie etwas abergläubisch und irritiert es Sie, daß wir genau 13 Schritte zu machen hatten, um alle Spritemöglichkeiten auszuschöpfen? Dann glauben Sie sicherlich auch an die Sage vom geheimnisvollen Fliegenden Holländer, der einige Jahrhunderte die Seeleute aller Nationen in Angst und Schrecken versetzte, weil mit seinem Auftauchen immer ein Unglück verbunden war. Eigentlich war ja der Fliegende Holländer dazu verdammt, bis in alle Ewigkeit ruhelos über die Weltmeere zu segeln. Merkwürdigerweise findet man aber schon seit einigen Jahrzehnten keinerlei Bericht mehr – obwohl mit unseren hervorragenden Kommunikationsmitteln jedermann schnell davon erfahren würde – über ein Auftauchen dieses Unglücksschiffes! Woran liegt das? Dieses Rätsel kann nun erstmalig unser Beispielprogramm »Sprites« (Listing 4) lösen: Ich will Ihnen noch nicht zuviel verraten. Die Kommentare im Programm und unsere 13 Schritte erklären das Programm ausreichend. Im Grunde genommen finden sich nur noch ein paar Ergänzungen, die aus Texten, einem Programmteil für den Hintergrund, einer Reaktion auf den Zusammenstoß der beiden Sprites und einer Schleife zur Bewegung von Sprites bestehen. Bei der Bewegung werden in jedem Schleifendurchlauf die X- und die Y-Koordinaten der beiden Sprites um einen bestimmten Betrag verändert und die neuen Werte in die Register für die Sprite-Orte geschrieben. Viel Spaß bei dieser Lösung des Rätsels, die eines unserer Hauptgerichte ist. Sehen wir uns nun ein weiteres Rezept für ein Hauptgericht an.</p>
+
+        <h2>Hochauflösende Grafik</h2>
+
+        <p>Wir haben nun schon einige Male erlebt – und zwar beim veränderten Zeichensatz und auch bei den Sprites -, daß einzelne gesetzte Bits einen leuchtenden Bildpunkt auf dem Bildschirm erzeugen und gelöschte Bits die Hintergrundfarbe bestehen lassen. Wie allerdings der VIC-II-Chip unsere Erzeugnisse auf den Bildschirm bringt, nämlich als 8 mal 8-Bit-Feld auf einmal bei den Zeichen oder als 24 mal 21-Bit-Feld bei den Sprites, darauf haben wir bisher nur geringen Einfluß ausüben können. Dabei braucht man nur einen kleinen Gedankensprung weiter zu gehen: Was wäre, wenn wir anstelle der eben erwähnten kompletten Bitmuster (8 mal 8 oder 24 mal 21) dafür sorgen könnten, daß nur einzelne Bits des Bildschirmes an- oder ausgeschaltet werden? Dann hätten wir 320 Bildschirmpositionen (nämlich 40 Spalten zu je 8 Bits) in der Waagerechten und 200 (das sind 25 Zeilen mit je 8 Positionen) in der Senkrechten zur Verfügung, könnten also insgesamt 64000 verschiedenen Bildpunkte steuern! Tatsächlich gibt es einen Betriebszustand des VIC-II-Chip, den sogenannten Bit-Map-Modus, der diese Steuerung erlaubt. Es ist wahrhaft ein Jammer, daß das Basic des C 64 die darin liegenden Möglichkeiten nicht im geringsten unterstützt. Wieder müssen wir uns in ein Gewirr von POKE- und PEEK-Befehlen stürzen, wobei im Bit-Map-Modus auch noch eine große Portion Geduld vom Benutzer erwartet wird, solange er in der Sprache Basic arbeitet. Allerdings lohnt das Ergebnis die Geduld. »Map« kann man ins Deutsche als »Landkarte« übersetzen. Allerdings hinkt diese Entsprechung etwas, denn eine Landkarte versucht die Gegend auf dem Papier abzubilden, hier bei der Bit-Map aber ist es umgekehrt: Der Inhalt der Bit-Map wird auf dem Bildschirm gezeigt. Es handelt sich um einen 8000 Byte großen Speicherbereich, der für jeden Bildschirmpunkt von den 64000 möglichen ein Bit enthält (8000 Byte zu je 8 Bits = 64000 Bits). Ist dieses Bit auf 1 gesetzt, dann bildet es der VIC-II-Chip an einer bestimmten Position des Bildschirmes als leuchtenden Punkt ab. Die Aufgabe, Grafik zu programmieren, besteht also darin, innerhalb dieses Speicherbereiches die richtigen Bits auf 1 oder 0 zu setzen. Dazu kommen wir gleich noch. Nun also zum Rezept: Damit Sie die einzelnen Schritte auch gleich in der Anwendung sehen, ist hierzu noch ein kleines Programm »HiRes-Grafik« (Listing 5) abgedruckt:</p>
+
+        <figure>
+            <pre data-filename="hires-grafik" data-name="HiRes-Grafik" data-checksummer="3"></pre>
+            <figcaption>Listing 5. »HiRes-Grafik«</figcaption>
+        </figure>
+
+        <h3>Schritt 1: Bit-Map-Modus einschalten</h3>
+
+        <p>Das Register 53265 (genauer gesagt, das Bit 5 davon) ist zuständig für diesen Bit-Map-Modus. Man schaltet ihn ein durch:</p>
+
+        <pre><code>POKE 53265,PEEK(53265) OR 32</code></pre>
+
+        <p>und in den normalen Textmodus gelangt man durch:</p>
+
+        <pre><code>POKE 53265,PEEK(53265) AND (255-32)</code></pre>
+
+        <p>In unserem Programm »HiRes-Grafik« geschieht dieses Einschalten in Zeile 120. Probehalber können Sie den Einschaltbefehl auch mal im Direktmodus eingeben. Der sich dadurch ergebende Bildschirm ist recht interessant: Man kann nämlich dem Computer direkt bei der Arbeit zusehen, weil wir auf dem Bildschirm den Speicherbereich von 0 bis 999 abgebildet sehen. Dort befindet sich beispielsweise die sogenannte Zeropage, ein Arbeitsspeicher des Betriebssystems, in dem sich dauernd Inhalte verändern.</p>
+
+        <h3>Schritt 2: Welche Bit-Map?</h3>
+
+        <p>Stellen Sie sich vor, die auf die eben erwähnte Weise gewählte Bit-Map soll nun beschrieben werden. Das könnte ja dazu führen, daß Inhalte der Zeropage verändert werden müssen. Unser Computer ist in dieser Angelegenheit aber sehr eigen: Wenn man nicht sehr darauf achtet, wohin man was schreibt in diesem empfindlichen Speicherbereich, dann stürzt er ab. Es muß also noch eine Möglichkeit geben, einen anderen Ort für die Bit-Map anzugeben. Tatsächlich ist das der Fall und auf diese Weise packen wir die Bit-Map in einen Speicherbereich, in dem sie auch in den meisten Grafikprogrammen zu finden ist:</p>
+
+        <pre><code>POKE 53272,PEEK(53272) OR 8</code></pre>
+
+        <p>legt unsere Bit-Map-Startadresse nach 8192. Übrigens gibt es – wie Sie sich sicher denken können – noch mehrere Möglichkeiten, im Speicher unseres Computers solche Bit-Maps unterzubringen. Allerdings wird das etwas komplizierter als das hier gezeigte Verfahren, weshalb ich Sie da wieder auf die eingangs erwähnte Literatur verweisen möchte. Zeile 140 dient im Programm »HiRes-Grafik« zur Festlegung des Bit-Map-Ortes. Bevor wir uns den weiteren Programmverlauf ansehen – und damit die nächsten Schritte – soll noch der Aufbau der Bit-Map, wie er für uns auf dem Bildschirm existiert, anhand des Bildes 11 erklärt werden: Unser Bildschirm ist im Bit-Map-Modus praktisch wie ein Koordinatensystem aufgebaut, dessen Nullpunkt oben links liegt und dessen X-Werte von 0 bis 319 reichen, wohingegen die Y-Werte von oben (ab Null) nach unten verlaufen bis 199. Das ist ein etwas ungewöhnliches Koordinatensystem, mit dem sich aber auch allerhand anstellen läßt.</p>
+        <figure>
+            <img src="77-11.png" alt="Koordinatenachsen X bis 319 und Y bis 199, das Rechteck darin ist als »Bildschirm« bezeichnet">
+            <figcaption>Bild 11. Aufbau der Bit-Map auf dem Bildschirm</figcaption>
+        </figure>
+
+        <h3>Schritt 3: Bit-Map schützen</h3>
+
+        <p>Die mit diesen beiden POKE-Befehlen in die VIC-II-Chip-Register erzeugte Bit-Map liegt mitten im Basic-Speicherraum (der beginnt ja bei 2048 und reicht bis 40960). Ähnlich wie bei der Erzeugung eigener Zeichen besteht auch hier die Gefahr, daß ein Basic-Programmtext oder Variable über 8192 hinausreichen. Dadurch würde aber die Bit-Map beeinflußt. Das kann man verhindern, indem man mittels zweier POKE-Befehle den Basic-Speicher begrenzt:</p>
+
+        <pre><code>POKE 52,32:POKE 56,32</code></pre>
+
+        <p>Damit hört der Basic-Speicher bei 8192 auf. Soll er wieder die normale Länge annehmen, dann gibt man ein:</p>
+
+        <pre><code>POKE 52,160:POKE 56,160</code></pre>
+
+        <p>Unser Programm vollführt diesen Schutz der Bit-Map in Zeile 50. Wenn Sie alles bisher vorgestellte eingegeben und durch RUN gestartet haben, dann sieht der Bildschirm sehr merkwürdig aus. Es zeigen sich mehr oder weniger zufällige Speicherinhalte als Punkte.</p>
+
+        <h3>Schritt 4: Bit-Map säubern</h3>
+
+        <p>Von diesen zufällig dort vorhandenen Inhalten müssen wir die Bit-Map natürlich reinigen, bevor wir sie ernsthaft für Zeichnungen benutzen. Das geschieht einfach durch eine Programmschleife, in der in jede Speicherzelle der Bit-Map eine Null geschrieben wird:</p>
+
+        <pre><code>160 B = 8192
+170 FOR I=0 TO 7999
+180 :POKE B+I,0
+190 NEXT</code></pre>
+
+
+        <p>So sieht das dann auch im Beispielsprogramm »HiRes-Grafik« aus. Allerdings muß ich Sie noch warnen: das dauert eine ganze Weile! Hinterher ist der Bildschirm schwarz – jedenfalls im Programm. Wenn Sie alles bis hierher eingegeben und dann durch RUN gestartet haben, werden Sie meistens noch bunte Felder auf dem Bildschirm finden. Das hängt mit der besonderen Art der Farbgebung im Bit-Map-Modus zusammen, die wir uns nun ansehen werden.</p>
+
+        <h3>Schritt 5: Es wird farbig</h3>
+
+        <p>Anders als im Textmodus holt der VIC-II-Chip die Vorder- und die Hintergrundfarbe im Bit-Map-Modus aus dem Speicher, der bisher als Bildschirmspeicher gedient hat: aus dem Bereich 1024 bis 2023 also. Das gilt übrigens nur dann, wenn man den Bildschirm an der alten Stelle beläßt, so wie wir das hier tun. Es gibt aber auch Möglichkeiten, den Bildschirmspeicher zu verschieben. In dem Fall dient immer der aktuelle Bildschirmspeicher der Farbgebung. Das aber nur nebenbei. Jeder Bildschirmspeicherplatz (also beispielsweise die Speicherstelle 1024) ist zuständig für die Vorder- und die Hintergrundfarbe eines 8 mal 8-Bit-Bereiches der Abbildung (die eben erwähnte Speicherstelle liefert also die Farben für das Bildschirmquadrat, dessen linke obere Ecke die Koordinaten 0,0 und dessen rechte untere die Koordinaten 7,7 hat). Damit zwei Farbinformationen in einem Byte des Bildschirmspeichers Platz haben, bedient sich der Computer des sogenannten »gepackten« Formates. Das ist für uns einfach eine Kennzahl F, die sich aus der Vordergrundfarbe ZF und der Hintergrundfarbe HF durch folgende Formel berechnet:</p>
+
+        <p>F = 16*ZF + HF</p>
+
+        <p>Der Programmteil zwischen Zeile 60 und 90 fragt Sie nach der gewünschten Farbkombination und berechnet die Kennzahl F. Wir belegen nun den gesamten Bildschirmspeicher in einer Schleife mit dieser Kennzahl. Dadurch werden auch die eventuell vorhandenen bunten Felder – die sich aus zufälligen Inhalten des Bildschirmspeichers ergeben – überdeckt durch die gewählte Hintergrundfarbe:</p>
+
+        <pre><code>210 C = 1024
+220 FOR I=0 TO 999
+230 :POKE C+I,F
+240 NEXT</code></pre>
+
+
+        <p>Auch dieser Teil unseres Programmes verlangt nochmal etwas Geduld von Ihnen. Damit hätten wir alle Vorbereitungen abgeschlossen. Falls Sie bis hierher alles abgetippt und mittels RUN gestartet haben, dann sehen Sie nun einen leeren sauberen Bildschirm vor sich, der in der Hintergrundfarbe erstrahlt. Nun können wir Punkte setzen. Aber wie macht man das?</p>
+
+        <h3>Schritt 6: Punkte setzen</h3>
+
+        <p>Einen Punkt auf dem Bildschirm sichtbar zu machen, erfordert – das hatten wir schon zu Beginn dieses Rezeptes erwähnt – das Setzen des richtigen Bits im richtigen Byte. Wir müssen also in den Bit-Map-Speicher etwas hineinschreiben. Probieren Sie doch einfach mal:</p>
+
+        <pre><code>POKE 9000,255</code></pre>
+
+        <p>Sie sehen plötzlich irgendwo im oberen Teil des Bildschirmes einen kleinen horizontalen Strich. Aber das ist es ja eigentlich nicht das, was wir brauchen. Wir wollen vielmehr ganz gezielt Punkte setzen können. Was tut man, um beispielsweise genau den Punkt anzuschalten, der einen X-Wert von 200 und einen Y-Wert von 50 sein eigen nennt (siehe Bild 12)? Das ist leider wegen des ziemlich komplizierten Speicheraufbaues der Bit-Map ein relativ komplizierter Weg. Wieder muß ich Sie da auf die Literatur verweisen. Wir brauchen uns hier nur einige Formeln zu merken. X und Y sind die Koordinaten des zu setzenden Punktes, BY ist ein Zwischenwert (der die Nummer des Bytes in der Bit-Map bezeichnet) und BI ebenfalls ein Zwischenwert, der die Nummer des Bit im Byte enthält. Die letzte Zeile sorgt dann für das Setzen des richtigen Bits in der Bit-Map:</p>
+
+        <pre><code>280 BY = (X AND 504) + 40*(Y AND 248) + (Y AND 7)
+290 BI = 7 - (X AND 7)
+300 POKE B + BY,PEEK(B+BY) OR (2↑BI)</code></pre>
+
+        <p>B ist übrigens im Programm (daraus stammen diese Zeilen) vorher schon auf 8192 festgelegt worden. Diese drei Zeilen lassen sich auch gut als Unterprogramm einsetzen.</p>
+        <figure>
+            <img src="77-12.png" alt="Koordinatensystem mit x bis 319 und y bis 199, der Punkt P(200/50) ist eingezeichnet">
+            <figcaption>Bild 12. Ort des Punktes P(200/50) auf dem Bildschirm-Koordinatensystem</figcaption>
+        </figure>
+
+        <p>Das war's eigentlich schon. Alles weitere im Programm »HiRes-Grafik« dient dazu, festzulegen, welche Punkte zu setzen sind.</p>
+
+        <p>Die Programmzeilen 260, 270 und 310 steuern eine Schleife, in der X von 0 bis 319 läuft.</p>
+
+        <p>In Zeile 270 wird mittels der Funktion A(X) der aktuelle Y-Wert berechnet. Das Programm zeichnet eine Sinusfunktion. Die Funktionsdefinition in Zeile 30 sieht allerdings etwas merkwürdig aus. Das rührt daher, daß wir solch ein ungewöhnliches Koordinatensystem zur Verfügung haben. Wenn Sie das Programm gestartet haben, werden Sie aufgefordert, die Vorder- und die Hintergrundfarbe einzugeben. Danach wird einige Geduld von Ihnen erwartet, bis schließlich die Sinuskurve auf dem Bildschirm erscheint. Das Programm wartet nun auf einen Tastendruck, um dann den normalen Textmodus wieder herzustellen. Dies also war wieder ein Hauptgericht. Kommen wir nun noch zur Nachspeise.</p>
+
+        <p>Es kommt natürlich immer darauf an, was Sie zeichnen wollen: Für die grafische Darstellung mathematischer Funktionen ist es durchaus vorteilhaft, nur eine Zeichenfarbe zu verwenden. Für künstlerische Zwecke allerdings wären mehrere Farben erwünscht. Wie schon bei den Zeichen und den Sprites, gibt es natürlich auch im Bit-Map-Modus die Möglichkeit, vier Farben auf dem Bildschirm zu zeigen. Wieder werden nicht mehr einzelne Bits, sondern Bitpaare vom VIC-II-Chip interpretiert. Einen gravierenden Nachteil hat dieser Mehrfarben-Bit-Map-Modus allerdings:</p>
+
+        <p>In der Horizontalen stehen uns nun nicht mehr 320, sondern nur noch 160 Bildschirmpositionen zur Verfügung. Das schränkt die Anwendung dieses Modus gewaltig ein. Sehen wir uns die Zuordnung der Bitpaare zu den Farbquellen an (siehe Bild 13): Die Kombination 00 steht wieder für die Hintergrundfarbe. Der VIC-II-Chip holt sich den dazugehörigen Farbcode aus der Speicherstelle 53281. 01 und 10 vereinigen sich, wie zuvor im normalen hochauflösenden Modus die Vorder- und die Hintergrundfarbe, zu einem gepackten Format. Das befindet sich dann im Bildschirmspeicher. Ist F1 der Code für die Farbe, die zur Bitpaarung 01 gehört und F2 der für das Paar 10, dann berechnet sich die Kennzahl für beide aus der Formel:</p>
+
+        <p>F = 16*F1 + F2</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>BIT-PAAR</th>
+                    <th colspan="2">FARBQUELLE</th>
+                </tr>
+                <tr>
+                    <td>00</td>
+                    <td colspan="2">SPEICHER 53281, HINTERGRUNDREG. Nr. 0</td>
+                </tr>
+                <tr>
+                    <td>01</td>
+                    <td>BITS 4-7</td>
+                    <td rowspan="2">DES VIDEO-RAM</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>BITS 0-3</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td colspan="2">BILDSCHIRMFARBSPEICHER</td>
+                </tr>
+            </table>
+            <figcaption>Bild 13. Bitpaare und Farbquellen</figcaption>
+        </figure>
+
+        <p>Die Farbe der Bitkombination 11 schließlich stammt aus dem auch im Textmodus verwendeten Bildschirmfarbspeicher (55296 bis 56295). Drei Bereiche sind es, die im Vergleich zum normalen Bit-Map-Modus hier verändert werden müssen: Zum einen muß dem VIC-II-Chip gesagt werden, daß er nun die Bit-Map in Bitpaaren interpretieren soll. Zum zweiten müssen wir für die Belegung der verschiedenen Farbquellen Sorge tragen, und zum dritten verändert sich die Routine, die für uns aus den Koordinaten eines Punktes die richtige Stelle in der Bit-Map berechnet und dann dort Bits an- oder abschaltet. Das beigefügte Programm »Multigrafik« (Listing 6) soll Ihnen diese Unterschiede zeigen: Einschalten des Mehrfarben-Bit-Map-Modus: Daß er die Bits aus der Bit-Map nun paarweise interpretieren soll, erfährt der VIC-II-Chip durch das Register 53270. Dort schaltet man diesen Mehrfarben-Bit-Map-Modus ein durch:</p>
+
+        <pre><code>144 POKE 53270,PEEK(53270) OR 16</code></pre>
+
+        <figure>
+            <pre data-filename="multigrafik" data-name="Multigrafik" data-checksummer="3"></pre>
+            <figcaption>Listing 6. »Multigrafik«</figcaption>
+        </figure>
+
+        <p>Das Ausschalten geschieht im Programm in Zeile 342:</p>
+
+        <pre><code>342 POKE 53270,PEEK(53270) AND (255-16)</code></pre>
+
+        <p>Belegen der Farbregister: In den Programmzeilen 60 bis 90 ist die Abfrage auf die gewünschten Farben ergänzt worden ebenso wie die Berechnung der Farbkennzahl F. Die Farbgebung zwischen den Zeilen 200 und 242 wurde erweitert. Dazu wird in Zeile 210 der Variablen D die Startadresse 55296 des Bildschirmfarbspeichers übergeben. Die anschließende Schleife belegt dann nicht nur den Bildschirm-, sondern auch den Bildschirmfarbspeicher, letzteren mit der Farbe F3. In 242 wandert noch die Hintergrundfarbe F0 ins Register 53281.</p>
+
+        <p>Punkte zeichnen: Aus der einen Schleife, in der X von 0 bis 319 lief und die auch gleich die Berechnung der Bitadresse und den POKE-Befehl enthielt, wurden nun drei Schleifen, die jeweils eine etwas veränderte Sinusfunktion mit anderer Farbe auf den Bildschirm zaubern. Vor der Schleife erhält jeweils die Variable PF die gewünschte Farbkennzahl (sie ist hier übrigens identisch mit dem Dezimalwert des entsprechenden Bitpaares, also 11 = 3, das aber nur am Rande bemerkt). Das Berechnen und Zeichnen ist nun in ein Unterprogramm verschoben, welches bei 400 beginnt. Die Formeln in diesem Modus sind natürlich anders als im normalen hochauflösenden Modus. Wer darüber mehr wissen möchte, der sollte sich dazu das Commodore-64-Buch (Band 3) von Schneider und Eberl zu Gemüte führen. Es erscheint im Markt&amp;Technik Verlag unter der Bestellnummer MT595. Das Unterprogramm erwartet beim Einsprung jeweils einen Koordinatenwert f=r X (0 bis 159), für Y (0 bis 199) und eine Farbzahl PF (0 bis 3). Ansonsten funktioniert »Multigrafik« genauso wie »HiRes-Grafik: Nach den Abfragen auf die gewünschten Farben dauert alles noch etwas länger, bis dann nacheinander die drei Kurven erscheinen. Wieder nach einem Tastendruck schaltet der VIC-II-Chip in den normalen Textmodus zurück.</p>
+
+        <p>Damit ist unsere Rezeptsammlung abgeschlossen. Natürlich bietet sie lediglich eine grundlegende Einführung in die Grafik-Kochkunst. Falls Ihnen das so gekochte Menü geschmeckt hat, dann wagen Sie sich doch mal an die raffinierteren Gerichte. Da gibt es beispielsweise im 64'er-Magazin einen Kurs »Grafik-Streifzüge« und natürlich die anfangs aufgezählte Literatur.</p>
+
+        <address class="author">(Heimo Ponnath/cg)</address>
+    </article>
+</body>
+
+</html>

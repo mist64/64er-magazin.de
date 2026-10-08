@@ -1,0 +1,48 @@
+
+
+;saeulen.prg ==1c01==
+   10 rem ***** programm saeulendiagramme *****
+   20 poke53280,0:poke53281,11
+   30 printchr$(30)chr$(147)
+   40 i=0:j=0:n=0:dx=0:dy=0:z=0:ma=0:dn$="":up$="":k$="":a$=""
+   50 for i=1 to 24:dn$=dn$+chr$(17):up$=up$+chr$(145):nexti
+   60 rem --- eingabeteil ---
+   65 input"test(1) oder eigene werte(2)";z
+   67 if z<>2 then goto400
+   70 printchr$(17)"wieviele werte (max.10)"tab(30);:inputn
+   80 :if n<1 or n>10 then printchr$(147):goto70
+   90 dimw(n),w$(n)
+  100 printchr$(17)tab(2)"bezeichnung (2 zeichen)"tab(27)"wert"chr$(17)
+  110 for i=1 to n
+  120 :printitab(10);:inputw$(i):w$(i)=left$(w$(i),2)
+  130 :printchr$(145)tab(25);:inputw(i)
+  140 ::if abs(w(i))>ma then ma=w(i)
+  150 nexti
+  160 printchr$(17)"kopfzeile:":inputk$
+  170 :if len(k$)<40 then k$=k$+chr$(17)
+  180 rem --- berechnungsteil ---
+  190 dx=ma/30:dy=int(22/n)-1
+  200 rem --- zeichenteil ---
+  210 printdn$chr$(19):poke53281,0
+  220 for i=1 to 23
+  230 :printtab(2)chr$(98)
+  240 nexti
+  250 printchr$(19)k$
+  260 for i=1 to n
+  265 :printleft$(dn$,dy);
+  270 :printw$(i);chr$(18)chr$(28)tab(3);
+  280 ::for j=1 to int(w(i)/dx)
+  290 ::printchr$(32);
+  300 :nextj
+  310 :printchr$(146)chr$(30)tab(33)w(i)
+  330 nexti
+  340 geta$:ifa$=""then340
+  350 end
+  400 rem ---- testlauf ----
+  410 n=10:dimw(n),w$(n)
+  420 for i=1 to n:read w$(i),w(i):nexti
+  430 ma=875
+  440 k$="waffenexporte der bundesrepublik deutschland 1969 bis 1978 (mio dollar)"
+  450 goto170
+  460 data69,100,70,190,71,130,72,330,73,140,74,210,75,420,76,650,77,850,78,875
+

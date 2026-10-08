@@ -1,0 +1,37 @@
+
+
+;klang dynamisch.prg ==0801==
+  100 rem--------------------------------
+  110 rem klangeffekte mit
+  120 rem dynamischer frequenzsteuerung
+  130 rem--------------------------------
+  140 s=54272
+  150 read a,d,su,r,c,p,f,g,n,m
+  160 poke s+5 ,16*a +d
+  170 poke s+6 ,16*su+r
+  180 poke s+2 ,p and 255
+  190 poke s+3 ,p/256
+  200 poke s+23,0     :rem fr
+  210 poke s+24,15    :rem ml
+  220 get a$:if a$="" then 220
+  230 for i=1 to m
+  240 : f1=f
+  250 : poke s+4,c or 1
+  260 : for j=1 to n
+  270 :   poke s,f1 and 255
+  280 :   poke s+1,f1/256
+  290 :   f1=f1*g
+  300 : next j
+  310 : poke s+4,c
+  320 next i
+  330 goto 220
+  400 rem--------------------------------
+  410 rem parameter
+  420 data 0 ,10, 0,10:rem a d su r
+  430 data 16         :rem control-byte c
+  440 data 2048       :rem pulsweite p
+  450 data 16000      :rem frequenz f
+  460 data 1.33       :rem faktor g
+  470 data 2          :rem anzahl n
+  480 data 25         :rem anzahl m
+

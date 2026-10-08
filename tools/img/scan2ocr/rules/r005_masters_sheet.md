@@ -182,6 +182,10 @@ nothing to fill, which is why the two variants exist at all.
   `r000_issue.py` — `scan_dir`, `thumb_150`, `tmp`, `pages`, and the two
   **answers**, `binding` and `paper` (`paper.low` replaces the old whole-issue
   `colors`, which still loads for an issue that has not been migrated)
+- one **field file per paper class**, beside that class's `colors.txt` —
+  `field_low.txt`, `field_high.txt` — written by `r005_field.py`. A missing one
+  is not an error: that class gets no flat-field correction and every stamp
+  says so. See *The paper has not browned evenly*
 - `tools/img/cmyk_reconstruction/target/release/cmyk_reconstruction`, built
   (`cargo build --release` in `tools/img/cmyk_reconstruction`)
 - the ICC pair in `tools/img/`: `USWebCoatedSWOP.icc`, `AdobeRGB1998.icc`
@@ -207,9 +211,19 @@ trace to 209.2 × 296.9 mm (p050). Derive that issue's thumbs at
 
 ```bash
 cd tools/img/scan2ocr/rules
+../../../../.venv/bin/python r005_field.py                    # ONCE, first
 ../../../../.venv/bin/python r005_masters_sheet.py            # every page
 ../../../../.venv/bin/python r005_masters_sheet.py 6 41 56 92 # named pages
 ```
+
+**`r005_field.py` runs first, once per issue**, and measures the
+paper-yellowing field for each paper class — about 0.6 s a page on 28 lanes for
+a 600 dpi issue, 119 s for SH8605's 192 interior pages. It writes
+`field_<class>.txt` beside that class's `colors.txt` and nothing else. Run it
+again only if the scans or the paper map change. Skipping it is not an error:
+every class then gets an identity field and every stamp says
+`field  identity -- not measured`, which is the state the step was in before
+this correction existed.
 
 **The repo venv, not `python3`** — CLAUDE.md requires it, and *Inputs* above
 used to say "`/usr/bin/python3` has all three", which is a claim about one box.
@@ -229,11 +243,15 @@ called.
 
 **After any change to this step, wipe `<tmp>/masters600` and start again from
 page 1.** `r010`'s block ids and `r020`'s cache are keyed on the masters, and a
-directory mixing two runs is not something any downstream check can see.
+directory mixing two runs is not something any downstream check can see. **A new
+field file is such a change** — it has a new `field-sha`, which is exactly how
+Verification 7b finds the masters it did not make.
 
 ## Outputs
 
 ```
+issues/<ID>/field_low.txt        the paper-yellowing field, per paper class
+issues/<ID>/field_high.txt       ...beside that class's colors.txt  (r005_field.py)
 <tmp>/masters600/NNN.png         the OCR master — r010 reads this   (the contract)
 <tmp>/masters600/NNN.stamp.txt   which profile and which curve made that master
 <tmp>/sheets600/NNN.png          the uncropped graded sheet
@@ -714,6 +732,192 @@ flat fill is the pipeline working, not ink loss). Both numbers go in every log
 line, because the failure they were built for — the old `LK 90 95` turning black
 type into blank paper — is loud enough for a human to see in a thumbnail.
 
+### The paper has not browned evenly — the flat-field correction
+
+**The grade has one white point and the paper has many.** `W` is the density
+reference, `d = -log10(rgb/W)`, so the same number is the reference at the page
+centre and 2 mm from the trim. MEASURED on SH8605, on 190 of its 192 interior
+pages, on the **raw** levelled scans: the clean substrate needs these gains to
+read as the same paper as that page's own centre —
+
+| distance from the edge | gutter | fore | top | bottom |
+|---|---|---|---|---|
+| 2 mm | R 1.025 G 1.063 B 1.074 | 1.052 / 1.147 / 1.186 | 1.044 / 1.169 / 1.226 | 1.036 / 1.229 / 1.340 |
+| 12 mm | 1.004 / 1.024 / 1.037 | 1.005 / 1.030 / 1.043 | 1.011 / 1.059 / 1.081 | 1.019 / 1.111 / 1.152 |
+| 50 mm | 1.004 / 1.010 / 1.012 | 1.005 / 1.005 / 1.005 | 1.002 / 1.003 / 1.004 | 1.000 / 1.005 / 1.008 |
+
+*(SH8605's `low` class, 190 pages, `field_low.txt`.)*
+
+A third of a stop of blue at the foot of the sheet, nothing at the centre, and
+`R` almost flat. Three channels moving by different amounts is the signature of
+**yellowing** — a scanner vignette is grey and moves all three together.
+
+So the page is flattened **before** the separation, and the grade then works on
+a page whose paper is one colour everywhere, which is what it has always
+assumed. `r005_field.py` measures the field; this step reads it and applies it.
+`r005_field.py`'s own docstring is the method and carries the measurements
+behind each of its five decisions; the short version is:
+
+1. **Measured on the raw scans, never on the graded page.** The grade clips
+   66–84 % of each page to pure 255; the signal is not attenuated there, it is
+   gone.
+2. **Anchored on each page's own traced box.** The registered A4 window is
+   placed on the 64'er wordmark, and the paper's own edge wanders over an
+   **11.0 mm** range inside it — wider than the whole steep part of the field.
+   This was the single biggest error in the first pass.
+3. **The ink is regressed out as a covariate, not filtered out.** Within one
+   page, "distance from the trim" and "inside the text block" are nearly the
+   same variable, and the ink really does darken the paper around it: holding
+   the block position exactly constant and comparing the pages where that block
+   carries ink against the pages where it is clean, the paper level falls
+   −0.70 DN at 7–12 % coverage, −2.02 at 12–20 %, −3.56 at 20–30 %, −14.12 above
+   45 %. **No percentile removes it** (−3.85 at p85, −3.77 at p95, −3.78 at p98,
+   −3.65 taken inside the ink-free population only): the first pass blamed the
+   selector and was wrong. So `log paper = c + page + v_row + h_col + b(ink)`
+   with `b` non-parametric, and the field is read at `b(ink = 0)` — clean
+   substrate.
+4. **Separable and monotone**: `log gain = gx(x) + gy(y)`, four half-profiles
+   (gutter, fore, top, bottom), each non-decreasing outward from the page centre
+   and exactly 0 there. Monotone because browning is a diffusion front from an
+   edge and cannot contain a bright ring; a free fit grows one out of the ink
+   collinearity above. The constraint costs: whole-page mean |residual| rises
+   from 0.60/0.50/0.48 DN (free additive fit) to 2.07/1.18/0.93 (monotone), paid
+   in the corners where the separable product over-predicts the browning by
+   2–4 DN. Worth paying rather than inventing a ring.
+5. **Mirrored by parity** at application time — an odd page is a recto (fore
+   edge right), an even page a verso.
+
+#### It is not a multiply
+
+A multiply scales the ink with the paper, and **dense ink does not brown with
+the substrate**: measured, the solid-black floor is flat with position, while
+the paper around it is 33 % darker in blue at the foot of the page. A plain
+multiply lifts that floor by up to 0.65 DN — small, but it is the one number on
+the page known to be position-independent, so moving it is a measurable
+fabrication. What is applied instead holds **both** ends fixed:
+
+```
+p_local = Pc / g
+v'      = Pc - (Pc - K) * (p_local - v) / (p_local - K)
+```
+
+`p_local` → `Pc` (the browned paper here reads as the centre's paper), `K` → `K`
+(the ink floor does not move), linear in between, with a soft knee above 235 so
+that a highlight gradient rolls into 255 instead of clipping flat on it.
+
+`Pc` and `K` are **measured on the page**, not taken from the class — over the
+seven validated pages the centre paper runs R 184.0–211.2 and the ink floor
+R 24.1–32.5 — and both are written into the page's stamp, because the field
+file alone does not reproduce the pixels. A page that cannot measure one of its
+own (a full-bleed colour page has no paper at its centre) falls back on the
+class median, which is in the field file for exactly that reason, and **says so
+in its note**.
+
+#### The amplitude is 1.0, and that is a measurement
+
+| alpha | paper \|R−B\| gap to the page's own centre |
+|---|---|
+| none | 16.42 DN |
+| **1.00** | **3.31 DN** |
+| 1.25 | 4.25 |
+| 1.50 | 7.97 |
+| 2.00 | 17.64 — *worse than no correction at all* |
+
+Over-correcting does not trade neutrality for punch; past 1.0 the fitted field
+keeps rising where the paper has stopped browning. 1.0 is the owner's decision
+(2026-10-08) and the measured optimum, and it is a named constant,
+`FIELD_ALPHA`, so the number is in the source rather than implied by its
+absence.
+
+#### One field per paper class — and a class that cannot have one
+
+The field is a property of a **stock**, so it is measured and applied **per
+paper class**, through the same `grade_for(page)` lookup that picks the anchors.
+`field_low.txt` sits beside `colors.txt`; a class with no profile of its own
+(`"high": null`) has its field beside the issue descriptor.
+
+A class that cannot support a fit gets an **identity** field — gain 1.0
+everywhere — and it is **written down** rather than skipped, because "no file"
+and "a stock that cannot be fitted" are different facts and a master has to be
+able to say which of them made it. Two explicit tests, both of which fire on
+SH8605's `high` class:
+
+| test | constant | SH8605 `high` |
+|---|---|---|
+| enough pages | `FIELD_MIN_PAGES` = 24 | **8 pages** |
+| one piece of paper | `FIELD_SIZE_SPREAD_MM` = 10 | **88.8 mm** of interdecile spread — the wrapper traces 210–214 × 296–298 mm, the Zahlkarte 150 × 208 |
+
+The page floor is **measured, not chosen.** SH8605's own field was refitted on
+random subsets of *n* pages, six draws each, and the gain 2 mm from each edge
+compared against the full fit — `|dgain|` over the twelve (side, channel) pairs:
+
+| n pages | 6 | 12 | 18 | **24** | 32 | 48 | 96 |
+|---|---|---|---|---|---|---|---|
+| mean worst pair | .0291 | .0191 | .0109 | **.0085** | .0113 | .0086 | .0042 |
+| max worst pair | .0475 | .0344 | .0191 | **.0116** | .0245 | .0120 | .0065 |
+
+0.01 of gain is about 2 DN of paper — the point below which the correction is
+better than nothing at *every* edge and not only on average — and 24 is where
+both rows first sit under it. At 12 the worst edge is out by 0.034, a tenth of
+the whole bottom-edge correction applied in the wrong direction. Between 18 and
+48 the curve is flat, so the floor is not sensitive to where in that range it is
+put. It is a statement about the **ink covariate** and not about pixel counts:
+one page already gives ~3000 blocks, but `b(ink)` is identified only by pages
+putting their ink in different places, and that is what runs out first.
+
+The size test is the **interdecile** spread and not min–max, and is made on the
+150 dpi thumbs with the production tracer, because the question is whether the
+class has two modes and not whether one page's trace failed: SH8605's `low`
+class contains p035, whose trace locks onto the interior of a dark-ground ad and
+reads 173.6 × 254.6 mm, and min–max would therefore be 45 mm and the whole
+interior would lose its correction over one bad page.
+
+#### The guard on a bad traced box
+
+`field_box_ok()` is **one** test, read by both halves: `FIELD_PAGE_MM` =
+205–212 × 293–301 mm, tighter than `PAGE_CLASSES` on purpose, because the size
+gate's ±6 mm asks *"would the fill eat type"* and a few mm of fabricated margin
+is survivable, while the field asks *"where is the edge"* and the fitted gain
+moves 13 % of its range over 4 mm there.
+
+**And the honest size of what it buys, measured rather than asserted.**
+Refitting SH8605's field with p193's bad box included moves the fitted gain
+2 mm from the edges by at most **0.00016** — one bad box in 190 pages cannot
+bend a median-polished fit, and this rule's first draft claimed it could. The
+gate earns its place on the other side: the **application** is not an average
+over pages, so a page whose box is not its page has its *whole* gain field
+placed where the page is not, and nothing downstream can see it. On a class at
+the 24-page floor one bad box is also 4 % of the fit, which is no longer
+nothing.
+
+`r005_field.py` **rejects such a page by name** and counts it in the field
+file's own provenance; `r005_masters_sheet.py` leaves such a page uncorrected
+and stamps it `field-sha` = the identity digest, so that the stamp is never a
+claim about pixels the field did not touch. Measured on SH8605, exactly two
+pages:
+
+```
+REJECT p035: the trace matched no page class, so there is no traced page to anchor a field on
+REJECT p193: traced page 204.2 x 297.1 mm is outside the 205-212 x 293-301 mm a field can be anchored on
+```
+
+#### The switch, and the default
+
+`FIELD_CORRECTION = True` in `r005_masters_sheet.py` — **on** is the default and
+the owner's decision. `False` applies nothing on any class and says so in every
+stamp (`field  identity -- switched off at FIELD_CORRECTION`). A module constant
+and not a CLI flag, for the same reason nothing else here is one; it exists
+because this correction is the one thing in this step that invents a tone the
+scanner did not record, so it has to be possible to make the page without it
+and compare.
+
+A class with no field file at all is **not** a refusal, and that is deliberate
+and consistent: a missing `colors.txt` is not a refusal either. The run prints
+one line per class saying so and every stamp of every page of that class reads
+`field  identity -- not measured -- <path>`. This step refuses over exactly two
+things — see *The first action* — and "nobody has measured this stock's field
+yet" is not one of them.
+
 ## The stamp — every artefact says which grade made it
 
 A finished master used to carry no record of the numbers that produced it, and
@@ -725,6 +929,25 @@ So everything this step writes carries the grade's fingerprint — the 8 anchors
 the 4 level lines, and a 12-hex `grade-sha` over exactly those — plus
 **`paper-class`**, the name of the class whose profile made this page, plus what
 was decided about the page's geometry.
+
+**And `field-sha` beside it, carried exactly the same way.** Two things decide a
+pixel now: the profile, and the paper-yellowing field. A master that names one
+of them cannot say what produced it. The digest is over the field's numbers
+alone, as `grade-sha` is over the profile's alone; the `field` line says which
+file they came from, whether it is fitted or identity, and at what alpha, and
+`field-anchors` gives the page's own two ends of the affine map, which are
+measured per page and are therefore not in the field file:
+
+```
+grade-sha    f02fda38752c
+field-sha    59bbbe19fc02
+field        .../issues/SH8605/field_low.txt (fitted, step 0.5 mm, alpha 1.00)
+field-anchors Pc 211.2/190.8/179.3  K 24.8/22.3/21.5  (Pc own centre, K own floor)
+```
+
+A page the field could **not** be anchored on carries the *identity* digest and
+`field  identity -- NOT APPLIED -- <why>`, never the fitted one: the stamp must
+not be a claim about pixels the field did not touch.
 
 The class is deliberately **not** in the digest. `grade-sha` answers *"were
 these pixels made with these numbers?"*, which is a string comparison;
@@ -747,6 +970,7 @@ profile      (none -- the built-in anchors, identity levels)
 | `sheets600/NNN.png` | PNG `Comment` |
 | `cmyk2400/NNN.tif` | TIFF `ImageDescription` |
 | `cmyk2400/NNN.colors.txt` | the profile file the separator was **actually run with**, kept rather than deleted with the scratch directory |
+| `field_<class>.txt` | the field's own numbers, beside the class's `colors.txt`, with its provenance in `#` comments — which pages were fitted, which were rejected and why |
 | the run's log | the whole block once at the top, and `grade <sha>` on every page line (it used to read `grade <sha> level 30%`, from the curve that is gone) |
 
 Three copies because each survives a different accident: the chunk survives the
@@ -1052,6 +1276,171 @@ for stem, mm in sorted(WINDOWS.items()):
         print(f"  FAIL p{stem}: paper p50 {np.median(a[paper]):.0f} < 250 -- "
               f"something is eating the paper")
 PY
+
+# 7. THE PAPER-YELLOWING FIELD.  Five checks, and each of them has been seen to
+#    FAIL against a deliberately planted fault before it was trusted -- the
+#    faults and what they printed are recorded under "What check 7 read" below.
+#
+# 7a. EVERY PAPER CLASS HAS A FIELD FILE, IT PARSES, AND IT ROUND-TRIPS.
+#     FlatField re-emits the body through field_text() instead of digesting the
+#     bytes it read, so this also catches a file this reader cannot reproduce
+#     exactly -- which is the only way `field-sha` can lie.
+python3 - <<'PY'
+import r005_masters_sheet as R
+for klass, f in sorted(R.FIELDS.items(), key=lambda kv: str(kv[0])):
+    p = R.field_path(R.GRADES[klass])
+    print(f"{str(klass):6s} {p}")
+    print(f"       exists {p.exists()} | mode {f.mode} | field-sha {f.sha}")
+    print(f"       {f.summary}")
+    assert p.exists(), (f"no field file for paper class {klass!r} -- "
+                        f"run r005_field.py")
+    if f.mode == "fitted":
+        body = "version 1" + p.read_text().split("version 1", 1)[1]
+        assert body == f.text, "the field file does not re-emit identically"
+        print(f"       half-page {f.half[0]:.2f} x {f.half[1]:.2f} mm, step "
+              f"{f.step:g} mm, {len(f.gain['R']['bottom'])} samples/profile, "
+              f"round-trips")
+PY
+
+# 7b. THE STAMP: every master names the FIELD that made it, and it is the
+#     current one for that page's paper class -- or the IDENTITY digest, which
+#     is what a page whose traced box the field could not be anchored on must
+#     carry.  A string comparison, like check 5, and for the same reason.
+python3 - <<'PY'
+import hashlib, os, re
+import r005_masters_sheet as R
+ident = hashlib.sha1(R.field_text("identity").encode()).hexdigest()[:12]
+bad = []
+for f in sorted(os.listdir(R.OUT_MASTER)):
+    if not f.endswith(".stamp.txt"):
+        continue
+    s = (R.OUT_MASTER / f).read_text()
+    page = int(f[:3])
+    sha = re.search(r"^field-sha\s+(\S+)$", s, re.M).group(1)
+    w, h = (float(v) for v in
+            re.search(r"^page-size\s+([\d.]+) x ([\d.]+) mm$", s, re.M).groups())
+    anchored = R.field_box_ok(w, h)
+    want = R.field_for(page).sha if anchored else ident
+    ok = sha == want
+    bad += [] if ok else [f]
+    print(f"{f[:3]} {sha} {'anchored    ' if anchored else 'NOT ANCHORED'}",
+          "CURRENT" if ok else f"*** WRONG or STALE (want {want}) ***",
+          "|", re.search(r"^field\s+(.*)$", s, re.M).group(1))
+assert not bad, f"{len(bad)} master(s) do not name the current field: {bad}"
+PY
+
+# 7c. CENTRE GAIN IS EXACTLY 1.0, per channel and either parity.  The whole
+#     correction is defined relative to the page's own centre -- Pc is measured
+#     there -- so a centre gain other than 1.0 is a global tone shift wearing a
+#     flat field's clothes, and nothing downstream could see it.
+python3 - <<'PY'
+import numpy as np
+import r005_masters_sheet as R
+for klass, f in sorted(R.FIELDS.items(), key=lambda kv: str(kv[0])):
+    if f.mode != "fitted":
+        print(f"{str(klass):6s} identity -- gain is 1.0 everywhere")
+        continue
+    for recto in (True, False):
+        g = f.gain_at([0.0], [0.0], recto)[0, 0]
+        print(f"{str(klass):6s} {'recto' if recto else 'verso'} centre gain "
+              f"R {g[0]:.6f} G {g[1]:.6f} B {g[2]:.6f}")
+        assert np.allclose(g, 1.0, atol=1e-6), "centre gain is not 1.0"
+PY
+
+# 7d. ALL FOUR HALF-PROFILES ARE MONOTONE outward from the page centre, and
+#     start at exactly 1.0.  Monotonicity is the constraint that keeps the ink
+#     collinearity (see the rule) from putting a bright RING into the field,
+#     and it is imposed by a cumulative maximum inside the fit -- so if it ever
+#     stops holding, something between the fit and the file has reordered or
+#     re-rounded the samples.
+python3 - <<'PY'
+import numpy as np
+import r005_masters_sheet as R
+for klass, f in sorted(R.FIELDS.items(), key=lambda kv: str(kv[0])):
+    if f.mode != "fitted":
+        print(f"{str(klass):6s} identity -- no profiles")
+        continue
+    for cn in "RGB":
+        for side in R.FIELD_SIDES:
+            g = f.gain[cn][side]
+            d = np.diff(g)
+            print(f"{str(klass):6s} {cn} {side:7s} centre {g[0]:.5f} -> edge "
+                  f"{g[-1]:.5f}   worst step {d.min():+.5f}")
+            assert g[0] == 1.0, f"{cn} {side} does not start at 1.0"
+            assert d.min() >= 0.0, f"{cn} {side} is not monotone outward"
+PY
+
+# 7e. PAPER NEUTRALITY AT THE EDGES, MEASURED ON THE PUBLISHED MASTER.  This is
+#     the check that the correction did what it is for: the ink-free paper in a
+#     band 2/6/12/25 mm inside each traced edge must read as the same colour as
+#     the page's own centre.  Bands are taken 20 mm clear of the corners, and a
+#     band whose "paper" does not come out at 230 or above is full-bleed art and
+#     is skipped -- otherwise a photograph running to the trim is measured as
+#     yellowed paper.
+#
+#     MEASURED on SH8605's 099 120 114 162 008, built both ways: mean
+#     |d(R-B)| to the page centre 6.12 DN with the field off and 0.58 with it
+#     on, worst band 28.83 -> 2.87.  The ceilings below are ~3x the measured
+#     value and under a third of the uncorrected one, so they sit in the middle
+#     of a gap an order of magnitude wide.
+python3 - <<'PY'
+import re, sys
+import numpy as np
+from PIL import Image
+import r005_masters_sheet as R
+Image.MAX_IMAGE_PIXELS = None
+PAGES = ["099", "120", "114", "162", "008"]   # <- this issue's sampled pages
+BANDS, GUTTER_MM, HALF_MM, PAPER_MIN = (2, 6, 12, 25), 20.0, 1.5, 230.0
+MEAN_MAX, WORST_MAX = 2.0, 6.0
+
+def paper(rgb):
+    C = rgb.reshape(-1, 3).astype(np.float64)
+    L = C @ R.FIELD_LUM
+    sel = C[L >= np.percentile(L, 85)]
+    if len(sel) < 500:
+        return None
+    m = sel.mean(0)
+    return m if m @ R.FIELD_LUM >= PAPER_MIN else None
+
+gaps = []
+for stem in PAGES:
+    s = (R.OUT_MASTER / f"{stem}.stamp.txt").read_text()
+    pw, ph = (int(v) for v in
+              re.search(r"^page-px\s+(\d+) (\d+)$", s, re.M).groups())
+    a = np.array(Image.open(R.OUT_MASTER / f"{stem}.png").convert("RGB"))[:ph, :pw]
+    g, hw, c = int(GUTTER_MM * R.MM), int(HALF_MM * R.MM), int(18 * R.MM)
+    ctr = paper(a[ph // 2 - c:ph // 2 + c, pw // 2 - c:pw // 2 + c])
+    if ctr is None:
+        print(f"p{stem}: no paper at the page centre -- skipped"); continue
+    for name in ("bottom", "top", "gutter", "fore"):
+        for d in BANDS:
+            lo, hi = int(d * R.MM) - hw, int(d * R.MM) + hw
+            sl = {"top": (slice(lo, hi), slice(g, pw - g)),
+                  "bottom": (slice(ph - hi, ph - lo), slice(g, pw - g)),
+                  "gutter": (slice(g, ph - g), slice(lo, hi)),
+                  "fore": (slice(g, ph - g), slice(pw - hi, pw - lo))}[name]
+            v = paper(a[sl])
+            if v is None:
+                continue
+            gaps.append((stem, name, d,
+                         (v[0] - v[2]) - (ctr[0] - ctr[2]),
+                         (v @ R.FIELD_LUM) - (ctr @ R.FIELD_LUM)))
+for name in ("bottom", "top", "gutter", "fore"):
+    for d in BANDS:
+        v = [x for x in gaps if x[1] == name and x[2] == d]
+        if v:
+            print(f"  {name:7s} {d:3d} mm   |d(R-B)| "
+                  f"{np.mean([abs(x[3]) for x in v]):6.2f}   dL "
+                  f"{np.mean([x[4] for x in v]):+7.2f}   n={len(v)}")
+mean = np.mean([abs(x[3]) for x in gaps])
+worst = max(gaps, key=lambda x: abs(x[3]))
+print(f"  ALL BANDS: mean |d(R-B)| {mean:.2f} DN (max {MEAN_MAX}), "
+      f"worst band p{worst[0]} {worst[1]} {worst[2]} mm "
+      f"{abs(worst[3]):.2f} DN (max {WORST_MAX})")
+assert mean <= MEAN_MAX, (f"the paper at the page edges is {mean:.2f} DN off "
+                          f"the page's own centre -- the field is not working")
+assert abs(worst[3]) <= WORST_MAX, f"band {worst[:3]} is {abs(worst[3]):.2f} DN off"
+PY
 ```
 
 ### What it read, on the twelve pages verified
@@ -1104,6 +1493,73 @@ Kept as the record of what the curve did when there was one:
 | 092 | 4.0 % | 87 → **15** | 255 → 255 |
 
 **p117 fails, and nothing was published for it** — see below.
+
+### What check 7 read, and the fault each check was seen to catch
+
+**A check that has never been seen to fail is not a check.** Every one of 7a–7e
+was run twice: once against a real build, and once against a deliberately
+planted fault. Measured on SH8605 — `field_low.txt` fitted on 190 pages,
+`field_high.txt` identity, and masters built for 099, 120, 114, 162, 008 and
+193 both with the field and with `FIELD_CORRECTION = False`.
+
+| check | on the real build | planted fault | what it printed |
+|---|---|---|---|
+| **7a** exists / parses / round-trips | `low` fitted `59bbbe19fc02`, 298 samples per profile, round-trips; `high` identity `038549436824` | `field_low.txt` removed | `AssertionError: no field file for paper class 'low' -- run r005_field.py` |
+| | | `gain G top` renamed to `gain G middle` | `r005: …/field_low.txt: bad gain line gain G middle` |
+| | | one sample respelled `1.00000` → `1.0` (same number) | `AssertionError: the field file does not re-emit identically` |
+| **7b** the stamp names the current field | all six masters CURRENT; 193 `NOT ANCHORED`, carrying the identity digest | one digit of p120's `field-sha` changed | `120 59bbbe19fc03 … *** WRONG or STALE (want 59bbbe19fc02) ***` then `AssertionError: 1 master(s) do not name the current field: ['120.stamp.txt']` |
+| **7c** centre gain is 1.0 | `1.000000 / 1.000000 / 1.000000`, both parities | the whole `gain B fore` profile × 1.003 | `AssertionError: centre gain is not 1.0` |
+| **7d** four monotone profiles | worst step `+0.00000` on all twelve | one mid-profile sample of `gain B bottom` pushed down by 0.004 | `B bottom  centre 1.00000 -> edge 1.35234  worst step -0.00400` then `AssertionError: B bottom is not monotone outward` |
+| **7e** paper neutrality at the edges | mean \|d(R−B)\| **0.58 DN**, worst band 2.87 | the same five pages built with `FIELD_CORRECTION = False` | `ALL BANDS: mean |d(R-B)| 6.12 DN (max 2.0), worst band p099 bottom 2 mm 28.83 DN` then `AssertionError: the paper at the page edges is 6.12 DN off the page's own centre -- the field is not working` |
+
+A centre gain other than 1.0 is necessarily a profile that does not start at
+1.0, so 7c's fault trips 7d as well; the reverse is not true, which is what the
+7d fault shows.
+
+**7e, band by band, on the published master** — five pages, mean over them:
+
+| band | OFF \|d(R−B)\| | ON \|d(R−B)\| | OFF dL | ON dL |
+|---|---|---|---|---|
+| bottom 2 mm | 22.93 | 0.57 | −9.70 | +3.34 |
+| bottom 6 mm | 20.75 | 0.57 | −8.32 | +3.34 |
+| bottom 12 mm | 8.52 | 0.57 | +1.06 | +3.34 |
+| top 2 mm | 16.59 | 0.57 | −5.79 | +3.34 |
+| top 6 mm | 9.54 | 0.57 | −0.39 | +3.34 |
+| gutter 2 mm | 5.95 | 0.57 | +1.79 | +3.34 |
+| fore 2 mm | 4.50 | 0.57 | +1.86 | +3.34 |
+| **all 16 bands** | **6.12** | **0.58** | +0.63 | +3.38 |
+
+0.57 is the floor of the measurement, not a residual: on the graded master the
+paper is at 255 and `R − B` of a clipped white is 0, so a band that reads 0.57
+is a band that has become paper white like the centre. That is also why the
+**raw** figures in *The amplitude is 1.0* (16.42 → 3.31 DN) are the ones to
+quote for the method and these are the ones to quote for the artefact.
+
+**And the bad-box guard, planted the other way round.** With `FIELD_PAGE_MM`
+widened to 160–220 × 250–310 mm, p193 is accepted into the fit and
+`field_box_ok(204.2, 297.1)` returns `True`, i.e. the application would correct
+it too. p035 is *still* rejected, by the independent `uncropped sheet` test —
+two guards, and only one of them is a millimetre range.
+
+### The switch, proved against the masters that were already there
+
+A one-off measurement, recorded because it cannot be re-run once this change is
+the only code there is. SH8605's `masters600/` was built by the code *before*
+this correction existed. Rebuilding 099, 120, 114, 162, 008, 193, 001 and 197
+with `FIELD_CORRECTION = False`:
+
+| page | field off | field on |
+|---|---|---|
+| 099 120 114 162 008 | **bit-identical** to the published master | 22–41 % of pixels move, max \|d\| 85–107 |
+| 193 (box not anchorable) | bit-identical | **bit-identical** — the guard really does leave it alone |
+| 001 197 (`high`, identity field) | bit-identical | **bit-identical** |
+
+So the switch is a true switch: off, this step produces the same masters it
+produced before `level_and_trace()`, `Traced.locate()`, `FlatField` and the
+extra stamp lines existed. That is the check that the refactor moved code and
+nothing else — including on the `ink/bed` pages, which the sampled low-class
+pages never exercise.
+
 
 ## Known outliers — two pages of 152 do not trace
 
@@ -1183,3 +1639,14 @@ still the thing that settles the count, and it has not been run.
   every master's pixel size and every page-fraction downstream of it. Wipe
   `masters600/` and start from page 1, as above — this is not a change that can
   be made for one page.
+- **The flat-field correction is in this variant only.** `r005_masters_spread`
+  shares nothing with this file — it imports its constants and its grade from
+  `r005_masters.py` — so a *spread*-bound issue gets no field, and its stamps
+  carry no `field-sha`. Measuring a field for a clipped spread is a different
+  geometry problem (two pages per frame, one of them with the facing page's
+  gutter) and nobody has measured it.
+- Levelling, masking and tracing now live in `level_and_trace()` /
+  `Traced.locate()` rather than inline in `process()`, because `r005_field.py`
+  needs **the same** four traced lines the master will be cut on — the field is
+  anchored on that box. Two spellings of "where is the paper" would drift page
+  by page and the drift would be invisible.

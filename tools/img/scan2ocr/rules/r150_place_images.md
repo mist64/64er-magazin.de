@@ -65,10 +65,28 @@ Checksummer's sequence and be placed in the wrong article.
 lowercase because Verification 1 matches `[0-9]+-[0-9a-z_]+\.png` and the
 corpus has **0** PNG names with a capital in them.
 
+> **ERRATUM, 2026-10-07.** This table first gave the unnumbered-picture case as
+> `<page>-p<n>`, taken from SH8604's errata *proposal* and codified without
+> checking the corpus. **The corpus has 0 `-p<n>` names and 36 `-x` ones**, and
+> `-x` already meant exactly this. The rows below are the measured convention.
+> A naming rule is settled by counting the corpus, not by adopting the
+> suggestion that surfaced it.
+>
+> **And then counted twice.** The first count found 27 and reported the two
+> forms below it; it missed the 9 `-x<n>` names entirely, because the regexes
+> looked for `-x` and `-<n>x` and the third form puts the digit AFTER the x.
+> Found by SH8605 when a rule built on the short count told it to invent a
+> pairing that its page did not have. **A count that drives a rule is only as
+> good as the pattern you counted with** — enumerate what is actually there
+> (`ls | grep -E '\-[0-9a-z]*x[0-9a-z]*\.'`) before concluding a form does
+> not exist.
+
 | shape | name | why |
 |---|---|---|
 | an **uncaptioned boxed table** | `<page>-ta`, `-tb`, … | it is a table, so it joins the `t` series, but it has no printed number to take — letters keep it out of the numbered run |
-| an **uncaptioned non-lead picture** | `<page>-p<n>` | not a Bild (no printed number), not the lead (`-00`). A portrait beside a byline is the usual case |
+| an **unnumbered figure, standalone** | `<page>-x` | **`-x` means it lacks a printed number** (owner, 2026-10-07), and it is not a lead or author image, which take `-0` / `-00`. 6 in the corpus |
+| an **unnumbered figure belonging with Bild n** | `<page>-<n>x` | the same, where the figure sits with a numbered one. 21 in the corpus, and **all 21 have a plain `<page>-<n>` sibling** — that pairing is what the form means |
+| **SEVERAL unnumbered standalone figures** in one article | `<page>-x<n>`, numbered in page order | 9 in the corpus — `8511/9-x1 … 9-x6` in *9 Aktuell*, `8510/126-x1 … 126-x3` in *Dem Klang auf der Spur (Teil 9)* — and every one is placed in its article's HTML. Use this, not `-<n>x`, when the figures sit with NO numbered Bild: `-<n>x` would invent a pairing the page does not have |
 | a numbered Bild the owner has **already typeset** | no file — listed `typeset` in the worklist | owner-crop-wins in reverse: where the typeset version is the delivered one, there is no PNG, and the worklist says so rather than leaving a gap that reads as a lost image |
 
 **And `-t0` is the rule, not `-t1`.** SH8603's worklist HEADER says an
@@ -330,6 +348,49 @@ Image filenames follow `<startpage>-<figurenum><suffix>.png`, e.g.
     `<img class="inline" src="…" alt="…">` without `<figure>`
     wrapper.
 
+## TEXT IS THE PRINT'S. POSITION IS OURS.
+
+Owner, 2026-10-07: *"if two image references are swapped, you can still
+position them correctly. dont change any text, but the positioning is yours."*
+
+This is the fidelity boundary for this step, and it cuts cleanly:
+
+- **Every character is the print's.** Captions verbatim, prose verbatim, a
+  printed typo kept as a printed typo (r325). Nothing in this section licenses
+  touching a word.
+- **Where an image sits on OUR page is ours.** The HTML reflows — one column
+  instead of three, a different measure, a different page break — so the
+  print's physical arrangement is not something we reproduce in the first
+  place. Choosing which image goes with which caption is the same kind of
+  decision as choosing where in the prose a figure lands, and this rule is
+  already full of such choices (first mention, *never leave an orphan at the
+  end*, a series placed between its neighbours).
+
+**So when the print pairs a caption with the wrong image, place the image the
+caption describes.** The reader gets a correct pairing and an unaltered text.
+
+MEASURED on SH8605's 69, p72: *"Bild 2. Die Bedeutung der ADSR-Hüllkurve"* is
+printed under the Hüllkurven-Beispiele TABLE, and *"Bild 3. Einige ADSR-Werte
+und die dazugehörigen Hüllkurven"* beside the ADSR BOX — while the article
+says *"Beispiel d in Bild 2"* and *"Bild 3 zeigt einige Hüllkurvenbeispiele"*.
+The images go with the captions that describe them. No text changes, and no
+Futureteufelchen is needed, because nothing the reader sees is wrong.
+
+**THE FILE NAME DOES NOT MOVE WITH THE IMAGE.** The crop keeps the name the
+owner delivered it under — that name records which figure on the page it was
+cut from, which is a fact and stays true. So after a repositioning the file
+name and the caption it now sits under will deliberately DISAGREE: SH8605's
+`69-2.png` is the table, delivered as Bild 2 because the page prints it there,
+and it is placed under Bild 3's caption because that is what Bild 3 describes.
+That mismatch is correct and must not be "fixed" by a later pass. Record the
+reason in `LOG.md`; do not put it in an HTML comment, which is reader-facing
+German and never a process note.
+
+**What this does NOT license.** It is about position only. A caption that is
+wrong in its WORDS is still r300/r325's business and is recorded, not
+rewritten. If you find yourself editing a character to make a pairing work,
+you have left this rule.
+
 ## What is NOT a figure
 
 **A cartoon is a filler, not part of the article.** Signed or not, a cartoon set
@@ -338,6 +399,36 @@ put one on the worklist. (Owner, 2026-10-04, on SH8602's `58-29`, a signed
 cartoon at the end of the Sprites article that the survey had proposed as a
 DRAWING. Nothing in this rule said so, and "every figure the pages call for"
 invites it.)
+
+**AND A CARTOON ON THE ARTICLE'S OWN SUBJECT IS STILL A CARTOON.** The
+paragraph above says "set in leftover space", which reads as a test of
+PLACEMENT and lets a topical one through. Owner, 2026-10-07, on SH8605's p8 bit
+and byte cartoons and the p22 crocodile box: *"i didn't do any of the cartoons,
+as always. usually they are not connected to articles. this time they are, but
+they are still not helpful, and not referenced or labeled, so let's omit
+them."*
+
+So the test is not where it sits or what it depicts. **A cartoon is omitted
+unless the body text REFERENCES it or the print LABELS it** — and if either is
+true it is not a cartoon, it is a Bild with a number or a figure the prose
+calls for. Being about the subject is not enough.
+
+**BUT THIS RULE GOVERNS THE WORKLIST, NOT THE DELIVERY. A CROP THAT ARRIVES IS
+PLACED.** Owner, 2026-10-07: *"if they are delivered, they are not dropped. i
+am deliberate about what goes into crops."* The owner does not cut cartoons, so
+a worklist row for one normally comes back undelivered — and that silence is
+the answer, not an omission to chase. But if a crop IS in the delivery, the
+decision has already been made and it is not ours to revisit: place it.
+
+This is the same principle as *owner crop wins* elsewhere in the chain. Judging
+a delivered PNG against this section and holding it back inverts who decides.
+MEASURED on SH8605: `6-00` and `6-000`, the p8 bit and byte cartoons, were
+delivered; they were set aside as cartoons and had to be put back. **The test
+in this section tells you what not to ASK for. It never tells you to refuse
+what you were given.**
+
+(The NAME of a delivered crop is a different matter and may well be wrong —
+see *renaming is authorised* above. Rename it and place it; do not drop it.)
 
 ## A listing full of unreadable glyphs is cut WHOLE, not glyph by glyph
 

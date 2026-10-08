@@ -1,0 +1,37 @@
+
+
+;abrakadabra.prg ==0801==
+   10 rem *** neue zeichenmuster ***
+   20 printchr$(147)"abrakadabra"
+   30 rem --- ram schuetzen ---
+   40 poke 52,48:poke 56,48
+   50 rem --- unterbrechung abschalten ---
+   60 poke 56334,peek(56334)and254
+   70 rem --- zeichenrom einschalten ---
+   80 poke 1,peek(1)and251
+   90 rem --- ml-programm erzeugen ---
+  100 for i=49152 to 49158:reada:pokei,a:nexti
+  110 data 133,95,134,96,76,191,163
+  120 rem --- kopieren zeichenrom ---
+  130 qs=53248:qe=qs+4096:rem zeichenrom
+  140 ze=12288+4096:rem neues zeichenram
+  150 a=int(qs/256):poke781,a:poke780,qs-256*a
+  160 a=int(qe/256):poke91,a:poke90,qe-256*a
+  170 a=int(ze/256):poke89,a:poke88,ze-256*a
+  180 sys49152
+  190 rem --- normalzustand herstellen ---
+  200 poke 1,peek(1)or4
+  210 poke56334,peek(56334)or1
+  220 rem -- vic auf neue zeichenquelle --
+  230 poke 53272,(peek(53272)and240)or12
+  240 rem --- zeichen a veraendern ---
+  250 c=1:rem code fuer zeichen a
+  260 s=12288+8*c:rem start muster von a
+  270 for i=0 to 7
+  280 :read a:pokes+i,a
+  290 next i
+  300 data 102,0,24,24,129,102,60,0
+  310 rem --- programmende ---
+  320 stop
+  330 poke 53272,21:poke 52,160:poke 56,160:end
+

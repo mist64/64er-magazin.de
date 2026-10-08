@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Drucken ohne Rätsel</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Karsten Schramm, aw">
+    <meta name="64er.issue" content="Sonderheft 5/86">
+    <meta name="64er.pages" content="114-118">
+    <meta name="64er.head1" content="Grundlagen">
+    <meta name="64er.head2" content="C 64/C 128">
+    <meta name="64er.toc_category" content="Software-Grundlagen">
+    <meta name="64er.index_category" content="Hardware-Grundlagen|Drucker">
+    <meta name="64er.id" content="drucker-steuerung">
+</head>
+
+<body>
+    <article>
+        <h1>Drucken ohne Rätsel</h1>
+        <p class="intro">Wenn man sich ein wenig intensiver mit seinem Computer beschäftigt, so ist die Anschaffung eines Druckers in der Regel unvermeidlich. Es handelt sich dabei nicht etwa um Luxus, sondern vielmehr um ein sehr hilfreiches Zusatzgerät, das einem die Arbeit stark erleichtert. Es stellt sich dabei natürlich vielfach die Frage, wie ein solcher Drucker prinzipiell angesprochen oder bedient wird.</p>
+
+        <figure>
+            <img src="114-0.png" alt="Nahaufnahme der Mechanik eines Druckers mit Druckkopf, Flachbandkabel und Walze">
+        </figure>
+
+        <p>Wir wollen Ihnen nun zeigen, wie die gängigsten Drucker für den C 64 angesprochen werden. Es soll erläutert werden, welche Möglichkeiten ein Drucker bietet und wie diese Möglichkeiten genutzt werden können. Bei den Druckern für den Commodore 64 und anderen Heim- oder Personal-Computern handelt es sich in der Regel um sogenannte Matrixdrucker. Das heißt nichts anderes, als daß der Drucker die einzelnen Zeichen aus winzigen Punkten zusammensetzt, wobei jeder Punkt durch eine Nadel, die gegen ein Farbband auf das Papier schlägt, gedruckt wird. Genauere Angaben zur Funktionsweise eines solchen Matrixdruckers finden Sie im Artikel »Ohne Drucker geht es nicht – eine Entscheidungshilfe«.</p>
+
+        <p>Es stellt sich nun natürlich die Frage, wie ein Drucker die Informationen verarbeitet, die vom Computer kommen und vor allem, wie der Benutzer einen Ausdruck herstellen kann. Um das genauer zu verstehen, müssen wir erst einmal begreifen, wie ein Drucker im Prinzip aufgebaut ist. Bei einem der gängigen Matrixdrucker handelt es sich in der Regel um nichts anderes, als um einen vollständigen kleinen Computer, der so wie der C 64 ein eigenes ROM, ein RAM und einen Prozessor besitzt. Zusätzlich ist natürlich noch eine Elektronik zur Steuerung des Druckvorgangs vorhanden. Das ROM des Druckers, also der Festwertspeicher, enthält dabei ein Betriebssystem und die Punktmatrix für jedes einzelne Zeichen, das gedruckt werden kann. Das RAM dient dem Drucker vor allem als Zwischen- und Pufferspeicher. Es erlaubt dem Computer eine effektivere Drucksteuerung. Wenn zum Beispiel ein Text ausgedruckt werden soll, so schickt der Computer die Zeichen an den Drucker. Dieser füllt seinen Pufferspeicher, und während er dann mit dem Drucken des Speicherinhalts beschäftigt ist, kann der Computer wieder andere Arbeiten übernehmen. Der Prozessor des Druckers steuert, wie im Computer auch, sämtliche Abläufe im Drucker. Haben Sie also nun einen Drucker an Ihren Computer angeschlossen, so stellt sich beim Zugreifen auf den Drucker zuerst die Frage, was der Drucker mit den Daten, die Sie ihm schicken, anfangen soll. Dazu muß man wissen, daß ein Drucker normalerweise über zwei verschiedene Betriebsarten verfügt und zwar über eine Betriebsart, in der alle entgegengenommenen Zeichen direkt ausgedruckt werden und eine andere Betriebsart, in der ein Zeichen als Befehl interpretiert wird. Ja, Sie haben ganz richtig gelesen: Ihr Drucker kann verschiedene Befehle ausführen. Zu diesem Zweck hat er einen bestimmten Befehlssatz, der von Druckertyp zu Druckertyp unterschiedlich sein kann; jedoch in wesentlichen Punkten bei den verbreiteten Typen übereinstimmt. Für uns sind im wesentlichen zwei dieser Befehlsformate von Bedeutung. Das ist zum einen der Befehlssatz der Commodore-Drucker oder der Drucker mit Commodore-Interface und zum anderen der Befehlssatz der Epson-Drucker. Der Epson-Befehlssatz ist dabei unter dem ESC/P-Standard (Epson Standard Code for Printers) zusammengefaßt, an den sich die meisten der bekannten Druckertypen halten. Diese Druckertypen sind dabei, wie die Epson-Drucker, mit einer Centronics kompatiblen Schnittstelle ausgestattet und lassen sich an einen C 64 nicht direkt anschließen. Der Anschluß erfolgt hier mit speziellen Interfaces oder über den User-Port mit einer Software-Centronics-Schnittstelle. Dazu kommen wir später. Zuerst sollen uns die Commodore-Drucker interessieren.</p>
+
+        <p>Es stellt sich an dieser Stelle natürlich die Frage, was für einen Sinn die einzelnen Befehle bei den Druckern haben. Diese Frage ist schnell beantwortet: Die Befehle dienen der Wahl der jeweiligen Druckmodi. Wenn Sie ein Zeichen auf dem Bildschirm Ihres Computers ausgeben, so wird das Zeichen so dargestellt, wie der Bildschirm das zuläßt; also in einem bestimmten Punktraster mit einer bestimmten Größe und so weiter – bei einem Drucker ist das anders. Hier gibt es in der Regel sehr verschiedene Möglichkeiten, ein Zeichen zu drucken. Es kann dick, dünn, hoch, niedrig, normal oder invers sein. Darüber hinaus kann der Zeilenabstand zwischen zwei Zeilen eingestellt werden. Bei einem Drucker ist es möglich, die folgende Zeile direkt an die vorhergehende anzuschließen oder einen Zwischenraum zur besseren Lesbarkeit zu lassen.</p>
+
+        <p>Alle diese Einstellungen müssen einem Drucker natürlich mitgeteilt werden. Er muß also wissen, ob er als nächstes einen Befehl ausführen oder ein Zeichen drucken soll. Die Commodore-Drucker lehnen sich dabei verständlicherweise an den Zeichensatz des Computers an. Dieser kann auf dem Bildschirm zum Beispiel mit PRINT CHR$(14) auf Kleinschrift umschalten. Das gleiche geht auch auf einem Commodore-Drucker. Senden Sie den Code CHR$(14) an den Drucker, so werden alle folgenden Zeichen in Groß-/Kleinschrift und nicht mehr in Graphic-/Großschrift ausgegeben. Das folgende kleine Beispiel veranschaulicht dies:</p>
+
+        <pre><code>OPEN 4,4
+PRINT#4,CHR$(14);"Das ist ein Test"
+CLOSE 4</code></pre>
+
+        <p>Es muß jedoch bei dieser Methode darauf geachtet werden, daß der Druckerbefehl in diesem Fall nur für den direkt nachfolgenden Text Gültigkeit hat. Beim Commodore 64 wird jeweils der gesamte Bildschirm umgeschaltet; bei einem Drucker gilt der Befehl nur für die nachfolgende Zeichenkette oder eine einzige Druckzeile. Wie Sie sehen, werden die einzelnen Befehle an den Drucker gesendet, wie jedes andere Zeichen auch. Der Drucker »weiß« dabei ganz genau, daß diese Zeichen nicht gedruckt werden können und führt den Befehl entsprechend aus. Es sei an dieser Stelle vielleicht darauf hingewiesen, daß bei Commodore und auch im amerikanischen ASCII-Zeichenstandard die Zeichen mit den Codes CHR$(0) bis CHR$(31) generell kein druckbares Zeichen, sondern Steuercodes darstellen, die bestimmte Funktionen übernehmen. Der Code 13 steht dabei beispielsweise für den Wagenrücklauf (carriage return), der auf dem Computer dem Drücken der RETURN-Taste entspricht. In Tabelle 1 sind die wichtigsten Steuercodes der Commodore-Drucker MPS 801, 802 und 803 zusammengefaßt.</p>
+        <figure>
+            <table class="right1 right2">
+                <tr>
+                    <th>Drucker-Steuercodes für</th>
+                    <th rowspan="2">MPS 801/803</th>
+                    <th rowspan="2">MPS 802</th>
+                </tr>
+                <tr>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>Bit-Muster-Modus ein (Drucken ohne Zwischenraum!)</td>
+                    <td>CHR$ (8)</td>
+                    <td>–</td>
+                </tr>
+                <tr>
+                    <td>Zeilenvorschub (line feed)</td>
+                    <td>(10)</td>
+                    <td>(10)</td>
+                </tr>
+                <tr>
+                    <td>Wagenrücklauf (carriage return) mit Zeilenvorschub</td>
+                    <td>(13)</td>
+                    <td>(13)</td>
+                </tr>
+                <tr>
+                    <td>Sperrschrift/erweiterte Zeichen</td>
+                    <td>(14)</td>
+                    <td>(14)</td>
+                </tr>
+                <tr>
+                    <td>Standardzeichen ein</td>
+                    <td>(15)</td>
+                    <td>(15)</td>
+                </tr>
+                <tr>
+                    <td>Druckpositionsbestimmung</td>
+                    <td>(16)</td>
+                    <td>(16)</td>
+                </tr>
+                <tr>
+                    <td>Textmodus ein (unshift)</td>
+                    <td>(17)</td>
+                    <td>(17)</td>
+                </tr>
+                <tr>
+                    <td>Reverses Drucken ein (RVS on)</td>
+                    <td>(18)</td>
+                    <td>(18)</td>
+                </tr>
+                <tr>
+                    <td>Seitenaufteilung aus</td>
+                    <td>–</td>
+                    <td>(19)</td>
+                </tr>
+                <tr>
+                    <td>Wiederholen des Bitmusters</td>
+                    <td>(26)</td>
+                    <td>–</td>
+                </tr>
+                <tr>
+                    <td>Druckstartposition – Punktadresse</td>
+                    <td>(27)</td>
+                    <td>–</td>
+                </tr>
+                <tr>
+                    <td>Stringabschluß</td>
+                    <td>–</td>
+                    <td>(29)</td>
+                </tr>
+                <tr>
+                    <td>Anführungszeichen</td>
+                    <td>(34)</td>
+                    <td>(34)</td>
+                </tr>
+                <tr>
+                    <td>Wagenrücklauf ohne Zeilenvorschub</td>
+                    <td>–</td>
+                    <td>(141)</td>
+                </tr>
+                <tr>
+                    <td>Grafik-Modus (hochgeschaltet: shift)</td>
+                    <td>(145)</td>
+                    <td>(145)</td>
+                </tr>
+                <tr>
+                    <td>Reverses Drucken aus (RVS off)</td>
+                    <td>(146)</td>
+                    <td>(146)</td>
+                </tr>
+                <tr>
+                    <td>Seitenaufteilung an</td>
+                    <td>–</td>
+                    <td>(147)</td>
+                </tr>
+                <tr>
+                    <td>Seitenvorschub</td>
+                    <td>–</td>
+                    <td>(12)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Drucker-Steuercodes für MPS 801/803 und MPS 802</figcaption>
+        </figure>
+
+
+        <p>Es sei an dieser Stelle vielleicht darauf hingewiesen, daß der Wagenrücklauf (carriage return; CHR$(13)) und der Zeilenvorschub (line feed; CHR$(10)) normalerweise nichts miteinander zu tun haben. Bei Ihrem Computer sind beide Befehle miteinander verknüpft; und auch ein Commodore-Drucker führt beim Empfangen des Codes 13 einen Wagenrücklauf aus, wobei gleichzeitig in die nächste Zeile gesprungen wird. Im allgemeinen erfolgt bei einem Wagenrücklauf jedoch kein Zeilenvorschub, das heißt, der Cursor auf dem Bildschirm oder der Druckkopf beim Drucker würde auf den Anfang der gleichen Zeile gesetzt. Bei Druckern von Commodore ist das, wie gesagt, miteinander verknüpft. Für andere Druckertypen gilt das jedoch in der Regel nicht. Hier muß der Zeilenvorschub explizit angegeben oder durch Schalter im Inneren des Druckers so eingestellt werden, daß er bei einem Carriage Return automatisch erfolgt. Es sei in diesem Zusammenhang vielleicht auf eine Besonderheit der Commodore-Computer hingewiesen. Wenn Sie zum Beispiel ein Listing ausgeben wollen, so ist eine der gängigen Befehlszeilen dazu folgende:</p>
+
+        <pre><code>OPEN 1,4: CMD 1: LIST &lt;RETURN&gt;</code></pre>
+
+        <p>Hier eröffnen Sie eine Datei mit der Nummer 1 und sprechen darüber den Drucker mit der Geräteadresse 4 an. Der CMD-Befehl sorgt dabei dafür, daß das Listing, das üblicherweise auf dem Bildschirm erscheinen würde, nun auf dem (hoffentlich angeschlossenen) Drucker ausgegeben wird. Der Computer gibt dabei am Ende einer jeden Zeile ein Wagenrücklauf-Kommando an den Drucker, so daß an den Anfang der nächsten Zeile zurückgegangen wird. Eröffnen Sie jedoch eine Datei mit einer Nummer, die größer als 128 ist, so schickt der Computer zusätzlich zu dem normalen Wagenrücklauf noch ein Line-Feed-Kommando an den Drucker. Das erlaubt die Ausgabe eines Listings mit freigelassenen Zwischenräumen zwischen zwei Zeilen. Bei Druckern, die bei einem Carriage Return nicht automatisch auch ein Line Feed senden, erlaubt diese Anwendung einen einwandfreien Ausdruck, ohne daß die DIP-Schalter, die oft im Inneren des Druckers liegen, angetastet werden müssen. Zu dieser Befehlsfolge ein Beispiel:</p>
+
+        <pre><code>OPEN 129,4: CMD 129: LIST &lt;RETURN&gt;</code></pre>
+
+        <p>Außer den schon erwähnten Befehlscodes, die wie einfach zu druckende Zeichen an den Drucker übertragen werden, gibt es bei einigen Commodore-Druckern und Kompatiblen, beziehungsweise Druckern mit einem Commodore-Interface noch eine andere Art der Befehlsübertragung; nämlich die Sekundäradressen im OPEN-Befehl.</p>
+
+        <p>Bei einem normalen Ausdruck wird die Sekundäradresse in der Regel nicht benötigt und deshalb auch nicht angegeben. Der Computer setzt dann automatisch eine Null. Diese Null ist jedoch auch für einen Commodore-Drucker ein Befehl und »sagt« diesem, daß er die nun folgenden Zeichen als Großbuchstaben und Grafikzeichen ausdrucken soll (es sei denn, der Befehl CHR$(14) fordert etwas anderes). In Tabelle 2 sehen Sie die Sekundäradressen der Commodore-Drucker mit ihren jeweiligen Funktionen aufgeführt.</p>
+        <figure>
+            <p><b>Sekundäradressen im »Open«-Befehl beim MPS 802:</b></p>
+            <table class="plain right0">
+                <tr>
+                    <td>0</td>
+                    <td>Drucken von Großbuchstaben und Grafikzeichen (Grafik-Modus)</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Drucken der Daten nach einem vorher definierten Format</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Speicherung der Formatierungsdaten</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Angabe der Zeilenanzahl pro Seite</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Absetzen der Format-Fehlerdiagnose-Nachricht</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Definition eines programmierbaren Zeichens</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Spezifizierung von Leerzeilen zwischen gedruckten Zeilen</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Drucken von Klein- und Großbuchstaben (Textmodus)</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>nicht benutzt</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>Unterdrückung des Drucks von Fehlerdiagnose-Nachrichten</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>Drucker in Grundstellung zurücksetzen</td>
+                </tr>
+            </table>
+            <p>Eine »Datei«-Nummer größer als 127 im »OPEN«-Befehl bewirkt im Ausdruck einen doppelten Zeilenvorschub; es wird also jeweils eine Leerzeile ausgegeben (zum Beispiel in einem Listing).</p>
+            <p>zum Beispiel OPEN 130,4,0</p>
+            <figcaption>Tabelle 2. Sekundäradressen im »OPEN«-Befehl beim MPS 802</figcaption>
+        </figure>
+
+
+        <p>Wie schon erwähnt, wirkt der Code CHR$(14) nur jeweils für die direkt darauffolgenden Daten. Soll nun ein ganzer Text in Klein-/Großbuchstaben ausgedruckt werden, so ist die Verwendung der Sekundäradresse 7 sinnvoll. Hier wird der Drucker komplett in den Klein-/Großschriftmodus umgeschaltet, und es ist dann zum Beispiel möglich, ein Listing in Klein-/Großschrift auszudrucken:</p>
+
+        <pre><code>OPEN 1,4,7: CMD 1: LIST &lt;RETURN&gt;</code></pre>
+
+        <p>Die Bedienung der Drucker von Commodore, oder die Bedienung von Druckern mit einem Interface, das den entsprechenden Drucker einen Commodore-Drucker simulieren läßt, ist also recht einfach. Es werden sowohl Zeichencodes als auch Sekundäradressen für die Druckersteuerung verwendet. Anders verhält es sich bei Epson-Druckern und Epson-Kompatiblen. Hier erfolgt die Befehlsübergabe ein wenig anders, da diese Drucker in der Regel einen viel größeren Befehlsvorrat besitzen und die Anzahl der »normalen« Steuerzeichen begrenzt ist. Außerdem verfügen diese Drucker in der Regel über eine Centronics-kompatible Schnittstelle, um an die meisten Computer angeschlossen werden zu können. Diese Computer können aber in der Regel nicht mit Sekundäradressen arbeiten, so daß auch diese Möglichkeit der Befehlsübermittlung wegfällt.</p>
+
+        <p>Hier (im ESC/P-Standard) arbeitet man mit sogenannten Escape-Sequenzen. Das Escape kommt dabei vom ASCII-Steuerzeichen ESC, das auf den meisten Computern auch als eigene Taste vorhanden ist. Dabei wird jedoch nicht auf die schon bekannten Standardsteuerzeichen von 0 bis 31 verzichtet. Diese behalten ihre Funktion auch weiterhin, wobei jedoch nun der ASCII-Standard (ASCII = American Standard Code for Information Interchange) gilt, an den sich Commodore bei seinen Druckern und Computern nur sehr bedingt gehalten hat. Die einzelnen Steuerzeichen und ihre Bedeutung sind in Tabelle 3 dargestellt.</p>
+        <figure>
+            <img src="114-t3.png" alt="Tabelle der Zeichen und Steuercodes 0 bis 255, nach Hexadezimal- und Binärwerten geordnet; markierte Felder sind internationale Sonderzeichen">
+            <figcaption>Tabelle 3. Die ASCII-Tabelle ist genormt (gilt aber nicht für Commodore-Drucker)</figcaption>
+        </figure>
+
+
+        <p>Das ESC-Zeichen stellt ein Steuerzeichen mit dem Code 27 ($1B) dar und kann vom C 64 aus mit der Anweisung CHR$(27) an einen Drucker geschickt werden.</p>
+
+        <p>Soll nun ein Befehl an den Drucker gesendet werden, so wird das ESC-Zeichen übergeben. Danach folgt der eigentliche Befehlscode, der nun den gesamten Bereich der 256 möglichen Zeichen abdecken kann. Wie Sie sehen, ist also auf diese Art und Weise schon ein Druckerbefehlssatz von 256 Grundbefehlen möglich, wobei eventuelle weitere Befehlsunterteilungen nicht berücksichtigt sind. Wir wollen uns diese Art der Befehlsübergabe einmal etwas genauer betrachten. Sehen Sie sich dazu einmal die Tabelle 4 an. Sie enthält die wichtigsten Befehle der Epson- und kompatibler Drucker.</p>
+        <figure>
+            <p><b>ESC/P-Steuercodes</b></p>
+            <table class="plain">
+                <tr>
+                    <th colspan="2">Drucken und Zeilenvorschub</th>
+                </tr>
+                <tr>
+                    <td>– Druckkopfrücklauf</td>
+                    <td>CR</td>
+                </tr>
+                <tr>
+                    <td>– Zeilenvorschub</td>
+                    <td>LF</td>
+                </tr>
+                <tr>
+                    <td>– Zeilenvorschub um n/180" (24 Pin)</td>
+                    <td>ESC J</td>
+                </tr>
+                <tr>
+                    <td>– Zeilenvorschub um n/216" (9 Pin)</td>
+                    <td>ESC j</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Formatsteuerung</th>
+                </tr>
+                <tr>
+                    <td colspan="2">I. Vertikal</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(1) Zeilenabstand</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Zeilenabstand 1/8"</td>
+                    <td>ESC 0</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Zeilenabstand 1/6"</td>
+                    <td>ESC 2</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Zeilenabstand n/180" (24 Pin)</td>
+                    <td>ESC 3</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Zeilenabstand n/60" (24 Pin)</td>
+                    <td>ESC A</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Zeilenabstand 7/72" (8 Pin)</td>
+                    <td>ESC 1</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Zeilenabstand n/216" (8 Pin)</td>
+                    <td>ESC 3</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Zeilenabstand n/72" (8 Pin)</td>
+                    <td>ESC A</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(2) Formularvorschub und Formularlänge</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Formularvorschub</td>
+                    <td>FF</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Formularlänge in Zeilen</td>
+                    <td>ESC C</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Formularlänge in Zoll</td>
+                    <td>ESC C 0</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(3) Vorschub auf neues Formular</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Vorschub auf neues Formular setzen</td>
+                    <td>ESC N</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Vorschub auf neues Formular löschen</td>
+                    <td>ESC 0</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(4) Vertikale Tabulierung</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Vertikaler Tabulator</td>
+                    <td>VT</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Vertikale Tabulatorsprünge setzen</td>
+                    <td>ESC B</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Auswahl eines VFU-Kanals</td>
+                    <td>ESC /</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– VFU-Position setzen</td>
+                    <td>ESC b</td>
+                </tr>
+                <tr>
+                    <td colspan="2">II. Horizontal</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(1) Rand</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Rechten Rand setzen</td>
+                    <td>ESC Q</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Linken Rand setzen</td>
+                    <td>ESC 1</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(2) Horizontale Tabulierung</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Horizontaler Tabulator</td>
+                    <td>HT</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Horizontalen Tabulator setzen</td>
+                    <td>ESC D</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(3) Zeichenzwischenraum</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Zeichenzwischenraum setzen</td>
+                    <td>ESC (space)</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(4) Punktposition</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Absolute Punktposition setzen</td>
+                    <td>ESC $</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Relative Punktposition setzen</td>
+                    <td>ESC \</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(5) Randausgleich</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Automatischer Randausgleich</td>
+                    <td>ESC a</td>
+                </tr>
+                <tr>
+                    <td colspan="2">III. Horizontal und Vertikal</td>
+                </tr>
+                <tr>
+                    <td>– Horizontale/Vertikale Tab.Einheiten</td>
+                    <td>ESC e</td>
+                </tr>
+                <tr>
+                    <td>– Horizontale/Vertikale Tab.Sprünge</td>
+                    <td>ESC f</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Drucksteuerung</th>
+                </tr>
+                <tr>
+                    <td colspan="2">I. Druckqualität</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Umschalten zwischen Entwurfs-/Schönschriftqualität</td>
+                    <td>ESC x</td>
+                </tr>
+                <tr>
+                    <td colspan="2">II. Schriftart</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Umschalten auf Schriftart »Elite«</td>
+                    <td>ESC M</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Schriftart »Elite« löschen bzw. »Pica« setzen</td>
+                    <td>ESC P</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Proportionalschrift-Modus setzen/löschen</td>
+                    <td>ESC p</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Wahl der Schriftartenfamilie</td>
+                    <td>ESC k</td>
+                </tr>
+                <tr>
+                    <td colspan="2">III. Druckmodi</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(1) Breitschrift</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Breitschrift-Modus mit autom. Rückschaltung</td>
+                    <td>SO</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Breitschrift-Modus mit autom. Rückschaltung</td>
+                    <td>ESC SO</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Breitschrift-Modus mit autom. Rückschaltung löschen</td>
+                    <td>DC 4</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Breitschrift-Modus setzen/löschen</td>
+                    <td>ESC W</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(2) Engschrift</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Engschrift-Modus setzen</td>
+                    <td>SI</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Engschrift-Modus setzen</td>
+                    <td>ESC SI</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Engschrift-Modus löschen</td>
+                    <td>DC 2</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(3) Fettschrift</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Fettschrift-Modus setzen</td>
+                    <td>ESC E</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Fettschrift-Modus löschen</td>
+                    <td>ESC F</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(4) Doppelanschlag</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Doppeldruck-Modus setzen</td>
+                    <td>ESC G</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Doppeldruck-Modus löschen</td>
+                    <td>ESC H</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(5) Kursivschrift</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Kursivschrift-Modus setzen</td>
+                    <td>ESC 4</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Kursivschrift-Modus löschen</td>
+                    <td>ESC 5</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(6) Unterstreichen</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Unterstreichungs-Modus setzen/löschen</td>
+                    <td>ESC -</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(7) Potenzierung/Indizierung</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Potenzierungs-Modus setzen</td>
+                    <td>ESC S 0</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Indizierungs-Modus setzen</td>
+                    <td>ESC S 1</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Potenzierungs-/Indizierungs-Modus setzen/löschen</td>
+                    <td>ESC T</td>
+                </tr>
+                <tr>
+                    <td colspan="2">(8) Auswahlmodus</td>
+                </tr>
+                <tr>
+                    <td class="indent1">– Druckmodi auswählen</td>
+                    <td>ESC !</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Zeichensätze</th>
+                </tr>
+                <tr>
+                    <td>– Anwählen internationaler Zeichensätze</td>
+                    <td>ESC R</td>
+                </tr>
+                <tr>
+                    <td>– Sonderzeichen ASCII-Code 128-159D</td>
+                    <td>ESC 6</td>
+                </tr>
+                <tr>
+                    <td>– Steuercodes ASCII-Code 128-159D</td>
+                    <td>ESC 7</td>
+                </tr>
+                <tr>
+                    <td>– Internationale Zeichentabelle</td>
+                    <td>ESC I</td>
+                </tr>
+                <tr>
+                    <td>– Spezialzeichensatz</td>
+                    <td>ESC m</td>
+                </tr>
+                <tr>
+                    <td>– Wahl des ESC/P-Tabelle (Kursiv/Grafik)</td>
+                    <td>ESC t</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Bitmuster</th>
+                </tr>
+                <tr>
+                    <td>– Bitmuster-Modus in Normaldichte setzen</td>
+                    <td>ESC K</td>
+                </tr>
+                <tr>
+                    <td>– Bitmuster-Modus mit doppelter Dichte setzen</td>
+                    <td>ESC L</td>
+                </tr>
+                <tr>
+                    <td>– Bitmuster-Modus mit doppelter Dichte und doppelter Geschwindigkeit setzen</td>
+                    <td>ESC Y</td>
+                </tr>
+                <tr>
+                    <td>– Bitmuster-Modus mit vierfacher Dichte setzen</td>
+                    <td>ESC Z</td>
+                </tr>
+                <tr>
+                    <td>– Bitmuster-Modus anwählen</td>
+                    <td>ESC *</td>
+                </tr>
+                <tr>
+                    <td>– Bitmuster-Modus zuordnen</td>
+                    <td>ESC ?</td>
+                </tr>
+                <tr>
+                    <td>– 9-Punkt-Bitmuster-Modus</td>
+                    <td>ESC Y</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Ladbare (benutzerdefinierbare) Zeichen</th>
+                </tr>
+                <tr>
+                    <td>– Ladbaren Zeichensatz anwählen/abwählen</td>
+                    <td>ESC %</td>
+                </tr>
+                <tr>
+                    <td>– Ladbare Zeichen definieren</td>
+                    <td>ESC &amp;</td>
+                </tr>
+                <tr>
+                    <td>– ROM-Zeichensatz kopieren</td>
+                    <td>ESC : 0</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Verschiedene Codes</th>
+                </tr>
+                <tr>
+                    <td>– Summer</td>
+                    <td>BEL</td>
+                </tr>
+                <tr>
+                    <td>– Rückschritt</td>
+                    <td>BS</td>
+                </tr>
+                <tr>
+                    <td>– Drucker initialisieren</td>
+                    <td>ESC @</td>
+                </tr>
+                <tr>
+                    <td>– Papierende-Erkennung abschalten</td>
+                    <td>ESC 8</td>
+                </tr>
+                <tr>
+                    <td>– Papierende-Erkennung einschalten</td>
+                    <td>ESC 9</td>
+                </tr>
+                <tr>
+                    <td>– Druckkopf in Ausgangsstellung bringen</td>
+                    <td>ESC &lt;</td>
+                </tr>
+                <tr>
+                    <td>– Druckrichtung wählen</td>
+                    <td>ESC U</td>
+                </tr>
+                <tr>
+                    <td>– Drucken mit halber Geschwindigkeit setzen/löschen</td>
+                    <td>ESC s</td>
+                </tr>
+                <tr>
+                    <td>– Kontrolle des Ausdrucks</td>
+                    <td>ESC i</td>
+                </tr>
+                <tr>
+                    <td>– Autom. Einzelblatteinzug ein/aus</td>
+                    <td>ESC EM</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Eingabedaten-Steuerung</th>
+                </tr>
+                <tr>
+                    <td>– Löschen des Druckpuffers</td>
+                    <td>CAN</td>
+                </tr>
+                <tr>
+                    <td>– Löschen des letzten druckbaren Zeichens</td>
+                    <td>DEL</td>
+                </tr>
+                <tr>
+                    <td>– Drucker anwählen</td>
+                    <td>DC 1</td>
+                </tr>
+                <tr>
+                    <td>– Drucker abwählen</td>
+                    <td>DC 3</td>
+                </tr>
+                <tr>
+                    <td>– Modus-Druckdaten wiederholen/setzen</td>
+                    <td>ESC V</td>
+                </tr>
+                <tr>
+                    <td>– MSB-Steuerung löschen</td>
+                    <td>ESC #</td>
+                </tr>
+                <tr>
+                    <td>– MSB-Steuerung setzen</td>
+                    <td>ESC &gt;</td>
+                </tr>
+                <tr>
+                    <td>– MSB-Steuerung zurücksetzen</td>
+                    <td>ESC =</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Ladbarer Zeichengenerator</th>
+                </tr>
+                <tr>
+                    <td>– Zeichengenerator definieren</td>
+                    <td>ESC&amp;</td>
+                </tr>
+                <tr>
+                    <td>– Ein-/Ausschalten ladbaren Zeichengenerator</td>
+                    <td>ESC%</td>
+                </tr>
+                <tr>
+                    <td>– Kopieren internen ZG auf ladbaren ZG</td>
+                    <td>ESC:0</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4. Die wichtigsten ESC/P-Steuercodes (ESC/P = Epson-Standard-Code for Printers)</figcaption>
+        </figure>
+
+
+        <p>Als Beispiel schalten wir einmal in einen anderen Druckmodus; nämlich von Normalschrift auf Doppelanschlag. In diesem Modus werden von Epson-kompatiblen Druckern alle Zeichen zweimal übereinander gedruckt, wobei ein geringfügiger Zeilenvorschub erfolgt. Das Ergebnis ist eine stärkere und schönere Schrift:</p>
+
+        <pre><code>OPEN 1,4
+PRINT#1,CHR$(27);CHR$(71);
+CLOSE 1</code></pre>
+
+        <p>Der Code 71 entspricht außerdem einem großen »G«, weshalb der Befehl für den Doppelanschlag auch mit ESC G bezeichnet werden kann. Wollen wir den Doppelanschlag wieder rückgängig machen, so müssen wir nur den Code ESC H an den Drucker senden:</p>
+
+        <pre><code>OPEN 1,4
+PRINT#1,CHR$(27);CHR$(72);
+CLOSE 1</code></pre>
+
+        <p>Wie Sie sehen, ist auch im ESC/P-Standard die Befehlsübergabe an einen Drucker denkbar einfach. Es darf jedoch nicht vergessen werden, daß auch die normalen ASCII-Steuerbefehle noch vorhanden sind. Carriage Return beispielsweise hat nach wie vor den Code 13 und Line Feed entspricht der Codezahl 10. Ansonsten gelten die übrigen ASCII-Zeichen (Tabelle 3). Hat Ihr Drucker also beispielsweise einen eingebauten Summer, so können wir ihn dazu veranlassen, Töne von sich zu geben:</p>
+
+        <pre><code>OPEN 1,4
+PRINT#1,CHR$(7);
+CLOSE 1</code></pre>
+
+        <p>Wichtig für den Computeranwender ist aber natürlich noch eine weitere Eigenschaft von vielen Druckern: Der Grafik- oder Bitmapmodus.</p>
+
+        <p>Dieser Grafikmodus ist natürlich nur auf grafikfähigen Druckern möglich, was der Commodore MPS 802 zum Beispiel nicht ist! Außerdem muß beim Druck von Grafiken darauf geachtet werden, mit wievielen Nadeln der Matrixdrucker arbeitet. Beim C 64 besteht nämlich jedes Zeichen aus 8 mal 8 Punkten; MPS 801 und 803 können jedoch nur maximal 7 Punkte in der Senkrechten ansteuern. Es fehlt hier also eine Punktreihe. Der Epson FX-80 wiederum verfügt über 9 Nadeln; er hat also eine »zuviel«.</p>
+
+        <p>Gerade im Grafikmodus der Drucker müssen wir zwischen Commodore-Druckern und Druckern von Fremdherstellern unterscheiden. Verwenden Sie den Drucker eines Fremdherstellers außerdem mit einem Interface für den seriellen Bus des Commodore 64, so sind außerdem die Eigenheiten des jeweiligen Interfacetyps zu beachten. Es sei an dieser Stelle auf unseren Artikel über Interfaces in der 64'er-Ausgabe 2 verwiesen, der die Eigenheiten der bekanntesten Interfaces vorstellt.</p>
+
+        <p>Im folgenden ein paar Beispiele, wie Sie auf mehreren Druckertypen eine Einzelnadelansteuerung vornehmen können.</p>
+
+        <p>Zuerst die beiden Commodore-Drucker MPS 801 und 803. Diese Drucker besitzen 7 Drucknadeln und können über den Code 8 ein freidefinierbares Sonderzeichen drucken. Bei der Definition dieses Sonderzeichens ist zu beachten, daß jeder Drucknadel ein Bit in einem Byte zugeordnet wird, wobei die oberste Nadel dem Bit 0 und die unterste Nadel dem Bit 6 eines Bytes entspricht. Da der MPS 801 und 803 mit einer 7 mal 6 Punktmatrix arbeitet, benötigen wir für die Definition eines Zeichens also 6 Byte. Bild 1 zeigt, wie so ein Zeichen durch 6 entsprechende Bytes definiert wird. Listing 1 zeigt, wie Sie das entsprechende Zeichen auch auf dem Drucker ausgeben können.</p>
+        <figure>
+            <img src="114-1.png" alt="Punktmuster eines Zeichens aus Sternen und Nullen in sieben Zeilen, darunter die Bitwerte jeder Spalte mit ihren Summen 255, 145, 149, 149, 138 und 128">
+            <figcaption>Bild 1. So definiert man ein »ß« für den MPS 801/803</figcaption>
+        </figure>
+
+
+        <figure>
+            <pre>10 DATA 255,145,149,149,138,128
+20 FOR I = 1 TO 6
+30  READ A: A$=A$+CHR$(A)
+40 NEXT I
+50 OPEN 1,4
+60 PRINT#1,CHR$(8);A$;CHR$(15);"= SCHARFES S"
+70 CLOSE 1</pre>
+            <figcaption>Listing 1. Das »ß« wird gedruckt</figcaption>
+        </figure>
+
+        <p>Bei Epson-kompatiblen Druckern funktioniert diese Ansteuerung ganz ähnlich; nur gibt es hier meistens verschiedene Grafikmodi, die von der Anzahl der Drucknadeln abhängen. Da viele Computer mit einer Zeichenhöhe von 8 Punkten arbeiten, haben Drucker im ESC/P-Standard die Möglichkeit, einen 8-Nadel-Grafikmodus zu realisieren. Der Drucker reagiert dann, als besäße er nur 8 Nadeln und kann so sehr einfach angesteuert werden.</p>
+
+        <p>Bei diesen Druckern macht sich der, in der Regel ziemlich große, Pufferspeicher positiv bemerkbar. Der Computer sendet die einzelnen Daten für das Bitmuster, wobei diese vom Drucker gespeichert werden. Erst wenn der Computer bis zu einer ganzen Druckzeile gesendet hat, werden die Werte umgesetzt und ausgedruckt.</p>
+
+        <p>Im ESC/P-Standard schaltet das Kommando ESC * den Bitmustermodus für 8 Nadeln ein. Direkt hinter diesem Befehl folgt die Einstellung des Druckmodus (siehe Handbuch des Druckers) und danach die Anzahl der Bitmuster/Bytes, die gesendet werden sollen. In Listing 2 sehen Sie ein kleines Beispielprogramm, das auf einem Epson-Drucker ein Bitmuster erzeugt.</p>
+
+        <figure>
+            <pre>10 OPEN 4,4
+20 PRINT#4,CHR$(27);"*";CHR$(0);CHR$(100)CHR$(0);
+30 FORX=129TO229
+40 PRINT#4,CHR$(X);
+50 NEXT
+60 CLOSE4
+READY.</pre>
+            <figcaption>Listing 2. Grafikdefinition nach dem ESC/P-Standard.</figcaption>
+        </figure>
+
+        <p>Diese ganzen Angaben über spezielle Befehle sind natürlich mit Vorsicht zu genießen, wenn Drucker anderer Hersteller oder irgendwelche »exotischen« Interfaces verwendet werden. Es sollte hier nur ein kleiner Einblick in die Anwendung von Steuerzeichen auf Druckern gewährt werden, der zum Experimentieren anregen soll. Es ist wohl eine der schönsten Einsatzmöglichkeiten eines Druckers, wunderbare Grafikbilder oder seltsame Schriftarten zu drucken, wobei der Kreativität des Benutzers kaum Grenzen gesetzt sind.</p>
+
+        <p>Natürlich konnten wir Ihnen hier keine komplette Drucker-Schulung geben. Trotzdem hoffen wir, in Ihnen die »Lust« aufs Programmieren eines Druckers geweckt zu haben. Für den eingefleischten Drucker-Liebhaber gibt es ohnehin nichts schöneres, als den Drucker zu immer neuen Kunststücken zu bewegen.</p>
+
+        <address class="author">(Karsten Schramm/aw)</address>
+    </article>
+</body>
+
+</html>

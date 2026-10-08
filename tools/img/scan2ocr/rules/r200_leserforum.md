@@ -1,6 +1,29 @@
 # 200 — Restructure Leserforum into the Q&A shape + banner image
 
-**Applies to:** monthly — the Leserforum is a monthly reader-mail rubric. No Sonderheft in the repo has one: `ls issues/SH85*/*eserforum*` is empty and `grep -l 'article class="qa"' issues/SH85*/*.html` finds zero files.
+**Applies to:** all — **this rule is about the Q&A SHAPE, not about the rubric
+called Leserforum**, and the two are not the same question. See *THE Q&A SHAPE
+IS NOT THE LESERFORUM'S ALONE* below, which this header used to contradict.
+
+It used to read `monthly`, on the evidence that `ls issues/SH85*/*eserforum*`
+is empty and `grep -l 'article class="qa"' issues/SH85*/*.html` finds zero
+files. Both are still true today and **neither is evidence for the claim**:
+
+* the first tests for the RUBRIC, and the rule's subject is the shape — a
+  Sonderheft reaches it through an article called something else entirely;
+* the second is CIRCULAR. No Sonderheft carries `article class="qa"` because
+  this header told every Sonderheft build to skip this step. The absence was
+  manufactured by the classification it was then used to justify.
+
+And the miss it caused is already in the corpus: **SH8603's `11 Fragen und
+Antworten zum C 16 und VC 20` shipped as a plain `<article>` with 0 `div.q`
+and 0 `p.author`** — reader questions, each with its asker, flat. That is not
+a ruling that Sonderhefte do not get the shape; it is precisely the failure
+the section below warns about, one issue earlier and unnoticed.
+
+Found by SH8605, which has `155 Fragen & Antworten` (pp 155-163): reader
+questions with each asker named, filed by the printed Inhalt under a band
+literally called **Leserforum**. The input the header says cannot exist was on
+the page.
 
 **Goal:** turn the flat OCR-imported `Leserforum` article into the
 project's canonical Q&A HTML shape (`<article class="qa">`, per-topic

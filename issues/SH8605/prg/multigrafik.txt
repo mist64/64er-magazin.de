@@ -1,0 +1,68 @@
+
+
+;multigrafik.prg ==0801==
+   10 rem **** multigrafik ****
+   20 poke 53280,0:poke53281,0
+   30 def fn a(x) = 40*sin(x/5)+100
+   32 def fn b(x) = 45*sin(x/10)+100
+   34 def fn c(x) = 50*sin(x/15)+100
+   40 rem --- basic begrenzen ---
+   50 poke 52,32:poke 56,32
+   60 rem --- farbabfrage -------
+   70 printchr$(147)chr$(30)"hintergrundfarbe";:input f0
+   80 print"vordergrund 01  ";:input f1
+   82 print"vordergrund 10  ";:input f2
+   84 print"vordergrund 11  ";:input f3
+   90 f = 16*f1 + f2
+  100 printchr$(147)
+  110 rem --- bitmapmodus einschalten ---
+  120 poke 53265,peek(53265) or 32
+  130 rem --- bitmapstart auf 8192 ------
+  140 poke 53272,peek(53272) or 8
+  142 rem --- mehrfarbenmodus ein -------
+  144 poke 53270,peek(53270) or 16
+  150 rem --- bitmap loeschen (geduld!) -
+  160 b = 8192
+  170 for i=0 to 7999
+  180 :poke b+i,0
+  190 next i
+  200 rem --- farbgebung (nochmal geduld!)
+  210 c = 1024:d=55296
+  220 for i=0 to 999
+  230 :poke c+i,f
+  232 :poke d+i,f3
+  240 next i
+  242 poke 53281,f0
+  250 rem --- punkte zeichnen -----------
+  255 pf=1
+  260 for x=0 to 159
+  270 :y = fna(x)
+  280 :gosub 400
+  290 next x
+  295 pf=2
+  300 for x=0 to 159
+  302 :y = fnb(x)
+  304 :gosub 400
+  310 next x
+  312 pf=3
+  314 for x=0 to 159
+  316 :y = fnc(x)
+  318 :gosub 400
+  319 next x
+  320 rem --- warten auf taste ----------
+  330 get a$:if a$="" then 330
+  340 rem --- normalmodus einschalten ---
+  342 poke 53270,peek(53270) and (255-16)
+  350 poke 53272,peek(53272) and (255-8)
+  360 poke 53265,peek(53265) and (255-32)
+  370 printchr$(147)
+  380 end
+  400 rem --- up punkte setzen ----------
+  410 hx=8*int(x/4)
+  420 hy=320*int(y/8)+(y and 7)
+  430 bx=4^(3-(x and 3))
+  440 bm=pf*bx
+  450 h1=b+hx+hy
+  460 poke h1,(peek(h1) and (not 3*bx)) or bm
+  470 return
+

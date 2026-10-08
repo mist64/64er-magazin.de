@@ -1,0 +1,76 @@
+
+
+;sprites.prg ==0801==
+   10 rem **** sprite - beispielsprogramm ****
+   20 poke53280,0:poke53281,0
+   30 printchr$(147)chr$(28)chr$(17)chr$(17)
+   40 print"dies ist die loesung des raetsels":print
+   50 print"um den fliegenden hollaender"
+   60 rem ***** spritedaten einlesen *****
+   70 for i=704 to 767:read a:poke i,a:next i
+   80 for i=832 to 895:read a:poke i,a:next i
+   90 rem ***** sprite-zeiger ************
+  100 poke 2040,11:poke 2041,13
+  110 rem **** zum up hintergrund *******
+  120 gosub 550
+  130 rem **** einschalten **************
+  140 poke 53269,peek(53269) or (2^0):poke 53269,peek(53269) or (2^1)
+  150 rem **** sprite-positionen ********
+  160 poke 53248+2*0,250:poke 53249+2*0,100:rem sprite 1
+  170 poke 53248+2*1,30:poke 53249+2*1,190:rem sprite 2
+  180 poke 53264,0
+  190 rem **** sprite-farben ************
+  200 poke53287,0
+  210 poke 53285,2:poke53286,5:poke53288,1
+  220 poke 53276,peek(53276) or (2^1)
+  230 rem **** sprite-prioritaeten ******
+  240 poke 53275,peek(53275) or (2^1)
+  250 rem **** kollision vorbereiten ****
+  260 a=peek(53278)
+  270 rem **** die loesung des raetsels *
+  280 printchr$(19)chr$(146)chr$(5)"seit einigen jahrzehnten ist der"
+  290 print"fliegende hollaender nicht mehr auf den"
+  300 print"weltmeeren gesehen worden!":printchr$(158)"hier sehen sie weshalb:"
+  310 rem **** sprite-bewegung **********
+  320 d1=73/200:d2=-147/200:d3=-90/200
+  340 x1=250:x2=30:y2=190:y1=100
+  350 x1=x1+d2:x2=x2+d1:y2=y2+d3
+  360 poke53248,x1:poke53250,x2:poke53251,y2
+  370 ifpeek(53278)then400
+  380 goto350
+  390 rem **** kollision ! **************
+  400 poke 53275,0:poke53281,7:fori=1to10:poke53281,6:nexti
+  410 poke 53269,peek(53269) and (255-2^0)
+  420 poke53250,x2:poke53251,y1:fori=0to50:nexti
+  430 rem **** abgang und ende **********
+  440 poke53275,0
+  450 x2=x2+d1:y1=y1-d3
+  460 poke53250,x2:poke53251,y1
+  470 ify1>251then490
+  480 goto450
+  490 rem **** ende der vorstelliung ****
+  500 poke53269,0:poke53281,0
+  510 printchr$(147)chr$(30)chr$(17)chr$(17)
+  520 print"verstaendlicherweise ward seither"
+  530 print"der fliegende hollaender nie mehr"
+  535 print"gesehen."
+  540 end
+  550 rem *** up hintergrund ***********
+  560 printchr$(147)chr$(17)chr$(17)chr$(17)chr$(17)chr$(17)chr$(17)chr$(17)
+  570 b$="UI":c$="KJ":fori=1to20:a$=a$+b$:d$=d$+c$:nexti:poke53281,6
+  580 printchr$(154)chr$(18);
+  590 for i=1to8
+  600 printa$d$;:nexti
+  610 return
+  620 rem *** dies sind die spritedaten ***
+  630 rem ----- sprite 1 -----
+  640 data003,003,128,002,002,112,015,143,128,031,031,000,031,159,128,002,002
+  650 data000,015,159,192,031,063,160,031,063,144,031,159,204,034,002
+  660 data014,111,143,142,223,031,015,223,159,128,079,207,191,130,002,107,114
+  670 data170,234,127,255,254,058,170,184,031,255,224,000,000,000,000
+  680 rem ----- sprite 2 -----
+  690 data255,000,000,000,195,192,000,060,048,000,240,012,000,048,003,015,255
+  700 data003,048,049,124,240,053,080,000,053,080,000,022,100,063,213
+  710 data084,192,021,080,000,245,240,003,012,204,003,048,195,003,192,195,003
+  720 data003,003,012,195,003,240,012,003,000,048,204,015,192,048,000
+

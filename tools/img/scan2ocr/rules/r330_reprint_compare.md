@@ -64,8 +64,51 @@ Later than everything, including rule 300:
   their side. Render the *page image*; the PDF's **text layer is void** (r000,
   *the PDF has no usable text layer*) — it is a third OCR of the same paper and
   proves nothing either way.
+
+### NO 2400 dpi SCAN IS NOT A DEAD END — UPSCALE THE PDF PAGE IMAGE
+
+**8404 is the one issue with no masters** (`/Volumes/S/png/` runs 8405-8612
+plus the Sonderhefte), and a reading taken off its PDF at 150 ppi was recorded
+as unresolvable. It is not. Owner, 2026-10-07: *"the 150 dpi images are
+actually pretty high quality. if you resize to 300, then make it K only and
+high contrast, i'm sure tesseract will give you better info, and you can use
+vision too."* MEASURED, and it settles glyph questions outright:
+
+```bash
+pdftoppm -f <pdfpage> -l <pdfpage> -r 300 -gray -png "issues/<YYMM>/<pdf>" out
+```
+
+then `ImageOps.autocontrast(img.convert("L"), cutoff=1)`, and crop the glyph at
+3-6x. **Check the folio on the rendered page before trusting the page number**
+— the offset is per-issue; 8404 happens to have none.
+
+**What it settled:** SH8605's step 330 reported 7 THEIRS candidates on 8404's
+*Tabelle 1, Registerübersicht des VIC-II-Chips* (pp 122-123) — a comma where
+8404's published HTML has a full stop, in rows of the form `0 = …. 1 = …`.
+At 300 dpi the glyph is a round dot on the baseline, with the descender of the
+`g` in "Normaldarstellung" two letters earlier giving the baseline in the same
+crop. **All seven are full stops; 8404's HTML is RIGHT and the claims are
+refuted.** Recast as PRINT.
+
+That is the direction this matters in: an unreadable original does not produce
+a cautious silence, it produces THEIRS candidates against a published issue
+that nobody can check. Upscale before reporting one.
 - `tools/img/scan2ocr/rules/r330_reprint_compare.py` — the deterministic half:
   `resolve`, `diff`, `verify`.
+
+### OUR `futureteufelchen` ASIDE IS NOT COMPARED — the magazine's IS
+
+Same reason the reprint credit is excluded: a `<aside class="futureteufelchen">`
+is **site apparatus printed on neither page**. r300 adds one where a reprint
+lacks an erratum its original carried, so it exists on our side only, enters
+the diff as a block-only-in-ours, and no disposition fits — `PRINT` would
+claim both pages print it, `OURS` would claim we misread something. And since
+D-numbering is positional, one aside shifts every difference after it: on
+SH8605 the two asides would have hit **all 27 pairs** of articles 155 and 164.
+
+**The class is the test and it is exact.** `fehlerteufelchen` is the MAGAZINE'S
+own printed errata column — real transcribed prose, and it stays compared.
+Only `futureteufelchen`, which is ours, is excluded.
 
 ### The leads are untrusted
 
@@ -302,9 +345,9 @@ not a problem to explain away.
 
 ## Step 5 — disposition every difference
 
-Every `D-NNN` gets exactly one disposition. The vocabulary is closed — six
-values, so the whole issue's outcome is greppable and so nobody invents a
-seventh that means "I did not look":
+Every `D-NNN` gets exactly one disposition. The vocabulary is closed — seven
+values, so the whole issue's outcome is greppable and so nobody invents an
+eighth that means "I did not look":
 
 | disposition | means | what happens |
 |---|---|---|
@@ -313,7 +356,19 @@ seventh that means "I did not look":
 | `THEIRS` | the monthly's published transcription misread **its** printed page | **reported, not fixed** — see step 6 |
 | `MOVED` | both sides carry the SAME WORDS, in a different place on the page — the aligner cannot pair them, so the prose between them comes out unpaired on both sides as `BLOCK ONLY IN` | **nothing.** Closed, like `PRINT` |
 | `MARKUP` | the words are the same and only the tagging differs — one side wraps a run in `<code>`, the other does not | **nothing.** Closed |
-| `UNRESOLVED` | the scan could not settle it (page not in the corpus, region illegible, original issue not imported) | stays open in `LOG.md` as a known gap |
+| `CROP` | one side publishes the content as a delivered owner CROP (*owner crop wins*) and the other as text. Same printed content, different **medium** | **nothing.** Closed |
+| `UNRESOLVED` | the scan could not settle it (page not in the corpus, region illegible, original issue not imported) — **and neither could anything else: see r325, *"the glyphs are identical" means the glyph cannot decide*. Improving the render, the series the item sits in, a redundant encoding in the artefact, the external standard and the language all come first, and the entry says which were tried** | stays open in `LOG.md` as a known gap |
+
+**`CROP` is not `MARKUP`, and the difference is the point.** `MARKUP` says *the
+words are the same*; on the cropped side there are no words at all, only
+pixels. That is what a reader of the LOG needs to know, because it means our
+page is **not searchable** there — something a tagging difference never
+implies. It is also a different cause: a deliberate project decision
+(*owner crop wins*) rather than a transcription difference, so counting it
+separately says how often that decision creates divergence. MEASURED on
+SH8605's 20 ← 8510/129: **51** cells of a User-Port pin table that we publish
+as `20-3.png` and 8510 publishes as HTML. At that volume, folding them into
+MARKUP would bury the tagging differences it exists to count.
 
 **Why the two new values exist.** The four above all assert something about a
 TRANSCRIPTION, and neither of these is one. SH8604's 93 produced 14
@@ -386,6 +441,55 @@ disappoints:
 This lead had been recorded as NOT a reprint on the strength of the score, and
 its evidence sentence filed under a different article. Both were wrong.
 
+### A CONFIRMED `THEIRS` IS CHECKED IN EVERY PRINTING OF THAT ARTICLE
+
+A diff compares two printings. A popular article has more. **When a THEIRS
+finding is confirmed, grep the corrected string across the whole corpus before
+closing it** — the same OCR pass produced the same error in the other
+printings, and no compared pair will ever surface them.
+
+MEASURED after SH8605's 31 corrections were applied: sweeping all 31 strings
+over 2023 published files found one more, `liegtvon $0146` in
+`SH8506/124 Hypra-Save.html` — a THIRD printing of Hypra-Save (8508/79,
+SH8506/124, SH8605/144) that was in no compared pair. One hit from 31 strings
+is a low yield, and that is the point: it is two minutes of grep for a class of
+error nothing else in the chain can reach.
+
+**Beware the self-match.** A correction that only ADDS characters leaves the
+old string inside the new one — sweeping for `verschiedene Fragesteller` after
+writing `(verschiedene Fragesteller)` reports the file you just fixed. Check
+the hit's context before believing it.
+
+**AND THE SWEEP ONLY FINDS ERRORS OF COMMISSION, NOT OF OMISSION.** It looks
+for a wrong string PRESENT in another file. It cannot find a right string
+ABSENT from one. MEASURED: B28 restored a dropped continuation sentence to
+`8602/57`'s figcaption; `SH8602/7` is a FOURTH printing of that same caption
+and still carries the short form, i.e. the identical defect — and no sweep
+over the 31 corrected strings could ever have reached it, because there was
+nothing wrong to search for.
+
+For a correction that ADDS text, sweep differently: find the other printings
+of that article (`reprints.txt`, `REPRINTS.md`, or a title search) and check
+each for the **new** text. Absent means the same defect, present means clean.
+
+### APPLYING A `THEIRS` CORRECTION REACHES BACKWARDS THROUGH THE CORPUS
+
+Editing a published file does not only invalidate the CURRENT build's diff. It
+invalidates **every past issue's recorded `## Step 330` table that compared
+against that file**, and nothing announces it — the breakage surfaces the next
+time somebody runs `verify` on an issue they were not working on.
+
+MEASURED: the B28 correction to `8602/57` broke **SH8602's** recorded log
+(`8602/57: table says D=4, the diff reports 5`), an issue finished long before.
+Confirmed against the previous script, so it was the edit and not a tool
+change.
+
+So after applying any THEIRS correction: **`grep -l '<the edited file>'
+issues/*/LOG.md` and re-run `verify` on every issue that names it.** Either
+remap those tables in the same commit, or do the applying after every affected
+issue's 330 is final — but know which issues are affected before you start,
+not afterwards.
+
 ## Step 6 — a `THEIRS` finding is REPORTED, never applied
 
 A fix to the monthly's published HTML changes an **already-published issue**.
@@ -437,10 +541,46 @@ moved: the differences vanish, the numbering shifts, and a renamed file breaks
 its table row. Re-diff, remap the content, and record applied items in a
 per-pair "THEIRS applied" table.
 
+## `pubdate.txt` IS A REPUBLICATION DATE — IT DOES NOT ORDER THE ORIGINALS
+
+Every issue's `pubdate.txt` is when **we** publish it, forty years on, and the
+republication order is not the original order. MEASURED: SH8605's pubdate is
+`2026-10-31` against 8606's `2026-05-16` and 8607's `2026-06-14`, so by
+pubdate SH8605 looks *later* than both — while Sonderheft **5/86** plainly
+precedes **6/86** and **7/86**.
+
+**The original order is in the issue ID**, which is the cover date: `SH8605` =
+5/86, `8606` = 6/86. Use that, never the pubdate.
+
+And there is a second, independent test that settles direction outright: **an
+issue that prints another issue's errata necessarily came out after it.** Both
+8606 and 8607 carry Fehlerteufelchen entries for Sonderheft 5/86 — 8606 for
+*Der leichte Umgang mit Sprites*, p90ff, and 8607 for *Ein geänderter
+Zeichensatz*, p165 — which is our own step 300's input, and proof that SH8605
+preceded them.
+
+### `REVERSED` — the claimed original is younger than this issue
+
+A lead can point the wrong way in time. SH8605's 114 shared its tables with
+8606/160 and 8607/92, and a credit reading "Teilweiser Nachdruck aus 64'er
+6/86 … 7/86" would have asserted a direction of copying that is false; if
+anything the monthlies took the tables from this Sonderheft, or both from a
+common source (lane A suspected Commodore's MPS 802 manual).
+
+None of the other four verdicts fits. `NOT-A-REPRINT` is closest but makes
+`verify` skip the diff, and the comparison is still a perfectly good OCR
+cross-check — two independent transcriptions of the same table.
+
+So: **`REVERSED` behaves exactly like `PARTIAL` for the diff** — every
+difference is dispositioned, the counts must sum — **and it carries NO
+credit.** Record the reason in one sentence beside the row: which issue is
+older, and how you know.
+
 ## Step 7 — the reprint carries a reference to its original
 
 A `CONFIRMED` or `PARTIAL` reprint is published on this site twice, in two
-issues, with no way for a reader of either copy to know the other exists. So
+issues, with no way for a reader of either copy to know the other exists.
+A `REVERSED` row gets no credit at all — see above. So
 once the verdict is settled, the reprint **links to the article it reprints**.
 This is the only step of this rule that adds anything to the page; it runs after
 the dispositions are recorded, for the numbering reason in *What the credit must
@@ -628,17 +768,24 @@ a contract, not a suggestion.
 First a table, one row per **lead × original** (so a `PARTIAL` lead with two
 originals gets two rows):
 
+**THE TABLE IS TWELVE CELLS WIDE**, because the vocabulary is seven. A nine-cell
+row (the old four buckets) is still accepted for an issue written before MOVED
+and MARKUP existed — but a nine-cell row carrying a MOVED or MARKUP
+disposition FAILS, by name, rather than being folded into PRINT. That fold is
+what this exists to prevent: `PRINT` asserts *both pages print it and the
+printed pages differ*, which is false of a block that merely moved.
+
 ```markdown
 ## Step 330 (reprint_compare)
 
-| verdict | this issue | claimed | monthly file | D | OURS | THEIRS | PRINT | UNRESOLVED |
-|---|---|---|---|---|---|---|---|---|
-| CONFIRMED | `issues/SH8601/NN Ein Monitor ist genug.html` | 8510/16 | `issues/8510/16 Ein Monitor ist genug.html` | 12 | 0 | 0 | 12 | 0 |
-| PARTIAL | `issues/SH8601/12 Rundgang durch die Hardware des C128.html` | 8506/16 | `issues/8506/16 Erster ausführlicher Test PC 128 (Teil 1).html` | 41 | 0 | 1 | 39 | 1 |
-| PARTIAL | `issues/SH8601/12 Rundgang durch die Hardware des C128.html` | 8507/17 | `issues/8507/17 Erster ausführlicher Test_ C 128, Teil 2.html` | 28 | 0 | 0 | 28 | 0 |
-| CONFIRMED | `issues/SH8601/NN Test_ WordStar.html` | 8601/47 | `issues/8601/47 Gestatten_ Wordstar.html` | 19 | 0 | 2 | 17 | 0 |
-| NOT-A-REPRINT | `issues/SH8601/NN Welche Floppy für den C128_.html` | 8601/44 | — | — | — | — | — | — |
-| UNRESOLVED | `issues/SH8601/NN Basic 7.0 – das starke Basic.html` | 8403/70 | — | — | — | — | — | — |
+| verdict | this issue | claimed | monthly file | D | OURS | THEIRS | PRINT | UNRESOLVED | MOVED | MARKUP | CROP |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| CONFIRMED | `issues/SH8601/NN Ein Monitor ist genug.html` | 8510/16 | `issues/8510/16 Ein Monitor ist genug.html` | 12 | 0 | 0 | 12 | 0 | 0 | 0 | 0 |
+| PARTIAL | `issues/SH8601/12 Rundgang durch die Hardware des C128.html` | 8506/16 | `issues/8506/16 Erster ausführlicher Test PC 128 (Teil 1).html` | 41 | 0 | 1 | 39 | 1 | 0 | 0 | 0 |
+| PARTIAL | `issues/SH8601/12 Rundgang durch die Hardware des C128.html` | 8507/17 | `issues/8507/17 Erster ausführlicher Test_ C 128, Teil 2.html` | 28 | 0 | 0 | 28 | 0 | 0 | 0 | 0 |
+| CONFIRMED | `issues/SH8601/NN Test_ WordStar.html` | 8601/47 | `issues/8601/47 Gestatten_ Wordstar.html` | 19 | 0 | 2 | 17 | 0 | 0 | 0 | 0 |
+| NOT-A-REPRINT | `issues/SH8601/NN Welche Floppy für den C128_.html` | 8601/44 | — | — | — | — | — | — | — | — | — |
+| UNRESOLVED | `issues/SH8601/NN Basic 7.0 – das starke Basic.html` | 8403/70 | — | — | — | — | — | — | — | — | — |
 ```
 
 The two `PARTIAL` rows are the one merged reprint against each of its two

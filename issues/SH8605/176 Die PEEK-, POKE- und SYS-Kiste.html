@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Die PEEK-, POKE- und SYS-Kiste</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="dm">
+    <meta name="64er.issue" content="Sonderheft 5/86">
+    <meta name="64er.pages" content="176-177">
+    <meta name="64er.head1" content="Peeks &amp; Pokes">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Programmieren">
+    <meta name="64er.id" content="poke">
+</head>
+
+<body>
+    <article>
+        <h1>Die PEEK-, POKE- und SYS-Kiste</h1>
+        <p class="intro">Das Betriebssystem bietet einige Kniffe, die sich erst durch spezielle POKEs richtig ausnutzen lassen. Auch andere spezielle und nützliche Routinen benötigen mindestens einen SYS-Aufruf, um arbeiten zu können. Lernen Sie hiermit die Tricks des C 64 kennen.</p>
+
+        <p>Durch geschicktes POKEn in bestimmte Speicheradressen lassen sich verblüffende Effekte erzielen. So kann man etwa Programme gegen LISTen schützen, auf daß sie sich bei einem versuchten LIST-Befehl selbst zerstören. Dies kann recht hilfreich sein, wenn man sein eigenes Programm vor fremden Augen verbergen will. Aber lesen Sie selbst, welche Möglichkeiten sich noch bieten und lernen Sie dadurch Ihren C 64 besser kennen.</p>
+
+        <p class="hanging"><strong>POKE 1,53</strong> – Das Basic und Kernel sind ausgeschaltet (die vollen 64 KByte RAM wären vorhanden – wenn aber das Betriebssystem nicht vorher vom ROM in das RAM kopiert wurde, stürzt der Computer ab, da er auf keine Befehle mehr zurückgreifen kann). Diese Konfiguration ist nur von Maschinensprache aus nutzbar.</p>
+
+        <p class="hanging"><strong>POKE 1,54</strong> – Hierbei ist das Basic ausgeschaltet. Diese Ebene ist ebenfalls nur unter Maschinensprache zu nutzen.</p>
+
+        <p class="hanging"><strong>POKE 1,55</strong> – Der normale Zustand. Der Interpreter und das Betriebssystem sind aktiv.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(10)</strong> – Ist der Wert = 0, so war die letzte Operation LOAD. VERIFY ergibt den WERT = 1.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(17)</strong> – Abfrage auf die letzte zugewiesene Variable. Bei dem Wert = 0 wurde die letzte Variable mittels INPUT geholt oder es fand noch keine Operation statt. Die Zuweisung mit GET ergibt den Wert = 64 und READ den Wert = 152.</p>
+
+        <p class="hanging"><strong>POKE 19,64</strong> – Beim nächsten INPUT-Befehl wird kein Fragezeichen mehr ausgegeben. Allerdings kann man nachher durch Drücken der RETURN-Taste nicht mehr in die nächste Zeile gelangen.</p>
+
+        <p class="hanging"><strong>POKE 19,0</strong> – Läßt die Ausgabe des Fragezeichens wieder zu.</p>
+
+        <p class="hanging"><strong>POKE 24,0</strong> – Nach Eingabe dieses POKEs auf einen FORMULA TOO COMPLEX-ERROR verhält sich der Computer wieder normal.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(43)+PEEK(44)*256</strong> – Mit dieser Befehlszeile erfährt man die aktuelle Startadresse des Basic-Programms. Soll die Startadresse verändert werden, so muß in die Speicherzellen 43 und 44 ein anderer Wert geschrieben werden.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(45)+PEEK(46)*256</strong> – Gleichlautend dazu erfährt man hiermit die aktuelle Endadresse des Basic-Programmes.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(55)+PEEK(56)*256</strong> – Ergibt das derzeitige Ende des Basic-Bereiches. Durch Herabsetzen dieses Zeigers ist es möglich, den RAM-Bereich zu verkleinern, um etwa im oberen Bereich liegende Maschinenprogramme gegen Überschreiben zu schützen.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(57)+PEEK(58)*256</strong> – Ergibt die Zeilennummer, bei der nach einer Programmunterbrechung gestoppt wurde.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(61)+PEEK(62)*256</strong> – Dies ist der Zeiger auf CONT. Normalerweise ist nach einem anschließenden CLR das Programm nicht mehr fortzusetzen. Merkt man sich jedoch die Inhalte der beiden Speicherzellen noch vor dem CLR, so kann man anschließend an den Befehl die gemerkten Werte wieder hineinPOKEn und das Programm mit CONT wieder starten.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(63)+PEEK(64)*256</strong> – So erhält man die Nummer der DATA-Zeile, aus der das zuletzt gelesene Datum geholt wurde. (Gut zum Finden von Fehlern in DATA-Zeilen geeignet.)</p>
+
+        <p class="hanging"><strong>PEEK(69)/PEEK(70)</strong> – Name der zuletzt zugewiesenen Variablen. Bei normalen Fließkommavariablen ermittelt man den Wert mit PRINT CHR$(PEEK(69))+CHR$(PEEK(70)) aus.<br>
+            Der Name von Integervariablen (zum Beispiel X%) ergibt sich durch PRINT CHR$(PEEK(69)-128)+CHR$(PEEK(70)-128).<br>
+            Strings (zum Beispiel A$) erhält man durch PRINT CHR$(PEEK(69))+CHR$(PEEK(70)-128).</p>
+
+        <p class="hanging"><strong>POKE 120,2</strong> – Der C 64 nimmt keinerlei Befehle mehr an.</p>
+
+        <p class="hanging"><strong>POKE 147,X</strong> – Springt man die LOAD-Routine im Betriebssystem an, so entscheidet der Wert dieser Speicherstelle darüber, ob ein LOAD (X = 0) oder VERIFY (X = 4) durchgeführt wird.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(152)</strong> – Gibt die Anzahl der geöffneten Dateien bekannt.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(153)</strong> – Nummer des aktuellen Eingabegerätes. Hierbei gilt:</p>
+
+        <table class="plain">
+            <tr>
+                <td>0</td>
+                <td>= Tastatur</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>= Datasette</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>= RS232-Port</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>= Bildschirm</td>
+            </tr>
+            <tr>
+                <td>8-11</td>
+                <td>= Floppy</td>
+            </tr>
+        </table>
+
+        <p class="hanging"><strong>PRINT PEEK(154)</strong> – Man erfährt hier die Nummer des aktuellen Ausgabegerätes.</p>
+
+        <table class="plain">
+            <tr>
+                <td>0</td>
+                <td>= Tastatur</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>= Datasette</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>= RS232-Port</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>= Bildschirm</td>
+            </tr>
+            <tr>
+                <td>4,5</td>
+                <td>= Drucker</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>= Plotter</td>
+            </tr>
+            <tr>
+                <td>8-11</td>
+                <td>= Floppy</td>
+            </tr>
+        </table>
+
+        <p class="hanging"><strong>POKE 157,128</strong> – Meldungen wie LOADING... oder SEARCHING... auch im Programmodus.</p>
+
+        <p class="hanging"><strong>POKE 157,192</strong> – Läßt alle Meldungen des Betriebssystems zu.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(182)</strong> – Dieser Befehl gibt die Anzahl der Zeichenlesefehler aus.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(183)</strong> – Länge des derzeitigen Filenamens.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(184)</strong> – Hiermit kann die laufende Filenummer abgerufen werden (OPEN...).</p>
+
+        <p class="hanging"><strong>PRINT PEEK(185)</strong> – Analog hierzu läßt sich die derzeitige Sekundäradresse herausfinden.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(186)</strong> – ergibt die Gerätenummer des zuletzt angesprochenen Gerätes.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(197)</strong> – Derzeit gedrückte Taste</p>
+
+        <p class="hanging"><strong>POKE 198,0 : WAIT 198,1</strong> – Der Computer wartet auf einen Tastendruck.</p>
+
+        <p class="hanging"><strong>POKE 199,1</strong> – Umschaltung in den Revers-Modus. Das Rücksetzen in die Normalausgabe erfolgt mit POKE 199,0.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(200)</strong> – Gibt an, wieviele Zeichen die zuletzt eingegebene Zeile hatte.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(201)</strong> – Gibt die Zeile der aktuellen Cursorposition an.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(202)</strong> – So erhält man die Spalte der aktuellen Cursorposition.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(203)</strong> – Gibt an, welche Taste gedrückt wurde, und zwar im Charaktermodus (siehe Tabelle im C 64-Handbuch), wobei 64 bedeutet, daß keine Taste gedrückt wurde.</p>
+
+        <p class="hanging"><strong>POKE 204,0</strong> – Der Cursor bleibt auch bei GET an.</p>
+
+        <p class="hanging"><strong>POKE 204,1:POKE 207,0</strong> – Dieses normalisiert den oberen Zustand wieder.</p>
+
+        <p class="hanging"><strong>POKE 212,0</strong> – Flag für Gänsefüßchenmodus</p>
+
+        <p class="hanging"><strong>PRINT PEEK(215)</strong> – Hiermit läßt sich das zuletzt eingegebene Zeichen im ASCII-Code auslesen.</p>
+
+        <p class="hanging"><strong>POKE 646,X</strong> – setzt die aktuelle Cursorfarbe (Wert für X von 0 bis 15).</p>
+
+        <p class="hanging"><strong>POKE 647,X</strong> – Über die X-Werte von 0 bis 15 läßt sich die jeweilige Farbe unter dem Cursor ändern.</p>
+
+        <p class="hanging"><strong>POKE 648,X</strong> – Beginn Bildschirmspeicher</p>
+
+        <p class="hanging"><strong>POKE 649,0</strong> – Sperren von Tastatureingaben.</p>
+
+        <p class="hanging"><strong>POKE 649,10</strong> – Rücksetzung auf den Normalzustand.</p>
+
+        <p class="hanging"><strong>POKE 650,255</strong> – Ab jetzt haben alle Tasten REPEAT-Funktion, das heißt Dauerfunktion.</p>
+
+        <p class="hanging"><strong>POKE 650,0</strong> – Rücksetzung in den Normalzustand.</p>
+
+        <p class="hanging"><strong>POKE 650,127</strong> – Dauerfunktion der Cursortasten ausschalten.</p>
+
+        <p class="hanging"><strong>POKE 650,64</strong> – Dauerfunktion für alle Tasten aus.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(653)</strong> – Abfrage auf SHIFT (Bit 0)-, COMMODORE (Bit 1)- und CONTROL (Bit 2)-Taste.</p>
+
+        <p class="hanging"><strong>POKE 657,128</strong> – Dieser Befehl macht die Umschaltung von der Tastatur her auf Groß- und Kleinschreibung unmöglich.</p>
+
+        <p class="hanging"><strong>POKE 768,145</strong> – Fehlermeldungen abschalten</p>
+
+        <p class="hanging"><strong>POKE 768,139</strong> – normal</p>
+
+        <p class="hanging"><strong>POKE 768,143</strong> – Reset nach Programmende</p>
+
+        <p class="hanging"><strong>POKE 770,X</strong> – Durch EinPOKEn eines beliebigen Wertes erfolgt die READY-Meldung unendlich oft. Nur noch Ausschalten hilft.</p>
+
+        <p class="hanging"><strong>POKE 774,226:POKE 775,252</strong> – Wird nun der LIST-Befehl angewandt, so erfolgt ein Reset des Computers.</p>
+
+        <p class="hanging"><strong>POKE 775,200</strong> – So kann man einen kleinen Listschutz aktivieren, der sich mit POKE 775,167 wieder desaktivieren läßt.</p>
+
+        <p class="hanging"><strong>POKE 776,1</strong> – Dieser Befehl zerstört das im Speicher befindliche Basic-Programm.</p>
+
+        <p class="hanging"><strong>POKE 777,1</strong> – Ab jetzt wird kein Befehl mehr ausgeführt. Der Cursor steht in der linken oberen Ecke.</p>
+
+        <p class="hanging">Stelle <strong>781/782</strong> – Startadresse, ab der ein Programm geladen wird. Durch entsprechende Werte kann ein Programm in einen anderen Speicherbereich geladen werden. (Siehe SYS 65493)</p>
+
+        <p class="hanging"><strong>POKE 788,52</strong> – Dieser Befehl hebt die Wirkung der STOP-Taste auf.</p>
+
+        <p class="hanging"><strong>POKE 788,49</strong> – STOP-Taste wieder einschalten</p>
+
+        <p class="hanging"><strong>POKE 788,62</strong> – Cursor blinkt schneller</p>
+
+        <p class="hanging">Stelle <strong>788/789</strong> – IRQ-Vektor. Das Betriebssystem springt ständig in diese Routine. Durch Ändern des Inhalts können eigene, »interruptgesteuerte« Maschinenroutinen ständig neben dem Hauptprogramm laufen.</p>
+
+        <p class="hanging"><strong>POKE 792,226:POKE 793,252</strong> – wirkt wie ein RESET beim Drücken der Restore-Taste.</p>
+
+        <p class="hanging"><strong>POKE 801,0:POKE 802,0:POKE 818,165</strong> – Nach diesen drei POKE-Befehlen kann ein im Speicher befindliches Programm weder auf Kassette noch auf Diskette gespeichert werden.</p>
+
+        <p class="hanging"><strong>POKE 808,225</strong> – Hebt die Tastenkombination RUN/STOP und RESTORE auf. Ein Programm läßt sich nicht mehr unterbrechen.</p>
+
+        <p class="hanging"><strong>POKE 808,237</strong> – RUN/STOP und RESTORE werden wieder aktiviert.</p>
+
+        <p class="hanging"><strong>POKE 813,2</strong> – Nach der Eingabe dieses Befehles ist ein Basic-Programm nicht mehr zu ändern.</p>
+
+        <p class="hanging"><strong>POKE 818,226:POKE 819,252</strong> – Wird der Befehl SAVE eingegeben, so löst der Computer einen Reset aus.</p>
+
+        <p class="hanging"><strong>POKE 53270,X</strong> – Durch verschiedene X-Werte kann ein horizontales Soft-Scrolling erreicht werden. X = 1: Scrollen nach rechts. X = 0: Scrollen nach links.</p>
+
+        <p class="hanging"><strong>POKE 53280,X</strong> – Ein Ändern des Wertes X im Bereich von 0 bis 15 setzt eine andere Rahmenfarbe des Bildschirms.</p>
+
+        <p class="hanging"><strong>POKE 53281,X</strong> – Gleichlautend zum oberen Befehl wird die Hintergrundfarbe geändert.</p>
+
+        <p class="hanging">Stelle <strong>53260</strong> – Joystick Port 2:</p>
+
+        <p class="hanging"><strong>WAIT 56320,16,16</strong> wartet auf Druck des Feuerknopfes.</p>
+
+        <p class="hanging"><strong>WAIT 56320,4,4</strong> – Warten auf Linksbewegung des Joysticks.</p>
+
+        <p class="hanging"><strong>WAIT 56320,1,1</strong> – Warten auf Joystick nach oben.</p>
+
+        <p class="hanging"><strong>WAIT 56320,2,2</strong> – Warten auf Joystick nach unten.</p>
+
+        <p class="hanging"><strong>WAIT 56320,8,8</strong> – Warten auf Rechtsbewegung des Joysticks.</p>
+
+        <p class="hanging">Stelle <strong>56321</strong> – Analog zu Speicherstelle 56320, nur Port 1.</p>
+
+        <p class="hanging"><strong>POKE 56325,5</strong> – Der Cursor wird rasend schnell.</p>
+
+        <p class="hanging"><strong>POKE 56325,49</strong> – Normalisierung der Cursor-Geschwindigkeit.</p>
+
+        <p class="hanging"><strong>POKE 56325,255</strong> – Der Cursor bewegt sich sehr langsam.</p>
+
+        <p class="hanging"><strong>PRINT PEEK(56576)</strong> – Abfrage der Pins am Userport. Nähere Informationen darüber im Artikel »Die Ports des C 64« in diesem Heft.</p>
+
+        <p class="hanging"><strong>POKE 56576,X</strong> – Setzen der Ausgaben auf dem Userport. Nähere Informationen finden Sie ebenfalls im oben genannten Artikel.</p>
+
+        <p class="hanging"><strong>POKE 56578,X</strong> – Datenrichtungsregister Userport. Hiermit wird entschieden, ob die Pins des Userports auf Ein- oder Ausgabeoperationen arbeiten. Informationen darüber im oben erwähnten Artikel.</p>
+
+        <p class="hanging"><strong>SYS 42039</strong> – Ausgabe von Fehlermeldungen. Dabei muß in 781 die Fehlernummer gePOKEd werden.</p>
+
+        <p class="hanging"><strong>SYS 43121</strong> – Entspricht dem Befehl RUN 0</p>
+
+        <p class="hanging"><strong>SYS 45499</strong> – Mittels dieses Befehls wird die interne Uhr auf Null gesetzt.</p>
+
+        <p class="hanging"><strong>POKE 214,(Zeile):POKE 211,(Spalte):SYS 58640</strong> – So läßt sich der Cursor ohne umständliche PRINT-Anweisungen auf jede Stelle des Bildschirms positionieren.</p>
+
+        <p class="hanging"><strong>SYS 63123</strong> – Dieser Befehl kann eine große Hilfe sein. Angenommen, ein Programm will ein anderes von der Diskette nachladen, findet es aber nicht. Das Programm steigt in diesem Fall mit der Fehlermeldung FILE NOT FOUND aus und die rote LED an der Floppy beginnt zu blinken. Durch diesen SYS können Sie nun feststellen, wie das File heißt, das gesucht wurde.</p>
+
+        <p class="hanging"><strong>SYS 64738</strong> – Hiermit wird der Computer in seinen Einschaltzustand versetzt. Das bedeutet: Programme werden gelöscht, Vektoren und Register zurückgesetzt.</p>
+
+        <p class="hanging"><strong>SYS 64763</strong> – Führt das gleiche wie SYS 64738 aus bis auf den Vektor für den IRQ, der auf seinem Wert belassen wird.</p>
+
+        <p class="hanging"><strong>SYS 65409</strong> – Setzt den Video-Chip wieder in den Ursprungszustand zurück.</p>
+
+        <p class="hanging"><strong>SYS 65511</strong> – Dieser Befehl schließt alle zu diesem Zeitpunkt offenen Files. So erspart man sich das lästige Eintippen von CLOSE 1:CLOSE 2:CLOSE 3:... Dabei sollte aber beachtet werden, daß so nur die Kanäle geschlossen werden, aber keine Dateien auf Diskette.</p>
+
+        <p class="hanging"><strong>SYS 65493</strong> – LOAD-Routine des Betriebssystems. Mit folgender kleiner Routine kann man Unterprogramme nachladen, ohne irgendwelche Basic-Pointer (zum Beispiel die Zeiger auf die Endadresse, 45 und 46) zu verändern:</p>
+        <pre><code>POKE 186,1:POKE 780,0:POKE 781,0:POKE 782,96: POKE 183,0:SYS 65493</code></pre>
+        <p>Erklärung: 186,1 = Geräteadresse für Datasette<br>
+            781 und 782 geben die Startadresse an, ab der das Programm nachgeladen werden soll.<br>
+            183,0 = kein Programmname<br>
+            SYS 65493 = LOAD-Routine</p>
+
+        <address class="author">(dm)</address>
+    </article>
+</body>
+
+</html>

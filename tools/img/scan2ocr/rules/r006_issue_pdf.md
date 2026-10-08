@@ -274,6 +274,46 @@ table; do not argue pages out of it one at a time. "There is no judgement here"
 is true only once the measure is right — and an exact 50.0 is part of that: a
 tilde gives no answer at 48 or 52 while claiming there is nothing to decide.
 
+## CROSS-CHECK THE COLOUR SET AGAINST THE SCAN RESOLUTION
+
+**Owner, 2026-10-08: "2400/600 is an indicator, but it may be wrong. rule:
+double check the ones where it disagrees."**
+
+The owner scans COLOUR pages at 2400 dpi and everything else at 600. That is a
+human judgement made at the glass, recorded in the file size, and completely
+independent of anything this step measures — so it is the cheapest second
+opinion available, and it costs one `ls`.
+
+```bash
+$PY - <<'PY'
+from PIL import Image; from pathlib import Path
+Image.MAX_IMAGE_PIXELS = None
+hi = {int(p.stem) for p in Path("<SRC_DIR>").glob("*.png")
+      if Image.open(p).size[0] > 6000}          # 2400 dpi scans
+colour = { … the approved contone list … }
+print("2400 dpi but NOT colour:", sorted(hi - colour), " <- LOOK AT THESE")
+print("colour but 600 dpi     :", sorted(colour - hi))
+PY
+```
+
+**The two directions are not equally informative, and the measurement says so.**
+A 2400 dpi scan means the owner decided that page was colour, so a 2400 dpi
+page missing from the set is a classifier MISS and must be looked at. The
+converse is weak — plenty of colour pages are scanned at 600. MEASURED on
+SH8605: **1** page in the first direction and **10** in the second, and the one
+was real while all ten were fine.
+
+That one page is **p032**, and it is why this check exists. The largest-blob
+measure cannot see it: its colour survives the 3x3 opening as 55 crumbs whose
+biggest is **35.2 mm²** against the 50 mm² threshold. Neither guard misfired —
+the near-black exclusion drops **0 mm²** of it. **And p031, which DID ship as
+colour, measures 33.0 mm²** — under threshold too, and only in the set because
+somebody forced it by hand. So the measure genuinely cannot separate these
+pages from a mono one, and nothing inside this step was ever going to.
+
+Run the cross-check before the compile, look at every page in the first
+direction, and add the real ones to `FORCE_CONTONE`.
+
 **And the mirror switch, `FORCE_BILEVEL`.** A page can be wrongly promoted to
 colour as well as wrongly kept bilevel: SH8602's p3 is black and white, but its
 banner bars are darker than the grade's K anchor, so they separated red-brown
@@ -374,11 +414,31 @@ halftones are being crushed, and the archive is not reprocessed.
 - **Step 2 needs no guetzli** on a Sonderheft of this shape: `ENCODER=fast`,
   as SH8602 used.
 
-## THE PAGE INPUTS ARE REVIEWED BEFORE THE PDF IS COMPILED — ALWAYS
+## THE PAGE-INPUT REVIEW IS STANDINGLY WAIVED — THE OWNER JUDGES THE PDF
 
-**Do not compile until the issue owner has looked at the exact files that will
-be embedded and said they are good.** Not the masters, not a sample, not a
-uniform rendering of them — the embedded images themselves.
+**Owner, 2026-10-07, asked for the third issue running and answered once for
+all of them:** *"waive. i will ALWAYS judge the PDF, not the review files.
+worst case we have to re-do the PDF too. codify"*
+
+So **do not stop for a page-input review.** Build the PDF and hand that over.
+The waiver is permanent and it is not per-issue — SH8604's *"make me the pdf,
+i'll judge on that one"* was read as covering that issue only, and asking
+again cost SH8605 a stop at this gate. It does not need asking again.
+
+The owner has accepted the cost explicitly: if the inputs were wrong, the PDF
+is rebuilt. That is their trade to make, and it is cheaper than a gate that
+stops every build to show somebody files they do not want to look at.
+
+**What the rest of this section is still for.** The reasoning below is not
+void — it says what the review set WOULD have to show, and that is still the
+specification for the artefact you hand over. Generate the review set if it
+costs nothing, mention where it is, and keep going; the one thing you must not
+do is wait.
+
+### The reasoning, kept — why a review set has to show both paths
+
+Not the masters, not a sample, not a uniform rendering of them — the embedded
+images themselves.
 
 **They are not all the same resolution, and the review must show each page as
 it will ship.** The mixed build sends each page down one of two paths:
@@ -395,18 +455,24 @@ the owner something the reader will never see, and hides exactly the defects
 bilevel conversion introduces — a thin rule dropped, halftone gone to noise,
 type thinned at the threshold.
 
-This is not a formality and it is not conditional on how the run went:
+The costs that argued for the gate are real and are now the owner's to carry,
+having been told plainly:
 
 - the compile is expensive (hours, with a quality binary search over the whole
   issue) and every defect found afterwards costs the whole build again;
 - a grading or cutting mistake is obvious at 150 dpi and invisible in a log;
-- the cover is hand-made and must be checked in the same pass, since it is
-  page 1's image rather than a re-derivation.
+- the cover is hand-made and ships as page 1's image rather than a
+  re-derivation.
 
-**How to present them:** the prepared 150 dpi pages, in page order, as files the
-owner can open — plus a contact sheet for the sweep. Say where they are on
-disk. Then WAIT. A build started without that review is to be stopped, not
-finished; SH8601's first two builds were.
+**How to present the set, if you make one:** the prepared 150 dpi pages, in
+page order, as files the owner can open — plus a contact sheet for the sweep.
+Say where they are on disk. **Then CARRY ON and compile.** Do not wait.
+
+(This paragraph used to end "Then WAIT. A build started without that review is
+to be stopped, not finished; SH8601's first two builds were." That is
+superseded by the standing waiver above. The SH8601 history is why the gate
+existed; the owner has since judged the trade differently, and it is theirs to
+judge.)
 
 ## The PDF's metadata is a house standard — and it is NOT set by the scripts
 

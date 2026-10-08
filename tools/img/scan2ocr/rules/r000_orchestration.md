@@ -800,6 +800,27 @@ commit by `git add -A`. Both are preventable:
    be partly populated when you arrive — reconcile it deliberately, per
    file, before committing.
 
+   **AND `git commit -- <path>` COMMITS THE WORKTREE FILE, NOT WHAT YOU
+   STAGED.** A pathspec on `git commit` bypasses the index for those paths
+   entirely, so a file you deliberately staged in part — `git add -p`, or a
+   change you were holding back for the owner — goes in whole. The two
+   defences in this section pull against each other here: committing by
+   pathspec is what stops a sibling's self-staged output being swept
+   (*Commit by pathspec while a sibling builds*), and it is also what
+   defeats partial staging.
+
+   MEASURED on SH8605's step 330: the 14 reprint credits were being held
+   uncommitted for an owner ruling, and a pathspec commit of one article took
+   the held credit with it. Caught and amended before any push.
+
+   **So: a file you are holding back in part does not go in the same commit
+   as a file you are committing by pathspec.** Either finish the holding-back
+   by keeping the held hunk out of the worktree (stash it, or keep it in a
+   scratch copy), or commit that file separately from the index with no
+   pathspec on `git commit`. And before any commit during a build, read
+   `git status --short` and `git diff --cached --stat` and check that what is
+   about to go in is what you meant — the pathspec is not the whole answer.
+
    **When TWO agents share one working tree, an explicit pathspec is not
    enough — commit by pathspec too.** The index is shared, so a rule script
    that `git add`s its output and a supervisor that commits a rule change

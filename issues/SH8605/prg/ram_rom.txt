@@ -1,0 +1,28 @@
+
+
+;ram_rom.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *        d e m o 1              *
+    4 rem *                               *
+    5 rem *  heimo ponnath hamburg 1985   *
+    6 rem *                               *
+    7 rem *********************************
+   10 printchr$(147):poke211,7:poke214,10:sys58640
+   15 print"so sieht ein rom-bereich aus:":fori=55296to56295:pokei,0:next
+   20 j=1:w=128:gosub200:fori=40960to40960+1023:pokei,peek(i):next
+   25 geta$:ifa$=""then25
+   30 j=3:w=48:gosub200:printchr$(147):poke211,0:poke214,10:sys58640
+   35 print"das ist der vom computer reservierte ram"
+   37 fori=55296to56295:pokei,0:next
+   40 j=3:w=0:gosub200
+   45 geta$:ifa$=""then45
+   50 poke56576,151:poke56578,63:poke53272,21:poke648,4:end
+  199 rem ++ up.bildschirm verschieben ++
+  200 poke56576,(peek(56576)and252)orj
+  205 poke56578,peek(56578)or3
+  210 poke53272,(peek(53272)and15)orw
+  215 p=(w/16*1024+16384*(3-j))/256
+  220 poke648,p
+  225 return
+

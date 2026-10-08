@@ -1,0 +1,53 @@
+
+
+;klang + 3.stimme.prg ==0801==
+  100 rem--------------------------------
+  110 rem klangeffekte mit
+  120 rem dynamischer steuerung
+  125 rem durch stimme 3
+  130 rem--------------------------------
+  140 s=54272
+  150 read a,d,su,r,c,p,f,g,n,m
+  160 poke s+5 ,16*a +d
+  170 poke s+6 ,16*su+r
+  180 poke s+2 ,p and 255
+  190 poke s+3 ,p/256
+  200 poke s+23,0     :rem fr
+  210 poke s+24,128+15:rem ml (s3 aus)
+  220 read a3,d3,s3,r3,c3,p3,f3,q
+  230 hi=int(f3/256):lo=f3-256*hi
+  240 poke s+14,lo
+  250 poke s+15,hi
+  260 poke s+16,p3 and 255
+  270 poke s+17,p3/256
+  280 poke s+19,16*a3+d3
+  290 poke s+20,16*s3+r3
+  300 q=s+q
+  310 f=f/256
+  320 get a$:if a$="" then 320
+  330 for i=1 to m
+  340 : poke s+4 ,c or 1
+  350 : poke s+18,c3 or 1
+  360 : for j=1 to n
+  370 :   poke s+1,f*(1+peek(q)/g)
+  380 : next j
+  390 : poke s+4 ,c
+  400 : poke s+18,c3
+  410 next i
+  420 goto 320
+  500 rem--------------------------------
+  510 rem parameter stimme 1
+  520 data 0 , 8, 0, 8:rem a d su r
+  530 data 32         :rem control-byte c
+  540 data 2048       :rem pulsweite p
+  550 data 40000      :rem frequenz f
+  560 data 500        :rem faktor g
+  570 data 8          :rem anzahl n
+  580 data 10         :rem anzahl m
+  600 rem parameter stimme 3
+  610 data  0, 8, 0, 0:rem a3 d3 s3 r3
+  620 data 16         :rem control c3
+  630 data 2048       :rem pulsweite p3
+  640 data 10         :rem frequenz f3
+  650 data 28         :rem mod.-quelle q
+

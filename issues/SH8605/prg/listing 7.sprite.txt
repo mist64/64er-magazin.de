@@ -1,0 +1,28 @@
+
+
+;listing 7.sprite.prg ==0801==
+  310 x=0:y=0
+  320 p2=peek(56320)
+  321 if (p2 and 1)=0 then y=-4
+  322 if (p2 and 2)=0 then y=+4
+  323 if (p2 and 4)=0 then x=-4:xb=2
+  324 if (p2 and 8)=0 then x=+4:xb=0
+  330 if x=0 and y=0 then 320
+  340 poke 2040,32+xb
+  345 gosub 500
+  350 poke 2040,33+xb
+  355 gosub 500
+  400 goto 310
+  500 bw=bw+x
+  501 cw=cw+y
+  505 if bw>344 then bw=0
+  506 if bw<0 then bw=bw+344
+  507 if cw>242 then cw=0
+  508 if cw<0 then cw=cw+242
+  510 bh=int(bw/256):bl=bw-bh*256
+  520 poke v+0,bl
+  521 poke v+1,cw
+  530 poke v+16,bh
+  560 for w=0 to 50:next
+  600 return
+

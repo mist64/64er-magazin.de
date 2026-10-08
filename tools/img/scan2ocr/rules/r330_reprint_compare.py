@@ -64,6 +64,20 @@ SKIP_TAGS = {"head", "script", "style", "pre", "code", "noscript", "template"}
 # neighbour.  Excluding the credit here is what keeps that from happening.
 REPRINT_CREDIT = re.compile(r"^(Teilweiser\s+)?Nachdruck\s+aus\b", re.I)
 
+# Never compared, for exactly the same reason: OUR Futureteufelchen note is
+# site apparatus printed on NEITHER page.  r300 adds one where a reprint lacks
+# an erratum its original carried, so it exists on our side only and enters the
+# diff as a block-only-in-ours that no disposition fits -- PRINT would claim
+# both pages print it and OURS would claim we misread something.  And because
+# D-numbering is positional, one aside shifts every difference after it, which
+# is the failure the credit exclusion above was written for: on SH8605 the two
+# asides would have hit all 27 pairs of articles 155 and 164.
+#
+# THE CLASS IS THE TEST, AND IT IS EXACT.  `fehlerteufelchen` is the MAGAZINE'S
+# own printed errata column -- real transcribed prose that must stay compared.
+# Only `futureteufelchen`, which is ours, is excluded.
+EXCLUDED_ASIDE = "futureteufelchen"
+
 PAGES_META = re.compile(r'<meta\s+name="64er\.pages"\s+content="([^"]*)"', re.I)
 ISSUE_META = re.compile(r'<meta\s+name="64er\.issue"\s+content="([^"]*)"', re.I)
 TITLE_TAG = re.compile(r"<title>(.*?)</title>", re.I | re.S)
@@ -109,6 +123,7 @@ class _Extractor(html.parser.HTMLParser):
         self._buf = []
         self._role = None
         self._skip = 0
+        self._excl = 0        # nesting depth inside an excluded <aside>
 
     # -- helpers ---------------------------------------------------------
     def _flush(self):
@@ -122,6 +137,15 @@ class _Extractor(html.parser.HTMLParser):
 
     # -- parser callbacks ------------------------------------------------
     def handle_starttag(self, tag, attrs):
+        if self._excl:
+            if tag == "aside":
+                self._excl += 1
+            return
+        if tag == "aside" and \
+                EXCLUDED_ASIDE in dict(attrs).get("class", "").split():
+            self._flush()
+            self._excl = 1
+            return
         if tag in SKIP_TAGS:
             self._skip += 1
             return
@@ -136,10 +160,19 @@ class _Extractor(html.parser.HTMLParser):
             self._role = tag + ("." + cls[0] if cls else "")
 
     def handle_startendtag(self, tag, attrs):
+        if self._excl:
+            return
         if tag == "br" and not self._skip:
             self._buf.append(" ")
 
     def handle_endtag(self, tag):
+        if self._excl:
+            if tag == "aside":
+                self._excl -= 1
+                if self._excl == 0:
+                    self._buf = []
+                    self._role = None
+            return
         if tag in SKIP_TAGS:
             self._skip = max(0, self._skip - 1)
             return
@@ -404,9 +437,47 @@ def diff_report(a_path, b_path, context=6, min_sim=0.45, out=sys.stdout):
 # verify
 # ---------------------------------------------------------------------------
 
-VERDICTS = {"CONFIRMED", "PARTIAL", "NOT-A-REPRINT", "UNRESOLVED"}
+# REVERSED: this issue PREDATES the "original".  It is not NOT-A-REPRINT,
+# because that skips the diff and the comparison is still a good OCR
+# cross-check; and it must never carry a credit, because the credit would
+# claim a direction of copying that is false.  It takes the full CONFIRMED /
+# PARTIAL path below -- the diff runs and every difference is dispositioned.
+#
+# WHY THIS IS NEEDED AT ALL: `pubdate.txt` is the REPUBLICATION date, forty
+# years on, and the republication order is NOT the original order.  MEASURED:
+# SH8605's pubdate is 2026-10-31 against 8606's 2026-05-16 and 8607's
+# 2026-06-14, so by pubdate this issue looks later than both -- while
+# Sonderheft 5/86 obviously precedes 6/86 and 7/86.  Lane A credited SH8605's
+# 114 to 8606/160 and 8607/92 on exactly that reading.
+VERDICTS = {"CONFIRMED", "PARTIAL", "NOT-A-REPRINT", "UNRESOLVED", "REVERSED"}
 CAND_LINE = re.compile(r"^\s*[-*]\s+(CANDIDATE|REJECTED)\s+`([^`]+)`")
-DISPOSITIONS = {"OURS", "THEIRS", "PRINT", "UNRESOLVED"}
+# THE VOCABULARY IS THE RULE'S, AND IT IS SIX.  MOVED and MARKUP were added to
+# r330's step-5 table in fc1e404f and that harvest did NOT update this file --
+# so the rule prescribed two words `verify` then rejected.  Found by SH8605,
+# whose lane B has 10 MOVED and 1 MARKUP of 14 differences on one reprint.
+#
+# The four-column LOG table cannot express the two new ones, and older issues'
+# tables have exactly nine cells, so BOTH forms are accepted: nine cells means
+# the old four buckets, eleven means all six.  A nine-cell table that tries to
+# carry a MOVED or MARKUP disposition is the one combination that fails, with
+# the reason named -- silently folding them into PRINT is what this change
+# exists to stop, because PRINT asserts "both pages print it differently",
+# which is false of a block that merely MOVED.
+BUCKETS_4 = ("OURS", "THEIRS", "PRINT", "UNRESOLVED")
+BUCKETS_6 = BUCKETS_4 + ("MOVED", "MARKUP")
+# CROP: one side publishes the content as a delivered owner crop
+# (owner-crop-wins) and the other as text.  Same printed content, different
+# MEDIUM -- which is not MARKUP, because MARKUP says "the words are the same"
+# and on the cropped side there are no words at all.  That distinction is the
+# point: a CROP divergence means our page is not searchable there, which a
+# reader of the LOG needs to know and a tagging difference never implies.
+# Found on SH8605's 20 <- 8510/129: 51 cells of a User-Port pin table that we
+# publish as 20-3.png and 8510 publishes as HTML.
+BUCKETS_7 = BUCKETS_6 + ("CROP",)
+DISPOSITIONS = set(BUCKETS_7)
+# row width -> bucket names.  Older issues' tables have 9 cells and must keep
+# verifying; 11 was this session's six-word table; 12 is the current one.
+_BY_WIDTH = {9: BUCKETS_4, 11: BUCKETS_6, 12: BUCKETS_7}
 DISP_LINE = re.compile(r"^\s*[-*]\s+D-(\d{3,})\s+([A-Z-]+)\b")
 STEP_HEAD = re.compile(r"^##\s+Step\s+330\b", re.M)
 NEXT_H2 = re.compile(r"^##\s+(?!#)", re.M)
@@ -592,7 +663,7 @@ def verify(repo, issue_dir):
         for k, m in enumerate(heads):
             if key not in m.group(0):
                 continue
-            if verdict == "PARTIAL" and lead not in m.group(0):
+            if verdict in ("PARTIAL", "REVERSED") and lead not in m.group(0):
                 continue  # one subsection per original, disambiguated by lead
             end = heads[k + 1].start() if k + 1 < len(heads) else len(section)
             chunk = section[m.end():end]
@@ -624,21 +695,29 @@ def verify(repo, issue_dir):
         # otherwise a summary row can quietly say "all editorial" over a list
         # that says otherwise.
         if len(r) >= 9:
+            names = _BY_WIDTH.get(min(len(r), 12), BUCKETS_4)
+            wide = names is not BUCKETS_4
             try:
                 stated = int(r[4])
-                buckets = [int(x) for x in r[5:9]]
+                buckets = [int(x) for x in r[5:5 + len(names)]]
             except ValueError:
-                problems.append(f"{lead}: D / OURS / THEIRS / PRINT / UNRESOLVED must be numbers")
+                problems.append(f"{lead}: D / " + " / ".join(names) + " must be numbers")
             else:
                 if stated != n:
                     problems.append(f"{lead}: table says D={stated}, the diff reports {n}")
                 if sum(buckets) != stated:
-                    problems.append(f"{lead}: OURS+THEIRS+PRINT+UNRESOLVED={sum(buckets)} != D={stated}")
-                actual = [sum(1 for t in seen.values() if t == d)
-                          for d in ("OURS", "THEIRS", "PRINT", "UNRESOLVED")]
+                    problems.append(f"{lead}: " + "+".join(names)
+                                    + f"={sum(buckets)} != D={stated}")
+                actual = [sum(1 for t in seen.values() if t == d) for d in names]
                 if actual != buckets:
-                    problems.append(f"{lead}: table counts {buckets} != dispositions {actual} "
-                                    "(OURS, THEIRS, PRINT, UNRESOLVED)")
+                    problems.append(f"{lead}: table counts {buckets} != dispositions "
+                                    f"{actual} (" + ", ".join(names) + ")")
+                late = sorted({t for t in seen.values() if t not in names})
+                if late:
+                    problems.append(
+                        f"{lead}: {', '.join(late)} cannot be counted in a "
+                        f"{len(names)}-column table -- widen this row to "
+                        f"D | " + " | ".join(BUCKETS_7) + " (12 cells)")
 
         if len(problems) == before:
             print(f"OK: {key} ← {lead} — {n} difference(s), all dispositioned")

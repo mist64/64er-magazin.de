@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Sphärenklänge</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Krätzig, tr">
+    <meta name="64er.issue" content="Sonderheft 5/86">
+    <meta name="64er.pages" content="69-76">
+    <meta name="64er.head1" content="Software-Grundlagen">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Software-Grundlagen">
+    <meta name="64er.index_category" content="Software-Grundlagen|Sound">
+    <meta name="64er.id" content="musik">
+</head>
+
+<body>
+    <article>
+        <h1>Sphärenklänge</h1>
+        <p class="intro">Wissen Sie eigentlich, welche Klangvielfalt Sie Ihrem C 64 entlocken können; wie man Musik oder Geräusche programmiert? Wir bringen Ihnen eine ausführliche und leicht verständliche Einführung zu diesem interessanten Thema.</p>
+
+        <p>Zur Erzeugung von Geräuschen und von Musik ist der C 64 mit einem leistungsfähigen Baustein ausgestattet. Er trägt die Bezeichnung 6581 und soll hier im folgenden SID genannt werden. SID steht für »Sound Interface Device«, was man mit »Klang-Schnittstellen-Baustein« übersetzen könnte. Der SID ist eigentlich ein kleiner Synthesizer, der dreistimmige Melodien spielen oder drei unabhängige Geräusche gleichzeitig erzeugen kann oder auch eine Kombination von beiden, zum Beispiel eine zweistimmige Melodie oder ein Geräusch. Wie man ihn dafür programmiert, soll hier gezeigt werden. Da das Standard-Basic des C 64 keine speziellen Befehle zu diesem Zweck vorsieht, muß man sich näher mit dem inneren Aufbau des SID befassen, um ihn dann mit PEEK- und POKE-Befehlen zu steuern. Dieser gezwungenermaßen etwas unelegante Programmierstil hat aber wenigstens einen Vorteil für denjenigen, der in Maschinensprache programmieren kann oder es lernen will. Er kann nämlich die PEEK- und POKE-Befehle direkt in die Assemblersprache übernehmen. Stürzen wir uns also gleich mittenhinein in die SID-Programmierung (in Basic).</p>
+
+        <p>Beim SID wird ein Klang durch folgende Parameter (= Steuergrößen) beeinflußt:</p>
+
+        <table class="plain">
+            <tr>
+                <td>1) Lautstärke</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2) Hüllkurve</td>
+                <td>Sie steuert den zeitlichen Lautstärkenverlauf zum Beispiel eines ausklingenden Tones.</td>
+            </tr>
+            <tr>
+                <td>3) Kurvenform</td>
+                <td>Sie ist für den Klangcharakter des Tones verantwortlich.</td>
+            </tr>
+            <tr>
+                <td>4) Frequenz</td>
+                <td>Sie entspricht der Tonhöhe.</td>
+            </tr>
+        </table>
+
+        <p>Mit Einzelheiten und mit weiteren Parametern zur Klangsteuerung werden wir uns gleich befassen. Zunächst wollen wir aber einmal einen Ton erzeugen, zum Beispiel um zu hören, ob unser Monitor oder Fernseher, der die Töne wiedergeben muß, richtig eingestellt ist (Perfektionisten schließen den C 64 über die Audio/Video-Buchse und ein normales DIN-Überspielkabel an die HiFi-Anlage an).</p>
+
+        <table class="plain nobreak0">
+            <tr>
+                <td>POKE 54296,15</td>
+                <td>stellt den SID auf maximale Lautstärke</td>
+            </tr>
+            <tr>
+                <td>POKE 54278,240</td>
+                <td>wählt eine einfache Hüllkurve.</td>
+            </tr>
+            <tr>
+                <td>POKE 54273,67</td>
+                <td>stellt eine Frequenz ein (zirka 1000 Hz).</td>
+            </tr>
+            <tr>
+                <td>POKE 54276,17</td>
+                <td>wählt eine sogenannte Dreieckskurve und schaltet zugleich den Ton ein (muß immer als Letztes geschehen!).</td>
+            </tr>
+        </table>
+
+        <p>Jetzt müßte ein Ton hörbar sein, der ähnlich wie bei einem Fernseh-Testbild klingt.</p>
+
+        <table class="plain nobreak0">
+            <tr>
+                <td>POKE 54276,16</td>
+                <td>schaltet den Ton wieder ab.</td>
+            </tr>
+        </table>
+
+        <p>Der gleiche Ton mit schärferem Klang gefällig?</p>
+
+        <table class="plain nobreak0">
+            <tr>
+                <td>POKE 54276,33</td>
+                <td>wählt eine »Sägezahnkurve«. Diese klingt heller und schärfer als das Dreieck.</td>
+            </tr>
+        </table>
+
+        <p>Doch anstatt mit geheimnisvollen POKEs zu arbeiten, sollten wir uns doch besser systematisch mit dem SID befassen. Wer aber nur schnell einen Klangeffekt für ein eigenes Programm benötigt und wen die Einzelheiten des SID nicht so sehr interessieren, der kann den systematischen Teil überspringen und gleich bei »Klangeffekte zum Abtippen« weiterlesen.</p>
+
+
+
+        <p>Unter einem Register versteht man in der Computertechnik einen Speicherplatz, der mit einer besonderen Funktion gekoppelt ist. Diese Speicherplätze sind also nicht dazu da, um Daten darin abzulegen, sondern um eine Funktion auszulösen oder um Informationen über den Zustand eines Bausteins zu bekommen. Man unterscheidet demnach Schreibregister und Leseregister.</p>
+
+        <p>Der SID verfügt insgesamt über 25 Schreib- und Leseregister. Auf Bild 1 sind diese in grafischer Form dargestellt. Der SID hat die Basisadresse:</p>
+
+        <p>S = 54272 (dezimal) oder $D400 (hexadezimal)</p>
+        <figure>
+            <img src="69-1.png" alt="Registerschema »Die Register des SID«, Basisadresse S = 54272: Adressen S+0 bis S+28 für die drei Stimmen mit Bitnummern 7 bis 0, Frequenz, Pulsweite, Wellenformen, Attack, Decay, Sustain, Release, Filter und Lautstärke">
+            <figcaption>Bild 1. Alle Register des Sound-Chip auf einen Blick</figcaption>
+        </figure>
+
+        <p>Unter dieser und den 28 folgenden Adressen können die Register des SID angesprochen werden. Wir werden in Zukunft Registeradressen wie in Bild 1 immer in der Form S+n (n = 0 bis 28) angeben, weil diese Schreibweise prägnanter als eine fünfstellige Zahl ist. Es ist empfehlenswert, sich auch in Programmen an diese Vereinbarung zu halten.</p>
+
+        <p>Das Registerschema gliedert sich in drei Blöcke: Der erste Block ist in Wirklichkeit dreimal vorhanden, für jede Stimme einmal. Die sieben Register dieser Blöcke haben also für die drei Stimmen unterschiedliche Adressen, wie links im Schema auch angegeben ist.</p>
+
+        <h2>Ein Instrument mit 29 Registern</h2>
+
+        <p>Der zweite Block (S+21 bis S+24) dient hauptsächlich zur zusätzlichen Klangbeeinflussung durch einen Filter. Den Filter werden wir aber erst später behandeln. Aus diesem Block interessiert zunächst nur die rechte Hälfte des Registers S+24, das für die Lautstärke zuständig ist.</p>
+
+        <p>Der dritte Block (S+25 bis S+28) besteht aus vier sogenannten »Nur-Lese-Registern«. Aus diesen Registern kann nur gelesen werden, Schreibzugriffe bleiben wirkungslos. Auch diese Register, die Spezialeffekten dienen, interessieren uns zunächst noch nicht.</p>
+
+        <p>Ein Register besteht, wie jeder andere Speicherplatz beim C 64 auch, aus einem Byte, beziehungsweise 8 Bit. Man sieht, daß einige Register noch in Felder unterteilt sind. Bei diesen Registern haben einzelne Bits oder Bitgruppen unterschiedliche Bedeutung. Die schraffierten Bereiche kennzeichnen Bits, die keine Funktion im SID haben. Wir werden bald sehen, wie man einzelne Bits innerhalb eines Byte gezielt ansprechen kann. Nun zu den Registern im einzelnen: Es werden beim ersten Block stellvertretend die Register der Stimme 1 (S+0 bis S+6) beschrieben. Die Register für Stimme 2 (S+7 bis S+13) und Stimme 3 (S+14 bis S+20) sind in ihrer Funktion identisch.</p>
+
+        <p>Ab hier ist es praktisch, wenn man bei der Lektüre das kleine Programm aus Listing 1 im Computer hat, denn dann kann man die Wirkung der Parameter in den SID-Registern gleich ausprobieren. Die Parameter stehen gut les- und editierbar in den DATA-Zeilen. Das Programm erzeugt nach dem Starten einen Ton bei einem beliebigen Tastendruck. Tasten mit Auto-Repeat-Funktion, wie zum Beispiel die Space-Taste, erzeugen einen Dauerton. Abgebrochen wird das Programm mit der RUN/STOP-Taste. Der letzte Parameter steuert übrigens die Tonlänge durch eine einfache Verzögerungsschleife.</p>
+
+        <h2>Frequenz S+0 und S+1</h2>
+
+        <p>Die Frequenz kann beim SID auf 16 Bit genau angegeben werden. Eine 16-Bit-Zahl kann Werte zwischen 0 und 65535 annehmen. Dieser Wert entspricht allerdings nicht der Frequenz in Hz (Hertz = Schwingungen pro Sekunde). Der SID-Wert F zu einer gegebenen Frequenz in Hz errechnet sich nach:</p>
+
+        <pre><code>F = 17.0284 * Frequenz</code></pre>
+
+        <p>Der SID-Wert F zum sogenannten Kammerton a mit 440 Hz beträgt also (ganzzahlig gerundet):</p>
+
+        <pre><code>F = 17.0284 * 440 ≈ 7492</code></pre>
+
+        <p>Die höchste vom SID erzeugbare Frequenz beträgt dann (gerundet):</p>
+
+        <pre><code>65535 / 17.0284 ≈ 3849 (Hz)</code></pre>
+
+        <p>Zum Experimentieren mit Klangeffekten interessiert uns die genaue Frequenz eigentlich gar nicht, für korrekt gestimmte Tonleitern müssen wir sie dagegen kennen. Zunächst wollen wir aber erfahren, wie man den SID mit dem Wert F (Frequenz) programmiert. Diese im Dezimalsystem maximal fünfstellige Zahl wird im Binärsystem durch 16 Bit dargestellt. Da es sich beim C 64 um einen 8-Bit-Mikrocomputer handelt, müssen wir diesen Wert in zwei 8-Bit-Hälften, das sogenannte niederwertige und höherwertige Byte, kurz Low-Byte und High-Byte zerlegen. Hier zwei »Rezepte«:</p>
+
+        <p>1. Methode (Standard):</p>
+
+        <pre><code>HI = INT(F/256)
+LO = F-256*HI</code></pre>
+
+        <p>Das ist nichts anderes als eine Division durch 256 mit Rest. HI ist dabei der Quotient und LO der Divisionsrest. Die Werte LO und HI sind beide Byte-Werte und liegen damit im Bereich 0 bis 255. Im Fall F=7492 (entsprechend 440 Hz) ergibt sich zum Beispiel:</p>
+
+        <pre><code>HI = 29 und LO = 68</code></pre>
+
+        <p>2. Methode (mit Einschränkungen, aber schneller):</p>
+
+        <pre><code>HI = F/256
+LO = F AND 255</code></pre>
+
+        <p>Die INT-Funktion zur Berechnung von HI wurde hier gespart. HI kann hier noch Nachkommastellen haben; diese werden aber später von dem noch folgenden POKE-Befehl abgeschnitten. Die Berechnung von LO funktioniert hier nur bei F-Werten im Bereich 0 bis 32767. Die zweite Methode ist nur dann zu empfehlen, wenn es auf Geschwindigkeit ankommt.</p>
+
+        <p>Mit den Werten LO und HI müssen wir dann die beiden Register S+0 und S+1 besetzen:</p>
+
+        <pre><code>POKE S+0,LO
+POKE S+1,HI</code></pre>
+
+        <p>Man kann die Wirkungsweise des High- und Low-Bytes auch als Grob- und Feineinstellung auffassen. Oft genügt für einen Klangeffekt eine grobe Frequenzsteuerung. Man braucht dann nur das High-Byte zu berücksichtigen und kann das Low-Byte ein für allemal zum Beispiel auf 0 setzen.</p>
+
+        <h2>Pulsweite S+2 und S+3</h2>
+
+        <p>Der Parameter »Pulsweite« ist nur wirksam, wenn als Kurvenform das Rechteck gewählt wurde. Die Kurvenformen sind in Bild 1 bei Register S+4 grafisch dargestellt und werden im nächsten Abschnitt besprochen. Das Rechteck ist eine Kurvenform, die nur zwischen zwei Werten hin- und herspringt. Ist der obere Wert genauso lang wie der untere, so spricht man von einer symmetrischen Rechteckkurve. Das Verhältnis zwischen der Länge des oberen und des unteren Wertes kann mit dem Parameter »Pulsweite«, im folgenden P genannt, gesteuert werden. P kann Werte von 0 bis 4095 annehmen und wirkt sich auf die Klangfarbe des Tones aus. Das symmetrische Rechteck, das man mit P = 2048 erhält, klingt verhältnismäßig hohl und wird als typischer Rechteckklang bezeichnet. Entfernt man sich mit P von 2048 in Richtung 0 oder 4095, so wird der Klang zunehmend heller und später schnarrend oder zirpend. Maßgeblich ist hierbei nur der Abstand von P zum Mittelwert 2048. So klingt zum Beispiel P = 2048+500 genauso wie P = 2048-500. Bei P=0 und P=4095 wird kein Ton mehr erzeugt.</p>
+
+        <p>P ist eine 12-Bit-Größe und muß wie F in ein Low- und ein High-Byte zerlegt werden. Beim High-Byte können dabei nur die unteren vier Bit gesetzt sein. Zu diesem Zweck kann man ohne Einschränkungen die schon beschriebene Methode 2 anwenden:</p>
+
+        <pre><code>HI = P/256
+LO = P AND 255
+POKE S+2,LO
+POKE S+3,HI</code></pre>
+
+        <h2>Steuerregister S+4</h2>
+
+        <p>Dieses Register ist für mehrere Funktionen gleichzeitig zuständig:</p>
+
+        <p>— Die Wahl der Kurvenform</p>
+
+        <p>— Ein- und Ausschalten des Tones</p>
+
+        <p>— Spezialeffekte Ringmodulation und Synchronisation</p>
+
+        <p>— Reset der Stimme</p>
+
+
+        <p>Zunächst einmal eine Tabelle mit den Funktionen im einzelnen:</p>
+        <table class="right1">
+            <tr>
+                <th>Bit</th>
+                <th>Dezimalwert (POKE...)</th>
+                <th>Funktion</th>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>1</td>
+                <td>GATE schaltet Ton ein und aus</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>SYNC Synchronisation (Spezialeffekt)</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>4</td>
+                <td>RING Ringmodulation (Spezialeffekt)</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>8</td>
+                <td>TEST Reset</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>16</td>
+                <td>wählt Dreieckskurve</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>32</td>
+                <td>wählt Sägezahnkurve</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>64</td>
+                <td>wählt Rechteckkurve</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>128</td>
+                <td>wählt Rauschen</td>
+            </tr>
+        </table>
+
+        <p>Mit einem POKE an die Adresse S+4 werden immer alle acht Bit gleichzeitig beeinflußt. Einen Befehl zum Setzen oder Löschen einzelner Bits gibt es nicht. Man muß sich daher über die gewünschten Werte aller acht Bits im klaren sein, auch wenn man nur ein Bit verändern will. Um den richtigen POKE-Wert zu erhalten, müssen die Wertigkeiten der Bits, die man setzen will, addiert werden. Dazu drei Beispiele:</p>
+
+        <p>1) Rechteck wählen und Ton einschalten</p>
+        <table class="plain">
+            <tr>
+                <td>Bits:</td>
+                <td>6 und 0</td>
+            </tr>
+            <tr>
+                <td>= Byte-Wert:</td>
+                <td>2↑6+1 = 65</td>
+            </tr>
+            <tr>
+                <td>POKE S+4,65</td>
+                <td></td>
+            </tr>
+        </table>
+
+        <p>2) Ton abschalten, Rechteck gewählt lassen</p>
+        <table class="plain">
+            <tr>
+                <td>Bits:</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td>Byte-Wert:</td>
+                <td>2↑6 = 64</td>
+            </tr>
+            <tr>
+                <td>POKE S+4,64</td>
+                <td></td>
+            </tr>
+        </table>
+
+        <p>Anmerkung: Beim Abschalten eines Tons sollte man immer die zuletzt gewählte Kurvenform gewählt lassen, damit der Ton ausklingen kann. Mit POKE S+4,0 (alle Bits rücksetzen) wird der Ton abrupt abgebrochen.</p>
+
+        <p>3) Dreieck mit Ringmodulation wählen, Ton einschalten</p>
+        <table class="plain">
+            <tr>
+                <td>Bits:</td>
+                <td>4, 2 und 0</td>
+            </tr>
+            <tr>
+                <td>Byte-Wert:</td>
+                <td>2↑4+2↑2+2↑0 = 16+4+1 = 21</td>
+            </tr>
+            <tr>
+                <td>POKE S+4,21</td>
+                <td></td>
+            </tr>
+        </table>
+
+        <h2>Die Kurvenform</h2>
+
+        <p>Sie bestimmt die Klangfarbe des Tones. Am vielseitigsten ist das schon besprochene Rechteck, weil man es durch die Pulsweite reichhaltig gestalten kann. Der Sägezahn klingt noch etwas heller und strahlender als das Rechteck. Er eignet sich besonders gut zur Imitation mancher Instrumentenklänge wie Streicher und Blechbläser. Das Dreieck klingt dagegen weich und dumpf und ist bei tiefen Tönen leider leise. Der Klang ist aber bei hohen Tönen sehr angenehm. Rauschen eignet sich für Effekte wie Wind, Düsenlärm, Schüsse, Explosionen und Schlagzeugklänge. Das Rauschen hat zwar keine feste Tonhöhe, doch sein Klangcharakter wird durch den Frequenzparameter entscheidend beeinflußt.</p>
+
+        <p>Indem man zwei Kurvenform-Bits gleichzeitig setzt, kann man durch Kombination mehrerer Kurvenformen weitere Klänge erzeugen. Dabei werden die Einzelklänge nicht etwa einfach gemischt, sondern es werden andere Kurvenformen erzeugt. Rauschen läßt sich allerdings nicht mit einer anderen Kurvenform kombinieren. Auch die Kombination von drei Kurvenformen ist unbrauchbar. Sie liefert einen leisen, fast im Rauschen untergehenden Klang. Es bleiben also drei Kombinationen, die sehr interessant klingen:</p>
+
+        <table class="plain">
+            <tr>
+                <th></th>
+                <th>POKE-Wert (An/Aus)</th>
+            </tr>
+            <tr>
+                <td>Rechteck – Sägezahn</td>
+                <td>97/96</td>
+            </tr>
+            <tr>
+                <td>Rechteck – Dreieck</td>
+                <td>81/80</td>
+            </tr>
+            <tr>
+                <td>Sägezahn – Dreieck</td>
+                <td>49/48</td>
+            </tr>
+        </table>
+
+        <p>Der Klangcharakter variiert stark von tiefen zu hohen Tönen. Die letzte Kombination liefert zum Beispiel nur bei sehr tiefen Tönen gute Resultate. Der Klang der ersten beiden Kombinationen hängt natürlich auch von der Pulsweite P ab.</p>
+
+        <h2>Die Spezialeffekte</h2>
+
+        <p>Sie sollen hier nur am Rande erwähnt werden. Wird das SYNC-Bit für Stimme 1 gesetzt (Bit 1 in Register S+4), so kann Stimme 1 nicht mehr frei schwingen, sondern wird von Stimme 3 mit beeinflußt, man sagt hier »synchronisiert«. Auch das Ring-Bit bewirkt, daß Stimme 3 die Stimme 1 beeinflußt. Diese sogenannte Ringmodulation wirkt allerdings nur auf die Dreieckskurve. Der Effekt ist daher nur hörbar, wenn das Ring-Bit (Bit 2) zusammen mit Bit 4 für Dreieck gesetzt wird. Beide Effekte liefern ähnliche Resultate. Es lassen sich unter anderem metallische und glockenähnliche Klänge erzeugen. Die Stimme 3 braucht dabei nicht über ihr GATE-Bit eingeschaltet werden. Maßgeblich ist nur die Frequenz von Stimme 3 (Register S+14 und S+15).</p>
+
+        <p>Nun besitzen natürlich auch Stimme 2 und 3 je ein SYNC- und ein RING-Bit. Die drei Stimmen steuern sich dabei nach dem Schema:</p>
+
+        <p>Stimme 1 → Stimme 2<br>Stimme 2 → Stimme 3<br>Stimme 3 → Stimme 1</p>
+
+        <p>Das TEST-Bit wird man wahrscheinlich nie benötigen. Es übt eine lokale Reset-Funktion auf die jeweilige Stimme aus. Solange es gesetzt ist, ist nichts hörbar, unabhängig von den anderen Bits. Wenn man allerdings versucht, Rauschen mit einer anderen Kurvenform zu kombinieren, kann es passieren, daß die betroffene Stimme gewissermaßen »abstürzt« und nichts mehr von sich gibt. Man kann sie dann mit einem gezielten Reset über das TEST-Bit wieder zum Leben erwecken.</p>
+
+        <h2>Die Hüllkurven S+5 und S+6</h2>
+
+        <p>Wenn eine Stimme über das GATE-Bit eingeschaltet wird, dann folgt ihr zeitlicher Lautstärkenverlauf einer programmierbaren Hüllkurve. Die Hüllkurve bestimmt unter anderem, ob der Ton hart oder weich einsetzt und ob er schnell oder langsam ausklingt. Der Name kommt von den vier Phasen, die die Hüllkurve durchläuft. Jeder Phase ist dabei ein Parameter zugeordnet.</p>
+
+        <table class="plain">
+            <tr>
+                <td>Attack</td>
+                <td>Die Attack-Phase wird durch das Setzen des GATE-Bits eingeleitet. Der Pegel steigt dabei von 0 bis Maximum (Lautstärkeregister) an. Die Zeit für diesen Anstieg ist über den Parameter A in 16 nicht-linearen Stufen von 2 ms bis 8 s einstellbar. Eine kurze Attack-Phase bewirkt einen unmittelbaren und harten Toneinsatz wie bei Schlag- oder Zupfinstrumenten. Eine mittlere Attack-Zeit ist typisch für Bläser- und Streicherklänge, und mit einer langen Attack-Zeit kann man einen Ton wie am Mischpult langsam einblenden.</td>
+            </tr>
+            <tr>
+                <td>Decay</td>
+                <td>Nachdem der Maximalwert erreicht ist, fällt der Pegel in der Decay-Phase bis auf den Sustain-Pegel ab. Die Zeit dazu ist mit dem Parameter D in 16 nicht-linearen Stufen von 6 ms bis 24 s einstellbar.</td>
+            </tr>
+            <tr>
+                <td>Sustain</td>
+                <td>nennt man die Phase nach dem Pegelabfall in der Decay-Phase. Der Ton klingt dann solange auf dem Sustain-Pegel weiter, bis das GATE-Bit zurückgesetzt wird. Der Parameter SU bestimmt hier also keine Zeit, sondern einen Pegel und zwar in 16 linearen Stufen von Null bis Maximum.</td>
+            </tr>
+            <tr>
+                <td>Release</td>
+                <td>Beim Rücksetzen des GATE-Bits wird der Ton nicht einfach abgeschaltet, sondern nimmt in der Release-Phase gleichmäßig vom Sustain-Pegel bis nach Null ab. Die Zeit dazu ist in der gleichen Abstufung wie die Release-Zeit über den Parameter R einstellbar.</td>
+            </tr>
+        </table>
+
+        <h2>Sonderfälle</h2>
+
+        <p>Wenn das GATE-Bit bereits vor Erreichen der Sustain-Phase rückgesetzt wird, dann startet die Release-Phase mit dem aktuellen Pegel der Hüllkurve. Auf diese Weise ergeben sich:</p>
+
+        <p>a) Attack-Decay-Release-Zyklen ADR oder gar nur<br>b) Attack-Release-Zyklen AR</p>
+
+        <p>Bei einem Sustainpegel von Null sind Decay und Release funktionell gleichwertig (Beispiel d in Bild 2). Bei einem maximalen Sustain-Pegel entfällt die Decay-Phase (Attack-Sustain-Release-Zyklus ASR, Beispiel c).</p>
+        <figure>
+            <img src="69-3.png" alt="Diagramm der Hüllkurve: Pegel über der Zeit mit Attack-, Decay-, Sustain- und Release-Phase zwischen »Gate-Bit gesetzt« und »Gate-Bit rueckgesetzt«, darunter vier Sonderfälle a bis d">
+            <figcaption>Bild 2. Die Bedeutung der ADSR-Hüllkurve</figcaption>
+        </figure>
+
+        <p>Die Parameter A, D, SU und R sind 4-Bit-Werte. Jeweils zwei von ihnen werden wie folgt in ein Register gepackt:</p>
+
+        <pre><code>POKE S+5,16*A+D
+POKE S+6,16*SU+R</code></pre>
+
+        <p>Bild 3 zeigt einige Hüllkurvenbeispiele.</p>
+        <figure>
+            <img src="69-2.png" alt="Tabelle »Hüllkurven – Beispiele« mit neun Wertekombinationen für A, D, S und R und der jeweils gezeichneten Hüllkurvenform zwischen »GATE on« und »GATE off«">
+            <figcaption>Bild 3. Einige ADSR-Werte und die dazugehörigen Hüllkurven</figcaption>
+        </figure>
+
+        <h2>Filter, Register S+21 bis S+24</h2>
+
+        <p>Der Filter bietet neben der Wahl der Kurvenform eine weitere Möglichkeit zur Klangbeeinflussung. Im Gegensatz zu den vorher beschriebenen Parametern muß man sich aber nicht um den Filter kümmern, da er abschaltbar ist und weil der SID auch ohne Filter reichhaltige Klänge erzeugen kann. Um die Wirkungsweise eines Filters zu verstehen, muß man sich einen Klang aus mehreren sogenannten Sinustönen zusammengesetzt denken, dem Grundton und den Obertönen. Sinustöne sind gewissermaßen die nicht mehr weiter zerlegbaren Atome in der Akustik. Ein reiner Sinuston klingt dumpf und ohne charakteristische Färbung. Die vom SID erzeugte Dreiecksschwingung kommt vom Klang her einem Sinuston recht nahe. Die anderen Kurvenformen verdanken ihren helleren Klang einem reichhaltigeren Obertonspektrum (= Folge von Obertönen). Und dieses Obertonspektrum kann man mit dem Filter verändern. Der Filter im SID kennt dazu drei Betriebsarten, die über die Bits 4, 5 und 6 in Register S+24 gewählt werden:</p>
+        <table class="plain">
+            <tr>
+                <td>Tiefpaß</td>
+                <td>Frequenzen beziehungsweise Obertöne oberhalb der in den Registern S+21 und S+22 einstellbaren Filterfrequenz werden abgeschwächt, und zwar umso mehr, je höher diese Frequenzen sind. Der Gesamtklang wird dadurch dunkler und weicher.</td>
+            </tr>
+            <tr>
+                <td>Hochpaß</td>
+                <td>Es werden die Frequenzen abgeschwächt, die unterhalb der Filterfrequenz liegen. Höhere Frequenzen werden ungehindert durchgelassen. Mit einem Hochpaß kann man den Grundton eines Klanges abschwächen. Seine Gesamtzusammensetzung verschiebt sich dann zugunsten der Obertöne. Der Klang wird dabei dünner und heller.</td>
+            </tr>
+            <tr>
+                <td>Bandpaß</td>
+                <td>Dieser Filtermodus schwächt Frequenzen auf beiden Seiten der Filterfrequenz ab. Der Klang wird dabei, wie man fast erwarten kann, etwas dürftig, sofern man nicht maximale Resonanz (siehe weiter unten) einstellt.</td>
+            </tr>
+        </table>
+
+        <h2>Filterfrequenz (Register S+22 und S+23)</h2>
+
+        <p>Die Filterfrequenz kann auf elf Bit genau eingestellt werden. Dabei kann man aber die drei niederwertigen Bits in Register S+21 unberücksichtigt lassen, da ihr Einfluß praktisch unhörbar ist.</p>
+
+        <h2>Resonanz und Stimmen-Wahlschalter (Register S+23)</h2>
+
+        <p>Über den 4-Bit-Parameter Resonanz kann ein gefilterter Klang effektvoller gestaltet werden. Bei großer Resonanz (der Maximalwert ist 15) werden Frequenzanteile in der Gegend der Filterfrequenz verstärkt. Die sonstigen abschwächenden Eigenschaften von Tief- und Hoch- und Bandpaß bleiben dabei erhalten.</p>
+
+        <p>Über die Bits 0, 1 und 2 desselben Registers kann man für jede der drei SID-Stimmen unabhängig wählen, ob sie gefiltert oder ungefiltert erklingen soll. Ist zum Beispiel Bit 0 gesetzt, so wird Stimme 1 gefiltert. Das Bit 3, Filter Ex, steuert die Verarbeitung einer von außen zuführbaren Signalquelle, zum Beispiel eines zweiten SID, was uns aber hier nicht kümmern soll.</p>
+
+        <h2>Filtermodus und Lautstärke (Register S+24)</h2>
+
+        <p>Die Lautstärkeneinstellung haben wir schon kennengelernt. Man wird sie meistens auf ihren Maximalwert 15 stellen, weil dann der Rauschabstand und damit die Klangqualität am besten ist. Durch Setzen der Bits 4, 5 und 6 wird die Betriebsart des Filters, Tief-, Band- oder Hochpaß gewählt. Die Betriebsarten sind uneingeschränkt kombinierbar. Mit Bit 7 (S3 Aus) kann man die Stimme 3 unhörbar machen. Der Sinn dieser Sonderfunktion wird im Abschnitt über die Leseregister klar.</p>
+
+        <p>Ein Beispiel zur Filterprogrammierung: Stimme 1 soll mit maximaler Resonanz durch den Tiefpaßfilter geschickt werden:</p>
+
+        <pre><code>FF = 50      Filterfrequenz (nur High-Byte)
+FR = 241     (=15*16 für Resonanz +1 für Bit 1)
+ML = 31      (=16 für Bit 4 + 15 für Lautstärke)
+POKE S+22,FF
+POKE S+23,FR
+POKE S+24,ML</code></pre>
+
+
+        <h2>Die Leseregister S+25 bis S+28</h2>
+
+        <p>Die Register S+25 und S+26 haben mit der Klangprogrammierung nichts zu tun. Über sie können die Werte zweier an Joystick-Ports angeschlossener Potentiometer (Paddles) abgefragt werden. Interessant sind die Register S+27 und S+28:</p>
+
+        <p>Aus S+27 kann man den Signalverlauf von Stimme 3 in Form von Byte-Werten lesen. Mit folgendem kleinen Programm kann man diesen Signalverlauf sogar sichtbar machen:</p>
+
+        <pre><code>10 S=54272
+20 POKE S+14,10       :REM F LOW
+30 POKE S+15,0        :REM F HIGH
+40 POKE S+18,16       :REM DREIECK
+50 PRINT TAB(PEEK(S+27)/7);"*":GOTO 50</code></pre>
+
+        <p>Hier sollte man einmal ein wenig mit den Parametern in Zeile 20-40 experimentieren.</p>
+
+        <p>Auf die gleiche Weise kann man aus Register S+28 den Hüllkurvenverlauf von Stimme 3 lesen.</p>
+
+        <pre><code>100 S=54272
+110 POKE S+19,16+11+11   :REM A D
+120 POKE S+20,16*8 +11   :REM S R
+130 POKE S+18,1          :REM GATE ON
+140 FOR I=1 TO 50
+150 PRINT TAB(PEEK(S+28)/7);"*"
+160 NEXT I
+170 POKE S+18,0          :REM GATE OFF
+180 FOR I=1 TO 50
+190 PRINT TAB(PEEK(S+28)/7);"*"
+200 NEXT I</code></pre>
+
+        <div style="display: none;">
+            <figure>
+                <!-- Im Heft abgedruckt: 110 POKE S+19,16+11+11. Auf der Diskette: 16*11+11. Die REM-Kommentare des Hefts fehlen auf der Diskette. -->
+                <pre data-filename="huellkurve" data-name="Hüllkurvenverlauf"></pre>
+            </figure>
+        </div>
+
+
+        <p>Diese Werteverläufe sind besonders zum Modulieren anderer Stimmen geeignet. Normalerweise möchte man Stimme 3 dann nicht hören, wenn man ihren Signalverlauf oder ihre Hüllkurve anderweitig verwendet. Man kann sie dann, wie schon erwähnt, über Bit 7 in Register S+24 ausschalten.</p>
+
+        <h2>Klangeffekte zum Abtippen</h2>
+
+        <p>Nach diesem systematischen Teil folgen noch Einstellungen. Tabelle 1 enthält einige Parametersätze für Klänge, die der SID ohne großen Programmieraufwand erzeugen kann. Die Klangbezeichnungen wollen die Effekte nur subjektiv beschreiben und sind natürlich nicht zu wörtlich zu nehmen. Man muß nun lediglich die Werte einer Zeile in die, in der Kopfzeile angegebenen SID-Register schreiben, das GATE-Bit setzen und nach einiger Zeit zurücksetzen. Der Parameter M ist übrigens kein SID-Parameter, sondern soll eine Verzögerungsschleife steuern, die die Zeit zwischen GATE ON und GATE OFF bestimmt. Parameter M bezieht sich auf das Programm in Listing 1, das beim Experimentieren Hilfestellung leisten soll. Im DATA-Teil ab Zeile 320 sind die Parameter aus Tabelle 1 einzusetzen und zwar genau in der gleichen Reihenfolge. Das Programm belegt nach dem Start den SID mit den Parametern aus den DATA-Zeilen und wartet auf einen beliebigen Tastendruck, der dann den Klangeffekt auslöst. Man versuche es auch einmal mit den Tasten, die eine Auto-Repeat-Funktion haben, wie zum Beispiel die Space-Taste.</p>
+        <figure>
+            <table class="right">
+                <tr>
+                    <th>Register</th>
+                    <th>A<br>S+5</th>
+                    <th>D<br>S+5</th>
+                    <th>SU<br>S+6</th>
+                    <th>R<br>S+6</th>
+                    <th>C<br>S+4</th>
+                    <th>P<br>S+2<br>S+3</th>
+                    <th>F<br>S<br>S+1</th>
+                    <th>FF<br>S+22</th>
+                    <th>FR<br>S+23</th>
+                    <th>ML<br>S+24</th>
+                    <th>M</th>
+                </tr>
+                <tr>
+                    <td class="left">Glöckchen</td>
+                    <td>0</td>
+                    <td>10</td>
+                    <td>0</td>
+                    <td>10</td>
+                    <td>16</td>
+                    <td>x</td>
+                    <td>40000</td>
+                    <td>x</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>100</td>
+                </tr>
+                <tr>
+                    <td class="left">Oboe</td>
+                    <td>8</td>
+                    <td>7</td>
+                    <td>10</td>
+                    <td>8</td>
+                    <td>64</td>
+                    <td>250</td>
+                    <td>7500</td>
+                    <td>x</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>500</td>
+                </tr>
+                <tr>
+                    <td class="left">Fagott</td>
+                    <td>8</td>
+                    <td>7</td>
+                    <td>10</td>
+                    <td>8</td>
+                    <td>64</td>
+                    <td>250</td>
+                    <td>2500</td>
+                    <td>x</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>750</td>
+                </tr>
+                <tr>
+                    <td class="left">Zungenpfeife</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>10</td>
+                    <td>48</td>
+                    <td>x</td>
+                    <td>400</td>
+                    <td>x</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>1000</td>
+                </tr>
+                <tr>
+                    <td class="left">Banjo</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>32</td>
+                    <td>x</td>
+                    <td>7500</td>
+                    <td>50</td>
+                    <td>241</td>
+                    <td>111</td>
+                    <td>30</td>
+                </tr>
+                <tr>
+                    <td class="left">Stahl</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>12</td>
+                    <td>96</td>
+                    <td>2044</td>
+                    <td>30000</td>
+                    <td>x</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>100</td>
+                </tr>
+                <tr>
+                    <td class="left">Feder</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>9</td>
+                    <td>32</td>
+                    <td>x</td>
+                    <td>750</td>
+                    <td>x</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>35</td>
+                </tr>
+                <tr>
+                    <td class="left">Preßlufthammer</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>10</td>
+                    <td>80</td>
+                    <td>2100</td>
+                    <td>200</td>
+                    <td>x</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>2000</td>
+                </tr>
+                <tr>
+                    <td class="left">Schuß</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>10</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>10000</td>
+                    <td>x</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>50</td>
+                </tr>
+                <tr>
+                    <td class="left">Starkstrom</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>0</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>100</td>
+                    <td>x</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>2000</td>
+                </tr>
+                <tr>
+                    <td class="left">Düsenflugzeug</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>13</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>3000</td>
+                    <td>50</td>
+                    <td>241</td>
+                    <td>31</td>
+                    <td>3000</td>
+                </tr>
+                <tr>
+                    <td class="left">Rakete</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>15</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>1000</td>
+                    <td>10</td>
+                    <td>241</td>
+                    <td>31</td>
+                    <td>3000</td>
+                </tr>
+            </table>
+            <p>x = don't care (Parameter muß nicht eingestellt werden)</p>
+            <figcaption>Tabelle 1. Einige Beispiel-Effekte für Listing 1</figcaption>
+        </figure>
+
+
+        <p>Das Programm aus Listing 2 ist ganz ähnlich aufgebaut, kann aber ein viel größeres Spektrum von Effekten dadurch realisieren, daß es die Frequenz von Stimme 1 dynamisch verändert. Dazu dient die innere Schleife, Zeile 260-300. Dort wird bei jedem Durchlauf die Frequenz F1 mit einem Faktor G multipliziert. Für G > 1 steigt die Frequenz schneller an, für G &lt; 1 nimmt sie ab und zwar um so schneller, je weiter G von 1 entfernt ist. Die Umrechnung von F1 in Low- und High-Byte geschieht hier nach der schnellen Methode 2. Man beachte, daß damit nur F1-Werte bis 32767 verarbeitet werden können, also nur die Hälfte des vollen Frequenzumfangs des SID. In der äußeren Schleife wird der Wert von F1 auf seinen Ausgangswert F zurückgesetzt. Außerdem steuert die äußere Schleife bei jedem Durchlauf einen ADSR-Hüllkurvenzyklus durch GATE-ON-GATE-OFF. Die Zahl N gibt dabei die Anzahl der inneren Schleifendurchläufe an, die Zahl M die der äußeren Schleifendurchläufe. Beispielparameter zu Listing 2 findet man in Tabelle 2.</p>
+        <figure>
+            <table class="right">
+                <tr>
+                    <th>Fest eingestellt:<br>Register</th>
+                    <th colspan="3">FF<br>S+22</th>
+                    <th colspan="4">FR<br>S+23</th>
+                    <th colspan="3">ML<br>S+24</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="3" class="center">x</td>
+                    <td colspan="4" class="center">0</td>
+                    <td colspan="3" class="center">15</td>
+                </tr>
+                <tr>
+                    <th>Register</th>
+                    <th>A<br>S+5</th>
+                    <th>D<br>S+5</th>
+                    <th>SU<br>S+6</th>
+                    <th>R<br>S+6</th>
+                    <th>C<br>S+4</th>
+                    <th>P<br>S+2<br>S+3</th>
+                    <th>F<br>S<br>S+1</th>
+                    <th>G</th>
+                    <th>N</th>
+                    <th>M</th>
+                </tr>
+                <tr>
+                    <td class="left">Telefon</td>
+                    <td>0</td>
+                    <td>10</td>
+                    <td>0</td>
+                    <td>10</td>
+                    <td>16</td>
+                    <td>x</td>
+                    <td>16000</td>
+                    <td>1.33</td>
+                    <td>2</td>
+                    <td>25</td>
+                </tr>
+                <tr>
+                    <td class="left">Laserkanone</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>0</td>
+                    <td>64</td>
+                    <td>1000</td>
+                    <td>30000</td>
+                    <td>0.85</td>
+                    <td>10</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td class="left">Take-Off</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>15</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>500</td>
+                    <td>1.004</td>
+                    <td>1000</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td class="left">Turbine</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>15</td>
+                    <td>96</td>
+                    <td>2044</td>
+                    <td>20000</td>
+                    <td>1.001</td>
+                    <td>460</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td class="left">Trommelwirbel</td>
+                    <td>0</td>
+                    <td>5</td>
+                    <td>2</td>
+                    <td>9</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>20000</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>30</td>
+                </tr>
+                <tr>
+                    <td class="left">Maschinengewehr</td>
+                    <td>0</td>
+                    <td>5</td>
+                    <td>2</td>
+                    <td>9</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>12000</td>
+                    <td>0.7</td>
+                    <td>3</td>
+                    <td>30</td>
+                </tr>
+            </table>
+            <p>x = don't care (Parameter muß nicht eingestellt werden)</p>
+            <figcaption>Tabelle 2. Einige Beispiel-Effekte für Listing 2</figcaption>
+        </figure>
+
+
+        <p>Das dritte Programm (Listing 3) verwendet schließlich den Signalverlauf oder die Hüllkurve von Stimme 3, um Stimme 1 zu modulieren. Dies geschieht in der inneren Schleife, Zeile 360-380. Q ist dabei die Adresse eines der Leseregister des SID, also entweder S+27 für den Signalverlauf oder S+28 für den Hüllkurvenverlauf. In der DATA-Zeile 650 ist dazu nur 27 oder 28 anzugeben. Über die Variable G kann die Stärke der Modulation, die sogenannte Modulationstiefe, gesteuert werden. Ein kleinerer Wert von G ergibt hier eine stärkere Modulation. Die äußere Schleife steuert hier ADSR-Hüllkurvenzyklen für Stimme 1 und Stimme 3. Dieses kleine Programm sollte Anlaß zum weiteren Experimentieren sein. Man kann statt der Tonfrequenz zum Beispiel auch einmal versuchen, die Pulsweite oder die Filterfrequenz zu modulieren. Tabelle 3 enthält einige Parametersätze für dieses Programm.</p>
+        <figure>
+            <table class="right">
+                <tr>
+                    <th>Register</th>
+                    <th>A</th>
+                    <th>D</th>
+                    <th>SU</th>
+                    <th>R</th>
+                    <th>C</th>
+                    <th>P</th>
+                    <th>F</th>
+                    <th>G</th>
+                    <th>N</th>
+                    <th>M</th>
+                    <th>A3<br>S+19</th>
+                    <th>B3<br>S+19</th>
+                    <th>F3<br>S+20</th>
+                    <th>R3<br>S+20</th>
+                    <th>C3<br>S+18</th>
+                    <th>P3<br>S+16<br>S+17</th>
+                    <th>F3<br>S+14<br>S+15</th>
+                    <th>Q</th>
+                </tr>
+                <tr>
+                    <td class="left">Vogelgezwitscher</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>16</td>
+                    <td>x</td>
+                    <td>40000</td>
+                    <td>500</td>
+                    <td>8</td>
+                    <td>10</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>28</td>
+                </tr>
+                <tr>
+                    <td class="left">Bongo</td>
+                    <td>0</td>
+                    <td>7</td>
+                    <td>0</td>
+                    <td>7</td>
+                    <td>16</td>
+                    <td>x</td>
+                    <td>4000</td>
+                    <td>1000</td>
+                    <td>4</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>28</td>
+                </tr>
+                <tr>
+                    <td class="left">E-Baß</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>9</td>
+                    <td>32</td>
+                    <td>x</td>
+                    <td>750</td>
+                    <td>1000</td>
+                    <td>7</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>10</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>28</td>
+                </tr>
+                <tr>
+                    <td class="left">Dampfhammer</td>
+                    <td>0</td>
+                    <td>9</td>
+                    <td>0</td>
+                    <td>11</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>5000</td>
+                    <td>200</td>
+                    <td>20</td>
+                    <td>15</td>
+                    <td>0</td>
+                    <td>9</td>
+                    <td>0</td>
+                    <td>9</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>28</td>
+                </tr>
+                <tr>
+                    <td class="left">Martinshorn</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>8</td>
+                    <td>64</td>
+                    <td>1000</td>
+                    <td>7000</td>
+                    <td>720</td>
+                    <td>300</td>
+                    <td>1</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>64</td>
+                    <td>2048</td>
+                    <td>15</td>
+                    <td>27</td>
+                </tr>
+                <tr>
+                    <td class="left">Sirene</td>
+                    <td>10</td>
+                    <td>13</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>64</td>
+                    <td>2048</td>
+                    <td>10000</td>
+                    <td>400</td>
+                    <td>300</td>
+                    <td>1</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>16</td>
+                    <td>x</td>
+                    <td>30</td>
+                    <td>27</td>
+                </tr>
+                <tr>
+                    <td class="left">Geklimper</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>15</td>
+                    <td>0</td>
+                    <td>64</td>
+                    <td>2048</td>
+                    <td>10000</td>
+                    <td>200</td>
+                    <td>400</td>
+                    <td>1</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>20</td>
+                    <td>27</td>
+                </tr>
+                <tr>
+                    <td class="left">Grollen</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>32</td>
+                    <td>x</td>
+                    <td>50000</td>
+                    <td>2000</td>
+                    <td>40</td>
+                    <td>10</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>x</td>
+                    <td>128</td>
+                    <td>x</td>
+                    <td>500</td>
+                    <td>27</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Einige Beispiel-Effekte für Listing 3</figcaption>
+        </figure>
+
+
+        <h2>Ausblick: Programmierung von Musikstücken</h2>
+
+        <p>Dieses Thema wollen wir hier nur einmal streifen. Grundlage hierfür ist die genaue Kenntnis der Tonleiterfrequenzen. Diese müssen aber nicht mühsam aus Tabellen abgetippt, sondern können durch ein kleines Programm selbst berechnet werden. Man muß dazu ein klein wenig Mathematik betreiben:</p>
+
+        <p>1) Die Frequenzen zweier Töne im Oktavabstand verhalten sich wie 2:1.</p>
+
+        <p>2) Eine Oktave ist durch die Halbtöne in zwölf gleiche Intervalle eingeteilt und zwar nicht linear, sondern exponentiell.</p>
+
+        <p>3) Das Frequenzverhältnis H zweier aufeinanderfolgender Halbtöne ist die zwölfte Wurzel aus zwei. In Basic läßt sich das leicht ausrechnen:</p>
+
+        <pre><code>H = 2(1/12)</code></pre>
+
+        <p>4) Man bekommt dann alle Halbtöne, indem man die Frequenzen, ausgehend von einem Grundwert, fortlaufend mit H multipliziert.</p>
+
+        <p>Im Programm aus Listing 4 macht das eine Schleife in Zeile 140 bis 190. Die Variable FAUS wird mit 110 vorbesetzt. Das entspricht einem »großen A«, dem Ton, der zwei Oktaven unter dem Kammerton, dem bekannten »eingestrichenen a« mit 440 Hz, liegt. In Zeile 170 wird FAUS in den dazugehörenden SID-Wert F umgerechnet. F wird in High- und Low-Byte zerlegt, welche in den Feldern FH und FL gespeichert werden. Dort stehen die Töne als fertige POKE-Werte zum Spielen einer Melodie zur Verfügung.</p>
+
+        <p>Das restliche Programm erzeugt aus diesen Werten eine mehr oder weniger zufällige Tonfolge auf dem SID. Ein wenig wird der Zufall aber durch die Werte in den DATA-Zeilen ab Zeile 500 gesteuert. Diese Werte stellen ein Blues-Schema in codierter Form dar. Das Schema selbst steht in den letzten drei Zeilen. Das Programm holt sich aus diesem Schema die erste Zahl. Diese zeigt auf eine der sieben Auswahlmengen in den vorausgehenden Zeilen. Die Auswahlmengen enthalten Tonnummern. Das Programm spielt nun nacheinander acht zufällig ausgewählte Töne aus dieser Menge. Tonwiederholungen sind dabei möglich. Anschließend geht das Programm über den nächsten Zeiger aus dem Schema zu einer neuen Auswahlmenge über. Die links etwas abgesetzten Zahlen dienen dabei nur zur Längenangabe der Auswahlmengen und des Schemas.</p>
+
+        <p>Mit dieser Technik kann man zwar noch keinen brauchbaren Blues »erwürfeln«, aber der Blues-Charakter wird aus den erzeugten Tonfolgen doch deutlich hörbar.</p>
+
+        <address class="author">(Thomas Krätzig/tr)</address>
+
+        <aside>
+            <h2>Hinweise zum Abtippen</h2>
+            <p>Im folgenden Listing tauchen eventuell unterstrichene oder überstrichene Zeichen auf. Diese sind folgendermaßen einzugeben:<br>
+                unterstrichen: SHIFT-Taste und Buchstabe<br>
+                überstrichen: COMMODORE-Taste und Buchstabe<br>
+                Bei Begriffen in geschweiften Klammern, zum Beispiel {CLR}, muß die Taste SHIFT und CLR gedrückt werden und weder die Klammer noch das Wort CLR.<br>
+                Die &lt;Zahl&gt; am Ende jeder Basic-Zeile darf nicht eingegeben werden.<br>
+                <strong>Genaueres steht im Beitrag Checksummer 64 auf Seite 135.</strong>
+            </p>
+        </aside>
+
+        <figure>
+            <pre data-filename="klang einfach" data-name="Einfache Klangeffekte" data-checksummer="3"></pre>
+            <figcaption>Listing 1. Einfache Klangeffekte. Hinweise im Text.</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="klang dynamisch" data-name="Klangeffekte mit Frequenzsteuerung" data-checksummer="3"></pre>
+            <figcaption>Listing 2. Klangeffekte mit Frequenzsteuerung</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="klang + 3.stimme" data-name="Klangeffekte mit Stimme 3" data-checksummer="3"></pre>
+            <figcaption>Listing 3. Klangeffekte mit Steuerung durch Stimme 3</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="zufalls-blues" data-name="Zufalls-Blues" data-checksummer="3"></pre>
+            <figcaption>Listing 4. Programm zum Errechnen einer Zufalls-Blues-Musik</figcaption>
+        </figure>
+
+
+    </article>
+</body>
+
+</html>

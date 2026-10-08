@@ -1,0 +1,74 @@
+
+
+;demo+boot.prg ==0801==
+  100 rem *******************************
+  101 rem *    demo + boot  programm    *
+  102 rem *            fuer             *
+  103 rem *                             *
+  104 rem *        b l o w   u p        *
+  105 rem *                             *
+  106 rem *  eine basic-zusatzfunktion  *
+  107 rem *   fuer zeichendarstellung   *
+  108 rem *  in 4-facher hoehe + breite *
+  109 rem *                             *
+  110 rem *            von              *
+  111 rem *                             *
+  112 rem *        ludwig wolff         *
+  113 rem *       niederhutstr.42       *
+  114 rem *       5483 ahrweiler        *
+  115 rem *       tel.02641/34867       *
+  116 rem *                             *
+  117 rem *         15.11.1985          *
+  118 rem *******************************
+  200 :
+  300 :
+  400 :
+  500 ifa=0thena=1:load"blow up",8,1
+  520 c=646:poke53280,0:poke53281,0
+  530 z1$="@abcdefghijklmnopqrstuvwxyz \~1234567890"
+  540 z2$="{CBM-Z}V{CBM-X}SWQ{SHIFT-*}M{CBM-*}X{CBM--}{SHIFT-+}L{CBM-E}{CBM-Q}J{SHIFT-@}YR/{CBM-POUND}{CBM-R}N{CBM-B}*U+-Z^{CBM-U}{CBM-Y}{CBM-T}{CBM-@}RFCD{CBM-T} {CBM-U}{CBM-Y}{CBM-T} {CBM-G}{CBM-H}{CBM-J}{CBM-K}{SHIFT-POUND}{CBM-L}{CBM-N}{CBM-D}{CBM-V}{CBM-D} {CBM-B}{CBM-+}[]_"
+  600 gosub1000:s=9:z=6:gosub1100
+  610 print"ein demo-programm fuer"
+  620 s=12:z=11:gosub1100:print" b l o w   u p":t=600:gosub1200
+  650 gosub1000:print"{home}{down}{down}{rght}{rght} blow up  ist ein hilfsprogramm zur"
+  660 print"{down}{rght}{rght}darstellung von zeichen aus dem c64-"
+  670 print"{down}{down}{rght}{rght}{rght}{rght}zeichensatz in 4-facher groesse:":t=300:gosub1200
+  680 s=6:z=11:pokec,1:gosub1100:sys51968("blow up"):t=150:gosub1200
+  690 s=4:z=16:pokec,10:gosub1100:sys51968("demo-prg")
+  700 t=400:gosub1200
+  710 gosub1000:s=11:z=13:gosub1100:print"das kann blow up:"
+  720 t=150:gosub1200:print"{cyn}{home}":sys51968(z1$)
+  730 s=13:z=19:gosub1100:print"{yel}grosse  zeichen."
+  740 t=450:gosub1200:poke52073,216:print"{lred}{home}":sys51968(z1$)
+  750 s=13:z=19:gosub1100:print"{yel}kleine":gosub1200:gosub1000
+  760 s=7:z=2:pokec,10:gosub1100:sys51968("GROSSE,")
+  770 s=8:z=6:pokec,14:gosub1100:sys51968("kleine")
+  780 s=0:z=10:pokec,7:gosub1100:sys51968("Buchstaben")
+  790 gosub1200:gosub1000:s=10:z=10:gosub1100:print"und die blockgrahik:"
+  800 t=150:gosub1200:print"{home}";:poke52073,208
+  810 sys51968(z2$)
+  820 gosub1200:poke52073,212
+  830 sys51968(z2$)
+  840 gosub1200:gosub1010:poke52073,216:s=13:z=7:pokec,14:gosub1100
+  850 sys51968("auch"):s=8:z=13:gosub1100:sys51968("invers")
+  860 gosub1200:gosub1000:s=11:z=7:gosub1100:print"{yel}und hier ein trick:"
+  870 l$="                    "
+  880 printspc(90)l$spc(20)l$"{lred}"spc(20)l$spc(20)"{lblu}"l$
+  890 poke52128,165:s=10:z=10:gosub1100:sys51968("64'er")
+  900 poke52128,145:poke52073,208:t=350:gosub1200:goto600
+  999 stop
+ 1000 rem -- bildschirm maske --
+ 1005 print"{clr}"
+ 1010 print"{home}{yel}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}";
+ 1020 fori=0to20:print"{SHIFT--}"spc(38)"{SHIFT--}";:next
+ 1030 print"{SHIFT--} taste druecken oder warten !"spc(9)"{SHIFT--}";
+ 1040 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}";
+ 1050 print" * blow up * l.wolff * ahrweiler 1985 *";:return
+ 1100 rem -- crsr set --
+ 1110 poke211,s:poke214,z:sys58640:return
+ 1200 rem -- get --
+ 1210 i=0
+ 1220 i=i+1:ifi>tthenreturn
+ 1230 geta$:ifa$=""then1220
+ 1240 return
+

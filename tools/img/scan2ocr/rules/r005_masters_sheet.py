@@ -42,6 +42,9 @@ The pipeline:
                            plus ~1 mm
       -> fill everything outside the traced page with paper white
       -> drop bed components that touch the frame AND lie mostly outside the page
+      -> flatten the paper-yellowing field, per paper class, immediately before
+         the separation  (see "the paper-yellowing field"; r005_field.py
+         measures it, this file applies it)
       -> separate to CMYK with tools/img/cmyk_reconstruction  (see THE GRADE)
       -> ONE render off that ONE separation, UNCURVED -- see "there is no OCR
          contrast curve, and that is deliberate" below.  There is no
@@ -499,6 +502,169 @@ INK_DARK_PCT = 5.0          # "the darkest ink" = this percentile of the page
 # same measurement and a reader must not have to guess.
 PAPER_PROBE_MIN_FRAC = 0.05
 
+# --- the paper-yellowing field ---------------------------------------------
+# THE PAPER HAS NOT BROWNED EVENLY, AND THE GRADE CANNOT SEE IT.  The
+# separation works in the density domain, d = -log10(rgb/W), against ONE
+# measured white point -- so the same number is the reference at the page
+# centre and 2 mm from the trim.  MEASURED on SH8605, on 190 of its 192
+# interior pages, on the RAW levelled scans (the graded page is useless for
+# this: the grade clips 66-84 % of it to pure 255 and the signal is gone):
+# the clean substrate needs these gains to read as the same paper as that
+# page's own centre --
+#
+#     edge         e = 2 mm             e = 12 mm          e = 50 mm
+#     bottom   R 1.036 G 1.229 B 1.340  1.019/1.111/1.152  1.000/1.005/1.008
+#     top      R 1.044 G 1.169 B 1.226  1.011/1.059/1.081  1.002/1.003/1.004
+#     fore     R 1.052 G 1.147 B 1.186  1.005/1.030/1.043  1.005/1.005/1.005
+#     gutter   R 1.025 G 1.063 B 1.074  1.004/1.024/1.037  1.004/1.010/1.012
+#
+# -- i.e. a third of a stop of blue at the foot of the sheet, nothing at the
+# centre, and R almost flat, which is the signature of YELLOWING and not of a
+# scanner vignette (a vignette is grey and would move all three channels
+# together).  So the page is flattened BEFORE the separation and the grade then
+# works on a page whose paper is one colour everywhere, which is what it has
+# always assumed.
+#
+# THE FIELD IS NOT MEASURED HERE.  r005_field.py measures it and writes it
+# beside the paper class's profile; this file READS that file and applies it.
+# It is not a per-page measurement and cannot be: one page cannot tell "the
+# paper is browner here" from "there is more ink here" -- the text block sits
+# at a FIXED distance from the trim on every page, so position and ink coverage
+# are nearly collinear within one page, and the leverage that separates them is
+# that different PAGES put their ink in different places.  See r005_field.py.
+#
+# PER PAPER CLASS, through the same grade_for(page) lookup that picks the
+# anchors.  A field is a property of a STOCK -- the yellowing is in the paper --
+# and an issue has more than one: SH8605's wrapper and Zahlkarte are coated
+# white card that has not browned the way the interior sheet has, and the card
+# is not even the same size (3551x4923 against 4961x7016).  A class that cannot
+# support a fit gets an IDENTITY field, and that is WRITTEN DOWN in a field
+# file of its own rather than silently skipped -- see r005_field.py,
+# FIELD_MIN_PAGES.
+
+# THE SWITCH.  True is the default and the owner's decision (2026-10-08).
+# False applies nothing at all, on every class, and says so in every stamp:
+# `field  (switched off at FIELD_CORRECTION)`.  A module constant and not a CLI
+# flag for the same reason nothing else in this file is one (see ../README.md),
+# and it exists because this correction is the one thing in this step that
+# invents a tone the scanner did not record: it must be possible to make the
+# page without it and compare.
+FIELD_CORRECTION = True
+# ...and the amplitude, which is NOT a knob to taste.  MEASURED over 7 SH8605
+# pages (text recto, text verso, photo, dark, colour, and two controls) and all
+# four edges: the mean |R-B| gap between the ink-free edge bands and the page's
+# own centre falls 16.42 -> 3.31 DN at alpha 1.0, and then gets WORSE again --
+# 4.25 at 1.25, 7.97 at 1.5, 17.64 at 2.0, which is worse than no correction at
+# all, because the fitted field keeps rising where the paper has stopped
+# browning.  1.0 is the owner's decision AND the measured optimum.  The
+# constant is named so that the number is in the source rather than implied by
+# its absence.
+FIELD_ALPHA = 1.0
+# The four half-profiles, named outward from the page centre.  `gutter` is the
+# bound (torn) side and `fore` the trimmed outer side, which is why the
+# horizontal pair is MIRRORED BY PARITY at application time: an odd page is a
+# recto, fore edge on the right; an even page is a verso, fore edge on the
+# left.  Measured, and it is the bigger of the two horizontal asymmetries --
+# the fore edge needs 1.19 of blue at 2 mm against the gutter's 1.07, because
+# the fore edge was exposed to air and the gutter was glued into a spine.
+FIELD_SIDES = ("gutter", "fore", "top", "bottom")
+
+# --- the traced box the field is anchored on, and when it cannot be trusted --
+# THE FIELD IS ANCHORED ON EACH PAGE'S OWN TRACED BOX.  Not on the frame, not
+# on A4, and not on the registered A4 window: the window is registered on the
+# 64'er wordmark, and MEASURED over SH8605's pages the real paper edge lands
+# anywhere over an 11.0 mm range inside it -- which is wider than the whole
+# steep part of the field.  Binning the measurement by window coordinate
+# instead of by the page's own box was the single biggest error source in the
+# prototype.
+#
+# So a box that is not a page is a box the field cannot be anchored on, and
+# both halves of this correction read the one test below: the MEASUREMENT
+# rejects such a page by name (r005_field.py) and the APPLICATION leaves that
+# page alone and stamps it as identity.
+#
+# IT IS THE APPLICATION THAT NEEDS THIS, and that is measured.  Letting p193's
+# bad box into SH8605's 190-page fit moves the fitted edge gains by at most
+# 0.00016 -- one page cannot bend a median-polished fit.  But the application
+# is not an average over pages: each page's correction is anchored on ITS OWN
+# box, so a page whose box is not its page gets its whole gain field placed
+# somewhere the page is not, and nothing downstream can see that.  (On a class
+# at the FIELD_MIN_PAGES floor of 24 one bad box is also 4 % of the fit, which
+# is no longer nothing.)
+#
+# MEASURED on SH8605's 169 traced boxes: width 204.22-215.26 mm (sd 1.01),
+# height 295.95-304.25 mm (sd 0.74) -- and exactly TWO outside the core.  p035
+# traced 164 x 267 mm, matched no page class, and what is recorded for it is
+# therefore the whole uncropped sheet at 215.3 x 304.2; p193's trace lost 5 mm
+# of width and recorded 204.2 x 297.1.
+#
+# The window is TIGHTER THAN PAGE_CLASSES on purpose.  The size gate's +-6 mm
+# asks "did the trace run away far enough that the fill would eat type", and a
+# few mm of fabricated margin is survivable.  The field asks "where is the
+# edge", and the fitted gain changes by 13 % of its own range over 4 mm there,
+# so 6 mm of anchor error puts a quarter of the correction in the wrong place.
+FIELD_PAGE_MM = (205.0, 212.0, 293.0, 301.0)    # w min, w max, h min, h max
+
+# --- the two anchors the correction holds fixed, measured PER PAGE ----------
+# The gain is NOT applied as a multiply.  A multiply scales the ink with the
+# paper, and DENSE INK DOES NOT BROWN WITH THE SUBSTRATE: MEASURED on SH8605,
+# the solid-black floor is flat with position to within the measurement, while
+# the paper around it is 33 % darker in blue at the foot of the page.  A plain
+# multiply lifts that floor by up to 0.65 DN -- small, but it is the one number
+# on the page that is known to be position-independent, so moving it is a
+# measurable fabrication.  What is applied instead is the affine map that holds
+# BOTH ends fixed (the prototype's "variant B"):
+#
+#     p_local = Pc / g            the paper level this pixel's position implies
+#     v' = Pc - (Pc - K) * (p_local - v) / (p_local - K)
+#
+# which sends p_local -> Pc (the browned paper here reads as the centre's
+# paper), K -> K (the ink floor does not move at all), and interpolates
+# linearly in between.  Both ends are measured ON THE PAGE, because both vary
+# page to page: MEASURED over the same 7 pages, the centre paper runs
+# R 184.0-211.2 and the ink floor R 24.1-32.5.
+#
+# They are measured on `arr` -- the levelled page at MASTER_DPI -- and not at
+# scan resolution, because they are anchors of the same map whose gain was
+# measured in exactly that space.  On a 2400 dpi issue `arr` is the 4:1 box
+# reduction: the paper percentile is unmoved (paper is smooth over 4 px) and the
+# 0.05 % ink percentile selects pixels interior to solid areas, where a 4x4 box
+# average is still the solid value.
+FIELD_PC_WINDOW_MM = 18.0     # half-width of the centre window: a 36 mm square
+FIELD_PC_PCT = 85             # "paper" in that window: this luminance percentile up
+FIELD_PC_MIN_PIX = 500        # ...of at least this many valid pixels
+# ...and if what that selects is not bright, the page has no paper at its
+# centre to anchor on -- a full-bleed colour page (SH8605 p008) is the case --
+# and the CLASS's median centre paper is used instead and said so.  150 sits
+# below every paper tone measured on this corpus (centre paper luminance
+# 160-207) and above every ink and tint.
+FIELD_PC_MIN_LUM = 150.0
+FIELD_K_PCT = 0.05            # the ink floor: this percentile of the page's own pixels
+FIELD_K_STRIDE = 2            # sampled 1 px in 4; a 0.05 % tail of 9 M pixels is 4500
+# ...and the same question for the other end.  A page with no solid ink at all
+# has no floor to hold, and a 0.05 percentile then lands in a mid-tone, which
+# makes the map's slope (Pc-K)/(p_local-K) explode -- at K = 150 it is 9.7
+# instead of 1.4, and the correction would multiply every mid-tone.  MEASURED
+# over SH8605's 167 fitted pages the floor luminance is 21.4-74.5 (p50 24.2),
+# and the ceiling below sits above all of them and far below any paper; a page
+# over it uses the CLASS's median floor and says so.
+FIELD_K_MAX_LUM = 110.0
+# Above this the affine map is rolled off into 255 instead of clipped flat
+# against it.  Variant B sends a pixel BRIGHTER than its local paper -- a
+# specular highlight on the sheet, a reversed-out white panel -- to
+# Pc + (v - p_local) * (Pc-K)/(p_local-K), i.e. up to 1.4x further above the
+# centre paper than it was above the local paper, and without a knee a whole
+# gradient of them lands on 255 together and becomes a flat.  235 is above
+# every paper tone measured (the brightest centre paper is 211) and below the
+# clip, so the knee only ever touches pixels that were already at the top of
+# the scanner's range.
+FIELD_SHOULDER_KNEE = 235.0
+# The correction is applied in horizontal stripes, so that peak memory is set
+# by the stripe and not by the scan: a 2400 dpi sheet is 20232x28751, and one
+# float32 copy of it with a per-pixel gain beside it is 7 GB.  256 rows of a
+# 2400 dpi sheet is 60 MB of gain.
+FIELD_STRIPE_ROWS = 256
+
 # --- there is no OCR contrast curve, and that is deliberate ---------------
 # There was one here: `-level 30%,100%`, one issue-wide constant, applied to
 # masters600 while a second uncurved render fed the figures.  It existed to fix
@@ -684,8 +850,395 @@ def write_profile(grade, dest):
         fh.write(grade.text)
 
 
-def stamp_text(grade, **fields):
-    """The stamp that says which profile made this page.
+# ---------------------------------------------------------------------------
+# The paper-yellowing field
+#
+# ONE paper class's field, read from the file r005_field.py wrote beside that
+# class's profile.  Everything that MEASURES a field is in r005_field.py; what
+# is here is the format (written in one place, read in one place), the identity
+# case, and the application.
+# ---------------------------------------------------------------------------
+
+# The luminance the field was measured with: Rec. 601, not the plain channel
+# mean this file uses for the bed and the overlay.  It decides which pixels
+# count as "the paper" and which as "the ink floor", and the field in the file
+# was fitted against pixels selected with these weights; a different sum would
+# select a different population and read a different anchor.
+FIELD_LUM = np.array([0.299, 0.587, 0.114])
+
+
+def field_path(grade):
+    """Where ONE paper class's field lives: beside that class's profile.
+
+    Beside `colors.txt`, because the anchors and the field are two halves of
+    one answer to "what is this stock, now, in this copy" -- and a class whose
+    field has been copied somewhere its profile has not is a master nobody can
+    reproduce.  A class with no profile of its own (`"high": null`, the
+    built-in anchors) has no colors.txt to sit beside, so its field goes beside
+    the ISSUE DESCRIPTOR, which is the other place that class's answer is
+    written down.
+    """
+    name = f"field_{grade.klass or 'single'}.txt"
+    return (Path(grade.source).with_name(name) if grade.source
+            else Path(ISS.descriptor).with_name(name))
+
+
+def field_box_ok(w_mm, h_mm):
+    """Is this traced box one the field can be anchored on?  See FIELD_PAGE_MM.
+
+    ONE test, read by the measurement and by the application, so that a page
+    the fit refused to learn from cannot quietly be a page the correction is
+    applied to.
+    """
+    wlo, whi, hlo, hhi = FIELD_PAGE_MM
+    return bool(wlo <= w_mm <= whi and hlo <= h_mm <= hhi)
+
+
+def field_box_complaint(w_mm, h_mm):
+    """Why field_box_ok() said no, in words, for a note and for a reject line."""
+    wlo, whi, hlo, hhi = FIELD_PAGE_MM
+    return (f"traced page {w_mm:.1f} x {h_mm:.1f} mm is outside the "
+            f"{wlo:g}-{whi:g} x {hlo:g}-{hhi:g} mm a field can be anchored on")
+
+
+def field_text(mode, step=None, half=None, centre=None, floor=None, prof=None):
+    """The field's NUMBERS, and nothing else -- the text `field-sha` is over.
+
+    Same discipline as profile_text(): ONE function produces this text and
+    everything else quotes it -- the file r005_field.py writes, the stamp
+    written beside every master, and the digest the two are compared by.
+
+    What is in it is exactly what can change a pixel: the mode, the geometry
+    the profiles are indexed by, the two class-median anchors a page falls back
+    on, and the profiles.  What is NOT in it is provenance -- which class, how
+    many pages, which pages were rejected and why -- which goes in the file as
+    `#` comments, exactly as write_profile() puts the class and the source in
+    comments above the anchors.  FIELD_ALPHA is not in it either, for the same
+    reason: it is the APPLIER's decision, it lives in this file, and every
+    stamp prints it on the `field` line.
+
+    A `gain` line is one half-profile for one channel, sampled every `step-mm`
+    of distance from the traced page CENTRE outward: the first value is the
+    centre (1.00000 by construction) and the last is the page edge.  Linear
+    gain and not log, because this file is read by people and 1.33 is the
+    number in the reports.
+    """
+    L = ["version 1", f"mode {mode}"]
+    if mode == "identity":
+        # Nothing else, deliberately: an identity field has no geometry and no
+        # anchors because it touches no pixel, so EVERY identity field in every
+        # issue has the same digest -- which is the honest statement that these
+        # pixels were made with no field at all.
+        return "\n".join(L) + "\n"
+    L += [f"step-mm {step:.2f}",
+          "half-page-mm %.2f %.2f" % tuple(half),
+          "centre-paper %.1f %.1f %.1f" % tuple(centre),
+          "ink-floor %.1f %.1f %.1f" % tuple(floor)]
+    for cn in "RGB":
+        for side in FIELD_SIDES:
+            L.append(f"gain {cn} {side} "
+                     + " ".join("%.5f" % v for v in prof[cn][side]))
+    return "\n".join(L) + "\n"
+
+
+def write_field(dest, grade, body, provenance):
+    """A field file: `#` provenance, then the body field_text() produced.
+
+    The split is write_profile()'s: the comments say how the numbers were made
+    and the body IS the numbers, so the digest is over the numbers and a
+    re-worded comment is not a new field.
+    """
+    with open(dest, "w", encoding="utf-8") as fh:
+        fh.write(f"# {ISSUE} -- the paper-yellowing field for paper class "
+                 f"`{grade.klass or 'single'}`\n")
+        fh.write(f"# read and applied by r005_masters_sheet.py; "
+                 f"measured by r005_field.py\n")
+        fh.write(f"# the grade this class is separated with: "
+                 f"{grade.source or 'built-in anchors, identity levels'}\n")
+        for line in provenance:
+            fh.write(f"# {line}\n".replace("# \n", "#\n"))
+        fh.write(body)
+
+
+def _shoulder(v):
+    """Roll the top of the range off into 255 instead of clipping flat on it.
+
+    See FIELD_SHOULDER_KNEE: variant B pushes a pixel that is brighter than its
+    own local paper further above the centre paper than it was above the local
+    one, and a gradient of such pixels clips into a flat without this.
+    """
+    out = v.copy()
+    m = v > FIELD_SHOULDER_KNEE
+    span = 255.0 - FIELD_SHOULDER_KNEE
+    out[m] = FIELD_SHOULDER_KNEE + span * (
+        1.0 - np.exp(-(v[m] - FIELD_SHOULDER_KNEE) / span))
+    return out
+
+
+class FlatField:
+    """ONE paper class's field: the numbers, their fingerprint, and the apply.
+
+    There is one of these per class, beside one Grade per class, for the same
+    reason: the field describes a STOCK.  Three states, and all three are
+    recorded in every stamp rather than being the absence of a line --
+
+      fitted     a measured file, parsed below
+      identity   a measured file that SAYS it is identity, because the class
+                 could not support a fit (too few pages, or more than one page
+                 size).  r005_field.py writes it; see FIELD_MIN_PAGES there.
+      identity   no file at all, or FIELD_CORRECTION is False.  Same digest as
+                 the one above, because the pixels are the same pixels; the
+                 `field` line in the stamp says which of the three it was.
+
+    The missing-file case is not a refusal, and that is deliberate and
+    consistent: a missing colors.txt is not a refusal either (read_profile()
+    returns the built-in anchors and the run prints one line saying so).  This
+    step refuses over exactly two things -- see first_action() -- and "nobody
+    has measured this stock's field yet" is not one of them.  What it must not
+    do is be silent, and it is not: every stamp of every page says
+    `field  (not measured -- <path>)`.
+    """
+
+    def __init__(self, grade, identity_because=None):
+        self.klass = grade.klass
+        self.path = field_path(grade)
+        self.mode = "identity"
+        self.step = 0.0
+        self.half = (0.0, 0.0)
+        self.centre_paper = None
+        self.ink_floor = None
+        self.logprof = {}
+        self.provenance = []
+        if identity_because is not None:
+            # ONE PAGE's field, turned off for a reason about that page.  The
+            # file is not even read: the point of this branch is that the stamp
+            # must say identity, and `field-sha` must be the identity digest,
+            # because that is what made these pixels.  A stamp naming a fitted
+            # field on a page the field was not applied to is exactly the lie
+            # the stamp exists to make impossible.
+            self.why = identity_because
+        elif not FIELD_CORRECTION:
+            self.why = "switched off at FIELD_CORRECTION"
+        elif not self.path.exists():
+            self.why = f"not measured -- no {self.path}"
+        else:
+            self.why = str(self.path)
+            self._parse(self.path.read_text(encoding="utf-8"))
+        self.text = (field_text("identity") if self.mode == "identity" else
+                     field_text("fitted", self.step, self.half,
+                                self.centre_paper, self.ink_floor, self.gain))
+        self.sha = hashlib.sha1(self.text.encode("utf-8")).hexdigest()[:12]
+
+    def _parse(self, raw):
+        """Read a field file.  The body only; `#` is provenance, and kept.
+
+        It is re-emitted through field_text() rather than digested as read, so
+        that a file whose numbers mean the same thing has the same digest
+        whatever its whitespace -- and so that a file this reader cannot
+        reproduce exactly is a loud failure here rather than a stale-looking
+        master later.
+        """
+        vals, self.gain = {}, {cn: {} for cn in "RGB"}
+        for line in raw.splitlines():
+            line = line.split("#", 1)[0].split()
+            if not line:
+                continue
+            if line[0] == "gain":
+                if len(line) < 4 or line[1] not in "RGB" or line[2] not in FIELD_SIDES:
+                    raise SystemExit(f"r005: {self.path}: bad gain line "
+                                     f"{' '.join(line[:3])}")
+                self.gain[line[1]][line[2]] = np.array(
+                    [float(v) for v in line[3:]], float)
+            else:
+                vals[line[0]] = line[1:]
+        if vals.get("version", ["?"])[0] != "1":
+            raise SystemExit(f"r005: {self.path}: version "
+                             f"{vals.get('version', ['(absent)'])[0]}, not 1")
+        self.mode = vals.get("mode", ["?"])[0]
+        if self.mode == "identity":
+            return
+        if self.mode != "fitted":
+            raise SystemExit(f"r005: {self.path}: mode {self.mode!r} is neither "
+                             f"`fitted` nor `identity`")
+        self.step = float(vals["step-mm"][0])
+        self.half = tuple(float(v) for v in vals["half-page-mm"])
+        self.centre_paper = np.array([float(v) for v in vals["centre-paper"]])
+        self.ink_floor = np.array([float(v) for v in vals["ink-floor"]])
+        for cn in "RGB":
+            for side in FIELD_SIDES:
+                g = self.gain[cn].get(side)
+                if g is None:
+                    raise SystemExit(f"r005: {self.path}: no `gain {cn} {side}` line")
+                # Held as LOG gain because that is what the fit produced and
+                # what adds: log g(x,y) = gx(x) + gy(y).  The file holds the
+                # linear gain because that is what a reader wants.
+                self.logprof.setdefault(cn, {})[side] = np.log(g)
+
+    @property
+    def summary(self):
+        """The one line every stamp carries.  Says the state, not the numbers."""
+        if self.mode == "identity":
+            return f"identity -- {self.why}"
+        return (f"{self.why} (fitted, step {self.step:g} mm, "
+                f"alpha {FIELD_ALPHA:.2f})")
+
+    def _d(self, cn, side):
+        return np.arange(len(self.logprof[cn][side])) * self.step
+
+    def gx(self, cn, sx_mm, recto=True):
+        """log gain across the page.  sx = signed mm from the traced CENTRE.
+
+        MIRRORED BY PARITY: + is to the right in page coordinates, and on a
+        recto (odd page) the right-hand edge is the FORE edge while on a verso
+        it is the gutter.  Getting this backwards swaps a 1.19 blue gain for a
+        1.07 one on every page in the issue and is invisible in a thumbnail,
+        which is why the parity is read from the page number -- the one fact
+        about the page that cannot be misread -- and not from the pixels.
+
+        AND IT IS CONFIRMED, not assumed.  Fitting the horizontal factor
+        separately for the odd and the even pages, with the ink regressed out
+        and NO mirroring, on SH8605's 190 pages:
+
+            odd  (94 pages)   blue gain needed at the left end 1.0401,
+                              at the right end 1.0834
+            even (96 pages)   left 1.0730, right 1.0407
+
+        -- the browner side is the RIGHT on a recto and the LEFT on a verso,
+        which is what the mirror does and which way round the fore edge is.
+        (Done with the ink regressed out for a reason: the same comparison on
+        the RAW column means reads the other way, because on these pages the
+        text block sits off centre toward the gutter and the ink bias is
+        larger than the field.  That confound is the whole reason b(ink)
+        exists; see r005_field.py.)
+        """
+        sx = np.asarray(sx_mm, float)
+        if not recto:
+            sx = -sx
+        a = np.abs(sx)
+        return np.where(sx >= 0,
+                        np.interp(a, self._d(cn, "fore"), self.logprof[cn]["fore"]),
+                        np.interp(a, self._d(cn, "gutter"), self.logprof[cn]["gutter"]))
+
+    def gy(self, cn, sy_mm):
+        """log gain down the page.  + is downward, i.e. toward the foot."""
+        sy = np.asarray(sy_mm, float)
+        a = np.abs(sy)
+        return np.where(sy >= 0,
+                        np.interp(a, self._d(cn, "bottom"), self.logprof[cn]["bottom"]),
+                        np.interp(a, self._d(cn, "top"), self.logprof[cn]["top"]))
+
+    def gain_at(self, sx_mm, sy_mm, recto=True, alpha=None):
+        """exp(alpha*(gy + gx)) as an (len(sy), len(sx), 3) array."""
+        a = FIELD_ALPHA if alpha is None else alpha
+        G = np.empty((len(np.atleast_1d(sy_mm)), len(np.atleast_1d(sx_mm)), 3))
+        for c, cn in enumerate("RGB"):
+            G[..., c] = np.exp(a * (self.gy(cn, np.atleast_1d(sy_mm))[:, None]
+                                    + self.gx(cn, np.atleast_1d(sx_mm), recto)[None, :]))
+        return G
+
+    def apply(self, full, box, reduce, recto, pc, k):
+        """Flatten `full` IN PLACE, in stripes.  See the two anchors above.
+
+        `full` is the LEVELLED scan at its own resolution, which is the image
+        the separator is about to be handed; `box` is the traced page in
+        MASTER_DPI pixels, which is where the geometry was decided, so the
+        centre is scaled by `reduce` and the millimetre comes from MM*reduce.
+
+        IT IS APPLIED TO THE WHOLE SHEET, not only inside the traced page.  The
+        profiles are monotone and clamp at the half-page, so beyond the trim the
+        gain is simply the edge gain -- and that is the right answer there: the
+        margin outside the traced lines is paper that browned like the rest, and
+        `sheets600` is the file a figure bleeding off the trim gets cut from.
+        The bed and the prop are corrected too and it does not matter: on the
+        master they are replaced by paper white, and on the sheet they are what
+        they always were, scanner furniture.
+        """
+        W, H = full.size
+        x0, y0, x1, y1 = box
+        cx, cy = 0.5 * (x0 + x1) * reduce, 0.5 * (y0 + y1) * reduce
+        mmpx = MM * reduce
+        sx = (np.arange(W) - cx) / mmpx
+        gx = np.stack([self.gx(cn, sx, recto) for cn in "RGB"], 1)
+        # float32 from here down, and deliberately: the per-pixel arrays are
+        # the only thing in this step whose size is set by the SCAN, and at
+        # 2400 dpi one stripe's worth of value, gain and result in float64 is
+        # half a gigabyte for an 8-bit output.  float32 carries seven digits
+        # against the eight bits that leave here.  MEASURED, because the
+        # separation is a polynomial solve that can amplify a last-bit
+        # difference: the same page (p099) rendered both ways differs on 150
+        # pixels of 39 million -- 0.0004 % -- by at most 6 DN, all of them at
+        # the top or the bottom of the range where the map is steepest.  Both
+        # renders are reproducible; neither is more correct.
+        pc = np.asarray(pc, np.float32)[None, None, :]
+        k = np.asarray(k, np.float32)[None, None, :]
+        for top in range(0, H, FIELD_STRIPE_ROWS):
+            bot = min(H, top + FIELD_STRIPE_ROWS)
+            sy = (np.arange(top, bot) - cy) / mmpx
+            gy = np.stack([self.gy(cn, sy) for cn in "RGB"], 1)
+            g = np.exp(FIELD_ALPHA * (gy[:, None, :] + gx[None, :, :])
+                       ).astype(np.float32)
+            v = np.asarray(full.crop((0, top, W, bot)), np.float32)
+            ploc = pc / g
+            # np.maximum(., 1.0): the denominator is the contrast the page's own
+            # paper has over its own ink at THIS position, and a page whose
+            # fallback anchors leave it near zero would otherwise divide by it.
+            # It cannot happen with a measured pair -- the smallest this corpus
+            # can produce is about 100, from the dimmest centre paper (p114's
+            # 184) at the largest gain (1.35) over the highest floor (32) --
+            # and the guard is one floating-point op per stripe.
+            out = pc - (pc - k) * (ploc - v) / np.maximum(ploc - k, 1.0)
+            full.paste(Image.fromarray(
+                np.clip(_shoulder(out), 0, 255).astype(np.uint8)), (0, top))
+
+
+FIELDS = {klass: FlatField(grade) for klass, grade in GRADES.items()}
+
+
+def field_for(page):
+    """The FlatField that makes THIS page -- its paper class's, as the grade is."""
+    return FIELDS[ISS.paper.klass(page)] if ISS.paper else FIELDS[None]
+
+
+def page_anchors(arr, keep, box, field=None):
+    """(Pc, K, how): this page's own centre paper and ink floor, per channel.
+
+    See the FIELD_PC_* and FIELD_K_* constants for what each is and why it is
+    measured on the page rather than taken from the class.  `field` supplies the
+    class's medians for a page that cannot produce one of its own; with
+    field=None -- which is how r005_field.py calls this while MEASURING those
+    medians -- an unreadable anchor comes back as None instead.
+    """
+    x0, y0, x1, y1 = box
+    cx, cy = (x0 + x1) // 2, (y0 + y1) // 2
+    r = int(FIELD_PC_WINDOW_MM * MM)
+    sl = (slice(max(0, cy - r), cy + r), slice(max(0, cx - r), cx + r))
+    win = arr[sl].reshape(-1, 3)[keep[sl].reshape(-1)]
+    pc, pc_how = None, "own centre"
+    if len(win) >= FIELD_PC_MIN_PIX:
+        lum = win @ FIELD_LUM
+        cand = win[lum >= np.percentile(lum, FIELD_PC_PCT)].mean(0)
+        if cand @ FIELD_LUM >= FIELD_PC_MIN_LUM:
+            pc = cand
+    if pc is None:
+        pc, pc_how = (None if field is None else field.centre_paper), \
+                     "class median (no paper at this page's centre)"
+
+    s = FIELD_K_STRIDE
+    sub = arr[::s, ::s].reshape(-1, 3)[keep[::s, ::s].reshape(-1)]
+    k, k_how = None, "own floor"
+    if len(sub):
+        lum = sub @ FIELD_LUM
+        cand = sub[lum <= np.percentile(lum, FIELD_K_PCT)].mean(0)
+        if cand @ FIELD_LUM <= FIELD_K_MAX_LUM:
+            k = cand
+    if k is None:
+        k, k_how = (None if field is None else field.ink_floor), \
+                   "class median (no ink floor on this page)"
+    return pc, k, f"Pc {pc_how}, K {k_how}"
+
+
+def stamp_text(grade, field, **fields):
+    """The stamp that says which profile and which field made this page.
 
     Written three ways, because each of them is the one that survives a
     different accident: as a PNG/TIFF text chunk INSIDE every render (survives
@@ -696,11 +1249,21 @@ def stamp_text(grade, **fields):
     `paper-class` is in the head beside `grade-sha` because a mixed-stock issue
     has TWO current grades and "is this master stale?" is only answerable once
     you know which of them was supposed to make it.
+
+    `field-sha` sits beside `grade-sha` and is carried exactly as it is: TWO
+    things decide a pixel now -- the eight anchors and the four level lines, and
+    the paper-yellowing field -- and a master that names one of them cannot say
+    what produced it.  The digest is over the field's numbers alone, for the
+    same reason grade-sha is over the profile's alone; the `field` line beside
+    it says which file they came from, whether it is fitted or identity, and at
+    what alpha, which is the part a human reads.
     """
     head = [f"r005_masters_sheet {ISSUE} -- the grade as used for this page",
             f"grade-sha    {grade.sha}",
+            f"field-sha    {field.sha}",
             f"paper-class  {grade.klass or '(no paper map -- legacy single profile)'}",
             f"profile      {grade.source_name}",
+            f"field        {field.summary}",
             f"render       ONE master, uncurved -- r010 OCRs it and r145 "
             f"cuts figures from it"]
     body = [f"{k:<12s} {v}" for k, v in fields.items()]
@@ -1063,26 +1626,83 @@ def tilt(poly):
     return math.degrees(math.atan(poly[0]))
 
 
-def process(page):
-    # THIS STEP DOES NOT REFUSE A PAGE.  Everything that used to be a gate --
-    # parity, skew residual, page class, canvas fit, the grade's ink numbers --
-    # is measured, published, and NOTED here.  A note goes in the page's log
-    # line and in its stamp, so a page that needs a human eye is findable with
-    # grep instead of missing from the output.  The one thing that still stops
-    # a page is a missing input file: there is nothing to publish.
-    notes = []
-    stem = f"{page:03d}"
+class Traced:
+    """What the tracer found on one page: the levelled pixels and four lines.
+
+    One object, and `level_and_trace()` below is the ONE place that fills it,
+    because two readers now need the same answer.  process() needs it to cut
+    and grade the page; r005_field.py needs it to MEASURE the paper-yellowing
+    field, and the field is anchored on the traced page box -- so a field
+    measured against a box traced by a second, slightly different spelling of
+    this code would be anchored somewhere the correction is not applied.  That
+    is not a hypothetical: binning the measurement by A4-WINDOW coordinate
+    instead of by the page's own traced box was the single biggest error the
+    prototype made, because the window is registered on the 64'er logo and the
+    real paper edge wanders over an 11 mm range inside it.
+    """
+
+    def locate(self):
+        """The traced page's box in the frame, and which page class it is.
+
+        Called by process() AFTER the overlay is written and by r005_field.py
+        instead of writing one.  It is separate from level_and_trace() purely
+        to keep that order: the overlay is the artefact that explains a page
+        whose trace ran away, and it is written before anything judges the
+        trace.
+        """
+        w, h = self.w, self.h
+        x0 = int(math.floor(min(self.xl.min(), self.xr.min())))
+        x1 = int(math.ceil(max(self.xl.max(), self.xr.max())))
+        y0 = int(math.floor(min(self.yt.min(), self.yb.min())))
+        y1 = int(math.ceil(max(self.yt.max(), self.yb.max())))
+        x0, y0 = max(x0, 0), max(y0, 0)
+        x1, y1 = min(x1, w - 1), min(y1, h - 1)
+        page_w_mm, page_h_mm = (x1 - x0) / MM, (y1 - y0) / MM
+        klass = page_class(page_w_mm, page_h_mm)
+        if klass is None:
+            # IF WE CANNOT CROP, DO NOT CROP.  A trace that lands outside every
+            # page class has found something that is not the sheet -- p117's
+            # tracer locked onto the cream panel inside a dark-ground ad -- and
+            # a wrong crop throws print away silently.  The whole levelled sheet
+            # is published instead, with the note saying why, and the page is
+            # still there to be looked at and re-cut.
+            self.notes.append(f"NOT CROPPED: the trace gave {page_w_mm:.1f} x "
+                              f"{page_h_mm:.1f} mm, which matches no page class "
+                              f"({self.finder}); publishing the whole levelled "
+                              f"sheet instead. See debug600/{self.stem}.png")
+            x0, y0, x1, y1 = 0, 0, w - 1, h - 1
+            self.keep = np.ones_like(self.keep)
+            page_w_mm, page_h_mm = (x1 - x0) / MM, (y1 - y0) / MM
+            klass = "uncropped sheet"
+        self.box = (x0, y0, x1, y1)
+        self.page_w_mm, self.page_h_mm = page_w_mm, page_h_mm
+        self.klass = klass
+        return self
+
+
+def level_and_trace(page):
+    """Scan -> levelled page at MASTER_DPI, its masks, and its four edges.
+
+    Everything between the scanner and the decision about where the paper is.
+    It opens no output directory and writes no file, so that the field
+    measurement can run it on an issue whose masters do not exist yet -- which
+    is the ordinary case, since the field has to be measured before the masters
+    it corrects can be made.
+    """
+    t = Traced()
+    t.page, t.stem = page, f"{page:03d}"
+    t.notes = []
     # THE PAGE'S PAPER, hence THE PAGE'S PROFILE.  From the descriptor's paper
     # map, which the operator answered before this step ever ran; see
-    # first_action().  Everything in this function that touches paper white --
-    # the fill outside the traced page, the canvas margin, the stock reference,
-    # the separation itself -- uses THIS grade and not a module constant.
-    grade = grade_for(page)
-    scan = SCAN_DIR / f"{stem}.png"
-    thumb = THUMB_DIR / f"{stem}.png"
+    # first_action().  Everything downstream that touches paper white -- the
+    # fill outside the traced page, the canvas margin, the stock reference, the
+    # separation itself -- uses THIS grade and not a module constant.
+    t.grade = grade_for(page)
+    scan = SCAN_DIR / f"{t.stem}.png"
+    thumb = THUMB_DIR / f"{t.stem}.png"
     for p in (scan, thumb):
         if not p.exists():
-            raise PageFailed(f"r005 p{stem}: missing input {p}")
+            raise PageFailed(f"r005 p{t.stem}: missing input {p}")
 
     # --- skew, measured on the thumb ---------------------------------------
     thumb_rgb = Image.open(thumb).convert("RGB")
@@ -1093,9 +1713,9 @@ def process(page):
     # 0.2 s there instead of 45.  See FULLBLEED_PAPER_FRAC: how much of this
     # frame the profile's paper white can see decides it, not the page number.
     thumb_mask = paper_mask(np.array(thumb_rgb))
-    paper_frac = mask_paper_frac(thumb_mask)
-    from_ink = paper_frac < FULLBLEED_PAPER_FRAC
-    finder = "ink/bed" if from_ink else "paper/bed"
+    t.paper_frac = mask_paper_frac(thumb_mask)
+    t.from_ink = t.paper_frac < FULLBLEED_PAPER_FRAC
+    t.finder = "ink/bed" if t.from_ink else "paper/bed"
 
     # ...and the same measurement is a CROSS-CHECK on the answer.  The two are
     # independent: the finder is measured off this frame, the class was decided
@@ -1103,17 +1723,17 @@ def process(page):
     # mask cannot see is a page on another stock -- so a disagreement is worth an
     # eye on either the map or the scan.  It is a NOTE and never a refusal: the
     # map is the answer and this step does not overrule it.
-    if from_ink and grade.klass == "low":
-        notes.append(f"PAPER MAP: this page took the ink/bed edge finder "
-                     f"(paper frac {paper_frac:.3f} < {FULLBLEED_PAPER_FRAC}), "
-                     f"i.e. this issue's paper white cannot see its stock -- "
-                     f"but the map calls it LOW quality and grades it with "
-                     f"{grade.source_name}")
-    if not from_ink and grade.klass == "high":
-        notes.append(f"PAPER MAP: the map calls this page HIGH quality, but "
-                     f"the paper mask sees {paper_frac:.3f} of the frame as "
-                     f"this issue's own paper -- high-quality stock normally "
-                     f"reads well under {FULLBLEED_PAPER_FRAC}")
+    if t.from_ink and t.grade.klass == "low":
+        t.notes.append(f"PAPER MAP: this page took the ink/bed edge finder "
+                       f"(paper frac {t.paper_frac:.3f} < {FULLBLEED_PAPER_FRAC}), "
+                       f"i.e. this issue's paper white cannot see its stock -- "
+                       f"but the map calls it LOW quality and grades it with "
+                       f"{t.grade.source_name}")
+    if not t.from_ink and t.grade.klass == "high":
+        t.notes.append(f"PAPER MAP: the map calls this page HIGH quality, but "
+                       f"the paper mask sees {t.paper_frac:.3f} of the frame as "
+                       f"this issue's own paper -- high-quality stock normally "
+                       f"reads well under {FULLBLEED_PAPER_FRAC}")
 
     # --- the parity gate, off the same thumb -------------------------------
     # It reads the jitter of the PAPER boundary, so it can only be asked where
@@ -1121,12 +1741,13 @@ def process(page):
     # and nothing to read it from either: the cover leaf's inner edge is a FOLD,
     # not a tear, and the card was cut on all four sides.  Skipped, and said.
     expected = "right" if page % 2 == 0 else "left"
-    side, ratio = ("not measurable", 0.0)
-    if not from_ink:
-        side, ratio = torn_side(thumb_mask, THUMB_MM)
-        if side != expected and ratio >= TORN_CONFIDENT_RATIO:
-            notes.append(f"TORN SIDE reads {side} (ratio {ratio:.2f}) but "
-                         f"parity says {expected} -- misfiled or mis-rotated?")
+    t.expected = expected
+    t.side, t.ratio = ("not measurable", 0.0)
+    if not t.from_ink:
+        t.side, t.ratio = torn_side(thumb_mask, THUMB_MM)
+        if t.side != expected and t.ratio >= TORN_CONFIDENT_RATIO:
+            t.notes.append(f"TORN SIDE reads {t.side} (ratio {t.ratio:.2f}) but "
+                           f"parity says {expected} -- misfiled or mis-rotated?")
 
     # --- level, then RE-MEASURE the residual --------------------------------
     # LEVEL AT 2400, REDUCE AFTERWARDS.  The scan is rotated at full resolution
@@ -1134,11 +1755,11 @@ def process(page):
     # other order (reduce, then rotate, then grade at 600) averages the ink away
     # before the grade can see whether it was on the paper, and thin black type
     # is exactly what that loses.
-    dpi = scan_dpi(scan)
-    reduce = dpi // MASTER_DPI                # 4 at 2400, 1 at 600
+    t.dpi = scan_dpi(scan)
+    t.reduce = t.dpi // MASTER_DPI             # 4 at 2400, 1 at 600
     full = Image.open(scan).convert("RGB")
     full = full.rotate(angle, resample=Image.BICUBIC, fillcolor=(0, 0, 0))
-    img = full.reduce(reduce)
+    img = full.reduce(t.reduce)
     def residual_of(im):
         return measure_skew(np.array(im.reduce(MASTER_DPI // THUMB_DPI)
                                      .convert("L"), float))
@@ -1152,20 +1773,24 @@ def process(page):
         first, angle = residual, angle + residual
         full = Image.open(scan).convert("RGB")
         full = full.rotate(angle, resample=Image.BICUBIC, fillcolor=(0, 0, 0))
-        img = full.reduce(reduce)
+        img = full.reduce(t.reduce)
         residual = residual_of(img)
-        notes.append(f"SKEW re-levelled: residual was {first:+.2f}, "
-                     f"corrected to {angle:+.2f} deg, now {residual:+.2f}")
+        t.notes.append(f"SKEW re-levelled: residual was {first:+.2f}, "
+                       f"corrected to {angle:+.2f} deg, now {residual:+.2f}")
     if abs(residual) > SKEW_RESIDUAL_MAX:
-        notes.append(f"SKEW still {residual:+.2f} deg after a second pass "
-                     f"(allowed {SKEW_RESIDUAL_MAX}) -- published anyway")
+        t.notes.append(f"SKEW still {residual:+.2f} deg after a second pass "
+                       f"(allowed {SKEW_RESIDUAL_MAX}) -- published anyway")
+    t.angle, t.residual = angle, residual
+    t.full, t.img = full, img
 
-    arr = np.array(img)
-    h, w = arr.shape[:2]
-    mask = paper_mask(arr)
+    t.arr = np.array(img)
+    arr = t.arr
+    t.h, t.w = arr.shape[:2]
+    h, w = t.h, t.w
+    t.mask = paper_mask(arr)
 
     # --- trace the four edges ----------------------------------------------
-    if from_ink:
+    if t.from_ink:
         # No paper to trace from, so the edge is the sheet's own boundary
         # against the bed.  All four are traced the same way: there is no torn
         # fringe on these pages to model -- the cover leaf's inner edge is a
@@ -1179,7 +1804,7 @@ def process(page):
         right = trace(ends, rows, CLEAN_PCT, MM)
         in_l = in_r = CLEAN_INSET_MM * MM
     else:
-        rows, starts, ends, cols, tops, bots = boundaries(mask)
+        rows, starts, ends, cols, tops, bots = boundaries(t.mask)
         # The two torn sides are NOT the same problem; see RECTO_FLUSH_MM.
         if expected == "right":                               # verso
             left = trace(starts, rows, CLEAN_PCT, MM)         # clean, traced
@@ -1192,14 +1817,15 @@ def process(page):
             in_l, in_r = 0.0, CLEAN_INSET_MM * MM
     top = trace(tops, cols, CLEAN_PCT, MM)
     bot = trace(bots, cols, CLEAN_PCT, MM)
+    t.left, t.right, t.top, t.bot = left, right, top, bot
 
     ys, xs = np.arange(h), np.arange(w)
-    xl = np.polyval(left, ys) + in_l
-    xr = np.polyval(right, ys) - in_r
-    yt = np.polyval(top, xs) + CLEAN_INSET_MM * MM
-    yb = np.polyval(bot, xs) - CLEAN_INSET_MM * MM
-    keep = ((xs[None, :] >= xl[:, None]) & (xs[None, :] <= xr[:, None]) &
-            (ys[:, None] >= yt[None, :]) & (ys[:, None] <= yb[None, :]))
+    t.xl = np.polyval(left, ys) + in_l
+    t.xr = np.polyval(right, ys) - in_r
+    t.yt = np.polyval(top, xs) + CLEAN_INSET_MM * MM
+    t.yb = np.polyval(bot, xs) - CLEAN_INSET_MM * MM
+    t.keep = ((xs[None, :] >= t.xl[:, None]) & (xs[None, :] <= t.xr[:, None]) &
+              (ys[:, None] >= t.yt[None, :]) & (ys[:, None] <= t.yb[None, :]))
 
     # --- drop the bed that a line fit cannot clear --------------------------
     lum = arr.mean(2, dtype=np.float32)
@@ -1207,62 +1833,69 @@ def process(page):
     lab, _ = ND.label(bedlike)
     touching = set(lab[0, :]) | set(lab[-1, :]) | set(lab[:, 0]) | set(lab[:, -1])
     touching.discard(0)
-    dropped = 0
+    t.dropped = 0
     if touching:
         labels = np.array(sorted(touching))
         total = ND.sum(np.ones_like(lab, bool), lab, labels)
-        outside = ND.sum(~keep, lab, labels)
+        outside = ND.sum(~t.keep, lab, labels)
         doomed = labels[(outside / np.maximum(total, 1)) > BED_OUTSIDE_FRAC]
         if len(doomed):
-            keep &= ~np.isin(lab, doomed)
-            dropped = len(doomed)
+            t.keep &= ~np.isin(lab, doomed)
+            t.dropped = len(doomed)
+    return t
 
-    # --- the debug overlay: the traced lines on the LEVELLED, UNFILLED page --
-    # Written HERE, before the size gate, and not at the end: it is the artefact
-    # that explains a FAILED page, and a failed page never reaches the end.  The
-    # size gate's own message says "look at debug600/NNN.png", which was a lie
-    # while this sat below the raise.
+
+def write_overlay(t):
+    """The debug overlay: the traced lines on the LEVELLED, UNFILLED page.
+
+    Written HERE, before the size gate, and not at the end: it is the artefact
+    that explains a FAILED page, and a failed page never reaches the end.  The
+    size gate's own message says "look at debug600/NNN.png", which was a lie
+    while this sat below the raise.
+    """
     for d in OUT_DIRS:
         d.mkdir(parents=True, exist_ok=True)
-    overlay = img.copy()
+    h, w = t.h, t.w
+    overlay = t.img.copy()
     draw = ImageDraw.Draw(overlay)
     for i in range(0, h - DEBUG_STEP, DEBUG_STEP):
-        for poly in (left, right):
+        for poly in (t.left, t.right):
             draw.line((np.polyval(poly, i), i,
                        np.polyval(poly, i + DEBUG_STEP), i + DEBUG_STEP),
                       fill=DEBUG_COLOR, width=DEBUG_WIDTH)
     for i in range(0, w - DEBUG_STEP, DEBUG_STEP):
-        for poly in (top, bot):
+        for poly in (t.top, t.bot):
             draw.line((i, np.polyval(poly, i),
                        i + DEBUG_STEP, np.polyval(poly, i + DEBUG_STEP)),
                       fill=DEBUG_COLOR, width=DEBUG_WIDTH)
     overlay.resize((w // DEBUG_REDUCE, h // DEBUG_REDUCE),
-                   Image.LANCZOS).save(OUT_DEBUG / f"{stem}.png")
+                   Image.LANCZOS).save(OUT_DEBUG / f"{t.stem}.png")
 
-    # --- the traced page, and the fixed canvas it is placed on --------------
-    x0 = int(math.floor(min(xl.min(), xr.min())))
-    x1 = int(math.ceil(max(xl.max(), xr.max())))
-    y0 = int(math.floor(min(yt.min(), yb.min())))
-    y1 = int(math.ceil(max(yt.max(), yb.max())))
-    x0, y0 = max(x0, 0), max(y0, 0)
-    x1, y1 = min(x1, w - 1), min(y1, h - 1)
-    page_w_mm, page_h_mm = (x1 - x0) / MM, (y1 - y0) / MM
-    klass = page_class(page_w_mm, page_h_mm)
-    if klass is None:
-        # IF WE CANNOT CROP, DO NOT CROP.  A trace that lands outside every page
-        # class has found something that is not the sheet -- p117's tracer locked
-        # onto the cream panel inside a dark-ground ad -- and a wrong crop throws
-        # print away silently.  The whole levelled sheet is published instead,
-        # with the note saying why, and the page is still there to be looked at
-        # and re-cut.
-        notes.append(f"NOT CROPPED: the trace gave {page_w_mm:.1f} x "
-                     f"{page_h_mm:.1f} mm, which matches no page class "
-                     f"({finder}); publishing the whole levelled sheet instead. "
-                     f"See debug600/{stem}.png")
-        x0, y0, x1, y1 = 0, 0, w - 1, h - 1
-        keep = np.ones_like(keep)
-        page_w_mm, page_h_mm = (x1 - x0) / MM, (y1 - y0) / MM
-        klass = "uncropped sheet"
+
+def process(page):
+    # THIS STEP DOES NOT REFUSE A PAGE.  Everything that used to be a gate --
+    # parity, skew residual, page class, canvas fit, the grade's ink numbers --
+    # is measured, published, and NOTED here.  A note goes in the page's log
+    # line and in its stamp, so a page that needs a human eye is findable with
+    # grep instead of missing from the output.  The one thing that still stops
+    # a page is a missing input file: there is nothing to publish.
+    #
+    # Levelling, masking and tracing are level_and_trace() above -- the field
+    # measurement runs the same code on the same page, and two spellings of
+    # "where is the paper" would drift.  The names below are unpacked once, so
+    # that everything from there down reads as it did when they were locals.
+    t = level_and_trace(page)
+    write_overlay(t)
+    t.locate()
+    stem, grade, notes = t.stem, t.grade, t.notes
+    full, img, arr, h, w = t.full, t.img, t.arr, t.h, t.w
+    mask, keep = t.mask, t.keep
+    left, right, top, bot = t.left, t.right, t.top, t.bot
+    from_ink, finder, paper_frac = t.from_ink, t.finder, t.paper_frac
+    side, ratio, angle, residual = t.side, t.ratio, t.angle, t.residual
+    dpi, reduce, dropped = t.dpi, t.reduce, t.dropped
+    x0, y0, x1, y1 = t.box
+    page_w_mm, page_h_mm, klass = t.page_w_mm, t.page_h_mm, t.klass
 
     cw, ch = int(round(MASTER_W_MM * MM)), int(round(MASTER_H_MM * MM))
 
@@ -1304,9 +1937,30 @@ def process(page):
     canvas_page = place(np.ones((h, w), bool), False)
     canvas[~canvas_page] = grade.paper_rgb.astype(np.uint8)
 
+    # --- the paper-yellowing field, and the two anchors it holds fixed ------
+    # Measured HERE, before the stamp, because the stamp has to record them:
+    # the correction is not reproducible from the field file alone -- it also
+    # needs this page's own centre paper and its own ink floor.  See
+    # page_anchors(), and FIELD_PAGE_MM for the page that gets no field at all.
+    field = field_for(page)
+    if field.mode != "identity" and not field_box_ok(page_w_mm, page_h_mm):
+        field = FlatField(grade, identity_because=(
+            "NOT APPLIED -- " + field_box_complaint(page_w_mm, page_h_mm)))
+        notes.append(f"FIELD not applied: "
+                     f"{field_box_complaint(page_w_mm, page_h_mm)}")
+    field_pc = field_k = None
+    field_anchors = "(none -- " + field.summary + ")"
+    if field.mode != "identity":
+        field_pc, field_k, how = page_anchors(arr, keep, t.box, field)
+        field_anchors = (f"Pc {field_pc[0]:.1f}/{field_pc[1]:.1f}/{field_pc[2]:.1f}"
+                         f"  K {field_k[0]:.1f}/{field_k[1]:.1f}/{field_k[2]:.1f}"
+                         f"  ({how})")
+        if "class median" in how:
+            notes.append(f"FIELD anchors: {how}; {field_anchors}")
+
     # The stamp every artefact of this page carries.  Built BEFORE the render,
     # because it describes what the render is about to be done with.
-    stamp = stamp_text(grade, **{
+    stamp = stamp_text(grade, field, **{
         "page": f"{stem} of {ISSUE}",
         "page-class": klass,
         "page-size": f"{page_w_mm:.1f} x {page_h_mm:.1f} mm",
@@ -1329,6 +1983,11 @@ def process(page):
         "edge-finder": f"{finder} (paper frac {paper_frac:.3f})",
         "skew": f"{angle:+.2f} -> {residual:+.2f} deg",
         "scan-dpi": f"{dpi}",
+        # The field file gives the GAIN; these two give the page's own ends of
+        # the affine map it is applied through.  Both are needed to reproduce
+        # the pixels and neither is in the field file, because both are
+        # measured on this page.
+        "field-anchors": field_anchors,
     })
 
     with tempfile.TemporaryDirectory(prefix=f"r005_{ISSUE}_{stem}_") as work:
@@ -1338,6 +1997,22 @@ def process(page):
         profile_txt = OUT_CMYK / f"{stem}.colors.txt"
         write_profile(grade, profile_txt)
         src_png, cmyk_tiff = work / "in.png", work / "sep.tiff"
+        # --- FLATTEN THE PAPER, THEN SEPARATE ------------------------------
+        # LAST, and on the pixels the separator is about to be handed.  The
+        # grade uses a single measured white as its density reference, so it is
+        # only right where the paper is that white: correcting after the
+        # separation would mean correcting a density that was computed against
+        # the wrong reference, and correcting before the TRACE would move the
+        # paper under the mask thresholds PAPER_DIST and BED_LUM were measured
+        # against.  Between the two is this line.
+        #
+        # `arr`, `mask`, `keep` and every measurement above are deliberately
+        # NOT recomputed: they describe the page as the scanner recorded it,
+        # which is what the edge finders, the parity gate and the raw side of
+        # the ink ratio are all statements about.  The published pixels all
+        # come through `full`.
+        if field.mode != "identity":
+            field.apply(full, t.box, reduce, page % 2 == 1, field_pc, field_k)
         full.save(src_png)
         # A 600 dpi scan has no 2400 dpi sheet: its full-resolution render IS
         # sheets600, so it is rendered into the scratch directory and not
@@ -1433,7 +2108,8 @@ def process(page):
           f"bed comps {dropped} | torn {side} ({ratio:.2f}) | "
           f"paper {paper_white:.0f} ({probe_name}) ink {ink_p50:.0f} "
           f"({ink_frac:.1%} of {raw_ink_frac:.1%}) | "
-          f"grade {grade.sha} ({grade.klass or 'single'} paper)"
+          f"grade {grade.sha} ({grade.klass or 'single'} paper) "
+          f"field {field.sha} ({field.mode})"
           + (" | grade: " + "; ".join(unproven) if unproven else "")
           + ("".join(f"\n      NOTE p{stem}: {n}" for n in notes)), flush=True)
 
@@ -1696,12 +2372,20 @@ if __name__ == "__main__":
     # The same text goes into every artefact; see stamp_text.
     for klass in sorted({grade_for(p).klass for p in pages}, key=str):
         grade = GRADES[klass]
+        field = FIELDS[klass]
         mine = [p for p in pages if grade_for(p).klass == klass]
         if not grade.measured:
             print(f"r005: the {klass or 'single'} paper class has no measured "
                   f"colors.txt -- grading its {len(mine)} page(s) with the "
                   f"built-in anchor set and identity levels", flush=True)
-        print(stamp_text(grade, **{
+        # ...and the same sentence for the other half of the grade.  A missing
+        # field is not a refusal (see FlatField), and it is not silent either.
+        if field.mode == "identity":
+            print(f"r005: the {klass or 'single'} paper class has NO FITTED "
+                  f"PAPER-YELLOWING FIELD ({field.why}) -- its {len(mine)} "
+                  f"page(s) get no flat-field correction at all. Measure one "
+                  f"with r005_field.py.", flush=True)
+        print(stamp_text(grade, field, **{
             "run": f"{len(mine)} of {len(pages)} page(s) in this run",
             "pages": " ".join(f"{p:03d}" for p in mine),
         }), flush=True)

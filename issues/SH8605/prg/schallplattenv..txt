@@ -1,0 +1,96 @@
+
+
+;schallplattenv..prg ==0801==
+   10 rem --- schallplattenverwaltung ---
+   20 rem ----- (s.baloui/feb 1986) -----
+   30 :
+   40 rem --- dimensionierung ---
+   50 dimt$(500),i$(500),p$(500),m$(500)
+   60 :
+   70 rem --- vorbereitung ---
+   80 g$="d":rem bei floppybetrieb in 'f' aendern
+   90 print"'e' druecken, wenn erstbenutzung des programms"
+  100 geta$:ifa$=""then100
+  110 ifa$<>"e"thengosub780:rem datei einlesen
+  120 :
+  130 rem --- menue ---
+  140 printchr$(147):rem screen loeschen
+  150 print"(e)intragen von datensaetzen"
+  160 print"(s)uchen von datensaetzen"
+  170 print"(b)eenden des programms"
+  180 print:print"kommando ?"
+  190 geta$:ifa$=""then190
+  200 ifa$="e"thengosub260
+  210 ifa$="s"thengosub340
+  220 ifa$="b"thengosub600:end
+  230 goto140
+  240 :
+  250 rem --- eintragen ---
+  260 ad=ad+1:rem anzahl datensaetze um eins erhoehen
+  270 input"titel";t$(ad)
+  280 input"interpret";i$(ad)
+  290 input"platte";p$(ad)
+  300 input"musikrichtung";m$(ad)
+  310 return
+  320 :
+  330 rem --- suchen ---
+  340 input"suchkriterium";s$
+  350 fori=1toad
+  360 ifs$<>t$(i)ands$<>i$(i)ands$<>p$(i)ands$<>m$(i)then460
+  370 printt$(i):printi$(i):printp$(i):printm$(i)
+  380 print"weitersuchen (j/n) ?"
+  390 geta$:ifa$=""then390
+  400 ifa$="j"then460
+  410 print"(l)oeschen/(a)endern ?"
+  420 geta$:ifa$=""then420
+  430 ifa$="l"ora$="a"thenn=i:gosub500:rem loeschen
+  440 ifa$="a"thengosub260:rem eintragen
+  450 goto470:rem ende
+  460 next
+  470 return
+  480 :
+  490 rem --- loeschen ---
+  500 fori=ntoad-1
+  510 t$(i)=t$(i+1)
+  520 i$(i)=i$(i+1)
+  530 p$(i)=p$(i+1)
+  540 m$(i)=m$(i+1)
+  550 next
+  560 ad=ad-1:rem anzahl datensaetze um eins erniedrigen
+  570 return
+  580 :
+  590 rem --- datei speichern ---
+  600 ifg$="d"thenopen1,1,1,"schallplatten":goto630:rem datasette
+  610 open15,8,15,"s:schallplatten":close15:rem loeschen der alten datei
+  620 open1,8,2,"schallplatten,s,w":rem floppy
+  630 print#1,ad:rem anzahl datensaetze speichern
+  640 fori=1toad
+  650 ift$(i)=""thent$(i)="*":rem leerer string?
+  660 print#1,t$(i):rem t$(1)-t$(ad) speichern
+  670 ifi$(i)=""theni$(i)="*":rem leerer string?
+  680 print#1,i$(i):rem i$(1)-i$(ad) speichern
+  690 ifp$(i)=""thenp$(i)="*":rem leerer string?
+  700 print#1,p$(i):rem p$(1)-p$(ad) speichern
+  710 ifm$(i)=""thenm$(i)="*":rem leerer string?
+  720 print#1,m$(i):rem m$(1)-m$(ad) speichern
+  730 next
+  740 close1:rem datei schliessen
+  750 return
+  760 :
+  770 rem --- datei einlesen ---
+  780 ifg$="d"thenopen1,1,0,"schallplatten":goto800:rem datasette
+  790 open1,8,2,"schallplatten,s,r":rem floppy
+  800 input#1,ad:rem anzahl datensaetze einlesen
+  810 fori=1toad
+  820 input#1,t$(i):rem titel einlesen
+  830 ift$(i)="*"thent$(i)="":rem leerer string?
+  840 input#1,i$(i):rem interpret einlesen
+  850 ifi$(i)="*"theni$(i)="":rem leerer string?
+  860 input#1,p$(i):rem platte einlesen
+  870 ifp$(i)="*"thenp$(i)="":rem leerer string?
+  880 input#1,m$(i):rem musikrichtung einlesen
+  890 ifm$(i)="*"thenm$(i)="":rem leerer string?
+  900 next
+  910 close1:rem datei schliessen
+  920 return
+
