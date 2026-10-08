@@ -517,3 +517,19 @@ leaves Leserforum's alone.
 
 **Suggested.** "Check 2 applies only where the page prints a banner motif; a
 plain running-head bar is head1, not a banner."
+
+## 210/220 — small defects the agent hit
+
+- **r210 names `masters600` as the page**, but on a `sheet` issue that is the
+  5457x7181 traced canvas; the apply script's `PAGE_W = 4961` and the bands match
+  `a4600`. **Suggested.** "`<A4>`: a4600 on sheet, masters600 on spread".
+- **r210 check 1 counts Leserforum by FILENAME** and asserts "0 on every
+  Sonderheft"; SH8608's 8 is Leserforum-banded (head1 from r200, now `all`).
+  Count by `head1="Leserforum"`.
+- **r210's OCR apply script was unusable** on SH8608 (28/39 junk: `TIPIS&ETRICKS`,
+  `C16lı`, `5SBIELE`); bands were read by eye. Say so: the script is a dry-run
+  lead; the band crop is the source.
+- **r220's orphan check reports every typo fixed at application** (rule step 4
+  says fix them) as "matching no article". **Suggested.** "a row corrected at
+  application is recorded in `reviewed/r220-orphan-rows.txt` with the fix as the
+  reason". And the comment "keys it in COLUMN 4" is stale (the code uses `r[3]`).
