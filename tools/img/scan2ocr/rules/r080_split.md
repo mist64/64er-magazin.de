@@ -472,13 +472,27 @@ Inhalt line:**
 | the PRINT gives the pair ONE combined headline (`Checksummer 64 V3 und MSE`, `Eingabehilfen mit Checksummer 64V3 und MSE`) | **one article**, by the Inhalt principle |
 | SH8603's: shares a page with a THIRD article, and its own figures are printed on the Checksummer's page | the owner — this is the entanglement that made it a question |
 
-MEASURED over the corpus, the first row is the overwhelming norm and has
-shipped that way **fifteen times and more**: SH8602 6/7, SH8604 93/94,
-SH8605 135/136, SH8503 6/8, SH8504 6/8, SH8505 6/8, SH8506 16/18, SH8507 6/8,
-SH8508 109/110, and the monthlies 8502 65/68, 8503 68/78, 8504 54/57,
-8505 54/55, 8508 53/54. The second row is the print's own decision and needs no
-ruling either: 8509, 8510, 8511, 8512, 8610 and 8611 all print one headline
-over the pair, and each is one article.
+**AND THE CORPUS DOES NOT SETTLE THIS PAIR — be careful which pair you count.**
+The first version of this table cited "fifteen or more" precedents for splitting:
+SH8602 6/7, SH8604 93/94, SH8605 135/136 and the rest. **Every one of those is
+Checksummer + _MSE_, which is a different second article** (its own id, `mse`,
+its own subject). SH8608's builder caught that at step 140 and it is worth
+recording as the error it was, because a count of the wrong pair reads exactly
+like evidence.
+
+What the corpus actually says about THIS text, measured on the exact headline:
+
+- `Wie unsere Basic-Programme einzugeben sind` appears in **two** files in the
+  whole archive — `SH8603/76` as an `<h2>` inside the Checksummer (the fold
+  above), and `SH8608/130` as an `<h1>`.
+- The curly-brace Eingabehinweise TEXT sits inside the `checksummer` article in
+  nineteen files and has never had an id of its own.
+- But the subject plainly CAN be a standalone article: the monthly `8507/77`
+  *Hinweise zum Abtippen unserer Listings* is one, with the id `abtippen`.
+
+So the split is decided by the PRINT of the issue in hand, not by a tally. The
+second row of the table is the print's own decision and needs no ruling either:
+8509, 8510, 8511, 8512, 8610 and 8611 all set one headline over the pair.
 
 So SH8603 stays what the owner called it — *"combine on my authority. special
 case. not a rule"* — and it is a special case because of the entanglement, not
@@ -487,8 +501,12 @@ articles**, which is nothing more than this rule's own principle that the
 printed Inhalt is what names an article, applied without flinching.
 
 Applied to SH8608: `129 Checksummer VC 20 V3` and `130 Wie unsere
-Basic-Programme einzugeben sind` are two Inhalt lines on two pages, so they are
-two articles, and the builder's default was right.
+Basic-Programme einzugeben sind` are two Inhalt lines on two pages with nothing
+entangled, so they are two articles — on the print's evidence, which is the only
+evidence this rule ever claimed to rest on. SH8603 had its own Inhalt line TOO
+and was still folded, so the Inhalt line is not sufficient by itself; what
+separates them is that SH8603's piece shared a page with a third article and had
+its figures printed on the Checksummer's page, and SH8608's does not.
 
 ## A LEADING `>` IS AN INTRO, AND A MONITOR PROMPT LOOKS THE SAME
 
