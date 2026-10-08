@@ -24,6 +24,38 @@ previous issue's descriptor and wrote the new issue's pages into the finished
 issue's directories, on top of published work, silently. A build that cannot say
 which issue it is now stops and tells you how to say so.
 
+### TWO ISSUES AT ONCE: `ISSUE.txt` IS A SINGLE SHARED RESOURCE — EMPTY IT
+
+One working tree, one `ISSUE.txt`. Two builds running in parallel share it, and
+the failure it was invented to prevent comes straight back: **a step run without
+the environment variable falls back to the file and silently builds the OTHER
+issue** -- into its `<tmp>`, over its masters, into its `issues/<ID>/`.
+
+MEASURED, all four cases:
+
+| `ISSUE` in env | `ISSUE.txt` | what the chain builds |
+|---|---|---|
+| `SH8606` | `SH8608` | `SH8606` -- the environment wins |
+| *(unset)* | `SH8608` | **`SH8608`** -- the silent wrong-issue build |
+| *(unset)* | *(empty)* | **refuses**, and says how to set it |
+| `SH8606` | *(empty)* | `SH8606` |
+
+So for a parallel build:
+
+1. **EMPTY `ISSUE.txt`** -- `: > tools/img/scan2ocr/rules/ISSUE.txt`. It is
+   git-ignored, so this costs nothing and commits nothing.
+2. **Every builder exports `ISSUE` in every shell it uses**, and passes it
+   explicitly to any sub-agent or background job it starts. A sub-process that
+   does not inherit the export is exactly the case row 2 describes.
+3. **Nobody writes `ISSUE.txt` while another build is live.** Setting it to
+   your own issue is the dangerous move, not the helpful one: it makes YOUR
+   build work and converts the other builder's forgotten export from a loud
+   refusal into a silent wrong-issue write.
+
+The point of the empty file is that it turns the undetectable failure into an
+immediate one. A single build can still use `ISSUE.txt` normally; it is only
+shared concurrency that makes it a hazard.
+
 The build pipeline is a chain of substantive, sometimes editorial
 transformations. It has **two kinds of step**, and they are run differently:
 
