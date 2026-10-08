@@ -441,7 +441,7 @@ because it belongs to the layout and not to any article. These are signed,
 authored, typeset text that happens to sit in leftover space, and they are
 **kept**. The test is the signature: authored content stays.
 
-## Eingabehinweise beside the Checksummer — AN OPEN QUESTION, NOT A PRECEDENT
+## Eingabehinweise beside the Checksummer — TWO PAGES MEANS TWO ARTICLES
 
 SH8603 p77 prints *Wie unsere Basic-Programme einzugeben sind* under the
 EINGABEHILFE band at section-head size (smaller than the display headline of
@@ -458,10 +458,37 @@ overlap with SH8507's `checksummer`), while the monthly 8507/77 *Hinweise zum
 Abtippen unserer Listings* is a standalone article with its own id
 (`abtippen`).
 
-So a later issue meeting this shape **goes to the owner** and does not copy
-SH8603. Nothing here touches this rule's "a headline-less start page takes its
-`h1` from the printed Inhalt", nor the principle that the printed Inhalt is
-what names an article.
+**BUT THAT IS ONE SHAPE, AND IT IS THE RARE ONE.** This section used to send
+every later issue meeting "Eingabehinweise beside a Checksummer" to the owner.
+That over-fires, because it does not distinguish SH8603's ENTANGLED shape from
+the ordinary one, and the corpus is not ambiguous about the ordinary one at all.
+
+**The discriminator is whether the Eingabehinweise has its OWN PAGE and its own
+Inhalt line:**
+
+| shape | disposition |
+|---|---|
+| its own page, its own Inhalt line, 030 split it | **two articles.** Not a question. |
+| the PRINT gives the pair ONE combined headline (`Checksummer 64 V3 und MSE`, `Eingabehilfen mit Checksummer 64V3 und MSE`) | **one article**, by the Inhalt principle |
+| SH8603's: shares a page with a THIRD article, and its own figures are printed on the Checksummer's page | the owner — this is the entanglement that made it a question |
+
+MEASURED over the corpus, the first row is the overwhelming norm and has
+shipped that way **fifteen times and more**: SH8602 6/7, SH8604 93/94,
+SH8605 135/136, SH8503 6/8, SH8504 6/8, SH8505 6/8, SH8506 16/18, SH8507 6/8,
+SH8508 109/110, and the monthlies 8502 65/68, 8503 68/78, 8504 54/57,
+8505 54/55, 8508 53/54. The second row is the print's own decision and needs no
+ruling either: 8509, 8510, 8511, 8512, 8610 and 8611 all print one headline
+over the pair, and each is one article.
+
+So SH8603 stays what the owner called it — *"combine on my authority. special
+case. not a rule"* — and it is a special case because of the entanglement, not
+because of the subject matter. **Two Inhalt entries on two pages are two
+articles**, which is nothing more than this rule's own principle that the
+printed Inhalt is what names an article, applied without flinching.
+
+Applied to SH8608: `129 Checksummer VC 20 V3` and `130 Wie unsere
+Basic-Programme einzugeben sind` are two Inhalt lines on two pages, so they are
+two articles, and the builder's default was right.
 
 ## A LEADING `>` IS AN INTRO, AND A MONITOR PROMPT LOOKS THE SAME
 
