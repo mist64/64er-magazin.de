@@ -27,8 +27,22 @@ R 185 34 31
 G 42 109 44
 B 36 44 79
 K 16 17 17
-# Levels: identity until measured as the p99 of each ink over bare paper.
-LC 0 100
-LM 0 100
-LY 0 100
-LK 0 100
+# Levels: the low point of each ink is the p99 of that ink over BARE INTERIOR
+# PAPER in the separator's own output (r005_masters_spread, "the level lines
+# stay identity until measured as the p99 of each ink over bare interior
+# paper").  MEASURED 2026-10-08 on cmyk2400/{010,028,045,070,088,129}.tif, three
+# ink-free patches a page (top margin, page centre, foot margin; 7.3 M px):
+#   C p50 0-2 p90 9-15 p99 24-32 /255   M p50 0-3 p90 10-15 p99 24-30
+#   Y p50 1-10 p90 13-23 p99 26-38       K p50 0 p90 5-10 p99 15-20
+# i.e. in percent p99 C 11.0  M 10.6  Y 12.5  K 7.1.  With identity levels this
+# paper graded to 236-248 instead of 255 (window paper p50 on 010/028/088/142)
+# because the interior stock sits only 4-7 levels above its own p2 in each
+# channel (pool p2 188 165 154 vs p50 192 168 158), so 600 dpi grain puts ~10 %
+# of paper pixels under W in some channel and the separator reports it as ink.
+# Lowering W by two levels (600 dpi p0.5, 186 162 153) moved the paper by 4
+# levels and was not the fix; SH8608's paper has 20 levels of headroom and
+# needed no levels.
+LC 11 100
+LM 11 100
+LY 13 100
+LK 7 100

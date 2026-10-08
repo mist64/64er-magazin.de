@@ -83,3 +83,50 @@ the trim ×(600/150) into the master; the levelling moves a centre-band edge by
 under a pixel. And fill the strip beyond the trim by MIRRORING the page
 (r005's fill rule), because a full-bleed dark page has no paper white to
 paint."
+
+## 005 — the levels were "identity until measured" and nothing said WHEN the measurement is due
+
+**What the rule says.** r005_masters_sheet.md, *Two papers, two profiles*:
+"The levels stay the identity because nobody has measured that stock; a level
+line is a per-ink contrast decision that must be measured, not guessed."
+r005_masters_spread.md: "The level lines stay identity until they are measured
+as the p99 of each ink over bare interior paper. That measurement is still OPEN
+on 8610". Every sister profile (8610, SH8602–SH8605, SH8608) ships `L* 0 100`.
+
+**What I did.** Shipped identity levels like every issue before, ran the full
+17-minute sweep, and found at Verification 6 that the paper graded to 236–248
+instead of 255 on every window. Spent ~40 min and five measurement scripts
+establishing why (tight pool, 4–7 levels of headroom, bare-paper ink p99 of
+11/11/13/7 %), tried the W percentile first because the rule's W section is
+long and its levels sentence is one line, and only then ran the p99 recipe —
+which worked at once. Result: a second full sweep.
+
+**What it cost.** ~1 h and a 17-minute sweep plus 005b and 010 repeated.
+
+**Suggested.** Make the level measurement part of the three-page gate, before
+the sweep: "After the gate pages are rendered, measure the p99 of C/M/Y/K over
+three bare-paper patches of their `cmyk2400/NNN.tif`. If any ink's p99 is
+above ~5 %, the paper will not clamp (SH8606: 11/11/13/7 % → paper 236–248);
+set that ink's level low point to its p99 and re-render the gate pages. Check
+the paper p50 reaches 255 AND glyph p50 stays within the sister issues' range
+(SH8606: 38–43 after, 27–33 before)." And in the W section: "A W whose joint
+clamp is already ~97 % does not fix grey paper — the levels do."
+
+## 005 — Verification 7b fails a correct master at the field window's boundary
+
+**What the rule says.** 7b: "every master names the FIELD that made it … or
+the IDENTITY digest, which is what a page whose traced box the field could not
+be anchored on must carry", re-deriving `anchored = field_box_ok(w, h)` from
+the stamp's `page-size`.
+
+**What I did.** p168's stamp says `page-size 209.3 x 301.0 mm` and `FIELD not
+applied: … 301.0 mm is outside the 205-212 x 293-301 mm`: the step tested the
+unrounded height (just over 301) and stamped identity. The check reads the
+rounded 301.0, `field_box_ok` says anchored, and it asserts the master is
+STALE. It is not; the step's own decision is in the stamp.
+
+**What it cost.** ~5 min.
+
+**Suggested.** 7b should trust the stamp's own `field` line ("NOT APPLIED")
+over its re-derivation when the page-size is within 0.05 mm of a
+`FIELD_PAGE_MM` bound — or the stamp should carry the unrounded size.
