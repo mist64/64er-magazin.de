@@ -130,3 +130,28 @@ STALE. It is not; the step's own decision is in the stamp.
 **Suggested.** 7b should trust the stamp's own `field` line ("NOT APPLIED")
 over its re-derivation when the page-size is within 0.05 mm of a
 `FIELD_PAGE_MM` bound — or the stamp should carry the unrounded size.
+
+## 005 — a rule was fine and I was not: a fix's blast radius is a PAPER CLASS, not an artefact
+
+**What the rule says.** r005_masters_sheet.md, *Two papers, two profiles*: the
+`high` class is graded with the built-in anchors and identity levels; the
+`low` class with the issue's measured `colors.txt`. Every stamp carries
+`paper-class`.
+
+**What I did.** After measuring the level lines into `colors.txt` I told
+control that the re-sweep would refresh `sheets600` and `title_source_150.png`
+and that *the owner's title crop therefore carries the grey paper*. The first
+half is true (the files are rewritten); the second does not follow: the grey
+paper was a `low`-class defect and the cover is `high` — its stamp reads
+`paper-class high`, `profile (none -- the built-in anchors, identity levels)`,
+`grade-sha cec3ff863b36`, and nothing in LC/LM/LY/LK reaches it. The re-sweep
+rewrites the cover with identical pixels. Control caught it; the owner was
+nearly asked to re-crop a title for nothing.
+
+**What it cost.** One wrong sentence to the owner's channel; nothing re-done.
+
+**Suggested.** In r005's *The stamp* section: "When a grade changes, say
+which PAPER CLASS changed and check that the artefact you are worried about
+is in that class — `grep paper-class <tmp>/masters600/NNN.stamp.txt` — before
+telling anyone it is stale. A profile edit to `colors.txt` touches the `low`
+class only; the wrapper and any card are untouched by it."
