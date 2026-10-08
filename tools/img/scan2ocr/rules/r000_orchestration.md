@@ -351,6 +351,23 @@ with **no cut figures**, then stops and hands over. What it delivers:
 Then the owner cuts the figures and makes `title.png`. Then the chain resumes:
 place the images (150), build the PDF (006), re-run the end-of-issue gates.
 
+**BUT THE PDF DOES NOT WAIT FOR THE FIGURES — that sentence is an ORDER OF
+CONVENIENCE, not a dependency.** Owner, 2026-10-08: *"PDFs don't need crops.
+PDFs only need title.png."* The two deliverables come from different places:
+
+| deliverable | built from | waits for the crops? |
+|---|---|---|
+| the **PDF** (006) | `<A4>` + the OCR layer + `title.png` | **NO** |
+| the **HTML** (150 onward) | the articles + the placed figures | yes |
+
+So as soon as `title.png` exists, the PDF can be built — the issue's A4 pages
+are final from 005b, and nothing in 006 reads a crop. Reading this paragraph as
+a dependency cost both SH8606 and SH8608 a day of being described as blocked on
+figures when only their HTML was.
+
+The crop worklist still goes to the owner at PAUSE 2, because the HTML genuinely
+does wait.
+
 **Step 006 is numbered early and RUNS LATE.** It is the issue PDF, it blocks on a
 hand-made input, and the PDF comes last anyway (*THE PAGE IMAGE IS `masters600`*).
 Numbering is not a schedule.
