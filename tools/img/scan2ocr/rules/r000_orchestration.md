@@ -278,9 +278,54 @@ SH8601 is `binding: "sheet"` and the Sonderheft after it may be anything.
 Write the descriptor fresh: copy only the SHAPE (which keys exist), never the
 values. Both values come from PAUSE 1.
 
-**PAUSE 1 — before step 005.** The two questions about the physical copy:
-binding, and which pages are which paper. They cannot be answered from a scan,
-and 005 grades nothing until they are. See the section below.
+**PAUSE 1 — before step 005.** Binding, and which pages are which paper. This
+section used to open *"they cannot be answered from a scan"*. **Binding can, and
+as of 2026-10-08 it is not an owner question at all.**
+
+### BINDING IS DERIVED FROM THE SCAN, NOT ASKED
+
+Owner, 2026-10-08, after two issues running where the builder's evidence and the
+owner's answer agreed: *"from now on, it seems you can detect the binding
+yourself. codify. don't ask any more."*
+
+**Read the four edges of one leaf at full thumb resolution** — take a
+consecutive verso/recto pair from the middle of the issue, where the binding is
+least disturbed — and decide:
+
+| what the edges show | binding |
+|---|---|
+| ONE sheet per frame; black bed visible on **both** sides; **no facing half**; no fold; no clip holes; gutter edge a **torn fringe**, fore edge a **flush cut** | `sheet` |
+| TWO printed halves in one frame, a **fold** or gutter shadow down the middle, or **clip holes** along one edge | `spread` |
+
+MEASURED, and it is not a close call either way: SH8606's leaf 100/101 reads one
+sheet per frame on a 214 × 304 mm frame, bed on both sides, no facing half, no
+clip holes, no fold, gutter a torn fringe (verso right, recto left — the same
+side as SH8601), fore edge flush — `sheet`, and the owner confirmed `sheet` from
+the copy. SH8608 the same. Every Sonderheft so far is `sheet`; the monthlies
+8609-8611 are `spread` and show the fold.
+
+**Write it into the descriptor yourself and say in LOG.md which leaf you read
+and what its four edges showed.** r000 still forbids copying the previous
+issue's descriptor: derive it from THIS copy's scans every time. If the edges
+genuinely disagree with each other — a fold on one side and a torn fringe on the
+other — that is a real question and it goes to the owner; agreement is not a
+question.
+
+### PAPER: ASK ONLY WHEN THE THREE WITNESSES DISAGREE
+
+The paper answer has three witnesses (r005, *What the step offers as evidence*):
+the own-white gap read per dpi, the edge-finder pre-fill, and the scan dpi.
+**When all three point at the same set, take it — do not ask.** MEASURED:
+SH8606's three agree exactly on `high_pages = [1, 2, 179, 180]`, and on SH8605
+and SH8608 the owner's answer was what the witnesses already said.
+
+**Ask when they disagree, or when one of them is blind** — which is the case the
+rules were built around and it is not rare: SH8605's bound-in Zahlkarte p198 was
+offered by the own-white gap alone (paper frac 0.116 against 0.10), and a
+full-bleed cover has no own white to read. A disagreement is a question about a
+physical object; an agreement is a measurement.
+
+005 grades nothing until both are settled, however they were settled.
 
 For `binding: spread` the paper answer is **fixed** until the spread variant
 learns per-page classes: one measured profile under the legacy `colors` key,
