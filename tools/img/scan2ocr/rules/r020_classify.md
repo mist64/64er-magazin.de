@@ -226,6 +226,27 @@ entries, and on no other page of 192 — no other page has even 2. The
 published-side companion is in `r310_issue_invariants.py`: exactly one article
 with `64er.id="impressum"`, which 41 of 41 published issues satisfy.
 
+**THIS GATE IS A PRESENCE TEST AND CANNOT SEE A WRONG IMPRESSUM.** It asks
+whether the masthead page kept ANY blocks. SH8605's p194 kept 20 of them with 8
+distinct labels, so the gate passed — while the corpus had the masthead
+interleaved with the Depot-Händler ad that shares the page, which is the defect
+(the Impressum column is one of three on that page and its blocks alternate with
+the ad's in reading order).
+
+**And the obvious strengthening does not work — do not re-attempt it.** The
+errata that produced this paragraph proposed: *a masthead label present in
+`blocks/pNNN.txt` and absent from `NNN.article.txt` is a HARD fail.* Tried
+against SH8605's own artefacts, it reads **clean on the issue whose Impressum
+was wrong**: all 8 labels (Chefredakteur, Stellv. Chefredakteur, Redaktion:,
+Verlagsleit, Vertriebsleit, Verantwortlich, Urheberrecht, Druck:) are in BOTH
+files. What was wrong was the ORDER and the values between the labels, and no
+label-set comparison can see that.
+
+**What did see it was `r020_evaluate.py`, at recall 0.19 — so it is not
+optional.** Two builds (SH8603, SH8604) left that evaluation "pending" and this
+is what it is for: of the first four steps of SH8605, the one real defect was
+found by nothing else. Run it, and read `WORST.txt`.
+
 
 ```bash
 # The venv, not bare python3 (numpy), and the ISSUE's page count, not
@@ -325,10 +346,15 @@ carry them.
 
 **The recovery is a rebuild, not a re-classification.** The block index is
 authoritative and it survived: reconstruct the article from that page's blocks
-plus a 600 dpi crop of the master, in the shape of the **previous issue's**
-Impressum (same head metas, same `<article class="impressum">`, same
-`<p><em>Label: </em>value</p>` run in the printed order), with the line-break
-hyphens resolved. The prior issue decides OCR doubts one word at a time and
+plus a 600 dpi crop of the master, **in the shape of the previous issue's
+Impressum — open it and copy its markup.** Do not copy the shape from here:
+there is no house shape, and the example that stood in this sentence
+(`<article class="impressum">` with a `<p><em>Label: </em>value</p>` run) is
+none of the corpus's three. MEASURED: SH8604 has a plain `<article>` with
+`<p><strong>Label:</strong> value</p>` and `<hr>`; SH8603 uses
+`<em>Label: </em>`; SH8601 `<strong>Label</strong>:` with one `<hr />`. The
+PREVIOUS ISSUE wins over any example written down here, which is what SH8605
+did, correctly. Resolve the line-break hyphens. The prior issue decides OCR doubts one word at a time and
 supplies the HTML shape — it does not supply content: 8610's masthead carries a
 paragraph 8609's does not (the Aktionäre / Aufsichtsrat block), and that came
 off the crop.

@@ -181,7 +181,13 @@ done
 # verbatim, so [21a] produced "21a Title.html" and the letters had to be put
 # back into the metas by hand afterwards, which the rule never said to do.
 # The two siblings' filenames still differ -- their titles do.
-grep -h '64er.pages" content=' issues/8607/*.html | grep -vE 'content="[0-9a-z,\- ]+"'
+# NO SPACE IN THE CLASS: the rule says the separator is a bare comma, and the
+# class used to accept a space, so a spaced spec passed silently.  030 writes
+# the spec SPACED (`[30-34, 36-38]`) and the splitter copies the h1 verbatim,
+# so SH8605 got four spaced specs from the script and they were rewritten by
+# hand.  Verified on SH8605: this form fires on a planted `content="90 - 97"`
+# and stays silent on the issue.
+grep -h '64er.pages" content=' issues/8607/*.html | grep -vE 'content="[0-9a-z,-]+"'
 
 # 5. consolidated file is gone
 [ ! -f issues/8607/8607.html ] && echo "consolidated removed ✓"

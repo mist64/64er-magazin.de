@@ -125,7 +125,8 @@ Shrinksprite parameters, `96`'s POKE line and six in `135`.
 ## Verification
 
 - A literal `(\*\*\*)` in the .md renders as `(***)` in the HTML.
-- A line ending in a single LF inside a paragraph becomes `…<br/>` in the HTML.
+- A line ending in a single LF inside a paragraph becomes `…<br/>` in the HTML
+  — PROVE THIS WITH THE PROBE BELOW, not by counting `<br/>` in the issue.
 - `**bold**` becomes `<strong>bold</strong>`.
 - **No `<p><pre>` anywhere**: `grep -c '<p>\s*<pre>' issues/<YYMM>/*.html` → 0.
   A hit means the fenced-code post-pass did not run.
@@ -136,10 +137,30 @@ Shrinksprite parameters, `96`'s POKE line and six in `135`.
 Quick spot-check (paste into shell after running the script):
 
 ```bash
+# THE PROBE, which cannot depend on the issue: does -G still break a single LF?
+printf 'Zeile eins\nZeile zwei\n' | markdown -G \
+  -f '+html,+github-listitem,+strikethrough,+tables,+fencedcode,-smarty,-alphalist'
+# expect:  <p>Zeile eins<br/>
+#          Zeile zwei</p>                        (verified, Discount 3.0.2.0)
+
 grep -n 'Asterisken'    issues/8607/8607.html | head -1   # expect (***)
-grep -c '<strong>'      issues/8607/8607.html             # ~90+
-grep -c '<br/>'         issues/8607/8607.html             # >0 (intra-paragraph LFs)
+grep -c '<strong>'      issues/8607/8607.html   # a READOUT: 8607 has ~90+,
+                                                # SH8605 has 0 and is correct
+grep -c '<br/>'         issues/8607/8607.html   # a READOUT, not a threshold
 ```
+
+**`<br/>` > 0 IS NOT A PASS CONDITION — it is a property of the .md, not of the
+flag.** SH8605's HTML has **0** `<br/>` and is right: every adjacent-line pair
+in its .md ends in a hand-written `<br>` (the "Im folgenden Listing…" source
+notes) or is a list item, so there is no soft-wrapped prose pair for `-G` to
+break. A check that fails on correct output is the shape r000 calls worse than
+no check, because what gets "fixed" is the transform. **The probe above is the
+check; the issue's count is the readout.** The same goes for `<strong>`: ~90+
+is 8607's number, and SH8605 reads 0 because its source has no bold.
+
+And `<p><pre>`: Discount 3.0.2.0 no longer produces it for this rule's own
+example (fed raw, the count is 0), so that grep is now a regression backstop
+rather than a live defect.
 
 **`<br/>` with the slash, not `<br`.** `-G` is what produces the
 intra-paragraph break and it emits the XHTML form; the loose `<br`

@@ -338,14 +338,77 @@ for o in orphans[:12]:
     print("   ", o)
 PYEOF
 
+# 3b. AND THE ORPHAN COUNT IS NOT THE CHECK.  It can only see files before the
+#     FIRST separator: remove a MID-disk separator and its files fall silently
+#     under the PREVIOUS one, still "placed", count unchanged.  MEASURED on
+#     SH8605, planted on copies under <tmp>/scratch_120/plant/: removing the
+#     "6" separator took the count 1 -> 4, and removing "77" left it UNCHANGED
+#     while 77's files had joined 69's article.  Re-verified here on SH8605's
+#     own step-120 prg.txt (51 figures, 21 separators): with "77" removed the
+#     orphan count stays at 4 and the mapping shows 69's article going from 5
+#     files to 11 -- the merge is visible in one line and invisible to a count.
+#
+#     RUN IT AT STEP 120 TIME.  By the time an issue is published, 130 has
+#     moved every PLACED listing into its article, so `issues/<ID>/prg.txt`
+#     holds only what was never placed and the separators are gone with it:
+#     8611's and 8612's published prg.txt have no numbered separator at all.
+#
+#     So print the MAPPING and read it: for each separator, the files under it
+#     must belong to an article whose `64er.pages` CONTAINS that separator's
+#     page.  A count cannot be the evidence here; the mapping can.
+$PY - issues/<YYMM> <<'PYEOF2'
+import glob, os, re, sys
+root = sys.argv[1]
+s = open(os.path.join(root, "prg.txt"), encoding="utf-8").read()
+pages = {}                                  # printed page -> article file
+for f in sorted(glob.glob(os.path.join(root, "*.html"))):
+    m = re.search(r'64er\.pages" content="([^"]+)"',
+                  open(f, encoding="utf-8").read())
+    if not m:
+        continue
+    for part in m.group(1).split(","):
+        a, _, b = part.strip().partition("-")
+        a = re.sub(r"[a-z]$", "", a)
+        b = re.sub(r"[a-z]$", "", b or a)
+        if a.isdigit():
+            for n in range(int(a), int(b) + 1):
+                pages[n] = os.path.basename(f)
+chunks = re.split(r'(<!--[^>]*"----+[^"]*"[^>]*-->|<!-- [^>]*\.[Dd]64[^>]*-->)', s)
+sep = None
+for c in chunks:
+    if c.startswith("<!--"):
+        sep = None if ".D64" in c or ".d64" in c else c.strip()
+        continue
+    files = re.findall(r'data-filename="([^"]+)"', c)
+    if not files:
+        continue
+    m = re.search(r"-+(\d+)", sep or "")
+    pg = int(m.group(1)) if m else None
+    art = pages.get(pg)
+    flag = "" if art else ("  <- NO ARTICLE COVERS THIS PAGE" if pg
+                           else "  <- SEPARATOR CARRIES NO PAGE NUMBER")
+    print(f"  sep {sep!r:46s} page {pg} -> {art}{flag}")
+    print(f"      {len(files)} files: {', '.join(files[:6])}")
+PYEOF2
+
 # 4. ROUND-TRIP every listing: the .txt must re-tokenise to the .prg it
-#    came from.  This is the only check that sees a WRONG DIALECT -- the
-#    decoded text reads fine and the reader's download is the wrong bytes.
+#    came from.
+#
+#    A CLEAN ROUND TRIP PROVES THE BYTES, NOT THE DIALECT.  This comment used
+#    to say it is "the only check that sees a WRONG DIALECT"; it is not.  The
+#    trip disagrees only if the program USES a token the two dialects spell
+#    differently, and most do not: MEASURED on SH8605, a wrong `;version=3` tag
+#    on a V2 file (`huellkurve`) round-tripped BYTE-IDENTICAL.  To decide a
+#    dialect, decode with `-2` AND with the candidate and DIFF THE TWO TEXTS;
+#    if they are identical the tag is unfalsifiable from this file and has to be
+#    justified from the print.
+#    What the trip does catch is a decoded text that no longer re-tokenises,
+#    which is a real and different defect: the reader's download is wrong bytes.
 #    It re-implements nothing: the address/version/petcat call is
 #    generate.py's petcat2prg (generate.py:59-94), so a pass here is a
 #    pass on the site.
 dir=issues/<YYMM>
-python3 - "$dir" <<'PY'
+$PY - "$dir" <<'PY'
 import os, re, subprocess, sys
 d = os.path.join(sys.argv[1], "prg")
 bad = 0

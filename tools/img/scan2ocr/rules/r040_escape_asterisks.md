@@ -17,6 +17,19 @@ line carries one literal `**`, which this rule kept as a bold delimiter. All of
 the fence-aware checks read 0, because an unpaired delimiter is invisible to a
 pair count.
 
+**AND NEITHER IS "A PAIR IS BOLD": a pair can be two literals.** A `**` pair is
+bold only if **what it encloses is PROSE**. Two `**` in a line that is a
+BASIC or monitor listing line are two literals, and they pair with each other:
+
+- SH8605 l.2377 `20 PRINT"*%**%%* ZAHLEN RATENXXRX**`
+- SH8605 l.3692, a whole checksummed listing set in prose:
+  `18 REM #**#*#* … #*%* ** <202> 28 POKE …`
+
+Both were kept as bold delimiters, so 060 would have wrapped listing text in
+`<strong>`. **Test the line, not the run:** it is a listing line if it begins
+with a line number, or carries `PRINT` / `REM` / `POKE` / `SYS` / `DATA` or a
+checksum `<NNN>` token. In a listing line, escape both.
+
 That covers:
 - `*` (one) → `\*` (BASIC multiply, wildcard, literal star)
 - `***` → `\*\*\*` (three literal asterisks)
@@ -85,6 +98,14 @@ s = outside_fences(open(sys.argv[1], encoding='utf-8').read())
 print('unescaped solitary *:', len(re.findall(r'(?<!\\)(?<!\*)\*(?!\*)', s)))
 print('3+ contiguous runs   :', len(re.findall(r'\*{3,}', s)))
 print('**bold** pairs       :', len(re.findall(r'\*\*[^*]+?\*\*', s)))
+# A PAIR COUNT THAT CANNOT SEE A PAIR is the check that never fires, so count
+# every UNESCAPED ** outside fences and print the line it sits on.  The pattern
+# above cannot span an escaped \* between the delimiters, which is exactly the
+# shape of a listing line's two literals: it read 0 on both of SH8605's.
+for i, line in enumerate(s.split('\n'), 1):
+    hits = re.findall(r'(?<![\\*])\*\*(?!\*)', line)
+    if hits:
+        print(f'  ** on line {i} ({len(hits)}x): {line[:90]}')
 PYEOF
 ```
 

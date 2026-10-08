@@ -169,6 +169,14 @@ different kinds, so no single replacement is right and the script only
 | a **comma** | `ausnutzen ‚kann`, `LOAD "??Name*" ‚8`, `str(‚dv)`, and `VOLDEF (n(‚n(‚n(,n))))` — where the innermost comma survived as a real one |
 | an **opening quote** | `‚Computer Music'`, `die ‚Reihe Taschenbuch Telekommunikation` |
 | pure **noise** | `Dollar-‚Zeichen`, `Joystick-‚Modus` |
+| **any other punctuation the OCR has no glyph for** — `;` in a `PRINT` list, PETSCII `←` | `PRINT"FEHLER IN SEKTOR: ‚;TAB(20)ES` → `";` (SH8605 p27), `‚A Anfangszeilennummer` → `←A` (SH8605 p168) |
+
+**The table is what has been SEEN, not what can occur.** SH8605 resolved 38
+sites against the page and two were none of the first three kinds — both BASIC
+or monitor punctuation that tesseract has no glyph for at all, so it emitted the
+nearest low mark. What got them right was the instruction below, not the table;
+the table nearly suggested the wrong answer. A fourth kind on the next issue is
+expected, not surprising.
 
 Resolve each against the page. Note the contrast with `„` (U+201E, the German
 low DOUBLE), which **is** a real quotation mark and folds to `"` in the table
