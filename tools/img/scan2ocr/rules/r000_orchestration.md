@@ -171,6 +171,23 @@ experiment. Everything it needs in between is either in these files or derivable
 from the scan; where it is not, that is a **defect in these files** and fixing it
 is part of the work (see *THE SCAN IS THE ONLY INPUT*).
 
+**AND THE SCAN IS OF ONE PHYSICAL COPY, WHICH A PREVIOUS READER MAY HAVE
+WRITTEN ON.** Pen or pencil scans as ink, the OCR reads it as print, and it is
+PLAUSIBLE — a reader annotates where the text is wrong, so the mark sits
+exactly where a correction belongs and says exactly what a correction would
+say. MEASURED on SH8605: p165 has an ↑ drawn in grey pen into a gap in a
+printed listing line, and p95 has `2040` struck through with `2041` written in.
+Both were transcribed as print before anyone noticed. The second was
+corroborated three ways — the disk file, and 8606's own Fehlerteufelchen,
+which prints that same fix — so the previous owner had read the published
+erratum and applied it by hand.
+
+**So: a correction that looks too apt may be somebody else's.** Suspect pen
+wherever a listing's defect is repaired in place, check the stroke against the
+printed type at 3x (pen is grey, uneven, and sits off the type's baseline), and
+say in the report which it was. Every reader of this issue's scan should be
+told to look for it.
+
 **NEVER COPY THE PREVIOUS ISSUE'S DESCRIPTOR.** `binding` and `paper` are
 properties of the PHYSICAL COPY in the owner's hands, and the next issue in a
 series is not bound or printed the same way just because it is next. 8612's
@@ -694,6 +711,17 @@ was read carefully and never executed:
 >
 > It exits 0 and prints the lane line, or the edit is not finished.
 
+**RUN IT FROM `tools/img/scan2ocr/rules`, AND JUDGE IT BY THE LANE LINE, NOT
+THE EXIT STATUS.** Both halves of that were wrong in practice. Piped, the
+wrapper's `BASH_SOURCE[0]` is EMPTY, so its `DIR="$(cd "$(dirname …)" && pwd)"`
+resolves to the current directory and `PY` to a path four levels above
+wherever you happen to be — from the repo root it printed
+`…/64er-magazin.de/../../../../.venv/bin/python: No such file or directory`.
+And it **exited 0 anyway**, because the failing command is inside a `$(…)`
+and the pipeline's status is `bash`'s. So the recipe's own pass condition
+passed on a broken run. The lane line is the evidence; its absence is the
+failure.
+
 ### A CHECK IS RUN BOTH WAYS BEFORE IT SHIPS
 
 Against a file you know is **good**, and against one you know is **bad**. Not
@@ -1120,6 +1148,16 @@ artefact you find in the scan directory is untrusted, whatever it is called.**
 Do not match on the name `thumb`; treat anything that is not a `NNN.png`
 master as something a previous tool left behind. Re-derive what you need.
 
+**EXCEPT A NOTE A HUMAN LEFT** — a `README`, a `.txt` in prose. It is not an
+input, and it is not a leftover either: it is a CLAIM ABOUT THE INPUT, and the
+chain cannot see what it claims. Read it, then check the claim against the
+masters it names — the date, the md5 against its neighbours, the folio in the
+footer — before the sweep. SH8605's `00README.txt` said "160 missing from scan,
+still have to be done!"; p160 had been scanned four weeks after every other
+master, under different conditions, and the note was never removed. Applied as
+written, the rule said ignore it; applied as written, the rule would also have
+been right to ignore it only after somebody looked.
+
 A thumb a build DERIVED is reproducible; a thumb it FOUND is an artefact of
 whichever script ran last. The point is not that the found ones are wrong today
 -- for 8612 they are identical to what this command makes. The point is that
@@ -1293,6 +1331,14 @@ once. MEASURED for 005 on 8611: **~19 GB** — python holding the 2400 dpi sheet
 measurement; take the real number off the next run and put it in.
 
 ### NOT for model-call steps
+
+**AND NEVER RUN TWO MODEL-CALLING STEPS AT ONCE.** 020, 020's evaluation, 030
+and 145 share one credential and one rate limit, so running them in parallel
+does not halve the time — it starves one of them. MEASURED on SH8605: 020's
+evaluation (about 200 vision calls) was run alongside 030, hit the session
+limit **148 times**, and killed 030 in `dehyphenate`. Both completed cleanly
+when run one after the other. The lane cap governs processes; this governs
+STEPS, and nothing said so.
 
 020 classify, 020 evaluate and 145 judge fan out over **model calls**, and they
 are bound by rate limits and by the credential race in `r000_llm.py` — four
@@ -1942,6 +1988,13 @@ status deliberately — and never pipe a check's findings into `head`.
 ```bash
 .venv/bin/python generate.py --issues <ID> --future local
 ```
+
+**`port <N> busy — build complete, not serving` IS A PASS.** The site is
+written before the server is started, so a port held by something else says
+nothing about the build. Before the fix this ended every rebuild in an
+`OSError` traceback and a non-zero exit, and completion had to be proved by
+counting regenerated files; SH8605 hit the same situation at its end gate and
+it read as one clean line. Read the line, not the absence of a server.
 
 Exit 0 and no traceback. This is the only check that sees the issue the way
 the site does, and it catches what no per-rule verification can:
