@@ -179,8 +179,28 @@ All three found on SH8603, with its own evidence:
    re-tokenises under `-w3` to `$1F`. A re-tokenise that differs is not
    automatically a transcription error.
 
-   **BUT EACH DIFFERENCE GOES TO THE OWNER WITH ITS OWN BYTE-LEVEL CAUSE —
-   NEVER GROUPED UNDER A SHARED LABEL.** This is the one entry in SH8604's
+   **AND EACH DIFFERENCE IS DISPOSED OF BY ITS OWN BYTE-LEVEL CAUSE — NEVER
+   GROUPED UNDER A SHARED LABEL.**
+
+   **THE DEFAULT IS NOT AN OWNER QUESTION.** MEASURED on SH8605: 14
+   divergences (D1–D13, D15) were put to the owner one at a time, and the
+   answers are a rule:
+
+   | divergence | disposition |
+   |---|---|
+   | one that matters to a reader | a GERMAN HTML comment at the listing, naming the difference (r000's comment rule: reader-facing, no process) |
+   | a one-byte tail, or a REM-only difference | nothing at all |
+   | a reprint whose original printed an erratum the reprint lacks | Futureteufelchen (r300) |
+   | anything that fits none of these | the owner |
+
+   Owner, 2026-10-07: *"if it's a reprint and original has an erratum that is
+   missing in the reprint, make it a Futureteufelchen … for other not important
+   divergences between disk and print, an html comment suffices in general."*
+   And `↑` in a printed filename is how `^` looks on a C 64 — the SAME
+   character, not a divergence at all (SH8605 D8).
+
+   The byte-level cause is still mandatory, for the LOG: it is what caught
+   `der kl. hobbit`. This is the one entry in SH8604's
    errata where **a reader's download was wrong**, and the grouping is how it
    happened. Three files round-tripped differently (`1985_1986`, `lader`, `der
    kl. hobbit`); they were filed together as "petcat asymmetries"; the cause

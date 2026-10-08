@@ -82,6 +82,17 @@ lowercase, only the LAST hyphen is the OCR line-break; keep
 leading compound hyphens. `Sinclair-Com-puter` →
 `Sinclair-Computer` (NOT `SinclairComputer`).
 
+**A CAPITAL AFTER THE HYPHEN MEANS THE HYPHEN IS REAL, AND THIS IS NEVER AN
+OWNER QUESTION.** German compounds are hyphenated, so a line-end hyphen
+followed by an UPPERCASE continuation is part of the word and stays;
+a LOWERCASE continuation is a line break and is joined (except the
+suspended-hyphen set — see r330). The test is already encoded in this rule and
+in r330's normaliser; what was missing is that it settles the question.
+MEASURED on SH8605: the crop worklist and the PAUSE 2 list asked the owner (C10)
+about 77's caption »Bildschirm-|Koordinatensystem«. Owner, 2026-10-08: *"it's a
+capital K, so hyphen. not sure why you ask."* Applies wherever a line-end
+hyphen is resolved — here, r150's captions, and the crop worklist.
+
 **Lost-space heuristic.** A lowercase→capital boundary inside a
 word (`derComputer`), or concatenated short German words
 (`derComputerdabeiist`), are lost spaces from OCR — DO fix those.

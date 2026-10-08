@@ -296,10 +296,27 @@ ran `- <<'PY'` as a command and the Verification block ran on the system python
 paper-yellowing field for each paper class — about 0.6 s a page on 28 lanes for
 a 600 dpi issue, 119 s for SH8605's 192 interior pages. It writes
 `field_<class>.txt` beside that class's `colors.txt` and nothing else. Run it
-again only if the scans or the paper map change. Skipping it is not an error:
-every class then gets an identity field and every stamp says
-`field  identity -- not measured`, which is the state the step was in before
-this correction existed.
+again only if the scans or the paper map change.
+
+**IT IS NOT OPTIONAL, AND THIS RULE USED TO SAY IT WAS.** The sentence here
+read *"Skipping it is not an error: every class then gets an identity field"* —
+which is true of the PROGRAM (a class with no field file gets identity and the
+stamp says so) and false of the STEP: **check 7a asserts that every paper class
+has a field file**, so a build that skips this fails its own Verification with
+`no field file for paper class 'low' -- run r005_field.py`. The two halves of
+this rule disagreed, and the prose is the half a builder reads first (r000,
+*WHEN A RULE'S HEADER AND ITS BODY DISAGREE*). The correction is ON by the
+owner's decision of 2026-10-08 (`FIELD_CORRECTION = True`), and **the inner
+pages are what it is for** — the cheap yellowed interior stock is the class that
+browns, so `field_low.txt` is the one that is actually fitted.
+
+A class that CANNOT support a fit still gets a file: fewer than
+`FIELD_MIN_PAGES` = 24 pages of that class and `r005_field.py` writes an
+IDENTITY field for it, by name, with its own digest. That is why a wrapper class
+of 6 or 8 pages is not a problem and not a question — SH8605's `high` (8 pages)
+came out identity `038549436824` while its `low` (192) was fitted
+`59bbbe19fc02`. Running the program is what produces both; skipping it produces
+neither.
 
 **The repo venv, not `python3`** — CLAUDE.md requires it, and *Inputs* above
 used to say "`/usr/bin/python3` has all three", which is a claim about one box.

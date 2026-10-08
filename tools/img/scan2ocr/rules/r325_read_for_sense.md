@@ -203,9 +203,27 @@ exist, a figure numbered against its own caption — the archive has a place to
 say so beside the text without altering it: `<aside class="futureteufelchen">`,
 see r300.
 
-**You do not add one.** Reading is how candidates are found; adding one is the
-issue owner's call, case by case. Record the passage, what appears wrong, and
-the crop — then move on. A list of candidates is a report, never a worklist.
+**You do not add one.** Reading is how candidates are found. Record the
+passage, what appears wrong, and the crop — then move on. A list of candidates
+is a report, never a worklist.
+
+**THE OWNER'S DEFAULT IS NO FUTURETEUFELCHEN — and that is now stated, because
+not stating it turned every candidate into a question.** Print errors stay as
+printed, recorded in LOG.md only, and they **do not go on the PAUSE 2 list**.
+MEASURED on SH8605: the nine r325 readers recorded 66 candidates (D21–D86), the
+PAUSE 2 report listed every one, and the owner was asked them one at a time —
+answering "leave it" to D20 through D30 and then: *"did you learn yet"* (owner,
+2026-10-08).
+
+**The one standing exception:** a REPRINT whose original carried a printed
+erratum (a Fehlerteufelchen) that the reprint lacks. That one gets a
+Futureteufelchen, saying which erratum is missing here and what it says — check
+every reprint in `REPRINTS.md` against its original's errata. Owner, 2026-10-07:
+*"if it's a reprint and original has an erratum that is missing in the reprint,
+make it a Futureteufelchen."*
+
+So "record them and stop" means record them IN THE LOG and stop. A candidate
+list is still a report — it is just not a report the owner is asked to read.
 
 **FIRST, RE-READ THE GLYPHS THE CLAIM RESTS ON. RUNNING IT PROVES NOTHING
 ABOUT THE PRINT.** SH8604's p71 `51103 IF 01<>0 AND 02<>0 …` was reported as

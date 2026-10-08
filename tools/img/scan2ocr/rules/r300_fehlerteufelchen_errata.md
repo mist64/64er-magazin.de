@@ -139,7 +139,25 @@ matter, not about the scan.
 
 So: **find them, record them, and stop.** Never add one on your own judgement,
 never add one in bulk, never treat a list of candidates as work to be worked
-through. Each one is decided case by case, by the issue owner.
+through.
+
+**THE OWNER'S DEFAULT IS NO FUTURETEUFELCHEN — and that is now stated, because
+not stating it turned every candidate into a question.** Print errors stay as
+printed, recorded in LOG.md only, and they **do not go on the PAUSE 2 list**.
+MEASURED on SH8605: the nine r325 readers recorded 66 candidates (D21–D86), the
+PAUSE 2 report listed every one, and the owner was asked them one at a time —
+answering "leave it" to D20 through D30 and then: *"did you learn yet"* (owner,
+2026-10-08).
+
+**The one standing exception:** a REPRINT whose original carried a printed
+erratum (a Fehlerteufelchen) that the reprint lacks. That one gets a
+Futureteufelchen, saying which erratum is missing here and what it says — check
+every reprint in `REPRINTS.md` against its original's errata. Owner, 2026-10-07:
+*"if it's a reprint and original has an erratum that is missing in the reprint,
+make it a Futureteufelchen."*
+
+So "record them and stop" means record them IN THE LOG and stop. A candidate
+list is still a report — it is just not a report the owner is asked to read.
 
 What to hand over: the passage, what appears to be wrong, and the crop that
 shows the page really prints it — the same evidence any other finding carries.

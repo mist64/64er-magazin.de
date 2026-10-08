@@ -6,6 +6,14 @@
 typesets. Don't promote / demote on structure alone — judge against
 the print's typographic weight.
 
+**A HEADING LEVEL IS NEVER AN OWNER QUESTION.** Apply the printed weight. If
+you are about to put a heading level on the PAUSE 2 list, apply it instead.
+MEASURED on SH8605: 178's 33 error-message heads are body-size bold run-ins in
+print — h3 by the rule above — were set as `<h2>`, and went to the owner as a
+"presentation" question. Owner, 2026-10-08: *"clearly h3. if it looks like h3,
+make it h3, why would you ask!!"* The rule was already clear; what was missing
+was the sentence saying it is not escalable.
+
 ## DEFAULT: DON'T CHANGE HEADER LEVELS
 
 **The OCR'd / post-step-0 markdown is the source of truth for heading

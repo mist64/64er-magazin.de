@@ -25,7 +25,31 @@ $PY tools/img/scan2ocr/rules/r150_figure_captions.py issues/<YYMM> --write
 It writes `issues/<YYMM>/figure_captions.txt` (`page<TAB>status<TAB>caption`)
 next to the articles, where it survives the sweep, and r150's later re-run has
 the text without touching a master. `status` is `IN_HTML`, `ABSENT` (no figure
-yet — the work list for after the owner cuts them) or `TRUNCATED`.
+yet) or `TRUNCATED`. **`IN_HTML` means "present as a `<figcaption>` in THIS
+PAGE'S OWN ARTICLE"** — the match is against figcaptions only, scoped by
+`64er.pages`, because matching the whole article text made a caption "present"
+when the prose merely mentioned the figure, and matching issue-wide let a bare
+`Bild 5.` on p106 find a `Bild 5. …` in any of four other SH8605 articles.
+
+**AND IT IS A LEAD, NOT THE WORKLIST.** The extractor takes its candidates from
+the block index, so **a caption the layout analysis folded into a figure or box
+region never reaches it at all**. MEASURED on SH8605's PAUSE 2 survey (every
+editorial page at 20 %, 600 dpi where needed): **39 printed captions are missing
+from `figure_captions.txt` altogether** — 6 ×6, 20 ×2, 30 ×2, 40, 69, 77 ×8,
+90, 101 ×4, 111, 149 ×10, 164 ×3. They have a shape in common: the caption is
+printed INSIDE the frame or on the tinted ground, e.g. 40 p57 *"Bild 3. Ein
+Programm-Ablaufplan"* inside a grey flowchart frame, 164 p175 *"Bild 3. Ein
+normales Diskettendirectory"* inside the framed screenshot, 30 p37 *"Bild 15"*
+inside a shared print-sample frame, and 149's sprite captions set two to a
+frame.
+
+**So the worklist comes from LOOKING AT EVERY EDITORIAL PAGE**, with this file
+as a cross-check — not the other way round. A build that trusted the file would
+have handed the owner a worklist missing about a quarter of the figures.
+
+In the other direction the file carries spurious ROWS, which cost a line and
+nothing more: a prose mention `(Bild 5)` or a DATA line `BILD 7` opens like a
+caption and becomes a candidate. Read the row, not the count.
 
 ## TWO ARTICLES CAN SHARE A START PAGE — the second one's lead image is `-00`
 
@@ -412,6 +436,13 @@ So the test is not where it sits or what it depicts. **A cartoon is omitted
 unless the body text REFERENCES it or the print LABELS it** — and if either is
 true it is not a cartoon, it is a Bild with a number or a figure the prose
 calls for. Being about the subject is not enough.
+
+**APPLY IT TO EVERY UNCAPTIONED DRAWING BEFORE IT GETS A WORKLIST ROW.** The
+test fires on the drawing, not on where it sits, so it has to be asked while
+the row is being written — SH8605's p8 cartoons reached the worklist with
+proposed names because each sits INSIDE its article on the article's own
+subject, and a placement test never fired. **Lettering inside the art is not a
+label**: a caption is set as a caption, in caption type, outside the drawing.
 
 **BUT THIS RULE GOVERNS THE WORKLIST, NOT THE DELIVERY. A CROP THAT ARRIVES IS
 PLACED.** Owner, 2026-10-07: *"if they are delivered, they are not dropped. i

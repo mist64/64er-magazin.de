@@ -38,12 +38,35 @@ norm = lambda t: re.sub(r'[^a-z0-9]+', ' ',
                         html.unescape(re.sub(r'[¬\u00ad-]\s*', '', t)).lower()).split()
 
 def main(issue_dir, ocr_dir, write):
-    hay = set()
+    # THE HAYSTACK IS THE <figcaption>s, NOT THE WHOLE ARTICLE.  Built from the
+    # stripped article text, a caption "matched" the prose that merely MENTIONS
+    # the figure, and IN_HTML then meant "these words occur somewhere on the
+    # page".  MEASURED on SH8605: p106 "Bild 5." matched the prose "(Bild 5)",
+    # p151 "BILD 7" matched a DATA line, and p151 "Bild 11." had no figure at
+    # all -- three rows reported as present while the figure was missing, which
+    # is the direction that silently shortens a crop worklist.
+    # ...AND IT IS SCOPED TO THE PAGE'S OWN ARTICLE.  Issue-wide, a bare
+    # "Bild 5." on p106 matches a figcaption "Bild 5. ..." from any of the four
+    # other SH8605 articles that have one, which is how the short-caption
+    # branch below kept answering yes.  Map page -> article from 64er.pages,
+    # exactly as r220 does, and ask only that article.
+    hay, caps = {}, {}
     for f in glob.glob(os.path.join(issue_dir, '*.html')):
-        w = norm(re.sub(r'<[^>]+>', ' ', open(f, encoding='utf-8', errors='replace').read()))
-        for i in range(len(w)):
-            hay.add(' '.join(w[i:i+4]))          # 4-word shingles, as r320 uses
-    def seen(words):
+        src = open(f, encoding='utf-8', errors='replace').read()
+        m = re.search(r'64er\.pages" content="([^"]+)"', src)
+        pages = set()
+        for seg in (m.group(1).split(',') if m else []):
+            lo, _, hi = seg.strip().partition('-')
+            ml, mh = re.match(r'\s*(\d+)', lo), re.match(r'\s*(\d+)', hi or lo)
+            if ml:
+                pages.update(range(int(ml.group(1)), int(mh.group(1)) + 1))
+        for cap in re.findall(r'<figcaption[^>]*>(.*?)</figcaption>', src, re.S):
+            w = norm(re.sub(r'<[^>]+>', ' ', cap))
+            for pg in pages:
+                caps.setdefault(pg, []).append(' '.join(w))
+                for i in range(len(w)):
+                    hay.setdefault(pg, set()).add(' '.join(w[i:i+4]))
+    def seen(words, page):
         # A SHORT CAPTION IS NOT AUTOMATICALLY PRESENT.  `return True` for
         # anything under four words reported SH8603's p146 and p148 tables as
         # IN_HTML while they were absent -- the shortcut exists because the
@@ -51,10 +74,21 @@ def main(issue_dir, ocr_dir, write):
         # "yes".  Fall back to the longest shingle the caption can form.
         if not words:
             return True
+        # (b) A SHORT CAPTION IS MATCHED AGAINST WHOLE figcaptionS, by PREFIX.
+        #     This branch used to substring-test against ' '.join(sorted(hay)),
+        #     the CONCATENATION of the 4-word shingles -- which matches across
+        #     shingle boundaries, so for a two-word caption the answer was
+        #     effectively arbitrary and moved when the haystack changed.  It is
+        #     what produced SH8605's false IN_HTML rows (p106 "Bild 5.", p151
+        #     "BILD 7", p151 "Bild 11."): all three are short, and all three
+        #     "matched" words that were never a caption.  A short caption is
+        #     present iff some figcaption BEGINS with it -- which is what
+        #     "Bild 5." being the start of a real caption means.
+        probe = ' '.join(words)
+        mine = caps.get(page, [])
         if len(words) < 4:
-            return ' '.join(words) in ' '.join(sorted(hay)) or any(
-                ' '.join(words) in h for h in hay)
-        return ' '.join(words[:4]) in hay
+            return any(c == probe or c.startswith(probe + ' ') for c in mine)
+        return ' '.join(words[:4]) in hay.get(page, set())
     rows = []
     for jf in sorted(glob.glob(os.path.join(ocr_dir, '[0-9][0-9][0-9].json'))):
         page = int(os.path.basename(jf)[:3])
@@ -69,7 +103,8 @@ def main(issue_dir, ocr_dir, write):
             t = ' '.join((b.get('text') or '').split())
             if not CAPTION.match(t): continue
             w = norm(t)
-            head, tail = seen(w), seen(w[-6:] if len(w) > 10 else w)
+            head = seen(w, page)
+            tail = seen(w[-6:] if len(w) > 10 else w, page)
             rows.append((page, 'IN_HTML' if head and tail else
                                'TRUNCATED' if head else 'ABSENT', t))
     rows.sort()

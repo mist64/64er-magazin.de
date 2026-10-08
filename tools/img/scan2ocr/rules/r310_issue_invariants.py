@@ -59,6 +59,11 @@ ADJUDICATED = (r'<!--(?:(?!-->).)*'
 # adjudicated; it is recorded so a later run that finds MORE of them says so
 # instead of silently inheriting an old blessing.
 ADJ_FILE = 'adjudicated.txt'
+# The keys THIS step adjudicates.  Every other key in adjudicated.txt belongs to
+# another rule (r260 keeps `heading-all-caps` here) and r310 must not count it:
+# a key it does not check always reads "found 0", which is not a shortfall.
+# Keep this in step with the ADJUDICATED_HERE() calls below -- grep for them.
+OWN_KEYS = {'byline-split', 'single-li-ol', 'badge-intro', 'heading-ends-period'}
 
 
 def adjudications(issue_dir):
@@ -241,11 +246,46 @@ def main(d):
         else: ids[m.group(1)] = os.path.basename(f)
 
         # --- HARD: the closing run is a unit --------------------------------
-        blocks = [(mm.start(), mm.group(1)) for mm in
-                  re.finditer(r'<(figure|table|p class="source"|address class="author")\b', body)]
-        for i, (_, k) in enumerate(blocks):
-            if k in ('p class="source"', 'address class="author"') and i and blocks[i-1][1] in ('figure', 'table'):
-                H(f'<{blocks[i-1][1]}> splits the closing run', f)
+        # THIS CHECK WAS SILENT ON EVERY PAGE EVER BUILT.  The pattern was
+        #   <(figure|table|p class="source"|address class="author")\b
+        # and `\b` after a `"` has no word boundary to match -- `"` and `>` are
+        # both non-word characters -- so the two quoted alternatives never
+        # matched and the `blocks[i-1]` test could not fire.  A planted figure
+        # between the last <p> and its byline was caught only by the separate
+        # byline-split check.
+        #
+        # Fixing only the regex is wrong in the other direction: the old test
+        # compared against ANY earlier figure/table rather than what sits
+        # directly before the closing run, and a figure followed by its source
+        # note is ordinary -- with the regex fixed it reports 25 findings on
+        # SH8605, nearly all false.
+        #
+        # So: find the TRAILING closing run (the suffix of source/author
+        # blocks), find the last body <p> before it, and look only at what lies
+        # between the two.  A float there separates the body text from its own
+        # byline, which is the defect this check is named for.
+        seq = []
+        for mm in re.finditer(r'<(figure|table|p|address)\b([^>]*)>', body):
+            tag, attr = mm.group(1), mm.group(2)
+            cm = re.search(r'class="([^"]*)"', attr)
+            cls = cm.group(1) if cm else ''
+            if tag == 'p':
+                kind = 'source' if 'source' in cls else 'body' if not cls else 'other'
+            elif tag == 'address':
+                kind = 'author' if 'author' in cls else 'other'
+            else:
+                kind = tag                                  # figure | table
+            seq.append(kind)
+        fc = len(seq)                                       # closing run start
+        while fc and seq[fc - 1] in ('source', 'author'):
+            fc -= 1
+        if fc < len(seq):                                   # there IS one
+            bodies = [i for i in range(fc) if seq[i] == 'body']
+            if bodies:
+                between = [k for k in seq[bodies[-1] + 1:fc]
+                           if k in ('figure', 'table')]
+                if between:
+                    H(f'<{between[0]}> splits the closing run', f)
 
         # --- HARD: OCR classes with no legitimate population -----------------
         for mm in re.finditer(r'\b(?:Bild|Tabelle|Listing)\s+\]', prose): H('"] " for digit 1 (r280)', f)
@@ -542,8 +582,22 @@ def main(d):
     # than no blessing: it covers findings nobody has seen.  Over-count is HARD.
     # Under-count is not: the findings went away, which is the normal result of
     # fixing them, and the stale line can be tidied at 340.
+    # THE SHORTFALL IS ONLY REPORTABLE FOR KEYS THIS STEP CHECKS.
+    # adjudicated.txt is SHARED -- r260 keeps its `heading-all-caps`
+    # adjudications in it, read with this module's loader -- and r310 has no
+    # such check, so it reported "declared 29, found 0" on every run and told
+    # the builder to "tidy the line at 340".  Doing that would have deleted
+    # r260's 29 adjudications (the C 64 error messages in SH8605's 178, each
+    # checked on the 600 dpi master) and made r260's own check fire again on
+    # the next run.  It was caught only because LOG.md had recorded
+    # "informational, do not tidy it away"; by step 340 the message reads as
+    # an instruction.
     for key, (n, why) in sorted(ADJ.items()):
         got = adj_seen.get(key, 0)
+        if key not in OWN_KEYS:
+            print(f'ADJ   {key:<24} declared {n}, found {got}'
+                  '  -- owned by another step, not counted here')
+            continue
         if n and got != n:
             if got > n:
                 hard.append((f'ADJ {key}: declared {n}, found {got} '
