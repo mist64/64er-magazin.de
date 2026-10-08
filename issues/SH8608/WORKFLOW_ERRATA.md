@@ -389,3 +389,35 @@ at a `…01` load address with no BASIC stub (C 16 TEDMON at $1001, VC 20 at
 $1201) — promote to .prg; how to DISPLAY it is 130's decision from the print."
 Also: the rule asks for a LOG.md re-apply checklist, which a sub-agent confined
 to `prg/` cannot write — say "return it in the report; the orchestrator logs it".
+
+## 130 — check 6 assumes every printed "Listing N." has a description; and check 5 keeps a `<YYMM>`
+
+**What the rule says.** Check 6 FAILs a `Listing N` caption with "nothing after"
+it, on the claim that every printed caption carries a trailing description.
+
+**What happened.** Basic-Kurs (p32/p34/p36) prints "Listing 4a", "Listing 4b",
+"Listing 5" BARE — confirmed on the crops. Three FAILs on correct output.
+Also: check 5's site-build line still reads `<YYMM>` after the documented
+`issues/<YYMM>` substitution (`line 80: YYMM: No such file`), and r130 step 5
+("remove the placed block from prg.txt") cannot be done by two parallel agents
+sharing one worklist — the orchestrator did it after both, having proved every
+non-intro filename was placed.
+
+**What it cost.** ~5 min.
+
+**Suggested.** Check 6: "bare `Listing N` is a FAIL only if the page prints a
+description; a bare printed caption is `look`, confirmed on the crop (SH8608
+Basic-Kurs)". Use one `$ID` variable for every `<YYMM>` in the block. And in
+step 5: "when placement is split across agents, prg.txt is read-only to them;
+the orchestrator removes placed blocks afterwards, after diffing worklist
+filenames against placed `data-filename`s."
+
+## 130 — a printed TEDMON dump WITH a disk file: who builds it, and the ASCII column
+
+Both 130 agents generated the `<pre>` from the disk and checked it against the
+print, and both dropped TEDMON's `:`+reverse-video ASCII column (SH8603/165 did
+the same). The rule says the `<pre>` "carries the dump as printed" but not who
+produces it (130 or 170) nor what happens to that column. **Suggested.** "A
+TEDMON dump with a disk file is built at 130 FROM the file and checked row by
+row against the print; the reverse-video ASCII column is dropped (unreadable,
+derivable); differing bytes are a print/disk difference (r300)."
