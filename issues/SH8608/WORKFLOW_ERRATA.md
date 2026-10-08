@@ -366,3 +366,26 @@ it does not say whether `Rubriken` goes into `toc.txt` for the Impressum. The
 agent followed SH8602-05 (it does, last). **Suggested.** "A Sonderheft with no
 Rubriken box still lists `Rubriken` last in toc.txt, for the Impressum (SH8602-
 SH8605, SH8608); toc_entries.txt gets no line for it, since nothing is printed."
+
+## 120 — check 3b splits on the closing dash bar, and TEDMON code at $1001 is not a routed case
+
+**What the rule says.** Checks 3 and 3b split sections on `"----+…"` separators;
+*Four cases the extractor does not route correctly* lists the misroutes.
+
+**What happened.** SH08.D64 frames every section as `****` / `---c16-NN` /
+`-- name --` / `----------------`. The all-dash CLOSING bar also matches the
+split pattern, so 3b reported "SEPARATOR CARRIES NO PAGE NUMBER" for 9 sections
+and its mapping was unusable; the agent re-keyed on the last NUMBERED separator.
+Separately, four files at load address $1001 with no BASIC stub (TEDMON monitor
+listings, article 87) were decoded as BASIC garbage; the fix came only by way of
+check 4 case 2 → Remediation, and Remediation's display choices (Hypra-Ass /
+MSE) may not fit a monitor listing.
+
+**What it cost.** ~10 min of the sub-agent's run.
+
+**Suggested.** 3b: "a section's page is its last NUMBERED separator; an
+all-dash bar is a frame, not a section". And a fifth routing case: "machine code
+at a `…01` load address with no BASIC stub (C 16 TEDMON at $1001, VC 20 at
+$1201) — promote to .prg; how to DISPLAY it is 130's decision from the print."
+Also: the rule asks for a LOG.md re-apply checklist, which a sub-agent confined
+to `prg/` cannot write — say "return it in the report; the orchestrator logs it".
