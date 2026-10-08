@@ -249,7 +249,7 @@ found by nothing else. Run it, and read `WORST.txt`.
 
 
 ```bash
-# The venv, not bare python3 (numpy), and the ISSUE's page count, not
+# The venv, not bare "$PY" (numpy), and the ISSUE's page count, not
 # another issue's: the literal 176 that stood here was 8609's and would
 # have scored 16 pages short of a 192-page issue and 24 past a 152-page
 # Sonderheft. r010_ocr_blocks.sh fixed this in its own file years ago;

@@ -107,6 +107,10 @@ to find**, and exercise them against 8607 or a fault-planted copy.
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # 1. no TODO FORMULA / FORMULAS markers survive
@@ -136,7 +140,7 @@ for f in sorted(os.listdir(d)):
 PYEOF
 
 # 3. balanced \( \) and \[ \] pairs per file
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

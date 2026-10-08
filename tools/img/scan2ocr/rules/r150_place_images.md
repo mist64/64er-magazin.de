@@ -560,6 +560,10 @@ Tell the sub-agent explicitly:
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # 1. every loose PNG (excluding title.png) is referenced by exactly
@@ -597,7 +601,7 @@ grep -nE 'XXXXXXXXX' "$dir"/*.html && echo "  FAIL: placeholder caption survived
 #    `<img [^>]*>` regex, which stops at the wrong `>`.  MEASURED: the corpus
 #    has 2, both `alt="Michael Scharfenberger, Chefredakteur<"` (8604/8 and
 #    8606/8), so the second clause below exists to find them.
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
@@ -617,7 +621,7 @@ PY
 )" "$dir"
 
 # 5. <figure> nesting clean: every <figure> has a matching </figure>
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

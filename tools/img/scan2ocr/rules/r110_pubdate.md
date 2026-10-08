@@ -128,8 +128,12 @@ echo 2026-06-14 > issues/8607/pubdate.txt
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 # Format is exactly one ISO date, ending in a newline:
-python3 - <<'PY'
+"$PY" - <<'PY'
 import datetime, sys
 import os
 fp = 'issues/%s/pubdate.txt' % os.environ.get('ISSUE', '8607')

@@ -160,7 +160,11 @@ Don't guess crop coordinates by trial-and-error. Step 010 already wrote the
 block index; grep it for the `Listing` caption line:
 
 ```bash
-OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
+OUT_DIR=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
 grep -i "listing" "$OUT_DIR/blocks/p<NNN>.txt"
 # → block=22 label=body bbox=825x84+195+1955 frac=... text= Listing 1. Komprimierte ...
@@ -174,8 +178,8 @@ padding.
 
 One-shot crop — **from the master, not from a PDF render**:
 ```bash
-# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
-# which the system python does not have, so `python3` makes SRC silently EMPTY
+# The repo venv, not bare "$PY": r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `"$PY"` makes SRC silently EMPTY
 # and every crop below then fails on "/NNN.png". MEASURED on 8611.
 PY=${PYTHON:-.venv/bin/python}
 SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
@@ -404,6 +408,10 @@ with zero markers.
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # 1. no <pre>TODO</pre> left
@@ -414,7 +422,7 @@ grep -l '<p>TODO LISTING</p>' "$dir"/*.html && echo "  FAIL: TODO LISTING surviv
 
 # 3. every <figcaption>Listing N…</figcaption> has a non-empty <pre>
 #    body before it (filled, not the placeholder)
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 bad = 0
@@ -448,7 +456,7 @@ PY
 #    minority don't is the signal that OCR ate some line-number
 #    prefixes — flag it. Pure-asm / Pascal blocks (0% digit-starts)
 #    are NOT BASIC and are correctly left unflagged.
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

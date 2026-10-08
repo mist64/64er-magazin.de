@@ -118,8 +118,8 @@ each with its measurement in the comment above it.
 
 ```bash
 cd tools/img/scan2ocr/rules
-# The repo venv, not bare python3: the step modules import numpy and
-# scipy, which the system python here does not have, so as `python3`
+# The repo venv, not bare "$PY": the step modules import numpy and
+# scipy, which the system python here does not have, so as `"$PY"`
 # this check failed at the import rather than checking anything.
 PY=${PYTHON:-../../../../.venv/bin/python}
 dir=$("$PY" -c "import r010_ocr_blocks as OB; print(OB.OUT_DIR)")
@@ -130,7 +130,7 @@ ls $dir/*.json | grep -vc 'labels' ; ls $dir/*.digest.txt | wc -l ; ls $dir/*_bo
 # 2. the block index covers every page that has blocks
 ls $dir/blocks/p*.txt | wc -l
 
-# 3. no page silently produced nothing -- "$PY", not python3: this check
+# 3. no page silently produced nothing -- "$PY", not "$PY": this check
 #    imports r010_ocr_blocks, which imports numpy
 "$PY" - <<'PY'
 import glob, json, os

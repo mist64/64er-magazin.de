@@ -30,8 +30,8 @@ The sub-agent must:
 
 
 ```bash
-# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
-# which the system python does not have, so `python3` makes SRC silently EMPTY
+# The repo venv, not bare "$PY": r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `"$PY"` makes SRC silently EMPTY
 # and every crop below then fails on "/NNN.png". MEASURED on 8611.
 PY=${PYTHON:-.venv/bin/python}
 SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
@@ -369,7 +369,7 @@ cat "$TMPDIR_ISSUE/skipped_files.txt"
 # TMPDIR_ISSUE is this issue's <tmp>. r000 forbids /tmp, which this was.
 
 # 3. <pre> well-formed
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
@@ -399,7 +399,7 @@ for f in sorted(os.listdir(d)):
 NEVERSPLIT
 
 # 4. <aside> well-formed
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

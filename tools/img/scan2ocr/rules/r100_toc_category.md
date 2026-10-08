@@ -231,6 +231,10 @@ After running, every article should have exactly one `64er.toc_category`
 line and no remaining placeholder comment:
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 # placeholder gone
 grep -lE '<!-- <meta name="64er\.toc_category" content="XXX"> -->' issues/<ID>/*.html
 # expect: no output
@@ -247,7 +251,7 @@ for f in issues/<ID>/*.html; do
 done
 
 # every category value appears in toc.txt
-python3 - <<'PY'
+"$PY" - <<'PY'
 import glob, re
 issue = '<ID>'
 toc = {ln.strip() for ln in open(f'issues/{issue}/toc.txt') if ln.strip()}

@@ -226,6 +226,10 @@ silent in 8609, `hm` and `kn` silent in 8610, `aa` undefined in 8608–8610.
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # 1. no XXX left
@@ -237,7 +241,7 @@ grep -lE 'name="author" content=""' "$dir"/*.html && echo "  FAIL: empty content
 # 3. articles missing meta must match the Case B unsigned list. Cross-
 #    check against the same article in the previous issue: if 8606's
 #    Leserforum has no meta, 8607's Leserforum should also have none.
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d, prev = sys.argv[1], sys.argv[2]
 def has_meta(path):
@@ -281,7 +285,7 @@ grep -hE 'name="author" content=' "$dir"/*.html | \
 #    article is using the wrong shape — likely the expansion shape
 #    applied to a tip-column article, or stale duplicates from an
 #    earlier pass.
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

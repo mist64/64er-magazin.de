@@ -1490,7 +1490,11 @@ constant at the top of `r010_ocr_blocks.py` and is **not** inside the repo. Ask
 the module rather than assuming a path:
 
 ```bash
-OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
+OUT_DIR=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
 ls "$OUT_DIR/blocks/" | head
 ``` There is nothing to schedule and nothing to wait for:
@@ -1578,8 +1582,8 @@ be: **`<tmp>/masters600/NNN.png`**, 600 dpi, A4, deskewed, cut and graded by
 step 005 -- the same file `r010` OCR'd and `r145` cuts figures from.
 
 ```bash
-# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
-# which the system python does not have, so `python3` makes SRC silently EMPTY
+# The repo venv, not bare "$PY": r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `"$PY"` makes SRC silently EMPTY
 # and every crop below then fails on "/NNN.png". MEASURED on 8611.
 PY=${PYTHON:-.venv/bin/python}
 SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")

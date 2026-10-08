@@ -79,8 +79,8 @@ For each of the three rubrics:
    doesn't, skip the rubric and report N/A.
 
 ```bash
-# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
-# which the system python does not have, so `python3` makes SRC silently EMPTY
+# The repo venv, not bare "$PY": r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `"$PY"` makes SRC silently EMPTY
 # and every crop below then fails on "/NNN.png". MEASURED on 8611.
 PY=${PYTHON:-.venv/bin/python}
 SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
@@ -161,6 +161,10 @@ Critical guardrails:
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # Editorial is detected by stable id (its filename is a headline, not
@@ -203,7 +207,7 @@ else
 fi
 
 # Per-rubric shape check
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

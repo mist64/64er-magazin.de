@@ -200,10 +200,14 @@ banners".
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # 1. each article has exactly one h1
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
@@ -217,7 +221,7 @@ PY
 # 2. aside headings -- an INVENTORY, not a failure.  <h2> in an <aside>
 #    is the correct shape; this lists the hits so the report can account
 #    for them, and flags the one level that is NOT expected.
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 n = bad = 0

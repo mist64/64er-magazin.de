@@ -133,7 +133,11 @@ its CSV argument is relative to that cwd, and so is the Verification block below
 # The rule used to say "run from the issue directory" while its Verification
 # used repo-root paths.
 cd /Users/mist/Documents/git/64er-magazin.de
-# $PY, not bare python3 (r000).  And from the repo root the CSV is NOT ../../ :
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
+# $PY, not bare "$PY" (r000).  And from the repo root the CSV is NOT ../../ :
 ( cd issues/$ISSUE && $PY ../../tools/img/scan2ocr/rules/r220_index_meta_apply.py \
     "$ISSUE" "../../Jahresinhaltsverzeichnis <YYYY>.csv" )
 # ...or, for a Sonderheft, the OTHER file:
@@ -386,6 +390,10 @@ Druckermarkt*, because "drucker" matches "Druckermarkt".
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 csv="Jahresinhaltsverzeichnis <YYYY>.csv"    # replaced below for a Sonderheft
 
@@ -426,7 +434,7 @@ done
 
 # 3. no index_title equals <title> still present (would be
 #    redundant — should have been removed)
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

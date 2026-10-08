@@ -180,7 +180,11 @@ A pure `Tabelle …` grep is **not enough**. Use a layered sweep:
 
 **Pass 1 — explicit captions:**
 ```bash
-OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
+OUT_DIR=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
 cat "$OUT_DIR"/blocks/p*.txt > "$OUT_DIR"/blocks_full.txt
 grep -iE "Tabelle[ :.][^.]" "$OUT_DIR"/blocks_full.txt | \
@@ -377,13 +381,17 @@ and they cover all three kinds.
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # 1. no TODO TABLE survives
 grep -l 'TODO TABLE' "$dir"/*.html && echo "  FAIL: TODO TABLE left"
 
 # 2. every <table> has a matching </table>
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 bad = 0
@@ -407,7 +415,7 @@ grep -l '\[ILLEGIBLE\]' "$dir"/*.html && echo "  WARN: [ILLEGIBLE] cells present
 # 4. every <figcaption> for a Tabelle N. caption lives BELOW the table
 #    inside the same <figure>. Grep for misplaced ones (figcaption
 #    before table within a figure).
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
@@ -426,7 +434,7 @@ PY
 #    <figcaption>Tabelle N. …</figcaption> in the same file, b) an
 #    <img> for Tabelle N (-tN.png), or c) an explicit LOG.md note.
 #    Soft check — flag for human review:
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 sys.path.insert(0, 'tools/img/scan2ocr/rules')
 import r000_reviewed as R
@@ -474,7 +482,7 @@ PY
 #    after Pass 3 "completed" signals Pass 3 was rubber-stamped (8607
 #    pattern, see commit 8d9b2f7da). Just emit the counts; the
 #    orchestrator decides whether to re-run Pass 3.
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 tables = 0; tabelle_caps = 0
@@ -493,7 +501,7 @@ PY
 #    (uncaptioned inline data). A <figure>-wrapped table with a
 #    non-Tabelle caption is fine too (e.g. STECKBRIEF), but the list
 #    is for operator-eyeballing — confirm each one is intentional.
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 sys.path.insert(0, 'tools/img/scan2ocr/rules')
 import r000_reviewed as R

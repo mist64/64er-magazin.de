@@ -859,7 +859,11 @@ exiftool -overwrite_original -Title="$T" -XMP-dc:Title="$T" \
 looks it up there:
 
 ```sh
-cp <tmp>/<name>.pdf <repo>/issues/<ID>/$(python3 -c \
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
+cp <tmp>/<name>.pdf <repo>/issues/<ID>/$("$PY" -c \
    "import json;print(json.load(open('<repo>/issues/<ID>/issue.json'))['pdf'])")
 ```
 

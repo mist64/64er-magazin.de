@@ -279,7 +279,7 @@ trace to 209.2 × 296.9 mm (p050). Derive that issue's thumbs at
 
 ```bash
 cd tools/img/scan2ocr/rules
-PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare "$PY"
 $PY r005_field.py                    # ONCE, first
 $PY r005_masters_sheet.py            # every page
 $PY r005_masters_sheet.py 6 41 56 92 # named pages
@@ -364,7 +364,7 @@ DELIVERABLE is handed over the MOMENT it exists*.
 
 ```bash
 cd tools/img/scan2ocr/rules
-PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare "$PY"
 
 # 1. the uncut, deskewed, colour-corrected 600 dpi pages -- for review
 open "$TMPDIR_ISSUE/sheets600"
@@ -1179,7 +1179,7 @@ and look at it:
 
 ```bash
 cd tools/img/scan2ocr/rules
-PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare "$PY"
 $PY - <<'PY'
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = None
@@ -1232,7 +1232,7 @@ the decision drawn on top.
 
 ```bash
 cd tools/img/scan2ocr/rules
-PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare "$PY"
 
 # 1. every page produced all six artefacts, and nothing else did
 $PY - <<'PY'

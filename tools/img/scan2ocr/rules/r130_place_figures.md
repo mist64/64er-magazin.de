@@ -315,6 +315,10 @@ and they cover all three kinds.
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # 1. prg.txt is empty (every listing placed) — or only contains
@@ -322,7 +326,7 @@ dir=issues/<YYMM>
 wc -l "$dir/prg.txt"
 
 # 2. Every <figure>'s data-filename resolves to a file in prg/ or prg/del/:
-python3 - "$dir" <<'PY'
+"$PY" - "$dir" <<'PY'
 import os, re, sys
 d = sys.argv[1]; pdir = os.path.join(d, 'prg'); ddir = os.path.join(pdir, 'del')
 have = set(os.listdir(pdir)) | (set(os.listdir(ddir)) if os.path.isdir(ddir) else set())
@@ -343,7 +347,7 @@ PY
 #    the name — EXEMPT that pairing (this check counts <pre> and
 #    <div> names separately and allows each div name to cancel one
 #    pre name, matching r130_place_figures.sh's verifier #3):
-python3 - "$dir" <<'PY'
+"$PY" - "$dir" <<'PY'
 import os, re, sys, collections
 d = sys.argv[1]
 for f in os.listdir(d):
@@ -404,7 +408,7 @@ PY
 #    correct by this rule's own "captions are verbatim"; what the test is
 #    actually looking for is a caption that is ONLY the label.  So: fail on
 #    nothing after "Listing N.", and report a 1-2 word description as a look.
-python3 - "$dir" <<'PY'
+"$PY" - "$dir" <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):
@@ -432,7 +436,7 @@ PY
 #    skips any integer between min and max, report. 8607 example:
 #    `79 Tips & Tricks für Profis.html` jumped 1→2→4 (Listing 3
 #    missing) before second-pass review.
-python3 - "$dir" <<'PY'
+"$PY" - "$dir" <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

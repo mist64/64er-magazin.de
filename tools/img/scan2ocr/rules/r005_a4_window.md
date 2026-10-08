@@ -25,7 +25,7 @@ fall back to.
 
 ```bash
 cd tools/img/scan2ocr/rules
-PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare "$PY"
 $PY r005_a4_window.py            # no arguments: every page
 ```
 
@@ -230,7 +230,7 @@ which fallback was used.
 
 ```bash
 cd tools/img/scan2ocr/rules
-PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare "$PY"
 
 # 1. every body page is exactly 4961 x 7016, and any page that is NOT says so
 #    in its own stamp.  An INSERT is legitimately a different size -- 'ONE

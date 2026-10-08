@@ -145,10 +145,14 @@ the bucket, because it can see the picture.
 
 ```bash
 cd tools/img/scan2ocr/rules
-OUT=$(python3 -c 'import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-../../../../.venv/bin/python}
+OUT=$("$PY" -c 'import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
 
 # 1. every kept figure produced a file, and no two share a name
-python3 - "$OUT" <<'PY'
+"$PY" - "$OUT" <<'PY'
 import json, os, sys, collections
 d = sys.argv[1] + "/figures"
 rows = json.load(open(f"{d}/png/figures.json"))
@@ -161,7 +165,7 @@ sys.exit(1 if dupes or missing else 0)
 PY
 
 # 2. no figure was cut from an advertising page
-python3 - "$OUT" <<'PY'
+"$PY" - "$OUT" <<'PY'
 import json, sys
 d = sys.argv[1]
 rows = json.load(open(f"{d}/figures/png/figures.json"))
@@ -182,7 +186,7 @@ find "$OUT/figures/png" -name '*.png' -size -2k | head
 #    not the page edge, and it had been shearing the right frame rule off every
 #    figure that reached the outer margin.  An edge value repeated across many
 #    figures is a clamp, not a boundary.
-python3 - "$OUT" <<'EDGES'
+"$PY" - "$OUT" <<'EDGES'
 import json, sys, collections
 rows = json.load(open(sys.argv[1] + "/figures/png/figures.json"))
 for i, side in ((0, "left"), (2, "right"), (1, "top"), (3, "bottom")):
@@ -193,7 +197,7 @@ EDGES
 
 # 5. NO FIGURE IS MOSTLY INSIDE ANOTHER.  Two captions claiming the same artwork,
 #    or a cluster emitted alongside its own members, both show up here.
-python3 - "$OUT" <<'OVERLAP'
+"$PY" - "$OUT" <<'OVERLAP'
 import json, sys
 rows = json.load(open(sys.argv[1] + "/figures/png/figures.json"))
 bad = []
@@ -220,7 +224,7 @@ OVERLAP
 #    page; one read "Bild 2. Anschlussbelegung des CIA 6526" for a chip printed
 #    "Bild 3. Die Pinbelegung des CIA 6526".  Invented metadata is worse than
 #    missing metadata because it is not visible as missing.
-python3 - "$OUT" <<'CAPS'
+"$PY" - "$OUT" <<'CAPS'
 import json, re, sys, unicodedata
 rows = json.load(open(sys.argv[1] + "/figures/png/figures.json"))
 norm = lambda t: re.sub(r"[^a-z0-9]", "", unicodedata.normalize("NFKD", t).lower())
@@ -245,7 +249,7 @@ CAPS
 #    it while its own "Bild 2" sat directly beneath the crop, and every check
 #    above passed.  A number bound to the wrong picture is worse than no number,
 #    because the article's text refers to it.
-python3 - "$OUT" <<'BIND'
+"$PY" - "$OUT" <<'BIND'
 import json, sys
 rows = json.load(open(sys.argv[1] + "/figures/png/figures.json"))
 bad = []
@@ -375,3 +379,5 @@ p40's charset specimen, p128's DFÜ cover, p168's labyrinth). All four are small
 high-contrast type or line items — a principled hard case for a screen-based
 detector, not a tuning miss.
 
+
+```

@@ -117,7 +117,11 @@ The independent reading is **step 010's block index** -- a *different OCR
 engine* on the same paper:
 
 ```bash
-OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
+OUT_DIR=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
 grep -i '<candidate-word>' "$OUT_DIR/blocks/p<NNN>.txt"
 ```
@@ -191,7 +195,11 @@ them as confirmed until a crop settles them.
 ### Verification step at the end of every Pass 1 / Pass 2 / Pass 3 candidate
 
 ```bash
-OUT_DIR=$(python3 -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
+OUT_DIR=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
 # labels.json carries the FULL block text; blocks/pNNN.txt truncates at ~300
 # chars, so a grep there misses most body text.
@@ -319,7 +327,11 @@ survived r280, r310 and the build. Sweep them mechanically over the prose
 (listings and tables excluded — a `<pre>` legitimately contains anything):
 
 ```bash
-python3 - <<'EOF'
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
+"$PY" - <<'EOF'
 import glob, io, re
 for f in sorted(glob.glob('issues/<YYMM>/*.html')):
     s = io.open(f, encoding='utf-8').read()

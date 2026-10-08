@@ -202,11 +202,15 @@ by that ordering accident. A prime in a formula is legitimate; leave it.
 After running:
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 grep -c '<blockquote'        issues/8607/8607.html   # expect 0
 grep -c 'class="intro"'      issues/8607/8607.html   # ≥1
 grep -c '<br/>'              issues/8607/8607.html   # 0
 grep -c '<br>'               issues/8607/8607.html   # >0
-python3 -c "
+"$PY" -c "
 import sys
 s = open(sys.argv[1]).read()
 for c in '‘’“”„':

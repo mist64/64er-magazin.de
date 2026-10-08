@@ -79,8 +79,8 @@ The sub-agent must:
 
 
 ```bash
-# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
-# which the system python does not have, so `python3` makes SRC silently EMPTY
+# The repo venv, not bare "$PY": r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `"$PY"` makes SRC silently EMPTY
 # and every crop below then fails on "/NNN.png". MEASURED on 8611.
 PY=${PYTHON:-.venv/bin/python}
 SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
@@ -126,6 +126,10 @@ Critical guardrails:
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # 1. how many articles got head1 — and make the target checkable by
@@ -167,7 +171,7 @@ echo "  → n plus the front-matter files WITHOUT a band plus $lf should be $tot
 echo "    any other gap is a missed article, and the crop decides which."
 
 # 2. head1 / head2 placement is immediately before toc_category
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
 for f in sorted(os.listdir(d)):

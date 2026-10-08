@@ -56,8 +56,8 @@ Rubriken
    for p in 6 7; do
 
 ```bash
-# The repo venv, not bare python3: r010_ocr_blocks imports numpy and scipy,
-# which the system python does not have, so `python3` makes SRC silently EMPTY
+# The repo venv, not bare "$PY": r010_ocr_blocks imports numpy and scipy,
+# which the system python does not have, so `"$PY"` makes SRC silently EMPTY
 # and every crop below then fails on "/NNN.png". MEASURED on 8611.
 PY=${PYTHON:-.venv/bin/python}
 SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
@@ -144,13 +144,17 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
 ## Verification
 
 ```bash
+# The repo venv, not bare python3 (CLAUDE.md): the step modules import
+# numpy, scipy and PIL, which the system python here does not have, so as
+# `python3` this check failed at the import rather than checking anything.
+PY=${PYTHON:-.venv/bin/python}
 # 1. shape: every line is either bare or pipe-separated, no empties:
 grep -nE '^$|[[:space:]]$|^[[:space:]]' issues/<YYMM>/toc.txt && echo "BAD"
 # (no output = good)
 
 # 2. cross-check that every article's <meta name="64er.toc_category"> value
 #    appears in toc.txt (run this once all toc_category metas are filled):
-python3 - <<'PY'
+"$PY" - <<'PY'
 import glob, re
 issue = '<YYMM>'   # e.g. '8608' — set to the issue being built
 toc = set(line.strip() for line in open(f'issues/{issue}/toc.txt') if line.strip())
