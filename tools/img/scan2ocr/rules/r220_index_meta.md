@@ -241,11 +241,16 @@ for line in io.open(csv_path, encoding='utf-8'):
     if len(p) > max(PAGE, TITLE, KEYCOL) and p[KEYCOL].strip() == key:
         mm = re.match(r'\s*(\d+)', p[PAGE])
         if mm:
-            rows.append((int(mm.group(1)), p[TITLE]))
+            # .strip() THE TITLE.  The rule says every cell is stripped and the
+            # apply script does strip it -- this check did not, so a row with a
+            # trailing space reported "matching no article" AND escaped the
+            # misroute test below, both at once.  MEASURED on SH8605:
+            # `Software-Test,Grafik,Grafikprogramme ,5/86,132,,`
+            rows.append((int(mm.group(1)), p[TITLE].strip()))
 if not rows:
     print('  NO ROWS for %s in %s -- wrong CSV or wrong key, not a pass'
           % (key, os.path.basename(csv_path)))
-starts, spans, titles, LETTERED = {}, {}, {}, {}
+starts, spans, titles, LETTERED, CATS = {}, {}, {}, {}, {}
 for f in sorted(glob.glob(os.path.join(d, '*.html'))):
     s = io.open(f, encoding='utf-8').read()
     m = re.search(r'64er\.pages" content="([^"]+)"', s)
@@ -271,6 +276,13 @@ for f in sorted(glob.glob(os.path.join(d, '*.html'))):
     spans[f] = segs
     for t in re.findall(r'64er\.index_title" content="([^"]*)"', s):
         titles.setdefault(t, []).append(f)
+    # WHICH FILE CARRIES AN index_category AT ALL.  A row whose title equals
+    # the article's own <title> gets no `index_title`, so it is resolved
+    # through <title> below -- and then moving only its `index_category` to
+    # another file is invisible: the row still "matches an article", just not
+    # the one that carries it.  SH8605's 22 single-row articles had to be
+    # walked by hand to rule that out.  See the CARRIER check after the loop.
+    CATS[f] = len(re.findall(r'64er\.index_category" content="[^"]+"', s))
     tm = re.search(r'<title>(.*?)</title>', s)
     if tm: titles.setdefault(tm.group(1), []).append(f)
 bad = 0
@@ -330,6 +342,26 @@ if R.report('rows matching no article', new, len(items), d, 'r220-orphan-rows'):
     print('    -- for each: grep -ril <distinctive word> issues/  '
           'A row found in ANOTHER issue carries the wrong issue key and is')
     print('       that issue\'s row; report it, do not apply it here.')
+# THE CARRIER CHECK.  Route each row by the file that actually CARRIES an
+# `index_category`, and require that file's span to COVER the row's page.  A
+# title lookup alone cannot see an index_category that was written into the
+# wrong file, because the title still resolves to the right one.
+for page, title in rows:
+    fs = titles.get(title) or titles.get(title.replace('&', '&amp;'))
+    if not fs:
+        continue                      # already reported as an orphan row above
+    carriers = [f for f in fs if CATS.get(f)]
+    if not carriers:
+        print(f"  CARRIER  p{page} {title!r} resolves to "
+              f"{[os.path.basename(f) for f in fs]}, and NONE of them carries "
+              f"an index_category line")
+        continue
+    for f in carriers:
+        if not any(lo <= page <= hi for lo, hi in spans.get(f, [])):
+            print(f"  CARRIER  p{page} {title!r} is carried by "
+                  f"{os.path.basename(f)}, whose pages {spans.get(f)} do not "
+                  f"cover p{page}")
+
 # LETTERED SIBLINGS CANNOT BE SEPARATED BY PAGE, because they share one.  The
 # nearest-preceding-start rule is silent between 21a and 21b, so say so and
 # name them: those rows are routed by TITLE and have to be read.

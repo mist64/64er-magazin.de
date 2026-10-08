@@ -134,6 +134,27 @@ index metadata because this example taught the skip. Before writing
 `not applicable — kind`, ask what the input for THIS kind would be, and show
 that it does not exist.
 
+**AND "NOBODY DOES X" IS VOID EVIDENCE WHEN THIS RULE IS WHY.** r200's header
+read *"`grep -l 'article class="qa"' issues/SH85*/*.html` finds zero files"* —
+true, and circular: no Sonderheft carried `class="qa"` BECAUSE that header told
+every Sonderheft build to skip the step. An absence the rule itself caused is
+not a finding about the magazine. Ask what would have had to happen for the
+evidence to come back non-empty; if the answer is "a build would have had to
+ignore this header", the line proves nothing.
+
+**WHEN A RULE'S HEADER AND ITS BODY DISAGREE, THE HEADER IS WRONG UNTIL SHOWN
+OTHERWISE — and the header is what gets read first.** That is the general
+defect behind SH8605's r200 stop, and it is worse than either half alone.
+r200's header said `monthly`; its body said the Q&A shape *"is the project's
+shape for ANY reader-question article"* and even warned that such an article
+*"can pass the whole chain unrestructured"*. A build that trusts the header
+never reaches the warning. SH8605's `155 Fragen & Antworten` is a
+reader-question article that the printed Inhalt files under a band named
+Leserforum, and it was the builder stopping at the header — as this section
+requires — that surfaced the contradiction. When you find one, fix the header
+in the same commit; do not run the step "because the body says so" and do not
+skip it "because the header says so".
+
 Three things are mandatory in that entry and all three are checkable:
 
 1. **The literal phrase `not applicable — kind`** in the heading, so the whole

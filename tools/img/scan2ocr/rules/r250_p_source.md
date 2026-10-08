@@ -379,7 +379,14 @@ for f in sorted(os.listdir(d)):
             # ...and a source note CONTINUED AS A LIST is still the tail.
             # 8603/8 "Die Wueste Lebt" has <ul class="plain source"> right
             # after one, which this reported as mid-section.
-            re.match(r'<[uo]l class="[^"]*source', t)):
+            #
+            # OR AS A TABLE, which is what a MULTI-COLUMN Info note is:
+            # supplier / address pairs do not fit a <ul>.  SH8605/120 "Das
+            # Computerbuero" has <p class="source">Info:</p> followed by
+            # <table class="plain source">, built at 160 on the 8603/41
+            # precedent -- and this check reported it as mid-section, a
+            # permanent finding on a correct issue.
+            re.match(r'<(?:[uo]l|table) class="[^"]*source', t)):
             continue
         print(f"  {f}: mid-section <p class=\"source\"> followed by {t!r}")
         sys.exit(1)

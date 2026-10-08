@@ -173,7 +173,21 @@ P = re.compile(r'<p(?:\s[^>]*)?>(.*?)</p>', re.S)
 # Uppercase after the number is what separates code from prose: German text is
 # full of "Bit 4 und 5" and "Register 25", and BASIC in this corpus is CAPS.
 # Without the [A-Z]{2} this floods -- 39 hits on a clean issue, 2 with it.
+#
+# BUT THE CAPS TEST IS A DEFAULT, NOT A FACT, AND IT READS 0 ON AN ISSUE THAT
+# BREAKS IT.  A Sonderheft for beginners may print its BASIC in LOWERCASE:
+# SH8605/101 "Dateiverwaltung fuer Einsteiger" sets `30 input "titel";t$(ad)`
+# and `1 rem dimensionierung`, so 22 code regions sat in <p> -- several glued
+# onto the end of a prose sentence -- and this sweep reported 0.  Found by
+# READING the article, which is the only thing that could have.
+#
+# So run the sweep TWICE: once as below, and once with NUM_LOWER, and read
+# every hit of the second by eye (it is deliberately noisier -- the keyword
+# list is what keeps "Register 25 und" out).
 NUM = re.compile(r'(?:^|[\s>])(\d{1,5})\s+(?=[A-Z]{2})')
+BASIC_KW = (r'rem|print|input|poke|peek|goto|gosub|for|next|if|then|data|'
+            r'read|open|close|get|sys|dim|let|end|return|def\s*fn')
+NUM_LOWER = re.compile(r'(?:^|[\s>])(\d{1,5})\s+(?=(?:%s)\b)' % BASIC_KW)
 def run_len(ns):
     best = cur = 1 if ns else 0
     for a, b in zip(ns, ns[1:]):

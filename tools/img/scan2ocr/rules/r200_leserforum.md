@@ -78,10 +78,21 @@ generator needs to render the rubric banner.
 </html>
 ```
 
-Required metas: `64er.head1=Leserforum`, `64er.toc_category=Rubriken`,
-`64er.id=leserforum`. **No `<meta name="author">`** — Leserforum has
-no overall author; per-question authorship lives inside each
-`<p class="author">`.
+Required metas **when the article IS the monthly Leserforum rubric**:
+`64er.head1=Leserforum`, `64er.toc_category=Rubriken`, `64er.id=leserforum`.
+
+**THOSE THREE ARE THE RUBRIC'S, NOT THE SHAPE'S.** This rule applies to any
+reader-question article (below), and another one keeps its OWN metas: `head1`
+is its printed running head, `toc_category` is wherever the print files it, and
+`id` follows its subject thread from r140. MEASURED on SH8605/155 *Fragen &
+Antworten*, which the printed Inhalt files under a band named Leserforum and
+which is NOT the rubric: requiring the three produced **three permanent FAILs
+on correct output**, which is the shape r000 warns gets "fixed" by undoing the
+transform.
+
+**No `<meta name="author">`** — a Q&A article has no overall author;
+per-question authorship lives inside each `<p class="author">`. That one is the
+shape's, and holds for all of them.
 
 ## THE Q&A SHAPE IS NOT THE LESERFORUM'S ALONE
 
@@ -204,9 +215,12 @@ The sub-agent must:
    `<p>`s. If signed by a guest expert, end with `<p class="author">`.
 8. Vendor / product / address footer → `<p class="source">Info: …</p>`
    at the end of the `<section>`.
-9. Add `<meta name="64er.head1" content="Leserforum">` if missing.
-   Verify `64er.toc_category=Rubriken`, `64er.id=leserforum`, NO
-   `<meta name="author">`.
+9. Metas. **Only if this article IS the monthly Leserforum rubric:** add
+   `<meta name="64er.head1" content="Leserforum">` if missing and verify
+   `64er.toc_category=Rubriken`, `64er.id=leserforum`. For any OTHER
+   reader-question article, verify instead that `head1` equals the printed
+   running head and that `toc_category` / `id` are what r100 and r140 set.
+   Either way: NO `<meta name="author">`.
 10. Apply word-level OCR fixes to headings and body:
     `U→ll` (`darsteUen` → `darstellen`), lost spaces
     (`aufjedenfalls` → `auf jedenfalls`), `0` ↔ `O` confusions
@@ -259,16 +273,33 @@ grep -qE '<article class="qa( [a-z-]+)*"' "$file" || echo "  FAIL: missing class
 grep -qz '<header>[[:space:]]*<img src="<START>-0\.png"' "$file" || \
   echo "  FAIL: missing banner"
 ls "issues/<YYMM>/<START>-0.png" >/dev/null || echo "  FAIL: banner file missing"
+# A BANNER NOT CUT YET IS NOT A FAILURE -- it is PAUSE 2 work.  Pointing an
+# <img> at a file that does not exist ships a broken image, so until the crop is
+# delivered the banner stays OUT of the HTML (the <h1> remains) and the page
+# goes on the crop worklist as `<page>-0.png`.  Checks 2 and this one are then
+# DEFERRED to after PAUSE 2, exactly as r150's figure checks are.
 
-# 3. required metas
-grep -q '64er.head1" content="Leserforum"' "$file" || echo "  FAIL: head1 meta"
-grep -q '64er.toc_category" content="Rubriken"' "$file" || \
-  echo "  FAIL: toc_category"
-grep -q '64er.id" content="leserforum"' "$file" || echo "  FAIL: id meta"
+# 3. required metas -- CONDITIONAL, because the three Leserforum values are the
+#    monthly RUBRIC's and this rule applies to any reader-question article.
+#    Hard-coded, they were three permanent FAILs on SH8605/155's correct output.
+if grep -q '64er.id" content="leserforum"' "$file"; then
+  # the monthly rubric: the three fixed values
+  grep -q '64er.head1" content="Leserforum"' "$file" || echo "  FAIL: head1 meta"
+  grep -q '64er.toc_category" content="Rubriken"' "$file" || \
+    echo "  FAIL: toc_category"
+else
+  # any other Q&A article: head1 is its own running head, and r100/r140 set the
+  # other two -- so check they are PRESENT and non-empty, not what they say.
+  for m in head1 toc_category id; do
+    grep -qE "64er\.$m\" content=\"[^\"]+\"" "$file" || echo "  FAIL: $m meta missing"
+  done
+  echo "  note: not the Leserforum rubric -- head1 must equal the printed" \
+       "running head; compare it with the page by eye"
+fi
 grep -lE '<meta name="author"' "$file" && echo "  FAIL: author meta present (must be removed)"
 
 # 4. balanced section / div counts
-python3 -c "$(cat <<'PY'
+$PY -c "$(cat <<'PY'
 import re, sys
 s = open(sys.argv[1]).read()
 checks = [
@@ -286,7 +317,7 @@ PY
 )" "$file"
 
 # 5. spot-check: every <div class="q"> has a <p class="author">
-python3 -c "$(cat <<'PY'
+$PY -c "$(cat <<'PY'
 import re, sys
 s = open(sys.argv[1]).read()
 for m in re.finditer(r'<div class="q">(.*?)</div>', s, re.DOTALL):

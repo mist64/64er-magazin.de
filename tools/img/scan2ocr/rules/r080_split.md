@@ -18,6 +18,18 @@ das Listing des Monats` as `2000 Mark für Listing des Monats`. The page prints
 the long forms, and 8608, 8609 and 8610 all carry them in full — a shortened
 h1 here makes the same recurring page look like a different article each year.
 
+**READ THE HEADLINE OFF THE SPREAD, NOT THE START PAGE.** A display headline
+can run across the gutter onto the facing page, in the same type, and a crop of
+the start page alone shows a headline that looks complete. MEASURED on
+SH8605/20: the print sets `Die Ports` on p20 and `des C 64` on p21 — one
+headline across two pages. The crop brief said "the headline from its start
+page", so the reviewer saw only `Die Ports`, read 030's longer form as the
+Inhalt's wording rather than the page's, and SHORTENED the h1 to match the
+crop. It took step 190 reading p21 to find the other half, and the repair was a
+content edit plus the danger-zone rename. **Crop both pages' top halves side by
+side**, and when 030's form is longer than what you see, suspect the crop
+before suspecting 030.
+
 Fix it AT THIS STEP. The filename derives from the `<h1>`, so by rule 260 a
 correction means a content edit and a `git mv` staged together, which r000
 calls the danger zone; and by then 090, 100 and 140 have all built on the
