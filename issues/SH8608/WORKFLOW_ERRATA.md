@@ -309,3 +309,14 @@ Discount then renders the asterisks literally (probe run).
 and widen it: "…or the run sits in a banner line — the line is nothing but
 `*`/`%`/`#`/`;` runs around ≤ 4 words in capitals — which is how listings mark
 sections (SH8608 l.4687)."
+
+## 060 — the wrapper's post-pass calls bare `python3`
+
+**What happened.** r060_md_to_html.sh's fenced-code post-pass invokes `python3`
+by bare name; CLAUDE.md and r000 require the repo venv. The sub-agent ran it
+with `.venv/bin` first on PATH so `python3` resolved to the venv. r000's
+`"$PY"` sweep fixed the Verification fences, not the wrappers' bodies.
+
+**Suggested.** `PY="${PYTHON:-$DIR/../../../../.venv/bin/python}"` at the top
+of r060_md_to_html.sh and every other `.sh` here that calls python, and grep the
+wrappers for a bare `python3` as part of r000's census.
