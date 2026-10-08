@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Apfelmännchen mit 256000 Punkten</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="P. Siepen, og">
+    <meta name="64er.issue" content="Sonderheft 6/86">
+    <meta name="64er.pages" content="157-163">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX22">
+</head>
+
+<body>
+    <article>
+        <h1>Apfelmännchen mit 256000 Punkten</h1>
+        <p class="intro">Normale Hardcopies erreichen beim Vergrößern keine höhere Auflösung. Im Gegensatz dazu können Sie auf dem MPS 802 mit wenig Aufwand und viel Zeit die Grafiken des »Apfelmännchen« in achtfacher Auflösung drucken.</p>
+
+        <p>B:: Sie ans Abtippen gehen, vergewissern Sie sich bitte, daß Ihr Drucker ein MPS 802 der Version 7 ist. Das erreichen Sie, indem Sie beim Einschalten des Druckers die Taste »Paper Advance« gedrückt.halten. Nur bei der Version 7 kann das Programm hundertprozentig funktionieren.</p>
+
+        <p>Geben Sie die Programme »APFEL/BAS« (Listing 1) und »APFEL/OBJ« (Listing 2) ein und speichern Sie sie auf Diskette oder Kassette. Für die Kassettenversion ändern Sie in Zeile 100 die Gerätenummer »8« zu »1«. Dann laden Sie das Basic-Programm »APFEL/BAS« und starten esmit &lt;RUN&gt;. Dieses Programm lädt dann das Maschinenprogramm »APFEL/OByJ« nach. Nachdem das passiert ist, erscheint das Menü. In diesem können Sie aus vier Menüpunkten auswählen.</p>
+
+        <p>Wenn Sie den Menüpunkt »Berechnen« wählen, können Sie die Parameter eingeben, wie Sie es von dem Programm aus Ausgabe 11/85 gewohnt sind. Nachdem Sie diese Eingaben gemacht haben, beginnt der Computer zu rechnen. Sie erkennen das an der wechselnden Umrandungsfarbe, die für jeden berechneten Punkt einmal ihre Farbe wechselt (daran erkennen Sie, daß Ihr Computer arbeitet). Sobald das Bild fertig berechnet ist, erscheint wieder das Menü.</p>
+
+        <p>Wenn Sie anschließend den Menüpunkt »Speichern« wählen, brauchen Sie nur den Filenamen einzugeben und das aktuelle Bild wird gespeichert. Anschließend wird der Fehlerkanal der Floppy ausgelesen und ausgegeben. Das Speichern funktioniert übrigens auch nach einem Abbruch.</p>
+
+        <p>Das Laden funktioniert genauso. Nur werden nach der Fehlermeldung noch die Parameter des Bildes ausgegeben.</p>
+
+        <p>Wenn Sie nun den Menüpunkt »Drucken« wählen, erscheint zunächst die Frage, ob Sie Normal oder Invers drucken wollen. Dabei bedeutet »Normal«, daß eine Fläche, bei der die Folge den gewählten Grenzwert nicht überschreitet, weiß bleibt. Das heißt also, daß das Apfelmännchen weiß bleibt. Wenn Sie »Invers« wählen, wird eben dieses Apfelmännchen schwarz (je nach Farbband auch grau) gedruckt. Da dieses Programm aufgrund der hohen Auflösung sehr viel Rechenzeit benötigt, empfiehlt es sich, dieses Programm für Bilder zu benutzen, die mit dem Programm aus Ausgabe 11/85 erstellt wurden.</p>
+
+        <p>Die Rechenzeit des »Apfelpainters« beträgt etwa das Achtfache der Zeit, die das Programm für ein Bild benötigt (wegen der achtfachen Auflösung).</p>
+
+        <p>Da das Basic-Programm sehr einfach programmiert ist, soll ausschließlich das Assemblerprogramm (Listing 3) erklärt werden.</p>
+
+        <p>Dieses besteht aus den Hauptroutinen »APFEL«, »LOAD«, »SAVE«, und »PRINT«. Die am Anfang des Programms stehende Sprungleiste gewährt einwandfreien Zugang zu allen Programmteilen. Die Routine »START« liest erst die Werte aus dem SYS-Befehl aus (»HOLWERTE«) und springt dann in die Routine zum Berechnen des Bildes »APFEL«. Diese entspricht größtenteils der Rechenroutine von G. Pehlands Programm. Die im folgenden erwähnten Unterschiede erklären sich durch die bedeutend größere Auflösung und der Anordnung der Pixel im Speicher.</p>
+
+        <p>Der erste Unterschied besteht in den Zeilen 4080 - 4100. Dort wird der 16-Bit-Wert »SPALTEN« in Fließkommaformat umgerechnet. Die Routine »INTTOFAC« ist aus der Betriebssystemroutine »$BDCD« entnommen. Die gleiche Befehlsfolge steht in den Zeilen 4230 - 4250, nur diesmal für den 16-Bit-Wert »ZEILEN«. Die nächste Änderung steht in den Zeilen 4430 - 4433. Diese Änderung ergibt sich daraus, daß der Einfachheit halber »POS« von Acht auf Null heruntergezählt wird. Der nächste Unterschied besteht darin, daß das Carry-Flag zur Anzeige eines gesetzten Punktes benutzt wird (Zeile 4560 - 4570). Diese Befehlsfolge löscht also den nächsten Punkt. In Zeile 4810 - 4830 wird der Routine »PLOT« mitgeteilt, ob der entsprechende Punkt gesetzt oder gelöscht ist. Dazu wird ausgenutzt, daß das niederwertigste Bit angibt, ob der Byte-Wert gerade oder ungerade ist. (Die Auflösung der Farben beschränkt sich beim Drucker ja logischerweise auf zwei Farben: Weiß und Schwarz entsprechend einem geraden oder ungeraden Wert von »TIEFE«.) Aufgrund dieser Übergabemethode wurde natürlich auch der Anfang der Routine »PLOT« (Zeile 5200 - 5220) geändert. Dort wird dann das Carry-Flag in den Wert »BYTE« geSHIFTet. Undin Zeile 5225 wird für jeden berechneten Punkt die Umrandungsfarbe geändert. In Zeile 5400 wurde die Anzahl der Spalten von 40 (Bildschirm) auf 80 (Drucker) hochgesetzt. In den Zeilen 5520 - 5580 wurde von der ursprünglichen 8-Bit-Operation auf eine 16-Bit-Operation umgestellt. Die Routine »SETBYTE« (Zeile 6000 - 6080) speichert das in der Routine »PLOT« zusammengestellte 'Byte. Und zwar werden diese Bytes in der Reihenfolge, wie sie errechnet werden, gespeichert. Es entsteht also eine andere Anordnung der Bitmap als in der Bitmap des Grafikbildschirms.</p>
+
+        <p>Die Routine »PRINT« transportiert jeweils den Inhalt einer Druckzeile in einen Zwischenspeicher, der dann von der Routine »OUTPUT ausgegeben wird.</p>
+
+        <p>In Zeile 12000 werden die nötigen Files geöffnet. Dann wird in Zeile 12010 die Anzahl der Druckzeilen definiert. Anschließend wird in den Zeilen 12030 - 12060 der Zeiger auf den Grafikspeicher gesetzt. In den Zeilen 12070 - 12100 wird. nun ein zweiter Zeiger auf den Zwischenspeicher gesetzt. Inden Zeilen 12120 - 12130 wird dann der Inhalt der betreffenden Druckzeile aus dem Grafikspeicher in den Zwischenspeicher transportiert. In den folgenden Zeilen werden nun die Zeiger erhöht und anschließend wird abgefragt, ob der Zwischenspeicher schon voll ist (Zeile 12210 - 12250). Wenn der Zwischenspeicher vollist, wird dieser ausgegeben (Zeile 12260). Anschließend wird der Zähler für die Zeilen dekrementiert. Wenn er noch nicht gleich Null ist, wird auf die gleiche Art die nächste Druckzeile ausgegeben. Sonst wird die Ausgabe wieder auf den Bildschirm gelegt (Zeile 12285) und die Files werden geschlossen (Zeile 12290).</p>
+
+        <p>Nachdem das Bitmuster einer Zeile in den Puffer »SPEICHER« übertragen wurde, wird diese Zeile von der Routine »OUTPUT« ausgedruckt. Als erstes werden die 8 Byte eines Zeichens in einen Zwischenspeicher gebracht. Diese 8 Byte befinden sich aufgrund der Anordnung der Bitmap in jeweils 80 Byte Abstand. Zuerst wird ein Zwischenspeicher für den Zeiger auf das jeweilige Byte angelegt (Zeile 13000 13650). In den Zeilen 13060 - 13070 wird dann der Zähler für die Anzahl der Leerzeichen vor dem nächsten Zeichen gesetzt und in den nächsten beiden Zeilen wird dann noch ein Zähler für die Anzahl der Spalten gesetzt. In der Zeile 13120 wird nun das X-Register als Zähler für die Anzahl der Pixelzeilen definiert. Dann wird in den Zeilen 13140 - 13170 ein Zeiger auf das aktuelle Byte definiert. In den Zeilen 13180 - 13270 werden jetzt die 8 Byte eines Zeichens aus »SPEICHER« nach »PUFFER« kopiert. Die Bytes stehen jeweils in einem Abstand von 80 Byte im »SPEICHER« (Zeile 13220). Anschließend werden nun die 8 Byte eines Zeichens, die ja horizontal orientiert sind, vertikal orientiert. Das heißt, jeweils die Bits der gleichen Wertigkeit aller 8 Byte ergeben ein Byte. ' Das geht folgendermaßen vonstatten: Es wird ein Maskenbyte definiert (Zeile 13300), in dem jeweils das entsprechende Bit gesetzt ist. Dieses Maskenbyte wird nun mit allen 8 Byte AND-verknüpft (Zeile 13330) und entsprechend dem Ergebnis wird dann das Carry-Flag gesetzt oder gelöscht (Zeile 13340 - 13360). Dieses Carry-Flag wird dann in das Ergebnisbyte geschoben (Zeile 13370). Dieser Vorgang wiederholt sich nun, bis alle 8 Byte so behandelt worden sind (Zeile 13380 - 13400). Nun wird das Ergebnisbyte noch in Abhängigkeit, ob Normal oder Invers gedruckt werden soll, invertiert (Zeile 13420). Das Ergebnis wird dann im »PUFFER« abgelegt (Zeile 13430). Nun wird noch im Maskenbyte das nächste Bit gesetzt und gleichzeitig getestet, ob schon alle 8 Bits durch sind (Zeile 13442 - 13448).</p>
+
+        <p>Nun wird als erstes getestet, ob alle 8 Bitmusterbyte leer sind (Zeile 13450 - 13462). Wenn ja, wird dieses Zeichen gar nicht erst gedruckt, sondern es werden nur die Zeiger aktualisiert (Zeile 13630). In den Zeilen 13469 - 13490 werden nun die 8 Bitmusterbyte an den Drucker geschickt. Anschließend wird in Zeile 13500 - 13580 der Druckknopf auf das aktuelle Zeichen positioniert, was nach einem Wagenrücklauf ja nötig ist. Nachdem das geschehen ist, wird in Zeile 13590 - 13600 das eben definierte Zeichen ausgedruckt. In den nächsten beiden Zeilen wird durch einen Wagenrücklauf das Definieren des nächsten Zeichens ermöglicht. In den Zeilen 13630 - 13660 werden dann die Zähler und Zeiger aktualisiert. Wenn nun die Zeile noch nicht fertig gedruckt ist, wird das nächste Zeichen auf die gleiche Art ausgedruckt.</p>
+
+        <p>Das Programm wurde extra so entwickelt, daß man es leicht für einen anderen Drucker umschreiben kann. Man muß dafür dann nur die druckerspezifischen Routinen anpassen (Openfls, Closefls). Die Routine »OUTPUT« muß jedoch für den entsprechenden Drucker vollkommen neu geschrieben werden. Diese Routine muß die Bitmuster, die im »SPEICHER« enthalten sind, ausdrucken. Dieses Bitmuster ist folgendermaßen gespeichert: In den ersten 80 Byte sind der Reihe nach alle Bits der nächsten Pixelzeile enthalten. Die nächsten 80 Byte enthalten die Bits der nächsten Pixelzeile und so weiter bis zur achten Pixelzeile.</p>
+
+        <p>Für den erfahrenen Programmierer dürfte das Umschreiben dieses Programms auf einen 8-Nadeldrucker keine Probleme bereiten. Bei Druckern mit 9 Nadeln gibt es zwei Möglichkeiten. Einmal besteht die Möglichkeit, nur mit 8 Nadeln zu arbeiten und damit kompatibel zu der vorliegenden Version zu bleiben, oder man arbeitet mit allen 9 Nadeln, wobei man dann die vertikale Auflösung anpassen oder aber die letzte Zeile gesondert verarbeiten muß, denn die jetzige vertikale Auflösung ist ja nicht durch 9 teilbar.</p>
+
+        <p>Das Programm funktioniert auch mit dem C 128 einwandfrei. Für die Benutzer dieses Computers empfiehlt es sich aber, in Zeile 2070 den Prozessor auf 2 MHz umzuschalten und in Zeile 2095 wieder auf 1 MHz zurückzuschalten.</p>
+
+        <p>Ach ja, es gibt ja die leidigen Probleme mit den verschiede-: nen Betriebssystemen des MPS 802. Dieses Programm wurde auf einem MPS 802 Version 7c entwickelt. Bei anderen Versionen könnte es Probleme geben, da diese zum Teil nicht grafikfähig sind.</p>
+
+        <address class="author">(P. Siepen/og)</address>
+    </article>
+</body>
+
+</html>

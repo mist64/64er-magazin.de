@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>3D-Funktionsgrafiken auf dem C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Wolfgang Hummel, dm">
+    <meta name="64er.issue" content="Sonderheft 6/86">
+    <meta name="64er.pages" content="102-105">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX8">
+</head>
+
+<body>
+    <article>
+        <h1>3D-Funktionsgrafiken auf dem C 128</h1>
+        <p class="intro">Durch Umwandlung mathematischer Formeln in Computergrafik lassen sich verblüffende Bilder erzielen. Hier werden Funktionen und Meßwert-Reihen in HiRes-Grafik gezeichnet.</p>
+
+        <p>Dieses Programm erzeugt Grafiken im 3D-Format durch selbstgewählte Funktionen und eingegebene Stützstellen (Meßwerte). Es ist in Basic 7.0 geschrieben, kann also gegebenenfalls auch an andere Basic-Erweiterungen angepaßt werden.</p>
+
+        <p>Bedienungsanleitung</p>
+
+        <p>Nachdem Sie das Programm »Flächen im IR ! 3« (Listing 1) im C128-Modus abgetippt und gespeichert haben, starten Sie es durch RUN. Sie sehen nun das Menü mit sieben verschiedenen Auswahlmöglichkeiten:</p>
+
+        <p>1) Dies ist der Unterpunkt »Grafiken speichern«. In diesem Menüpunkt können Sie die unter Punkt 6) erzeugten Grafiken auf Diskette speichern. Für den Namen geben Sie bitte maximal 14 Buchstaben ein und schließen die Eingabe mit &lt;RETURN&gt; ab.</p>
+
+        <p>2) Diese Funktion dient zum Laden der mit Punkt 6) erstellten Grafiken. Dazu müssen Sie nur den Namen der Grafik (ohne die Kennung »G>«) eingeben. Schließen Sie die Eingabe mit &lt;RETURN&gt; ab. Der Bildschirm wird auf HiRes-Modus umgeschaltet und die Bilddaten langsam von Diskette in die Speicherstellen gePOKEt. Ist das Bild fertig aufgebaut, erscheint alle 10 Sekunden das Wort »sTASTE«. Außerdem ertönt ein Gong. Mit einem beliebigen Tastendruck gelangt man wieder in das Hauptmenü.</p>
+
+        <p>3) Unter diesem Menüpunkt können Sie eine eigene Meßreihe oder sonstige strukturierte zusammenhängende Daten eingeben. Zuerst geben Sie Ihrer Meßreihe einen Namen und quittieren diesen mit &lt;RETURN&gt;.</p>
+
+        <p>Zum besseren Verständnis werden die folgenden Schritte anhand des Beispiels »Windkanal« erläutert:</p>
+
+        <p>Mit einem Luftdruckmeßgerät wird einfach der Durchmesser der Düse entlang der X-Achse abgefahren und alle 10mm der Luftdruck gemessen (siehe Bild 1). Diesen kann man als Diagramm auftragen (rechte Kurve im Windkanal, Bild 2). Macht man dasselbe noch einmal im Abstand von 10, 20, 30... cm von der Düse, bekommt man mehrere Meßreihen.</p>
+
+        <p>Im Grunde wird die ganze Fläche vor der Düse abgetastet und die Windgeschwindigkeit registriert. Die Fläche wird in X und Y aufgeteilt, welche vor jeder Windmessung fest eingeteilt ist (Parameter).</p>
+
+        <p>Die Meßgröße »Windstärke« kann symbolisch in der erzeugten Grafik nach oben aufgetragen werden und man erhält dadurch ein Geschwindigkeitsfeld für die ausströmende Luft.</p>
+
+        <p>Ein Beispiel: Sie möchten 20 Messungen in der Düse vornehmen, also geben Sie für den X-Wert 20 ein.</p>
+
+        <p>Die Messung soll aus drei Meßreihen bestehen (0 cm, 20 cm und 30 cm), demzufolge: Y=3.</p>
+
+        <p>Die nun folgende Frage nach den min/max-Werten müßte nun zum Beispiel mit X,n=0, Xnu» 20, Yan=0, Yna= 30 beantwortet werden. In die Kommentarzeile geben Sie bitte einen Text ein, der während des Ladevorganges ausgegeben wird (eine leere Eingabe kann zu Fehlern führen).</p>
+
+        <p>Zu Ihrer Erleichterung sind die zu erwartenden Parameterwerte schon vorgegeben. Stimmen Sie mit Ihren Werten überein, so drücken Sie bitte nur &lt;RETURN&gt;. Andernfalls korrigieren Sie die Werte und löschen den Rest mit der Space-Taste. Die Eingabe des Meßwertes Z leitet ein Gongein. Erfolgt keine Eingabe, so lautet der jeweilige Meßwert = O0.</p>
+
+        <p>Nach der Abfrage, ob alles korrekt war, werden die Meßdaten auf Diskette gespeichert und das Programm kehrt in das Hauptmenü zurück.</p>
+
+        <p>4) In diesem Unterpunkt liest das Programm die unter Punkt 3) erstellten Meßwert-Tabellen in den Speicher ein. Sind die Daten komplett eingelesen, so erscheint ein kleines Menü. Sie finden folgende Auswahlmöglichkeiten vor:</p>
+
+        <p>T – Hier können Sie noch einmal die aus den Meßwerten erzeugte Tabelle einsehen. Ein anschließender Tastendruck am Ende bringt Sie wieder in das kleine Untermenü.</p>
+
+        <p>G – Die Meßwerte werden in eine 3D-Netzgrafik umgewandelt, die dann in HiRes auf dem Bildschirm erscheint. Die Meßwerte der Grafik dienen als Stützstellen, die zweimal (parallel zur X- und Y-Achse) abgetastet werden. Damit man den räumlichen Effekt besser erkennt, zeichnet das Programm den Rand der Nullebene (Z = O für alle X, Y) und verbindet die Ecken der Grafik-Fläche zu einem Sockel. Die Seitenwände dieses Sockels werden ausgefüllt, falls die Meßwerte größer Null sind. Die Grafik ist so dimensioniert, daß sie immer komplett auf dem Bildschirm erscheint.</p>
+
+        <p>Alle 10 Sekunden erscheint das Wort »TASTE«. Bei Tastendruck gelangen Sie wieder in das kleine Untermenü. Sie können beliebig oft zwischen T und G wechseln. Mit E und &lt;TASTE&gt; gelangen Sie wieder in das Hauptmenü.</p>
+
+        <p>5) Eine Druckerroutine ist im Programm nicht enthalten, da insbesondere für Grafiken die Drucker unterschiedliche Software benötigen. Mit der Taste 5 erhalten Sie einen Hinweis, wo Sie Druckerroutinen im Programm einbauen können.</p>
+
+        <p>6) Dies ist die interessanteste Funktion des Programms. Hier können Sie Funktions-Grafiken berechnen, die ähnlich den Bildern 3 und 4 aussehen können.</p>
+
+        <p>Nach Anwahl dieses Unterpunktes fragt Sie das Programm zuerst, ob Sie die Funktionsgleichung ansehen wollen (beim Start des Programmes ist dies die Nullfunktion). Danach erfolgt eine Abfrage, ob die Funktion geändert werden soll. Ist dies der Fall, so geben Sie bitte J ein. Ändern Sie nun die Funktion, schließen die Zeile mit &lt;RETURN&gt; ab und starten das Programm erneut. Wenn Sie nun die oben erwähnten Abfragen jeweils mit N quittieren, dann möchte das Programm von Ihnen die Intervalle von X und Y wissen, in denen die Funktion gezeichnet werden soll (die Werte der Intervalle sollten nicht zu groß gewählt werden – am besten zwischen 0,5 und 2). Die Intervalle sind symmetrisch, das heißt, wenn Sie für X1=5 eingeben, läuft das Intervall von -5 bis +5.</p>
+
+        <p>Die Grafik ist für den Bildschirm nicht dimensioniert. Mit dem Dehnungsfaktor können Sie die Grafikfläche dehnen oder stauchen:</p>
+
+        <ul>
+            <li>
+                <p>Stauchen: O&lt;den&lt;1</p>
+            </li>
+            <li>
+                <p>Dehnen : den>1</p>
+            </li>
+        </ul>
+
+
+        <p>Wahlweise kann ein Achsenkreuz mit in die Grafik eingezeichnet werden.</p>
+
+        <p>Bei Eingabe von »K« wird die Funktion in zwei senkrecht zueinander liegenden Geradenscharen abgetastet (Bild 3).</p>
+
+        <p>Die Eingabe von »P« tastet die Funktion in Ringen und Strahlen ab (Bild 4).</p>
+
+        <p>Danach fehlt nur noch die Anzahl der Linien (2..50) oder, falls &lt;P&gt; gewählt wurde, die Anzahl der Kreise und Strahlen.</p>
+
+        <p>Um eine Grafik komplett auf den Bildschirm zu bekommen, probieren Sie erst einmal mit kleiner Linienanzahl aus, wie die Grafik ungefähr aussehen wird und wo sie liegt. Ist dies geschehen und die Grafik liegt wie gewünscht, so können Sie die Berechnung noch einmal mit höherer Auflösung starten.</p>
+
+        <p>Möchten Sie einen ersten Überblick über die 3D-Darstellung erhalten, so lassen Sie erst einmal die Nullfunktion berechnen. Diese Grundfläche wird beianderen Funktionen im Raum praktisch gedehnt und verzerrt.</p>
+
+        <p>7) Verlassen des Programms. Es wird einfach durch ein END beendet.</p>
+
+        <p>Erweiterungsvorschläge</p>
+
+        <p>Die unter Punkt 6) erzeugten Grafiken sind durchsichtig. Um verdeckte Flächen nicht zu zeichnen, kann das Programm wie folgt abgewandelt werden:</p>
+
+        <p>Definition zweier weiterer Funktionen XX(X) und YY(Y), welches die partiellen Ableitungen von Z(X) sind: | 5Z (xy) , SZ(Xy)</p>
+
+        <p>6x öy</p>
+
+        <p>Die Gerade im Raum, die genau in das Betrachterauge zeigt (also in der Grafik als Punkt dargestellt werden würde), besitzt folgende Koordinaten: 1, 1, 5/6 *V3.</p>
+
+        <p>Ist das Skalarprodukt zwischen der Betrachtergerade (Sichtvektor) und dem Flächennormalenvektor kleiner Null (Winkel zwischen F-Vektor und S-Vektor > 90°), soll die Fläche nicht gezeichnet werden. Also: 220 IF 5*SQR(3)/6-XX(X)-YY(Y)&lt;O THEN 250</p>
+
+        <p>Die Funktionen müssen dabei analytisch berechnet werden. Wem die Grafik zu langsam läuft, sollte folgende FAST- und SLOW-Befehle eingeben:</p>
+
+        <p>385 FAST</p>
+
+        <p>425 SLOW</p>
+
+        <p>475 FAST</p>
+
+        <p>515 SLOW</p>
+
+        <p>2120 FAST</p>
+
+        <p>2420 SLOW</p>
+
+        <p>Dabei wird, wie bekannt, der Bildschirm für die Dauer der Berechnung abgeschaltet.</p>
+
+        <address class="author">(Wolfgang Hummel/dm)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>IRQ-Basic – eine Erweiterung für Sprite-Fans</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="st">
+    <meta name="64er.issue" content="Sonderheft 6/86">
+    <meta name="64er.pages" content="108-113">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX10">
+</head>
+
+<body>
+    <article>
+        <h1>IRQ-Basic – eine Erweiterung für Sprite-Fans</h1>
+        <p class="intro">Dieses Programm ist ein Leckerbissen für jeden, der gern Spiele programmiert. Neben mehr als 20 Sprite-Befehlen stehen Ihnen Befehle zur Verfügung, die die Programmierung des Video- und Sound-Chips erheblich erleichtern.</p>
+
+        <p>RQ-Basic (Listing 1) unterstützt mit über 70 Befehlen alle</p>
+
+        <p>Möglichkeiten des C64. Es stellt dem Programmierer zwei Bildschirmfenster zur Verfügung, deren Größe er selbst bestimmen kann. Alle Betriebsarten des Video-Prozessors, zwei verschiedene Zeichensätze und Groß-/ Kleinschrift lassen sich miteinander mischen. Die zwei Zeichensätze sind vollständig. Sie enthalten alle Grafikzeichen für Groß-/Kleinschreibung und können frei programmiert werden (zum Beispiel Multicolor-Zeichen).</p>
+
+        <p>Besonders die Sprite-Programmierung wird unterstützt. Diese ist mit fast 20 Befehlen vertreten und läßt keine Wünsche offen.</p>
+
+        <p>Die Register des SID lassen sich, soweit sie durch diese Befehle angesprochen werden, ab Adresse $8041 auslesen.</p>
+
+        <p>Für den Programmierer stehen außerdem noch eine Reihe von Programmierhilfen zur Verfügung. Die Funktionen NORM, ?F@, HLP und RST sind in dieser Reihenfolge über die Funktionstasten F1, F3, F5 und F7 erreichbar.</p>
+
+        <h2>Einzelheiten zum Programm</h2>
+
+        <p>Das Programm ist für den C64 ohne besondere Peripherie geschrieben worden. Lediglich der Befehl ?F@ benötigt ein .Diskettenlaufwerk. Ist dieses nicht vorhanden, wird »?DEVICE NOT PRESENT ERROR« gemeldet. Alle anderen Befehle arbeiten auch mit der Datasette zusammen. Vorsicht! Das Programm (Listing 1) istin gepackter Form veröffentlicht.</p>
+
+        <p>Es wird mit dem MSE eingegeben und gespeichert. Möchten Sie mit »IRQ-Basic« arbeiten, ist das Programm mit LOAD'"IRQ-Basic",8 zu laden und durch</p>
+
+        <p>RUN zu starten.</p>
+
+        <p>Die beiden Zeichensätze tragen die Nummern eins und zwei. Diese Nummer ist bei den Befehlen »U«-Mode und »D«-Mode mit anzugeben. Die Voreinstellung beträgt für beide Zeichenfenster »1«. Also gilt Zeichensatz »2«.</p>
+
+        <p>Zur Sprite-Programmierung muß man wissen, daß die Spritepointer für Text und Grafik verschieden sind. Für Text beginnen Sie bei $CFF8, für HiRes bei $87F8. Auch der zur Verfügung stehende Speicherplatz für Sprite-Daten ist unterschiedlich. Er beträgt im Textmodus (MODI O bis 2) rund 3000 Byte (von $CO00 bis $CCOO) und im HiRes-Modus 384 Byte ($9E80 bis $A000; Block 122 bis 127). Wird der Text mit dem HiRes-Modus gemischt, kann auch noch ein Teil des Farb-RAMs ($8400 bis $8800) für Sprites genutzt werden.</p>
+
+        <p>Wird der HiRes-Modus gewählt, muß gleichzeitig Zeichensatz »2« (also Nummer 1!) gewählt werden, da sich das RAM für den hochauflösenden Bildschirm sonst verschieben kann.</p>
+
+        <p>Hier noch einige Anmerkungen zu denbisher wenig behandelten Modi des VIC:</p>
+
+        <h3>Modusnummer 1:</h3>
+
+        <h3>Normale Zeichensatzdarstellung im Multicolor-Modus: Ausschlaggebend ist Bit 3im Farb-RAM. Ist es gesetzt, so ist das Zeichen ein Multicolor-Zeichen. Wenn nicht, sieht es normal aus. Bei einem Multicolor-Zeichen werden jeweils zwei Punkte zu einem zusammengefaßt, wobei die möglichen Bit-Muster über die Farbe des Punktes entscheiden: TYP: 00: Farbe im Register für die Hintergrundfarbe O 01: Farbe im Register für die Hintergrundfarbe 1 10: Farbe im Register für die Hintergrundfarbe 2 11: Übrige Farb-RAM-Bits stellen Farbe Modusnummer 2:</h3>
+
+        <h3>Extended Color Mode:</h3>
+
+        <h3>Hierbei wird die Hintergrundfarbe des Zeichens von den Bits 6 und 7 des Video-RAMs bestimmt. Die Bitkombinationen sind die gleichen wie bei Typ 1, lediglich bei der letzten (11) stammt die Farbe aus dem Register »3« für die Hintergrundfarbe.</h3>
+
+        <h3>Modusnummer 4:</h3>
+
+        <h3>Hochauflösende Farbgrafik:</h3>
+
+        <h3>In dieser Betriebsart hat der Bildschirm nur eine Auflösung von 160*200 Punkten. Auch hier entscheidet die jeweilige Bitkombination wieder über die Herkunft der Punktfarbe. Für diesen Modus existiert ein eigener Befehl zum Setzen eines Punktes. Dieser Befehl heißt CSET. Neben der x- und y-Koordinate muß noch die Herkunft der Farbe angegeben werden.</h3>
+
+        <h3>Hierbei bedeutet:</h3>
+
+        <h3>O: Farbe aus dem Register O für die Hintergrundfarbe (also kein Punkt sichtbar) 1: Video-RAM High-Nibble stellt Farbe 2: Video-RAM Low-Nibble stellt Farbe 3: Farb-RAM stellt Farbe.</h3>
+
+        <h3>Speicheraufteilung: \ $0400 bis O7FF: Programmvariable für die Befehle SSPRITE und BSPRITE. Basic-Speicher Programm erster Teil (Tabellen, Variable und so weiter) HiRes-Farb-RAM. Achtung: Durch den Befehl GCOL werden die Spritepointer gelöscht.</h3>
+
+        <p>$0800 bis 7FFF: $8000 bis 83FF: $8400 bis 87F7: Also zuerst diesen Befehl ausführen und dann die Blockpointer setzen! Spritepointer für HiRes.</p>
+
+        <p>Programm zweiter Teil</p>
+
+        <p>Frei (für Sprites).</p>
+
+        <p>Grafik-RAM</p>
+
+        <p>Frei $87F8 $8800 $9E4AF bis 87FF:</p>
+
+        <p>bis 9E4E:</p>
+
+        <p>bis 9FFF:</p>
+
+        <p>$A000 bis BFFF:</p>
+
+        <p>$CO000 bis CBFF:</p>
+
+        <p>$CCO0. bis CFF7: Bildschirm-RAM</p>
+
+        <p>$CFF8 bis CFFF: Spriteblockpointer für Text.</p>
+
+        <p>$DOO0 bis DFFF: 1/O</p>
+
+        <p>$EOOO bis EFFF: Im RAM : Zeichensatz 1</p>
+
+        <p>$F000 bis FFFF: Im RAM: Zeichensatz 2</p>
+
+        <p>$EOO00 bis FFFF: Betriebssystem</p>
+
+        <p>Benutzte Vektoren:</p>
+
+        <p>$0037/0038: Speichergrenze ($8000)</p>
+
+        <p>$0304/0305: Text in Token ($936C)</p>
+
+        <p>$0306/0307: Token im Klartext (List) ($9587) $0308/0309: Befehl ausführen ($95E3)</p>
+
+        <p>$0314/0315: Hardware IRQ ($96BC)</p>
+
+        <p>$0316/0317: Break Interrupt ($98BD)</p>
+
+        <p>$0330/0331: LOAD ($9C6E)</p>
+
+        <p>$0332/0333: SAVE ($9C8A)</p>
+
+        <p>Die Basic-Befehle von IRQ-Basic werden als Zwei-Byte-Token verschlüsselt, wobei das erste Byte jeweils eine Identifizierung ist und das zweite die Befehlsnummer plus $80 darstellt. IRQ-Basic benutzt zwei Identifizierungen (FO und F}). Insgesamt existieren drei Routinen zur Umwandlung in Tokens. Die erste benutzt als Kennung $FO und beginnt ab $936C. Die zweite benutzt $F1 als Kennung und beginnt ab $941F. Außerdem gibt es noch eine dritte ab $94EO, die weitgehend mit der RAM-Routine identisch ist und alle Standardbefehle umwandelt. Die Befehlsworte sind ab $810C zu finden, die Adressen ab $8240. Diese Tabellen bestehen jeweils aus zwei Teilen, die unmittelbar aufeinander folgen.</p>
+
+        <p>Das Kernstück des Programms ist die Interrupt-Routine. Sie beginnt bei $96BC und hat die Aufgabe, alle Interruptarten voneinander zu trennen. Interrupts werden von folgenden Bausteinen ausgelöst:</p>
+
+        <p>VIC:</p>
+
+        <p>a) Rasterzeilen-Interrupt (zur Erstellung der Bildschirmfenster).</p>
+
+        <p>b) Berührung zweier Sprites (Befehl SSPRITE) c) Berührung Sprite mit Hintergrund (Befehl BSPRITE). CIA:</p>
+
+        <p>a) Timer-Interrupt (Befehl VIB) b) Alarm (Befehl ALARM)</p>
+
+        <p>Weiterhin müssen im Interrupt noch die Tastaturabfrage, das Cursor-Blinken, sowie die Funktions-Tasten-Abfrage erledigt werden. Diese Funktionen werden auf Rasterzeilen- und Timer-Interrupt aufgeteilt.</p>
+
+        <p>RESET und NMI werden über die Modulkennung CBM 80 ab $8004 gesteuert. Der Befehl CBASIC zerstört einfach diese Kennung und löst einen RESET aus. Der NMI zeigt zu Beginn auf eine Start-Routine ab $9821, die diesen Vektor auf den eigentlichen ProgrammNMI ab $98B5 umlenkt. Anschließend wird zum Programm-RESET verzweigt. Dadurch wird erreicht, daß das Programm nach dem Laden einfach durch Klopfen auf die RESTORE-Taste gestartet werden kann. Der Programm-RESET beginnt ab Adresse $9938.</p>
+
+        <p>IRQ-Basic ist relativ einfach zu erweitern. Wenn man die Speichergrenze noch etwas herabsetzt und die Tabellen für Befehlswörter und Adressen in den freien Bereich verlegt, können noch eine Menge Befehle hinzugefügt werden (zum Beispiel LINE, CIRCLE und so weiter). Die Befehle HSET, CSET, BLOT und COFF sind so programmiert, daß sie sich ohne weiteres auch in Maschinensprache ansprechen lassen. VIC:</p>
+
+        <p>a) Grafik</p>
+
+        <p>GLD"'Name',g: ($9A6C) lädt Grafik vom Gerät G nach $AO00.</p>
+
+        <p>GSV" Name",g: ($9A77) speichert Grafik auf Gerät G.</p>
+
+        <p>GCLR: ($9164) löscht Grafik-RAM. GCOL (Hintergrund, ($917D) setzt Farbe für Grafik. Punktfarbe):</p>
+
+        <p>HSET xy: ($91C2) setzt Grafikpunkte. BLOT xy: ($923D) löscht Grafikpunkte. CSET x,y,c: ($927A) setzt Farbgrafikpunkt. c=Farbe O bis 3 O=kein Punkt 1=Video-RAM High-Nibble 2=Video-RAM Low-Nibble 3=Farb-RAM</p>
+
+        <p>COFF xy: ($9333) löscht Farbgrafikpunkt. INV: ($9CA4,) invertiert Grafik ab $AO00.</p>
+
+        <p>b) Blockgrafik: FIL (Bildschirm-Code, x1, y1, x2, y2, Farbe): CUR (xy): BGR (c1, c2, c3): (9BAF) füllt Rechteck mit Zeichen des Bildschirm-Codes und der Farbe c, wobei x1 und y1.die Koordinaten der linken oberen Ecke und x2 und y2 die der rechten unteren Ecke sind. ($9BD8) setzt Cursor an Position x, Y.</p>
+
+        <p>($924A) Farben der Backround-Register 1 bis 3. c) Sprites:</p>
+
+        <p>NMOVE (Snr): (8BAF) bewegt Sprites der Nummern »Snr« nach Norden Beispiel: NMOVE (0, 4, 7) bewegt Sprites O, 4, 7 in Richtung Nord.</p>
+
+        <p>; Ebenso: SMOVE (Snr): (8BE3) Richtung: Süd. EMOVE (Snr): ($8C14) Richtung: Ost. WMOVE (Snr): ($8C69) Richtung: West. SSET ($8CB3) setzt ein Sprite an die (Spritenummer, x, y): Position x y.</p>
+
+        <p>SELS (Snr): ($8DO2) schaltet Sprite ein. Beispiel: SELS (0, 6) schaltet Sprites O und 6 ein. OSEL (Snr) schaltet Sprites aus. MULT (Snr): ($8D63) selektiert Multicolor-Sprites.</p>
+
+        <p>OMULT (Snr): (8D8A) selektiert Normalsprites. SCOL (Snr) c: MCOL c1, c2: SYSP (Snr): OYSP (Snr): SXSP (Snr): SPRIOR (Snr): ($8DB6) setzt Farbe für ein Sprite.</p>
+
+        <p>($8DDA) setzt Multicolor-Farben für alle Sprites.</p>
+
+        <p>($8DEA) vergrößert Sprite in y-Richtung.</p>
+
+        <p>($8E14) Gegenbefehl zu SYSP. ($8E40) vergrößert Sprite in x-Richtung.</p>
+
+        <p>Gegenbefehl: OXSP ($8E64) ($8E90) setzt Sprite hinter den Hintergrund.</p>
+
+        <p>Gegenbefehl: OPRIOR (Snr) ($8EB4) SSPRITE (Snri, Snr2) Z:($8953) BSPRITE (Snr) Z: Bei Kollision mindestens zweier Sprites wird das laufende Programm unterbrochen und ab Zeile »Z« fortgesetzt. Alle Variablen bleiben dabei erhalten. Es wird also ein Sprung zur Zeile »Z« ausgelöst (vergleiche »GOTO«). ($89B5)</p>
+
+        <p>Dieser Befehl ähnelt dem Befehl SSPRITE. Das laufende Programm wird unterbrochen, wenn das Sprite der Nummer »Snr« mit dem Hintergrund zusammenstößt. Es wird dann mit Zeile »Z« fortgefahren.</p>
+
+        <h3>d) Sonstiges: FUCOL (©):</h3>
+
+        <p>FDCOL (c): BUCOL (©): BDCOL (C): UMODE (M, Znr): DMODE (M, Znr): UGS: UKS: DGS: DKS: ($8304) setzt die Farbe »C« als Rahmenfarbe des oberen Bildschirm-Fensters.</p>
+
+        <p>($8316) setzt Farbe »C« als Rahmenfarbe des unteren Bildschirm-Fensters.</p>
+
+        <p>($8328) setzt Farbe »C« als Farbe des Bildschirm-Interrupts des oberen Bildschirm-Fensters. ($833A) Farbe des Hintergrundes des unteren Bildschirm-Fensters.</p>
+
+        <p>($8803) setzt Modus im oberen Bildschirm-Fenster. Dabei bedeutet M:</p>
+
+        <p>O: Normaler Textmodus</p>
+
+        <p>1: Normale Zeichendarstellung im</p>
+
+        <p>Mehrfarbenmodus</p>
+
+        <p>: Erweiterter Farbmodus</p>
+
+        <p>: Hochauflösende Grafik mit</p>
+
+        <p>320x200 Punkten</p>
+
+        <p>: Hochauflösende Farbgrafik mit 160x200 Punkten</p>
+
+        <p>Znr gibt die Nummer des aktuellen Zeichensatzes an. O: Zeichensatz 1</p>
+
+        <p>1: Zeichensatz 2</p>
+
+        <p>($88AE) wie UMODE, jedoch für den unteren Bildschirmteil. ($9A90) setzt Großschrift im oberen Bildschirmteil.</p>
+
+        <p>($9AA2) setzt Kleinschrift im oberen Bildschirmteil.</p>
+
+        <p>($9A99) setzt Großschrift im unteren Bildschirmteil.</p>
+
+        <p>($9AAB) setzt Kleinschrift im unteren Bildschirmteil.</p>
+
+        <h3>SID:</h3>
+
+        <h3>NOISE (st, par, w, an, ab, ha, ak, |):</h3>
+
+        <p>PULS (st, pl): FFILT (ft): OFILT (st): RESON (r): VIB (st, vb): SFILT (st): SFK (fa): FRQ (st, par): ($8F65)</p>
+
+        <p>Tonerzeugung:</p>
+
+        <p>st: Stimme 1 bis 3; par: Frequenzparameter (siehe Tabelle im Commodore-Handbuch; w: Wellenform; an: Anschlag O bis 15; ab: Abschwellen O bis 15; ha: Halten O bis 15; ak: Ausklingen O bis 15; l: Lautstärke O bis 15; Beispiel: NOISE (1, 7493, 33, O, 0, 15, 0, 15) erzeugt Dauerton von 440Hz auf Stimme 1 ($9025) setzt Tastenverhältnis für Stimme 1 bis 3 für Wellenform puls.</p>
+
+        <p>($906D) setzt Filtereckfrequenz. ($9092) Gegenbefehl zu SFILT</p>
+
+        <address class="author">(st)</address>
+
+        <p>($90B6) setzt Resonanz O bis 15.</p>
+
+        <p>($90DF) verändert die Frequenz der Stimme st um vb-Einheiten bei jedem zweiten Timer-IRQ. Der Ton beginnt zu schwanken (Geräusche).</p>
+
+        <p>($9145) leitet Stimme über Filter. ($9AOA) selektiert Filterart O bis 15.</p>
+
+        <p>Bit O: Tiefpaß</p>
+
+        <p>Bit 1: Bandpaß Bit 2: Hochpaß Bit 3: Stimme 3 aus ($9A2E) setzt Frequenz für eine Stimme.</p>
+
+        <h3>CIA 2 (Uhr): TIME (hh, mm, ss):</h3>
+
+        <p>TODON: TODBRK: RTIME: ALARM (hh, mm, ss) Z: ($8A19) setzt Echtzeituhr. Für Stunden, Minuten und Sekunden sind keine Variable zugelassen. ($8B07) blendet die Zeit links oben in der aktuellen Cursorfarbe ein.</p>
+
+        <p>Gegenbefehl: OFFTOD: ($8B13) ($8B21) hält Uhr an.</p>
+
+        <p class="source">- Gegenbefehl:</p>
+
+
+        <p></p>
+
+        <p>TODCONT: ($8B2B) läßt Uhr wieder weiter laufen. ($8B35) druckt Uhrzeit an Cursorposition aus. ($8ABC) stellt die Alarmzeit. Für hh, mm und ss sind Variable unzulässig! Bei Erreichen der Alarmzeit wird das laufende Programm ab Zeile Z fortgesetzt.</p>
+
+        <h3>Floppy 1541: ?F@:</h3>
+
+        <p>($8EDA) druckt Floppy-Fehlerkanal an der Cursorposition aus.</p>
+
+        <h3>Zeichensätze: CDEF (BC, D1, D2....D8):</h3>
+
+        <p>CHANGE: ($834C) definiert Zeichen mit Bildschirm-Code BC im Zeichensatz 2 ab $FOO0. ($8383) vertauscht beide Zeichensätze miteinander. Dabei geht eine eventuell vorhandene Grafik ab $A000 verloren! CHAR: LZS"Name", g: {$9ABC) erneuert Zeichensatz 2 ab $FOOO.</p>
+
+        <p>{$9BCD}) lädt Zeichensatz ab $FOOO.</p>
+
+        <p>{$9BF6) speichert Zeichensatz ab $FO00. Da dieser zuerst nach $AO000 kopiert werden muß, geht eine eventuell vorhandene Grafik verloren. Sonstige: HLP: RST:</p>
+
+        <p>CBASIC: RENEW: aut.</p>
+
+        <p>($FCE2) System-Reset. {($8EF9) Rückkehr ins Commodore-Basic. ($8F48) Gegenbefehl zu NEW.</p>
+
+        <p>schirms.</p>
+
+        <p>($8F04) setzt Normalmodi und Farben.</p>
+
+        <p>{$82E7) Bildschirmeinteilung (Rasterzeile O bis 249). Normaleinstellung ist O. {($9AB4) setzt sämtliche IRQ-Arten zurück. Die Befehle ALARM, SSPRITE, BSPRITE wei den rückgängig gemacht. {U. Schwickerath/al</p>
+    </article>
+</body>
+
+</html>

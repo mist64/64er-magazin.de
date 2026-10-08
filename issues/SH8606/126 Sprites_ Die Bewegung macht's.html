@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Sprites: Die Bewegung macht's</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Carsten Führmann, og">
+    <meta name="64er.issue" content="Sonderheft 6/86">
+    <meta name="64er.pages" content="126-133">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX14">
+</head>
+
+<body>
+    <article>
+        <h1>Sprites: Die Bewegung macht's</h1>
+        <p class="intro">Um anspruchsvolle Actionspiele zu schreiben, sind bewegte Sprites unerläßlich. Das »Sprite Construction Set« ist beim Erstellen von Sprites mit Bewegungsabläufen eine wertvolle Hilfe.</p>
+
+        <p>K: daß man heutzutage Sprites nicht mehr »von Hand« programmiert. Doch die wenigsten Sprite-Editoren besitzen die Möglichkeit, Bewegungsabläufe auszutesten und daran »herumzufeilen«. Mit dem »Sprite Construction Set«, im folgenden kurz »S.C.S.« genannt, können Sie mühelos die gesamte Sprite-Animation Ihrer Spiele entwerfen.</p>
+
+        <p>Kein Papierkram, keine Entwurfsblätter. Konzentrieren Sie sich ganz auf die künstlerische Gestaltung.</p>
+
+        <p>S.C.S. besteht aus 3 Teilen:</p>
+
+        <ul>
+            <li>
+                <p>dem Lader »S.C0.S. BOOT (Listing 1)</p>
+            </li>
+            <li>
+                <p>dem Basic-Hauptprogramm »S.C.S.« (Listing 2)</p>
+            </li>
+            <li>
+                <p>und dem Assemblerpaket »S.0.S.OBJ.« (Listing 3)</p>
+            </li>
+        </ul>
+
+
+        <p>Der Lader wird mit »,8« geladen und mit RUN gestartet. Er lädt das Maschinenprogramm und verschiebt den Basic-Start um eine Seite = 256 Byte nach oben, um 4 weiteren Sprites Platz zumachen. Die Daten für die 8 Sprites liegen jetztin den Blöcken 11, 13, 14, 15, 32, 33, 34 und 35. Nach dem Ladevorgang erscheint auf dem Bildschirm unter anderem ein grüner Rahmen mit Zahlenreihen links und oben. Er umrahmt das Feld für die 8fach-Vergrößerung des aktuellen Sprite. Innerhalb des Rahmens blinkt ein kleiner Cursor in Form eines »+«. Die Zahlenreihen hängen mit dem Aufbau des Sprite zusammen und dienen zur Orientierung. Auf der rechten Bildschirmseite erscheint eine Parameteranzeige. Man verstellt die Parameter, indem man die Zahlentaste drückt, die links vor dem jeweiligen Display steht. Alle Tasten haben Dauerfunktion.</p>
+
+        <p>Taste Funktion . schaltet von Normal- in Multicolor(MC-)Modus um und umgekehrt.</p>
+
+        <p>schaltet einen Sprite weiter (von O bis 7, dann wieder nach O) schaltet Spritefarbe 1 um eins weiter (von O bis 15, dann wieder nach 0) wie 5, aber Farbe 2 wie 6, aber Farbe 3 schaltet Hintergrundfarbe jeweils um eins weiter wie 8, aber Rahmenfarbe wie 8, aber Schriftfarbe vergrößert Sprite in X-Richtung, beziehungsweise schaltet zurück.</p>
+
+        <p>Y Wie X, jedoch Y-Richtung.</p>
+
+        <p>Farben 1 und 3 sind die beiden Multicolor-Farben. Sie tauchen nur im MC-Modus auf und sind für alle 8 Sprites gleich (Hardwarebedingung). Farbe 2 kommt sowohl im Multicolor- als auch im Normal-Modus vor und ist für jeden der 8 Sprites individuell wählbar. Im Normal-Modus stellt sie die ausschließliche Zeichenfarbe dar.</p>
+
+        <p>Der Cursor wird mit Joystick Port 2 innerhalb des Rahmens gesteuert. Mit &lt;-> schaltet man auf Punkt löschen, mit &lt;+> zurück auf Punkt setzen. Gelöscht oder gezeichnet wird aber nur, wenn der Knopf am Joystick gedrückt ist. Das Sprite wird natürlich nicht nur als 8fach-Vergrößerung, sondern auch im Original in der rechten oberen Bildschirmecke gezeigt.</p>
+
+        <p>Im Multicolor-Modus hat der Cursor eine andere Gestalt, da man hier nur die halbe Auflösung in X-Richtung, dafür aber 3 Zeichenfarben hat. Er ist doppelt so breit und zeigt an, mit welcher Farbe er gerade malt (1,2,3, oder &lt;-> fürLöschen). In den jeweiligen Modus schaltet man mit den Tasten &lt;1>, &lt;2>, &lt;3> und &lt;->.</p>
+
+        <p>Am besten, man probiert erstmal ein wenig herum, um das Zeichnen mit dem Joystick in den Griff zu bekommen.</p>
+
+        <p>Außerdem stehen eine ganze Reihe Befehle zur Verfügung, die teils einfache, teils sehr komplexe Operationen bewirken. Um einen Befehl eingeben zu können, muß man erst die CTRL-Taste drücken. Jetzt wird in der obersten Bildschirmzeile nach dem Befehl gefragt und ein Eingabecursor in Form eines Pfeils nach links erscheint. Nun kann man Befehlsworte und eventuell benötigte Parameter eingeben.</p>
+
+        <h2>Einfache Befehle für...</h2>
+
+        <p>Die Eingabe wird mit &lt;RETURN&gt; abgeschlossen. Ungültige Eingaben werden ignoriert. Hier eine Auflistung der Befehle und ihrer Wirkung:</p>
+
+        <p>Befehl Wirkung</p>
+
+        <p>CLEAR löscht den aktuellen Sprite</p>
+
+        <p>SWAP _ stelltiihn auf den Kopf</p>
+
+        <p>FLIP spiegelt ihn</p>
+
+        <p>ROT dreht ihn um 90 Grad im Uhrzeigersinn; die rechten 3 Reihen gehen dabei verloren, weil die Sprites ein Format von 24 x 21 Punkten haben. Dreht man einen Multicolor-Sprite, verfälscht sich zwangsläufig dessen Farbinformation, weil er in X- und -Richtung verschiedene Auflösung hat.</p>
+
+        <p>COPY X (X=Parameter) Sprite Nummer X wird mit all seinen Informationen in den aktuellen Sprite kopiert; dient zur Sicherung.</p>
+
+        <p>Sprite Nummer X wird mit dem aktuellen Sprite exklusiv- oder verknüpft. Das Ergebnis wird im aktuellen Sprite abgelegt.</p>
+
+        <p>wie XOR X, jedoch Oder-Verknüpfung wie XOR X, jedoch Und-Verknüpfung</p>
+
+        <p>Jetzt kann man den Sprite mit dem Joystick im Definitionsfeld verschieben. Drückt man beim Verschieben den Knopf, dann gehen die aus dem Rahmen gehobenen Reihen verloren, sonst erscheinen sie auf der anderen Seite wieder. Diese Funktion ist im Zusammenhang mit OR X und COPY X von entscheidender Wichtigkeit. Zwei Sprites, die später ein Objekt bilden sollen, kann man mit COPY X in andere Bereiche sichern und sie anschließend so verschieben, daß man, wenn man sie mit OR X verknüpft, ausprobieren kann, ob die Nähte passen. Will man einen Sprite um 90 Grad drehen, ohne daß die rechten 3 Reihen verlorengehen, kann man ihn vorher entsprechend verschieben. In den Zeichenmodus zurück gelangt man durch &lt;X&gt;. ist ein Befehl, um Bewegungsabläufe mit nur einem Sprite zu testen. Zuerst wird nach der Sequenz gefragt. Jetztkann man Ziffern von O bis 7 in beliebiger Reihenfolge eingeben. Jede der Ziffern entspricht einem der 8 Sprites. Bei der Eingabe reagiert S.C.S. interaktiv. Rechts oben und im Rahmen wird immer das der Ziffer entsprechende Sprite angezeigt. Schließt man die Eingabe der Sequenz mit &lt;RETURN&gt; ab, wird nach der Verzögerung gefragt. Man muß einen Wert von O bis 255 eingeben. Bei 0 läuft die Sequenz mit 14 bis 15 Bildern/s, bei 255 erscheint 1 Bild/s. Beim Sequenzdurchlauf werden die Sprites sowohl als 8fach-Vergrößerung als auch im Original dargestellt. Bei geeigneter Benutzung kann ein eleganter Film-Effekt entstehen. Auch hier entweicht man mit der &lt;X&gt;. XOR X ORX ANDX ROL SEQ PUZZLE Hier kann man Bewegungsabläufe mit bis zu 8 verschiedenen Sprites koordinieren. Nun wird der Bildschirm gelöscht und Sprite Nummer O erscheint. Man kann ihn mit dem Joystick plazieren. Auf Knopfdruck werden die Koordinaten akzeptiert und das nächste Sprite kann plaziert werden. Nach Sprite Nummer 7 kommt wieder Sprite Nummer O an die Reihe. Für den Bewegungsablauf werden später nur die Sprites verwendet, die momentan plaziert sind. Durch &lt;X&gt; verläßt man diese Funktion und kann nun die Sequenzen eingeben. Alle Sequenzen müssen genauso lang wie die von Sprite O sein, um angenommen zu werden. Auch hier reagiert S.C.S. interaktiv. Es werden alle Sprites genau in dem Sequenz-Stadium angezeigt, in dem das Sprite, für das gerade die Sequenz eingegeben wird, steht. Wenn sie den letzten plazierten Sprite erreicht haben, wird: wieder bei Sprite Nummer O angefangen. Man kann so lange herumprobieren, bis alles stimmt. Auf erneuten Druck von &lt;X&gt; verläßt man diese Funktion, um die Bewegungsvorschriften einzugeben. Jetzt wird nach DELTA X und DELTA Y gefragt. Der Wertebereich liegt jeweils von -127 bis +128. Negativ bedeutet Bewegung nach links beziehungsweise oben, positiv nach rechts beziehungsweise unten um X- beziehungsweise Y-Schritte. O bedeutet keine Bewegung in der jeweiligen Richtung. DELTA X und DELTA Y gelten für die Bewegung aller plazierten Sprites. Nun fragt S.C.S. nach der Verzögerung. O ist am schnellsten, 255 am langsamsten. Hier muß man ausprobieren und Erfahrungswerte einsetzen. Zuletzt wirdnach RATE gefragt. Gemeint ist, nach wieviel Bewegungsschritten eine Sequenz-Änderung für alle Sprites stattfindet. Dann wird der Bewegungsablauf gestartet. Wenn ein Sprite die zulässigen Koordinaten verläßt, kehren alle Sprites wieder an ihre Ursprungskoordinaten zurück. Durch &lt;X&gt; stoppt man den Bewegungsablauf und gelangt wieder in den Zeichenmodus. Limit für den Zeilenabstand ist 255. Hier wird vor den Filenamen automatisch ein »L.« gestellt.</p>
+
+        <p>Speichert ein File ab, das alle Informationen enthält, die für S.C.S. wichtig sind: die Daten aller Sprites, den gesamten VIC, die Nummer des aktuellen Sprites, Schriftfarbe, alle Sequenzen von PUZZLE und SEQ und die Koordinaten von PUZZLE. Will man die Arbeit mit S.C.S. unterbrechen, um später weiterzumachen, sollte man den aktuellen Stand durch SAVE ALL speichern. Vor den Filenamen wird automatisch ein »A.« gestellt.</p>
+
+        <p>LOAD lädt den gespeicherten Stand wieder. Man braucht ALL das »A.« vor dem Filenamen nicht einzugeben. Natürlich kann man die Bewegungsabläufe von S.C.S. nicht in sein eigenes Programm übernehmen. Sie dienen nur zur Planung, da die Programmierung der Bewegungsabläufe fortgeschrittenen Programmierern vorbehalten ist, die sich mit der Architektur des VIC auskennen. SAVE ALL</p>
+
+        <h2>...komplexe Operationen</h2>
+
+        <p>Und jetzt zu den Diskettenoperationen: Bei allen Diskettenoperationen wird automatisch der Fehlerkanal gelesen und die Directory angezeigt.</p>
+
+        <p>CAT zeigt Directory an.</p>
+
+        <p>DISK sendet Disk-Befehle, zum Beispiel Formatieren: »N:</p>
+
+        <p>Name, ID« und ähnliches.</p>
+
+        <p>SAVE das Sprite wird mit all seinen dazugehörigen Daten</p>
+
+        <p>gespeichert. Vor den Filenamen wird automatisch ein »S.« gestellt.</p>
+
+        <p>lädt ein mit SAVE gespeichertes Sprite. Man braucht das »S.« vor dem Filenamen nicht extraeingeben, da es automatisch vor den Filenamen gestellt wird. sichert nur die Blockdaten des aktuellen Sprite als Maschinenprogramm ab. Ein so gespeichertes File kann man nur mit »LOAD " Name ",8,1« im Direktmodus oder von Basic aus wieder laden. Bei letzterem muß berücksichtigt werden, daß automatisch ein Start des Basic-Programms ausgeführt wird. Vor den Filenamen wird automatisch ein »P.« gestellt. Dieser Befehl ist interessant für Assembler-Anwender.</p>
+
+        <p>Hier wird direkt auf Diskette ein Basic-DATA-Lader des aktuellen Sprite generiert. Mit der Frage »BLOCK« ist gemeint, in welchem Sprite-Block das Programm die Sprite-Daten später POKEn soll. Anschließend wird nach Anfangszeilennummer und Schrittweite gefragt, vor allem, damit man das Programm später bequem mit anderen MERGEn kann. Bemerkenswerte Nebeneffekte: Wählt man als Schrittweite O, ist das Programm zwar lauffähig, aber vor weiteren sinnvollen Eingriffen geschützt. Einen absoluten Schutz vor Basic-Laien erreicht man, indem man als Anfangszeilennummer eine Zahl zwischen 64000 und 65535 bei entsprechend geringer Schrittweite wählt. Man kann sogar einen Überlauf erreichen, so daß die Numerierung plötzlich wieder bei O anfängt. LOAD SAVE PRG SAVE LDR Sinnvolle Befehle, die Sie aus »S.C.S.OBJ« für eigene Programme verwenden können. AN ist die Startadresse 49152. SYS (AN+9) X SYS (AN+12)X SYS (AN+21) X SYS (AN+24)X,Y SYS (AN+27)XY SYS (AN+30)X,Y SYS (AN+33)X,Y SYS (AN+36)XY SYS (AN+57) SYS (AN+60)X stellt Spriteblock X auf den Kopf. spiegelt ihn. Handelt es sich um ein MC-Sprite, muß man SYS (AN+15) X anfügen.</p>
+
+        <p>dreht Spriteblock X um 90 Grad nach rechts. Nur für Normal-Sprites empfehlenswert. Die rechten drei Reihen gehen verloren.</p>
+
+        <p>rollt Block X nach links; ist Y=O, gehen die aus dem Block geschobenen Daten verloren, ist Y>O, erscheinen sie rechts wieder. analog nach rechts analog nach oben analog nach unten</p>
+
+        <p>XORt Inhalt der Speicherzelle X mit dem 1-Byte-Wert Y " SYS (AN+39) druckt Text mit Farbe Z an die KoordiX\Y,Z, Text" naten X und Y</p>
+
+        <p>SYS (AN+51)N,X,Y setzt Sprite Nummer N (0-7) an die Koordinaten X(0-360) und Y(0O-255); Abdeckung des ganzen Bildschirmbereichs!</p>
+
+        <p>zeigt Directory an schaltet Schriftfarbe des ganzen Bildschirms auf X</p>
+
+        <p>Hier muß man peinlichst darauf achten, keine falschen Parameter zu wählen, da das zum Programmabsturz führen kann.</p>
+
+        <p>Manche dieser Befehle können vor allem Anfängern helfen, die entworfenen Sprites im eigenen Programm erfolgreich einzusetzen. Außerdem sind die Befehle sehr schnell in der Ausführung.</p>
+
+        <h2>Eine kleine Demonstration</h2>
+
+        <p>Geben Sie das Programm »A.DEM@« (Listing 4) mitdem MSE ein, und laden Sie es von »S.C.S.« aus mit »LOAD ALL«.</p>
+
+        <p>Die acht Sprites, die jetzt geladen werden, sind Einzelteile eines großen Hubschraubers (Bild 1). Da alle Sequenzen mitgeladen werden, kann man den Hubschrauber durch »PUZZLE« über den Bildschirm fliegen lassen.</p>
+
+        <p>Wenn Sie »PUZZLE« eingegeben haben, drücken Sie solange den Knopf, bis alle acht Sprites auf dem Bildschirm erschienen sind. Mit: &lt;X&gt; kommt man in die Sequenz-Eingabe. Hier existieren die Sequenzen schon, das heißt, Sie können nochmals &lt;X&gt; drücken.</p>
+
+        <p>Empfohlene Werte für DELTAX: 1 DELTAY: 0 VERZOEG: 10 RATE: 1 Jetzt fliegt der Hubschrauber so lange über den Bildschirm, bis Sie wieder &lt;X&gt; drücken.</p>
+
+        <p>Solche und ähnliche Bewegungsabläufe kann man mit dem S.C.S. spielend realisieren.</p>
+
+        <address class="author">(Carsten Führmann/og)</address>
+    </article>
+</body>
+
+</html>

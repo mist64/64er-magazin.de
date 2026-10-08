@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>80 Zeichen pro Zeile auf dem C 64 mit ROM80</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="H. C. Edelmann, ks">
+    <meta name="64er.issue" content="Sonderheft 6/86">
+    <meta name="64er.pages" content="122-123">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX12">
+</head>
+
+<body>
+    <article>
+        <h1>80 Zeichen pro Zeile auf dem C 64 mit ROM80</h1>
+        <p class="intro">Mit dem folgenden Programm bekommt Ihr C 64 einen 80-Zeichen-Bildschirm, wie er auf größeren Personalcomputern selbstverständlich ist.</p>
+
+        <p>enn man sich ab und zu auch mit anderen Computern als dem C64 beschäftigt (zum Beispiel dem C128) und sich mit deren höherer Auflösung anfreundet, so kommen einem die 40 Zeichen pro Zeile des C64 oft recht mager vor. Für viele Anwendungen wäre es praktischer, wenn man wenigstens 80 Zeichen in einer Zeile darstellen könnte.</p>
+
+        <p>Textverarbeitungsprogramme auf dem C 64 behelfen sich oft mit der Möglichkeit des horizontalen Scrolling oder einer Doppelzeile auf dem Bildschirm als Notlösung. In beiden Fällen wird zum Beispiel ein Text dadurch jedoch recht unübersichtlich.</p>
+
+        <p>Um dem abzuhelfen, wurde ROM80 entwickelt. Dieses Programm verändert das Betriebssystem des C64 so, daß alle Ein- und Ausgaben nun im HiRes-Modus auf 80 Zeichen pro Zeile erfolgen. Alle Zeichen haben dadurch zwar nurnoch die halbe Breite; sie sind jedoch dennoch gut lesbar.</p>
+
+        <p>ROM80 verträgt sich mit den meisten Betriebssystemerweiterungen, wie Speeddos oder 64'er Dos, da die Bereiche der Kassetten- oder RS 232-Routinen, die meistens von diesen Erweiterungen verwendet werden, nicht verändert werden.</p>
+
+        <p>Nachdem man das Programm in Listing 1 mit dem MSE eingetippt und gespeichert hat, startet man es mit »RUN«. Es ist nun möglich, zwischen der EPROM- und der RAM-Version zu wählen. Wird dabei die Frage »EPROM-VERSION« mit »J« beantwortet, so wird das Betriebssystem entsprechend verändert und mit der Startadresse $2000 auf der Diskette gespeichert. Es wird dadurch möglich, sich später eventuell ein EPROM zu »brennen«, um dieses in den Computer fest einzubauen.</p>
+
+        <p>Das EPROM hat den Vorteil, daß der HiRes-Speicher nicht, wie bei der RAM-Version, mitten im Basic-Speicher liegt, wodurch 17 KByte verlorengehen. Er wird vielmehr unter dem Betriebssystem »versteckt«, was die Verträglichkeit von ROM80 mit anderen Programmen beträchtlich erhöht.</p>
+
+        <p>Wird die Frage mit »N« beantwortet, so wird das 80-Zeichen-Betriebssystem sofort generiert und kann ausprobiert werden. Es ergeben sich dadurch folgende Unterschiede zum normalen Betriebssystem:</p>
+
+        <ul>
+            <li>
+                <p>Da im HiRes-Modus des Bildschirms gearbeitet wird, können nicht alle Zeichen unterschiedliche Farben erhalten. Von einer Farbänderung werden immer alle Zeichen auf dem Bildschirm betroffen.</p>
+            </li>
+            <li>
+                <p>Mit ROM80 ist es nun möglich, den Grafik- und den Groß-/Kleinschrift-Zeichensatz des C 64 gleichzeitig zu verwenden, da sich die schon auf dem Bildschirm stehenden Zeichen bei einer Umschaltung mit »SHIFT/Commodore« oder »CHR$(14)«, beziehungsweise »CHR$(142)«, nicht ändern.</p>
+            </li>
+            <li>
+                <p>Der Bildschirmspeicher ist nun doppelt so groß wie vor- ' her und belegt den Bereich von $C800 bis $CFCF.</p>
+            </li>
+        </ul>
+
+
+        <p>ROM80, das zunächst nur durch einen Lader ins RAM oder auf die Diskette geschrieben wird, enthält eine erweiterte Reset-Routine, die den neuen Zeichensatz generiert, indem sie von den alten Zeichen jeweils Bit O, 2, 4 und 6 verwendet. Dieser neue Zeichensatz belegt im RAM den Bereich von $C400 bis $C7FF. Dabei enthalten die höherwertigen Halbbyte den Grafik- und die niederwertigen Halbbyte den Groß-/ Kleinschrift-Zeichensatz. Zusätzlich werden zwei Routinen nach $CFDO geschrieben. Die eine liest ein Byte aus dem Grafikspeicher, die andere scrollt diesen um eine Zeile nach oben. Das ist notwendig, da bei der EPROM-Version (beim Lesen) nicht direkt aus dem ROM auf das darunterliegende RAM zugegriffen werden kann (bei einem RAM-Zugriff müßte nämlich das ROM weggeschaltet werden).</p>
+
+        <p>Wenn ein Zeichen auf den Bildschirm geschrieben wird, wird es sowohl im Grafik-Speicher als auch in dem neuen Bildschirmspeicher ab $C800 abgelegt. Das erlaubt ein schnelleres Auslesen von Zeichen an bestimmten Positionen, und außerdem kann der Grafikspeicher für Grafiken verwendet werden, ohne daß der Bildschirminhalt verlorengeht. Tabelle 1 zeigt noch einmal die komplette Speicherbelegung unter ROM80.</p>
+
+        <address class="author">(H. C. Edelmann/ks)</address>
+    </article>
+</body>
+
+</html>

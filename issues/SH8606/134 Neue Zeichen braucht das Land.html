@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Neue Zeichen braucht das Land</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M.Rose, og">
+    <meta name="64er.issue" content="Sonderheft 6/86">
+    <meta name="64er.pages" content="134-140">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX15">
+</head>
+
+<body>
+    <article>
+        <h1>Neue Zeichen braucht das Land</h1>
+        <p class="intro">Dieses Programm ist mehr als nur ein einfacher Zeichensatzgenerator. Es unterstützt das Erstellen von Spielplänen und Bildern. Zur Bearbeitung des Zeichensatzes stehen Ihnen über 100 Befehle zur Verfügung.</p>
+
+        <p>Das Programm »BOOT CHARSETM.« (Listing 1) wird mit dem MSE eingegeben und erzeugt dann beim Starten ein Autostart-File auf Diskette. Dieses wird mit LOAD "CHARSETMASTER" ,8,1 geladen und startet automatisch. Dabei gehen eventuell vorhandene Basic-Programme oder Spiele, die im Bereich von $0400 bis $DOO0 liegen, nicht verloren, und auch die Programmzeiger bleiben erhalten! Wegen dieser Eigenschaft kann man im Speicher stehende Spielprogramme mit diesem Programm durch Zeichensatzänderungen und Zeichenfeldänderungen manipulieren und hinterher ganz normal speichern. Das aktivierte Programm belegt den Bereich von $EO00 bis $FC20 und der jeweils zu bearbeitende Zeichensatz liegt im Bereich $DOOO bis $D800. Das vom Programm benutzte Video-RAM liegt unter dem Farb-RAM im RAM-Bereich von $D800 bis $DCO0O. Weiterhin benutzt das Programm beim Arbeiten Speicherstellen in den Bereichen $0000 bis $0400, $DCOO bis $EO00 und $FEOO bis $FFFF! Das Programm befindet sich somit unter dem Kernel-ROM in dem dort befindlichen RAM. Deswegen ist der erneute Aufruf im Basic-Modus etwas schwierig. Im Bereich ab dezimal 760 wird deshalb von der Autostart-Routine eine 8 Byte lange Initialisierungs-Routine hinterlassen, so daß das Programm mit »SYS 760« erneut gestartet werden kann. Fehlt aus irgendwelchen Gründen diese Routine (zum Beispiel durch Überschreiben, oder weil man nur ein absolutes Programmfile vom »CHARSETMASTER« ohne Autostart benutzt), so kann man es auch mit einer kurzen Zeile wieder aufrufen. Sie müssen die folgenden Tasten drücken:</p>
+
+        <p>[HOMEISYS1031[CBM U}FAFA{[SHIFT L}{RVS ON}X[CBM G} {RETURN}</p>
+
+        <p>Diese etwas merkwürdige Initialisierung schreibt die 8 Byte lange, oben erwähnte Routine in den Bildschirmbereich und startet sie. Die eigentliche Startadresse des Programmes ist $E598. Nach dem Start sieht man links oben den Zeichensatz, rechts oben ist ein Fenster, welches später jeweils einen Ausschnitt der Zeichenfelder darstellt. In dem grau umrandeten Kasten unten befindet sich links das Zeicheneditierfeld, rechts unten das momentan bearbeitete Zeichen (zu Anfang gelöscht, deshalb nicht sichtbar) undin der Mitte eine weiße Zahlenkolonne. Außerdem befindet sich noch neben dem Zeichen ein Feld, in dem die verschiedenen Modi des Programmes abgelesen werden können.</p>
+
+        <h2>Befehlsübersicht</h2>
+
+        <p>Um bei den folgenden Befehlen nicht die Übersicht zu verlieren, können sie sich an Bild 1 und 2 orientieren, in denen alle wichtigen Elemente des Programmes und deren im folgenden benutzten Bezeichnungen enthalten sind. Die hervorgehobenen Ausdrücke geben die Tasten an, die gedrückt werden müssen. Allgemeine Befehle:</p>
+
+        <p>Q dient zum Verlassen des Programmes mit nachfolgender Sicherheitsabfrage für den Fall des versehentlichen Betätigens dieser Taste.</p>
+
+        <p>startet das Programm (nach Sicherheitsabfrage) noch einmal, womit gleichzeitig der Ursprungszustand aller Einstellungen wiederhergestellt wird.</p>
+
+        <p>SHIFT HOME löscht den im Puffer vorhandenen Zeichensatz (Sicherheitsabfrage vorhanden). SHIFT Q SHIFT F holt den Original Commodore Groß/Grafik-Zeichensatz in den Zeichensatzpuffer. SHIFT ; holt den Original Commodore Groß/Klein-Zeichensatz in den Zeichensatzpuffer.</p>
+
+        <p>SPACE nachfolgendes Betätigen der RUN/STOP-Taste führt zurück in den Normalmodus; das Betätigen einer Funktionstaste schaltet den LN-Modus (Lernmodus) ein (sichtbar im Modusfeld).</p>
+
+        <p>Bis zu 63 nachfolgende Tastendrücke (auch ungültige!) werden gespeichert und der entsprechenden Funktionstaste zugeordnet. Diesen Vorgang kann man mit der RUN/STOP-Taste beenden. Beim Betätigen dieser Funktionstasten zu späterer Zeit werden die gespeicherten Tasten ausgeführt. Man kann im LN-Modus auch schon definierte Funktionstasten aufrufen, eine enorme Erleichterung beim Umgang mit diesem Programm. Betätigt man im LN-Modus die Funktionstaste, der die Definition gerade zugeordnet wird, so entsteht eine Endlosschleife, die man mit der RUN/STOP-Taste jederzeit verlassen kann.</p>
+
+        <p>L lädt ein durch Namenseingabe bestimmtes Programmfile von Diskette. Tippt man nach der Namenseingabe ein »N«, so wird an die Adresse geladen, die auf Diskette gespeichert ist (absolut); tippt man ein »Y«, so wird an eine vom Benutzer zu bestimmende Adresse geladen.</p>
+
+        <p>ES} erwartet eine Namenseingabe und nachfolgende Eingabe von Start- und Endadresse. Danach wird der so bestimmte Bereich unter dem Namen als Programmfile auf Diskette gespeichert. Voraussetzung ist, daß ein File gleichen Namens auf der Diskette nicht existiert, sonst wird der Speichervorgang abgebrochen und der Fehler ist am Blinken der LED des Laufwerkes zu erkennen. Gespeichert werden grundsätzlich nur die RAM-Bereiche (auch unter dem ROM). T Verschieben eines durch Start-, End- und Zieladresse angegebenen Speicherbereiches.</p>
+
+        <p>P Auffüllen eines durch Start- und Endadresse angegebenen Speicherbereiches mit dem Bildschirm-Codewert des Zeichens im Zeichensatzcursor.</p>
+
+        <p>Inkrementieren der Rahmenfarbe.</p>
+
+        <p>Inkrementieren der Hintergrundfarbe O. Inkrementieren der Hintergrundfarbe</p>
+
+        <ol>
+            <li>Inkrementieren der Hintergrundfarbe</li>
+            <li>Inkrementieren der Hintergrundfarbe</li>
+            <li>Inkrementieren der Zeichenfarbe.</li>
+        </ol>
+
+
+        <h3>Zeichensatzbefehle:</h3>
+
+        <p>Y,G,H,B Diese vier Tasten bewegen den Zeichensatzcursor über den dargestellten Zeichensatz.</p>
+
+        <p>y4 kopiert den ab Z-ADR. befindlichen Zeichensatz in den Zeichensatzbuffer.</p>
+
+        <p>SHIFT Z schreibt den Zeichensatz im Puffer in den</p>
+
+        <p>Speicher ab Z-ADR.</p>
+
+        <p>SHIFT Fi erhöht Z-ADR. um 1.</p>
+
+        <p>SHIFT F3 erhöht Z-ADR. um 8.</p>
+
+        <p>SHIFT F5 erhöht Z-ADR. um 104. .</p>
+
+        <p>SHIFT F7 erhöht Z-ADR. um 2048.</p>
+
+        <p>CBM Fi erniedrigt Z-ADR. um 1.</p>
+
+        <p>CBM F3 erniedrigt Z-ADR. um 8.</p>
+
+        <p>CBM F5 ernierigt Z-ADR. um 104.</p>
+
+        <p>CBM F7 erniedrigt Z-ADR. um 2048.</p>
+
+        <p>Befehle zum Verändern eines Zeichens: Gesteuert wird der Zeichencursor durch die Cursortasten. +, SHIFT + setzt einen Punkt im Zeichen.</p>
+
+        <p>-, SHIFT – löscht einen Punkt im Zeichen. ,</p>
+
+        <p>HOME löscht das Zeichen (ohne Veränderung der</p>
+
+        <p>Cursorstellung).</p>
+
+        <p>DEL invertiert das Zeichen.</p>
+
+        <p>C holt das Zeichen unter dem Zeichensatzcursor in den Zeichenpuffer. schreibt das Zeichen im Zeichenpuffer in den Zeichensatz unter den Zeichensatzcursor.</p>
+
+        <p>N holt das Zeichen unter dem Zeichenfeldcursor in den Zeichenpuffer. schreibt das Zeichen im Zeichenpuffer in den Zeichensatz an den Platz, der von dem Zeichen unter dem Zeichenfeldcursor bestimmt wird.</p>
+
+        <p>A bitweise AND-Verknüpfung mit dem Zeichen im Zeichenpuffer und dem unter dem Zeichensatzcursor.</p>
+
+        <p>wie zuvor, jedoch wird das Ergebnis unter den Zeichensatzcursor in den Zeichensatz geschrieben.</p>
+
+        <p>(0) wie unter A, jedoch bitweise OR-Verknüpfung.</p>
+
+        <p>wie unter SHIFT A, jedoch bitweise OR-Verknüpfung.</p>
+
+        <p>x exklusiv-Oder-Verknüpfung wie unter A. SHIFT X exklusiv-Oder-Verknüpfung wie unter SHIFT A.</p>
+
+        <p>= horizontales Spiegeln des Zeichens. I vertikales Spiegeln des Zeichens. diagonales Spiegeln des Zeichens in den beiden Diagonalen.</p>
+
+        <p>_ horizontales Scrollen des Zeichens nach links.</p>
+
+        <p>horizontales Scrollen des Zeichens nach rechts.</p>
+
+        <p>t vertikales Scrollen des Zeichens nach oben.</p>
+
+        <p>vertikales Scrollen des Zeichens nach unten.</p>
+
+        <ul>
+            <li>Drehung des Zeichens entgegen dem Uhrzeigersinn. SHIFT C SHIFT N SHIFT A SHIFT O SHIFT ! Zeichenfeldbefehle:</li>
+        </ul>
+
+
+        <p>1,J,K,M Cursorsteuerung des Zeichenfeldcursors. £ kopiert das Zeichen unter dem Zeichensatzcursor in das Zeichenfeld unter den Zeichenfeldcursor.</p>
+
+        <p>. Inkrementieren von V-WID. , Dekrementieren von V-WID. V-WID. gibt die Breite des Feldes eines Zeichens im Speicher an, aus dem in das Zeichenfeld gelesen und geschrieben werden kann. 0 anhand der Farbgebung der Zahlen bei V-ADR. und F-ADR. kann man sehen, ob die folgenden Befehle zur Veränderung dieser Adressen auf V-ADR. oder F-ADR. wirksam sind. Dieser Befehl erlaubt es, alle möglichen Kombinationen einzustellen.</p>
+
+        <p>Inkrementieren der unter O spezifizierten Adressen.</p>
+
+        <p>Dekrementieren der unter O spezifizierten Adressen.</p>
+
+        <p>Inkrementieren der unter O spezifizierten Adressen um V-WID.</p>
+
+        <p>Dekrementieren der unter O spezifizierten Adressen um V-WID.</p>
+
+        <p>Inkrementieren der unter O spezifizierten Adressen um V-WID. mal 13.</p>
+
+        <p>Dekrementieren der unter O spezifizierten Adressen um V-WID. mal 13.</p>
+
+        <p>Da der Farbcode nur 4 Bits benötigt und 8 Bits zur Verfügung stehen, kann man mit dieser Funktion auswählen, ob die 4 unteren (LO) oder die 4 oberen (HI) oder sogar beide (LH beziehungsweise HL) benutzt werden sollen. Die Anzeige im Modusfeld gibt Auskunft über die aktuelle Darstellungsart. Wenn jeweils 2 Farben in 8 Bit dargestellt werden sollen, so erhöhen oder erniedrigen die Befehle 7 bis SHIFT 9 die Adressen nur noch um die Hälfte, wenn die F-ADR. verändert werden soll.</p>
+
+        <p>Lesen der Farbe des Zeichenfeldes aus dem Speicher ab F-ADR.</p>
+
+        <p>Schreiben der Farbe des Zeichenfeldes in den Speicher ab F-ADR.</p>
+
+        <p>Lesen der eigentlichen Zeichen des Zeichenfeldes aus dem Speicher ab V-ADR. Schreiben der eigentlichen Zeichen des Zeichenfeldes in den Speicher ab V-ADR. Auffüllen des Zeichenfeldes mit den Zeichenfeld-Cursor-Koordinaten als Grenzen mit dem Zeichen unter dem Zeichensatzcursor.</p>
+
+        <p>Auffüllen des Zeichenfeldes mit der aktuellen Zeichenfarbe mit den Zeichenfeld-Cursor-Koordinaten V-XKO und V-YKO als Grenzen.</p>
+
+        <p>vereint die Befehle U und SHIFT U. 7</p>
+
+        <p>SHIFT 7 8</p>
+
+        <p>SHIFT 8 9</p>
+
+        <p>SHIFT 9 SHIFT 0 F</p>
+
+        <p>SHIFT F V</p>
+
+        <p>SHIFT V U SHIFT U CBM U Es existiert ein Puffer zum Zeichenfeld, auf den mit folgender neun Befehlen zugegriffen werden kann: R liest die Zeichen des Puffers in das Zeichenfeld in dasjenige Rechteck, das der Zeichenfeldcursor mit der linken oberen Ecke des Zeichenfeldes bestimmt (siehe auch U, SHIFT U, CBM U).</p>
+
+        <p>SHIFTR liest die Farben des Puffers in das Zeichenfeld.</p>
+
+        <p>CBMR vereint die Befehle R und SHIFT R.</p>
+
+        <p>W,SHIFT entsprechende Schreibbefehle zu den obeW,CBM W ren drei Lesebefehlen.</p>
+
+        <p>E,SHIFT vertauscht den Inhalt des Puffers mit dem E,CBM E Zeichenfeld in der bei R, SUFT R, CBMR beschriebenen Art.</p>
+
+        <p>Modusbefehle:</p>
+
+        <p>CBM C schaltet den C-Modus an und aus. Dieser Modus kopiert das Zeichen unter dem Zeichensatzcursor bei dessen Bewegung. CBMN dient zum An- und Ausschalten des N136 Modus, der das durch den Zeichenfeldcursor bestimmte Zeichen automatisch in den Zeichenpuffer kopiert, wenn der Zeichenfeldcursor bewegt wird. CBM F,CBM V dienen zum An- und Ausschalten des F- und V-Modus. Bei diesen Modi wird das Zeichenfeld bei folgenden Befehlen automatisch aus dem Speicher gelesen: 7, SHIFT 7, 8, SHIFT 8, 9, SHIFT 9, SHIFT O, Komma, Punkt.</p>
+
+        <p>dient zum An- und Ausschalten des Z-Modus. Dieser Modus kopiert den Zeichensatz automatisch aus dem Speicher in den Zeichensatzpuffer, wenn Z-ADR. verändert wird.</p>
+
+        <p>An- und Ausschalten des Copymodus: Bei jeder Veränderung des Zeichens im Zeichenpuffer wird das Zeichen vor dem Ausführen von bestimmten Befehlen zu dem nach der Ausführung entstandenen Zeichen hinzukopiert. Der Modus gilt für folgende Befehle:</p>
+
+        <p>=, *, 5 +, SHIFT —, t, SHIFT t. CBM Z RETURN dient zum Anschalten des WRT-Modus. Bei diesem Modus kann man das Zeichenfeld editieren wie im normalen Basic-Editiermodus: HOME, SHIFT HOME, DEL, SHIFT DEL, RETURN und die Cursorsteuerung funktionieren ähnlich wie im Basic-Modus. Der Reversmodus läßt sich jedoch nur mit CBM 9 und CBM O an- und ausstellen. Farbänderungen sind in diesem Modus nicht möglich. Ansonsten werden alle Zeichen wie im Basic-Modus in das Zeichenfeld gedruckt. Die anderen Befehle des CHARSETMASTERSs sind in diesem Modus nicht wirksam.</p>
+
+        <h2>Vom Basic nutzbar</h2>
+
+        <p>Als letztes besitzt dieses Programm noch drei Befehle zur DATA-Zeilen-Erzeugung. Es werden Speicherbereiche mit Hilfe einer gewissen Art von DATA-Zeilen in Basic-Programme integriert. Dies sind jedoch keine eigentlichen Basic-DATA-Zeilen, sondern eine spezielle Art der Datenablegung, die nur durch eine Interpreter-Erweiterung in den Speicher gebracht werden kann. Die Daten werden nach einem Sonderzeichen als Hexadezimalzahlen ohne Leerzeichen getrennt in einer Basic-Zeile gespeichert. Dabei werden die Canvrnrenirhan am Antann annr onliaban Ornrasini MATA 7aia durch die Interpreter-Erweiterung zu Befehlen, die die Aufgabe haben, diese Hexadezimaldaten in den Speicher zu schreiben: D schreibt die 8 Byte des Zeichens im Zei- werden sollen.</p>
+
+        <p>chenpuffer als spezielle DATA-Zeile, ab der</p>
+
+        <p>Zeilennummer, die um eins größer ist als Bei diesen Befehlen wird der Vorgang der DATA-Zeilen- die letzte Basic-Zeilennummer. Erzeugung abgebrochen, wenn das Basic-Programm sich dem Speicherende für Basic-Programme nähert, so daß das SHIFT D wie unter C, jedoch wird der Bildschirm- Schreiben unter den Basic-Interpreter verhindert wird. Die code des Zeichens (angegeben durch die Position des Zeichensatz-Cursors) vorweg als Hexadezimalzahl gespeichert. Diese DATA-Art benötigt zwar mehr Speicherplatz als die unter C, doch kann man so willkürlich Zeichen anordnen, die an ihren ursprünglichen Platz im Zeichensatz wieder zurückgeschrieben werden. CBMD erzeugt DATA-Zeilen eines anzugebenden Speicherbereiches, wobei angegeben werden kann, wieviel Byte pro Zeile genommen Interpreter-Erweiterung »CHAR-ERWEITERUNG (Listing 2) kann man als normale DATA-Zeilen in das Basic-Programm aufnehmen und mit SYS 828,AN,CH starten (inifialisieren), wobei AN die Anfangadresse der zu speichernden Daten und CH das High-Byte des Zeichensatzes, in den die mit SHIFT C definierten DATA-Zeilen kopiert werden sollen, sein müssen. Die Interpreter-Erweiterung kann mit SYS 58451 wieder deaktiviert werden.</p>
+
+        <address class="author">(M.Rose/og)</address>
+    </article>
+</body>
+
+</html>
