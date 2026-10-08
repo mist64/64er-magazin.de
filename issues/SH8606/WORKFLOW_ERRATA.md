@@ -178,3 +178,28 @@ grade changes the projection profile, so a non-zero reading means "look at
 the step's own line for this page", not "the page is tilted". Compare against
 the step's `skew a -> b` log line before calling a page tilted. (Same family as
 7b: a check that reads a different artefact from the step it checks.)
+
+## 140 (and every Verification block) — a bash loop over `$SLUGS` passes silently under zsh
+
+**What the rule says.** r140 check 4: `SLUGS="impressum checksummer vorwort
+mse"` … `for slug in $SLUGS; do … done`, inside a fenced ```bash block. Every
+rule's Verification is "runnable as shell" (r000).
+
+**What happened.** The 140 sub-agent ran the block in this machine's default
+shell, zsh, where `for slug in $SLUGS` does not word-split: the loop ran once
+over the whole string, `prev` came back empty, the test short-circuited and
+check 4 printed nothing — the silent pass in the safe direction that r140's
+own text warns about for an empty PREV. Re-run under `bash`, it reported the
+four slugs correctly, and a planted rename of `impressum` was caught. This
+session's own shell is zsh too, so any Verification block that word-splits a
+variable (`$PAGES`, `$SLUGS`, `set -- $ISS`) has the same hole unless run
+through `bash`.
+
+**What it cost.** One re-run; the agent noticed because `prev=NONE` looked
+wrong.
+
+**Suggested.** In r000 *Verification rules mandatory*: "The blocks are bash.
+Run them with `bash <<'EOF' … EOF` (or `bash -c`), never pasted into an
+interactive zsh: zsh does not word-split `$VAR` in `for x in $VAR`, so a loop
+over a space-separated list runs once and reports nothing." And quote the
+list literally where the rule can (`for slug in impressum checksummer …`).
