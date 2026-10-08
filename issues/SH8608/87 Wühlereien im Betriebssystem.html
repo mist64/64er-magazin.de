@@ -45,15 +45,39 @@
 
         <p>Mit dieser Routine können Sie die Ausgabe von Systemmeldungen (Fehlermeldungen etc.) teilweise oder ganz unterdrücken.</p>
 
-        <p>Fehlermeldungen sind Meldungen wie »I/O ERROR #«, Systemmeldungen sind »LOADING« und so weiter. Entscheidend ist der Inhalt des Akkus vor dem Aufruf von »STMSG«: Akku Fehlermeldungen? Systemmeldungen?</p>
+        <p>Fehlermeldungen sind Meldungen wie »I/O ERROR #«, Systemmeldungen sind »LOADING« und so weiter. Entscheidend ist der Inhalt des Akkus vor dem Aufruf von »STMSG«:</p>
 
-        <p>$00 ja ja</p>
-
-        <p>$40 nein ja</p>
-
-        <p>$80 ja nein</p>
-
-        <p>$C0 nein nein</p>
+        <table class="plain">
+            <thead>
+                <tr>
+                    <th>Akku</th>
+                    <th>Fehlermeldungen?</th>
+                    <th>Systemmeldungen?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>$00</td>
+                    <td>ja</td>
+                    <td>ja</td>
+                </tr>
+                <tr>
+                    <td>$40</td>
+                    <td>nein</td>
+                    <td>ja</td>
+                </tr>
+                <tr>
+                    <td>$80</td>
+                    <td>ja</td>
+                    <td>nein</td>
+                </tr>
+                <tr>
+                    <td>$C0</td>
+                    <td>nein</td>
+                    <td>nein</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>So kann man also alle Meldungen ausschalten:</p>
 
@@ -264,6 +288,167 @@ JSR $8818 ;Linkpointer berechnen lassen
         <h3>Der letzte ROM-Einsprung, mit dem wir uns genauer beschäftigen wollen, ist RESET ($FFF9) »JMP $FFF%« hat die gleiche Wirkung wie das Drücken der Reset-Taste. Es erfolgt ein Sprung zum Reset-Vektor, wodurch der Einschaltzustand hergestellt wird.</h3>
 
         <h3>Die Tabelle in Bild 1 zeigt Ihnen noch einmal alle ROM-Routinen zusammengefaßt. Viel Spaß und viel Erfolg bei deren Anwendung. (Florian Müller/ks)</h3>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Adresse</th>
+                        <th class="shaded">Label</th>
+                        <th>Funktion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>$8818</td>
+                        <td class="shaded">LPUPDT</td>
+                        <td>LinkPointer aktualisieren</td>
+                    </tr>
+                    <tr>
+                        <td>$D83B</td>
+                        <td class="shaded">SETCR</td>
+                        <td>Cursor setzen</td>
+                    </tr>
+                    <tr>
+                        <td>$D849</td>
+                        <td class="shaded">GETCR</td>
+                        <td>Cursor holen</td>
+                    </tr>
+                    <tr>
+                        <td>$D88B</td>
+                        <td class="shaded">CLEAR</td>
+                        <td>Bildschirm löschen</td>
+                    </tr>
+                    <tr>
+                        <td>$D89A</td>
+                        <td class="shaded">HOME</td>
+                        <td>Cursor in HOME-Position</td>
+                    </tr>
+                    <tr>
+                        <td>$DC49</td>
+                        <td class="shaded">BSOUTSCREEN</td>
+                        <td>Zeichen auf Bildschirm ausgeben</td>
+                    </tr>
+                    <tr>
+                        <td>$FAFF</td>
+                        <td class="shaded">PUTWRD</td>
+                        <td>2-Byte-Zahl hexadezimal ausgeben</td>
+                    </tr>
+                    <tr>
+                        <td>$FB05</td>
+                        <td class="shaded">PUTHXS</td>
+                        <td>Bytewert hexadezimal mit Space ausgeben</td>
+                    </tr>
+                    <tr>
+                        <td>$FB10</td>
+                        <td class="shaded">PUTHEX</td>
+                        <td>Bytewert hexadezimal zweistellig ausgeben</td>
+                    </tr>
+                    <tr>
+                        <td>$FB20</td>
+                        <td class="shaded">MAKHEX</td>
+                        <td>ASCII-Code der Hex-Darstellung berechnen</td>
+                    </tr>
+                    <tr>
+                        <td>$FF81</td>
+                        <td class="shaded">VIRES</td>
+                        <td>Video-Chip und Editor initialisieren</td>
+                    </tr>
+                    <tr>
+                        <td>$FF84</td>
+                        <td class="shaded">IORES</td>
+                        <td>I/O-Bausteine initialisieren</td>
+                    </tr>
+                    <tr>
+                        <td>$FF90</td>
+                        <td class="shaded">STMSG</td>
+                        <td>Flag für System-/Fehlermeldungen setzen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFBA</td>
+                        <td class="shaded">SETLFS</td>
+                        <td>File-Parameter setzen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFBD</td>
+                        <td class="shaded">SETNAM</td>
+                        <td>File-Namen setzen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFC0</td>
+                        <td class="shaded">OPEN</td>
+                        <td>File öffnen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFC3</td>
+                        <td class="shaded">CLOSE</td>
+                        <td>File schließen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFC6</td>
+                        <td class="shaded">CHKIN</td>
+                        <td>Eingabegerät setzen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFC9</td>
+                        <td class="shaded">CKOUT</td>
+                        <td>Ausgabegerät setzen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFCC</td>
+                        <td class="shaded">CLRCH</td>
+                        <td>Tastatureingabe und Bildschirmausgabe setzen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFCF</td>
+                        <td class="shaded">BASIN</td>
+                        <td>Zeichen von Eingabegerät holen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFD2</td>
+                        <td class="shaded">BSOUT</td>
+                        <td>Zeichen auf Ausgabegerät ausgeben</td>
+                    </tr>
+                    <tr>
+                        <td>$FFD5</td>
+                        <td class="shaded">LOAD</td>
+                        <td>Programm laden</td>
+                    </tr>
+                    <tr>
+                        <td>$FFD8</td>
+                        <td class="shaded">SAVE</td>
+                        <td>Programm speichern</td>
+                    </tr>
+                    <tr>
+                        <td>$FFE1</td>
+                        <td class="shaded">STOP</td>
+                        <td>Stop-Taste abfragen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFE4</td>
+                        <td class="shaded">GETIN</td>
+                        <td>Zeichen eingeben</td>
+                    </tr>
+                    <tr>
+                        <td>$FFE7</td>
+                        <td class="shaded">CLALL</td>
+                        <td>alle offenen Kanäle schließen</td>
+                    </tr>
+                    <tr>
+                        <td>$FFF0</td>
+                        <td class="shaded">PLOT</td>
+                        <td>Cursor setzen (C=0) oder holen (C=1)</td>
+                    </tr>
+                    <tr>
+                        <td>$FFF9</td>
+                        <td class="shaded">RESET</td>
+                        <td>Software-Reset auslösen</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 1. Die Routinen und ihre Einsprünge. Die genaue Anwendung der Routinen entnehmen Sie bitte dem Artikel.</figcaption>
+        </figure>
+
     </article>
 </body>
 

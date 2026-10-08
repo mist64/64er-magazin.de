@@ -55,11 +55,27 @@
 
         <p>Sie alle kennen den Basic-Befehl OPEN, mit dem eine Datei für Lese- oder Schreibzugriffe geöffnet werden kann. Erst nach dem Öffnen einer Datei kann die eigentliche Datenein- oder -ausgabe mit PRINT # oder INPUT # erfolgen. Die Programmierung auf der Maschinenspracheebene verläuft analog. Zuerst muß eine Datei geöffnet werden, wobei die gleichen Dateiparameter angegeben werden wie im OPEN-Befehl, dessen genaue Syntax bekanntlich lautet:</p>
 
-        <p>OPEN (LF), (GA), (SA), "DATEINAME, TYP, MODUS" LF = Logische Filenummer</p>
+        <p>OPEN (LF), (GA), (SA), "DATEINAME, TYP, MODUS"</p>
 
-        <p>GA = Geräteadresse</p>
-
-        <p>SA =. Sekundäradresse</p>
+        <table class="plain">
+            <tbody>
+                <tr>
+                    <td>LF</td>
+                    <td>=</td>
+                    <td>Logische Filenummer</td>
+                </tr>
+                <tr>
+                    <td>GA</td>
+                    <td>=</td>
+                    <td>Geräteadresse</td>
+                </tr>
+                <tr>
+                    <td>SA</td>
+                    <td>=</td>
+                    <td>Sekundäradresse</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Dieser für die Dateibehandlung grundlegende Basic-Befehl kann leider nur mit großem Aufwand in die entsprechenden Maschinenbefehle umgesetzt werden. Sollten Sie annehmen, daß hierzu der Aufruf einer einzigen Betriebssystemroutine ausreicht, muß ich Sie leider enttäuschen. Im Betriebssystem existiert zwar eine Routine mit dem Namen OPEN. Bevor diese Routine aufgerufen werden kann, müssen zuvor zwei Vorbereitungsroutinen aufgerufen werden, mit denen die benötigten Dateiparameter übergeben werden.</p>
 
@@ -81,13 +97,25 @@
 
         <p>Sie wissen nun, welche Parameter der Routine SETFLS übergeben werden müssen, nicht jedoch wie. Alle drei Parameter werden mit Hilfe der Prozessorregister übergeben:</p>
 
-        <p>Akku = logische Filenummer (1 bis 255)</p>
-
-        <p>X-Register = Geräteadresse (0, 1, 3, 4 oder 8)</p>
-
-        <p>Y-Register = Sekundäradresse (Datasette: O0 und 1;</p>
-
-        <p>Floppy: 2 bis 14)</p>
+        <table class="plain">
+            <tbody>
+                <tr>
+                    <td>Akku</td>
+                    <td>=</td>
+                    <td>logische Filenummer (1 bis 255)</td>
+                </tr>
+                <tr>
+                    <td>X-Register</td>
+                    <td>=</td>
+                    <td>Geräteadresse (0, 1, 3, 4 oder 8)</td>
+                </tr>
+                <tr>
+                    <td>Y-Register</td>
+                    <td>=</td>
+                    <td>Sekundäradresse (Datasette: 0 und 1; Floppy: 2 bis 14)</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Wenn wir zum Beispiel Daten in eine Datasettendatei schreiben wollen, übergeben wir der Routine SETFLS folgende Parameter:</p>
 
@@ -105,7 +133,22 @@ JSR $FFBA ;SETFLS AUFRUFEN
 
         <p>Der Dateiname darf aus maximal 16 Zeichen bestehen. Unter »Zusatz« sind die Angaben »Typ« und »Modus« zu verstehen. Beide Angaben werden nur bei Diskettendateien benötigt, um zum Beispiel mit dem Befehl</p>
 
-        <p>OPEN 2,8,2, "TEST,S,W" die sequentielle Datei »test« zum Schreiben zu öffnen. Typ = S (Sequentielle Datei), R (Relative Datei), P (Programmdatei) oder U (Userdatei). Modus = R (»Read«=Daten lesen), W (»Write«=Daten schreiben) oder A (»Append«=Daten an bestehende Datei anhängen)</p>
+        <p>OPEN 2,8,2, "TEST,S,W" die sequentielle Datei »test« zum Schreiben zu öffnen.</p>
+
+        <table class="plain">
+            <tbody>
+                <tr>
+                    <td>Typ</td>
+                    <td>=</td>
+                    <td>S (Sequentielle Datei), R (Relative Datei), P (Programmdatei) oder U (Userdatei).</td>
+                </tr>
+                <tr>
+                    <td>Modus</td>
+                    <td>=</td>
+                    <td>R (»Read«=Daten lesen), W (»Write«=Daten schreiben) oder A (»Append«=Daten an bestehende Datei anhängen)</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Die Angabe des Dateityps wird bei Datasettendateien nicht benötigt, da die Datasette nur eine einzige Form der Datendatei kennt, den sequentiellen Typ.</p>
 
@@ -139,7 +182,60 @@ JSR $FFBA ;SETFLS AUFRUFEN
 
         <p>BCS $???? ;ADRESSE DER FEHLERBEHANDLUNGSROUTINE Die Fehlernummern haben folgende Bedeutung:</p>
 
-        <p>STOP-Taste gedrückt too many files file open file not open file not found device not present not input file not output file missing filename illegal device number</p>
+        <table class="plain">
+            <tbody>
+                <tr>
+                    <td>0</td>
+                    <td>=</td>
+                    <td>STOP-Taste gedrückt</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>=</td>
+                    <td>too many files</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>=</td>
+                    <td>file open</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>=</td>
+                    <td>file not open</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>=</td>
+                    <td>file not found</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>=</td>
+                    <td>device not present</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>=</td>
+                    <td>not input file</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>=</td>
+                    <td>not output file</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>=</td>
+                    <td>missing filename</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>=</td>
+                    <td>illegal device number</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Die Fehler 3, 6 und 7 sind beim Öffnen einer Datei bedeutungslos. Sie können nur nach Lese- oder Schreibversuchen auftreten. Ein Fehler wie zum Beispiel »missing filename« ist dagegen gerätespezifisch. Bei Verwendung der Datasette müssen Sie nicht unbedingt einen Dateinamen angeben, daher kann auch dieser Fehler nicht auftreten.</p>
 
@@ -616,6 +712,108 @@ INY ;STRINGADRESSE KORRIGIEREN
         <p>Dieses Demoprogramm schreibt einen String mit einer Maximallänge von 255 Zeichen inklusive dem mit INPUT # keinesfalls einlesbaren Zeichen »,« auf Band und liest ihn mit der vorgestellten Routine in der vollen Länge mit Kommata wieder ein, was für den INPUT #-Befehl völlig unmöglich wäre. Das Basic-Programm kann auf den eingelesenen String wie auf jeden anderen String mit PRINT A$ zugreifen.</p>
 
         <p>Wir sind nun am Ende dieses Artikels angelangt. Nachfolgend finden Sie das Monitorlisting (Listing 1) der Routine, den entsprechenden Datalader (Listing 2) und eine Tabelle, in der alle verwendeten Routinen des Betriebssystems und des Basic-Interpreters aufgeführt sind.</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="shaded">Name</th>
+                        <th>Funktion</th>
+                        <th class="shaded">Parameter hin</th>
+                        <th>Parameter zurück</th>
+                        <th class="shaded">Adresse</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="shaded">SETFLS</td>
+                        <td>Fileparameter setzen</td>
+                        <td class="shaded">AKKU=LF; X=GA; Y=SA</td>
+                        <td></td>
+                        <td class="shaded">$FFBA</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">SETNAM</td>
+                        <td>Dateiname übertragen</td>
+                        <td class="shaded">AKKU=Länge; X/Y=Point. auf Name</td>
+                        <td></td>
+                        <td class="shaded">$FFBD</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">OPEN</td>
+                        <td>Log. Datei öffnen</td>
+                        <td class="shaded">Vorbereitung: SETFLS, SETNAM</td>
+                        <td>Fehler: SEC, Fehlernr. im AKKU</td>
+                        <td class="shaded">$FFC0</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">CHKIN</td>
+                        <td>Eingabe von Log. Datei</td>
+                        <td class="shaded">X=Log. Filenummer</td>
+                        <td>Fehler: SEC, Fehlernr. im AKKU</td>
+                        <td class="shaded">$FFC6</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">CKOUT</td>
+                        <td>Ausgabe auf Log. Datei</td>
+                        <td class="shaded">X=Log. Filenummer</td>
+                        <td>Fehler: SEC, Fehlernr. im AKKU</td>
+                        <td class="shaded">$FFC9</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">READST</td>
+                        <td>I/O-Status abfragen</td>
+                        <td class="shaded"></td>
+                        <td>Status im AKKU (BIT 6 = Dateiende)</td>
+                        <td class="shaded">$FFB7</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">BASIN</td>
+                        <td>Zeichen einlesen</td>
+                        <td class="shaded"></td>
+                        <td>Zeichen im AKKU</td>
+                        <td class="shaded">$FFCF</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">BSOUT</td>
+                        <td>Zeichen ausgeben</td>
+                        <td class="shaded">Zeichen im AKKU</td>
+                        <td></td>
+                        <td class="shaded">$FFD2</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">CHKKOM</td>
+                        <td>Komma lesen</td>
+                        <td class="shaded"></td>
+                        <td></td>
+                        <td class="shaded">$9491</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">GETBYT</td>
+                        <td>Ein-Byte-Wert lesen</td>
+                        <td class="shaded"></td>
+                        <td>X=übergebenes Byte</td>
+                        <td class="shaded">$9D84</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">STRPOS</td>
+                        <td>Variablenadresse holen</td>
+                        <td class="shaded"></td>
+                        <td>$47/$48=Point. auf Längendescr.</td>
+                        <td class="shaded">$96A5</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">STRRES</td>
+                        <td>Stringplatz reservieren</td>
+                        <td class="shaded">AKKU=Stringlänge</td>
+                        <td></td>
+                        <td class="shaded">$A906</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle der verwendeten Betriebssystem- und Interpreterroutinen</figcaption>
+        </figure>
+
 
         <p>Verzeihen Sie mir bitte, daß die Erläuterungen der Routinen zum Anlegen des Strings, zur Behandlung der Descriptoren und des Rückdescriptors ziemlich knapp ausfielen, aber der Schwerpunkt dieses Artikels war nun einmal nicht der Basic-Interpreter des C 16 und dessen Variablenbehandlung, sondern es sollte gezeigt werden, wie Sie auch in Maschinensprache Daten an beliebige Peripheriegeräten senden oder von diesen empfangen können.</p>
 

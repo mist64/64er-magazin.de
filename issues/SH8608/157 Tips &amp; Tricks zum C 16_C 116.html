@@ -48,13 +48,22 @@
 
         <h3>Wiederholfunktion der Tasten</h3>
 
-        <p class="source">POKE 1344,0: Wiederholfunktion aus, nur »CRSR«, »SPACE«, »INST/DEL« haben Wiederholfunktion POKE 1344,64 keine Taste hat Wiederholfunktion<br>
-            POKE 1344,128 alle Tasten haben Wiederholfunktion</p>
+        <table class="plain">
+            <tr>
+                <td><code class="mono">POKE 1344,0:</code></td>
+                <td>Wiederholfunktion aus, nur »CRSR«, »SPACE«, »INST/DEL« haben Wiederholfunktion</td>
+            </tr>
+            <tr>
+                <td><code class="mono">POKE 1344,64</code></td>
+                <td>keine Taste hat Wiederholfunktion</td>
+            </tr>
+            <tr>
+                <td><code class="mono">POKE 1344,128</code></td>
+                <td>alle Tasten haben Wiederholfunktion (Normalzustand)</td>
+            </tr>
+        </table>
 
-
-        <p></p>
-
-        <p>Tastaturpuffer</p>
+        <h3>Tastaturpuffer</h3>
 
         <p>Die Adressen 1319 bis 1328 enthalten die Codes der Tasten, die nicht unmittelbar ausgeführt werden können.</p>
 
@@ -91,58 +100,167 @@
         </ul>
 
 
-        <p class="source">- Basic-Start – Anfang der Variablen – Anfang der Felder – Ende der Felder – Stringspeicher Ende – Anfang der Strings – Basic-Speicher Ende</p>
+        <table class="plain">
+            <tr>
+                <td>– Basic-Start</td>
+                <td>43/44 (Low-/Highbyte)</td>
+            </tr>
+            <tr>
+                <td>– Anfang der Variablen</td>
+                <td>45/46 (Low-/Highbyte)</td>
+            </tr>
+            <tr>
+                <td>– Anfang der Felder</td>
+                <td>47/48 (Low-/Highbyte)</td>
+            </tr>
+            <tr>
+                <td>– Ende der Felder</td>
+                <td>49/50 (Low-/Highbyte)</td>
+            </tr>
+            <tr>
+                <td>– Stringspeicher Ende</td>
+                <td>51/52 (Low-/Highbyte)</td>
+            </tr>
+            <tr>
+                <td>– Anfang der Strings</td>
+                <td>53/54 (Low-/Highbyte)</td>
+            </tr>
+            <tr>
+                <td>– Basic-Speicher Ende</td>
+                <td>55/56 (Low-/Highbyte)</td>
+            </tr>
+        </table>
 
+        <p>– Der Ton-Chip des C 16 läßt sich in Assembler wie folgt programmieren: Soundregister ist Adresse 65297. Jedem Bit kommt eine bestimmte Steuerfunktion zu:</p>
 
-        <p></p>
+        <table class="plain">
+            <tr>
+                <td>Bit 0 bis 2</td>
+                <td>= #0 bis #7</td>
+                <td>Lautstärke = VOL 0 bis VOL 6</td>
+            </tr>
+            <tr>
+                <td>Bit 3</td>
+                <td>= #8</td>
+                <td>volle Lautstärke (wenn Bit 3 gesetzt ist, sind Bit 0-2 ohne Bedeutung)</td>
+            </tr>
+            <tr>
+                <td>Bit 4</td>
+                <td>= #16</td>
+                <td>Stimme 1 an (=1) / aus (=0)</td>
+            </tr>
+            <tr>
+                <td>Bit 5</td>
+                <td>= #32</td>
+                <td>Stimme 2 an (=1) / aus (=0)</td>
+            </tr>
+            <tr>
+                <td>Bit 6</td>
+                <td>= #64</td>
+                <td>Stimme 2 Rauschen (=1)</td>
+            </tr>
+            <tr>
+                <td>Bit 7</td>
+                <td>= #128</td>
+                <td>Bit gesetzt = kein Ton</td>
+            </tr>
+        </table>
 
-        <p>43/44 (Low-/Highbyte) 45/46 (Low-/Highbyte) 47/48 (Low-/Highbyte) 49/50 (Low-/Highbyte) 51/52 (Low-/Highbyte) 53/54 (Low-/Highbyte) 55/56 (Low-/Highbyte) – Der Ton-Chip des C 16 läßt sich in Assembler wie folgt programmieren: Soundregister ist Adresse 65297. Jedem Bit kommt eine bestimmte Steuerfunktion zu:</p>
+        <p>Der Ton ist in 10 Bit codiert: mögliche Werte: #0 bis #1023</p>
 
-        <p class="source">BitObis2 = #0bis #7 Lautstärke = VOL Obis VOLG6 -</p>
+        <table class="plain">
+            <tr>
+                <td>Frequenzen</td>
+                <td></td>
+                <td>Low-Byte</td>
+                <td>High-Byte (0,1)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Stimme 1</td>
+                <td>65294</td>
+                <td>65298</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Stimme 2</td>
+                <td>65295</td>
+                <td>65296</td>
+            </tr>
+        </table>
 
-
-        <p></p>
-
-        <p>Bit 3 #8 volle Lautstärke (wenn Bit 3 gesetzt ist, sind</p>
-
-        <p>Bit 0-2 ohne Bedeutung)</p>
-
-        <p>Bit 4 =#16 Stimme 1 an (=1) /aus (=0)</p>
-
-        <p>Bit 5 = #32 Stimme 2 an (=1) /aus (=O)</p>
-
-        <p>Bit 6 = #64 Stimme 2 Rauschen (=1)</p>
-
-        <p>Bit7 = #128 Bit gesetzt = kein Ton</p>
-
-        <p class="source">Der Ton ist in 10 Bit codiert: mögliche Werte: #0 bis #1023<br>
-            Frequenzen Low-Byte High-Byte (0,1) Stimme 1 65294 65298 Stimme 2 65295 65296 – Register Durch Löschen der Bits 0/1 läßt sich der Bildschirm 65286: um bis zu drei Rasterzeilen nach oben verschieben. Bit 2 gesetzt Bildschirm vier Rasterzeilen nach unten Bit 3 gelöscht Bildschirm vier Rasterzeilen nach unten<br>
-            Bit 4 gelöscht Bit 5 gesetzt Bit 6 gesetzt</p>
-
-
-        <p></p>
-
-        <p>Bildschirm ausgeblendet Char-Speicher verschoben kein Cursor sichtbar</p>
-
-        <p class="source">- Register Bit 0/1 setzen<br>
-            65287<br>
-            Bit 4 gesetzt Bit 5 gesetzt<br>
-            Bit 6 gesetzt Bit 7 gesetzt – POKE 65290, 162<br>
-            - POKE 65290, 163<br>
-            - Register 65301<br>
-            - Register 65305<br>
-            Verschieben des Bildschirms um bis zu drei Rasterzeilen nach rechts<br>
-            Mehrfarbmodus ein<br>
-            Videochip stoppt (keine Bilderzeugung mehr)<br>
-            Programmierbare Bildstörung 38 Zeichen/Zeile<br>
-            sperrt Tastatur<br>
-            entriegelt Tastatur<br>
-            Hintergrundfarbe<br>
-            Bit 0-3 (Low-Nibble) Farbe Rahmenfarbe<br>
-            Bit 4-6 (High-Nibble) Intensität</p>
-
-
-        <p></p>
+        <table class="plain">
+            <tr>
+                <td>– Register 65286:</td>
+                <td colspan="2">Durch Löschen der Bits 0/1 läßt sich der Bildschirm um bis zu drei Rasterzeilen nach oben verschieben.</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Bit 2 gesetzt</td>
+                <td>Bildschirm vier Rasterzeilen nach unten</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Bit 3 gelöscht</td>
+                <td>Bildschirm vier Rasterzeilen nach unten</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Bit 4 gelöscht</td>
+                <td>Bildschirm ausgeblendet</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Bit 5 gesetzt</td>
+                <td>Char-Speicher verschoben</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Bit 6 gesetzt</td>
+                <td>kein Cursor sichtbar</td>
+            </tr>
+            <tr>
+                <td>– Register 65287</td>
+                <td>Bit 0/1 setzen</td>
+                <td>Verschieben des Bildschirms um bis zu drei Rasterzeilen nach rechts</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Bit 4 gesetzt</td>
+                <td>Mehrfarbmodus ein</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Bit 5 gesetzt</td>
+                <td>Videochip stoppt (keine Bilderzeugung mehr)</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Bit 6 gesetzt</td>
+                <td>Programmierbare Bildstörung</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Bit 7 gesetzt</td>
+                <td>38 Zeichen/Zeile</td>
+            </tr>
+            <tr>
+                <td colspan="2">– POKE 65290, 162</td>
+                <td>sperrt Tastatur</td>
+            </tr>
+            <tr>
+                <td colspan="2">– POKE 65290, 163</td>
+                <td>entriegelt Tastatur</td>
+            </tr>
+            <tr>
+                <td colspan="2">– Register 65301</td>
+                <td>Hintergrundfarbe<br>Bit 0–3 (Low-Nibble) Farbe</td>
+            </tr>
+            <tr>
+                <td colspan="2">– Register 65305</td>
+                <td>Rahmenfarbe<br>Bit 4–6 (High-Nibble) Intensität</td>
+            </tr>
+        </table>
 
         <address class="author">(Frank Plachetta/tr/bj)</address>
 
@@ -150,9 +268,33 @@
 
         <p>Im Sonderheft zum C 16 wird auf die Möglichkeit hingewiesen, Bildschirmfenster innerhalb eines laufenden Programms zu erstellen. Die beschriebenen Methoden sind jedoch weiter verbesserungsfähig.</p>
 
-        <p>Unter Umgehung des Escape-Modus: Die Koordinaten zur Festlegung eines Windows können direkt in die Systemadressen für die aktuelle Bildschirmgröße »gePOKEt« werden. Adresse</p>
+        <p>Unter Umgehung des Escape-Modus: Die Koordinaten zur Festlegung eines Windows können direkt in die Systemadressen für die aktuelle Bildschirmgröße »gePOKEt« werden.</p>
 
-        <p>2021 ($07E5): unterer Rand (Zeilenkoordinate/»esc-B«) 2022 ($07E6): oberer Rand (Zeilenkoordinate/»esc-T«) 2023 ($07E7): linker Rand (Spaltenkoordinate/»esc-T«) 2024 ($07E8): rechter Rand (Spaltenkoordinate/»esc-B«)</p>
+        <table class="plain mono">
+            <tr>
+                <td colspan="3">Adresse</td>
+            </tr>
+            <tr>
+                <td>2021 ($07E5):</td>
+                <td>unterer Rand</td>
+                <td>(Zeilenkoordinate/»esc-B«)</td>
+            </tr>
+            <tr>
+                <td>2022 ($07E6):</td>
+                <td>oberer Rand</td>
+                <td>(Zeilenkoordinate/»esc-T«)</td>
+            </tr>
+            <tr>
+                <td>2023 ($07E7):</td>
+                <td>linker Rand</td>
+                <td>(Spaltenkoordinate/»esc-T«)</td>
+            </tr>
+            <tr>
+                <td>2024 ($07E8):</td>
+                <td>rechter Rand</td>
+                <td>(Spaltenkoordinate/»esc-B«)</td>
+            </tr>
+        </table>
 
         <p>Ein Beispiel: Mit POKE 2022,2 wird die erste Bildschirmzeile »eingefroren« (zum Beispiel als Titelzeile), indem der obere Rand des aktuellen Bildschirms herabgesetzt wird.</p>
 
@@ -172,17 +314,49 @@
             <figcaption>Listing 2. »Hardcopy-Routine« für C 16/C 116</figcaption>
         </figure>
 
-        <p class="source">Programm-Beschreibung<br>
-            Zeile:<br>
-            1020 Eröffnen eines Drucker-Kanals<br>
-            1030 Erweitern des Feldes X$ auf insgesamt 42 Bindestriche 1040 Drucken des Feldes X$ als obere Umrandung<br>
-            1050 Schleife zur Erzeugung von 25 Zeilen mit der Initialisierung der linken Umrandung<br>
-            1060 Schleife zum PEEKen von 40 Zeichen pro Bildschirmzeile 1070 Ende der Zeichenschleife<br>
-            1080 ° Ende der Zeilenschleife mit der rechten Umrandung 1090 Drucken des Feldes X$ als untere Umrandung sowie einige Leerzeilen<br>
-            1100 Drucken weiterer Leerzeilen, Schließen des Druckers, Löschen der Felder X$ und Y$ sowie ein »RETURN« für den Fall, daß in diese Routine durch ein »GOSUB« verzweigt wurde.</p>
+        <p><span class="mono">Programm-Beschreibung</span></p>
 
-
-        <p></p>
+        <table class="plain mono">
+            <tr>
+                <td colspan="2">Zeile:</td>
+            </tr>
+            <tr>
+                <td>1020</td>
+                <td>Eröffnen eines Drucker-Kanals</td>
+            </tr>
+            <tr>
+                <td>1030</td>
+                <td>Erweitern des Feldes X$ auf insgesamt 42 Bindestriche</td>
+            </tr>
+            <tr>
+                <td>1040</td>
+                <td>Drucken des Feldes X$ als obere Umrandung</td>
+            </tr>
+            <tr>
+                <td>1050</td>
+                <td>Schleife zur Erzeugung von 25 Zeilen mit der Initialisierung der linken Umrandung</td>
+            </tr>
+            <tr>
+                <td>1060</td>
+                <td>Schleife zum PEEKen von 40 Zeichen pro Bildschirmzeile</td>
+            </tr>
+            <tr>
+                <td>1070</td>
+                <td>Ende der Zeichenschleife</td>
+            </tr>
+            <tr>
+                <td>1080</td>
+                <td>Ende der Zeilenschleife mit der rechten Umrandung</td>
+            </tr>
+            <tr>
+                <td>1090</td>
+                <td>Drucken des Feldes X$ als untere Umrandung sowie einige Leerzeilen</td>
+            </tr>
+            <tr>
+                <td>1100</td>
+                <td>Drucken weiterer Leerzeilen, Schließen des Druckers, Löschen der Felder X$ und Y$ sowie ein »RETURN« für den Fall, daß in diese Routine durch ein »GOSUB« verzweigt wurde.</td>
+            </tr>
+        </table>
 
         <h2>Das seltsame Listing</h2>
 
@@ -253,31 +427,68 @@
 
         <p>zes Maschinenprogramm eingeben:</p>
 
-        <p>A 10C5 SEI</p>
-
-        <p>10C6 LDA#$10</p>
-
-        <p>1008 STA$0313</p>
-
-        <p>10CB STA$0315</p>
-
-        <p>10CE CLI</p>
-
-        <p>10CF LDA#$11</p>
-
-        <p>10D1 STA $2C</p>
-
-        <p>10D3 LDA#$00</p>
-
-        <p>10D5 STA $1100</p>
-
-        <p>10D8 PLA</p>
-
-        <p>10D9 PLA</p>
-
-        <p>10DA JMP $8A7B</p>
-
-        <p>(Interrupt auf eigene Routine lenken) (Basic-Start auf $1 100 heraufsetzen) (NEW/CLR ausführen)</p>
+        <table class="plain">
+            <tr>
+                <td><code class="mono">A 10C5</code></td>
+                <td><code class="mono">SEI</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10C6</code></td>
+                <td><code class="mono">LDA#$10</code></td>
+                <td>(Interrupt auf eigene Routine lenken)</td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10C8</code></td>
+                <td><code class="mono">STA$0313</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10CB</code></td>
+                <td><code class="mono">STA$0315</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10CE</code></td>
+                <td><code class="mono">CLI</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10CF</code></td>
+                <td><code class="mono">LDA#$11</code></td>
+                <td>(Basic-Start auf $1100 heraufsetzen)</td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10D1</code></td>
+                <td><code class="mono">STA $2C</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10D3</code></td>
+                <td><code class="mono">LDA#$00</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10D5</code></td>
+                <td><code class="mono">STA $1100</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10D8</code></td>
+                <td><code class="mono">PLA</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10D9</code></td>
+                <td><code class="mono">PLA</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">A 10DA</code></td>
+                <td><code class="mono">JMP $8A7B</code></td>
+                <td>(NEW/CLR ausführen)</td>
+            </tr>
+        </table>
 
         <ol>
             <li>Verlassen Sie jetzt den Monitor mit »X« und machen Sie im Direktmodus folgende Eingaben:</li>
@@ -303,23 +514,59 @@
 
         <p>Sowohl bei der Eingabe als auch beim Laden des Programms muß der Basic-Start unbedingt auf seinem Normalwert sein! Ansonsten liegt die am Anfang eingegebene Basic-Zeile nicht an der richtigen Stelle im Speicher. Drücken Sie also am besten einmal auf den Reset-Knopf. Dies ist besonders wichtig für Besitzer eines Plus/4 oder eines C16 mit RAM-Erweiterung, da hier beim erstmaligen Einschalten der Grafik der Basic-Start automatisch um 12 KByte heraufgesetzt wird! Tabelle:</p>
 
-        <p>Innachfolgender Tabelle ist aufgeführt, welchen Effektman erzielt, wenn man durch POKE-Befehle die Größe des Grafikfensters ändern will. Dazu müssen Sie jeweils in die Speicherstellen 4203 und 42038 den Wert von X, und in Speicherstelle 4185 den Wert von X minus 2 POKEn.</p>
+        <h3>Tabelle:</h3>
 
-        <p>X Anzahl</p>
+        <p>In nachfolgender Tabelle ist aufgeführt, welchen Effekt man erzielt, wenn man durch POKE-Befehle die Größe des Grafikfensters ändern will. Dazu müssen Sie jeweils in die Speicherstellen 4203 und 4238 den Wert von X, und in Speicherstelle 4185 den Wert von X minus 2 POKEn.</p>
 
-        <p>Textzeilen Wirkung</p>
+        <table class="plain">
+            <tr>
+                <th>X</th>
+                <th>Anzahl Textzeilen</th>
+                <th>Wirkung</th>
+            </tr>
+            <tr>
+                <td>131</td>
+                <td>9</td>
+                <td>kleinstmögliches Grafikfenster</td>
+            </tr>
+            <tr>
+                <td>139</td>
+                <td>8</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>147</td>
+                <td>7</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>155</td>
+                <td>6</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>163</td>
+                <td>5</td>
+                <td>normal</td>
+            </tr>
+            <tr>
+                <td>171</td>
+                <td>4</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>179</td>
+                <td>3</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>187</td>
+                <td>2</td>
+                <td></td>
+            </tr>
+        </table>
 
-        <p>131 kleinstmögliches Grafikfenster 139</p>
-
-        <p>147</p>
-
-        <p>155</p>
-
-        <p>163</p>
-
-        <p>171</p>
-
-        <p>179 .. Ein besonderer Effekt läßt sich erzielen, wenn man den Wert in 4238 auf X plus 1 setzt. Hier wartet nämlich das Interrupt-Programm, bis der Rasterstrahl den eigentlichen Umschaltpunkt erreicht hat. Dadurch wird ein flimmerfreies Umschalten möglich. Erhöht man nun diesen Wert, so wartet der Interrupt mit dem Einschalten des Textbildschirms noch eine Rasterzeile »lang«, obwohl der Grafikbildschirm bereits ausgeschaltet wurde. Resultat ist eine schwarze Trennlinie zwischen Grafik und Text, die entsteht, während sich der Video-Chip im »Niemandsland« zwischen Text und Grafik befindet.</p>
+        <p>Ein besonderer Effekt läßt sich erzielen, wenn man den Wert in 4238 auf X plus 1 setzt. Hier wartet nämlich das Interrupt-Programm, bis der Rasterstrahl den eigentlichen Umschaltpunkt erreicht hat. Dadurch wird ein flimmerfreies Umschalten möglich. Erhöht man nun diesen Wert, so wartet der Interrupt mit dem Einschalten des Textbildschirms noch eine Rasterzeile »lang«, obwohl der Grafikbildschirm bereits ausgeschaltet wurde. Resultat ist eine schwarze Trennlinie zwischen Grafik und Text, die entsteht, während sich der Video-Chip im »Niemandsland« zwischen Text und Grafik befindet.</p>
 
         <address class="author">(Michael Schmand/tr/bj)</address>
 
@@ -327,13 +574,69 @@
 
         <p>Hier wollen wir einen leicht verständlichen Lösungsweg zur Umrechnung der beiden Zahlensysteme Dezimal und Hexadezimal erarbeiten.</p>
 
-        <p>Wir sind von Kind auf an das dezimale Zahlensystem gewöhnt. In der Computertechnik wird jedoch auch häufig das hexadezimale Zahlensystem verwendet. Warum? Um diese Frage zu beantworten, müssen wir etwas ausholen. Wie Sie vielleicht wissen, kennt der Computer im Prinzip nur das binäre Zahlensystem, also die Kombination von O und 1. Aus diesen beiden Ziffern wird jede Zahl gebildet. Beispiel: binär 00001101 = dezimal 13 = hexadezimal D binär 1100000000000000 = dezimal 49152 = hexadezimal CO0OO</p>
+        <p>Wir sind von Kind auf an das dezimale Zahlensystem gewöhnt. In der Computertechnik wird jedoch auch häufig das hexadezimale Zahlensystem verwendet. Warum? Um diese Frage zu beantworten, müssen wir etwas ausholen. Wie Sie vielleicht wissen, kennt der Computer im Prinzip nur das binäre Zahlensystem, also die Kombination von O und 1. Aus diesen beiden Ziffern wird jede Zahl gebildet. Beispiel:</p>
 
-        <p>In Fachzeitschriften finden Sie oft Abkürzungen oder andere Schreibweisen, um klarzustellen, welches Zahlensystem gemeint ist. Beispiel: binär =bin = % hexadezimal = hex = $ dezimal = dez = #</p>
+        <table class="plain">
+            <tr>
+                <td>binär</td>
+                <td>00001101</td>
+                <td>= dezimal</td>
+                <td>13</td>
+                <td>= hexadezimal</td>
+                <td>D</td>
+            </tr>
+            <tr>
+                <td>binär</td>
+                <td>1100000000000000</td>
+                <td>= dezimal</td>
+                <td>49152</td>
+                <td>= hexadezimal</td>
+                <td>C000</td>
+            </tr>
+        </table>
+
+        <p>In Fachzeitschriften finden Sie oft Abkürzungen oder andere Schreibweisen, um klarzustellen, welches Zahlensystem gemeint ist. Beispiel:</p>
+
+        <table class="plain">
+            <tr>
+                <td>binär</td>
+                <td>= bin</td>
+                <td>= %</td>
+            </tr>
+            <tr>
+                <td>hexadezimal</td>
+                <td>= hex</td>
+                <td>= $</td>
+            </tr>
+            <tr>
+                <td>dezimal</td>
+                <td>= dez</td>
+                <td>= #</td>
+            </tr>
+        </table>
 
         <p>Die Zeichen %, $und # werden vor allem von Programmen benutzt, die irgendetwas mit Assembler (Maschinensprache) oder mit dem Betriebssystem des Computers zu tun haben, zum Beispiel Maschinensprache-Monitore. Wenn Sie mehr darüber wissen wollen, empfehle ich Ihnen das 64'er-Sonderheft 8/85 (Assembler für Anfänger und Fortgeschrittene). Doch zurück zu den Zahlensystemen:</p>
 
-        <p>Die ersten Computer konnten nur mit binären Werten »gefüttert« werden, eine sehr anstrengende Sache für die Programmierer. Eine wesentliche Vereinfachung ergab das hexadezimale System. Jeweils 4 Binär-Ziffern konnten ersetzt werden durch eine einzige Hex-Ziffer. Beispiel: bin 1101 hex D dez 13 bin 1000 = hex 8 = dez 8</p>
+        <p>Die ersten Computer konnten nur mit binären Werten »gefüttert« werden, eine sehr anstrengende Sache für die Programmierer. Eine wesentliche Vereinfachung ergab das hexadezimale System. Jeweils 4 Binär-Ziffern konnten ersetzt werden durch eine einzige Hex-Ziffer. Beispiel:</p>
+
+        <table class="plain">
+            <tr>
+                <td>bin</td>
+                <td>1101</td>
+                <td>= hex</td>
+                <td>D</td>
+                <td>= dez</td>
+                <td>13</td>
+            </tr>
+            <tr>
+                <td>bin</td>
+                <td>1000</td>
+                <td>= hex</td>
+                <td>8</td>
+                <td>= dez</td>
+                <td>8</td>
+            </tr>
+        </table>
 
         <p>Das liegt daran, daß das binäre Zahlensystem die Basis 2 besitzt, sich jede Zahl also in 2er-Potenzen darstellen läßt, während das hexadezimale System die Basis 16 hat. Da 2 "hoch 4 den Wert 16 ergibt, können 4 Binär-Ziffern durch eine Hex-Ziffer ersetzt werden.</p>
 
@@ -351,17 +654,13 @@
 
         <p>00 01 02 03 04 05 06 07 08 09 10 11 12.13 14...</p>
 
-        <p>Im Hexadezimalsystem jedoch wird eine Stelle um 16 Werte erhöht, bevor zur nächsten Stelle ein Wert hinzugefügt wird. Da aber unsere Ziffern von O bis 9 dazu nicht ausreichen, wurden zusätzlich die Buchstaben A bis F herangezogen. Sie vertreten die Zahlenwerte 10 bis 15 (von O bis 15 sind es 16 Werte!). Es bedeuten: A=10</p>
-
-        <p>B=11</p>
-
-        <p>C=12</p>
-
-        <p>D=13</p>
-
-        <p>E=14</p>
-
-        <p>F=15</p>
+        <p>Im Hexadezimalsystem jedoch wird eine Stelle um 16 Werte erhöht, bevor zur nächsten Stelle ein Wert hinzugefügt wird. Da aber unsere Ziffern von O bis 9 dazu nicht ausreichen, wurden zusätzlich die Buchstaben A bis F herangezogen. Sie vertreten die Zahlenwerte 10 bis 15 (von O bis 15 sind es 16 Werte!). Es bedeuten:<br>
+            A = 10<br>
+            B = 11<br>
+            C = 12<br>
+            D = 13<br>
+            E = 14<br>
+            F = 15</p>
 
         <p>00 01 020304 05 06 07 0809 0AOBOCODOE OF 10 11121314... 1A1BIC...</p>
 
@@ -400,11 +699,11 @@
 
         <p>Als Abschluß unseres kleinen Kurses könnten Sie einmal versuchen, ein Basic-Programm zu schreiben, das diese Berechnungen ausführt. Kleine Merkhilfe</p>
 
-        <p>Gerade wenn man anfängt, sich mit dem hexadezimalen Zahlensystem zu beschäftigen (und dafür gibt es einige gute Gründe), ist man froh über ein paar kleine Eselsbrücken. Am Anfang kommt man immer wieder ins Stolpern, weil man sich nicht so schnell an den Dezimalwert von zum Beispiel Hex C erinnern kann. Dies geht wesentlich leichter, wenn man die Anfangsbuchstaben der beiden Systeme gegenüberstellt. C = Zwölf</p>
-
-        <p>= Dreizehn</p>
-
-        <p>= Fünfzehn</p>
+        <p>Gerade wenn man anfängt, sich mit dem hexadezimalen Zahlensystem zu beschäftigen (und dafür gibt es einige gute Gründe), ist man froh über ein paar kleine Eselsbrücken. Am Anfang kommt man immer wieder ins Stolpern, weil man sich nicht so schnell an den Dezimalwert von zum Beispiel Hex C erinnern kann. Dies geht wesentlich leichter, wenn man die Anfangsbuchstaben der beiden Systeme gegenüberstellt.<br>
+            <strong>C</strong> = <strong>Z</strong>wölf<br>
+            <strong>D</strong> = <strong>D</strong>reizehn<br>
+            <strong>F</strong> = <strong>F</strong>ünfzehn
+        </p>
 
         <address class="author">(bj)</address>
     </article>
