@@ -421,3 +421,20 @@ produces it (130 or 170) nor what happens to that column. **Suggested.** "A
 TEDMON dump with a disk file is built at 130 FROM the file and checked row by
 row against the print; the reverse-video ASCII column is dropped (unreadable,
 derivable); differing bytes are a print/disk difference (r300)."
+
+## 160 — a named box's intro text, and section rows inside one captioned box
+
+**What the rule says.** "The `<figcaption>` ALWAYS goes BELOW the table"; "a
+spanning header row that labels a section is a heading, not a row … only labels
+that group *rows within* one table … stay as a spanning `<th>`".
+
+**What happened.** p130's and p146's boxes print intro sentences inside the box
+above the table; the agent used the figure-series clause and put them as `<p>`
+inside the `<figure>`. p150's box has five section labels inside ONE ruled,
+captioned box; splitting them into `<h2>` would have broken the figure, so they
+stayed spanning `<th>`. Both readings are reasonable; neither is stated.
+
+**Suggested.** "Text printed inside a named box above its table is a `<p>` inside
+the `<figure>`, before the table. Section labels inside ONE ruled box under ONE
+caption are spanning `<th>` rows — the heading rule is for labels that sit
+between separate tables."
