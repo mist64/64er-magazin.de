@@ -284,3 +284,28 @@ and refuses to run on an a4600 that already holds an OVERRIDE.
 page, is idempotent (refuses on a4600 that already carries OVERRIDE), and is
 re-run after EVERY r005_a4_window.py run — that program re-cuts every page and
 restores the wrong automatic windows. Record its path in LOG.md."
+
+## 040 — the script has no listing-line test, and the rule's test misses assembler banners
+
+**What the rule says.** "Test the line, not the run: it is a listing line if it
+begins with a line number, or carries `PRINT` / `REM` / `POKE` / `SYS` / `DATA`
+or a checksum `<NNN>` token. In a listing line, escape both."
+
+**What happened.** The script pairs `**` within a line and has no listing-line
+test, so two literal pairs survived its run and its own summary (`**bold**
+pairs=0` — the pair regex cannot span the `\*` between them). Only the rule's
+per-line `**` readout showed them:
+- l.4383 `100 REM \*%** DATEN SCHREIBEN \*%**` — line number AND `REM`; the rule
+  says escape, the script did not.
+- l.4687 `**%\* STRING EINLESEN %%**` — an assembler section banner just before
+  its fenced listing: no line number, no BASIC keyword, so even the rule's test
+  misses it.
+Both escaped (4 `**` → `\*\*`) on exactly those lines, from the orchestrator;
+Discount then renders the asterisks literally (probe run).
+
+**What it cost.** ~5 min.
+
+**Suggested.** Implement the listing-line test in `r040_escape_asterisks.sh`,
+and widen it: "…or the run sits in a banner line — the line is nothing but
+`*`/`%`/`#`/`;` runs around ≤ 4 words in capitals — which is how listings mark
+sections (SH8608 l.4687)."
