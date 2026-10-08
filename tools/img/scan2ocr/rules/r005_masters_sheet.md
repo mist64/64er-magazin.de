@@ -120,6 +120,16 @@ Two stronger witnesses, both free:
    witness must not be re-promoted to "2400 means colour" the next time it looks
    convenient.
 
+   **AND THE WITNESS MISSES IN BOTH DIRECTIONS, so it is not the instrument for
+   finding either colour or markings.** MEASURED on SH8608 by a census over all
+   166 pages: five **600 dpi** pages carry genuine plate colour (009, 020, 026,
+   031, 162), and the issue's one hand MARKING — green highlighter over three
+   lines of p003 — is on a **600 dpi** page too, while all six of its 2400 dpi
+   interior pages are real plate colour and none is a marking. So a marking is
+   not a 2400 dpi phenomenon and the dpi witness will never point at one. Sweep
+   for colour and for markings over EVERY page, independent of dpi (r006 has
+   the measure); read dpi only as "the owner saw something here".
+
    **Read the dpi from the PNG header, not from `identify`.** These scans carry
    `pHYs` in pixels per METRE, and `identify -format '%x'` converts to pixels
    per CENTIMETRE: a 2400 dpi page prints `944.88`, a 600 dpi page `236.22`. A
@@ -181,6 +191,24 @@ profile. A fresh issue has none, so without this the gap is computed against
 the built-in `W` and compares the issue's pages to another issue's paper. The
 measuring method is in `r005_masters_spread.md`; run it on this issue's own
 interior first, then put the three witnesses to the owner together.
+
+**BUT TAKE THAT RECIPE'S IMPORT FROM THIS VARIANT, NOT THAT ONE — AS WRITTEN IT
+IS CIRCULAR.** It opens `import r005_masters_spread as R`, and that module
+REFUSES TO LOAD while `binding` is absent (*"SH8608 has binding=None, not
+'spread'"*), while `binding` is exactly what PAUSE 1 is for. So the rule ordered
+a measurement before PAUSE 1 through a recipe that cannot run before PAUSE 1,
+and SH8608 had to write its own script. The recipe needs only `R.ISS` and
+`R.THUMB_DIR`, and **`r005_masters_sheet` imports fine with `binding` absent**,
+so use this module:
+
+```python
+import r005_masters_sheet as R          # NOT _spread: that one refuses
+```
+
+and skip the owner's `high_pages` in the pool. Verified on SH8608 before its
+PAUSE 1 was answered: 124.8 M interior paper px, `p2 = [188 169 158]`, which is
+the profile the builder had measured with its own script — same number, by a
+recipe the rule can now actually hand over.
 
 ### The answer, recorded
 
@@ -292,7 +320,10 @@ appear in three fences here with no definition in any of them, so two of them
 ran `- <<'PY'` as a command and the Verification block ran on the system python
 (SH8605).
 
-**`r005_field.py` runs first, once per issue**, and measures the
+**`r005_field.py` runs first after PAUSE 1, once per issue** — FIRST of the
+005 programs, not first of the step: it ends in `R.first_action()`, which
+refuses an issue whose `binding` is not yet `sheet`, so it cannot run until
+PAUSE 1 has answered (SH8608). It measures the
 paper-yellowing field for each paper class — about 0.6 s a page on 28 lanes for
 a 600 dpi issue, 119 s for SH8605's 192 interior pages. It writes
 `field_<class>.txt` beside that class's `colors.txt` and nothing else. Run it

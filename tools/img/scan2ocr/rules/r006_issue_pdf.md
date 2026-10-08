@@ -359,8 +359,18 @@ PRINTING PLATE, NOT THIS COPY*. The two are easy to tell apart at 3x:
 | where | where a figure or a tint belongs | wherever a reader wanted to point |
 
 **A page whose only colour is a marking is BILEVEL**: `FORCE_BILEVEL` it, and
-record in the log that the 2400 dpi was a marking, so the next reader of the
+record in the log that the dpi was a marking, so the next reader of the
 cross-check does not re-promote it.
+
+**AND DO NOT LOOK FOR MARKINGS VIA THE DPI — THEY ARE NOT A 2400 DPI
+PHENOMENON.** MEASURED on SH8608, by a saturated-pixel census over all 166
+pages: its one hand marking (green highlighter over three lines of p003) is on a
+**600 dpi** page, and every one of its six 2400 dpi interior pages is real plate
+colour. The same census found plate colour on five more **600 dpi** pages (009,
+020, 026, 031, 162). The cross-check's first direction is still worth running —
+a 2400 dpi page the classifier calls colour-free is still a page to look at —
+but **the sweep for colour, and the sweep for a previous hand, both go over
+EVERY page regardless of dpi.**
 
 **And then flag the mark itself to the owner — it must not reach the PDF.** Owner,
 2026-10-08: *"if you encounter notes or markings that survive into the PDF, flag
