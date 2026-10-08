@@ -265,3 +265,22 @@ Check 1 is therefore still red on 165/166 after the fix, honestly.
 insert A-B at WxH: padded …`), and make check 1 look for the tag the program
 writes. Then verify by re-running 005b and reading 165's stamp — the step that
 was skipped for 1d449a34.
+
+## 005b — a recovery script must be re-runnable, because 005b always re-cuts every page
+
+**What the rule says.** *A PAGE WHOSE TRACE FAILS IS CUT BY A SCRIPT*: "the
+builder writes the script and records which recovery it used in the stamp."
+
+**What happened.** r005_a4_window.py has no per-page mode: any re-run (here,
+to pick up a program fix) re-cuts all 166 pages and silently puts the WRONG
+automatic windows back on p009 and p142. My first p142 recovery had been an
+inline run, so it could not have been replayed. `recover_005b.py` now holds
+both pages, re-copies the CURRENT automatic window to `a4600_auto/` each time,
+and refuses to run on an a4600 that already holds an OVERRIDE.
+
+**What it cost.** ~10 min to fold p142 into the script after the fact.
+
+**Suggested.** "The recovery script lives in `<tmp>`, covers every recovered
+page, is idempotent (refuses on a4600 that already carries OVERRIDE), and is
+re-run after EVERY r005_a4_window.py run — that program re-cuts every page and
+restores the wrong automatic windows. Record its path in LOG.md."
