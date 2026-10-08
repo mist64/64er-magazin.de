@@ -320,3 +320,25 @@ with `.venv/bin` first on PATH so `python3` resolved to the venv. r000's
 **Suggested.** `PY="${PYTHON:-$DIR/../../../../.venv/bin/python}"` at the top
 of r060_md_to_html.sh and every other `.sh` here that calls python, and grep the
 wrappers for a bare `python3` as part of r000's census.
+
+## 080 — an open question in a rule is scoped by the sentence that introduces it
+
+**What the rule said.** r080, *Eingabehinweise beside the Checksummer — AN OPEN
+QUESTION, NOT A PRECEDENT*: "a later issue meeting this shape goes to the owner".
+
+**What I did.** SH8608 prints the Checksummer on p129 and *Wie unsere
+Basic-Programme einzugeben sind* on p130, two Inhalt lines, nothing shared.
+The heading's SUBJECT (Eingabehinweise + Checksummer) matched, so I asked
+control and built the reversible default (two articles) meanwhile. Control:
+the corpus has shipped this exact shape 15+ times, never folded; what made
+SH8603 hard was its GEOMETRY (shared page with a third article, its figures
+printed on the Checksummer's page). Rule fixed in `a865bc40` with a
+discriminator table.
+
+**What it cost.** One round trip, no rework (the default was right).
+
+**Suggested.** A general sentence in r000 or r340: "When a rule records an
+open question, introduce it by WHAT MADE IT HARD (here: the piece shares a page
+with a third article and its figures sit on another article's page), never by
+its subject. A question scoped by subject catches every later issue that shares
+the subject and none of the difficulty."
