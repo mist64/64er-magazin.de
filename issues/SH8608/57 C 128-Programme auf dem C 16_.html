@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>C 128-Programme auf dem C 16?</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christian Quirin Spitzner, bj">
+    <meta name="64er.issue" content="Sonderheft 8/86">
+    <meta name="64er.pages" content="57,59-66">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX7">
+</head>
+
+<body>
+    <article>
+        <h1>C 128-Programme auf dem C 16?</h1>
+        <p class="intro">Da es für den C 16 bisher noch recht wenig Software gibt, werden sich viele C 16-Besitzer fragen, wie man ohne großen Aufwand Programme anderer Commodore-Computer umschreiben kann. Die Umwandlung vom Programm für den C 128 auf den C 16 wollen wir hier etwas näher betrachten.</p>
+
+        <p>\ m letzten VC 20/C 16-Sonderheft (SH 3/86) wurden die Gemeinsamkeiten des C 16 und VC 20 behandelt. Dieser</p>
+
+        <p>Vergleich ermöglichte es bestimmt vielen Lesern, VC 20-Programme an den C 16 anzupassen. Dies ist vor allem möglich, weil diese beiden Computer noch sehr viele Gemeinsamkeiten aufweisen. Eine Anpassung von © 128-Programmen auf den C 16 bedeutet allerdings etwas mehr Aufwand.</p>
+
+        <p>Wenn im folgenden Artikel vom C 16 gesprochen wird, ist natürlich ebenso der C 116 und Plus/4 gemeint.</p>
+
+        <p>Erste Schwierigkeiten treten auf, wenn man versucht, »einfache« Basic-Programme vom C 128 auf dem C 16 laufen zu lassen. Allzuoft tritt der »beliebte« SYNTAX ERROR auf. Dies liegt daran, daß der C 128 im Vergleich zum C 16 ein noch besseres Basic (Basic 7.0) besitzt. Tabelle 1 enthält den gesamten Befehlsvorrat des C 128. Die hervorgehobenen Befehle sind im Basic 3.5 des C 16 nicht enthalten. Bei einer Anpassung von Basic-Programmen müssen solche Befehle durch geeignete Routinen ersetzt oder gänzlich weggelassen werden.</p>
+
+        <p>Zunächst soll versucht werden, die fehlenden Befehle aufzuführen und eine eventuelle Umgehungsmöglichkeit anzubieten.</p>
+
+        <h3>APPEND</h3>
+
+        <p>Der Append-Befehl öffnet eine existierende, serielle Datei vom Typ SEQ, USR oder PRG als Ausgabedatei und positioniert den Schreibzeiger auf das Dateiende. Damit besteht die Möglichkeit, zusätzliche Daten in eine schon geschlossene serielle Datei zu schreiben. Der Befehl hat folgendes Format:</p>
+
+        <p>APPEND #log Filnr, Dateiname, D Laufw., U Geräteadr.</p>
+
+        <p>zum Beispiel:</p>
+
+        <p>APPEND #2, "TEXT"</p>
+
+        <p>Dasselbe kann beim C 16 mit dem normalen OPEN-Befehl erreicht werden:</p>
+
+        <p>OPEN 2,8,2, "TEXT,A"</p>
+
+        <p>BANK</p>
+
+        <p>Die BANK-Anweisung definiert eine von 16 möglichen 64-KByte-Speicherbänken für nachfolgende PEEK-, POKE-, SYS- oder WAIT-Anweisungen. Der BANK-Befehl erübrigt sich beim C 16, da sich seine 16-KByte-RAM-Speicher ohne weiteres über eine 16-Bit-Adreßleitung adressieren lassen.</p>
+
+        <h3>BEGIN-BEND</h3>
+
+        <p>Die Anweisungen BEGIN-BEND, welche einen beliebig langen Block von Basic-Anweisungen umschließen, kann man ohne weiteres mit GOTO, GOSUB oder einer IF...THEN-Anweisung umgehen.</p>
+
+        <h3>BLOAD-BSAVE</h3>
+
+        <p>Der Befehl BSAVE ermöglicht es, beim C 128 beliebige Speicherbereiche direkt zu speichern. Mit BLOAD kann dieser Datenblock wieder an die gleiche Stelle geladen werden. Die Befehle haben folgendes Format:</p>
+
+        <p>BSAVE Dateiname, D Laufwerk, U Gerät, ON B Bank, P Anfangsadresse TO P Endadresse</p>
+
+        <p>Sowohl die Anfangs- als auch die Endadresse werden in dezimaler Form erwartet.</p>
+
+        <p>BLOAD Dateiname, D Laufwerk, U Gerät, ON B Bank...</p>
+
+        <p>Beide Befehle können mit Hilfe einer kleinen Maschinenroutine simuliert werden. Das Programm heißt »BASICTOOL« und ist unter der Rubrik Tips &amp; Tricks zum C 16 nochmals veröffentlicht. Mit Hilfe dieses Programms werden die Befehle BSAVE und BLOAD wie folgt simuliert:</p>
+
+        <p>BSAVE: SYS 1548" name" ,G,1,AA,EA+1</p>
+
+        <p>BLOAD: SYS 1536 "name",G,1</p>
+
+        <p>Hierbei gibt G die Geräteadresse an, AA steht für die Anfangsadresse und EA für die Endadresse. BOOT</p>
+
+        <p>Der Befehl BOOT erübrigtsich beim C 16, daer nicht CP/M-fähig ist und deshalb auch kein CP/M-Programm von Diskette laden und starten kann.</p>
+
+        <p>BUMP</p>
+
+        <p>Da der C16 keine Sprites besitzt, erübrigt sich auch ein Ersatz für die BUMP-Funktion des C 128. Dieser Befehlliefert die Sprite-Nummer bei einer Sprite-Kollision. CATALOG-DIRECTORY</p>
+
+        <p>Der CATALOG-Befehl listet das Directory der Diskette auf. Gleiches bewirkt auch der DIRECTORY-Befehl des C 16 und C 128. Warum man beim C 128 für ein und dieselbe Funktion zwei Befehle benötigt, ist mir ein Rätsel, zumal beide Befehle dieselbe Betriebssystemroutine verwenden. COLLISION</p>
+
+        <p>Auch die COLLISION-Anweisung für die Sprites des C 128 ist auf dem C 16 nicht zu ersetzen.</p>
+
+        <p>CONCAT</p>
+
+        <p>Der CONCAT-Befehl des C 128 hängt an eine sequentielle Datei eine andere gleichartige Datei an. Das heißt, eskönnen auf einer Diskette mehrere Dateien des Typs SEQ zusammengefaßt werden. Dabei wird die Zieldatei, also die Datei, an die eine andere angehängt wird, verändert. Sie existiert nach dem Kommandb in ihrer ursprünglichen Form nicht mehr. Die angehängte Datei bleibt dagegen weiterhin zusätzlich in der alten Form im Directory.</p>
+
+        <p>Zum Beispiel:</p>
+
+        <p>CONCAT "DATEN1" TO "DATEN2"</p>
+
+        <p>. Hier wird die Datei DATEN1 an DATEN2 angehängt. DATEN2 wird dadurch verändert.</p>
+
+        <p>Beim C 16 kann man den CONCAT-Befehl mit der COPY-Anweisung über den Kommandokanal der Floppy umgehen: OPEN 1,8,15</p>
+
+        <p>PRINT #1, "C0:DATEN2=0:DATEN2,0:DATEN1</p>
+
+        <p>CLOSE 1</p>
+
+        <p>Auch hier wird die Datei DATEN1 an DATEN2 angehängt. DATEN2 wird dadurch verändert. Will man beim C16 eine Veränderung der Datei DATEN2 verhindern, aber trotzdem beide Dateien verknüpfen, verwendet man folgende Anweisung:</p>
+
+        <p>OPEN 1,8,15</p>
+
+        <p>PRINT #1, "C0:DATEN3=0:DATEN2,0:DATEN1</p>
+
+        <p>CLOSE 1 Eine Kopie der Dateien DATEN2 und DATEN1 wird zur Datei DATEN3 zusammengefaßt. Die Ursprungsdateien bleiben in ihrer alten Form unverändert. R</p>
+
+        <p>DCLEAR</p>
+
+        <p>Der Befehl DCLEAR zum Schließen aller geöffneten Diskettenkanäle für ein bestimmtes Laufwerk muß im Basic 3.5 durch den Befehl CLOSE umgangen werden.</p>
+
+        <p>DCLOSE-DOPEN</p>
+
+        <p>Auch der Befehl DCLOSE zum Schließen aller Dateien auf einer Diskette muß durch CLOSE ersetzt werden.</p>
+
+        <p>Zur Eröffnung einer Datei auf Diskette stehtbeim C 128 der DOPEN-Befehl zur Verfügung. So kann mit DOPEN1,...Kanal 1 zum Floppy eröffnet werden. Beim C16 wird dasselbe durch OPEN 1,8,... erreicht.</p>
+
+        <p>DVERIFY .</p>
+
+        <p>Zusätzlich zu den Befehlen DSAVE und DLOAD zum Speichern und Laden von Programmen auf Diskette wurde beim C128 der DVERIFY-Befehl integriert. Während das Laden und Speichern mittels DLOAD und DSAVE beim © 16 möglich ist, muß die Programmspeicherung auf Disk mit VERIFY "PROGRAMM'",8 (eventuell auch noch »,1«) überprüft werden. ENVELOPE-FILTER</p>
+
+        <p>Da der C 16 leider keinen SID-Chip für die Tonerzeugung hat, erübrigt sich auch der ENVELOPE-Befehl zur Definition einer Hüllkurve.</p>
+
+        <p>Der Tongenerator des C 16 ist nur über die Befehle VOL und SOUND ansteuerbar. Alle anderen beliebten Synthesizerfunktionen, die man vom C64 oder C 128 kennt, sind beim C16 nicht integriert. Deshalb hat auch die FILTER-Anweisung, zum Setzen der Klangfilterparameter des SID, beim C 16 keine »Daseinsberechtigung«.</p>
+
+        <p>FAST-SLOW</p>
+
+        <p>Weil man den © 16 im Gegensatz zum C 128 nicht auf doppelte Geschwindigkeit schalten kann, sind die Befehle FAST und SLOW, zum Wählen der Taktfrequenz zwischen 1 und 2 MHz, nicht sinnvoll.</p>
+
+        <p>FETCH - STASH - SWAP - G064</p>
+
+        <p>Die Befehle FETCH, STASH und SWAP zur RAM-Floppy-Verwaltung sind auch beim C 128 nur mit eingesteckter RAM-Floppy-Karte wirksam. Da mir nicht bekannt ist, daß von Commodore eine RAM-Floppy für den C 16 angeboten wird, sind diese Befehle beim C 16 unnötig.</p>
+
+        <p>Mit der Anweisung GO64 kann man den C 128 zum C64 umschalten. Da aber der C 16 nicht den Luxus von mehreren Computern in einem Gehäuse bietet, erübrigt sich auch dieser Befehl beim C 16.</p>
+
+        <p>GRAPHIC-MOVSPR</p>
+
+        <p>Der GRAPHIC-Befehl zum Umschalten in die Grafik-Modi existiert bei beiden Geräten. Der C128 berücksichtigt zusätzlich die 80-Zeichen-Darstellung.</p>
+
+        <p>Die MOVESPR-Anweisung zur Sprite-Animation entfällt beim C 16 wegen »akutem Sprite-Mangel«. PEN-POT</p>
+
+        <p>"Die Befehle PEN zur Abfrage des Lichtgriffels und POT zur Überprüfung des Paddies sind beim C 16 nicht vorhanden und müssen bei Bedarf durch selbstgeschriebene Programme ersetzt werden.</p>
+
+        <p>PLAY</p>
+
+        <p>Die PLAY-Anweisung zum Spielen einer Tonsequenz läßt sich beim C 16 sehr leicht durch ein kleines Basic-Programm ersetzen, zumal sich der simple Tongenerator mit Tonhöhe, Notenlänge und Lautstärke zufriedengibt. POINTER</p>
+
+        <p>Der POINTER-Befehl gibt beim C128 die Adresse einer Variablen im Speicher an. Diese nützliche Funktion fehlt leider beim C 16 und läßt sich auch nicht ohne weiteres durch ein »kleines« Basic-Programm ersetzen. Für einen geübten Programmierer dürfte aber eine entsprechende Maschinenroutine kein großes Problem darstellen.</p>
+
+        <p>RECORD</p>
+
+        <p>Zum komfortablen Positionieren des Schreib/Lese-Zeigers innerhalb einer REL-Datei, auf Diskette, steht dem C 128 Benutzer der RECORD-Befehl zur Verfügung. Der RECORD-Befehl hat folgenden Syntax:</p>
+
+        <p>RECORD #LA,R,B</p>
+
+        <p>Hierbei gibt #LA die logische Adresse der Datei, R die Record-Nummer und B die Stelle im Record an. Die Anweisung RECORD #1,200 positioniert zum Beispiel den Record-Zeiger der Datei mit LA=1 auf 200.</p>
+
+        <p>Will man beim C 16 den Schreib/Lese-Zeiger positionieren, muß man sich des Befehls POSITION im Kommandokanal der Floppy bedienen. Dieser hat folgendes Format:</p>
+
+        <p>PSARLRHB</p>
+
+        <p>Hier gibt SA die Sekundäradresse für die Position an. Zu diesem Wert muß 96 addiert werden. Wenn Sie die Datei durch OPEN 1,8,2.,..., also mit SA=2 geöffnethaben, so müssen Sie beim POSITION-Befehl für SA den WERT 98 (2+96) angeben.</p>
+
+        <p>RL und RH beinhalten die Record-Nummer zerlegt in Low- und High-Byte. Diese ist nötig, weil mit einem Byte nur 256 Werte dargestellt werden können, aber eine relative Datei mehr als 256 Records haben kann. Wenn R die absolute Record-Nummer ist, errechnen sich beide Parameter wie folgt:</p>
+
+        <p>RH = INT (R/256)</p>
+
+        <p>RL = R-RH*256</p>
+
+        <p>Der letzte Parameter stimmt mit der entsprechenden Angabe im RECORD-Befehl beim C 128 überein. Er gibt auch hier die Stellung im Record an. Dieser Parameter kann in beiden Fällen nur Werte von 1 bis 254 annehmen. Alle vier Parameter sind BYTE-Parameter und müssen mit Hilfe der CHR$()-Anweisung gesendet werden.</p>
+
+        <p>Will man beim C 16 beispielsweise eine REL-Datei mit der Kanalnummer 5 eröffnen und den Schreib/Lese-Zeiger auf Record 1000, Byte 15 stellen, so benutzt man folgende Anweisungen:</p>
+
+        <pre><code>OPEN 1,8,15
+RH = INT (1000/256)
+RL = 1000-RHx256
+PRINT#1,"P" + CHR$(5+96) + CHR$(RL) + CHR$(RH) + CHR$(15)
+CLOSE 1
+</code></pre>
+
+
+        <p>RREG</p>
+
+        <p>Die RREG-Anweisung des C 128 weist vier Variablen die Inhalte der Prozessorregister (Akku, X-Reg., Y-Reg.) und des Statusregisters zu. Beim C 16 lassen sich diese Werte durch die altbekannte PEEK-Anweisung auslesen:</p>
+
+        <pre><code>A-Reg. = PEEK (2034)
+X-Reg. = PEEK (2035)
+Y-Reg. = PEEK (2036)
+Statusreg. = PEEK (2037)
+</code></pre>
+
+
+        <p>RSPRCOLOR - RSPPOS - PSPRITE</p>
+
+        <p>Folgende Befehle zur Sprite-Animation und Kontrolle sind, wie schon erwähnt, beim © 16 nicht zu realisieren. Zur Sprite-Abfrage dienen beim C128 die Befehle RSPRCOLOR, RSPPOS und PSPRITE. Zur Sprite-Definiton und -Animation können die Basic-Befehle SPRCOLOR, SPRDEF, SPRITE und SPRSAV verwendet werden.</p>
+
+        <p>WINDOW - RWINDOW</p>
+
+        <p>Während der C 128 fähig ist, mehrere Windows zu definieren, stehtbeidemC 16 nur ein Fenster zur Verfügung. Dieses kann zudem nur über die ESC-Taste definiert werden. Der C 128 bietet dagegen komfortable Window-Befehle. Mit der Anweisung WINDOW lassen sich die Bildschirmfenster für die Textausgabe setzen.</p>
+
+        <p>Will man die aktuellen Parameter eines Windows abfragen, so steht dem C 128-Nutzer der Befehl RWINDOW zur Verfügung. Damit lassen sich allerdings nur drei Parameter abfragen:</p>
+
+        <ul>
+            <li>
+                <p>letzte Zeile des Fensters</p>
+            </li>
+            <li>
+                <p>letzte Spalte des Fensters</p>
+            </li>
+            <li>
+                <p>Bildschirmbreite (40 oder 80 Zeichen)</p>
+            </li>
+        </ul>
+
+
+        <p>Beim C 16 ist der Aufwand, im Direktmodus ein Window zu definieren, keineswegs hinderlich, sondern bringt eher Vorteile, da kein Befehl »Window« am Bildschirm erscheint. Im laufenden Programm ist es jedoch sehr umständlich, ein Fenster zu generieren. Es sind sehr viele PRINT-Anweisungen notwendig.</p>
+
+        <p>Da die WINDOW-Funktion zweifellos in vielen C 16-Programmen nützlich wäre, Iohntes sich schon, diesen Befehl im C 16-Wortschatz aufzunehmen. Ein kleines Maschinenprogramm aus dem 64'er-Sonderheft 3/86, Seite 174, macht es möglich. Nach dem Initialisieren des Programms steht dem C 16-Nutzer der Befehl FENSTER zur Verfügung. Mit ihm läßt sich durch Angabe von vier Parametern ein Window eröffnen. Weitere Anregungen zur Window-Technik auf dem C 16 sind den Artikeln »Das Auge ißt mit« in dieser Ausgabe und »Windows – Fenster zum neuen Bedienungskomfort« im Sonderheft 7/86 zu entnehmen.</p>
+
+        <p>Um die Parameter des Bildschirmfensters zu erfahren bedient man sich ebenfalls der PEEK-Anweisung. In den Systemadressen lassen sich unter den Labels SCBOT, SCTOP, SCLF und SCRT die Bildschirmgrenzen abrufen:</p>
+
+        <pre><code>BESCHREIBUNG LABEL ADRESSE
+Unterer Bildrand: SCBOT PEEK(2021)
+Oberer Bildrand: SCTOP PEEK(2022)
+Linker Bildrand: SCLF PEEK(2023)
+Rechter Bildrand: SCRT PEEK(2024)
+SLEEP
+</code></pre>
+
+
+        <p>Um den C 16 in der Programmabarbeitung für eine gewisse Zeit anzuhalten, bedient man sich in der Regel einer FOR...NEXT-Schleife. Beim C128 kann der Computer mit . SLEEP für eine bestimmte Zeit (zwischen 1 und 65535 Sekunden) »eingefroren« werden. Will man den C 16 ebenfalls für eine ganz bestimmte Zeit stillegen, so kann man sich der Variablen der Systemuhr (Tl und TI$) bedienen. TEMPO</p>
+
+        <p>Der TEMPO-Befehl setzt das Abspieltempo für die PLAY-Anweisung beim C 128. Dader C 16 aber keinen PLAY-Befehl besitzt, hat auch TEMPO wenig Sinn. WIDTH</p>
+
+        <p>Mit Ausnahme einer Anweisung besitzen beide Computer dieselben Grafik-Befehle. Um die Strichstärke bei allen Grafik-Befehlen zu variieren, besitzt der C 128 zusätzlich den Befehl WIDTH. Mit ihm kann zwischen einfacher und doppelter Strichstärke umgeschaltet werden. Soll beim C16 doppelt-dick gezeichnet werden, muß wohl oder übel der Grafik-Befehl zweifach angewandt werden. Zwischen beiden Anweisungen sollte man natürlich die entsprechenden Parameter um jeweils ein Pixel vergrößern oder verkleinern. XOR</p>
+
+        <p>Als letzter Basic-Befehl ist im Basic 7.0 zusätzlich zu den anderen logischen Operationen (and, or, not) die XOR-Anweisung hinzugekommen. Diese dient zur Exklusiv-Oder-Verknüpfung zweier Werte. Einen entsprechenden Ersatz gibt es dafür beim C 16 leider nicht. Die einzige Möglichkeit wäre, die Werte in 16-Bit-Zahlen zu zerlegen und diese »von Hand« exklusiv-oder-verknüpfen. So ergibt die Anweisung: PRINT XOR (124,12) den Wert 112. Von Hand sieht die Sache so aus:</p>
+
+        <pre><code>Dezimalzahl Binärschreibweise:
+124 0000000001 111100
+12 0000000000001 100
+xXoR 112 0000000001 110000
+</code></pre>
+
+
+        <p>Ein entsprechendes Basic-Programm zur Umwandlung von Dezimalzahlen in Binärschreibweise und anschließende XOR-Verknüpfung wäre relativ lang und würde den Rahmen dieses Artikels sprengen.</p>
+
+        <h2>Maschinenprogramme</h2>
+
+        <p>Soweit zur Basic-Anpassung der C 128-Programme an den C 16. Bis zu diesem Punkt ist es für den C 16-Anwender noch recht einfach, Programme für sein System umzusetzen. Wenn es darum geht, Maschinenprogramme umzuschreiben, wird die Sache schon komplizierter.</p>
+
+        <p>Zunächst werfen wir einen Blick auf die Prozessoren beider Geräte. Der C16 sowie der C128 besitzen sozusagen einen 65 xx-Prozessor. ImC 16 arbeitet ein Prozessor mit der Bezeichnung 7501. Diese Commodore-Entwicklung hat denselben Befehlsvorrat wie der 6502 des VC 20 oder 6510 des C 64. Er unterscheidet sich unter anderem dadurch, daß er das Bankswitching unterstützt. Diese Option erscheint für den C 16/116 überflüssig, da er mit seinem 16-KByte-RAM-Speicher keine Probleme haben dürfte, Betriebssystem, Basic-Interpreter und RAM-Speicher mit einer 16-Bit-Adreßleitung zu adressieren. Daaber auch der Plus/4 mit eingebauter Software und 64-KByte-RAM-Speicher denselben Prozessor besitzt, ist die Option BANKSWITCHING durchaus sinnvoll. Wenn Sie nun glauben, daß diese Funktion beim C 16 zwar vorhanden ist, aber nicht genutzt wird, so haben Sie weit gefehlt. Ein Beweis hierfür ist eine 64-KByte-Karte für den C 16. Diese stellt dem Benutzer wie beim Plus/4 fast 64-KByte-Basic-Speicher zur Verfügung. Das »Herz« des C128, der 8502-Prozessor, ist ebenfalls eine Entwicklung von Commodore. Er wurde speziell für den C 128 entwickelt und enthält ebenfalls alle Eigenschaften der Vorgänger. Dieser Prozessor hat den Vorteil, daß er im Gegensatz zu seinen Vorgängern mit unterschiedlicher Frequenz getaktet werden kann (erinnern wir uns an die Basic-Befehle FAST und SLOW).</p>
+
+        <p>Ein wichtiger Teil für .Maschinen-Programmierer ist die Zeropage bei beiden Computern. Dieser Bereich isteiner der wichtigsten Bereiche des Computers. Hier werden die meisten Werte von ROM-Operationen »zwischengelagert«. Außerdem liegen hier viele Betriebssystem-Vektoren. Da der Zeropage-Bereich im RAM-Bereich liegt, kann man durch Veränderung von Vektoren und Parametern fast beliebig ins »Computergeschehen« eingreifen. Aber Vorsicht: Unkontrollierte Änderungen (durch POKE) im Zeropage führen fast immer zu einem Totalabsturz!</p>
+
+        <p>Die Zeropage beider Computer ist ähnlich aufgebaut. Dies können sie den Tabellen 2 und 3 entnehmen. Natürlich verfügt der C 16 nicht über alle Funktionen des C 128. Im folgenden sollen die Zeropage-Adressen mit gleicher Bedeutung gegenübergestellt werden.</p>
+
+        <p>Die Adressen O und 1 haben bei beiden Computern die gleiche Funktion. Folgende Speicherstellen des C128 (Adresse 9 bis 98) liegen beim C 16 zwei Byte tiefer (also: Adresse 7 bis 96) und haben im großen und ganzen dieselben Aufgaben. Einige Bytes werden beim C 128 mit einer Doppelfunktion belegt, die aber beim C 16 keine Rolle spielen. Auch die folgenden Speicherstellen 99 bis 105 und 106 bis 111 enthalten dasselbe, wie die C 16-Speicherstellen 97 bis 103 und 105 bis 110. Der Überlauf für den Fließkomma-Akkumulator 1 fehlt beim C128 an der entsprechenden Stelle. Das heißt, daß im folgenden der Abstand zwischen den Speicherstellen des C 16 und C 128 auf ein Byte zusammenschrumpft: Die Zeropage-Adressen von 112 bis 126 befinden sich beim C 16 zwischen 111 und 127. Wo sich beim © 16 der Arbeitsbereich für den Sound befindet (126 bis 143), wurden beim C 128 nützliche Parameter für die Grafik eingeschoben.</p>
+
+        <p>Identisch sind die Adressen 144 bis 150. Der nun folgende Bereich der Zeropage (151 bis 255) enthält im großen und ganzen dieselben Parameter und Zeiger. Ihre Lage wurde aber dermaßen »durcheinandergewürfelt«, daß eine genaue Gegenüberstellung sehr umfangreich ausfallen würde. Aus den Tabellen 2 und 3 kann aber nach Bedarf die gesuchte Adresse sehr leicht entnommen werden.</p>
+
+        <p>Die Zeiten, in denen man die wichtigsten Systemadressen innerhalb der ersten 256 Byte unterbrachte, sind jedoch längst vorbei. Nur die alten Commodore-Geräte (PET, CBM 30xx und CBM 40xx) kamen mit der Zeropage aus. Die Nachfolger benötigten immer mehr Systemadressen für Farbe, Grafik, Sprites und so weiter. Beim C 16 wurden schließlich acht »Seiten« mit jeweils 256 Byte verwendet (Adresse O bis 2047) (Tabelle 4).</p>
+
+        <p>Der C128 mußte bedingt durch den 40-Zeichen-Bildschirm im Bereich 1024 bis 2023 die Systemadressen bis zur Adresse 4860 ausweiten (Tabelle 5).</p>
+
+        <p>All diese Systemadressen zu erläutern und zu vergleichen würde dieses Sonderheft füllen. Um Ihnen einen Überblick zu ermöglichen, werden die erweiterten Zeropages in den Tabellen 4 und 5 gegenübergestellt.</p>
+
+        <p>Zum Schluß noch ein weiterer wichtiger Punkt für Maschinen-Programmierer. Viele Maschinenprogramme nutzen die sogenannten Kernel-Sprungadressen am Ende des Betriebssystems für vielfältige Aufgaben. Hier sind Betriebssystemroutinen adressiert, die sehr häufig benötigt werden. Die wohl bekannteste ist die »BSOUT«-Routine bei $FFD2 (Dez: 56490), die ein Zeichen am Bildschirm ausgibt. Auch beim C128 wurden diese Sprungadressen implementiert. Das heißt, Sprünge ins Betriebssystem ab Adresse $FF81 (Dez: 56490) müssen nicht angepaßt werden.</p>
+
+        <p>Fazit:</p>
+
+        <p>Beide Computer haben mehr Gemeinsamkeiten, als zunächst angenommen. Obwohl eine Anpassung der C 128-Programme etwas aufwendiger ist als beim VC 20, ist es doch machbar. Ich hoffe, Sie haben mit diesem Artikel ein Mittel in Händen, das Ihnen hilft, diese »schwierige« Arbeit zu erleichtern.</p>
+
+        <address class="author">(Christian Quirin Spitzner/bj)</address>
+    </article>
+</body>
+
+</html>

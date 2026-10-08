@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Spitzen-Diskmonitor für C 16 und Plus/4</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="T. Pohl, ks">
+    <meta name="64er.issue" content="Sonderheft 8/86">
+    <meta name="64er.pages" content="132-134">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX29">
+</head>
+
+<body>
+    <article>
+        <h1>Spitzen-Diskmonitor für C 16 und Plus/4</h1>
+        <p class="intro">Mit »Disk Mon 16« wollen wir Ihnen einen durchaus professionellen Disketten-Monitor für den C16, den C116 und den Plus/4 anbieten. Es handelt sich hier sicherlich um das beste bisher veröffentlichte Programm.</p>
+
+        <p>ei»Disk Mon 16« handelt es sich um ein professionelles Maschinenprogramm, das wir Ihnen als Basic-Lader anbieten (Listing 1). Angefangen bei Befehlen wie Block lesen und Block schreiben können Sie mit dem Disketten-Monitor auch alle Byte eines Blocks ändern, Befehle an das Diskettenlaufwerk senden, das Directory anzeigen und Zahlen in verschiedene Zahlensysteme umrechnen.</p>
+
+        <p>Wenn Sie das Programm (Listing 1) abgetippt und gespeichert haben, starten Sie es mit»RUN«. Die DATAs werden nun im Speicher des Computers als Maschinenprogramm abgelegt (das dauert etwa 96 Sekunden). Anschließend startet sich der Monitor automatisch.</p>
+
+        <p>Wenn alles stimmt, erscheint jetzt ein Titelbild auf dem Monitor, das das Hauptmenü enthält. Natürlich wollen Sie nicht jedesmal wieder das Basic-Programm laden und dann 96 Sekunden auf den Start des Disketten-Monitors warten. Sie können das eigentliche Maschinenprogramm nun auch direkt auf Diskette speichern und anstatt des Basic-Laders laden und starten, was folgendermaßen funktioniert:</p>
+
+        <p>Verlassen Sie mit &lt;E&gt; den Disketten-Monitor. Es erscheint »READY.«, und Sie befinden sich wieder im Basic. Anschließend tippen Sie</p>
+
+        <p>MONITOR und drücken die &lt;RETURN &gt; -Taste. Haben Sie alles richtig gemacht, dann befinden Sie sich jetztim Maschinensprache-Monitor Ihres Computers. Die Anzeige auf dem Bildschirm sieht etwa so aus:</p>
+
+        <p>MONITOR</p>
+
+        <p>PC SR AC XR YR SP</p>
+
+        <p>; FF0O 00 00 FF 00 F2</p>
+
+        <p>Unterhalb dieser Zeilen blinkt. der Cursor, und der Computer wartet auf Ihre Eingabe. Tippen Sie jetzt bitte</p>
+
+        <p>S"DISK MON 16",08, 3835, 3ED7 und drücken Sie wiederum die &lt;RETURN &gt; -Taste. Das Laufwerk läuft nun an und speichert den Disketten-Monitor auf Diskette. Das Ergebnis auf der Diskette ist ein Programm mit dem Namen »DISK MON 16«, das nur sieben Blöcke lang ist.</p>
+
+        <p>Wir gehen einmal davon aus, daß der Disketten-Monitor gestartet ist. Dann erscheint das Hauptmenü mit allen zur Verfügung stehenden Befehlen.</p>
+
+        <p>Mit dem Befehl &lt;M&gt; ist es möglich, jederzeit wieder ins Hauptmenü zurückzukehren. Das ist zum Beispiel dann notwendig, wenn wir den Befehl für das Lesen eines Sektors nicht mehr wissen und noch einmal nachsehen wollen.</p>
+
+        <p>Mit dem Befehl &lt;L&gt; können Sie einen beliebigen Block von der Diskette in den Speicher des Computers lesen. Der Block steht dabei im Bereich von $3EFE bis $3FFD (16126 bis 16381). Die Syntax des &lt;L&gt;-Befehls lautet dabei L Track Sektor wobei für »Track« die Spurnummer (von 01 bis 35) und für Sektor die entsprechende Sektornummer (je nach Spur von O0 bis 20, 18, 17, 16) eingegeben werden kann.</p>
+
+        <h2>Arbeit mit drei Zahlensystemen</h2>
+
+        <p>Die Angabe der Track- und der Sektornummer kann dabei in einem der drei Zahlensysteme hexadezimal, dezimal oder binär eingegeben werden. Werden dezimale Werte verwendet, so erübrigt sich ein Kennzeichen. Bei hexadezimalen Werten müssen Sie ein <$> und bei Binärwerten ein &lt;%> vor den betreffenden Wert setzen.</p>
+
+        <p>Wollen Sie einen Sektor wieder auf die Diskette schreiben, dann verwenden Sie den Befehl &lt;S&gt;. Seine Syntax ist gleich der des &lt;L&gt;-Befehls, wobei wiederum alle drei Zahlensysteme verwendet werden können, also zum Beispiel: 5 $01 700000000</p>
+
+        <p>Dieser Befehl schreibt einen Block bei Spur 1 Sektor O auf die Diskette..Die Tracknummer wurde dabei hexadezimal und die Sektornummer binär angegeben.</p>
+
+        <p>Haben Sie einen Block gelesen, dann wollen Sie sich dessen Inhalt natürlich auch gleich ansehen. Dazu dient der Befehl &lt;A&gt;. Wird kein Adreßbereich angegeben, so wird der gesamte Sektor aufgelistet. Die Angaben sind dabei alle hexadezimal.</p>
+
+        <p>Bremsen können Sie das Auflisten mit der Commodore-Taste, abbrechen können Sie mit &lt;RUN/STOP &gt;.</p>
+
+        <p>Wollen Sie nur eine bestimmte Anzahl von Bytes auf dem Bildschirm ausgeben, so geben Sie den Adreßbereich an, der angezeigt werden soll. Beide Angaben werden dabei hexadezimal entgegengenommen, wenn kein Kennzeichen angegeben wird und dürfen Werte zwischen $00 und $FF enthalten. Wollen Sie sich also nur die erste Hälfte eines Sektors ansehen, den Sie zuvor eingelesen haben, so tippen Sie AO0O7F oder aber auch</p>
+
+        <p>A %00000000 %01111111</p>
+
+        <p>Der nächste Befehl ist vor allem für Maschinensprache-Programmierer interessant. Es handelt sich um den Befehl &lt;t&gt;, der das Springen in den Maschinensprache-Monitor gestattet. Hier kann der entsprechende Block dann zum Beispiel disassembliert oder assembliert werden. Die Rückkehr erfolgt entweder über Basic (siehe oben) oder mit »G 3835«.</p>
+
+        <p>Einen einmal eingelesenen Sektor können Sie natürlich auch verändern. Dazu lassen Sie sich den betreffenden Teil anzeigen (mit dem &lt;A&gt;-Befehl). Anschließend gehen Sie mit den Cursortasten auf das entsprechende Byte und</p>
+
+        <h2>Speichern des Disk Mon 16</h2>
+
+        <p>Wollen Sie das Programm auf der Datasette speichern, so müssen Sie die Angabe »,08,« hinter dem Filenamen im Maschinensprache-Monitor lediglich in »,01,« für die Datasette ändern.</p>
+
+        <p>Wollen Sie diesen »reinen« Disketten-Monitor nun wieder in den Computer laden und starten, so geben Sie LOAD "DISK MON 16" ,8,1 beziehungsweise für die Datasette</p>
+
+        <p>LOAD "DISK MON 16" ,1,1 ein. Anschließend kommen Sie mit dem Befehl</p>
+
+        <p>SYS 14389 wieder in den »Disk Mon 16«. ändern es demgemäß ab. Die Eingabe wird in jeder Zeile mit &lt;RETURN&gt; abgeschlossen.</p>
+
+        <p>Wollen Sie eine Zeile direkt eingeben, dann schreiben Sie .einen Doppelpunkt »:«, der dem Eingabe-Befehl entspricht, und geben anschließend eine Adresse und nachfolgend bis zu acht Byte ein. Wie Sie sicherlich bemerken, steht beim Auflisten eines Sektors an jedem Zeilenanfang schon automatisch der Doppelpunkt »:«, so daß ein einfaches Ändern der Bytes oder der Adresse genügt.</p>
+
+        <p>Natürlich ist es unter »Disk Mon 16« auch möglich, einen Befehl an die Diskettenlaufwerk zu senden. Dazu tippen Sie den Befehl &lt;O&gt; und nachfolgend die Zeichenkette für die Floppy ein. Wollen Sie also eine Diskette formatieren, dann tippen Sie zum Beispiel: ON:TESTDISKETTE,TD</p>
+
+        <p>Beim Arbeiten mit dem Laufwerk kommt es natürlich auch vor, daß zum Beispiel ein Fehler des Laufwerks durch das charakteristische Blinken angezeigt wird. Wollen Sie die Fehlermeldung im Klartext lesen, dann reicht die Eingabe von &lt;F&gt; undein anschließendes &lt; RETURN >, um den Fehlerkanal auszulesen und auf dem Bildschirm anzuzeigen.</p>
+
+        <p>Mit dem Befehl <$> können Sie sich das Directory der eingelegten Diskette anzeigen lassen.</p>
+
+        <p>Wollen Sie vielleicht auch einmal wissen, welcher Wert der hexadezimalen Zahl $6B entspricht? Dann kann Ihnen der Befehl &lt;Z&gt; weiterhelfen. Er erlaubt das Umrechnen einer Zahl aus einem der drei Zahlensysteme Dezimal, Hexadezimal und Binär in die jeweils anderen Systeme. Dazu ein Beispiel: Die Eingabe</p>
+
+        <p>2 $6B ergibt den Ausdruck</p>
+
+        <p>HEX = $6B</p>
+
+        <p>DEZ = 107</p>
+
+        <p>BIN = %01101011</p>
+
+        <p>Ebensogut können Sie als Ausgangswert jedes der beiden anderen Zahlensysteme angeben. Binärzahlen erfordern dabei ein &lt;%> vor dem Wert.</p>
+
+        <p>Die beiden letzten Befehle &lt;M&gt; und &lt;E&gt; wurden schon besprochen. Sie lassen das Hauptmenü (&lt;M&gt;) anzeigen oder ins Basic zurückkehren (&lt;E&gt;). Eine Aufstellung aller Befehle zeigt noch einmal Tabelle 1.</p>
+
+        <p>Für die Arbeit mit dem Disketten-Monitor gilt: generell ist nur die Angabe zweistelliger Hex-Werte bis $FF zulässig. Alle höheren Werte (dezimal 255 oder auch binär %11111111) führen zu Fehlfunktionen.</p>
+
+        <p>Vorsicht ist prinzipiell immer beim &lt;S&gt;-Befehl geboten. Ein einmal überschriebener Block kann nicht mehr zurückgeholt werden!</p>
+
+        <address class="author">(T. Pohl/ks)</address>
+
+        <p>Befehl] Wirkung Syntax</p>
+
+        <p>M Anzeige des Hauptmenüs M</p>
+
+        <p>L Lesen eines Sektors L Track Sektor</p>
+
+        <p>Ss Schreiben eines Sektors S Track Sektor</p>
+
+        <p>A Anzeigen eines Blockinhalts A Start-, Endadresse</p>
+
+        <p>t Sprung in den TEDMON t</p>
+
+        <p>Eingabe von Bytes : Adresse Bytes....</p>
+
+        <p>[6] Befehl an die Floppy senden O Befehl</p>
+
+        <p>F Fehlerkanal der Floppy auslesen F</p>
+
+        <p>$ Directory anzeigen $</p>
+
+        <p>y4 Umrechnen in andere Zahlensysteme | Z Wert</p>
+
+        <p>E Rückkehr ins Basic E</p>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Das Auge »ißt« mit</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="Sonderheft 8/86">
+    <meta name="64er.pages" content="47-55">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX5">
+</head>
+
+<body>
+    <article>
+        <h1>Das Auge »ißt« mit</h1>
+        <p class="intro">Genauso wie beim Essen das Auge mitißt, steigert auch das optische Bild (Menü) eines Programmes das Interesse. Wie Sie diesen Appetitanreger in Ihr Programm einbinden können, erfahren Sie in diesem Kurs.</p>
+
+        <p>iele Programme zeichnen sich dadurch aus, daß sie eine sehr anwenderfreundliche Form der Menüsteuerung (Bild 1) besitzen. Sieht man sich einige Menüs von Programmen kommerzieller Software-Hersteller an, wie zum Beispiel Textverarbeitungs- oder Dateiverwaltungsprogramme, so kann man hier mit den Cursortasten die einzelnen Programmfunktionen auswählen. Dabei werden mit den Cursortasten einzelne Menüpunkte hervorgehoben. Ist der gewünschte Menüpunkt erreicht, wird er mit einer Taste, zum Beispiel.die F1-Taste, aktiviert.</p>
+
+        <p>Die einfachste Form der Menüsteuerung ist die, die einzelnen Menüpunkte durchzunumerieren. Mit der Basic-Anweisung »ON n GOTO« können die Unterprogramme sehr schnell aufgerufen werden. Zum Beispiel:</p>
+
+        <p>100 INPUT" MENUEPUNKT";A</p>
+
+        <p>110 ON A GOTO 1000,2000,3000,...,n</p>
+
+        <p>Eine solche Menüsteuerung wird in Listing 1 angewandt. Dieses Programm ermöglicht es, die Werte »SPIELSTUFE«, »GESCHWINDIGKEIT« und »ANZAHL DER SPIELER« zu verändern. Die Werte »SPIELSTUFE« und »GESCHWINDIGKEIT« können 1, 2 oder 3 annehmen, »ANZAHL DER SPIELER« 1 oder 2. Ein solches Menü könnte vor einem Spielprogramm stehen.</p>
+
+        <p>Über einen INPUT-Befehl (Zeile 320) wird die Nummer des " gewünschten Menüpunktes eingegeben, auf Richtigkeit der Eingabe wird in Zeile 330 geprüft (es sind nur 1, 2, 3oder 4 als Eingaben gestattet) und in der Zeile 360 in das Unterprogramm gesprungen. Der Befehl</p>
+
+        <p>360 ON P GOTO 380, 450, 520, 590 verzweigt, wenn die Variable P, die in Zeile 320 die Nummer des gewünschten Menüpunktes vom Benutzer über die INPUT-Anweisung (320 INPUT "..";P) erhält, den Wert 1 hat, nach 380, bei P=2 nach 450 und so weiter.</p>
+
+        <p>Die Adressen, die hinter dem ON n GOTO-Befehl stehen, zeigen jeweils auf die erste Zeilennummer einer Unterroutine, die vorher per Menü ausgewählt wurde. Zu den Zeilen 370 bis 620 ist nichts weiter zu sagen, als daß dort die Unterroutinen stehen, die die Eingabe von Werten beziehungsweise das Verlassen des Menüs bewirken.</p>
+
+        <p>Die Variablen L, G und A enthalten die Werte für »Spielstufe« (&lt;L&gt; für »Level«), »Geschwindigkeit« &lt;G&gt; und »Anzahl der Spieler« &lt;A&gt;. Die Variable P enthält die Nummer des Menüpunktes, der ausgeführt werden soll.</p>
+
+        <p>Diese Form des Menüs, die in Listing 1 verwendet wird, ist allerdings noch recht unkomfortabel. Störend ist, daß jede Eingabe der Menünummer immer mit der RETURN-Taste bestätigt werden muß. Im folgenden soll dies geändert werden. Dies erreicht man durch Verwendung einer GET- beziehungsweise GETKEY-Abfrage anstelle des INPUT-Befehls, wie in Listing 2 in Zeile 640 zu sehen ist. Listing 2 hat jedoch noch eine weitere kleine Ergänzung, die ich Ihnen hier 'nebenbei vorstellen möchte, weil sie simpel, somit leicht ver- ' ständlich und ohne nennenswerte Probleme programmierbar und wirkungsvoll zugleich ist: die Window-Technik.</p>
+
+        <p>Damit Sie sofort erkennen können, worum es sich handelt, sollten Sie Listing 2 abtippen, starten und alle Funktionen ausprobieren. Jetzt drücken Sie nur noch 1, 2, 3 oder 4 (je nach Menüpunkt), dann können Sie gegebenenfalls einen der Werte »Spielstufe«, sIempo« (=»Geschwindigkeit« aus Listing 1) und »Anzahl der Spieler« ändern. Diese verbesserte Form der Parametereingabe hat allerdings nichts mit der Window-Technik zu tun, mit der wir uns nun beschäftigen wollen.</p>
+
+        <p>Ein Window (»window« = englisches Wort für »Fenstere) ist . ein Bildschirmausschnitt, der als Teilbildschirm behandelt wird und für einen bestimmten Zweck (zum Beispiel die Anzeige eines Copyrights) reserviert ist. Mit Hilfe der Sequenzen ESC-B beziehungsweise ESC-T können Sie beim C 16/116 das Window bestimmen, es handelt sich jedoch nur um eine Verkleinerung des Bildschirmbereiches: dieser Teilausschnitt wird wie der gesamte Bildschirm gehandhabt. Dies ist nützlich, um Teile des Bildschirms vor dem Überschreiben zu schützen (für eigene Programme äußerst unbrauchbar). Im Beispielprogramm (Listing 2) sind einzelne Teile des Bildschirms für bestimmte Aufgaben freigehalten; so gibt es:</p>
+
+        <ul>
+            <li>
+                <p>ein Copyright-Window, in dem der Copyright-Vermerk steht,</p>
+            </li>
+            <li>
+                <p>ein Level-Window, in dem die Spielstufe steht,</p>
+            </li>
+            <li>
+                <p>ein Tempo-Window, in dem die Geschwindigkeit steht, – und ein Anzahl-Window, in dem die Anzahl der Spieler steht.</p>
+            </li>
+        </ul>
+
+
+        <p>Die Windows werden in den Zeilen 290 bis 590 ausgegeben, und zwar dann, wenn auf eine neue Eingabe gewartet wird. Da die Windows immer an derselben Bildschirmposition stehen und nicht verschoben werden, muß vor der Neuausgabe eines Windows nicht erst der Bildschirm gelöscht werden. Dieser Trick, immer nur deckungsgleiche Bereiche auszugeben (wodurch dem Benutzer der Neuaufbau eines Bildschirmbereichs nicht auffällt), wird an späterer Stelle in diesem Kurs – bei einer anderen Form der Menüsteuerung erklärt. Dort können Sie dann die Funktionsweise erfahren, die uns hier im Moment nicht weiter aufhalten soll.</p>
+
+        <p>Bei der Verwendung von Windows sind folgende Punkte zu beachten:</p>
+
+        <ol>
+            <li>
+                <p>An der Stelle, an der ein Window stehen soll, darf vorher kein anderer Text stehen, da dieser sonst durch das Window überschrieben wird. Wenn Sie einmal sehen wollen, wie ein Window einen Teil des Bildschirms überschreibt, ändern Sie jeweils die drei Parameter nach CHAR in den Zeilen 340 bis 390 von 2 bis 7 auf 7 bis 12. Starten Sie dann das Programm, und das Copyright-Window überschreibt die Menüpunkte teilweise.</p>
+            </li>
+            <li>
+                <p>Windows muß man optisch abgrenzen, damit sie vom »normalen« Bildschirm unterschieden werden können. In der Regel nimmt man Grafikzeichen, die das Window einrahmen. In Listing 2 sehen Sie einige verschiedene Möglichkeiten der Eingrenzung eines Windows (durch Reversdruck, Grafikzeichen, Sterne), und es gibt noch mehr Variationen.</p>
+            </li>
+            <li>
+                <p>Die Position des Windows muß festgelegt sein. Vor dem Ausdrucken eines Windows muß diese Window-Position als Cursorposition eingestellt werden. Hierbei ist der CHAR-Befehl eine große Hilfe. Dieser Befehl kann nämlich nicht nur Texte in hochauflösende Grafik schreiben, sondern auch wie ein PRINT-Befehl bestimmte Stellen im normalen Text-Modus beschreiben. Die Syntax für CHAR zum PRINTen an eine beliebige Cursorposition ist:</p>
+            </li>
+        </ol>
+
+
+        <p>CHAR 1, Spalte,Zeile, "TEXT ALS STRING"</p>
+
+        <p>Die »1« hinter CHAR gibt an, daß in die normale Textseite geschrieben werden soll. Spalte und Zeile entspricht der Cursorposition, bei der die Textausgabe beginnen soll. sTEXT ALS STRING« ist der auszugebende Text.</p>
+
+        <p>Ein Tip: In der Regel wird man den Wert für »Spalte« beim Drucken eines Windows nichtändern, da der linke Rand nicht verändert wird; der Wert für »Zeile« ist jedoch dauernd um 1 hochzuzählen, wie man unter anderem an den Zeilen 340 bis 390 verfolgen kann (3. Parameter nach CHAR!).</p>
+
+        <ol>
+            <li>
+                <p>Der Einfachheit halber sollte man nur Windows in Rechteckform programmieren, weil man in diesem Fall nur zwei Begrenzungen des Windows kennen muß: Länge und Breite. Da das C 16/116-Betriebssystem das Arbeiten mit Windows, wie wir es benötigen würden, nicht unterstützt, muß man auf die Einhaltung dieser Grenzen selbst achten. Bei Rechteck-Windows der gebräuchlichen Form muß man folgende Werte festlegen:</p>
+            </li>
+            <li>
+                <p>linke Grenze</p>
+            </li>
+            <li>
+                <p>rechte Grenze</p>
+            </li>
+            <li>
+                <p>obere Grenze</p>
+            </li>
+            <li>
+                <p>untere Grenze</p>
+            </li>
+        </ol>
+
+
+        <p>Man darf also, weil ein Window kleiner als der gesamte Bildschirm ist, nur eine begrenzte Textbreite verwenden; außerdem stehen nicht beliebig viele Zeilen zur Verfügung. Dies ist ganz einfach eine Frage der Planung beim Schreiben der PRINT- beziehungsweise CHAR-Zeilen. Betrachten wir dazu einmal die Zeilen 340 bis 390. Jeder dieser sechs CHAR-Befehle hat als 2. Parameter eine 5, das Drucken wird also immer in der linken Spalte begonnen. Damit ist die Einhaltung der linken Grenze garantiert. Die obere Grenze wird dadurch eingehalten, daß die Ausgabe in der 2. Zeile beginnt (Zeile 340: CHAR ...,2,...), die untere Grenze dadurch, daß nicht weiter als bis zur 7. Zeile gedruckt wird (Zeile 390: CHAR</p>
+
+        <p>Die rechte Grenze einzuhalten ist am schwierigsten, denn hier kommt es nicht nur auf die Parameter des CHAR-Befehls an. Wenn man aber eine einheitliche Länge des Ausgabe-Strings einhält – in den Zeilen 340 bis 390 hat jeder Ausgabe-String exakt 11 Zeichen Länge, das Window ist also 11 Zeichen breit – dürfte es keine Probleme geben. Wir können nur abschließend wiederholen: Wenn man beim Programmieren ausreichend genau vorgeht, sind Windows ein Kinderspiel.</p>
+
+        <p>Wir hoffen, daß Ihnen der Ausflug ins Thema »Windows« Spaß gemacht hat; nun wollen wir uns bis zum Ende dieses Kurses mit einer ähnlich ästhetischen Form der Menüsteuerung befassen. Dazu ist zunächst etwas vorauszuschicken.</p>
+
+        <p>Der C 16/116 bietet im Gegensatz zum VC 20/C64 eine Funktionstastenbelegung, die Sie als C 16/116er sicher zu schätzen wissen. Der einzige Haken dieser Funktionstastenbelegung ist jedoch, daß die Abfrage der Funktionstasten über GET/GETKEY erschwert wird. Um dies zu umgehen, ist es erforderlich, den C64/VC 20-Zustand wiederherzustellen, indem die Funktionstasten wie Steuertasten (CLEAR, HOME, Cursortasten, Farbtasten,...) gehandhabt werden. Zwar kann man mit den auf die Funktionstasten gelegten Steuertasten keine Steuerfunktion hervorrufen (die verwendeten Codes 133 bis 140 haben eben keine Funktion), aber man kann leicht auf eine Funktionstaste warten: 10 KEY 1,CHR$(133):REM F1-Taste mit Code belegen 20 GETKEY A$:IF A$&lt;>CHR$(133) THEN 20:REM auf Fl-Code warten .</p>
+
+        <p>Von den Steuertasten wie CLEAR, HOME, Cursortasten und so weiter kennen Sie die Möglichkeit, Steuerzeichen in Anführungszeichen als reverse Symbole zu schreiben (siehe Eingabehinweise für Basic-Programme in diesem Heft). Nach der Belegung der Funktionstasten mit Steuercodes geht dies auch mit F-Tasten. Nach Eingabe von KEY 1,CHR$(133) ist die F1-Taste mit dem Code 133 belegt; durch einmaliges Drücken der Anführungszeichen-Taste wird die F1-Taste als reverses Grafikzeichen abgebildet, wie es innerhalb von Anführungszeichen auch mit der HOME-Taste geschieht.</p>
+
+        <p>Alle nun folgenden Listings machen von der Abfrage der F1- und der F7-Taste (die anderen Funktionstasten bleiben unberührt) Gebrauch. Dadurch steht zwar auf F1 nicht mehr »GRAPHIC« und auf F7 nicht mehr »LIST«, aber wir können die Tasten abfragen. Die erforderlichen KEY-Befehle stehen in jedem der nun folgenden Listings, müssen jedoch schon vor der Eingabe der Programme eingegeben werden, um in Anführungszeichen die F1/F7-Taste mit einem Steuerzeichen auszudrücken. Geben Sie also vor der Eingabe aller folgenden Listings dieses Kurses die Anweisung</p>
+
+        <p>KEY 1,CHR$(133):KEY 7,CHR$(136) im Direktmodus ein. Wenn Sie ein solches gespeichertes Programm laden wollen, sind diese Befehle nicht erforderlich, da sie bereits im Programm stehen.</p>
+
+        <p>Damit Sie gleich in den Genuß eines guten Menüs kommen, tippen Sie einfach Listing 3 ab und starten es. Der Bildschirm wird dunkel und ein Menü mit den Punkten A bis E erscheint. Hinter jedem Menüpunkt steht eine Zahl in Klammern, die die Nummer des Unterprogramms angibt, das Sie anwählen können. Die Funktionen des kleinen Programms im einzelnen:</p>
+
+        <p>Mit &lt;CURSOR DOWN &gt; kommen Sie zum nächsten Punkt.</p>
+
+        <p>Mit &lt;CURSOR UP&gt; erreichen Sie den vorhergehenden Punkt.</p>
+
+        <p>Vom untersten Menüpunkt aus können Sie mit CURSOR DOWN direktin den obersten und mit CURSOR UP vom obersten Punkt zum untersten springen.</p>
+
+        <p>Mit HOME können Sie von jedem Punkt immer in den obersten springen.</p>
+
+        <p>&lt;F1&gt; aktiviert das angewählte Unterprogramm.</p>
+
+        <p>&lt;F7&gt; bricht das Programm mit END ab.</p>
+
+        <p>Probieren Sie ohne weiteres alle Funktionen von Listing 3 aus (Bild 2). Sollte Ihnen diese Art der Menüsteuerung gefallen haben, dann erfahren Sie im folgenden mehr über den Aufbau.</p>
+
+        <p>Im Bild 3 finden Sie die schematische Darstellung der Menüpunkte von Listing 3. Die Randpunkte A (0) und E (4) sind besonders hervorgehoben, weil an diesen die Rotation stattfindet.</p>
+
+        <h3>Die Variablen von Listing 3:</h3>
+
+        <p>A (Menüanzahl) enthält die Anzahl der Menüpunkte (5). Aändert sich nie und ist folglich eine Konstante. . R$(n) ist immer ein 1-Byte-String, der den Wert</p>
+
+        <p>CHR$(0) enthält. Der Code CHR$(0) steht für Null und hat keine Funktion. Wenn ein Menüpunkt hervorgehoben is, so steht in R$(n) der Wert CHR$(18) für &lt;REVERS ON&gt;. P (Programmpunkt) enthält die Nummer des angewählten Unterprogramms. P wird durch die Cursortasten geändert und gibt den Menüpunkt an, der hervorgehoben werden soll. Des weiteren wird P zur Anwahl der Unterprogramme benötigt. (490 ON P+1 GOTO 610, 680, ...) T$ (Taste) In der Zeile 480 wird die Tastatur abgefragt. Der Tastencode wird in der Variablen T$ gespeichert. In den Zeilen 490 bis 500 und 520 bis 540 wird der Tastencode mit Bedingungen verglichen. Ist die Bedingung wahr, so wird die nachfolgende Anweisung ausgeführt.</p>
+
+        <p>Nachdem die Variablen beschrieben wurden, soll nun der Programmaufbau betrachtet werden.</p>
+
+        <p>Zeile 200 bis 300</p>
+
+        <p>In der Zeile 250 werden die Variablen definiert. Nach der DIM-Anweisung in der Zeile 250 ist übrigens das gesamte Feld R$(n) mit Leerstrings belegt. (Sollten Ihnen einige Begriffe, zum Beispiel »Feld« nicht bekannt sein, so schauen Sie sich doch bitte den Basic-Kurs oder das Lexikon an.)</p>
+
+        <p>In der Zeile 260 wird die Variable P (Programmpunkt) auf Null gesetzt (Menüpunkt A).</p>
+
+        <p>Die Anweisung R$(P) = CHR$(18) in Zeile 270 hebt den Menüpunkt hervor, indem der Zeichenhintergrund die Farbe des Zeichens erhält und das Zeichen in Schwarz dargestellt wird. Im folgenden werde ich diese Darstellung als invers bezeichnen.</p>
+
+        <p>Schließlich werden in Zeile 280 die Bildschirm- und Rahmenfarbe auf Schwarz gesetzt, der Groß-/Grafikmodus aktiviert und der Bildschirm mit PRINT CHR$(147) gelöscht. Hauptschleife: Zeile 310 bis 560</p>
+
+        <p>Bei der Zeile 310 beginnt die Hauptschleife. Das Menü springtimmer von Zeile 560 aus auf 310 zurück, solange kein Unterprogramm aktiviert wurde.</p>
+
+        <p>Textausdruck: Zeile 340 bis 420</p>
+
+        <p>In den Zeilen 340 bis 420 findet man die Textausgabe der fünf Menüpunkte. (Die Zeile 340 wird anschließend noch gesondert besprochen). Vor den einzelnen Menüpunkten steht die Stringvariable R$(n):</p>
+
+        <p>380 PRINT TAB(9);R$(0) ; " [Farbe}Menuepunkt A [Revers off} (0) [CURSOR DOWN] "</p>
+
+        <p>R$(n) wirkt hier als Schalter. IstR$(n)=CHR$(0), so schaltet er den Reversmodus nicht ein. Ist dagegen R$(n)=CHR$(18), so schaltet er den Modus ein. Die Zeile 430 gibt das gerade angewählte Programm (Nummer) an. Warten auf Tastendruck: Zeile 450 bis 480</p>
+
+        <p>Diese Programmzeile holt ein Zeichen von der Tastatur und legt sie in der String-Variablen T$ ab. Trifft die Bedingung T$ = Leerstring zu, so verzweigt das Programm zurück zum Anfang dieser Zeile. Damit wartet das Programm in dieser Schleife, bis eine Taste gedrückt wurde. 480 GET T$ : IFT$ = "" THEN 480</p>
+
+        <p>Programmaufruf: Zeile 490</p>
+
+        <p>In der Zeile 490 wird geprüft, ob die zuletzt gedrückte Taste die Funktionstaste F1 war. Ist diese Verknüpfung wahr, so wird die Anweisung, die hinter THEN steht, ausgeführt. 490 IF T$="{F1}" THEN ON P + 1 GOTO 610, 680, 730</p>
+
+        <p>Dabei bedeutet die Anweisung ON PGOTO (Zeile): springe auf die Zeilennummer, die durch den Zeiger P angewählt ist. Ein Beispiel: P enthält den Wert 2. Zu diesem wird laut Anweisung eine 1 addiert (P + 1) und ist damit 3. Dieser Wert gibt die Position (3) in der Tabelle an, an der die Zeilennummer steht, zu der gesprungen werden soll. In unserem Beispiel wäre es die Zeile 730.</p>
+
+        <p>Programmabbruch: Zeile 500</p>
+
+        <p>Ergibt die Prüfung T$ = "[F7}", daß diese Bedingung zutrifft, so wird das Programm mit einer Bemerkung beendet. 500 IF T$ = "{F7}" THEN PRINT "[CURSOR 2 mal DOWN] Programmabbruch." : END</p>
+
+        <p>Rücksetzen: Zeile 510</p>
+
+        <p>Es wird die Stringvariable R$(P), die an dieser Stelle noch den Wert CHR$(18) enthält, auf CHR$(0O) geändert. 510 R$(P) = CHR$(O)</p>
+
+        <p>Programmanwahl: Zeile 520 bis 540</p>
+
+        <p>In diesen drei Zeilen wird geprüft, ob die Taste CURSOR UP CURSOR DOWN oder HOME gedrückt wurde. (Auf diese Anweisungen wird noch gesondert eingegangen.) Menüpunkt invertieren: Zeile 550</p>
+
+        <p>In der Zeile 550 wird der Variablen R$(P), wobei P jetzt den neuen Menüpunkt beinhaltet, der Wert CHR$(18) zugewiesen.</p>
+
+        <p>550 R$(P) = CHR$(18)</p>
+
+        <p>Rücksprung: Zeile 560</p>
+
+        <p>Hier ist die Hauptschleife beendet und es wird auf die Zeile 310 zurückgesprungen.</p>
+
+        <p>560 GOTO 310</p>
+
+        <p>Unterprogramme: ab 570</p>
+
+        <p>Es folgen die fünf Unterprogramme, die Sie vom Menü aus aufrufen können.</p>
+
+        <p>Die Struktur des ersten Programms wäre damit, bis au einige Besonderheiten, beschrieben. Um die Bewegung des Reversfeldes zu simulieren, muß das alte Bild bei jedem Tastendruck mit dem neuen Bild überschrieben werden. Die Frage ist: wie erreicht man es, daß sich die Bilder absolut genau decken? Man legt dazu einen Bezugspunkt, die linke obere Ecke, auf dem Bildschirm fest. Der Basic-Befehl dazu ist HOME oder PRINT CHR$(19). Fügt man den Befehl als PRINT CHR$(19)-Anweisung in ein Programm ein, so springt der Cursor in die linke obere Ecke des Bildschirms. Läßt man nun den Bildschirminhalt erneut ausdrucken, so liegt er deckungsgleich zum alten Bild. Die Anweisung PRINT CHR$(19) kann auch durch die Sequenz, PRINT" {HOME} ", ausgedrückt werden.</p>
+
+        <p>Ersetzen Sie in der Zeile 340 die Anweisung CHR$(19) durch CHR$(147) (Bildschirm löschen), so wird der Neuaufbau des Bildes deutlicher, weil der Bildschirm jedesmal komplett gelöscht wird. Dies macht sich dann durch ein Flackern des Bildes bemerkbar.</p>
+
+        <p>Die eigentliche Besonderheit des kleinen Programms steht in den Zeilen 520 bis 540. Mit der Zeile 540, der einfachsten, soll begonnen werden.</p>
+
+        <p>540 IFT$= " {HOME} " THENP=0</p>
+
+        <p>Ist die Bedingung T$ = " [HOME}" wahr, so wird die Variable auf O gesetzt. Damit enthält P die Nummer des obersten Menüpunktes und druckt diesen in inverser Schrift aus.</p>
+
+        <p>Betrachtet man noch einmal Bild 3, so erkennt man, daß das Inversfeld jeweils um 1 nach oben wandert, wenn die CURSOR UP-Taste gedrückt wird. Zum Beispiel wandert das Feld von C nach B und der Wert für P sinkt um 1, von 3 auf 2. Daher heißt es auch in der Zeile:</p>
+
+        <p>530 IF T$ = "[CURSOR DOWN)" THENP=P-1...</p>
+
+        <p>Hatte die Variable vorher den Wert O, so vermindert sie sich jetzt auf den Wert (-1). Ein Menüpunkt mit der Nummer (-1) existiert aber nicht, statt dessen soll vielmehr von dem Menüpunkt A aus direkt nach Menü E gesprungen werden. Es folgen nun mehrere Möglichkeiten, mit denen diese Bedingung erfüllt werden kann. Ein entsprechendes Flußdiagramm finden Sie im Bild 4.</p>
+
+        <p>Der erste Weg:</p>
+
+        <p>P=P-1:IFP= (-1)THENP = oder</p>
+
+        <p>P=P-1:IFP=(-A)THENP=P+5</p>
+
+        <p>Der Weg, der beschritten wurde, ist eigentlich deutlich. Es wird das Ergebnis aus der Subtraktion P - 1 mit dem Wert (-1) verglichen. Ergibt der Vergleich, daß P = (-1) ist, dann wird der Wert der Variablen P durch 4 ersetztoder um 5 vermehrt.</p>
+
+        <p>In der Zeile 530 steht dagegen:</p>
+
+        <p>P=P-1-A*(P=O0)</p>
+
+        <p>Hier wird zunächst auch der Wert der Variablen P um 1 vermindert. Ist die in Klammern stehende Bedingung (P = 0) wahr, das heißt gleich, so wird der Ausdruck durch (-1) ersetzt. Dieser Wert kann nun in die Rechnung einbezogen werden. Die Gleichung lautet dann:</p>
+
+        <pre><code>...THENP=P-1-A%*(P=0) =—...THENP=P-1-A% (-1) =—...IHENP=P-1- (-A)
+=&gt;...THENP=P-1+HA
+</code></pre>
+
+
+        <p>Ersetzen Sie die Konstante A durch 5 und die Variable P durch 0, so erhalten Sie folgende Gleichung:</p>
+
+        <pre><code>...IHENP=0-1-5%(0=0) =&gt;...THENP=0-1-5%* (-ı) =—...IHENP=0-1- (-5)
+</code></pre>
+
+
+        <p>—...THEN P 0-1+5</p>
+
+        <p>—...THEN P 4</p>
+
+        <p>Ist die Bedingung P = O nicht wahr, so wird vereinbarungsgemäß eine O für die Antwort »das ist falsch« geschrieben. Ersetzt man in der Rechnung den Ausdruck (P = O) durch unwahr (O0), so ändert sich die Gleichung in</p>
+
+        <pre><code>...THENP=P-1-AX*(P=0) =&gt;...THENP=P-1-AX* (0) =&gt;...HENP=P-1-0 =&gt;...THENP=P-1ı
+</code></pre>
+
+
+        <p>Kontrollieren Sie diese Gleichung wieder mit folgenden Werten: A=5undP =2.</p>
+
+        <p>Betrachtet man nun die Zeile 520, so ähnelt sie der Zeile 530. Deshalb kann die Abhandlung auch etwas kürzer ausfallen (Bild 5).</p>
+
+        <p>In der Zeile 520 steht:</p>
+
+        <p>"P=P+1+A*(P=(A-1))</p>
+
+        <p>Auchhier ist wieder die Verknüpfung (P = (A-1)) der Hauptbestandteil. Geht man davon aus, daß P = 4 ist, so muß die Rechnung wie folgt aussehen.</p>
+
+        <pre><code>...THENP=P+1+A% (P=(A-1))
+=—...IHENP=P+1+A% (-1)
+=—...TIHENP=P+1+ (-A)
+Da P = 5-1 wahr ist, sieht die mit Zahlen ersetzte Gleichung so aus:
+...THENP=4+1+5%(4=(5-1))
+=—...THENP=4+1+5%* (-1)
+=—&gt;...THENP=4+1+ (-5)
+=—...THENP=0
+</code></pre>
+
+
+        <p>Ichnehme an, daß Ihnen der Algorithmus klar geworden ist. Im Anhang finden Sie noch weitere Erklärungen zur Computerlogik.</p>
+
+        <p>Warum nun diese umständliche Schreibweise? Alle IF-Anweisungen benötigen viel Rechenzeit, mathematische Operationen dagegen sind verhältnismäßig schnell. Deshalb lohnt sich die Verwendung dieses Algorithmus in allen Vergleichsverfahren, die durch eine Rechnung ersetzt werden können.</p>
+
+        <p>In der untersten Zeile unseres Menüs steht die Anmerkung »Derzeitangewählter Menüpunkte«. Dahinter wurde bisher die Nummer des Menüpunktes angezeigt. Dagegen sind alle Menüpunkte im Text durch einen Buchstaben gekennzeichnet (Bild 2). Deshalb wird die Zeile 430 geändert in: 430 PRINT "DERZEIT ANGEWAEHLTER MENUEPUNKT: " CHR$ (65 + P)</p>
+
+        <p>Der Code für den Buchstaben »A« ist die 65 (siehe auch im Commodore-Handbuch ASCII-Code). Alle im Alphabet folgenden Buchstaben haben jeweils eine um 1 größere Codezahl. Auf Grund dieser Tatsache läßt sich der Buchstabe des Menüpunktes mit der kleinen Rechnung</p>
+
+        <p>Code =65 +P ermitteln.</p>
+
+        <p>Listing 2 ist eine Variante von Listing 3, wie sie in der Praxis angewendet wird. Die Informationen bezüglich der internen Numerierung sowie die REM-Zeilen wurden weggelassen. Außerdem wurden die Zeilen teilweise komprimiert. So steht für PRINT CHR$(0) jetzt PRINT" " und für PRINT CHR$(18) jetzt PRINT" [Steuertaste} ". Die wichtigste Änderung dagegen ist, daß die Konstante A entfällt und dafür alle Ausdrücke, in denen A vorkommt, ausgerechnet werden. (Vergleichen Sie die Zeilen 520 und 530 von Listing 3 mit 360 und 370 von Listing 4.)</p>
+
+        <h2>Warum nicht horizontal?</h2>
+
+        <p>Bislang wurden die Menüs untereinander angeordnet, man könnte auch von einem vertikalen Menü sprechen. Esistaber kein Problem, die Menüs auch horizontal (waagerecht) anzulegen. In Bild 6 sehen Sie, wie dies gemeint ist. An den Punkten A und E erfolgt wieder die Rotation. Bei einem horizontalen Menü entspricht die Bewegung des Inversfeldes nach rechts die der Bewegung nach unten im vertikalen Menü. Die Bewegung nach links entspricht der nach oben. In Listing 5 finden Sie ein horizontales Menü, wie Sie es in Bild 6 sehen. Die mit der Taste Fi aufgerufenen Unterprogramme geben den Inhalt der Variablen P an. Wie Sie in Zeile 360 und 370 sehen, wird die Funktion der CURSOR DOWN-Taste von der CURSOR RIGHT-Taste übernommen. Ebenso ersetzt die CURSOR LEFT-Taste jetzt die CURSOR UP-Taste. Der größte Teil von Listing 5 wurde aus dem Listing 4 übernommen. Außer der Tastaturabfrage haben sich nur die Printanweisungen geändert. Zusätzlich sind die Zeilen 410 bis 580 (Unterprogramme) durch die Anweisung</p>
+
+        <p>330 IF T$ = "{F1}" THEN PRINT "ANGEWAEHLTER PUNKT: "; P : END ersetzt worden.</p>
+
+        <p>Zum Abschluß des Kurses soll noch das vertikale und horizontale Menü miteinander verbunden werden. Es entsteht ein zweidimensionales Menü (Listing 6). In den mehrdimensionalen Menüs werden alle vier Cursortasten mit einbezogen. Die CURSOR UP- und -DOWN-Tasten werden im Prinzip wie im vertikalen Menü (siehe Listing 3) zur Ansteuerung der vertikalen Ebenen (A-D, B-E, C-F siehe Bild 7) verwendet. Die CURSOR LEFT- und -RIGHT-Tasten werden zur Anwahl der beiden Spalten verwendet. Die Flußdiagramme finden Sie in Bild 8. Die entsprechenden Berechnungen stehen in den Zeilen 360 bis 390.</p>
+
+        <pre><code>360 IF T$ = "{CURSOR DOWN)" THEN P= P +1 + 3% (P=20RP=5)
+370 IF T$ = "{CURSOR UP" THENP=P-1-3% (P=0O0RP = 3)
+380 IF T$ = "{CURSOR RIGHT)" THENP=P+3+6 (P &gt;2)
+Logik-Befehle
+</code></pre>
+
+
+        <p>In Basic gibt es verschiedene Möglichkeiten Vergleiche durchzuführen. Jeden Vergleich können wir auch als Frage ansehen. So zum Beispiel könnte man für den Vergleich »A = B« fragen: Ist der Wert A ebensogroß wie der Wert B? Als Antwort stände: »das ist wahr« oder »das ist falsch«. Nach diesem Prinzip behandelt auch der Computer die Vergleiche. Wenn man die Antwort jedesmal in einem Satz ausgeben würde, bräuchte man viel Platz. Deshalb hat man sich geeinigt, für den Ausdruck »das ist wahr« (-1) anzugeben und für »das ist falsch« (0). Diese Werte ( (-1) und O) können wir auch zum Rechnen verwenden. In der folgenden Tabelle finden Sie alle Vergleichsbefehle mit ihrer Beschreibung.</p>
+
+        <p>= sind die Werte gleich groß? &lt; ist der links stehende Wert kleiner als der rechts stehende?</p>
+
+        <p>&gt; ist der links stehende Wert größer als der rechts stehende?</p>
+
+        <p>&lt;> sind die Werte verschieden groß? &lt;= ist der links stehende Wert kleiner oder gleichgroß mit dem rechts stehenden?</p>
+
+        <p>>= ist der links stehende Wert größer oder gleichgroß mit dem rechts stehenden?</p>
+
+        <p>Alle in dieser Tabelle stehenden Bedingungen (Vergleiche) können nur mit wahr oder falsch beantwortet werden. Es gibt aber noch eine Reihe anderer Logik-Befehle, wie OR oder AND. Diese unterscheiden sich von den ersten Logik-Befehlen dadurch, daß hier mehrere Antworten möglich sind. Ein Beispiel:</p>
+
+        <p>A=(27AND8S)=>A=8</p>
+
+        <p>Warum ist das Ergebnis acht? In unserem Beispiel wird der erste Wert binär mit dem zweiten Wert verglichen.</p>
+
+        <pre><code>27 = 0001 1011 AND 8 = 0000 1000
+8 = 0000 1000
+</code></pre>
+
+
+        <p>Verknüpfen wir die Bits jeder Spalte, von rechts nach links, nach folgendem Algorithmus: O AND 1 oder 1ANDO=Ound 1AND1 =1. Das entspricht also einer einfachen Multiplikation. Das heißt in unserem Beispiel, daß die ersten vier Bit zu Null werden. In der 5. Spalte steht jeweils in der ersten und zweiten Zeile eine 1 und somit ist die Verknüpfung auch eine 1 (1 mal 1 = 1).</p>
+
+        <p>Mit dieser Verküpfung können wir bestimmte Werte (binär) aus einem anderen Wert herausfiltern.</p>
+
+        <p>Beispiel:</p>
+
+        <p>A = (46 AND 15). Hier werden die Wertanteile von O bis 15 herausgefiltert.</p>
+
+        <p>46 = 0010 1110 AND 15 = 0000 1111</p>
+
+        <p>14 = 0000 1110 . Die andere Verknüpfung ist die OR-(Oder-)Verknüpfung. Hier lautet der Algorithmus: ist entweder der eine Wert oder der andere oder beide Werte 1, so ist das Ergebnis 1, sind beide Werte O, so ist auch das Ergebnis O.</p>
+
+        <p>Ein Beispiel:</p>
+
+        <pre><code>13 = 0000 1101 OR 46 = 0010 1110
+</code></pre>
+
+
+        <p>47 = 0010 1111 Mehr über IF-Abfragen und logische Vergleiche finden Sie im Basic-Kurs. 390 IF T$ = "[CURSOR LEFT}" THENP=P-3-6 (P &lt;3)</p>
+
+        <p>Da nur zwei Spalten vorhanden sind, müßte nicht zwischen CURSOR RIGHT und CURSOR LEFT unterschieden werden. Beide Tasten veranlassen nur den Wechseln die andere Spalte. Eigentlich ließe sich dieser Sonderfall durch eine OR-Verknüpfung einfacher realisieren. Sie lautet:</p>
+
+        <p>380 IF T$ = " [CURSOR RIGHT}" OR T$ =</p>
+
+        <p>5 [CURSOR LEFT]} "" THEN ...</p>
+
+        <p>Auf die THEN-Anweisung könnte jede der Formeln aus Zeile 380 oder 390 passen.</p>
+
+        <p>Als kleine Beigabe habe ich für Sie noch eine JA/NEIN-Abfrage (Listing 5). Im Prinzip haben Sie hier wieder ein horizontales Menü. Mit den Cursortasten können Sie eine der beiden Antworten anwählen. Durch Drücken der F1- oder RETURN-Taste veranlassen Sie die Ausführung des Unter-</p>
+    </article>
+</body>
+
+</html>

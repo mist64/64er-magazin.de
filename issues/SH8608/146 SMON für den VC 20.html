@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>SMON für den VC 20</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="K.H. Templin, og">
+    <meta name="64er.issue" content="Sonderheft 8/86">
+    <meta name="64er.pages" content="146-149">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX34">
+</head>
+
+<body>
+    <article>
+        <h1>SMON für den VC 20</h1>
+        <p class="intro">Der Super-Maschinensprache-Monitor auf dem VC 20. Mit mindestens 16 KByte können Sie die Vorteile des SMON nutzen. Für den Assembler-Programmierer ist SMON für den VC 20 ein unentbehrliches Werkzeug.</p>
+
+        <p>SMON VC20 ist eine Umsetzung des bekannten SMON für den C64, veröffentlicht in. Sonderheft 8/85, auf dem VC 20. Die Stärken des SMON sind vor allem seine mächtigen Suchbefehle. Als Zusatz enthält er einen Disketten-Monitor und natürlich einen Disassembler. Der Wermutstropfen beim SMON VC20 ist, daß man die Trace-Befehle nicht korrekt umsetzen kann. Das liegt am etwas höheren Systemtakt des VC 20 und den damit verbundenen Timing-Problemen.</p>
+
+        <p>Sämtliche Standard-Befehle für 6502-Assembler sind natürlich im SMON vorhanden. Dazu kommen Umrechnungsroutinen für Hexadezimal-Zahlen, komfortable Verschiebe- und Suchbefehle. Der Direktassembler des SMON verarbeitet sogar Label.</p>
+
+        <p>»SMON VC 20« liegt beim VC 20 im Bereich ab $A000. Tippen sie das Listing »SMON VC 20« ein, speichern Sie es und starten es dann. Daraufhin wird auf der Floppy das Programm »SMON.EX VC 20« generiert. Dieses laden Sie dann mit »,8,1« und starten es mit SYS 40960. Die Übersicht aller zur Verfügung stehenden Befehle entnehmen Sie bitte der Tabelle. Für Datasette: Da das Ladeprogramm »SMON VC 20« auf die Diskette ein File schreibt, müssen Datasetten-Besitzer einen anderen Weg gehen. Tippen Sie im Generator-Programm die Zeilen ab Zeilennummer 300 nicht mit ein. Statt dessen tippen Sie folgende Zeilen ein:</p>
+
+        <pre><code>300 FOR I=0 TO 4090:READ A:POKE 40960+I,A:P=P+A: NEXT
+310 IF P&lt;&gt;523777 THEN PRINT "DATAS NICHT OK":STOP 320 PRINT "DATAS OK"
+RUN
+</code></pre>
+
+
+        <p>Wenn die Meldung »Datas ok« erscheint, geben Sie ein:</p>
+
+        <pre><code>POKE 43,0:POKE 44,160:POKE 45,0:POKE -46,176 &lt;RETURN&gt;
+SAVE "SMON.EX VC20" &lt;RETURN&gt;
+</code></pre>
+
+
+        <p>Damit steht SMON auf Datasette zur Verfügung.</p>
+
+        <address class="author">(K.H. Templin/og)</address>
+
+        <h2>Befehlsübersicht zum SMON</h2>
+
+        <p>Alle Eingaben erfolgen in der hexadezimalen Schreibweise. In Klammern angegebene Adreßeingaben können entfallen. SMON benutzt dann sinnvolle, vorgegebene Werte.</p>
+
+        <p>Bei allen Ausgabe-Befehlen ist gleichzeitig die Ausgabe auf einem Drucker möglich. Dazu werden die Befehle geSHIFTet eingegeben. A 4000 (Assembler) symbolischer Assembler (Verarbeitung von Label möglich. Label bestehen aus dem Buchstaben »M« und einer zweistelligen Hex-Zahl von 01 bis 30.) Startadresse $4000 B 4000 4200 (Basic-Data) erzeugt Basic-DATA-Zeilen aus Maschinenprogramm im Bereich von $4000 bis $41FF C 4010 4200 4013 4000 4200 (Convert) in ein Programm, das von $4000 bis $4200 im Speicher steht, soll bei 4010 ein 3-Byte-Befehl eingefügt werden. Dazu wird das Programm ab $4010 bis 4200 auf die neue Adresse $4013 verschoben. Alle absoluten Adressen, die innerhalb des Programmbereichs ($4000 bis $4200) stehen, werden umgerechnet, so daß die Sprungziele stimmen. D 4000 (4100) (Disassembler) disassembliert den Bereich von $4000 (bis $4100) mit Ausgabe der Hex-Werte. Änderungen sind durch Überschreiben der Befehle möglich. F (Find) findet Zeichenketten (F), absolute Adressen (FA), relative Sprünge (FR), Tabellen (FT), Zeropage-Adressen (FZ) und Immediate-Befehle (FI) G (4000) (Go) startet ein Maschinenprogramm, das bei $4000 im Speicher beginnt I 01 (/O-Gerät) stellt die Gerätenummer für Floppy (08 oder 09) oder Datasette (01) ein K A000 (A500) (Kontrolle) zum schnellen Durchsuchen des Bereichs von $A000 (bis $A500) nach ASCII-Zeichen (32 Byte pro Zeile). Änderungen sind durch Überschreiben der ASCII-Zeichen möglich. L (4000) (Load) lädt ein Maschinenprogramm an die richtige oder eine angegebene Adresse ($4000) M 4000 (4400) (Memory Dump) gibt den Inhalt des Speichers von $4000 (bis $43FF) in Hex-Byte und ASCII-Code aus. Änderungen sind durch Überschreiben der Hex-Zahlen möglich. 0 4000 4500 AA (Occupy) füllt den Speicherbereich von $4000 bis $4500 mit vorgegebenem Byte ($AA) aus P 05 (Printer) setzt Geräteadresse 5 für-Drucker R (Register) zeigt die Registerinhalte und Flags an. Änderungen sind durch Überschreiben möglich. S "Test" 4000 5000 (Save) speichert ein Programm von $4000 bis $4FFF unter dem Namen »Test« ab V 6000 6200 4000 4100 4200 (Verschieben) ändert in einem Programm von $4100 bis $41FF alle absoluten Adressen, die sich auf den Bereich von $6000 bis $6200 beziehen, auf einen neuen Bereich, der bei $4000 beginnt. W 4000 4300 5000 (Write) verschiebt den Speicherinhalt von $4000 bis $42FF nach $5000 ohne Umrechnung der Adressen (zum Beispiel Tabellen) X (Exit) springt aus dem Monitor-Programm ins Basic zurück # 49152</p>
+
+        <p>Dezimalzahl umrechnen $ 002B</p>
+
+        <p>4stellige Hex-Zahl umrechnen % 01101010</p>
+
+        <p>8stellige Binärzahl umrechnen ? 0344 + 5234</p>
+
+        <p>Addition oder Subtraktion zweier 4stelliger Hex-Zahlen = 4000 5000 (Vergleich) vergleicht den Speicherinhalt ab $4000 mit dem ab $5000 Z (Diskmonitor) ruft den Diskmonitor auf. Dieser verfügt über folgende Befehle: R (12 01) (Read) (Nur im Diskmonitor) liest Track $12, Sektor $01 von der Diskette in einen Puffer im Speicher. Fehlt die Angabe von Track und Sektor, wird der logisch (!) nächste Sektor gelesen. W (12 01) (Write) (Nur im Diskmonitor) schreibt den Puffer im Speicher nach Track $12, Sektor $01 auf die Diskette. Ohne Angabe von Track und Sektor werden die letzten Eingaben von »R« benutzt. M (Memory Dump) (Nur im Diskmonitor) zeigt den Pufferinhalt als Hexdump (wie normales »M«). Weitere Ausgabe mit CBM-Taste, Abbruch mit STOP. Werte können durch Überschreiben geändert werden. X (Exit) (Nur im Diskmonitor) springt in SMON zurück F (weitere Disketten-Befehle initialisieren) (Nur im Diskmonitor) sind die Befehle initialisiert, gilt: M (07)</p>
+
+        <p>Memory Dump (Floppy-RAM/ROM) V 6000 0400</p>
+
+        <p>Verschieben eines 256-Byte-Blocks von $6000 in den Laufwerkspuffer 1 beziehungsweise in das Floppy-RAM</p>
+
+        <p>@ normale Disketten-Befehle senden X zurück zum normalen Disketten-Monitor</p>
+    </article>
+</body>
+
+</html>
