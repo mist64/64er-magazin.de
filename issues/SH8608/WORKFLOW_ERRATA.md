@@ -107,3 +107,55 @@ pass: 154 @ 600, 12 @ 2400, matching the brief exactly. Keep it.
 The K check's darkest page (p135, 31 27 27) was confirmed on the rendered mask
 to sit on the printed checksum bars of the listing, none in the bed. Cheap, and
 the only way to know.
+
+## 005 — the rules moved under this build at PAUSE 1 (0be19821)
+
+Recorded per r340: control fixed the three PAUSE 1 findings above mid-build
+(`0be19821`, r005_masters_sheet.md and r006_issue_pdf.md) — the colors.txt
+recipe now imports `r005_masters_sheet`, "field runs first" now says "first of
+the 005 programs, after PAUSE 1", and the dpi witness is no longer the
+instrument for colour or markings. Nothing already done needed redoing: the
+profile reproduces to the same p2 (188 169 158). Steps from here on run against
+the post-`0be19821` text.
+
+## 005 — the census that found p003 is not yet a step
+
+**What the rule says.** After `0be19821`: "Sweep for colour and for markings
+over EVERY page, independent of dpi (r006 has the measure)".
+
+**What I did, with numbers.** On the 150 dpi thumbs, cropped 3-93 % x 4-96 % to
+stay off bed and prop, the fraction of pixels with chroma `max-min > 80`.
+Yellowed interior paper sits at chroma ~45, so 80 is clear of it. Results:
+2400 dpi pages 1.0-25.1 %; 600 dpi 009 15.8, 026 12.1, 020 4.5, 031 3.3,
+003 0.80, 162 0.74; then a tail from 005 at 0.19 % down, which on an overlay
+(saturated px outlined, original colour kept) is orange foxing specks at the
+margins only — no strokes. p003's 0.80 % was the highlighter. The deciding step
+was LOOKING at the overlay of every hit above ~0.015 %, not the number: p003
+and p162 score alike (0.80 / 0.74) and one is a hand, the other the rainbow logo.
+
+**What it cost.** ~10 min, five commands. Cheap enough to run every issue.
+
+**Suggested.** A step-005 item before PAUSE 1: "Run the saturation census
+(chroma > 80 on the thumbs, off bed and prop) over every page, montage an
+overlay of every page above 0.015 %, and attribute each hit PLATE / HAND /
+FOXING in LOG.md. A number cannot tell a highlighter from a logo; the overlay
+can." Ideally as a script beside r005_field.py so it is not re-typed.
+
+## 005 — the Run section prescribes one process; r000 requires lanes
+
+**What the rule says.** r005_masters_sheet.md *Run*: "`$PY r005_masters_sheet.py
+# every page`" and "~45 s per page; ~2 h for 152 pages". r000: "Every step that
+fans out over pages locally — 005 masters, … — sizes its lanes … none of them
+may hardcode a number", `lanes(19)` for 005.
+
+**What I did.** The program has no fan-out of its own (no `lanes(`, no pool),
+so "every page" as written is one serial process. Ran it as
+`xargs -P $(lanes(19)) -n 1 … r005_masters_sheet.py`, 2400 dpi pages queued
+first. lanes(19) = 9 on this box today.
+
+**What it cost.** One grep, ~1 min.
+
+**Suggested.** In *Run*: "the program is serial; fan it out —
+`seq 1 N | OMP_NUM_THREADS=1 xargs -P $("$PY" -c 'import r000_issue;
+print(r000_issue.lanes(19))') -n 1 "$PY" r005_masters_sheet.py` — and queue the
+2400 dpi pages first; 19 GB is their peak, a 600 dpi page needs far less."
