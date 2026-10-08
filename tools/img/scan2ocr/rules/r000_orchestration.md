@@ -1382,13 +1382,29 @@ measurement; take the real number off the next run and put it in.
 
 ### NOT for model-call steps
 
-**AND NEVER RUN TWO MODEL-CALLING STEPS AT ONCE.** 020, 020's evaluation, 030
-and 145 share one credential and one rate limit, so running them in parallel
-does not halve the time — it starves one of them. MEASURED on SH8605: 020's
-evaluation (about 200 vision calls) was run alongside 030, hit the session
-limit **148 times**, and killed 030 in `dehyphenate`. Both completed cleanly
-when run one after the other. The lane cap governs processes; this governs
-STEPS, and nothing said so.
+**THE ACCOUNT LIMIT IS THE OWNER'S TO MANAGE — DO NOT SCHEDULE AROUND IT.**
+Owner, 2026-10-08: *"do not worry about session limits … i am in charge of the
+limit, i'll handle it."* So **do not serialise steps, throttle, delay or stagger
+work to protect the limit, and do not ask about it.** Run the chain at the pace
+the work wants. Two issues building in parallel both run their model steps when
+they reach them.
+
+This paragraph used to say NEVER RUN TWO MODEL-CALLING STEPS AT ONCE. The
+measurement behind it stands and is worth keeping, because it says what a
+limit's failure LOOKS like: on SH8605, 020's evaluation (about 200 vision
+calls) ran alongside 030, hit the session limit **148 times**, and **killed 030
+in `dehyphenate`**. What was wrong was the conclusion, not the observation.
+
+So the rule is about the FAILURE, not about avoiding it:
+
+- **A step killed by a rate limit is a STOP AND REPORT, not a retry loop and
+  not something to have prevented by scheduling.** Say which step died, where,
+  and what it had finished.
+- **Know whether your step is resumable before you start it**, because that is
+  what decides whether a kill costs minutes or the whole step. 030 died
+  mid-`dehyphenate` and had to be re-run.
+- The steps that fan out over model calls are 020 classify, 020 evaluate, 030
+  and 145 judge. They share one credential, so a kill can land on any of them.
 
 020 classify, 020 evaluate and 145 judge fan out over **model calls**, and they
 are bound by rate limits and by the credential race in `r000_llm.py` — four
