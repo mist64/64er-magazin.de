@@ -502,3 +502,18 @@ tables would separate them from the sentence they belong to. **Suggested.**
 it, citing the page".
 
 **What it cost.** Nothing to rework; each agent spent time quoting the conflict.
+
+## 200 — check 2 assumes every Q&A page prints a banner
+
+**What the rule says.** Briefing steps 2–3 crop the "envelope / letter motif at
+the top of page <START>"; check 2 requires `<header>` + `<img src="<START>-0.png"`;
+the only escape is "A BANNER NOT CUT YET IS NOT A FAILURE -- it is PAUSE 2 work".
+
+**What happened.** SH8608 p8 (like SH8605/155) prints only the plain LESERFORUM
+running-head bar — no motif. Check 2 is a permanent FAIL on correct output.
+Also unstated: what to do with a question already `<strong>` from 190 (dropped,
+per precedent), and that a non-rubric Q&A's head1 must be set here since 210
+leaves Leserforum's alone.
+
+**Suggested.** "Check 2 applies only where the page prints a banner motif; a
+plain running-head bar is head1, not a banner."
