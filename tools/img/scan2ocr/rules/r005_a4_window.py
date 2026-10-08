@@ -842,11 +842,20 @@ def unify_inserts(wins):
         for p in run:
             w = wins[p]
             dw, dh = W - w["w"], H - w["h"]
-            if not (dw or dh):
-                continue
-            w["x0"] -= dw // 2
-            w["y0"] -= dh // 2
-            w["w"], w["h"] = W, H
+            if dw or dh:
+                w["x0"] -= dw // 2
+                w["y0"] -= dh // 2
+                w["w"], w["h"] = W, H
+            # RECORD THE UNIFICATION EVEN WHEN NOTHING WAS PADDED.  The fact the
+            # stamp has to carry is "this page is one object with its run, at an
+            # agreed size", not "it was padded" -- and a run whose pages all
+            # traced the same size needs no padding at all.  Writing the note
+            # only when dw or dh were non-zero left such a run with NO record,
+            # so the delivered page was off-A4 with nothing in its stamp to say
+            # why, and r005_a4_window.md's check 1 failed on a correct build
+            # (SH8608).  The builder's first instinct was to add the line to the
+            # stamps by hand, which is the wrong direction: a stamp is the
+            # record of what the program did, so the program says it.
             w["note"] = (w.get("note", "") + " padded %+d/%+d px to the insert's "
                          "common size %dx%d" % (dw, dh, W, H)).strip()
         print("insert pages %d-%d unified to %dx%d px (%.2f x %.2f mm)" % (
