@@ -155,3 +155,26 @@ which PAPER CLASS changed and check that the artefact you are worried about
 is in that class — `grep paper-class <tmp>/masters600/NNN.stamp.txt` — before
 telling anyone it is stale. A profile edit to `colors.txt` touches the `low`
 class only; the wrapper and any card are untouched by it."
+
+## 005 — Verification 3 re-measures skew on the GRADED master and reports the grade, not the geometry
+
+**What the rule says.** Check 3: "RESIDUAL SKEW of the published masters is ~0
+— re-measured, not trusted", `R.measure_skew()` on `masters600/NNN.png`
+reduced ×4.
+
+**What I did.** Ran it after both sweeps. p147 read +0.00° on the first pass
+and +0.22° on the second — same scan, same traced edges (`L +0.00 R −0.21
+T +0.02 B −0.24`), same page size 207.4 × 299.5 mm, same step log line
+`skew +0.00 -> +0.00`; the only change between the passes was the level lines.
+So the check read the grade's contrast change as a rotation. 004/072/115 at
+±0.12° on both passes are the same thing at a smaller size.
+
+**What it cost.** ~5 min, one grep of both logs.
+
+**Suggested.** Say which artefact each check reads and what it can therefore
+see: the STEP measures skew on the raw levelled sheet and asserts the
+residual there; check 3 re-measures on the GRADED master, where a change of
+grade changes the projection profile, so a non-zero reading means "look at
+the step's own line for this page", not "the page is tilted". Compare against
+the step's `skew a -> b` log line before calling a page tilted. (Same family as
+7b: a check that reads a different artefact from the step it checks.)
