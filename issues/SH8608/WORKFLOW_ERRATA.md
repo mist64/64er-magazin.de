@@ -459,3 +459,21 @@ And the corpus is inconsistent for VC 20 BASIC load addresses (SH8501 $1201,
 SH8503/SH8505 $1001/$0801, SH8603 tacco $0801). **Suggested.** add "a printed
 BASIC program the disk lacks" as the general row, and "VC 20 + ≥8K BASIC at
 $1201 unless the article POKEs otherwise".
+
+## 180 — a Sonderheft whose own Impressum carries the editor key, in "Name (xx)" form
+
+**What the rule says.** "For a Sonderheft, resolve against the nearest MONTHLY
+Impressum instead" — "MEASURED over the corpus … 0 of 12 Sonderhefte do"; the
+check greps `\b[a-z]{2} = [A-ZÄÖÜ]`.
+
+**What happened.** SH8608's Impressum lists `Achim Hübner (ah), Karsten Schramm
+(ks), …` — the key, in the other form; the grep finds nothing. The agent used
+this issue's own Impressum with a `(xx)` grep. Also: the SILENT/UNDEFINED
+one-liner keeps only the last slash token, so `tr` in `Name/tr/bj` reads SILENT;
+check #3 needs a `<PREV_DIR>` that is undefined for a Sonderheft and matches
+recurring rubrics by exact title.
+
+**Suggested.** "Read the key from THIS issue's Impressum first, in either form
+(`xx = Name` or `Name (xx)`); only if it has none, the nearest monthly's. Split
+every slash token, not only the last. For a Sonderheft, PREV_DIR is the
+previous Sonderheft, and match recurring rubrics by id, not title."
