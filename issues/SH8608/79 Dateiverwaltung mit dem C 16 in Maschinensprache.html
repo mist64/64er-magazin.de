@@ -608,6 +608,11 @@ INY ;STRINGADRESSE KORRIGIEREN
 
         <p>Alle Pointer und Descriptoren sind nun völlig korrekt gesetzt und das Basic-Programm kann auf den angelegten String zugreifen, wie das folgende Demoprogramm zeigt:</p>
 
+        <!-- Im Heft ist das Demoprogramm mit den Zeilennummern 100 bis 240 für die Datasette abgedruckt: 160 OPEN 1,1,1,"TEST", 170 PRINT#2,Y$, 180 CLOSE 2, 210 OPEN 1,1,0,"TEST", 220 SYS 1630,1,A$, 230 CLOSE 2. Die Datei auf der Diskette ist auf die Zeilen 1 bis 80 umnumeriert und arbeitet mit der Floppy: OPEN 2,8,2,"TEST,S,W", PRINT#2,Y$, CLOSE 2, OPEN 2,8,2,"TEST,S,R", SYS 1630,2,A$, CLOSE 2. -->
+        <figure>
+            <pre data-filename="c16.input#.basic" data-name="Demoprogramm"></pre>
+        </figure>
+
         <p>Dieses Demoprogramm schreibt einen String mit einer Maximallänge von 255 Zeichen inklusive dem mit INPUT # keinesfalls einlesbaren Zeichen »,« auf Band und liest ihn mit der vorgestellten Routine in der vollen Länge mit Kommata wieder ein, was für den INPUT #-Befehl völlig unmöglich wäre. Das Basic-Programm kann auf den eingelesenen String wie auf jeden anderen String mit PRINT A$ zugreifen.</p>
 
         <p>Wir sind nun am Ende dieses Artikels angelangt. Nachfolgend finden Sie das Monitorlisting (Listing 1) der Routine, den entsprechenden Datalader (Listing 2) und eine Tabelle, in der alle verwendeten Routinen des Betriebssystems und des Basic-Interpreters aufgeführt sind.</p>
@@ -615,6 +620,78 @@ INY ;STRINGADRESSE KORRIGIEREN
         <p>Verzeihen Sie mir bitte, daß die Erläuterungen der Routinen zum Anlegen des Strings, zur Behandlung der Descriptoren und des Rückdescriptors ziemlich knapp ausfielen, aber der Schwerpunkt dieses Artikels war nun einmal nicht der Basic-Interpreter des C 16 und dessen Variablenbehandlung, sondern es sollte gezeigt werden, wie Sie auch in Maschinensprache Daten an beliebige Peripheriegeräten senden oder von diesen empfangen können.</p>
 
         <address class="author">(S. Baloui/ah)</address>
+
+        <figure>
+            <pre>. 065e  a9 ff    lda #$ff
+. 0660  20 06 a9 jsr $a906
+. 0663  20 91 94 jsr $9491
+. 0666  20 84 9d jsr $9d84
+. 0669  20 c6 ff jsr $ffc6
+. 066c  a0 00    ldy #$00
+. 066e  20 cf ff jsr $ffcf
+. 0671  c9 0d    cmp #$0d
+. 0673  f0 05    beq $067a
+. 0675  91 33    sta ($33),y
+. 0677  c8       iny
+. 0678  d0 f4    bne $066e
+. 067a  84 d0    sty $d0
+. 067c  20 cc ff jsr $ffcc
+. 067f  a5 34    lda $34
+. 0681  85 d2    sta $d2
+. 0683  a9 ff    lda #$ff
+. 0685  38       sec
+. 0686  e5 d0    sbc $d0
+. 0688  18       clc
+. 0689  65 33    adc $33
+. 068b  85 d1    sta $d1
+. 068d  90 02    bcc $0691
+. 068f  e6 d2    inc $d2
+. 0691  a4 d0    ldy $d0
+. 0693  88       dey
+. 0694  b1 33    lda ($33),y
+. 0696  91 d1    sta ($d1),y
+. 0698  88       dey
+. 0699  c0 ff    cpy #$ff
+. 069b  d0 f7    bne $0694
+. 069d  20 91 94 jsr $9491
+. 06a0  20 a5 96 jsr $96a5
+. 06a3  a0 02    ldy #$02
+. 06a5  b1 47    lda ($47),y
+. 06a7  99 d3 00 sta $00d3,y
+. 06aa  88       dey
+. 06ab  10 f8    bpl $06a5
+. 06ad  a5 d3    lda $d3
+. 06af  f0 08    beq $06b9
+. 06b1  a8       tay
+. 06b2  91 d4    sta ($d4),y
+. 06b4  c8       iny
+. 06b5  a9 ff    lda #$ff
+. 06b7  91 d4    sta ($d4),y
+. 06b9  a4 d0    ldy $d0
+. 06bb  a5 47    lda $47
+. 06bd  91 d1    sta ($d1),y
+. 06bf  c8       iny
+. 06c0  a5 48    lda $48
+. 06c2  91 d1    sta ($d1),y
+. 06c4  a0 00    ldy #$00
+. 06c6  a5 d0    lda $d0
+. 06c8  91 47    sta ($47),y
+. 06ca  c8       iny
+. 06cb  a5 d1    lda $d1
+. 06cd  91 47    sta ($47),y
+. 06cf  85 33    sta $33
+. 06d1  c8       iny
+. 06d2  a5 d2    lda $d2
+. 06d4  91 47    sta ($47),y
+. 06d6  85 34    sta $34
+. 06d8  60       rts</pre>
+            <figcaption>Listing 1. »Input-Routine« in Maschinensprache. Bitte mit dem eingebauten Monitor eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="c16.input#.prg" data-name="Input-Routine"></div>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 2. DATA-Lader zur »Input-Routine«</figcaption>
+        </figure>
     </article>
 </body>
 

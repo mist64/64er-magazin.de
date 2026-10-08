@@ -107,6 +107,32 @@ JSR $8818 ;Linkpointer berechnen lassen
 
         <p>Beim Laden von Maschinenprogrammen ist dies natürlich nicht erforderlich.</p>
 
+        <figure>
+            <pre>. 1001  20 E7 FF JSR $FFE7
+. 1004  A9 01    LDA #$01
+. 1006  A2 04    LDX #$04
+. 1008  A0 00    LDY #$00
+. 100A  20 BA FF JSR $FFBA
+. 100D  A9 00    LDA #$00
+. 100F  20 BD FF JSR $FFBD
+. 1012  20 C0 FF JSR $FFC0
+. 1015  A2 01    LDX #$01
+. 1017  20 C9 FF JSR $FFC9
+. 101A  A2 00    LDX #$00
+. 101C  BD 2F 10 LDA $102F,X
+. 101F  20 D2 FF JSR $FFD2
+. 1022  E8       INX
+. 1023  E0 08    CPX #$08
+. 1025  D0 F5    BNE $101C
+. 1027  20 CC FF JSR $FFCC
+. 102A  A9 01    LDA #$01
+. 102C  4C C3 FF JMP $FFC3
+
+&gt;102F 44 52 55 43 4B 45 52 0D</pre>
+            <figcaption>Listing 1. Beispieltext auf Drucker ausgeben</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="l1.$1001-$1037.prg" data-name="Beispieltext auf Drucker"></div>
+
         <p>SAVE ($FFD8)</p>
 
         <p>Siehe Sonderheft 3, 1986.</p>
@@ -171,6 +197,32 @@ JSR $8818 ;Linkpointer berechnen lassen
 
         <p>Ich möchte ausdrücklich darauf hinweisen, daß die Routinen »CLEAR«, »HOME«, »SETCR« und »GETCR« keine Standard-Vektoren sind und somit nur für den C 16 gelten.</p>
 
+        <figure>
+            <pre>. 1001  20 8B D8 JSR $D88B
+. 1004  A2 0A    LDX #$0A
+. 1006  A0 0F    LDY #$0F
+. 1008  20 3B D8 JSR $D83B
+. 100B  A2 00    LDX #$00
+. 100D  BD 1C 10 LDA $101C,X
+. 1010  20 49 DC JSR $DC49
+. 1013  E8       INX
+. 1014  E0 08    CPX #$08
+. 1016  D0 F5    BNE $100D
+. 1018  20 9A D8 JSR $D89A
+. 101B  60       RTS
+
+&gt;101C 28 43 29 36 34 27 45 52</pre>
+            <figcaption>Listing 2. Bildschirmausgabe mit den neuen ROM-Routinen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="l2.$1001-$1024.prg" data-name="Bildschirmausgabe"></div>
+        <figure>
+            <pre>. 1001  20 E1 FF JSR $FFE1
+. 1004  D0 FB    BNE $1001
+. 1006  60       RTS</pre>
+            <figcaption>Listing 3. Abfragen der Run/Stop-Taste</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="l3.$1001-$1007.prg" data-name="Run/Stop-Taste"></div>
+
         <p>Jetzt haben Sie die wichtigsten Betriebssystemroutinen kennengelernt. Nicht so bekannt sind vier recht interessante Routinen des TEDMON. Diese Routinen kann man zur hexadezimalen Ausgabe von Zahlen verwenden. PUTHEX ($FB10)</p>
 
         <p>Im Akku übergeben wir.einen Byte-Wert, der dann über JSR $FB10 zweistellig hexadezimal ausgegeben wird. Beispiel:</p>
@@ -194,6 +246,20 @@ JSR $8818 ;Linkpointer berechnen lassen
         <h3>PUTWRD ($FAFF) Mit dieser Routine ist auch die Ausgabe von 2-Byte-Werten kein Problem. Im Akku wird das Low-Byte, im X-Register das High-Byte der Zahl, die vierstellig hexadezimal ausgegeben werden soll, übergeben.</h3>
 
         <h3>Listing 4 wendet die aufgezeigten TEDMON-Routinen an.</h3>
+
+        <figure>
+            <pre>. 1001  A9 34    LDA #$34
+. 1003  A2 12    LDX #$12
+. 1005  20 FF FA JSR $FAFF
+. 1008  A9 A0    LDA #$A0
+. 100A  20 05 FB JSR $FB05
+. 100D  A9 A1    LDA #$A1
+. 100F  20 10 FB JSR $FB10
+. 1012  A9 2E    LDA #$2E
+. 1014  4C D2 FF JMP $FFD2</pre>
+            <figcaption>Listing 4. Beispiel zur Anwendung der Routinen des TEDMON</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="l4.$1001-$1017.prg" data-name="TEDMON-Routinen"></div>
 
         <h3>Der letzte ROM-Einsprung, mit dem wir uns genauer beschäftigen wollen, ist RESET ($FFF9) »JMP $FFF%« hat die gleiche Wirkung wie das Drücken der Reset-Taste. Es erfolgt ein Sprung zum Reset-Vektor, wodurch der Einschaltzustand hergestellt wird.</h3>
 
