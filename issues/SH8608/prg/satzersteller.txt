@@ -1,0 +1,55 @@
+;satzersteller.prg ==1001==
+;version=3
+   10 dimbx%(55),cy%(55):vol8:color0,15,2:color4,1:color1,2:graphic1,1
+   20 x=160:y=100:draw1,x,y:box1,135,75,185,125
+   30 gosub60:locatex+c,y+d:ifrdot(2)=1then30
+   40 draw0,x,y:x=x+c:y=y+d:draw1,x,y:a$=right$(str$(x-136),2):b$=right$(str$(y-76),2)
+   50 char1,4,2,"x-wert :":char1,4,4,"y-wert :":char1,14,2,a$:char1,14,4,b$:goto30
+   60 a=joy(2):ifa=128andk=0then220
+   70 ifa=129then300
+   80 ifa=133andk=0andi>0then370
+   90 geta$:ifa$="p"then420
+  100 ifa<>131ork=1then120
+  110 k=1:bx%(i)=99:cy%(i)=99:sound1,550,20:o=1:gosub260:goto60
+  120 ifa=0ora>127then60
+  130 k=0:onagoto140,150,160,170,180,190,200,210
+  140 c=0:d=-1:return
+  150 c=1:d=-1:return
+  160 c=1:d=0:return
+  170 c=1:d=1:return
+  180 c=0:d=1:return
+  190 c=-1:d=1:return
+  200 c=-1:d=0:return
+  210 c=-1:d=-1:return
+  220 sound1,700,20:bx%(i)=x-136:cy%(i)=y-76:ify>100theny=y-2:elsey=y+2
+  230 draw1,x,y:k=1:ifi=0then260
+  240 ifbx%(i-1)=99then260
+  250 draw1,bx%(i-1)+136,cy%(i-1)+76tobx%(i)+136,cy%(i)+76
+  260 c$=right$(str$(i+1),2)+". "+right$(str$(bx%(i)),2)+","+right$(str$(cy%(i)),2)
+  270 ifi>15thenp=25:q=-15:elsep=2:q=7
+  280 ifi>39thenp=25:q=-39
+  290 char1,p,i+q,c$:i=i+1:ifo=1theno=0:return:elsegoto60
+  300 l=i-1:j=bx%(l)
+  310 forg=1toi-1:ifbx%(l-g)<>99andta<>1then340
+  315 ifta=1thenbx%(i)=-bx%(l-g)+2*j:cy%(i)=cy%(l-g):ta=0:goto330
+  320 bx%(i)=bx%(l-g):cy%(i)=cy%(l-g):ta=1
+  330 o=1:gosub260:goto360
+  340 cy%(i)=cy%(l-g):bx%(i)=-bx%(l-g)+2*j
+  350 o=1:gosub250
+  360 next:bx%(i)=bx%(0):cy%(i)=cy%(0):goto250
+  370 ifi=0then60
+  380 i=i-1:ifi>0andbx%(i)<>99thendraw0,bx%(i-1)+136,cy%(i-1)+76tobx%(i)+136,cy%(i)+76
+  390 ifi>15thenp=25:q=-15:elsep=2:q=7
+  400 sound1,600,20:k=1:ifi>39thenp=25:q=-39
+  410 char1,p,i+q,"           ":goto60
+  420 open1,6,1:g=0
+  430 print#1,"m",220+bx%(g),48-cy%(g)
+  440 g=g+1:ifg=ithen470
+  450 ifbx%(g)=99theng=g+1:goto430
+  460 print#1,"d",220+bx%(g),48-cy%(g):goto440
+  470 graphic0:print"{clr}disk.":poke239,0:getkeya$:ifa$="n"then500
+  480 open2,8,2,"filenamen,s,a"
+  490 print#2,i:forg=0toi:print#2,bx%(g):print#2,cy%(g):next:close2
+  500 print"{clr}zurueck/neu/ende":poke239,0:getkeya$:ifa$="z"thensys65511:graphic1,0:goto60
+  510 ifa$<>"e"thenrun
+

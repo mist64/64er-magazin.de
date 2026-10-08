@@ -1,0 +1,234 @@
+;snake.prg ==1001==
+;version=3
+ 1000 rem +----------------------------+
+ 1010 rem !                            !
+ 1020 rem ! snake       1986 by a.jung !
+ 1030 rem !                            !
+ 1040 rem !  datasettenbenutzung nach  !
+ 1050 rem !  jedem programmstart erst  !
+ 1060 rem !  nach eingabe von:         !
+ 1070 rem !                            !
+ 1080 rem !   sys 819 [cr]             !
+ 1090 rem !                            !
+ 1100 rem !  sonst systemabsturz !!!!  !
+ 1110 rem !                            !
+ 1120 rem +----------------------------+
+ 1130 gosub2340
+ 1140 :
+ 1150 rem initialisierung
+ 1160 :
+ 1170 color0,3,3:color1,8,7:color4,6,3
+ 1180 dimpo(di),hi$(8,5):vol8:pu=0:ph=1:wo=1:restore2610
+ 1190 fort1=0to8:fort2=0to5:readhi$(t1,t2):ifhi$(t1,t2)="-1"thent2=6
+ 1200 nextt2,t1:pu=-10
+ 1210 fort=819to871:reada$:poket,dec(a$):next
+ 1220 gosub1780
+ 1230 gosub1970:po=4012:pa=0:pe=0:l=5:r=-40:v=r:po(0)=po:sp=0:poke239,0
+ 1240 :
+ 1250 rem hauptschleife
+ 1260 :
+ 1270 pokepo,215:pokepo-1024,peek(65282):sound3,1000,2
+ 1280 v=r:geta$
+ 1290 ifa$="5"thenr=-40
+ 1300 ifa$="6"thenr=1
+ 1310 ifa$="r"thenr=40
+ 1320 ifa$="d"thenr=-1
+ 1330 ifabs(r)>20thenpokepo,221:elsepokepo,192
+ 1340 ifr=vthen1410
+ 1350 ifr=-vthen1560
+ 1360 ifsgn(r)<>sgn(v)then1390
+ 1370 ifr>vthenpokepo,238:elsepokepo,237
+ 1380 goto1400
+ 1390 ifsgn(r)=1thenpokepo,240:elsepokepo,253
+ 1400 v=r
+ 1410 po=po+r:pa=pa+1:ifpa>dithenpa=0
+ 1420 ifpa=pethenpoke3171,96:pokepo(pe),32:pe=pa+1:sp=1:ifpe>dithenpe=0
+ 1430 po(pa)=po:pokepo-1024-v,102:ifpeek(po)<>32then1500
+ 1440 ifl=>0andsp=0thenl=l-1:goto1270
+ 1450 pokepo(pe),32:pe=pe+1:ifpe>dithenpe=0
+ 1460 goto1270
+ 1470 :
+ 1480 rem hindernisueberpruefung
+ 1490 :
+ 1500 hi=peek(po)
+ 1510 ifhi=81thensound3,400,6:gosub1970:goto1270
+ 1520 ifhi=96then1700
+ 1530 :
+ 1540 rem schlange geht ein
+ 1550 :
+ 1560 pokepo,215:sound3,800,3000
+ 1570 fort=89to0step-1
+ 1580 volt/10:pokepo-1024,rnd(1)*256
+ 1590 next:sound3,0,0:q2=.00001
+ 1600 ifpa<pethenqq=(di-pe+pa):elseqq=(pa-pe)
+ 1610 qq=qq+.00001:forq1=0toqq:fort=1to10:next
+ 1620 sound3,900,2:vol8:color4,6,8-q2:color0,3,8-q2:q2=q2+7.9/qq
+ 1630 pokepo(pe),32:pe=pe+1:ifpe>dithenpe=0
+ 1640 next:fort=1to100:next:color0,3,3:color4,6,3
+ 1650 wo=wo-1:ifwo=0then2090
+ 1660 goto1220
+ 1670 :
+ 1680 rem phase beendet
+ 1690 :
+ 1700 pu=pu+ph*10:wo=wo+1:ph=ph+1
+ 1710 pokepo,215:pokepo-1024,247:restore2830:vol8
+ 1720 fort=1to19:reads1,s2
+ 1730 color0,3,t/2.4:color4,6,t/2.4:sound1,s1,s2:sound1,1020,1
+ 1740 next:color0,3,3:color4,6,3:goto1220
+ 1750 :
+ 1760 rem spielfeldmaske
+ 1770 :
+ 1780 sys819:print"{clr}{lgrn}{rvon}the   snake    *    the   snake    *    ";
+ 1790 printusing"{home}{down}{rvon}{yel} punkte : ##### ";pu;
+ 1800 printusing"{rvon} leben : ## ";wo;
+ 1810 printusing"{rvon} phase : ##";ph;:poke3151,160:poke2127,119:sys830
+ 1820 char,0,2,"{rvon}########################################"
+ 1830 fort=3to23:char,0,t,"{rvon}#":printtab(39)"#":next
+ 1840 char,0,24,"{rvon}#######################################{left}{inst}#{home}{rvof}":gosub2040
+ 1850 pg=ph:ifpg>10thenpg=int(rnd(1)*10+1)
+ 1860 pg=pg-2:ifph=1then1930
+ 1870 fort=0to5:ifhi$(pg,t)="-1"then1930
+ 1880 w1=val(left$(hi$(pg,t),3))
+ 1890 w2=val(mid$(hi$(pg,t),4,2))
+ 1900 w3=val(right$(hi$(pg,t),2))
+ 1910 forw=w1tow1+w2*w3stepw2
+ 1920 pokew+3072,163:nextw,t
+ 1930 return
+ 1940 :
+ 1950 rem apfel darstellen
+ 1960 :
+ 1970 l=rnd(1)*840+3192
+ 1980 ifpeek(l)<>32then1970
+ 1990 pokel,81:pokel-1024,90:l=5:pu=pu+10
+ 2000 sys819:printusing"{home}{down}{rvon} punkte : ##### ";pu;:sys830:return
+ 2010 :
+ 2020 rem tastaturabfrage
+ 2030 :
+ 2040 char,8,15,"druecken sie eine taste!":poke239,0:getkeys$
+ 2050 char,8,15,"                        ":return
+ 2060 :
+ 2070 rem beerdigung
+ 2080 :
+ 2090 scnclr:color0,4,0:color4,4,0:sys819
+ 2100 printtab(15)"{rvof}{wht}{CBM-V}":printtab(26)"{CBM-C}":printtab(39)"{CBM-D}":printtab(8)"{CBM-V}"
+ 2110 print"{CBM-V}"spc(22)"{CBM-F}"spc(8)"{CBM-D}{CBM-I}":print"{lred}   {CBM-D}{rvon}  {rvof}{CBM-I}{rvon} {rvof}{CBM-F}"spc(22)"{wht}{CBM-D}{rvon}  {CBM-C}{rvof}"
+ 2120 print"{lred} {CBM-D}{rvon}   {brn}{CBM-B}{lred}    {rvof}      {wht}{CBM-F}"spc(14)"{rvon}{CBM-K}   "
+ 2130 print"{lred} {rvon}  {brn}{CBM-B}{lred}{CBM-F}{brn}{rvof}{CBM-B}{lred}{CBM-V}{brn}{CBM-K}{rvon}{lred}   {rvof}{CBM-F}"spc(20)"{wht}{rvon}{CBM-F} {rvof}{CBM-V}"
+ 2140 print"{lred}{rvon}{CBM-V} {brn}{CBM-C}{rvof}{CBM-K}{rvon}{lred} {brn}{rvof}{CBM-C}{rvon}{CBM-D}{rvof}{CBM-B}{rvon}{lred} {brn}{CBM-B}{lred}  ":print"{rvon}{CBM-K} {CBM-C}{brn}{rvof}{CBM-B}{lred}{CBM-C}{rvon} {brn}{rvof}{CBM-B}{rvon}{lred}{CBM-F}{rvof}{brn}{CBM-I}{CBM-V}{rvon}{lred}  "
+ 2150 print"{rvon}  {brn}{rvof}{CBM-B}{CBM-C}{rvon}{CBM-D}{lred}{CBM-D}{brn}{CBM-V}{CBM-B}{rvof}{CBM-V}{rvon}{lred}  {CBM-C}"spc(9)"{rvof}{wht}{CBM-D}{CBM-C}"spc(12)"{CBM-D}"
+ 2160 print"{lred}{CBM-C}{rvon}  {brn}{CBM-F}{rvof}{CBM-B}{rvon} {lred}{CBM-V}{CBM-C}{brn}{CBM-B}{lred}  {rvof}{CBM-V}"spc(11)"{wht}{CBM-D}":print"  {lred}{rvon}{CBM-F} {CBM-I}{CBM-I}{brn} {CBM-I}{lred}{CBM-F}{CBM-D}"
+ 2170 print"     {rvon}{brn}  ":print"    {CBM-D}{rvon}  {rvof}      {wht}{CBM-F}"spc(20)"{CBM-D}":print"     {brn}{rvon}  {CBM-V}{rvof}{CBM-K}"
+ 2180 print"     {rvon}  {CBM-D}":print" {wht}{CBM-D}   {brn}{rvon}  {rvof}"spc(17)"{wht}{CBM-F}":print"     {brn}{rvon}  {rvof}"
+ 2190 print"     {brn}{rvon}  {rvof}{CBM-K}    {orng}{CBM-D}{rvon}  {rvof}{CBM-F}"spc(20)"{wht}{CBM-D}{rvon}{CBM-D}{CBM-C}"
+ 2200 print"    {brn}{rvon}{CBM-K}   {rght}{rght}{rght}{rght}{orng}     {rvof}{brn}{CBM-I}{CBM-I}{CBM-I}{cyn}{rvon} {rvof}{CBM-F}"spc(14)"{wht}{rvon}{CBM-K}{rvof}{CBM-F}{rvon}{CBM-V}"
+ 2210 print"  {brn}{CBM-D}{CBM-I}{rvon}    {rvof}{CBM-I}{grn}{CBM-I}{orng}{CBM-I}{rvon}       {rvof}{CBM-I}{grn}{CBM-I}{rvon}{cyn}{CBM-I}{grn} {rvof}{CBM-I} {blk} {CBM-D}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-F}{grn} {CBM-D}{CBM-I}{wht}{rvon}{CBM-K}{CBM-C} {rvof}{grn}{CBM-I}"
+ 2220 print"{rvon}{grn}    {rvof}{CBM-F}{rvon}{CBM-V}{rvof}{CBM-F}{rvon}{CBM-F}    {orng}    {grn}       {rvof}{CBM-F}{blk}{CBM-D}{rvon}RRRRRRRR{rvof}{CBM-F}{rvon}{grn}      "
+ 2230 print"{rvon}                        {rvof}{CBM-F}{rvon}{blk}{CBM-F}      {CBM-D}{rvof}{grn}{CBM-D}{rvon}      "
+ 2240 print"{rvon}                                       {left}{inst} {home}"
+ 2250 restore2900
+ 2260 fort=22to1step-1:reada,b
+ 2270 sound1,a,b:sound1,1020,1:next
+ 2280 print"{home}"chr$(27)"ddruecken sie eine taste fuer start !!   "
+ 2290 printusing"{rvon}ihre punkte : ##### ";pu
+ 2300 sys830:poke239,0:getkeys$:sys819:run
+ 2310 :
+ 2320 rem titel
+ 2330 :
+ 2340 color0,1:color4,1
+ 2350 restore3010
+ 2360 fort=1to8:reada$:printchr$(27)a$
+ 2370 fortt=1to100:nexttt,t
+ 2380 fort=1to25:printchr$(27)"w{home}"
+ 2390 fortt=1to100:nexttt,t
+ 2400 fort=1to500:next
+ 2410 char1,0,24,chr$(14):restore3120
+ 2420 :
+ 2430 rem spielregeln
+ 2440 :
+ 2450 print"Sind die Spielregeln bekannt ?  (J/N)":poke239,0
+ 2460 getan$:ifan$="j"thenrestore3240:an=7:goto2480
+ 2470 an=19:ifan$<>"n"then2460
+ 2480 fort=1toan:vol8
+ 2490 readan$:an$=" "+an$:fortt=1tolen(an$)
+ 2500 printchr$(20)mid$(an$,tt,1);"{CBM-@}";:sound3,1000,2
+ 2510 fort1=1to30:nextt1,tt
+ 2520 printchr$(20):print:fort1=1to500:nextt1,t:poke239,0
+ 2530 getla$:la=val(la$):ifla>3orla<1then2530
+ 2540 di=50+20*la
+ 2550 fort=1to25:printchr$(27)"w{home}"
+ 2560 fortt=1to100:nexttt,t:printchr$(142)
+ 2570 return
+ 2580 :
+ 2590 rem datas hindernisse
+ 2600 :
+ 2610 data 5290121,-1
+ 2620 data 5290121,3004006,579405,-1
+ 2630 data 5290121,2894012,3104012,-1
+ 2640 data 3004006,5394006,2894012,3104012,3000110,7690110
+ 2650 data 1004006,7394006,5210106,5360107,5520106,-1
+ 2660 data 3610106,3750109,3920106,6810106,6950109,7120106
+ 2670 data 2934112,-1
+ 2680 data 2934112,3053912,-1
+ 2690 data 2934112,3084106,5254106,-1
+ 2700 :
+ 2710 rem datas maschinenroutine
+ 2720 :
+ 2730 data a9,0e,8d,14,03,a9,ce,8d
+ 2740 data 15,03,60,a9,49,8d,14,03
+ 2750 data a9,03,8d,15,03,60,18,a5
+ 2760 data d8,69,10,85,d8,90,13,ae
+ 2770 data 00,0c,a0,00,b9,01,0c,99
+ 2780 data 00,0c,c8,c0,28,d0,f5,8e
+ 2790 data 27,0c,4c,0e,ce
+ 2800 :
+ 2810 rem datas musik
+ 2820 :
+ 2830 data 860,4,860,10,860,4
+ 2840 data 900,14,900,14,912,14
+ 2850 data 912,14,940,20,924,7
+ 2860 data 900,7,1020,2,940,4
+ 2870 data 942,10,900,4,876,14
+ 2880 data 928,26,912,10,892,4
+ 2890 data 900,26
+ 2900 data 804,27,860,20,876,7
+ 2910 data 892,27,900,20,892,7
+ 2920 data 876,27,892,20,876,7
+ 2930 data 860,27,804,13,1020,13
+ 2940 data 804,27,860,20,876,7
+ 2950 data 892,27,900,20,892,7
+ 2960 data 876,27,892,20,876,7
+ 2970 data 860,30
+ 2980 :
+ 2990 rem datas titel
+ 3000 :
+ 3010 data"x{home}{home}{clr}{wht}   {CBM-*}{rvon}   {rvof}{SHIFT-POUND}  {rvon} {rght}{rght}{rght} {rght}{rght} {rght}{rght}{rght} {rght}{rght} {rvof}  {CBM-*}{rvon} {rvof}  {CBM-*}{rvon}    "
+ 3020 data"w{home}   {rvon} {CBM-*}{rght}{SHIFT-POUND} {rght}{rght} {rght}{rght}{rght} {rght}{rght} {rght}{rght}{rght} {rght}{rght} {rvof} {CBM-*}{rvon} {CBM-*}{rght}{rght} {CBM-*}"
+ 3030 data"w{home}      {CBM-*}{rvon} {rght}{rght} {rght}{rght}{rvof}{CBM-*}{rvon} {rght}{rght} {rvof}{SHIFT-POUND} {CBM-*}{rvon} {rght}{rght} {rvof}{CBM-*}{rvon} {CBM-*}{rght}{rght}{rght} "
+ 3040 data"w{home}     {CBM-*}{rvon} {CBM-*}{rght}{rght} {rght}{rvof}{CBM-*}{rvon}  {rght}{rght}     {rght}{rght}  {rvof}{SHIFT-POUND}    {rvon}    "
+ 3050 data"w{home}   {CBM-*}{rvon}  {CBM-*}{rght}{rght}{rght} {rvof}{CBM-*}{rvon} {CBM-*} {rght}{rght} {rght}{rght}{rght} {rght}{rght} {SHIFT-POUND} {rvof}{SHIFT-POUND}   {rvon} {CBM-*}"
+ 3060 data"w{home}   {rvon} {CBM-*}{rght}{rght}{rght}{rght}{rght}  {CBM-*}{rght} {rght}{rght} {rvof}{SHIFT-POUND} {CBM-*}{rvon} {rght}{rght} {rght}{SHIFT-POUND} {rvof}{SHIFT-POUND}  {rvon} "
+ 3070 data"w{home}   {rvon} {rvof}{SHIFT-POUND} {CBM-*}{rvon} {rght}{rght} {CBM-*}{rght}{rght} {rght}{rght}{SHIFT-POUND}   {CBM-*}{rght}{rght} {rght}{rght}{SHIFT-POUND} {rght}{rght} {rvof}{SHIFT-POUND}"
+ 3080 data"w{home}   {rvon}{SHIFT-POUND}   {CBM-*}{rght}{rght} {rght}{rght}{rght} {rght}{rght}{rght}{SHIFT-POUND} {CBM-*}{rght}{rght}{rght} {rght}{rght}{rght}{SHIFT-POUND}{rght}{rght}{SHIFT-POUND}    "
+ 3090 :
+ 3100 rem datas spielanleitung
+ 3110 :
+ 3120 data"{down}{down}{down}{down}{down}"
+ 3130 data"Spielanleitung:                         ==============="
+ 3140 data"Steuern Sie Ihre Schlange mit dem       Joystick (Port 1) !"
+ 3150 data"Fressen Sie soviele Aepfel, wie Sie     koennen !"
+ 3160 data"Sie wachsen staendig. (Kein Grund zur   Panik.)"
+ 3170 data" Nach einiger Zeit erscheint in der      oberen Mauer ein Ausgang."
+ 3180 data"Wenn Sie durch diesen das Spielfeld ver-lassen, erhalten Sie ein Leben mehr."
+ 3190 data"Der Schwierigkeitsgrad steigt mit jeder Phase."
+ 3200 data"Die Mauer ist ungeniessbar."
+ 3210 data"Sie selbst ebenfalls."
+ 3220 data"Bei jedem Fehler geht die Schlange ein  und verliert ein Leben."
+ 3230 data"Sind alle Leben verbraucht, koennen Sie Ihrer Beerdigung beiwohnen."
+ 3240 data"........................................"
+ 3250 data"{down}{down}{down}{down}{down}Made by Alexander JUNG{down}{down}{down}{down}{down}"
+ 3260 data"Waehlen Sie nun den Schwierigkeitsgrad !{down}"
+ 3270 data" 1 = Leicht"
+ 3280 data" 2 = Mittel"
+ 3290 data" 3 = Schwer"
+ 3300 data"{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+

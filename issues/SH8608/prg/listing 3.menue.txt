@@ -1,0 +1,80 @@
+;listing 3.menue.prg ==1c01==
+;version=3
+  100 rem *******************************
+  110 rem *                             *
+  120 rem * m e n u e s t e u e r u n g *
+  130 rem *                             *
+  140 rem *******************************
+  150 rem *                  *          *
+  160 rem * florian mueller  *  c16/116 *
+  170 rem *                  *          *
+  180 rem *******************************
+  190 :
+  200 rem ***     initialisierung     ***
+  210 rem ***     ===============     ***
+  220 :
+  230 clr:key 1,chr$(133):key 7,chr$(136):rem funktionstasten mit codes belegen
+  240 a = 5:rem fuenf menuepunkte
+  250 dim r$ (a-1):rem revers-tabelle dimensionieren
+  260 p = 0:rem menuepunkt 0 einstellen
+  270 r$ (p) = chr$(18):rem menuepunkt 0 revers
+  280 color 0,1:color 4,1:printchr$(142)
+  290 print chr$(147):rem bildschirm loeschen
+  300 :
+  310 rem *** ausgabe der menuepunkte ***
+  320 rem *** ======================= ***
+  330 :
+  340 print chr$(19);:rem cursor home
+  350 print "{yel}   menuesteuerung - beispielprogramm"
+  360 print "   ================================="
+  370 print:print:print
+  380 print tab(9);r$(0);"{red}menuepunkt a{rvof} (0){down}"
+  390 print tab(9);r$(1);"{cyn}menuepunkt b{rvof} (1){down}"
+  400 print tab(9);r$(2);"{pur}menuepunkt c{rvof} (2){down}"
+  410 print tab(9);r$(3);"{grn}menuepunkt d{rvof} (3){down}"
+  420 print tab(9);r$(4);"{dblu}menuepunkt e{rvof} (4){down}"
+  430 print:print"{lgrn}derzeit angewaehlter menuepunkt:"p
+  440 :
+  450 rem ***     tastaturabfrage     ***
+  460 rem ***     ===============     ***
+  470 :
+  480 get t$:if t$="" then 480
+  490 if t$="{f1}" then on p+1 goto 610,680,730,780,830
+  500 if t$="{f7}" then print"{down}{down}programmabbruch.":end
+  510 r$(p) = chr$(0)
+  520 if t$="{down}" then p = p+1 + a*(p=(a-1))
+  530 if t$="{up}" then p = p-1 - a*(p=0)
+  540 if t$="{home}" then p = 0
+  550 r$(p) = chr$(18)
+  560 goto 310
+  570 :
+  580 rem *** menuepunkte  (routinen) ***
+  590 rem *** ======================= ***
+  600 :
+  610 rem menuepunkt 1
+  620 print"{clr}sie haben den obersten menuepunkt ange-"
+  630 print"{down}waehlt. dieser hat in der internen nu-"
+  640 print"{down}merierung des programms die nummer:"p
+  650 print"{down}{down}bitte druecken sie eine taste"
+  660 getkey a$:goto 290
+  670 :
+  680 rem menuepunkt 2
+  690 print"{clr}sie haben den zweitobersten menuepunkt"
+  700 print"{down}angewaehlt. interne nummer: "p
+  710 goto 650
+  720 :
+  730 rem menuepunkt 3
+  740 print"{clr}sie haben den mittleren menuepunkt ange-"
+  750 print"{down}waehlt. dessen interne nummer ist:"p
+  760 goto 650
+  770 :
+  780 rem menuepunkt 4
+  790 print"{clr}sie haben den zweituntersten menuepunkt"
+  800 print"{down}angewaehlt. interne nummer:"p
+  810 goto 650
+  820 :
+  830 rem menuepunkt 5
+  840 print"{clr}sie haben den untersten menuepunkt ange-"
+  850 print"{down}waehlt. interne nummer:"p
+  860 goto 650
+

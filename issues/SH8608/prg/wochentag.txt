@@ -1,0 +1,54 @@
+;wochentag.prg ==1001==
+;version=3
+   10 rem   ermittlung der wochentage    von  j. hagen
+   30 b$="samstag   sonntag   montag    dienstag  mittwoch  donnerstagfreitag   "
+   40 p$="        ":a$=p$:o$=chr$(145):l$=chr$(157)
+   60 scnclr:print:print:input"     notiz : ";a$
+   90 do
+  100 scnclr:d$="tt.mm.jjjj":print:print" ";a$;
+  130 print tab(31) mid$(ti$,1,2);":";mid$(ti$,3,2);":";mid$(ti$,5,2):print:print
+  180 print tab(07)"ermittlung des wochentages"
+  190 print tab(06)"============================":print:print:print
+  210 print:print tab(11)"datum   ";d$;
+  230 for x=1 to 12:print l$;:next x
+  260 input d$
+  270 mid$(p$,1,2)=mid$(d$,1,2)
+  280 mid$(p$,3,2)=mid$(d$,4,2)
+  290 mid$(p$,5,4)=mid$(d$,7,4)
+  300 for k=1 to 7
+  310 if asc(mid$(p$,k,1)) < 48 or asc(mid$(p$,k,1)) > 57 then 740
+  320 next k
+  330 t=val(mid$(p$,1,2))
+  340 m=val(mid$(p$,3,2))
+  350 j=val(mid$(p$,5,4))
+  360 if j<1582 then 740
+  370 if m<1 or m>12 then 740
+  380 if t<1 or t>31 then 740
+  390 if m=4 and t>30 then 740
+  400 if m=6 and t>30 then 740
+  410 if m=9 and t>30 then 740
+  420 if m=11 and t>30 then 740
+  430 if m=2 and t>29 then 740
+  440 if m=2 and t<29 then 480
+  450 if m<>2 then 480
+  460 a=int(j/4):b=a*4:if j<>b then 740
+  480 gosub 790
+  500 print o$;:print tab(11)"der     ";
+  510 print mid$(p$,1,2);".";mid$(p$,3,2);".";mid$(p$,5,4)
+  540 print:print:print tab(08)"ist / war  ein  ";mid$(b$,w*10+1,10):print:print
+  580 print:print:print tab(12)"weiter j / n   j";l$;l$;l$;:input c$
+  620 if c$="j" goto 690
+  630 if c$="n" goto 690
+  650 print:print tab(08)"ungueltige eingabe !";o$;o$;o$;o$;o$:goto 580
+  690 loop until c$ = "n"
+  710 print:print tab(08) "                    ":print
+  730 end
+  740 print:print:print tab(08)"ungueltiges datum  !";o$;o$;o$;o$;:goto 210
+  790 rem rechnen
+  800 u=365*j+31*(m-1)+t:if m>2 then 830
+  820 goto 860
+  830 y=int(0.4*m+2.3):v=u-y:goto 870
+  860 v=u:j=j-1
+  870 s=int(j/4):t=int(j/100):t=int((t+1)*0.75):s=s-t:x=v+s
+  920 g=int(x/7):w=x-g*7:return
+

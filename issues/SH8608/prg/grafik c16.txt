@@ -1,0 +1,40 @@
+;grafik c16.prg ==1c01==
+;version=3
+   10 k=8:dimf%(4),l%(4),f$(1):getkeyp:ifp=1theng=1:elseg=3
+   20 graphicg,1:x=320/p/2:y=100:s=1:w=4:u=1:d$="{blk}{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+   30 drawg,5/p,0to0,0to0,5:drawg,0,0to7/p,7:sshapef$(0),0,0,7/p,7
+   40 boxg,9,1,14,6,,1:box0,11,2,12,5,,1:sshapef$(1),8,0,15,7:scnclr
+   50 gshapef$(f),x+1,y+1,4
+   60 do:trap370:graphicg:getkeya$:gshapef$(f),x+1-f,y+1-f,4:ifw=0thens=1
+   70 trap50:if(a$="{up}"ora$="@"ora$="+")andy>s-1theny=y-s:elseifa$="r"thenf=1:w=0
+   80 if(a$="{left}"ora$="@"ora$=";")andx>s/p-1thenx=x-s/p:elseifa$=","ands>1thens=s-1
+   90 if(a$="{rght}"ora$="+"ora$="*")andx<320/p-s/pthenx=x+s/p
+  100 ifa$>"/"andasc(a$)<49+gthenu=val(a$)
+  110 if(a$="{down}"ora$=";"ora$="*")andy<200-stheny=y+s:elseifa$="v"thenboxu,a,b,x,y
+  120 ifa$="f"thenpaintu,x,y:elseifa$="{clr}"thenscnclr:elseifa$=" "ord=1thendrawu,x,y
+  130 ifa$="k"thencircleu,a,b,sqr(abs(x-a)^2+abs((y-b)/p)^2):elseifa$="<"thens=1
+  140 ifa$="{home}"thena=x:b=y:elseifa$="{CBM-S}"ora$="{CBM-L}"then210:elseifa$="{stop}"thengraphic0:printd$:end
+  150 ifa$=">"thens=20:elseifa$="."ands<20thens=s+1:elseifa$="l"thendrawu,a,btox,y
+  160 ifa$="o"thencircleu,a,b,abs(x-a),abs(y-b):elseifa$=chr$(27)thend=0:f=0:w=4
+  170 ifa$="w"thentrap50:gosub260:elseifa$="q"thenboxu,a,b,x,y,,1:elseifa$="z"thend=1
+  180 ifa$="t"thengraphicg+1:a$="":printd$:inputa$:charu,x/(8/p),y/8,a$,d:d=0
+  190 ifa$<>"p"thengshapef$(f),x+1-f,y+1-f,w:loop
+  200 gshapef$(0),a+1,b+1,4:getkeya$:gshapef$(0),a+1,b+1,4:goto50
+  210 graphic0,1:ifk=8ora$="{CBM-S}"theninput" name";n$
+  220 print"{clr}mO{down}{down}{down}{down}{down}":ifa$="{CBM-L}"thenprint"l";:ifk=8thenprintchr$(34)n$chr$(34)","k;
+  230 ifa$="{CBM-S}"thenprint"s"chr$(34)n$chr$(34)","k"{left},1800,4000";
+  240 print:print"{down}{down}{down}{down}{down}{down}x":print"{down}gO50"
+  250 poke1319,19:fori=1320to1328:pokei,13:next:poke239,10:end
+  260 ifrclr(0)=1thenw$="{wht}":elsew$="{blk}"
+  270 printd$w$"{rvof}zeichenfarbe:";:printu:print:graphicg+1
+  280 fori=0to4:f%(i)=rclr(i):l%(i)=rlum(i):next:i=1:gosub360
+  290 do:print"{rvof}"w$;i;:color1,c,l:print"{rvon}           {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";:getkeya$
+  300 ifa$="{left}"andi>0theni=i-1:gosub360:elseifa$="{rght}"andi<4theni=i+1:gosub360
+  310 ifa$="{down}"andc>1thenc=c-1:elseifa$="{up}"andc<15thenc=c+1
+  320 ifa$="+"andl>0thenl=l-1:elseifa$="-"andl<7thenl=l+1
+  330 ifa$="*"then350:elseifa$<>chr$(13)thenloop
+  340 f%(i)=c:l%(i)=l:loop
+  350 fori=0to4:colori,f%(i),l%(i):next:return
+  360 c=f%(i):l=l%(i):return
+  370 resume
+

@@ -1,0 +1,258 @@
+;video-verwaltung.prg ==1001==
+;version=3
+    1 rem  ***********************
+    2 rem  *                     *
+    3 rem  *   commodore 116     *
+    4 rem  *                     *
+    5 rem  *    dieter beer      *
+    6 rem  *                     *
+    7 rem  *  tel.09231/72582    *
+    8 rem  *                     *
+    9 rem  ***********************
+   10 rem
+   12 printchr$(27)chr$(78)
+   13 key1,"action":key2,"western":key3,"spass":key8,"science-fiction":key4,"horror"
+   14 key5,"musik"
+   15 color0,7
+   20 dimd$(87,7)
+   25 gosub50000
+   30 f$(1)=" titel       "
+   31 f$(2)=" filmart     "
+   32 f$(3)=" cass.-nr.   "
+   33 f$(4)=" seite       "
+   34 f$(5)=" startzeit   "
+   35 f$(6)=" spieldauer  "
+   36 f$(7)=" bewertung   "
+   99 goto1000
+  100 rem   programmkopf
+  130 print"{clr}"
+  140 fori=1to40:print"=";:next
+  150 print"            videoverwaltung"
+  160 fori=1to40:print"=";:next
+  170 print
+  180 return
+  200 rem    fehlermeldung
+  230 printchr$(19);
+  240 forx=1to21:printchr$(17);:next
+  250 printchr$(18);fe$;chr$(146);
+  260 forx=1to1000:next
+  270 return
+  300 rem    koepfe programmteile
+  330 pt$(1)="   datei laden   "
+  340 pt$(2)=" datei speichern "
+  350 pt$(3)=" filme   eingeben"
+  360 pt$(4)=" filme   aendern "
+  370 pt$(5)=" filme   loeschen"
+  380 pt$(6)=" filme   ausgeben"
+  385 pt$(7)=" titel   listing "
+  390 pt$(8)="    erklaerung   "
+  395 pt$(9)="programm beenden "
+  400 print"{clr}"
+  410 printchr$(30);
+  420 print"UCCCCCCCCCCCCCCCCCI"
+  430 print"B";pt$(f);"B"
+  440 print"JCCCCCCCCCCCCCCCCCK"
+  450 return
+  500 rem    daten im rechner
+  530 ifz>0then560
+  540 fe$="keine daten im rechner"
+  550 gosub200
+  560 return
+ 1000 vol8:sound1,900,5:gosub100
+ 1005 printchr$(30);"UCCCCCCCCCCCCCCCCCCCI"
+ 1010 print"B";"programmfunktionen:";"B"
+ 1015 print"JCCCCCCCCCCCCCCCCCCCK"
+ 1030 print
+ 1035 print" {rvon}                           "
+ 1040 print" {rvon}   -1-    datei laden      "
+ 1050 print" {rvon}   -2-    datei speichern  "
+ 1060 print" {rvon}   -3-    filme eingeben   "
+ 1070 print" {rvon}   -4-    filme aendern    "
+ 1080 print" {rvon}   -5-    filme loeschen   "
+ 1090 print" {rvon}   -6-    filme ausgeben   "
+ 1100 print" {rvon}   -7-    titel listing    "
+ 1101 print" {rvon}   -8-    erklaerung       "
+ 1102 print" {rvon}   -9-    programm beenden "
+ 1103 print" {rvon}                           "
+ 1105 print
+ 1110 print"     auswahl "
+ 1115 input"      ";f
+ 1120 iff=0orf>9thenfe$="ungueltiger wert":gosub200:goto1000
+ 1125 vol8:sound1,900,5
+ 1130 onfgoto5000,10000,15000,20000,25000,30000,40000,45000,35000
+ 5000 rem    datei laden
+ 5030 gosub300:print
+ 5040 print"bitte datenkassette einlegen    "
+ 5050 print"{down}und zurueckspulen !"
+ 5060 print"{down}{down}{down}{down}druecke danach return "
+ 5070 inputx$
+ 5080 print
+ 5090 open1,1,0,"video"
+ 5100 input#1,z
+ 5110 fory=1toz
+ 5120 fori=1to7
+ 5130 input#1,d$(y,i)
+ 5140 nexti
+ 5150 nexty
+ 5160 close1
+ 5170 print"daten sind geladen !"
+ 5180 forx=1to2000:next
+ 5190 goto1000
+10000 rem   datei speichern
+10040 gosub300:print
+10050 gosub500:ifz=0then1000
+10060 print"bitte datenkassette einlegen "
+10070 print"{down}und zurueckspulen !":print
+10080 print"{down}druecke danach   return"
+10090 inputx$
+10100 open1,1,1,"video"
+10110 print#1,z
+10120 fory=1toz
+10130 fori=1to7
+10140 print#1,d$(y,i)
+10150 nexti
+10160 nexty
+10170 close1
+10180 print:print"daten sind gespeichert !"
+10190 forx=1to2000:next
+10200 goto1000
+15000 rem   filme eingeben
+15030 gosub300
+15040 z=z+1
+15050 print
+15060 fori=1to7
+15070 printf$(i);
+15080 inputd$(z,i)
+15090 print:next
+15100 print
+15110 print"eingabe richtig (j/n)"
+15120 x$="":inputx$
+15130 ifx$="j"then15160
+15140 ifx$="n"thenz=z-1:goto15000
+15150 printchr$(145);:goto15110
+15160 print"weitere eingaben (j/n)"
+15170 x$="":inputx$
+15180 ifx$="j"then15000
+15190 ifx$="n"then1000
+15200 printchr$(145);:goto15160
+20000 rem     filme aendern
+20030 zz=1
+20040 gosub300
+20050 print
+20060 fori=1to7
+20070 printi;f$(i);d$(zz,i):print
+20080 next
+20090 getx$:ifx$=""then20090
+20100 ifx$<>"{left}"andx$<>"{rght}"andx$<>" "andx$<>"{up}"then20090
+20110 ifx$="{up}"then1000
+20120 ifx$="{rght}"andzz<zthenzz=zz+1:goto20040
+20130 ifx$="{left}"andzz>1thenzz=zz-1:goto20040
+20140 ifx$=" "then20160
+20150 goto20090
+20160 print
+20170 input"feldnummer (1-7) ";x
+20180 ifx<1orx>7thenprintchr$(145);goto20170
+20190 print
+20200 input"neuer inhalt : ";d$(zz,x)
+20210 goto20040
+25000 rem    filme loeschen
+25030 gosub300
+25040 print
+25050 gosub500
+25060 ifz=0then1000
+25065 input"titel  : ";d1$
+25080 x=1
+25090 ifd$(x,1)=d1$then25135
+25100 ifx<zthenx=x+1:goto25090
+25110 fe$=" name nicht gefunden !"
+25120 gosub200:goto1000
+25130 gosub300:print
+25135 print"{up}{up}"
+25140 fori=1to7
+25145 printf$(i);d$(x,i):print
+25150 next:print
+25160 print"film  loeschen ? (j/n) ":inputx$
+25170 ifx$="j"then25200
+25180 ifx$="n"then1000
+25190 printchr$(145);:goto25160
+25200 fory=xtoz-1
+25210 fori=1to7
+25220 d$(y,i)=d$(y+1,i)
+25230 nexti
+25240 nexty
+25250 z=z-1
+25260 goto1000
+30000 rem     filme ausgeben
+30030 gosub300:print
+30040 gosub500
+30050 ifz=0then1000
+30060 print"drucker oder bildschirm (d/b) ":inputg$
+30070 ifg$<>"b"andb$<>"d"thenprintchr$(145);:goto30060
+30075 ifg$="d"thenopen1,4
+30080 gosub300:print
+30090 print"suchbegriffe:"
+30100 print"-------------"
+30110 print
+30120 fori=1to7:s$(i)="":next
+30130 fori=1to7
+30140 printf$(i);
+30150 inputs$(i)
+30160 print:next
+30170 fory=1toz
+30180 s=0
+30190 fori=1to7
+30200 ifs$(i)=""thens=s+1:goto30220
+30210 ifd$(y,i)=s$(i)thens=s+1
+30220 nexti
+30230 ifs<>7then30300
+30240 ifg$="d"thenprint#
+30245 ifg$="b"thengosub300:print
+30250 fori=1to7
+30260 ifg$="b"thenprintf$(i);d$(y,i):print
+30270 ifg$="d"thenprint#1,f$(i);d$(y,i)
+30280 nexti
+30285 ifg$="d"then30300
+30290 print:input"druecken sie  return";x$
+30300 nexty
+30310 gosub300:print:print
+30320 print"datei ende "
+30330 input"druecke   return";x$
+30340 ifg$="d"thenclose1
+30350 goto1000
+35000 rem programm beenden
+35030 gosub300:print
+35040 ifz=0then35150
+35050 print"sind alle daten gesichert (j/n)"
+35060 inputx$
+35070 ifx$="n"then1000
+35080 ifx$="j"then35100
+35090 printchr$(145);:goto35050
+35100 gosub300
+35110 print"{down}das programm kann mit"
+35120 print"{down}     'goto 1000'"
+35130 print"{down}wiedergestartet werden, ohne dass"
+35140 print"{down}daten verlohren gehen"
+35150 print
+35160 end
+40000 print"{clr}{down}             titel listing"
+40010 print"            ###############{down}{down}"
+40020 foru=1toz:print" "d$(u,1);:printtab(25)"{rvon}"d$(u,2)"{down}"
+40030 getkeyt$
+40040 nextu
+40050 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}druecke >return<"
+40060 getkeyo$
+40070 ifo$<>chr$(13)then40060
+40080 goto1000
+45000 print"{clr}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}erklaerung"
+45010 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}##############"
+45020 print"{down}{down}{down}{down}{rght}{rght}{rght}durch druecken der entsprechenden"
+45030 print"{down}{rght}{rght}{rght}funktionstasten lassen sich die"
+45040 print"{down}{rght}{rght}{rght}verschiedenen filmarten eingeben!"
+45050 print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}    > eine taste <"
+45060 getkeypp$:goto1000
+50000 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+50005 print"{rvon} 1 - action   2 - western   3 - spass   "
+50010 print"{rvon} 4 - horror   5 - musik     8 - s.f.   {home}"
+50100 print"{home}"chr$(27)chr$(84)
+50110 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{left}"chr$(27)chr$(66):return
+

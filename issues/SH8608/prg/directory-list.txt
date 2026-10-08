@@ -1,0 +1,84 @@
+;directory-list.prg ==1001==
+;version=3
+   10 rem --- directory list  fuer c-16
+   20 rem ---
+   30 rem ---  1986 by sven giero, burgdorf
+   40 rem ---------------------------------
+   50 :
+   60 rem --- parameter setzen
+   70 :
+   80 color0,1:color4,2,2:color1,14:scnclr
+   90 t=18:s=1
+  100 fori=1to4:readf$(i):next
+  110 data seq,prg,usr,rel
+  120 :
+  130 rem --- programmbeschreibung
+  140 :
+  150 print"{rvon}directory list  by sven giero, burgdorf ":print
+  160 print"dieses programm druckt das directory"
+  170 print"einer diskette mit allen dazugehoerigen"
+  180 print"daten ( spur, sektor, startadresse usw )"
+  190 print"der einzelnen files auf dem drucker aus.":print
+  200 print"bitte schalten sie den drucker an, legen"
+  210 print"die entsprechende diskette ins laufwerk"
+  220 print"und druecken sie eine taste !"
+  230 getkeya$:scnclr
+  240 poke65286,peek(65286)and239
+  250 :
+  260 rem --- name, id und format der
+  270 rem --- diskette lesen und ausgeben
+  280 :
+  290 open1,8,15,"i0":ifdsthen790
+  300 open2,8,2,"#"
+  310 open4,4,7:print#4
+  320 print#1,"u1 2 0 18 0"
+  330 print#1,"b-p 2 144"
+  340 fori=1to16
+  350 get#2,a$:n$=n$+a$
+  360 next
+  370 get#2,a$,a$,a$,b$:i$=a$+b$
+  380 get#2,a$,a$,b$:f$=a$+b$
+  390 print#4,"Name:{rvon}"n$"{rvof} ID:{rvon}"i$"{rvof} Format:{rvon}"f$:print#4
+  400 print#4,"Filename:"spc(9)"Filetyp: Bloecke: ";
+  410 print#4,"Startadresse: Spur: Sektor: Dirblock:"
+  420 fori=1to80:print#4,"=";:next:print#4
+  430 :
+  440 rem --- auslesen der einzelnen
+  450 rem --- bloecke im directory
+  460 :
+  470 ift=0then760
+  480 print#1,"u1 2 0";t;s
+  490 z=2:t1=t:s1=s
+  500 get#2,a$,b$:t=asc(a$):s=asc(b$)
+  510 ifz>256then470
+  520 print#1,"b-p 2";z:n$=""
+  530 get#2,a$,b$,c$
+  540 ft=asc(a$)and7:et=asc(b$):es=asc(c$)
+  550 fori=1to16
+  560 get#2,a$:n$=n$+a$
+  570 next
+  580 ifn$=""then760:elseifft=0then750
+  590 open3,8,3,n$+left$(f$(ft),1)+"r"
+  600 get#3,a$,b$:close3
+  610 sa=asc(b$)*256+asc(a$)
+  620 fori=1to9:get#2,a$:next
+  630 get#2,a$,b$:b=asc(b$)*256+asc(a$)
+  640 bb=bb+b
+  650 :
+  660 rem --- ausgabe auf dem drucker
+  670 :
+  680 print#4,n$spc(4)f$(ft)spc(6)
+  690 print#4,using"###";b;
+  700 print#4,spc(5)"$"hex$(sa)"/";
+  710 print#4,using"#####";sa;
+  720 print#4,using"   ##";et;
+  730 print#4,using"     ##";es;
+  740 print#4,spc(4)t1" "s1
+  750 z=z+32:goto510
+  760 fori=1to80:print#4,"-";:next:print#4
+  770 print#4,"Bloecke:"spc(5)"insgesamt = 664"spc(5)"belegt = "bb;
+  780 print#4,spc(4)"frei = "664-bb:print#4
+  790 close4:close2:close1
+  800 poke65286,peek(65286)or16
+  810 printds$:end
+

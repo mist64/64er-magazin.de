@@ -1,0 +1,61 @@
+;hypothek.prg ==1001==
+;version=3
+   10 rem        hypothek   von j. hagen
+   20 p$="        ":d$=p$:o$=chr$(145):l$=chr$(157)
+   30 scnclr:print:print:input"     notiz : ";d$
+   40 do
+   50 tg=0:zg=0:a=0:t=0:z=0:k=0
+   60 scnclr:print:print" ";d$;
+   70 print tab(31) mid$(ti$,1,2);":";mid$(ti$,3,2);":";mid$(ti$,5,2)
+   80 print tab(12)"h y p o t h e k"
+   90 print tab(11)"=================":print
+  100 print tab(11)"kredit-hoehe   ";:input k
+  110 if k<9999999.01 then 130
+  120 print:print tab(06)"kredit zu hoch !";:goto 150
+  130 if k>0 then 160
+  140 print:print tab(06)"kredit nicht > 0";
+  150 print o$;o$;o$:goto 100
+  160 print
+  170 print tab(06)"     zins-satz in % ";:input z
+  180 if z<0 then 220
+  190 if z>100 then 210
+  200 goto 240
+  210 print:print tab(06)"zins ist zu hoch";:goto 230
+  220 print:print tab(06)"zins ist negativ";
+  230 print o$;o$;o$:goto 170
+  240 print
+  250 print tab(06)"     tilgung   in % ";:input t
+  260 if t>100 then 290
+  270 if t>0 then 320
+  280 goto 300
+  290 print:print tab(06)"tilgung  zu hoch";:goto 310
+  300 print:print tab(06)"tilgung nicht > 0";
+  310 print o$;o$;o$:goto 250
+  320 jr=k*(z+t)/100:ok=k
+  330 print:print tab(06)"     jahres-rate  =  ";jr
+  340 for x=1 to 1000:next x
+  350 print:print:print"       zinsen      tilgung       kredit":print
+  360 for x=1 to 500:next x
+  370 bz=ok*z/100:bt=jr-bz:ok=ok-bt:tg=tg+bt:zg=zg+bz
+  380 print using"##,###,###.##";bz;
+  390 print using"##,###,###.##";bt;
+  400 print using"##,###,###.##";ok:a=a+1
+  410 for x=1 to 300:next x
+  420 if ok<=0 then 460
+  430 print o$;o$:if ok<jr then 450
+  440 goto 370
+  450 jr=ok:bz=ok*z/100:bt=ok:tg=tg+bt:zg=zg+bz:ok=ok-bt:goto 380
+  460 print" ------------ ------------"
+  470 print using"##,###,###.##";zg;
+  480 print using"##,###,###.##";tg;
+  490 print"  ";a;"jahr(e)"
+  500 print" ============ ============"
+  510 print:print tab(09)"                    "
+  520 print tab(09)"noch einmal  j / n   j";l$;l$;l$;:input f$
+  530 if f$="j" goto 560
+  540 if f$="n" goto 560
+  550 print:print tab(09)"ungueltige eingabe !";o$;o$;o$:goto 520
+  560 loop until f$="n"
+  570 print:print tab(09)"                    ";o$;o$;o$
+  580 end
+

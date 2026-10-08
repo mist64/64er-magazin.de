@@ -1,0 +1,71 @@
+;diagrammdrucker.prg ==1001==
+;version=3
+   10 dimbx%(60,5),cy%(60,5),br%(7,7):open7,6,2:open5,6,3:open4,6:vol8
+   20 printchr$(147)
+   30 fort=0to1
+   40 ift=1thenpoke2023,19:print"{home}stellung schwarz :":elseprint"{home}stellung weiss :"
+   50 print
+   60 fg=7
+   70 fg=fg-1:iffg=0then190
+   80 readd$:sound1,600,20
+   90 printd$" : {rvon} {rvof}";:poke239,0:sound1,700,20
+  100 getkeya$:ke=asc(a$):ifa$="-"thenprint"{left}"a$:goto70
+  110 ifke<65orke>72then100
+  120 print"{left}"a$"{rvon} {rvof}";
+  130 getkeya$:kf=asc(a$):ifkf=20thenprint"{left} {left}{left}{rvon} {rvof}";:goto100
+  140 ifkf<49orkf>56then130
+  150 print"{left}"a$"{rvon} {rvof}";
+  160 getkeya$:ifasc(a$)<>20andasc(a$)<>13then160
+  170 ifasc(a$)=20thenprint"{left} {left}{left}{rvon} {rvof}";:goto130
+  180 br%(ke-65,kf-49)=fg+t*10:print"{left} ":goto90
+  190 restore:next:poke2023,0
+  200 print"{clr}diagramm mit text? (j/n)":getkeyg$:ifg$="n"then370
+  210 print"{clr}standardmuster ?(j/n)":getkeyg$:ifg$="n"thenprint"{clr}":goto270
+  220 print"{clr}turnier :"
+  230 print:print"partie nr.:"
+  240 print"weiss   :"
+  250 print"schwarz :"
+  260 print:print"stellung nach dem     zug von"
+  270 fori=3432to3471:pokei,160:next
+  280 open14,0:print"{home}"
+  290 input#14,a$
+  300 print#5,1:fori=3072to3431:bi=peek(i)
+  310 ifbi<32thenbi=bi+64
+  360 print#4,chr$(bi);:next:print#4,"":print#4,""
+  370 print"{clr}welchen figurensatz?":print
+  380 restore2000
+  390 ta=ta+1:readsf$(ta):ifsf$(ta)="e"then410
+  400 print:printta". "sf$(ta):goto390
+  410 getkeyg$:nj=val(g$):ifnj<1ornj>ta-1then410
+  420 print:print"diskette/cassette (d/c)"
+  430 getkeyge$:ifge$<>"d"andge$<>"c"then430
+  440 ifge$="d"thenopen2,8,2,sf$(nj)+",s,r":elseopen2,1,0,sf$(nj)
+  450 forp=0to5:input#2,i(p):forg=0toi(p):input#2,bx%(g,p):input#2,cy%(g,p):next:next
+  460 close2
+  470 open1,6,1:print#7,0
+  480 fori=0to8:print#1,"m",94,-i*48:print#1,"d",477,-i*48:print#1,"m",i*48+94,0
+  490 print#1,"d",94+i*48,-384:next
+  500 fori=0to7:y=-i*48:forg=0to7:x=g*48+94
+  510 if(i+g)/2=int((i+g)/2)then540
+  520 ford=0to3:print#1,"m",x,-d*12+y:print#1,"d",48-d*12+x,-48+y:next
+  530 ford=0to2:print#1,"m",d*12+x+12,0+y:print#1,"d",48+x,-36+12*d+y:next
+  540 next:next
+  550 form=7to0step-1:y=(m-7)*48-48
+  560 forn=0to7:x=n*48+94
+  570 ifbr%(n,m)=0then650
+  580 ifbr%(n,m)>9thenp=br%(n,m)-11:print#7,1:goto600:elseprint#7,3
+  590 p=br%(n,m)-1
+  600 g=0
+  610 print#1,"m",bx%(g,p)+x,48-cy%(g,p)+y
+  620 g=g+1:ifg=i(p)then650
+  630 ifbx%(g,p)=99theng=g+1:goto610
+  640 print#1,"d",bx%(g,p)+x,48-cy%(g,p)+y:goto620
+  650 next:next
+  660 print#1,"m",108,2
+  670 print#7,0:print#5,2:close5
+  680 print#4,"a b c d e f g h";
+  690 form=0to7:y=-37-m*48:print#1,"m",60,y;
+  700 print#4,chr$(56-m);:next:sys65511
+  710 data"koenig","dame","turm","laeufer","springer","bauer"
+ 2000 data"satz","2. satz","e"
+

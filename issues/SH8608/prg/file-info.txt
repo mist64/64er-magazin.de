@@ -1,0 +1,112 @@
+;file-info.prg ==1001==
+;version=3
+  100 rem *******************************
+  110 rem *                             *
+  120 rem *        anfangsadresse       *
+  130 rem *                             *
+  140 rem *        und endadresse       *
+  150 rem *                             *
+  160 rem *   eines diskettenprogramms  *
+  170 rem *                             *
+  180 rem *          ermitteln.         *
+  190 rem *                             *
+  200 rem *******************************
+  210 rem *                             *
+  220 rem *  1985/86 by florian mueller *
+  230 rem *                             *
+  240 rem *******************************
+  250 :
+  260 scnclr:w$="#####"
+  270 printchr$(27)"o":print"bestimmung von anfangs- und endadresse"chr$(13)
+  280 input"filename";n$:if n$="$" then print:directory:print:goto 270
+  290 open15,8,15,"i0"
+  300 if ds<>0then330
+  310 open1,8,3,n$+",p,r"
+  320 ifds=0then400
+  330 print:printchr$(15)"diskfehler: ";ds$:print
+  340 close1:close15:goto280
+  350 :
+  360 rem **************************
+  370 rem * informationen ausgeben *
+  380 rem **************************
+  390 :
+  400 scnclr:print:print"informationen fuer "chr$(34);n$;chr$(34)
+  410 print
+  420 :
+  430 rem ******************
+  440 rem * anfangsadresse *
+  450 rem ******************
+  460 :
+  470 print:print"anfangsadresse:",
+  480 get#1,a$:get#1,b$
+  490 ifa$=""thena$=chr$(0)
+  500 ifb$=""thenb$=chr$(0)
+  510 a=asc(a$)+256*asc(b$)
+  520 printusing w$;a;:print" = $";hex$(a)
+  530 close1
+  540 :
+  550 rem **********************
+  560 rem * anzahl der bloecke *
+  570 rem **********************
+  580 :
+  590 print:print"diskbloecke:",
+  600 open1,8,0,"$:"+n$
+  610 get#1,a$,b$
+  620 get#1,a$,b$
+  630 get#1,a$,b$
+  640 get#1,b$:ifst<>0then830
+  650 ifb$<>chr$(34)then640
+  660 do:get#1,b$:loop while b$<>chr$(34)
+  670 do:get#1,b$:loop while b$=chr$(32)
+  680 do:get#1,b$:loop while b$<>""
+  690 get#1,a$,b$,a$,b$
+  700 ifa$=""thena$=chr$(0)
+  710 ifb$=""thenb$=chr$(0)
+  720 b=asc(a$)+256*asc(b$)
+  730 print using w$;b;:print" = $";hex$(b)
+  740 close1
+  750 :
+  760 rem ***********************
+  770 rem * maximale endadresse *
+  780 rem ***********************
+  790 :
+  800 print:print"max.endadresse:",
+  810 e=a+254*b-2
+  820 print using w$;e;:print" = $";hex$(e)
+  830 close1:close15
+  840 print:printchr$(18)"taste druecken"
+  850 print:print"(g = genaue endadr./ d = druckerausgabe)";
+  860 getkey gk$:if gk$="d"thenee=e:m=1:goto1070:else if gk$<>"g"then run
+  870 :
+  880 rem *********************
+  890 rem * genaue endadresse *
+  900 rem *********************
+  910 :
+  920 m=0
+  930 printchr$(27)"d";chr$(145)chr$(145)"endadresse fuer 's':";
+  940 ee=a:open 1,8,0,n$
+  950 do until st and 64
+  960 :get#1,a$:ee=ee+1
+  970 loop:ee=ee-1
+  980 printusing w$;ee;:print" = $";hex$(ee)
+  990 close1
+ 1000 print:printchr$(18)"taste druecken (d = druckerausgabe)";chr$(146);
+ 1010 getkey gk$:if gk$<>"d"then run
+ 1020 :
+ 1030 rem ******************
+ 1040 rem * druckerausgabe *
+ 1050 rem ******************
+ 1060 :
+ 1070 v$="##############################":rem 30 * #
+ 1080 printchr$(27)"d"
+ 1090 open 4,3
+ 1100 print#4,using v$;"filename:";:print#4,n$
+ 1110 print#4,using v$;"anfangsadresse:";:print#4,using w$;a;
+ 1120 print#4," = $";hex$(a)
+ 1130 print#4,usingv$;"endadresse:";:print#4,using w$;e;:print#4," = $";hex$(ee);
+ 1140 if m=1 then print#4," (maximal)":else print#4," (fuer 's'-befehl)"
+ 1150 print#4,using v$;"laenge in disk-bloecken:";:print#4,using w$;b;
+ 1160 print#4," = $";hex$(b)
+ 1170 close4
+ 1180 if m=1 then 840:else goto 1000
+

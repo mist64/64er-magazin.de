@@ -1,0 +1,302 @@
+;cave.prg ==1001==
+;version=3
+ 1000 ifpeek(0)<>15then1060
+ 1010 poke55,255:poke56,55:clr
+ 1020 fort=15360to15791
+ 1030 reada$:poket,dec(a$)
+ 1040 nextt:gosub2280
+ 1050 restore3890:fort=0to9:readhi$(t),hi(t):nextt
+ 1060 pu=0:hi=hi(0):an=0:sh=0:g=15
+ 1070 poke65286,0:color0,1:color1,3,4:color4,1:print"{home}{home}{clr}":vol8:poke1343,1
+ 1080 char,0,20,"{rvon}{lgrn} [^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[":print
+ 1090 print"{rvon}{lgrn} ]{blk}       score:        hi-score:      {lgrn}]"
+ 1100 print"{rvon} ]{wht} '()*  {blk}shoots:         {red}00000{wht}   '()*{lgrn} ]"
+ 1110 print"{rvon} ]{wht} +,./  {blk}hight:                  {wht}+,./{lgrn} ]"
+ 1120 print"{rvon} [^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[{home}"
+ 1130 char,16,21,"":printusing"{dblu}{rvon}#####";pu
+ 1140 char,18,22,"":printusing"{dblu}{rvon}###";sh
+ 1150 ifhi>9thenchar,25,22,"":printusing"{rvon}{red}#####";hi
+ 1160 char,25,23,"":fort=1to3-an:print"{rvon}{yel}";chr$(34);chr$(27);"o{rvon} {rvof}";:nextt
+ 1170 poke216,1:poke217,19
+ 1180 fort=1to40:sys15360:next
+ 1190 poke65286,27:sys15528
+ 1200 ifan=0thenchar,7,8,"{yel}alexander jung  presents :"
+ 1210 forl=0to1
+ 1220 fort=0-7*lto7-7*l:color1,8,abs(t)
+ 1230 char,18,10,"'()*{down}{left}{left}{left}{left}+,./"
+ 1240 forp=1to150:nextp,t
+ 1250 forp=1to500:nextp,l
+ 1260 color1,3,4:char,1,8,chr$(27)+"q{down}{down}"+chr$(27)+"q{down}"+chr$(27)+"q"
+ 1270 a=1:v=18:p=3473:px=5:poke239,0:char,29-an*2,23,"{rvon}{grn}"+chr$(34)+chr$(27)+"o"
+ 1280 do
+ 1290 ifv>gthenv=v-1:char,19,23,"":printusing"{red}{rvon}##";v
+ 1300 a=a+int(rnd(1)*3-1)
+ 1310 ifa<1thena=1
+ 1320 ifa+v>19thena=19-v
+ 1330 poke216,a:poke217,a+v
+ 1340 op=p+px
+ 1350 getj$:j=asc(j$)
+ 1360 p=p+(j=53)*40-(j=82)*40
+ 1370 px=abs(px-(j=54)+(j=68)):ifpx=37thenpx=36
+ 1380 pokeop,32:pokeop-1024,66:sys15360
+ 1390 ifpeek(op)<>32orpeek(p+px)<>32then1870
+ 1400 pokep+px,31:pokep+px-1024,119
+ 1410 ifint(rnd(1)*10)=3thengosub1650
+ 1420 sound3,-p+3833,7
+ 1430 loopuntilj=84
+ 1440 sh=sh+1:c=0:d=0:fort=p+pxtop+37
+ 1450 ifpeek(t)<>32andpeek(t)<>31thend=peek(t):c=t-p-px:t=p+37
+ 1460 nextt:ifc=0thenc=37-px
+ 1470 c=c-1:f$=left$("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",c)
+ 1480 char,px+2,(p-3073)/40,"{wht}"+f$
+ 1490 ifd<>0andd<>35thenprint"{pink}&"
+ 1500 sound3,1000,10:sound3,1000,1
+ 1510 char,18,22,"":printusing"{dblu}{rvon}###";sh
+ 1520 ff$=left$("                                        ",c+1)
+ 1530 char,px+1,(p-3073)/40,"{yel}_":color1,3,4:printff$
+ 1540 ifd=0then1280
+ 1550 ifd=34thenpu=pu+100
+ 1560 ifd=36thenpu=pu+50
+ 1570 ifd<>35thengosub1800:goto1280
+ 1580 f$=left$("{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}{CBM-G}",c)
+ 1590 char,px+1,(p-3073)/40,"{rvon}{yel}{CBM-*}{blk}"+f$+"{cyn}{CBM-T}"
+ 1600 sound3,800,999:fort=89to0step-1
+ 1610 poke65304,rnd(1)*256
+ 1620 poke65305,rnd(1)*256
+ 1630 vol(t/10):next:sound3,0,0:color4,1:vol8
+ 1640 goto1920
+ 1650 ifrnd(1)>.5then1690
+ 1660 d=3110+a*40+int(rnd(1)*(v-1))*40
+ 1670 poked,36:sound1,300,10
+ 1680 return
+ 1690 ifrnd(1)>.5then1730
+ 1700 d=3110+a*40+40*(v-1)
+ 1710 poked,34:sound1,500,10
+ 1720 return
+ 1730 ifrnd(1)>.5then1770
+ 1740 d=3110+a*40+int(rnd(1)*2)*40*(v-1)
+ 1750 poked,35:sound1,700,10
+ 1760 return
+ 1770 d=p+37
+ 1780 poked,35:sound1,900,10
+ 1790 return
+ 1800 sound3,800,999
+ 1810 fort=159to0step-1
+ 1820 vol(t/20):next
+ 1830 sound3,0,0:vol8
+ 1840 char,16,21,"":printusing"{dblu}{rvon}#####";pu
+ 1850 ifsh/(5+g)=int(sh/(5+g))theng=g-1:ifg<3theng=3
+ 1860 return
+ 1870 p=p+px:ifpeek(op)<>32thenp=op
+ 1880 pokep,230
+ 1890 sound3,800,999:fort=89to0step-1
+ 1900 poke65304,rnd(1)*256
+ 1910 vol(t/10):next:sound3,0,0:color4,1:vol8
+ 1920 an=an+1:pu=pu-sh*10
+ 1930 ifan<3then1070
+ 1940 color0,2,5:color4,2,4:poke65286,27:poke65287,8
+ 1950 print"{clr}{wht}{down}{down}";tab(16)"{rvof}{CBM-I}{rvon}      {rvof}{CBM-I}"
+ 1960 printtab(16)"{CBM-K}{rvon}      {CBM-K}{rvof}"
+ 1970 printtab(16)"{rvon}{CBM-I}      {CBM-I}{rvof}"
+ 1980 printtab(17)"{CBM-C}{rvon}    {rvof}{CBM-V}"
+ 1990 printtab(18)"{CBM-C}{rvon}  {rvof}{CBM-V}"
+ 2000 printtab(19)"{rvon}  {rvof}"
+ 2010 printtab(19)"{rvon}  {rvof}"
+ 2020 printtab(18)"{CBM-D}{rvon}  {rvof}{CBM-F}"
+ 2030 printtab(17)"{CBM-D}{rvon}    {rvof}{CBM-F}"
+ 2040 ifpu<hi(9)then2200
+ 2050 hi$="":a$="":printchr$(27)"t{down}{down}{down}{down}":goto2110
+ 2060 geta$:l=len(hi$)
+ 2070 ifa$=chr$(20)andl>0thenhi$=left$(hi$,l-1):goto2110
+ 2080 ifasc(a$)>64andasc(a$)<91thenhi$=hi$+a$
+ 2090 ifa$=" "ora$="-"thenhi$=hi$+a$
+ 2100 ifl=13thena$=chr$(20):goto2070
+ 2110 print"{up}  {blk}ihr name:   "hi$"_ "
+ 2120 ifa$<>chr$(13)then2060:elsesound2,800,10:scnclr
+ 2130 iflen(hi$)<12thenhi$=hi$+" ":goto2130
+ 2140 hi$(10)=hi$:hi(10)=pu
+ 2150 sp=0:fort=0to9:ifhi$(t)=""thenhi$(t)="    ----    "
+ 2160 ifhi(t)>=hi(t+1)then2190
+ 2170 hi$=hi$(t):hi$(t)=hi$(t+1):hi$(t+1)=hi$
+ 2180 hi=hi(t):hi(t)=hi(t+1):hi(t+1)=hi:sp=1
+ 2190 nextt:ifsp=1then2150
+ 2200 printtab(8)"{blk}N{CBM-Y}{CBM-Y}{CBM-Y}O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}M"
+ 2210 fort=0to9
+ 2220 printtab(8)"{CBM-H}";:printusing"## {CBM-H}";t+1;
+ 2230 printhi$(t)"{CBM-H}";:printusing"#####{CBM-N}";hi(t)
+ 2240 nextt
+ 2250 printtab(8)"M{CBM-P}{CBM-P}{CBM-P}L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N"
+ 2260 fort=1to2000:next
+ 2270 poke239,0:getkeys$:goto1060
+ 2280 color0,10,3:color4,10,3:scnclr
+ 2290 sys15528:poke65286,27
+ 2300 fort=1to25:a$="{brn}                                          "
+ 2310 forp=1to3:mid$(a$,rnd(1)*4-2+p*11,1)=mid$("{red}{orng}{yel}",p,1):nextp
+ 2320 printa$:nextt
+ 2330 restore2990:vol8
+ 2340 char,39,0,chr$(27)+"t":a$=""
+ 2350 fort=1to90:forp=1to60:next
+ 2360 print"{home}";a$:sound3,1010,2
+ 2370 sys15411
+ 2380 reada$:ifleft$(a$,1)="-"thena$="{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"+right$(a$,len(a$)-1)
+ 2390 next:a$="":poke239,0
+ 2400 do:geta$
+ 2410 sys15411:sound3,1010,2
+ 2420 forp=1to60:nextp
+ 2430 loopwhilea$=""
+ 2440 poke0,0:return
+ 2450 data a2,00,a9,27,8d,59,3c,a9
+ 2460 data 0c,8d,5a,3c,a9,a1,8d,57
+ 2470 data 3c,20,56,3c,e8,e4,d8,30
+ 2480 data f8,a9,20,8d,57,3c,20,56
+ 2490 data 3c,e8,e4,d9,30,f8,a9,a1
+ 2500 data 8d,57,3c,20,56,3c,e8,e0
+ 2510 data 14,30,f8,a9,00,85,da,a9
+ 2520 data 0c,85,db,20,6a,3c,18,a5
+ 2530 data da,69,28,85,da,b0,03,4c
+ 2540 data 3b,3c,e6,db,a5,db,c9,0f
+ 2550 data d0,01,60,4c,3b,3c,a9,a1
+ 2560 data 8d,47,0f,18,ad,59,3c,69
+ 2570 data 28,8d,59,3c,90,03,ee,5a
+ 2580 data 3c,60,a5,db,8d,92,3c,8d
+ 2590 data 97,3c,8d,9a,3c,8d,a2,3c
+ 2600 data 18,a5,da,8d,91,3c,8d,99
+ 2610 data 3c,69,01,8d,96,3c,69,26
+ 2620 data 8d,a1,3c,90,03,ee,a2,3c
+ 2630 data ae,f8,0e,a0,00,b9,f9,0e
+ 2640 data 99,f8,0e,c8,c0,28,d0,f5
+ 2650 data 8e,1f,0f,60,00,00,00,00
+ 2660 data a2,00,bd,00,d0,9d,00,38
+ 2670 data bd,00,d1,9d,00,39,bd,00
+ 2680 data d2,9d,00,3a,bd,00,d3,9d
+ 2690 data 00,3b,e8,e0,00,d0,e3,ad
+ 2700 data 06,ff,09,40,8d,06,ff,ad
+ 2710 data 07,ff,29,f7,8d,07,ff,ad
+ 2720 data 12,ff,29,fb,8d,12,ff,ad
+ 2730 data 13,ff,29,03,09,38,8d,13
+ 2740 data ff,a9,72,8d,16,ff,a9,61
+ 2750 data 8d,17,ff,a9,39,8d,18,ff
+ 2760 data a2,00,bd,08,3d,9d,d8,38
+ 2770 data e8,e0,a8,d0,f5,60,00,00
+ 2780 data 18,18,18,ff,ff,18,18,18
+ 2790 data 3c,42,99,a1,a1,99,42,3c
+ 2800 data 18,18,18,18,18,18,18,18
+ 2810 data 00,00,00,ff,ff,00,00,00
+ 2820 data 00,e0,70,3e,f3,3e,70,e0
+ 2830 data 00,00,00,00,00,00,00,00
+ 2840 data 00,fb,fb,fb,00,df,df,df
+ 2850 data 08,1c,1c,36,14,1c,3e,63
+ 2860 data 00,00,18,ff,18,ff,18,00
+ 2870 data 00,18,7e,e7,7e,24,42,00
+ 2880 data 00,00,00,00,66,00,00,00
+ 2890 data c6,6c,29,bb,ee,3c,6f,14
+ 2900 data 1e,33,60,60,60,61,33,1f
+ 2910 data 00,00,00,00,f8,c9,6d,3f
+ 2920 data 00,00,00,00,c7,ed,6c,38
+ 2930 data 00,00,00,38,6c,f8,f0,3e
+ 2940 data 00,3f,60,cc,df,cd,61,3f
+ 2950 data 00,c0,fc,0f,03,81,80,00
+ 2960 data 00,00,00,3c,3c,00,00,00
+ 2970 data 00,00,01,01,80,f0,3f,03
+ 2980 data 00,fc,86,b3,fb,33,86,fc
+ 2990 data "-_"
+ 3000 data "-{SHIFT-*}"
+ 3010 data "-{SHIFT-*}"
+ 3020 data "-{rvon} "
+ 3030 data "-{rvon}%"
+ 3040 data "-{rvon}#"
+ 3050 data "-{rvon}%"
+ 3060 data "-{rvon} "
+ 3070 data "-{rvon}c"
+ 3080 data "-{rvon}a"
+ 3090 data "-{rvon}v"
+ 3100 data "-{rvon}e"
+ 3110 data "-{rvon} "
+ 3120 data "-{rvon}%"
+ 3130 data "-{rvon}#"
+ 3140 data "-{rvon}%"
+ 3150 data "-{rvon} "
+ 3160 data "-{rvon}a"
+ 3170 data "-{rvon}l"
+ 3180 data "-{rvon}e"
+ 3190 data "-{rvon}x"
+ 3200 data "-{rvon}a"
+ 3210 data "-{rvon}n"
+ 3220 data "-{rvon}d"
+ 3230 data "-{rvon}e"
+ 3240 data "-{rvon}r"
+ 3250 data "-{rvon} "
+ 3260 data "-{rvon}j"
+ 3270 data "-{rvon}u"
+ 3280 data "-{rvon}n"
+ 3290 data "-{rvon}g"
+ 3300 data "-{rvon} "
+ 3310 data "-{rvon} "
+ 3320 data "-{rvon}1"
+ 3330 data "-{rvon}9"
+ 3340 data "-{rvon}8"
+ 3350 data "-{rvon}6"
+ 3360 data "-{rvon} "
+ 3370 data "-{rvon}%"
+ 3380 data "-{rvon}#"
+ 3390 data "-{rvon}%"
+ 3400 data "-{rvon} {rvof}"
+ 3410 data "-V"
+ 3420 data "-V"
+ 3430 data "-V"
+ 3440 data "{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}N M"
+ 3450 data "{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}N   M"
+ 3460 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}N     M"
+ 3470 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}N       M"
+ 3480 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         "
+ 3490 data "{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3500 data "{down}{down}{down}{down}{down}{down}{down}{rvon}          "
+ 3510 data "{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         {CBM-I}"
+ 3520 data "{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3530 data "{down}{down}{down}{down}{down}{down}{rvon}   +'+   "
+ 3540 data "{down}{down}{down}{down}{down}{CBM-I}{rvon}   ,(,   "
+ 3550 data "{down}{down}{down}{down}{down}{rvon}    .).  {CBM-I}"
+ 3560 data "{down}{down}{down}{down}{down}{rvon}    /*/  "
+ 3570 data "{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3580 data "{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3590 data "{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3600 data "{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3610 data "{down}{down}{down}{down}{down}{down}{down}{rvon}         "
+ 3620 data "{down}{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3630 data "{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3640 data "{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3650 data "{down}{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3660 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         "
+ 3670 data "{down}{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3680 data "{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3690 data "{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         "
+ 3700 data "{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3710 data "{down}{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3720 data "{down}{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3730 data "{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3740 data "{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         "
+ 3750 data "{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3760 data "{down}{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}   +'+   "
+ 3770 data "{down}{down}{down}{down}{down}{down}{down}{down}{CBM-O}{rvon}   ,(,   "
+ 3780 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}   .).   {CBM-I}"
+ 3790 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}   /*/   {CBM-I}"
+ 3800 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3810 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3820 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         "
+ 3830 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}         "
+ 3840 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3850 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         "
+ 3860 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{CBM-I}{rvon}        {CBM-I}"
+ 3870 data "{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}        {CBM-I}"
+ 3880 data "{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}         {CBM-I}"
+ 3890 data "------------",9
+ 3900 data "            ",8
+ 3910 data "    +,./    ",7
+ 3920 data "    '()*    ",6
+ 3930 data "    +,./    ",5
+ 3940 data "            ",4
+ 3950 data "    made    ",3
+ 3960 data "     by     ",2
+ 3970 data "   a jung   ",1
+ 3980 data " - \ 1986 - ",0
+

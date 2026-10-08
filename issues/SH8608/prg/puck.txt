@@ -1,0 +1,296 @@
+;puck.prg ==1001==
+;version=3
+    1 dim f%(40,25)
+    2 rem data in feld f% laden ***
+    3 scnclr:gosub271:scnclr:print"ein wenig geduld bitte!"
+    4 gosub 150
+    5 rem spielfeld zeichnen ***
+    6 pu=5:v=0:y=0:lv=25
+    7 iflv<10thenlv=10
+    8 gosub157:forn=1to10
+    9 getnr$:nextn
+   10 ad=88:h=0:nr=0:zv=0
+   11 pw=38:ps=23:poke 4030,81
+   12 gw=1:gs=1:poke3113,42:re=32:ol=3
+   13 ifps=gsandpw=gwthengosub178:ifpu=0theny=y+v:gosub194:goto6
+   14 zu=int(rnd(1)*lv):ifzu=0then17
+   15 gosub19:ifv=541thenpl=5:pu=pu+1:y=y+541:v=0:lv=lv-5:vol7:sound1,800,15:goto7
+   16 ifps=gsandpw=gwthengosub178:ifpu=0theny=y+v:gosub194:goto6
+   17 gosub49
+   18 goto13
+   19 nr=joy(1)
+   20 ifad=nrthengosub29:h=0:return
+   21 ifnr=0then25
+   22 zv=ad:ad=nr:gn=0:gosub29
+   23 ifgn=0thenh=0:return
+   24 h=nr:ad=zv:gosub29:return
+   25 ifh=0thengosub29:return
+   26 zv=ad:ad=h:gn=0:gosub29
+   27 ifgn=0thenh=0:return
+   28 ad=zv:gosub29:return
+   29 ifad<>7then34
+   30 c=3071+pw+40*ps:b=peek(c)
+   31 ifb=160thengn=1:return
+   32 ifb=46thenv=v+1
+   33 pokec,81:pw=pw-1:pokec+1,32:return
+   34 ifad<>3then39
+   35 c=3073+pw+ps*40:b=peek(c)
+   36 ifb=160thengn=1:return
+   37 ifb=46thenv=v+1
+   38 pokec,81:pw=pw+1:pokec-1,32:return
+   39 ifad<>1then44
+   40 c=3072+pw+40*ps-40:b=peek(c)
+   41 ifb=160thengn=1:return
+   42 ifb=46thenv=v+1
+   43 pokec,81:ps=ps-1:pokec+40,32:return
+   44 ifad<>5thenreturn
+   45 c=3072+pw+40*ps+40:b=peek(c)
+   46 ifb=160thengn=1:return
+   47 ifb=46thenv=v+1
+   48 pokec,81:ps=ps+1:pokec-40,32:return
+   49 gp%=f%(gw,gs)
+   50 a=3072+gw+40*gs
+   51 ra=re
+   52 on gp% goto 54,58,62,66,70,74,78,90,102,114,126
+   53 rem 1 ***
+   54 if ol=3 then 56
+   55 re=peek(a+1):gw=gw+1:poke a+1,42:poke a,ra:return
+   56 re=peek(a-1):gw=gw-1:poke a-1,42:poke a,ra:return
+   57 rem 2 ***
+   58 if ol=4 then 60
+   59 re=peek(a+40):gs=gs+1:poke a+40,42:poke a,ra:return
+   60 re=peek(a-40):gs=gs-1:poke a-40,42:poke a,ra:return
+   61 rem 3 ***
+   62 if ol=2 then 64
+   63 re=peek(a-40):gs=gs-1:poke a-40,42:ol=4:poke a,ra:return
+   64 re=peek(a+1):gw=gw+1:poke a+1,42:ol=1:poke a,ra:return
+   65 rem 4 ***
+   66 if ol=4 then 68
+   67 re=peek(a+40):gs=gs+1:poke a+40,42:ol=2:poke a,ra:return
+   68 re=peek(a+1):gw=gw+1:poke a+1,42:ol=1:poke a,ra:return
+   69 rem 5 ***
+   70 if ol=4 then 72
+   71 re=peek(a+40):gs=gs+1:poke a+40,42:ol=2:poke a,ra:return
+   72 re=peek(a-1):gw=gw-1:poke a-1,42:ol=3:poke a,ra:return
+   73 rem 6 ***
+   74 if ol=2 then 76
+   75 re=peek(a-40):gs=gs-1:poke a-40,42:ol=4:poke a,ra:return
+   76 re=peek(a-1):gw=gw-1:poke a-1,42:ol=3:poke a,ra:return
+   77 rem 7 ***
+   78 ifol<>2then 81
+   79 ar=abs(gw+1-pw)+abs(gs-ps):au=abs(gw-pw)+abs(gs+1-ps)
+   80 ifar<authen88:else87
+   81 ifol<>3then84
+   82 a1=abs(gw-pw):au=abs(gs+1-ps)+a1:ao=abs(gs-1-ps)+a1
+   83 ifao<authen86:else87
+   84 ar=abs(gw+1-pw)+abs(gs-ps):ao=abs(gw-pw)+abs(gs-1-ps)
+   85 ifar<aothen88:else86
+   86 re=peek(a-40):gs=gs-1:pokea-40,42:ol=4:pokea,ra:return
+   87 re=peek(a+40):gs=gs+1:pokea+40,42:ol=2:pokea,ra:return
+   88 re=peek(a+1):gw=gw+1:pokea+1,42:ol=1:pokea,ra:return
+   89 rem 8 ***
+   90 ifol<>1then93
+   91 ar=abs(gw+1-pw)+abs(gs-ps):au=abs(gw-pw)+abs(gs+1-ps)
+   92 ifar<authen98:else99
+   93 ifol<>3then96
+   94 al=abs(gw-1-pw)+abs(gs-ps):au=abs(gw-pw)+abs(gs+1-ps)
+   95 ifal<authen100:else99
+   96 a1=abs(gs-ps):al=abs(gw-1-pw)+a1:ar=abs(gw+1-pw)+a1
+   97 ifal<arthen100:else98
+   98 re=peek(a+1):gw=gw+1:pokea+1,42:ol=1:pokea,ra:return
+   99 re=peek(a+40):gs=gs+1:pokea+40,42:ol=2:pokea,ra:return
+  100 re=peek(a-1):gw=gw-1:pokea-1,42:ol=3:pokea,ra:return
+  101 rem 9 ***
+  102 ifol<>1then105
+  103 a1=abs(gw-pw):au=abs(gs+1-ps)+a1:ao=abs(gs-1-ps)+a1
+  104 ifao<authen110:else111
+  105 ifol<>2then108
+  106 al=abs(gw-1-pw)+abs(gs-ps):au=abs(gw-pw)+abs(gs+1-ps)
+  107 ifal<authen112:else111
+  108 al=abs(gw-1-pw)+abs(gs-ps):ao=abs(gw-pw)+abs(gs-1-ps)
+  109 ifal<aothen112:else110
+  110 re=peek(a-40):gs=gs-1:pokea-40,42:ol=4:pokea,ra:return
+  111 re=peek(a+40):gs=gs+1:pokea+40,42:ol=2:pokea,ra:return
+  112 re=peek(a-1):gw=gw-1:pokea-1,42:ol=3:pokea,ra:return
+  113 rem 10 ***
+  114 ifol<>1then117
+  115 ar=abs(gw+1-pw)+abs(gs-ps):ao=abs(gw-pw)+abs(gs-1-ps)
+  116 ifar<aothen123:else122
+  117 ifol<>2then120
+  118 a1=abs(gs-ps):al=abs(gw-1-pw)+a1:ar=abs(gw+1-pw)+a1
+  119 ifal<arthen124:else123
+  120 al=abs(gw-1-pw)+abs(gs-ps):ao=abs(gw-pw)+abs(gs-1-ps)
+  121 ifal<aothen124
+  122 re=peek(a-40):gs=gs-1:pokea-40,42:ol=4:pokea,ra:return
+  123 re=peek(a+1):gw=gw+1:pokea+1,42:ol=1:pokea,ra:return
+  124 re=peek(a-1):gw=gw-1:pokea-1,42:ol=3:pokea,ra:return
+  125 rem 11 ***
+  126 ifol<>1then131
+  127 a1=abs(gw-pw):ao=abs(gs-1-ps)+a1:au=abs(gs+1-ps)+a1
+  128 ar=abs(gw+1-pw)+abs(gs-ps)
+  129 ifao<auandao<arthen148
+  130 ifar<authen145:else146
+  131 ifol<>2then136
+  132 a1=abs(gs-ps):al=abs(gw-1-pw)+a1:ar=abs(gw+1-pw)+a1
+  133 au=abs(gs+1-ps)+abs(gw-pw)
+  134 ifau<arandau<althen146
+  135 ifal<arthen147:else145
+  136 ifol<>3then141
+  137 a1=abs(gw-pw):ao=abs(gs-1-ps)+a1:au=abs(gs+1-ps)+a1
+  138 al=abs(gw-1-pw)+abs(gs-ps)
+  139 ifao<auandao<althen148
+  140 ifal<authen147:else146
+  141 a1=abs(gs-ps):al=abs(gw-1-pw)+a1:ar=abs(gw+1-pw)+a1
+  142 ao=abs(gw-pw)+abs(gs-1-ps)
+  143 ifao<arandao<althen148
+  144 ifal<arthen147:else145
+  145 re=peek(a+1):gw=gw+1:pokea+1,42:ol=1:pokea,ra:return
+  146 re=peek(a+40):gs=gs+1:pokea+40,42:ol=2:pokea,ra:return
+  147 re=peek(a-1):gw=gw-1:pokea-1,42:ol=3:pokea,ra:return
+  148 re=peek(a-40):gs=gs-1:pokea-40,42:ol=4:pokea,ra:return
+  149 rem ende spinne bewegen ***
+  150 restore 218
+  151 for s=1 to 23
+  152 for w=0 to 39
+  153 read a%:f%(w,s)=a%
+  154 next w
+  155 next s
+  156 return
+  157 scnclr
+  158 restore 264
+  159 for n=0 to 19
+  160 read a:poke 16360+n,a:next n
+  161 sys 16360
+  162 for n=1 to 40
+  163 poke 3071+n,160
+  164 poke 4031+n,160
+  165 next n
+  166 poke 3112,160
+  167 for n=0 to 880 step 40
+  168 poke 3151+n,160:poke 3151+n+1,160
+  169 next n
+  170 restore 196
+  171 for n=0 to 331
+  172 read a%
+  173 poke 3072+a%,160
+  174 next n
+  175 t=pu:if pu>9 then t=-15
+  176 poke 4071,t+48
+  177 return
+  178 vol 7:vl=7
+  179 for so=0 to 30
+  180 sound 3,800,1:vol vl:vl=vl-.23
+  181 next so
+  182 pu=pu-1
+  183 if pu=0 then return
+  184 if re=81 then re=32
+  185 poke 3072+pw+ps*40,re
+  186 t=pu:if pu>9 then t=-15
+  187 poke 4071,t+48
+  188 pw=38:ps=23:poke 4030,81
+  189 gw=1:gs=1:poke 3113,42:re=32:ol=3
+  190 for n=1 to 10
+  191 get nr$:next n
+  192 ad=88:h=0:nr=0
+  193 return
+  194 scnclr:print"punkte:";y:print:y=0
+  195 input"druecke return";dummy$:return
+  196 data 82,84,85,86,87,89,90,91,93,94,95,97,99,100,101,102,103,105,106
+  197 data 107,109,111,112,114,116,117,122,127,135,145,149,152,154,162
+  198 data 163,164,165,167,168,170,171,173,175,177,179,180,181,183,185
+  199 data 187,188,189,190,192,194,195,197,208,213,225,242,244,246,248
+  200 data 250,251,253,254,255,257,259,261,263,265,267,268,269,271,273
+  201 data 275,276,277,284,286,288,290,297,299,301,303,307,311,313,317
+  202 data 322,326,330,332,334,336,337,339,341,343,345,346,347,349,351
+  203 data 353,354,355,362,364,366,367,369,370,372,374,376,379,389,393
+  204 data 397,418,419,421,422,423,425,427,428,429,431,433,435,442,443
+  205 data 444,445,446,448,449,450,451,452,454,456,463,465,471,475,477
+  206 data 494,496,498,499,500,501,503,505,507,509,510,511,513,514,515
+  207 data 517,522,523,524,526,527,528,530,532,533,534,536,541,545,570
+  208 data 576,577,579,581,582,583,585,586,588,589,590,591,592,594,595,596,597
+  209 data 602,604,605,606,607,608,612,614,617,619,623,630,637,642,646
+  210 data 650,652,654,655,657,659,660,661,663,665,667,668,670,672,673,674
+  211 data 675,682,684,686,688,689,690,701,703,705,708,717,724,732,733,735,736
+  212 data 738,739,745,746,748,749,750,751,752,754,755,757,762,763,764,766
+  213 data 767,768,770,773,778,781,783,792,794,797,804,810,811,813,814
+  214 data 815,817,818,820,821,823,825,826,827,828,829,830,834,836,837,842
+  215 data 844,846,848,853,857,860,863,872,874,877,882,884,886,888,889
+  216 data 890,892,893,895,896,897,899,900,902,903,904,905,907,908,909,911
+  217 data 912,914,915,917
+  218 data ,4,1,8,1,1,1,1,8,1,1,1,8,1,1,1,8,1,8,1
+  219 data 1,1,1,1,8,1,1,1,8,1,8,1,1,8,1,8,1,1,5,
+  220 data ,2,,2,,,,,2,,,,2,,,,2,,2,
+  221 data ,,,,2,,,,2,,2,,,2,,2,,,2,
+  222 data ,2,,3,1,1,5,,3,8,1,1,11,1,5,,7,1,11,1
+  223 data 1,1,8,1,9,,4,1,6,,3,5,,2,,3,8,1,9,
+  224 data ,2,,,,,2,,,2,,,2,,2,,2,,2,
+  225 data ,,2,,2,,2,,,,,2,,2,,,2,,2,
+  226 data ,7,1,8,1,8,10,5,,7,1,1,9,,3,1,11,1,11,1
+  227 data 8,1,11,1,9,,7,1,1,1,8,10,8,10,8,1,10,1,9,
+  228 data ,2,,2,,2,,2,,2,,,2,,,,2,,2,
+  229 data 2,,2,,2,,2,,,,2,,2,,2,,,,2,
+  230 data ,7,1,9,,2,,2,,2,,4,10,8,1,8,6,,2,
+  231 data 2,,2,,7,1,6,,4,1,9,,2,,3,1,5,,2,
+  232 data ,2,,7,1,9,,3,8,6,,2,,2,,2,,,2,
+  233 data 2,,2,,2,,,,2,,2,,2,,,,7,1,9,
+  234 data ,2,,2,,2,,,2,,,2,,2,,2,,4,6,
+  235 data 7,1,10,1,11,1,8,1,6,,7,1,9,,4,1,9,,2,
+  236 data ,7,1,10,1,10,1,8,10,1,1,10,1,11,1,11,1,9,,
+  237 data 2,,,,2,,2,,,,2,,2,,2,,7,1,9,
+  238 data ,2,,,,,,2,,,,,,2,,2,,7,1,1
+  239 data 10,1,5,,2,,7,1,8,1,6,,7,1,6,,2,,2,
+  240 data ,7,1,1,1,8,1,10,1,8,1,8,1,6,,2,,2,,
+  241 data ,,2,,2,,2,,2,,,,2,,,,2,,2,
+  242 data ,2,,,,2,,,,2,,2,,,,2,,3,8,1
+  243 data 5,,3,1,9,,3,8,10,1,1,1,10,8,1,1,10,1,9,
+  244 data ,7,1,8,1,10,1,1,1,9,,7,1,8,1,9,,,2,
+  245 data 2,,,,2,,,2,,,,,,2,,,,,2,
+  246 data ,2,,2,,,,,,7,1,9,,2,,3,5,,2,
+  247 data 3,1,5,,7,1,8,10,1,5,,4,1,10,1,1,5,,2,
+  248 data ,2,,7,1,5,,4,1,6,,2,,2,,,2,,2,
+  249 data ,,2,,2,,2,,,2,,2,,,,,7,1,9,
+  250 data ,2,,2,,2,,2,,,,7,1,10,8,1,10,8,10,1
+  251 data 5,,2,,2,,3,5,,3,1,10,1,8,1,1,9,,2,
+  252 data ,7,1,6,,7,1,10,1,8,1,9,,,2,,,2,,
+  253 data 7,1,11,1,9,,,2,,,,,,2,,,2,,2,
+  254 data ,2,,,,2,,,,2,,3,5,,3,1,8,6,,4
+  255 data 6,,2,,7,1,1,10,1,1,1,5,,2,,4,6,,2,
+  256 data ,7,1,5,,7,1,8,1,9,,,2,,,,2,,,2
+  257 data ,,2,,2,,,,,,,7,1,9,,2,,,2,
+  258 data ,2,,2,,2,,2,,3,1,8,6,,4,1,6,,4,6
+  259 data ,4,6,,3,1,8,1,1,1,8,6,,2,,3,5,,2,
+  260 data ,2,,2,,2,,2,,,,2,,,2,,,,2,
+  261 data ,2,,,,,2,,,,2,,,2,,,2,,2,
+  262 data ,3,1,10,1,10,1,10,1,1,1,10,1,1,10,1,1,1,10,1
+  263 data 1,10,1,1,1,1,10,1,1,1,10,1,1,10,1,1,10,1,6,
+  264 data 169,46,162,250,157,255,11,157,249,12,157,243,13,157,237,14,202,208
+  265 data 241,96
+  270 vol7:sound1,800,15
+  271 print"ziel ist es, moeglichst viele punkte zu"
+  272 print"fressen, ohne sich von der spinne fan-"
+  273 print"gen zu lassen. die anzahl der pucks"
+  274 print"wird rechts unten angezeigt."
+  275 print"der puck kann mit dem joystick in alle"
+  276 print"richtungen bewegt werden. eine gewaehlte"
+  277 print"richtung wird beibehalten, solange dies"
+  278 print"moeglich ist. der joystick kann dabei in"
+  279 print"neutralstellung stehen."
+  280 print"durch dauerbetaetigung oder kurzes an-"
+  281 print"tippen kann eine neue richtung gewaehlt"
+  282 print"werden, die bei der naechsten gelegen-"
+  283 print"heit eingeschlagen wird."
+  284 print"wurde keine neue richtung gewaehlt,"
+  285 print"bleibt der puck stehen, wenn eine bewe-"
+  286 print"gung in der alten richtung nicht mehr"
+  287 print"moeglich ist."
+  290 print"gelingt es abzuraeumen, gibt es einen"
+  291 print"puck als bonus."
+  292 print"bis zur vierten runde wird die spinne"
+  293 print"im verhaeltnis zum puck von runde zu"
+  294 print"runde etwas schneller."
+  295 print"sind alle pucks gefangen, wird die zahl"
+  296 print"der gefressenen punkte angezeigt."
+  297 input"druecke return! ";d$
+  298 return
+  299 end
+
