@@ -17,7 +17,7 @@
         <h1>Shapes auf dem C 16</h1>
         <p class="intro">Zwei Grafikbefehle sind es, die manchem C 16-Benutzer einige Rätsel aufgeben. Beide haben mit den Shapes zu tun: SSHAPE und GSHAPE werden Ihnen hier vorgestellt.</p>
 
-        <p>F: wichtige Kaufentscheidung bei Commodore-Computern sind ihre ausgezeichneten Grafikfähigkeiten. Doch leider ist ihnen teilweise recht schwer beizukommen. So etwa bei den Shapes. Hier erfahren Sie, wie Sie mit den Grafik-Befehlen SSHAPE und GSHAPE umgehen müssen. Doch zuerst: Was sind Shapes?</p>
+        <p>Eine wichtige Kaufentscheidung bei Commodore-Computern sind ihre ausgezeichneten Grafikfähigkeiten. Doch leider ist ihnen teilweise recht schwer beizukommen. So etwa bei den Shapes. Hier erfahren Sie, wie Sie mit den Grafik-Befehlen SSHAPE und GSHAPE umgehen müssen. Doch zuerst: Was sind Shapes?</p>
 
         <p>Wie so vieles aus der Computerkultur stammt auch dieses Wort aus dem Angelsächsischen: Shape heißt ins Deutsche übersetzt soviel wie Form, Gestalt oder Umriß. Hier bezeichnet Shape einen genau definierten Bildschirmausschnitt, der gespeichert und wiederverwendet werden kann. Wie das mit dem C 16 geschieht, soll nun erklärt werden.</p>
 
@@ -27,7 +27,8 @@
 
         <p>Dies ist der Befehl, mit dem ein Bildschirmbereich in einen String eingelesen werden kann. Seine Syntax ist</p>
 
-        <p>SSHAPE A$,X1,Y1,X2,Y2</p>
+        <pre><code>SSHAPE A$,X1,Y1,X2,Y2
+</code></pre>
 
         <p>A$ ist hier eine beliebige Stringvariable, auch ein Array kann Verwendung finden. X1 bis Y2 gibt die Eckkoordinaten des Rechteckes an, dessen Inhalt als Shape definiert werden soll. Bild 1 soll das etwas verdeutlichen.</p>
 
@@ -35,33 +36,33 @@
 
         <p>Falls es noch unklar sein sollte: Im Gegensatz zu den Sprites anderer Commodore-Computer, die jedem Bildschirm-Modus trotzen (also sowohl als HiRes- oder Multicolorsprites im Text- als auch im Hochauflösungs- und Multicolormodus auftauchen können), sind Shapes fest mit dem aktuellen Modus verbunden. Ein Shape ist ein Grafikobjekt und kann daher auch nur in den Grafikmodi auftreten und definiert werden. Also in denen, die durch GRAPHIC erzeugt werden, wobei n von 1 bis 4 geht. Außerdem ist ein Multicolorshape auch nur im Multicolormodus ein solches. Schaltet man beispielsweise mittels GRAPHIC1 in den normalen Hochauflösungsmodus um, wird auch unser Shape nur als hochaufgelöstes sichtbar.</p>
 
-        <p>Wie wir uns aus all dem schon fast denken können, ist das Koordinatensystem, auf das sich die Angaben X1 bis Y2 beziehen, das im jeweiligen Modus gültige. Im Normalfall also im HiRes-Modus X von O bis 319 und Y von O bis 199. Im Multicolormodus geht X nur von O bis 159.</p>
+        <p>Wie wir uns aus all dem schon fast denken können, ist das Koordinatensystem, auf das sich die Angaben X1 bis Y2 beziehen, das im jeweiligen Modus gültige. Im Normalfall also im HiRes-Modus X von 0 bis 319 und Y von 0 bis 199. Im Multicolormodus geht X nur von 0 bis 159.</p>
 
-        <p>A$ ist ein String. Für Strings gilt beim C 16 die Begrenzung auf maximal 255 Byte. Ein durch SSHAPE in einen String zu schreibendes Gebiet darf also eine gewisse Größe nicht überschreiten. Bezeichnen wir als</p>
+        <p>A$ ist ein String. Für Strings gilt beim C 16 die Begrenzung auf maximal 255 Byte. Ein durch SSHAPE in einen String zu schreibendes Gebiet darf also eine gewisse Größe nicht überschreiten. Bezeichnen wir als<br>DX = X2 - X1 und als<br>DY = Y - Y1<br>dann gilt für die Bytemenge im String im Hochauflösungsmodus die Formel:</p>
 
-        <p>DX =X2-X1 undals</p>
+        <pre><code>Lh=INT((ABS(DX)+1)/8+.99)*(ABS(DY)+1)+4
+</code></pre>
 
-        <p>DY=Y -Y1 dann gilt für die Bytemenge im String im Hochauflösungsmodus die Formel:</p>
+        <p>Im Multicolormodus gilt statt dessen die Gleichung:</p>
 
-        <p>Lh=INT((ABS(DX)+1)/8+.99)x(ABS(DY)+1)-+4 Im Multicolormodus gilt statt dessen die Gleichung: Im=INT((ABS(DX)+1) /4+.99)x(ABS(DY)+1)-+4</p>
+        <pre><code>Lm=INT((ABS(DX)+1)/4+.99)*(ABS(DY)+1)+4
+</code></pre>
 
         <p>Die Addition von 4 am Ende der Formeln ergibt sich durch 4 Byte, die den Schluß des Shape-String, bilden und Steuergrößen enthalten.</p>
 
-        <p>Sollte dann, trotz all dieser Berechnungsmöglichkeiten man wendet ja nicht jedesmal die Formeln an – der zu speichernde Shape größer als 255 Byte werden, dann meldet unser Computer einen STRING TOO LONG ERROR.</p>
+        <p>Sollte dann, trotz all dieser Berechnungsmöglichkeiten – man wendet ja nicht jedesmal die Formeln an – der zu speichernde Shape größer als 255 Byte werden, dann meldet unser Computer einen STRING TOO LONG ERROR.</p>
 
         <p>Einen Aspekt des SSHAPE-Befehls müssen wir noch besprechen, weil es da einige Verwirrung geben kann: Wie reagiert SSHAPE auf ein durch SCALE verändertes Bildschirmsystem? Die Koordinatenangabe bei SSHAPE muß ebenfalls in den aktuell gültigen Werten geschehen. Man muß sich also nicht um die Organisation des Koordinatensystems kümmern, denn durch SSHAPE wird automatisch die Umrechnung auf den normalen Bildschirm vorgenommen. Lediglich bei der Berechnung der Stringlänge müssen einige Korrekturen vorgenommen werden.</p>
 
-        <p>Nehmen wir an, wir hätten durch SCALE 1 ein System definiert, dann liegen (im Hochauflösungsmodus) die Vergrößerungsfaktoren</p>
+        <p>Nehmen wir an, wir hätten durch SCALE 1 ein System definiert, dann liegen (im Hochauflösungsmodus) die Vergrößerungsfaktoren<br>FX = 1023/320<br>FY = 1023/200<br>vor und die Beziehungen für die Stringlänge lauten dann:<br>Hochauflösungsmodus</p>
 
-        <p>FX = 1023/320</p>
-
-        <p>FY = 1023/200 vor und die Beziehungen für die Stringlänge lauten dann: Hochauflösungsmodus</p>
-
-        <p>Lh=INT( (ABS(DXx320/1023)+1) /8+.99)x (ABS(DYx200/1023) +1)</p>
+        <pre><code>Lh=INT((ABS(DX*320/1023)+1)/8+.99)*(ABS(DY*200/1023)+1)+4
+</code></pre>
 
         <p>Multicolormodus</p>
 
-        <p>Im=INT( (ABS(DXx160/1023)+1) /4+.99)x (ABS(DYx200/1023) +1)H</p>
+        <pre><code>Lm=INT((ABS(DX*160/1023)+1)/4+.99)*(ABS(DY*200/1023)+1)+4
+</code></pre>
 
         <p>DX und DY sind dabei im aktuellen Koordinatensystem geltende Werte.</p>
 
@@ -71,17 +72,18 @@
 
         <p>Ein durch SSHAPE im String gespeichertes Bild kann durch diesen Befehl nun wieder auf dem Bildschirm dargestellt werden:</p>
 
-        <p>GSHAPE A$,X,Y,M</p>
+        <pre><code>GSHAPE A$,X,Y,M
+</code></pre>
 
         <p>A$ ist der uns nun schon bekannte Speicherstring, der durch SSHAPE definiert wurde. Es kann jede Stringvariable oder ein String-Array-Element verwendet werden.</p>
 
         <p>X,Y sind die Koordinaten im aktuellen System, an die die linke obere Ecke unseres Shapes gelegt werden soll.</p>
 
-        <p>Interessant ist die Angabe von M. Hier dreht es sich um einen Darstellungsmodus, von dem es hier 4 Möglichkeiten gibt: !</p>
+        <p>Interessant ist die Angabe von M. Hier dreht es sich um einen Darstellungsmodus, von dem es hier 4 Möglichkeiten gibt:</p>
 
         <p>M=0. Unser Shape wird genauso abgebildet, wie es definiert wurde. Schon an dieser Stelle auf dem Bildschirm vorhandene Objekte werden überdeckt. Dasselbe ergibt sich, wenn wir diesen Parameter einfach weglassen.</p>
 
-        <p>M= 1. Das Shape wird invertiert abgebildet. Auch hier überdeckt das Shape vorhandene Objekte.</p>
+        <p>M=1. Das Shape wird invertiert abgebildet. Auch hier überdeckt das Shape vorhandene Objekte.</p>
 
         <p>M=2. OR-Modus: Bildpunkte werden sichtbar, wenn sie zum Shape oder zu vorhandenen Objekten gehören. Beide Bilder überlagern sich so.</p>
 
@@ -106,17 +108,17 @@
 
         <p>Eine Frage haben wir noch offengelassen, die eine recht verlockende Konsequenz in sich birgt: Wenn man mittels der SCALE-Anweisung die Systeme bei SSHAPE (also beim Aufbau des Shape) und bei GSHAPE (bei der Abbildung) unterschiedlich wählt, kann man dann Shapes verkleinern oder vergrößern?</p>
 
-        <p>Die Antwort ist leider nein. Bei GSHAPE werden nur die Koordinaten eines (des linken oberen) Eckpunktes angegeben. Somit hat ein unterschiedliches Koordinatensystem lediglich auf den Darstellungsort eine Wirkung, nicht aber auf' die Shape-Größe.</p>
+        <p>Die Antwort ist leider nein. Bei GSHAPE werden nur die Koordinaten eines (des linken oberen) Eckpunktes angegeben. Somit hat ein unterschiedliches Koordinatensystem lediglich auf den Darstellungsort eine Wirkung, nicht aber auf die Shape-Größe.</p>
 
         <p>Im Gegensatz zu den Sprites der anderen Commodore-Computer ist das Bewegen von Shapes eine langweilige Angelegenheit. Jedem Shape-Aufbau durch GSHAPE kann man ganz geruhsam zusehen. Zwar ist es durch Sequenzen wie.</p>
 
-        <p>FOR = 0 TO 200</p>
+        <pre><code>FOR = 0 TO 200
+GSHAPE A$,I,I,4
+GSHAPE A$,I,I,4
+NEXT I
+</code></pre>
 
-        <p>GSHAPE A$,1,1,4</p>
-
-        <p>GSHAPE A$,1,1,4</p>
-
-        <p>NEXT I möglich, Shapes ohne Schaden für den Bildschirminhalt über den Sichtbereich ziehen zu lassen. Das Ganze ähnelt aber bei weitem nicht der Sprite-Bewegung.</p>
+        <p>möglich, Shapes ohne Schaden für den Bildschirminhalt über den Sichtbereich ziehen zu lassen. Das Ganze ähnelt aber bei weitem nicht der Sprite-Bewegung.</p>
 
         <p>Der C 16 wird oft unterschätzt. Zwar ist er vom Speicherplatz her – besonders bei eingeschalteter Grafik – wirklich reichlich beschränkt, von seinem Basic her ist er allerdings manchem weitaus kostspieligeren Computer hoch überlegen, was auch diese beiden kleinen Befehle zeigen.</p>
 
