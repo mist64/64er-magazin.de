@@ -130,8 +130,9 @@ ls $dir/*.json | grep -vc 'labels' ; ls $dir/*.digest.txt | wc -l ; ls $dir/*_bo
 # 2. the block index covers every page that has blocks
 ls $dir/blocks/p*.txt | wc -l
 
-# 3. no page silently produced nothing
-python3 - <<'PY'
+# 3. no page silently produced nothing -- "$PY", not python3: this check
+#    imports r010_ocr_blocks, which imports numpy
+"$PY" - <<'PY'
 import glob, json, os
 import r010_ocr_blocks as OB
 empty = [f for f in sorted(glob.glob(os.path.join(OB.OUT_DIR, "[0-9][0-9][0-9].json")))

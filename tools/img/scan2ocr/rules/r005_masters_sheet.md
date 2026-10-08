@@ -76,6 +76,17 @@ one-sided, and it produces both misses and false positives:
 - SH8603: it offered `[1]` where the answer was eight pages.
 - SH8604: it offered `[1, 60]`, and p060 is an INTERIOR page printed under a
   full-page salmon tint — its own white is 200 169 154, the interior's.
+- SH8605: it did not offer p198 AT ALL — the bound-in Zahlkarte, whose paper
+  fraction is 0.116 against `FULLBLEED_PAPER_FRAC` 0.10. The own-white gap
+  offered it, at dist 91. A card the paper mask happens to SEE is invisible to
+  this witness, which is the whole of the one-sidedness above, now with a page
+  number attached.
+
+**THIS PARAGRAPH IS NOT FOR SHORTENING.** Three issues, three different ways for
+the pre-fill to be wrong: too few, a false positive, and a miss of a page that
+is physically a different stock. On SH8605 the warning is what caught p198
+before the grade did — the rule earned its length, and a harvest that trims it
+back to "the pre-fill is a guess" throws away the three cases that say how.
 
 Two stronger witnesses, both free:
 
@@ -83,9 +94,55 @@ Two stronger witnesses, both free:
    any bound-in card sit far from the interior with a clear gap: SH8604 reads
    163 (136), 002 (125), 164-166 (91), 168 (90), 167 (85), then NOTHING until
    p016 at 20.
-2. **The scan resolution.** MEASURED on SH8602, SH8603 and SH8604: the pages
-   scanned at 2400 dpi are EXACTLY the wrapper and the card, the interior at
-   600. Print the per-page dpi beside each candidate.
+2. **The scan resolution marks COLOUR, not stock.** The owner scans COLOUR
+   pages at 2400 dpi and everything else at 600 (owner, 2026-10-06: *"several
+   pages were color, for which i was using 2400 dpi. but you dont have to treat
+   them differently other than through dpi"*). On SH8602, SH8603 and SH8604 the
+   only colour pages WERE the wrapper and the card, so the witness looked like a
+   stock marker and this rule used to say it was one. It is not: SH8605 has 24
+   pages at 2400 dpi — the 8 good-stock pages AND 16 interior colour pages
+   (006, 007, 017-021, 024-026, 028-030, 032-034), and taken as a stock marker
+   the witness puts all 24 on the good stock. SH8608's scans read the same way
+   before it was built: 12 at 2400 (001, 002, 163-166 wrapper, plus interior
+   004, 010, 015, 021, 025, 034). **A colour interior page is `low` like any
+   other; dpi is its only difference.** Print the per-page dpi beside each
+   candidate, and read it as "this page is colour", never as "this page is on
+   the good stock".
+
+   **Read the dpi from the PNG header, not from `identify`.** These scans carry
+   `pHYs` in pixels per METRE, and `identify -format '%x'` converts to pixels
+   per CENTIMETRE: a 2400 dpi page prints `944.88`, a 600 dpi page `236.22`. A
+   census written as `%x >= 2000` therefore matches NOTHING and reports zero
+   colour pages without failing — measured here on SH8608. Walk the chunks
+   instead, which also costs one read of 200 bytes a page rather than a decode
+   of a 100 MB image:
+
+   ```python
+   import struct
+   def dpi(path):                      # None if the file carries no pHYs
+       with open(path, 'rb') as fh:
+           fh.seek(8)
+           while True:
+               hdr = fh.read(8)
+               if len(hdr) < 8: return None
+               ln, typ = struct.unpack('>I4s', hdr)
+               if typ == b'pHYs':
+                   px, _, unit = struct.unpack('>IIB', fh.read(ln)[:9])
+                   return round(px * 0.0254) if unit == 1 else None
+               if typ in (b'IDAT', b'IEND'): return None
+               fh.seek(ln + 4, 1)
+   ```
+
+   **And a 2400 dpi scan contaminates witness 1.** The same paper reads ~30
+   city-block whiter at 2400 than at 600. Proved per LEAF on SH8605, where both
+   sides are one physical sheet: 21/22 reads dist 29 on the 2400 side and 3 on
+   the 600 side; 27/28 36 vs 2; 23/24 31 vs 4; 31/32 31 vs 9. So on a mixed-dpi
+   issue the own-white gap has a second population at 27-39, and SH8605's cover
+   p001 — whose "own white" is full-bleed art — lands at 41, INSIDE that band:
+   sorted by distance alone it does not separate from the 2400 dpi interior
+   pages. **Read the gap per dpi, and settle any page still in doubt against its
+   leaf partner (n/n+1): one sheet of paper cannot be two stocks.** That is what
+   settled p001, whose partner p002 reads 166.
 
 **THE CODE DOES NOT DO THIS YET.** `r005_masters_sheet.py` pre-fills from the
 edge finder alone (`from_ink = paper_frac < FULLBLEED_PAPER_FRAC`), which is
@@ -211,10 +268,18 @@ trace to 209.2 × 296.9 mm (p050). Derive that issue's thumbs at
 
 ```bash
 cd tools/img/scan2ocr/rules
-../../../../.venv/bin/python r005_field.py                    # ONCE, first
-../../../../.venv/bin/python r005_masters_sheet.py            # every page
-../../../../.venv/bin/python r005_masters_sheet.py 6 41 56 92 # named pages
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+$PY r005_field.py                    # ONCE, first
+$PY r005_masters_sheet.py            # every page
+$PY r005_masters_sheet.py 6 41 56 92 # named pages
 ```
+
+**`$PY` is that line, in every fence in this file.** It is spelled relative to
+the rules directory, so a fence that uses it `cd`s there first; pasted from
+anywhere else it resolves four levels above the wrong place. `$PY` used to
+appear in three fences here with no definition in any of them, so two of them
+ran `- <<'PY'` as a command and the Verification block ran on the system python
+(SH8605).
 
 **`r005_field.py` runs first, once per issue**, and measures the
 paper-yellowing field for each paper class — about 0.6 s a page on 28 lanes for
@@ -270,6 +335,9 @@ available, tell me and `open` it — and do not stop.** See r000, *An OWNER
 DELIVERABLE is handed over the MOMENT it exists*.
 
 ```bash
+cd tools/img/scan2ocr/rules
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+
 # 1. the uncut, deskewed, colour-corrected 600 dpi pages -- for review
 open "$TMPDIR_ISSUE/sheets600"
 
@@ -1082,6 +1150,8 @@ is the parity its number claims. Cut the bottom ~4 % of the A4 page full width
 and look at it:
 
 ```bash
+cd tools/img/scan2ocr/rules
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
 $PY - <<'PY'
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = None
@@ -1134,9 +1204,10 @@ the decision drawn on top.
 
 ```bash
 cd tools/img/scan2ocr/rules
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
 
 # 1. every page produced all six artefacts, and nothing else did
-python3 - <<'PY'
+$PY - <<'PY'
 import os, r000_issue, r005_masters_sheet as R
 iss = r000_issue.load(R.ISSUE)
 for d, ext in ((R.OUT_MASTER, ".png"), (R.OUT_MASTER, ".stamp.txt"),
@@ -1149,22 +1220,43 @@ for d, ext in ((R.OUT_MASTER, ".png"), (R.OUT_MASTER, ".stamp.txt"),
           (miss[:12] + ["..."] if len(miss) > 12 else miss) or "none")
 PY
 
-# 2. every master is the SAME size, and it is the expected one (231 x 304 mm)
-python3 - <<'PY'
+# 2. every master is the expected size (231 x 304 mm), and any page that is
+#    NOT must SAY SO in its own stamp.  This check used to be a flat
+#    `assert list(sizes) == [want]`, and it fails on a CORRECT build: when a
+#    page's trace fails, the step publishes the whole levelled sheet and grows
+#    the canvas to fit it, which it records as "CANVAS grown" in the stamp.
+#    SH8605 shipped two such pages (035, 198, both 5457x7187 against the
+#    uniform 5457x7181) and this check was red at the end of that build --
+#    unnoticed, because the block it lives in could not be run at all (the
+#    `$PY` above was defined nowhere).  So the question is not "are they all
+#    the same size" but "is every exception a DOCUMENTED one".
+$PY - <<'PY'
 from collections import Counter
 from PIL import Image
 import os, r005_masters_sheet as R
 Image.MAX_IMAGE_PIXELS = None
-sizes = Counter(Image.open(R.OUT_MASTER / f).size
-                for f in sorted(os.listdir(R.OUT_MASTER)) if f.endswith(".png"))
 want = (round(R.MASTER_W_MM * R.MM), round(R.MASTER_H_MM * R.MM))
+sizes, bad = Counter(), []
+for f in sorted(os.listdir(R.OUT_MASTER)):
+    if not f.endswith(".png"): continue
+    sz = Image.open(R.OUT_MASTER / f).size
+    sizes[sz] += 1
+    if sz == want: continue
+    stamp = (R.OUT_MASTER / f).with_suffix(".stamp.txt")
+    note = stamp.read_text(encoding="utf-8") if stamp.exists() else ""
+    if "CANVAS grown" not in note:
+        bad.append((f, sz, "no 'CANVAS grown' in the stamp"))
+    else:                      # print the CLAUSE, not the whole notes line
+        line = next(l for l in note.splitlines() if "CANVAS grown" in l)
+        print(f"  {f[:3]} {sz[0]}x{sz[1]} -- documented:",
+              next(c.strip() for c in line.split(";") if "CANVAS grown" in c))
 print("expected", want, "| found", dict(sizes))
-assert list(sizes) == [want], "masters are not one uniform size"
+assert not bad, f"off-size masters with nothing in the stamp to explain them: {bad}"
 PY
 
 # 3. RESIDUAL SKEW of the published masters is ~0 -- re-measured, not trusted.
 #    This is the check the rotation-sign trap defeats when it is skipped.
-python3 - <<'PY'
+$PY - <<'PY'
 import numpy as np, os
 from PIL import Image
 import r005_masters_sheet as R
@@ -1192,7 +1284,7 @@ PY
 #        for a different reason: it is the UNCUT sheet, offset from the page by
 #        the sheet box, so a band measured inside the traced page lands
 #        somewhere else.  See "checks 4 and 6 read masters600, not sheets600".
-python3 - <<'PY'
+$PY - <<'PY'
 import numpy as np, os, re
 from PIL import Image
 import r005_masters_sheet as R
@@ -1220,7 +1312,7 @@ PY
 # 5. THE STAMP: every master names the grade that made it, and it is the CURRENT
 #    one.  This is the check that would have caught the three silently stale
 #    masters -- a string comparison, not a judgement about colour.
-python3 - <<'PY'
+$PY - <<'PY'
 import os, re
 from PIL import Image
 import r005_masters_sheet as R
@@ -1252,8 +1344,7 @@ PY
 #    top-left corner and they must land on body text.  "glyph" is the INTERIOR
 #    of the strokes (eroded), which is what an OCR threshold sees.
 $PY - <<'PY'
-import numpy as np, sys
-sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import numpy as np
 from PIL import Image
 from scipy import ndimage as ND
 import r005_masters_sheet as R
@@ -1285,7 +1376,7 @@ PY
 #     FlatField re-emits the body through field_text() instead of digesting the
 #     bytes it read, so this also catches a file this reader cannot reproduce
 #     exactly -- which is the only way `field-sha` can lie.
-python3 - <<'PY'
+$PY - <<'PY'
 import r005_masters_sheet as R
 for klass, f in sorted(R.FIELDS.items(), key=lambda kv: str(kv[0])):
     p = R.field_path(R.GRADES[klass])
@@ -1306,7 +1397,7 @@ PY
 #     current one for that page's paper class -- or the IDENTITY digest, which
 #     is what a page whose traced box the field could not be anchored on must
 #     carry.  A string comparison, like check 5, and for the same reason.
-python3 - <<'PY'
+$PY - <<'PY'
 import hashlib, os, re
 import r005_masters_sheet as R
 ident = hashlib.sha1(R.field_text("identity").encode()).hexdigest()[:12]
@@ -1333,7 +1424,7 @@ PY
 #     correction is defined relative to the page's own centre -- Pc is measured
 #     there -- so a centre gain other than 1.0 is a global tone shift wearing a
 #     flat field's clothes, and nothing downstream could see it.
-python3 - <<'PY'
+$PY - <<'PY'
 import numpy as np
 import r005_masters_sheet as R
 for klass, f in sorted(R.FIELDS.items(), key=lambda kv: str(kv[0])):
@@ -1353,7 +1444,7 @@ PY
 #     and it is imposed by a cumulative maximum inside the fit -- so if it ever
 #     stops holding, something between the fit and the file has reordered or
 #     re-rounded the samples.
-python3 - <<'PY'
+$PY - <<'PY'
 import numpy as np
 import r005_masters_sheet as R
 for klass, f in sorted(R.FIELDS.items(), key=lambda kv: str(kv[0])):
@@ -1383,7 +1474,7 @@ PY
 #     on, worst band 28.83 -> 2.87.  The ceilings below are ~3x the measured
 #     value and under a third of the uncorrected one, so they sit in the middle
 #     of a gap an order of magnitude wide.
-python3 - <<'PY'
+$PY - <<'PY'
 import re, sys
 import numpy as np
 from PIL import Image

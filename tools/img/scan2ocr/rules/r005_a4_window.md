@@ -21,6 +21,35 @@ fall back to.
 
 ---
 
+## Run
+
+```bash
+cd tools/img/scan2ocr/rules
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+$PY r005_a4_window.py            # no arguments: every page
+```
+
+**No arguments.** The program measures every page in `sheets600`, fits ONE
+`(S, B)` offset pair per parity, and cuts every page to `<tmp>/a4600/`, one
+`NNN.png` and one `NNN.stamp.txt` each. There is no per-page invocation and no
+page list — the whole point of the step is that the window is fitted across the
+issue and then applied rigidly, so cutting a subset would fit a different
+window.
+
+**Two env knobs, which `r005_masters_sheet` ("No CLI knobs, no env knobs") does
+not cover because they are this program's, not that one's:**
+
+| knob | default | what it does |
+|---|---|---|
+| `FILL` | `paint` | what goes outside the frame. `paint` is what every sheet issue has shipped; `mirror` is the experiment described under *The fill* and is NOT the default. |
+| `A4_OUT` | `<tmp>/a4600` | redirects the cut, for a comparison run that must not overwrite the delivery. |
+
+Reading these out of the program was a 4-command detour on SH8605, and the
+only other record of which `FILL` a build used was SH8604's git-ignored
+`LOG.md` — which the next build does not have.
+
+---
+
 ## Why the logo is the anchor — the principle, verbatim
 
 > The "64'er" wordmark is print-registered to the page CONTENT. The sheet edge
@@ -126,7 +155,7 @@ Record per page which of the three was used, beside the grade stamp, so a page
 whose type sits differently from its neighbours can be explained rather than
 re-derived.
 
-## A PAGE WHOSE TRACE FAILS IS STILL CUT AUTOMATICALLY — NEVER BY HAND
+## A PAGE WHOSE TRACE FAILS IS CUT BY A SCRIPT — NEVER BY HAND, AND THE SCRIPT IS YOURS TO WRITE
 
 **NAMING, because the numbers collide.** The three above — logo, paper-edge,
 traced-edge — are the ANCHOR fallbacks, and they are implemented in
@@ -199,11 +228,185 @@ which fallback was used.
 
 ## Verification
 
-1. Every body page is exactly 4961 × 7016 px.
-2. The anchor lands on the glyph — check the overlay on a sample, per parity,
-   rather than trusting the transform.
-3. Content registration: the same element (the folio, the foot rule) sits within
-   a pixel or two of the same place across a run of same-parity pages. This is
-   the property the rule exists for and the only one that proves it worked.
-4. Alpha inside the window is a thin border, not a chunk, and the per-page
-   figure is recorded.
+```bash
+cd tools/img/scan2ocr/rules
+PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare python3
+
+# 1. every body page is exactly 4961 x 7016, and any page that is NOT says so
+#    in its own stamp.  An INSERT is legitimately a different size -- 'ONE
+#    INSERT IS ONE OBJECT' unifies the run and records it -- so the question is
+#    not "are they all A4" but "is every exception a documented one".
+#    MEASURED on SH8605: 196 at 4961x7016 and 197-200 at 3551x4923, the
+#    bound-in card, each stamp carrying UNIFIED or OVERRIDE.
+$PY - <<'PY'
+import collections, re, struct
+import r005_a4_window as A
+def wh(f):                      # the IHDR, so a 100 MB page costs 24 bytes
+    with open(f, 'rb') as fh: return struct.unpack('>II', fh.read(24)[16:24])
+want, sizes, bad = (A.A4_W, A.A4_H), collections.Counter(), []
+for f in sorted(A.OUT_A4.glob("[0-9][0-9][0-9].png")):
+    sz = wh(f); sizes[sz] += 1
+    if sz == want: continue
+    note = f.with_suffix(".stamp.txt").read_text(encoding="utf-8")
+    tag = next((t for t in ("UNIFIED", "OVERRIDE") if t in note), None)
+    (print(f"  {f.stem} {sz[0]}x{sz[1]} -- documented {tag}") if tag
+     else bad.append((f.stem, sz)))
+print("expected", want, "| found", dict(sizes))
+assert not bad, f"off-size pages with no UNIFIED/OVERRIDE in the stamp: {bad}"
+PY
+
+# 2. The anchor lands on the glyph -- check the overlay on a sample, per
+#    parity, rather than trusting the transform.  (By eye: `overlay()` writes
+#    them.  Check 3 is the measurement, but it cannot tell a logo from a
+#    convincing near-miss, and the overlay can.)
+
+# 3. CONTENT REGISTRATION, which is the property this rule exists for and the
+#    only one that proves it worked: the logo must land in the SAME PLACE in
+#    every delivered page of a parity.  Detect it in the DELIVERY (not the
+#    sheet) and compare.  MEASURED on all 200 pages of SH8605: 181 pages carry
+#    a logo, and the modal position is (4600, 6888) even / (360, 6888) odd with
+#    spread 0 px in both axes.
+#
+#    **READ THE OPPOSITE EDGE AS THE CONTROL.**  The anchor is the tight
+#    bbox's corner on the wordmark's own side, and that is exactly the edge the
+#    tight bbox gets wrong on a page where the match is poor -- so a page can
+#    look 16 px out of register while its content is where it belongs.  SH8605
+#    p033: bbox x0 376 against a modal 360, width 364 against 379-383, score
+#    0.937 against 0.948 -- but x1 740 against 741-742.  The RIGHT edge agrees
+#    to a pixel, so the page is registered and what moved is the detection.
+#    (p033 had been re-cut by override to its pre-field window, and this is how
+#    you tell that the re-cut worked: the errata it came from recorded the same
+#    16 px as "0.68 mm out of register in the delivery", which the opposite
+#    edge disproves.)
+#
+#    So the check has to separate two findings that look identical:
+#      (a) width WITHIN p5-p95 but the anchor off the mode -> the window was
+#          not rigid.  This is the defect the rule is about.
+#      (b) width OUTSIDE p5-p95 -> the detector, not the window.  Check the
+#          opposite edge before concluding anything, and expect it to agree.
+#
+#    Two measures that DO NOT work, so they are not re-attempted:
+#      - cross-correlating the foot strips of same-parity pages.  The strips
+#        differ by CONTENT (different folios, different figures), so the best
+#        shift is content, not registration: it reported -4/+4 px on a
+#        correctly registered SH8605.
+#      - the darkest row of the foot strip, as a stand-in for the foot rule.
+#        Not every page has one, and a figure at the foot is darker: spread
+#        241 px (odd) and 282 px (even) on the same correct issue.
+$PY - <<'PY'
+import collections, cv2, numpy as np, statistics as st
+from PIL import Image
+import r005_a4_window as A
+Image.MAX_IMAGE_PIXELS = None
+tmpl = cv2.imread(str(A.TEMPLATE), cv2.IMREAD_GRAYSCALE)
+res = collections.defaultdict(list)
+for f in sorted(A.OUT_A4.glob("[0-9][0-9][0-9].png")):
+    pg = int(f.name[:3])
+    g = cv2.cvtColor(np.asarray(Image.open(f).convert("RGB")), cv2.COLOR_RGB2GRAY)
+    ok, side, sc, _a, bb = A.detect(g, tmpl)
+    if ok:
+        res[pg % 2].append((pg, side, round(sc, 3), bb[0], bb[2], bb[3]))
+for par in (0, 1):
+    rows = res[par]
+    if not rows: continue
+    far = 4 if par == 0 else 3          # the anchor's own edge: x1 even, x0 odd
+    near = 3 if par == 0 else 4         # and the opposite one, as the control
+    anc = [r[far] for r in rows]; ctl = [r[near] for r in rows]
+    w = [r[4] - r[3] for r in rows]; y = [r[5] for r in rows]
+    lo, hi = np.percentile(w, 5), np.percentile(w, 95)
+    mode_a, mode_y = st.mode(anc), st.mode(y)
+    print(("even" if par == 0 else "odd "),
+          f"n={len(rows)} anchor ({mode_a}, {mode_y}) spread {max(anc)-min(anc)}/"
+          f"{max(y)-min(y)} px | logo width {min(w)}-{max(w)} p5 {lo:.0f} p95 {hi:.0f}")
+    rigid, detect_ = [], []
+    for r in rows:
+        if r[far] == mode_a and r[5] == mode_y: continue
+        (detect_ if not (lo <= r[4] - r[3] <= hi) else rigid).append(
+            (r[0], r[far], r[5], r[2], r[4] - r[3], r[near]))
+    for pg, a_, y_, sc, w_, c_ in detect_:
+        print(f"    p{pg:03d} DETECTOR: anchor {a_} (mode {mode_a}), width {w_} "
+              f"outside p5-p95, score {sc} -- opposite edge {c_}, "
+              f"control says {'REGISTERED' if abs(c_ - st.mode(ctl)) <= 2 else 'MOVED'}")
+    assert not rigid, f"the window is not rigid on parity {par}: {rigid}"
+    assert all(abs(c_ - st.mode(ctl)) <= 2 for *_, c_ in detect_), \
+        "a detector outlier whose opposite edge ALSO moved -- that is registration"
+
+# 4. alpha is a thin border, not a chunk, and the per-page figure is recorded.
+#    Read it back out of the stamps rather than trusting the run's summary --
+#    the stamp is what a later build can still see.
+#
+#    ALPHA IS NOT THE NUMBER TO ASSERT ON.  It is measured with the PAPER MASK,
+#    which is blind to a full-bleed page, and ~half of an insert's window is
+#    bed by construction.  MEASURED on SH8605: the cover reads alpha 83.07%
+#    with fabricated 0.11% -- the window sits almost entirely inside the traced
+#    page and nothing was invented; the 83% is the mask failing, not a defect,
+#    and the delivered cover is right.  Inserts read ~50%.
+#    FABRICATED is the number that means something, because it is computed
+#    against the TRACED PAGE rather than the mask: it is the fraction of the
+#    delivery that is not print.  Report alpha in three populations, assert on
+#    fabricated.
+#
+#    ON AN INSERT, BOTH FIGURES ARE STALE AND DESCRIBE A PAGE THAT WAS NOT
+#    DELIVERED.  They are computed for the full A4 window and the UNIFIED step
+#    then cuts that window down to the card, so the stamp reports the A4
+#    window's numbers against a 3551 x 4923 delivery: SH8605's p199 and p200
+#    read fabricated 49.99% and 50.12%, which is the bed around a small card
+#    inside a window the size of a page, NOT half an invented delivery (the
+#    unification padded 3536 -> 3551 px, +7/+8 px a side, 0.4%).  So no check
+#    can catch a genuinely half-invented insert from these numbers.  Recompute
+#    alpha and fabricated AFTER the unification cut and overwrite them in the
+#    stamp; until that lands, read an insert's two figures as the window's and
+#    take the padding from the UNIFIED line.
+$PY - <<'PY'
+import re, statistics as st
+import r005_a4_window as A
+body, ins = [], []
+for f in sorted(A.OUT_A4.glob("*.stamp.txt")):
+    t = f.read_text(encoding="utf-8")
+    a = float(re.search(r'alpha\s+([\d.]+)%', t).group(1))
+    b = float(re.search(r'fabricated ([\d.]+)%', t).group(1))
+    (ins if ("UNIFIED" in t or "OVERRIDE" in t) else body).append((f.name[:3], a, b))
+fullbleed = [r for r in body if r[1] > 20.0]      # the mask could not see it
+body = [r for r in body if r[1] <= 20.0]
+for name, rows in (("body", body), ("full-bleed", fullbleed),
+                   ("insert/override", ins)):
+    if not rows: continue
+    A_ = [r[1] for r in rows]; B_ = [r[2] for r in rows]
+    print(f"{name:16s} n={len(rows):3d} alpha p50 {st.median(A_):5.2f}% "
+          f"max {max(A_):5.2f}% ({max(rows, key=lambda r: r[1])[0]}) | "
+          f"fabricated p50 {st.median(B_):5.2f}% max {max(B_):5.2f}% "
+          f"({max(rows, key=lambda r: r[2])[0]})")
+bad = [r for r in body + fullbleed if r[2] > 5.0]
+assert not bad, f"these pages are more than 5% invented: {bad}"
+
+# 5. AFTER A REGRADE, the window must not have moved.  The field moves no
+#    pixels, so a window that moves between runs is a MATCHER artefact, not a
+#    better fit.  MEASURED on SH8605: the paper-yellowing field changed p033's
+#    logo match to a 364 px bbox (every other page 379-383) at score 0.937
+#    against 0.948, and the anchor landed 16 px off -- 0.68 mm out of register
+#    in the delivery, the only outlier among 181 logo pages, and found only
+#    because the whole parity was re-run.  Keep the previous run (A4_OUT) and:
+$PY - <<'PY'
+import re, sys, pathlib
+import r005_a4_window as A
+PREV = pathlib.Path("<the previous run's a4600>")      # A4_OUT of that run
+if not PREV.is_dir():
+    sys.exit("no previous run to compare -- skip this check on a first build")
+def win(d, n):
+    m = re.search(r'window\s+(-?\d+) (-?\d+) (\d+) (\d+)\s+in the master',
+                  (d / n).read_text(encoding="utf-8"))
+    return m.groups() if m else None
+moved = [f.name[:3] for f in sorted(A.OUT_A4.glob("*.stamp.txt"))
+         if (PREV / f.name).exists() and win(A.OUT_A4, f.name) != win(PREV, f.name)]
+print("pages whose window moved across the regrade:", moved or "none")
+assert not moved, f"the field moves no pixels, so these are matcher artefacts: {moved}"
+PY
+```
+
+**And the stamp must name the grade it was cut from.** `a4600/*.stamp.txt` and
+the PNG's `r005b` chunk carry the anchor, the window, alpha and fabricated, but
+NOT `grade-sha` / `field-sha`, so a stale A4 page cannot be caught by string
+comparison the way a stale master can — `masters600/NNN.stamp.txt` carries both.
+Copy them through from the master's stamp at cut time, and check they match the
+masters the delivery was cut from. Until that lands, check 5 above is the only
+guard, and it needs the previous run kept.
