@@ -650,3 +650,12 @@ The agent wrote `Disk-Version bereits korrigiert` in 108's aside but left
 asides only, so it passes with the header missing. **Suggested.** A check: every
 aside with `Disk-Version bereits korrigiert` or `Korrektur im Programm angewendet`
 has a `prg/*.txt` naming its `Fehlerteufelchen M/YYYY` in the header.
+
+## 325 / 330 — the numbers say 325 first, both rules say 330 first
+
+r330: "Run order — LAST, after rule 300 … Later than everything". r325: "By the
+time this step runs, the issue has been through … r320 (omission) and r330
+(reprint comparison)". The chain handed to me (and the numbering) reads 320,
+325, 330. I run 330 before 325, because both rule texts agree and 325's readers
+then read 330's fixes too. **Suggested.** Renumber, or have r000's table say
+"330 runs before 325".
