@@ -922,7 +922,59 @@ look at `git status` first.
    page has exactly that size and codec, which is precisely how SH8601's wrong
    cover passed review. Measured there: the shipped page 1 differed from the
    hand-made cover by MAE 4676 while matching the derived cache file to 2.49.
-3. **Size** — under the 100 MB ceiling the build targets.
+3. **Size, AND THE BUILD THAT MADE IT — these are one check, because the
+   wrong build's size PASSES.** Under the 100 MB ceiling, and the delivered
+   file must carry the mixed build's own fingerprint:
+
+   ```sh
+   PDF=issues/<ID>/<name>.pdf
+   pdfinfo "$PDF" | grep -E '^(Producer|Pages)'
+   pdfimages -list "$PDF" | awk 'NR>2{print $9}' | sort | uniq -c
+   ```
+
+   | | the deliverable | step 2's by-product |
+   |---|---|---|
+   | `Producer` | `tesseract 5 + guetzli + jbig2enc + pikepdf` | `GPL Ghostscript <v>` |
+   | encodings | **`jbig2` AND `jpeg`** | `jpeg` only, every page |
+   | PDF/A | absent (see below) | `PDF/A-3B` |
+
+   **A jbig2 count of zero is the whole check.** The mixed build cannot
+   produce a file without JBIG2 pages on any real issue, and the plain build
+   cannot produce one with them.
+
+   **MEASURED, and this is why the check exists rather than the warning
+   below.** SH8608 built step 2's `scratch.pdf` — 166 pages, 98.3 MB,
+   `GPL Ghostscript 10.05.1`, 166 JPEG and zero JBIG2 — and it passes
+   **every other item in this Verification**: 166 pages against
+   `issue.json`'s 166, a real text layer, 98.3 MB under the 100 MB ceiling,
+   every page of the issue exact A4 with the Zahlkarte correctly at its own
+   size, built from the page box, fresher than every master. Six checks, six
+   passes, on a file the procedure above calls a by-product. The mixed build
+   of the same pages that SH8606 shipped came in at **48.0 MB** — half.
+
+   **And the ceiling is why "it fits" proves nothing.** 98.3 MB is 1.7 MB of
+   margin at q84, the guetzli floor, with nothing left to give: the plain
+   build does not fit an issue, it *squeaks under one* and stops being able to
+   the moment a page is re-cut. Compare the arithmetic in "Run" above — 8609
+   and 8610 both came out at 103 MB and did not fit at all.
+
+   **The log does NOT distinguish the two builds**, which is the other half of
+   how this happens: both scripts print the same `[search] q=NN -> N bytes`
+   quality-search lines, so a plain build's log reads exactly like a mixed
+   one's that happened to find no bilevel pages. The discriminators are
+   `[jbig2] NNN <bytes>` lines (one per JBIG2 page, absent from a plain build)
+   and the `DONE` line's `PDF/A-3B`. **Check the file, not the log.**
+
+   **`8608` IS IN THE REPO AT 98 MB FROM THE PLAIN BUILD, AND IT IS NOT A
+   PRECEDENT.** `issues/8608/` ships `GPL Ghostscript 10.07.1`, 168 JPEG, zero
+   JBIG2 — because the mixed build was decided ON 8609 (2026-08-15) and 8608 is
+   the monthly immediately before it. Everything this chain has built since is
+   `tesseract 5 + guetzli + jbig2enc + pikepdf`: SH8601, 8609, 8610, 8611,
+   8612. The ~100-104 MB `ccitt`+`jpeg` files for 8501-8607 and 8408-8412 are
+   inherited scans and were never built here at all. So the corpus contains
+   exactly one plain-built issue, it is the last one before the decision, and
+   "another issue shipped this way" is a fact about August 1986's monthly and
+   nothing else.
 
    **The shipped PDF is NOT PDF/A, and that is expected.** The mixed build
    ships the issue's colour-free pages as 600 dpi lossless JBIG2, and `gs`
@@ -931,7 +983,9 @@ look at `git status` first.
    and shipping those as JBIG2 costs 264 KB a page against ~620 KB for guetzli
    at a QUARTER the resolution — which buys nine quality steps on the other
    104 pages, q95 against q86. Do not "fix" this by switching to the plain
-   build; a plain PDF/A build exists and is the worse artefact.
+   build; a plain PDF/A build exists and is the worse artefact. **Losing PDF/A
+   is therefore a POSITIVE signal here** — a delivered file that validates as
+   PDF/A is the by-product, not a better build.
 4. **THE DELIVERED PDF IS EXACT A4 — 210 x 297 mm, every page OF THE ISSUE.**
 
    **A bound-in insert that is physically smaller keeps its own size**, as an
