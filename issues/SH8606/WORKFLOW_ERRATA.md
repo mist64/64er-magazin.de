@@ -225,3 +225,9 @@ bytes. The check contradicts the remediation it sits beside.
 **Suggested.** Check 4 opens and encodes the listing as `latin-1`, exactly as
 `generate.py:petcat2prg` does, "so a pass here is a pass on the site" (the
 rule's own words two lines above the code).
+
+## r170 — a whole-listing crop that is still on the worklist has no deferred state
+
+r170's *An unreadable PETSCII glyph is never guessed* sends the listing to r150's crop worklist, and the crop arrives only at PAUSE 2 — but r170's Verification check 1 ("no `<pre>TODO</pre>` left") and check 3 ("empty Listing pre") fail on the placeholder in the meantime, with no wording that says this is the expected state. r200 has exactly this clause for its banner ("A BANNER NOT CUT YET IS NOT A FAILURE — it is PAUSE 2 work … DEFERRED to after PAUSE 2"). On SH8606 it is Grafik 2000's Listing 2 (p120, screen printout with reverse-video glyphs, no checksums): the placeholder stays, the checks report it on every run until the owner delivers `114-l2.png`.
+
+**Suggested.** Add to r170's Verification, after check 3: *A `<pre>TODO</pre>` whose figure is on r150's crop worklist (a whole-listing crop, named `<page>-lN.png`) is DEFERRED to after PAUSE 2, like r200's banner; list it by name in LOG.md and re-run checks 1 and 3 once the crop is placed.* And name the crop file convention (`<article-page>-l<N>.png`, as SH8602's `20-l6.png`) in the PETSCII section, so the worklist entry is written the same way every time.
