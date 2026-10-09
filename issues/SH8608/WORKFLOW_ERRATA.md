@@ -616,3 +616,15 @@ ban as "no bulk heuristic"; per-heading scan comparison changed nothing here.
 Also: the Verification's `PY=${PYTHON:-.venv/bin/python}` only works from the
 repo root. **Suggested.** "Banned: changing levels by a heuristic. Required:
 comparing each heading against the print. Run from the repo root."
+
+## (pause) — the committed PDF vanished from the working tree mid-run
+
+At the owner's pause, `git status` showed `D issues/SH8608/64er_Sonderheft_1986-08.pdf`
+— deleted from the worktree, still in HEAD. None of my steps since 006 writes
+there (290 touched nothing; 300's brief excluded the PDF). Cause not established.
+Restored from the build copy in `<tmp>` after matching its sha256 to HEAD's blob
+(`git show HEAD:… | shasum`), not with checkout/restore. **Suggested.** r000's
+pre-commit discipline: "read `git status` for unexpected `D` lines in the issue
+directory before every commit — a pathspec commit of the directory would record
+the deletion"; and r006: "keep the `<tmp>` build copy until the issue ships — it
+is the restore source".
