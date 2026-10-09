@@ -571,3 +571,18 @@ The insert stamps were written 10-08 14:40; `1a39670f` (cut() emits the window's
 note) landed 14:43. The artefact is right (both 3386×4921, fabricated 52.07 /
 52.40 % = the card on an A4 window); only the record is thin. Not re-run; it will
 pick up the note whenever 005b next runs before the PDF.
+
+## 280 — the evidence form asks for something the locator cannot supply; checks count attributes
+
+Reported independently by all three 280 agents.
+- The evidence section asks for block-index output "showing the other engine
+  read the **corrected** form", while the same rule says the block index "is a
+  LOCATOR, not a second engine … it always shows the same oddity". For every
+  SH8608 fix the index shows the uncorrected form; the crop decided. **Suggested.**
+  "evidence = the crop (path + box) and the index line as locator".
+- Verification checks 1 and 2 grep whole files, so `data-filename`, ids and
+  `text-decoration` are counted as hyphen/space candidates; the counts never
+  reach zero on a clean issue. **Suggested.** strip tags/attributes first.
+- "Beautify touched files" names no tool; "`<pre>` IS in scope" vs "Do NOT touch
+  … `<code>`" collide when every hand-typed `<pre>` is `<pre><code>`; r280 never
+  mentions `adjudicated.txt`, though briefs (mine) said "append per the rule".
