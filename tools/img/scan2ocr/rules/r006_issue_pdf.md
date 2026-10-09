@@ -492,24 +492,50 @@ is itself the lesson.
 bilevel pages. **24 of them have at least 1 % of their area where a mid-grey
 GROUND floods solid black, 10 of them at 3 % or more:**
 
-| page | Otsu cutoff | box ground | black at Otsu | black at 35 % |
+**TWO DIFFERENT QUANTITIES GET CONFUSED HERE, AND ONLY ONE OF THEM IS THE
+DAMAGE.** The first version of this section led with the whole-page black
+fraction, which was the wrong column to lead with:
+
+| page | Otsu | flooded area | **black INSIDE it: Otsu → 35 %** | whole page: Otsu → 35 % |
 |---|---|---|---|---|
-| p033 | 175/255 (68 %) | 173 | **55.6 %** | 18.0 % |
-| p030 | 174/255 (68 %) | 192 | **52.7 %** | 13.5 % |
-| p029 | 167/255 (65 %) | 186 (range 127–232) | **42.1 %** | 20.0 % |
-| p036 | 175/255 (68 %) | 185 | **36.0 %** | 13.6 % |
-| p080 | 156/255 (61 %) | 145 | 16.5 % | 12.3 % |
+| p033 | 175 (68 %) | 27.3 % | **93.1 % → 24.2 %** | 55.6 % → 18.0 % |
+| p030 | 174 (68 %) | 1.7 % | **92.9 % → 14.0 %** | 52.7 % → 13.5 % |
+| p029 | 167 (65 %) | 1.9 % | **91.3 % → 47.3 %** | 42.1 % → 20.0 % |
+| p036 | 175 (68 %) | 3.2 % | **92.2 % → 17.9 %** | 36.0 % → 13.6 % |
+| p080 | 156 (61 %) | 4.9 % | **94.7 % → 44.6 %** | 16.5 % → 12.3 % |
+
+- **The middle column is the box.** Inside a flooded region Otsu leaves
+  **91–95 % black on every one of these pages** — the ground and the type on it
+  go solid together, which is what "hardly readable" means. At 35 % the same
+  regions come back to 14–48 %.
+- **The right-hand column is something else**, and mostly NOT the box: it
+  counts every pixel that changes state between the two cutoffs, which on a
+  magazine page is dominated by halftone and screen mid-greys. p030 makes the
+  point — only 1.7 % of it floods, yet its page figure moves 39 points.
+
+**Lead with the flooded region, never with the page.** The page figure both
+overstates the box (p030) and hides it completely (p080, 4.2 points), and the
+two numbers were presented side by side in the first draft of this section as
+though the second measured the first.
 
 The owner found 029, 033 and 080 by eye and missed 030 and 036, which are hit
 as hard. That is the whole case against a per-issue judgement call: **it needs
 the right page to come up under the right eye.**
 
 **AND p080 IS WHY NO GATE CAN STAND IN FOR THAT EYE.** Its box is 4.9 % of the
-page, so the whole-page black fraction stays at an ordinary-looking **16.5 %**
-while the box itself is ruined — indistinguishable, at page level, from p100's
-untouched 14.1 %. This is the same blind spot the halftone section above
-records ("a whole-page black fraction cannot see it"), in a second form: there
-the mid-greys of a photograph, here the ground of a tint box.
+page and **94.7 % black inside** — ruined — while the whole-page fraction sits
+at an ordinary-looking 16.5 %, indistinguishable from p100's untouched 14.1 %.
+This is the same blind spot the halftone section above records ("a whole-page
+black fraction cannot see it"), in a second form: there the mid-greys of a
+photograph, here the ground of a tint box.
+
+**So a check for this measures the GROUND, tile by tile.** What found all 24
+pages: take the 90th percentile of each 64 px tile — the paper or tint behind
+the type — and flag any tile whose ground is neither paper (≥ 235) nor solid
+ink (≤ 50) and sits below the cutoff about to be applied. A whole-page
+statistic of any kind cannot see it, and neither can a large crop: at
+1500 × 1000 the 90th percentile of p033 never drops below 188, because a crop
+that big always contains enough lighter material to lift it past the cutoff.
 
 **p029 shows the third failure mode: PARTIAL flooding.** Its ground is not one
 level but a range, 127–232, against a 167 cutoff — so the darker half of the
