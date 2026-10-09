@@ -1,0 +1,585 @@
+
+
+;apfel_src.prg ==0801==
+    0 rem *********************************
+    1 rem *         apfelprinter          *
+    2 rem *         written 1985          *
+    3 rem *  for c64 + vc 1541 + mps 802  *
+    4 rem *       by peter siepen         *
+    5 rem *                               *
+    6 rem *      rechenroutinen von       *
+    7 rem *       gerhard pehland         *
+    8 rem *   (aus 64'er 11.85 seite 80)  *
+    9 rem *********************************
+   10 sys9*4096
+   20 .opt oo
+   30 *= $c000
+   90 ;
+   92 ; *********** quellcode ************
+   95 ;
+   98 ; systemadressen
+  100 fac        = 97
+  110 arg        = 105
+  120 chrout     = $ffd2
+  130 div        = $bb12 ;fac=fac/arg
+  140 sub        = $b853 ;fac=fac-arg
+  160 facnarg    = $bc0c ;arg = fac
+  170 zeigsub    = $b850 ;fac=(a/y)-fac
+  180 zeigadd    = $b867 ;fac=(a/y)+fac
+  190 zeigmult   = $ba28 ;fac=(a/y)*fac
+  200 konnarg    = $ba8c ;arg=(a/y)
+  210 konnfac    = $bba2 ;fac=(a/y)
+  220 facnkon    = $bbd4 ;(x/y)=fac
+  230 chsign     = $bfb4 ;fac=-fac
+  240 filepar    = $ffba ;fileparameter
+  250 filenam    = $ffbd ;filename setzen
+  252 frmnum     = $ad8a ;ausdruck auswerten
+  254 chkcom     = $aefd ;test auf ","
+  256 iecout     = $ffa8
+  257 iecin      = $ffa5
+  258 suchvar    = $b0e7 ;sucht varnam
+  260 ;
+  265 ; variablen
+  270 zeig1      = $57   ;universal
+  275 zeig2      = $59   ;zeiger
+  280 zeiger     = $a8   ;zeiger bei druck
+  295 spzeig     = $b5   ;zeiger $2000
+  300 zeile      = $cf00 ;akt.zeile
+  305 spalte     = $cf04 ;akt.spalte
+  310 zeilzahl   = $cf02 ;zeilenzaehler
+  315 byte       = $cf03 ;enthaelt 8 pkt
+  320 pos        = $cf05 ;zaehler 8 pkte
+  325 tiefe      = $cf06 ;akt. tiefe
+  330 tiefemax   = $cf07 ;maximale tiefe
+  335 zeigsp     = $cf08 ;zwischenspeicher
+  337 :                  ;fuer zeiger
+  340 spaltzahl  = $cf0a ;bei druck
+  345 zs         = $cf0b ;universal-
+  350 zs2        = $cf0c ;speicher
+  355 spaces     = $cf0e ;zaehler bei
+  357 :                  ;druck
+  360 maske      = $0334 ;enthaelt maske
+  362 :                  ;bei druck
+  365 namlen     = $0336 ;laenge filenam
+  370 dx         = $cf90 ;rechenvariablen
+  375 dy         = $cf30
+  380 cx         = $cf40
+  385 cy         = $cf60
+  390 xquad      = 87
+  395 yquad      = 247
+  400 xwert      = $cf70
+  405 ywert      = $cf80
+  410 xmax       = $cfa0
+  415 xmin       = $cfb0
+  420 ymax       = $cfc0
+  425 ymin       = $cfd0
+  490 ; konstanten
+  500 spalten    = 640   ;anzahl spalten
+  510 zeilen     = 400   ;anzahl zeilen
+  520 puffer     = $033c ;speicher 8 bytes
+  530 speicher   = $c500 ;speicher fuer
+  532 puffer1    = $02a1
+  535 :                  ;eine druckzeile
+  690 ;
+  800 :          jmp start
+  810 :          jmp save
+  820 :          jmp load
+  830 :          jmp print
+  890 ;
+  895 ;
+  900 start      jsr holwerte
+  910 :          jmp apfel
+  990 ;
+  995 ;
+ 1000 holwerte  jsr chkcom ;liest werte
+ 1010 :         jsr frmnum ;aus sys
+ 1020 :         ldx #<xmin
+ 1030 :         ldy #>xmin
+ 1040 :         jsr facnkon
+ 1050 :         jsr chkcom
+ 1060 :         jsr frmnum
+ 1070 :         ldx #<xmax
+ 1080 :         ldy #>xmax
+ 1090 :         jsr facnkon
+ 1100 :         jsr chkcom
+ 1110 :         jsr frmnum
+ 1120 :         ldx #<ymin
+ 1130 :         ldy #>ymin
+ 1140 :         jsr facnkon
+ 1150 :         jsr chkcom
+ 1160 :         jsr frmnum
+ 1170 :         ldx #<ymax
+ 1180 :         ldy #>ymax
+ 1190 :         jsr facnkon
+ 1240 :         lda #<$2000 ;und setzt
+ 1250 :         sta spzeig  ;zeiger
+ 1260 :         lda #>$2000
+ 1270 :         sta spzeig+1
+ 1280 :         rts
+ 1290 ;
+ 1295 ;
+ 2000 openfls   lda #15   ;oeffnet files
+ 2010 :         ldx #04
+ 2020 :         ldy #05
+ 2030 :         jsr $ffba
+ 2040 :         lda #$00
+ 2050 :         jsr $ffbd
+ 2060 :         jsr $ffc0
+ 2070 :         lda #10
+ 2080 :         ldx #04
+ 2090 :         ldy #00
+ 2100 :         jsr $ffba
+ 2110 :         lda #$00
+ 2120 :         jsr $ffbd
+ 2130 :         jsr $ffc0
+ 2180 :         lda #26
+ 2190 :         ldx #04
+ 2200 :         ldy #06
+ 2210 :         jsr $ffba
+ 2220 :         lda #$00
+ 2230 :         jsr $ffbd
+ 2240 :         jsr $ffc0
+ 2250 :         ldx #26   ;und bereitet
+ 2260 :         jsr $ffc9 ;drucker vor
+ 2270 :         lda #21
+ 2280 :         jsr iecout
+ 2290 :         ldx #10
+ 2295 :         jsr $ffc9
+ 2300 :         lda #$0d
+ 2305 :         jmp iecout
+ 2310 ;
+ 2320 ;
+ 3000 closefls  lda #15
+ 3010 :         jsr $ffc3
+ 3020 :         lda #10
+ 3030 :         jsr $ffc3
+ 3040 :         lda #26
+ 3050 :         jmp $ffc3
+ 3060 ;
+ 3500 inttofac  sta $63 ;pos. int-zahl
+ 3510 :         stx $62 ;in a/x in fac
+ 3520 :         ldx #$90
+ 3530 :         sec
+ 3540 :         jmp $bc49
+ 3590 ;
+ 3700 facsarg   lda arg+5 ;vorzeichen-
+ 3710 :         eor fac+5 ;wechsel
+ 3720 :         sta arg+6 ;fac + arg
+ 3730 :         lda fac
+ 3740 :         rts
+ 3750 ;
+ 4000 apfel     sei       ;rechenrout.
+ 4010 :         lda #<xmin ;dx berechnen
+ 4020 :         ldy #>xmin
+ 4030 :         jsr konnfac
+ 4040 :         lda #<xmax
+ 4050 :         ldy #>xmax
+ 4060 :         jsr zeigsub
+ 4070 :         jsr facnarg
+ 4080 :         lda #<spalten
+ 4090 :         ldx #>spalten
+ 4100 :         jsr inttofac
+ 4110 :         jsr facsarg
+ 4120 :         jsr div
+ 4130 :         ldx #<dx
+ 4140 :         ldy #>dx
+ 4150 :         jsr facnkon
+ 4160 :         lda #<ymin ;dy berechnen
+ 4170 :         ldy #>ymin
+ 4180 :         jsr konnfac
+ 4190 :         lda #<ymax
+ 4200 :         ldy #>ymax
+ 4210 :         jsr zeigsub
+ 4220 :         jsr facnarg
+ 4230 :         lda #<zeilen
+ 4240 :         ldx #>zeilen
+ 4250 :         jsr inttofac
+ 4260 :         jsr facsarg
+ 4270 :         jsr div
+ 4280 :         ldx #<dy
+ 4290 :         ldy #>dy
+ 4300 :         jsr facnkon
+ 4310 :         ldy #4     ;cx=xmin
+ 4320 l13       lda xmin,y ;cy=ymax
+ 4330 :         sta cx,y
+ 4340 :         lda ymax,y
+ 4350 :         sta cy,y
+ 4360 :         dey
+ 4370 :         bpl l13
+ 4380 :         lda #0
+ 4390 :         sta zeile
+ 4400 :         sta zeile+1
+ 4410 :         sta spalte
+ 4430 :         lda #$08
+ 4433 :         sta pos
+ 4440 iterat    lda #0
+ 4450 :         sta byte
+ 4460 iterat1   lda #0
+ 4470 :         sta tiefe
+ 4480 :         ldy #4
+ 4490 l15       sta xwert,y
+ 4500 :         sta ywert,y
+ 4510 :         dey
+ 4520 :         bpl l15
+ 4525 iter1     inc tiefe
+ 4530 :         lda tiefemax
+ 4540 :         cmp tiefe ;"max. tiefe ?
+ 4550 :         bcs iter4
+ 4560 :         clc       ;punkt clear
+ 4570 :         jmp plot
+ 4580 iter4     lda #<xwert ;xwert^2
+ 4590 :         ldy #>xwert ;in xquad
+ 4600 :         jsr konnfac
+ 4610 :         lda #<xwert
+ 4620 :         ldy #>xwert
+ 4630 :         jsr zeigmult
+ 4640 :         ldx #xquad
+ 4650 :         ldy #0
+ 4660 :         jsr facnkon
+ 4670 :         lda #<ywert ;ywert^2
+ 4680 :         ldy #>ywert ;in yquad
+ 4690 :         jsr konnfac
+ 4700 :         lda #<ywert
+ 4710 :         ldy #>ywert
+ 4720 :         jsr zeigmult
+ 4730 :         ldx #yquad
+ 4740 :         ldy #0    ;xquad + yquad
+ 4750 :         jsr facnkon
+ 4760 :         lda #xquad
+ 4770 :         ldy #0
+ 4780 :         jsr zeigadd
+ 4790 :         lda fac
+ 4800 :         cmp #$84  ;"summe > 8 ?
+ 4810 :         bcc iter3
+ 4820 :         lda tiefe
+ 4830 :         ror       ;carry setzen
+ 4840 :         jmp plot
+ 4850 iter3     lda #<ywert ;ywert =
+ 4860 :         ldy #>ywert ;xwert*ywert
+ 4870 :         jsr konnfac ;*2-cy
+ 4880 :         lda #<xwert
+ 4890 :         ldy #>xwert
+ 4900 :         jsr zeigmult
+ 4910 :         lda fac
+ 4920 :         beq iter2
+ 4930 :         inc fac
+ 4940 iter2     lda #<cy
+ 4950 :         ldy #>cy
+ 4960 :         jsr zeigsub
+ 4970 :         jsr chsign
+ 4980 :         ldx #<ywert
+ 4990 :         ldy #>ywert
+ 5000 :         jsr facnkon
+ 5010 :         ldy #0      ;xwert =
+ 5020 :         lda #yquad  ;xquad-yquad
+ 5030 :         jsr konnfac ;-cx
+ 5040 :         ldy #0
+ 5050 :         lda #xquad
+ 5060 :         jsr zeigsub
+ 5070 :         lda #<cx
+ 5080 :         ldy #>cx
+ 5090 :         jsr zeigsub
+ 5100 :         jsr chsign
+ 5110 :         ldx #<xwert
+ 5120 :         ldy #>xwert
+ 5130 :         jsr facnkon
+ 5140 :         jmp iter1
+ 5200 plot      lda byte ;setze bit mit
+ 5210 :         rol      ;carry
+ 5220 :         sta byte
+ 5225 :         inc 53280 ;farbe
+ 5230 :         lda #<cx ;cx=cx+dx
+ 5240 :         ldy #>cx
+ 5250 :         jsr konnfac
+ 5260 :         lda #<dx
+ 5270 :         ldy #>dx
+ 5280 :         jsr zeigadd
+ 5290 :         ldx #<cx
+ 5300 :         ldy #>cx
+ 5310 :         jsr facnkon
+ 5320 :         dec pos
+ 5330 :         beq apfel1
+ 5340 :         jmp iterat1
+ 5350 apfel1    lda #08
+ 5360 :         sta pos
+ 5370 :         jsr setbyte
+ 5380 :         inc spalte
+ 5390 :         lda spalte
+ 5400 :         cmp #80 ;drucker
+ 5410 :         beq apfel2
+ 5420 :         jmp iterat
+ 5430 apfel2    lda #0
+ 5440 :         sta spalte
+ 5450 :         ldy #5     ;cx=xmin
+ 5460 l30       lda xmin,y
+ 5470 :         sta cx,y
+ 5480 :         dey
+ 5490 :         bpl l30
+ 5500 :         inc zeile
+ 5510 :         bne w1
+ 5520 :         inc zeile+1
+ 5530 w1        lda zeile+1
+ 5540 :         cmp #>zeilen
+ 5550 :         bcc w2
+ 5560 :         lda zeile
+ 5570 :         cmp #<zeilen
+ 5580 :         bcc w2
+ 5590 :         jmp endapfel
+ 5600 w2        lda #<dy    ;cy=cy-dy
+ 5610 :         ldy #>dy
+ 5620 :         jsr konnfac
+ 5630 :         lda #<cy
+ 5640 :         ldy #>cy
+ 5650 :         jsr zeigsub
+ 5660 :         ldx #<cy
+ 5670 :         ldy #>cy
+ 5680 :         jsr facnkon
+ 5690 :         jmp iterat
+ 5700 endapfel  cli
+ 5710 :         rts
+ 5990 ;
+ 5995 ;
+ 6000 setbyte   ldy #$00 ;byte speichern
+ 6005 :         lda byte
+ 6015 :         sta (spzeig),y
+ 6050 :         inc spzeig
+ 6060 :         bne spw1
+ 6070 :         inc spzeig+1
+ 6080 spw1      rts
+ 6090 ;
+10000 save     lda #8
+10010 :        ldx #08
+10020 :        ldy #1
+10030 :        jsr $ffba
+10040 :        lda namlen
+10050 :        ldx #<$033c
+10060 :        ldy #>$033c
+10070 :        jsr $ffbd
+10080 :        jsr $ffc0
+10090 :        ldx #8
+10100 :        jsr $ffc9
+10110 :        lda #<$2000
+10112 :        jsr iecout
+10114 :        lda $90
+10115 :        bmi saveende
+10116 :        lda #>$2000
+10117 :        jsr iecout
+10118 :        lda $90
+10119 :        bmi saveende
+10120 :        lda #<$2000  ;$2000-
+10125 :        sta spzeig
+10130 :        lda #>$2000
+10140 :        sta spzeig+1
+10150 :        ldy #$00
+10160 saveloop lda (spzeig),y
+10170 :        jsr iecout
+10174 :        lda $90
+10178 :        bmi saveende
+10180 :        inc spzeig
+10190 :        bne savew1
+10200 :        inc spzeig+1 ;-40192
+10210 savew1   lda spzeig+1
+10220 :        cmp #>32001+$2000
+10230 :        bne saveloop
+10240 :        lda spzeig
+10250 :        cmp #<32001+$2000
+10260 :        bne saveloop
+10270 :        ldx #$00    ;variablen
+10280 savel1   lda $cf00,x
+10290 :        jsr iecout
+10300 :        inx
+10310 :        bne savel1
+10320 saveende lda #08
+10330 :        jsr $ffc3
+10340 :        jmp $ffcc
+10350 ;
+11000 load     lda #8
+11010 :        ldx #08
+11020 :        ldy #0
+11030 :        jsr $ffba
+11040 :        lda namlen
+11050 :        ldx #<$033c
+11060 :        ldy #>$033c
+11070 :        jsr $ffbd
+11080 :        jsr $ffc0
+11090 :        ldx #8
+11100 :        jsr $ffc6
+11101 :        jsr iecin
+11102 :        lda $90
+11103 :        lsr
+11104 :        lsr
+11105 :        bcs loadende
+11106 :        jsr iecin
+11110 :        lda #<$2000  ;$2000
+11120 :        sta spzeig
+11130 :        lda #>$2000
+11140 :        sta spzeig+1
+11150 :        ldy #$00
+11160 loadloop jsr iecin
+11170 :        sta (spzeig),y
+11180 :        inc spzeig
+11190 :        bne loadw1
+11200 :        inc spzeig+1
+11210 loadw1   lda spzeig+1 ;-40192
+11220 :        cmp #>(32001+$2000)
+11230 :        bne loadloop
+11240 :        lda spzeig
+11250 :        cmp #<(32001+$2000)
+11260 :        bne loadloop
+11270 :        ldx #$00
+11280 loadl1   jsr iecin   ;variablen
+11290 :        sta $cf00,x
+11300 :        inx
+11310 :        bne loadl1
+11320 loadende jsr $ffcc
+11330 :        lda #08
+11340 :        jsr $ffc3
+11350 :        lda #<xmin  ;werte in
+11360 :        ldy #>xmin  ;basic-
+11370 :        jsr konnfac ;variablen
+11380 :        lda #"l"    ;schreiben
+11390 :        ldy #"i"
+11400 :        jsr facvar
+11430 :        lda #<xmax
+11440 :        ldy #>xmax
+11450 :        jsr konnfac
+11460 :        lda #"r"
+11470 :        ldy #"e"
+11480 :        jsr facvar
+11490 :        lda #<ymin
+11500 :        ldy #>ymin
+11510 :        jsr konnfac
+11520 :        lda #"o"
+11530 :        ldy #"b"
+11540 :        jsr facvar
+11550 :        lda #<ymax
+11560 :        ldy #>ymax
+11570 :        jsr konnfac
+11580 :        lda #"u"
+11590 :        ldy #"n"
+11600 :        jmp facvar
+11610 :
+11620 facvar   sta $45     ;schreibt
+11630 :        sty $46     ;fac in var
+11640 :        jsr suchvar ;mit name in
+11650 :        tax         ;a/y
+11660 :        jmp facnkon
+11670 :
+11680 :
+12000 print    jsr openfls ;oeffnet file
+12010 :        lda #50     ;anzahl druck
+12020 :        sta zeile   ;zeilen
+12030 :        lda #<$2000 ;zeiger auf
+12040 :        sta zeig1   ;grafik-
+12050 :        lda #>$2000 ;speicher
+12060 :        sta zeig1+1
+12070 ploop1   lda #<speicher ;zeiger
+12080 :        sta zeig2      ;auf puffer
+12090 :        lda #>speicher ;fuer eine
+12100 :        sta zeig2+1    ;zeile
+12110 :        ldy #$00
+12120 ploop    lda (zeig1),y
+12130 :        sta (zeig2),y
+12140 :        inc zeig1
+12150 :        bne pw1
+12160 :        inc zeig1+1
+12170 pw1      inc zeig2
+12180 :        bne pw2
+12190 :        inc zeig2+1
+12200 pw2      lda zeig2+1
+12210 :        cmp #>(640+speicher)
+12220 :        bne ploop    ;"fertig ?
+12230 :        lda zeig2
+12240 :        cmp #<(640+speicher)
+12250 :        bne ploop
+12260 :        jsr output ;zeile ausgb.
+12270 :        dec zeile
+12280 :        bne ploop1
+12285 :        jsr $ffcc  ;ende
+12290 :        jmp closefls
+12390 ;
+12395 ;
+13000 output   lda #<speicher
+13010 :        sta zeigsp
+13020 :        lda #>speicher
+13030 :        sta zeigsp+1
+13060 :        lda #$00   ;anzahl spaces
+13070 :        sta spaces ;vor zeichen
+13100 :        lda #80
+13110 :        sta spaltzahl
+13120 outloop1 ldx #$08
+13130 :        ldy #$00
+13140 :        lda zeigsp
+13150 :        sta zeiger
+13160 :        lda zeigsp+1
+13170 :        sta zeiger+1
+13180 outloop2 lda (zeiger),y ;8 bytes
+13190 :        sta puffer,x   ;eines
+13200 :        clc            ;zeichens
+13210 :        lda zeiger     ;in puffer
+13220 :        adc #80
+13230 :        sta zeiger
+13240 :        bcc w4
+13250 :        inc zeiger+1
+13260 w4       dex
+13270 :        bne outloop2
+13300 :        lda #$80
+13305 :        ldy #8
+13310 loop2    ldx #08
+13320 :        sta zs
+13330 loop1    and puffer,x ;8 bytes
+13340 :        clc          ;werden
+13350 :        beq w5       ;von horiz.
+13360 :        sec          ;nach
+13370 w5       rol zs2      ;vertikal
+13380 :        lda zs       ;orientiert
+13390 :        dex
+13400 :        bne loop1
+13410 :        lda zs2
+13420 :        eor maske     ;inv oder
+13430 :        sta puffer1,y ;normal
+13440 :        dey
+13442 :        lda zs        ;naechst.
+13444 :        lsr           ;bit
+13446 :        sta zs
+13448 :        bcc loop2
+13450 :        ldx #08       ;8 leerbyte
+13451 tloop    lda puffer1,x ;wenn ja
+13452 :        cmp #$00
+13453 :        bne nospace
+13454 :        dex
+13455 :        bne tloop
+13461 :        inc spaces    ;ausgabe
+13462 :        jmp cont      ;ueberspr.
+13469 nospace  ldx #15
+13470 :        jsr $ffc9
+13471 :        ldx #8
+13472 tloop1   lda puffer1,x ;bitmuster
+13473 :        jsr iecout    ;fuer
+13474 :        dex           ;1 zeichen
+13475 :        bne tloop1    ;an drucker
+13480 :        lda #$0d
+13490 :        jsr iecout
+13500 :        ldx #10
+13510 :        jsr $ffc9
+13520 :        inc spaces
+13530 :        ldx spaces    ;druckkopf
+13540 :        lda #$20      ;position
+13550 sloop    dex
+13560 :        beq spaceend
+13570 :        jsr iecout
+13580 :        jmp sloop
+13590 spaceend lda #$fe    ;def. zeichen
+13600 :        jsr iecout  ;ausdrucken
+13610 :        lda #141
+13620 :        jsr iecout
+13630 cont     inc zeigsp ;zeiger
+13640 :        bne w6     ;aktualisieren
+13650 :        inc zeigsp+1
+13660 w6       dec spaltzahl
+13670 :        beq w7
+13680 :        jmp outloop1
+13690 w7       lda #$0d   ;ende
+13700 :        jsr iecout
+13710 outend   rts
+

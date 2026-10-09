@@ -1,0 +1,924 @@
+
+
+;listing 3.prg ==0801==
+    1 rem  **********************************
+    2 rem *    giga-cad  graphic-system    *
+    3 rem *          'cad.create'          *
+    4 rem * by s. vilsmeier & s. lippstreu *
+    5 rem **********************************
+    6 :
+    7 :
+    8 a=peek(836)+1:poke836,a:ifa=1thenpoke55,0:poke56,82:clr:a=1
+    9 ifa=1thenload"hires3.cad.obj",8,1
+   10 ifa=2thenload"hires8.cad.obj",8,1
+   11 open1,8,15:gosub688
+   12 sys50707,1:poke53280,14:dimp(30,2),b$(63)
+   13 ifd=0thengosub907
+   14 :
+   15 :
+   16 rem **********************************
+   17 rem *    variablen/ sys-aressen      *
+   18 rem **********************************
+   19 :
+   20 h=50181:co=50292:pl=50447:e=50707:g=50859:li=51049:jo=51627:rf=53280
+   21 fl=51480:l=51507:r=51800:kr=52008:d4=52103:d3=52176:t1=52466:t2=52490
+   22 mu=52517:cp=36878:l3=38378:j2=39247:c1=39718:d1=40052:c2=40206
+   23 d2=40344:l4=21764:ci=21836:um=22873:c3=25652:da=25123
+   24 sysh,11,15,2:goto108
+   25 :
+   26 :
+   27 rem *********************************
+   28 rem *    grafik loeschen/ menue     *
+   29 rem *********************************
+   30 :
+   31 print"{clr}{gry1}";:sysh,11,15,b:syst1,b
+   32 bs=b:gosub68:syskr,1,b:sysmu,b:ifp=1thengosub61
+   33 return
+   34 j=j-128:qx=o:o=pz:gosub122:pz=o:o=qx:return:rem joyst. umwandlung -tiefe
+   35 :
+   36 :
+   37 rem *********************************
+   38 rem *     diverse unterprogramme    *
+   39 rem *********************************
+   40 :
+   41 print"{clr}{gry1} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}":return
+   42 fori=1to22:print" {CBM-H}                                    {CBM-N}":next
+   43 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{home}":return
+   44 n$="":input"{down}{down}{down}{down}{rght}{rght}{rght}Makro - Name     ";n$
+   45 iflen(n$)>13thenprint"{up}{up}{up}{up}";:goto44
+   46 gosub79:return
+   47 geta$:ifa$=""goto47
+   48 return
+   49 n1=0:fori=1tok:ifn$=b$(i)thenn1=i:i=k
+   50 next:return
+   51 print"{down}{down}{down}  Dieses Makro ist nicht im Speicher !":gosub47:return
+   52 n$="":print"{rght}{rght}{rght}{down}{down}Unter welchem Namen soll das Makro"
+   53 input"{down}{rght}{rght}{rght}eingefuegt werden                  {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";n$
+   54 gosub79:return
+   55 printchr$(14)chr$(8):poke198,0:return
+   56 bs=1
+   57 sysg,240,0,293,9,2,bs:return
+   58 bs=2:goto57
+   59 bs=1
+   60 sysg,139,0,180,9,2,bs:return
+   61 bs=2:goto60
+   62 sysg,0,0,42,9,2,1:return
+   63 sysg,99,0,137,9,2,1:return
+   64 sysg,43,0,98,9,2,1:return
+   65 sysh,11,15,2:return
+   66 bs=2:goto68
+   67 bs=1
+   68 sysr,0,0,319,199,1,bs:syscp,bs:return
+   69 zm=1:goto71
+   70 zm=0
+   71 sysr,2,101,157,197,zm,3:return
+   72 sysj2,z,o,0
+   73 z=peek(2024)+256*peek(2025):o=peek(2026):a=peek(631):return
+   74 xa=usr(1):sa=usr(2):vb=usr(3):return
+   75 ei=peek(877):c=peek(881):ifeithenei=0:c=0:wq=1
+   76 return
+   77 sysjo:j=peek(859):geta$:return
+   78 x2=x1:y2=y1:z2=z1:return
+   79 n1=0:ifn$="_"orn$=""thenn1=1
+   80 return
+   81 ifpeek(53272)<>23thensyse,0:gosub55
+   82 a=0:geta$:ifa$<>""thena=asc(a$)
+   83 return
+   84 input"{down}{down}{rght}{rght}{rght}Verbindungsvorschrift ";vb:ifvb<0orvb>2thenprint"{up}{up}{up}{up}";:goto84
+   85 syse,1:return
+   86 :
+   87 :
+   88 rem *********************************
+   89 rem *   flaechen & makros durchbl.  *
+   90 rem *********************************
+   91 :
+   92 syse,1
+   93 iff<1thenf=n1
+   94 iff=n1+1thenf=1
+   95 sysl,1:gosub65:sysda,mo,f,1,2
+   96 sysco,2,2:sysfl,4
+   97 gosub47
+   98 a=asc(a$):ifa=43thenf=f+1:goto93
+   99 ifa=86thengosub887:return
+  100 ifa=45thenf=f-1:goto93
+  101 return
+  102 :
+  103 :
+  104 rem *********************************
+  105 rem *      1. darstellung           *
+  106 rem *********************************
+  107 :
+  108 b=2:gosub31:ifd=1thensys25919
+  109 ifpthensysda,5,k,1,b:goto111
+  110 zn=0:sysda,zn,dg,1,b
+  111 sysco,1,0
+  112 :
+  113 :
+  114 rem *********************************
+  115 rem *  joystick-abfrage hauptmenue  *
+  116 rem *********************************
+  117 :
+  118 z=159:o=12:poke40783,0
+  119 gosub72
+  120 ifpeek(631)=0then127
+  121 goto119
+  122 w=w+1:ifw>20thenw=20
+  123 ifj1<>jthenw=1
+  124 ifme=2thenw=w*2
+  125 o=o-((j>3andj<7)-(j<3orj>7))*w:z=z-((j>1andj<5)-(j>5))*w:ifme=2thenw=w/2
+  126 n=0:j1=j:return
+  127 ifo>9goto119
+  128 ifz<42goto182
+  129 ifz>182andz<239goto344
+  130 ifz>99andz<137andd<>1goto420
+  131 ifz>43andz<98goto455
+  132 ifz>137andz<182goto555
+  133 ifz>239andz<293andp=0goto784
+  134 ifz>292andp=0thenprint"{clr}":syse,0:goto898
+  135 goto119
+  136 :
+  137 :
+  138 rem *********************************
+  139 rem *        linien-blinken         *
+  140 rem *********************************
+  141 :
+  142 ifn=0thenreturn
+  143 sysl4,pa,pb,z,o,2,b
+  144 ifu=1orme=3thenn=1-n:return
+  145 sysl4,z,o,pc,pd,2,b:n=1-n:return
+  146 :
+  147 :
+  148 rem *********************************
+  149 rem *   tastaturabfrage (blinken)   *
+  150 rem *********************************
+  151 :
+  152 a=asc(a$)
+  153 n=1-n:gosub142:n=1-n:ifme=3goto159
+  154 ifa=147thengosub65:poke40783,0:b=2:goto183
+  155 ifa=76thengosub142:gosub170:ifu=0goto189
+  156 ifa=95goto213
+  157 ifa=67thensysci,b:n=1
+  158 goto198
+  159 ifa=147thensyse,2:poke40783,0:goto456
+  160 ifa=76thengosub142:gosub173:ifu=0goto459
+  161 ifa=95goto483
+  162 ifa=67thensysci,b:n=1
+  163 goto468
+  164 :
+  165 :
+  166 rem *********************************
+  167 rem *        linie loeschen         *
+  168 rem *********************************
+  169 :
+  170 gosub142:u=u-1:ifu=0thenreturn
+  171 sysl4,p(u-1,1)+160,p(u-1,2)+100,pc,pd,2,b
+  172 pc=p(u-1,1)+160:pd=p(u-1,2)+100:z=pc:o=pd:return
+  173 u=u-1:ifu=0thenreturn
+  174 sysl4,p(u-1,0)+160,180-p(u-1,1),pa,pb,2,2
+  175 z=pa:o=pb:pa=p(u-1,0)+160:pb=180-p(u-1,1):return
+  176 :
+  177 :
+  178 rem *********************************
+  179 rem *      flaeche: 2d-eingabe      *
+  180 rem *********************************
+  181 :
+  182 gosub65:me=1:b=3:c=0
+  183 gosub66:syst1,2:sysd4,1,2
+  184 u=0:sysg,0,0,42,9,2,b
+  185 ifpthengosub61
+  186 m=0:b=2
+  187 sysli,160,97,160,103,1,2
+  188 sysli,157,100,163,100,1,2:syse,2
+  189 z=160:o=100
+  190 gosub72
+  191 ifa<>0goto193
+  192 goto197
+  193 ifa=67thensysci,b
+  194 ifa=95goto213
+  195 goto190
+  196 rem ***** 1. eckpunkt ************
+  197 n=0:u=1:p(0,1)=z-160:p(0,0)=0:p(0,2)=o-100:pa=z:pb=o:pc=z:pd=o
+  198 gosub143:gosub77:ifa$<>""goto152
+  199 ifj=0thenw=0:goto198
+  200 gosub142:ifj=128then202
+  201 gosub122:goto198
+  202 ifpc=zandpd=ogoto198
+  203 ifu>29goto198
+  204 sysl4,pc,pd,z,o,2,2
+  205 u=u+1:pc=z:pd=o:p(u-1,1)=pc-160:p(u-1,0)=0:p(u-1,2)=pd-100
+  206 goto198
+  207 :
+  208 :
+  209 rem ********************************
+  210 rem *     flaeche: einfuegen (3d)   *
+  211 rem ********************************
+  212 :
+  213 vf=0:ifu>1thengosub321:dg=d-1
+  214 c=0:me=1:sysl,1:m=0:z=160:o=100
+  215 gosub65:ifu<2thenme=0:gosub62:goto118
+  216 sysda,1,dg,1,2
+  217 sysco,2,2:sysfl,4
+  218 ifc=0thengosub69
+  219 ifc<>0then223
+  220 b=2:gosub72:ifa<>0goto227
+  221 ifz<42ando<9thena=95:goto227
+  222 wq=1
+  223 gosub749:ifc=0then220
+  224 gosub762:ifc=0then220
+  225 sysum,c,1,dg,d,ei,j,w:gosub75
+  226 sysl,1:m=0:goto215
+  227 gosub769:syse,1:ifsvgoto225
+  228 ifa=95goto325
+  229 ifa=48thenc=10:gosub772:df=dg:c=1:gosub548:goto225
+  230 ifa=43thenvf=dg:goto240
+  231 ifa=76thengosub254:goto325
+  232 ifa=42andvf<>0goto304
+  233 goto220
+  234 :
+  235 :
+  236 rem ********************************
+  237 rem *     flaeche duplizieren      *
+  238 rem ********************************
+  239 :
+  240 sysl,1:sysco,1,1:s=0
+  241 sysd2,dg:gosub74:ifs<>2thenze=1:gosub915:iffthensyse,1:goto247
+  242 sysd2,dg+1:xb=usr(1):ifs=2thensa=k
+  243 sysc2,v+1,d,sa,vb:d=d+1:sysc2,v+(xb-xa)+1,d,sa,vb
+  244 fori=xatoxb-1:v=v+1
+  245 sysd1,i:sysc1,usr(1),usr(2),usr(3),v
+  246 next:ifs=2thenreturn
+  247 dg=d-1:goto214
+  248 :
+  249 :
+  250 rem ********************************
+  251 rem *    flaeche loeschen          *
+  252 rem ********************************
+  253 :
+  254 sysl,1
+  255 sysd2,dg:ya=usr(1):sysd2,dg+1:xb=usr(1):su=xb-ya
+  256 fori=dg+1tod+1
+  257 sysd2,i:gosub74:ifxa<suthenxa=su
+  258 sysc2,xa-su,i-1,sa,vb:next:d=d-1
+  259 fori=xbtov+su
+  260 sysd1,i:sysc1,usr(1),usr(2),usr(3),i-su:next:v=v-su
+  261 return
+  262 :
+  263 :
+  264 rem ********************************
+  265 rem *    makro loeschen            *
+  266 rem ********************************
+  267 :
+  268 x2=1:y2=0:sysl,1:b$(dg)=""
+  269 fori=1tod-1
+  270 sysd2,i:gosub74:ifsa=dggoto280
+  271 ifsa>dgthensa=sa-1
+  272 sysd2,i+1:z1=usr(2):xb=usr(1)
+  273 sysc2,y2+1,x2,sa,vb:sysc2,y2+(xb-xa)+1,x2+1,z1,vb
+  274 x2=x2+1
+  275 forq=xatoxb-1
+  276 sysd1,q:x1=usr(1):y1=usr(2):z1=usr(3)
+  277 ifx1=-3276.8thenx1=0:y1=0:z1=0
+  278 y2=y2+1:sysc1,x1,y1,z1,y2
+  279 next
+  280 next
+  281 fori=x2+1tod:sysc2,0,i,0,0:next
+  282 v=y2:d=x2
+  283 fori=dgtomm+1:b$(i)=b$(i+1):next:return
+  284 :
+  285 :
+  286 rem ********************************
+  287 rem *    makro duplizieren         *
+  288 rem ********************************
+  289 :
+  290 gosub890:sysl,1:sysco,1,1
+  291 dr=d:dh=dg
+  292 gosub918:gosub915:iffthenk=k-1:return
+  293 forx2=1todr-1
+  294 sysd2,x2:sa=usr(2)
+  295 ifsa=dhthendg=x2:gosub241
+  296 next
+  297 return
+  298 :
+  299 :
+  300 rem ********************************
+  301 rem *    flaechen verbinden        *
+  302 rem ********************************
+  303 :
+  304 sysl,1:sysd2,vf:xa=usr(1):vb=usr(3):sysd2,vf+1:xb=usr(1):sysd2,dg:ya=usr(1)
+  305 ze=4*(xb-xa):gosub915:iffgoto314
+  306 fori=xatoxb:ifi=xbthenx1=x3:y1=y3:z1=z3:pa=x4:pb=y4:pc=z4:goto310
+  307 sysd1,i:x1=usr(1):y1=usr(2):z1=usr(3):sysd1,ya+(i-xa)
+  308 pa=usr(1):pb=usr(2):pc=usr(3)
+  309 ifi=xathenx3=x1:y3=y1:z3=z1:x4=pa:y4=pb:z4=pc:goto313
+  310 sysc2,v+1,d,mm,vb:d=d+1:sysc2,v+5,d,mm,vb
+  311 v=v+1:sysc1,x1,y1,z1,v:v=v+1:sysc1,x2,y2,z2,v
+  312 v=v+1:sysc1,pd,pe,pf,v:v=v+1:sysc1,pa,pb,pc,v:sysda,1,d-1,1,1
+  313 gosub78:pd=pa:pe=pb:pf=pc:next
+  314 gosub65:sysda,1,dg,1,2:sysco,2,2:sysfl,4:goto220
+  315 :
+  316 :
+  317 rem ********************************
+  318 rem * flaeche in speicher codieren *
+  319 rem ********************************
+  320 :
+  321 ifp=0thenmm=0
+  322 ze=1:gosub915:iffthenreturn
+  323 sysc2,v+1,d,mm,vn:sysc2,v+u+1,d+1,mm,vn:d=d+1:forq=1tou
+  324 sysc1,p(q-1,0),p(q-1,1),p(q-1,2),q+v:next:v=v+u:return
+  325 gosub70:sysl,1:ifa<>76thensysco,1,1
+  326 me=1:ifa=43thena=0:goto215
+  327 me=0:gosub62:m=0:goto118
+  328 :
+  329 :
+  330 rem ********************************
+  331 rem *     symbole invertieren      *
+  332 rem ********************************
+  333 :
+  334 ifc<>0andei<>1thensysg,pa,pb,pc,pd,2,b
+  335 ifc=7thensys52664,2,b
+  336 ifc=8thensys52835,2,b
+  337 ifc=9thensys53045,2,b
+  338 return
+  339 :
+  340 rem ********************************
+  341 rem *    3d-zeichnen               *
+  342 rem ********************************
+  343 :
+  344 sysco,2,0:sysd3,2,2:m=1:n=0
+  345 sysg,182,0,239,9,2,2:me=2:syse,2
+  346 z=0:o=0:pz=0:n=0:b=2:u=0
+  347 sysli,78,55,82,55,2,2:sysli,80,53,80,57,2,2
+  348 sysli,238,55,242,55,2,2:sysli,240,53,240,57,2,2
+  349 sysli,238,145,242,145,2,2:sysli,240,143,240,147,2,2
+  350 ifm=0thenreturn
+  351 sysc3,pz,z,o,2,b:n=1-n
+  352 gosub77:ifa$<>""goto357
+  353 ifj=0orj=128thenw=0:goto351
+  354 ifnthensysc3,pz,z,o,2,b:n=0
+  355 ifj>128thengosub34:goto351
+  356 gosub122:goto351
+  357 a=asc(a$):ifnthensysc3,pz,z,o,2,b:n=0
+  358 ifa=94goto362
+  359 ifa=95thengoto413
+  360 ifa=67thensysci,b:n=1
+  361 goto351
+  362 u=1:p(0,1)=z:p(0,0)=pz:p(0,2)=o:pa=z:pb=o:pc=z:pd=o:pe=pz:pf=pz
+  363 gosub378:gosub77
+  364 ifa$<>""goto386
+  365 ifj=0orj=128thenw=0:goto363
+  366 gosub377:ifj>128andu<29thengosub34:goto363
+  367 gosub122:goto363
+  368 gosub377:sysl3,pf,pc,pd,pz,z,o,1,b
+  369 u=u+1:pc=z:pd=o:pf=pz:p(u-1,1)=pc:p(u-1,0)=pf:p(u-1,2)=pd
+  370 goto363
+  371 :
+  372 :
+  373 rem ********************************
+  374 rem *     3d-linien-blinken        *
+  375 rem ********************************
+  376 :
+  377 ifn=0thenreturn
+  378 sysl3,pe,pa,pb,pz,z,o,2,b:ifu=1thenn=1-n:return
+  379 sysl3,pf,pc,pd,pz,z,o,2,b:n=1-n:return
+  380 :
+  381 :
+  382 rem ********************************
+  383 rem *  3d-zeichnen: tastenabfrage  *
+  384 rem ********************************
+  385 :
+  386 a=asc(a$):ifa=87ora=94goto390
+  387 ifa<>147anda<>95anda<>76anda<>43anda<>70anda<>67goto363
+  388 ifa<>147goto390
+  389 poke40783,0:sysco,2,0:sysd3,2,2:goto345
+  390 ifa=95goto396
+  391 ifa=76goto405
+  392 ifa=43thenm=0:gosub347:m=1:goto397
+  393 n=1-n:gosub377:n=1-n:ifa=67thensysci,b:goto363
+  394 ifa=94goto368
+  395 gosub62:goto213
+  396 ifu<2goto413
+  397 me=2:gosub321:syse,2
+  398 m=0:forq=0tou-1:ifq=uthenx1=x3:y1=y3:z1=z3:goto400
+  399 x1=p(q,0):y1=p(q,1):z1=p(q,2):ifm=0thenm=1:x3=x1:y3=y1:z3=z1:goto401
+  400 sysl3,x1,y1,z1,x2,y2,z2,1,3
+  401 gosub78:next
+  402 sysl3,pe,pa,pb,pf,pc,pd,1,3
+  403 ifa=43thenn=1:u=0:b=2:goto346
+  404 n=0:syse,1:me=0:goto118
+  405 gosub377:ifu=<1thenz=0:o=0:pz=0:u=0:goto344
+  406 sysco,2,0:u=u-2:sysg,182,0,239,9,2,2:sysd3,2,2
+  407 m=0:forq=0tou
+  408 x1=p(q,0):y1=p(q,1):z1=p(q,2):ifm=0thengosub347:m=1:goto410
+  409 sysl3,x1,y1,z1,x2,y2,z2,1,2
+  410 gosub78:next
+  411 pc=p(u,1):pd=p(u,2):pf=p(u,0):z=pc:o=pd:pz=pf:u=u+1
+  412 goto363
+  413 ifu<2thenme=0:syse,1:n=0:goto118
+  414 :
+  415 :
+  416 rem ********************************
+  417 rem *     form                     *
+  418 rem ********************************
+  419 :
+  420 gosub63:gosub69:sysco,2,0:me=0
+  421 z=160:o=100:fo=1:jl=0:c=0
+  422 syse,1:b=1
+  423 zn=0:ifpthendg=mm:zn=5
+  424 gosub72
+  425 ifa<>0goto435
+  426 ifz>99andz<137ando<9thena=95:goto435
+  427 wq=1
+  428 gosub749:ifc=0goto424
+  429 gosub762:ifc=0goto424
+  430 gosub70:sysum,c,zn,dg,d,ei,j,w:gosub75
+  431 ifjl=0thengosub442:gosub334:syse,1:sysco,2,0
+  432 ifjl>0thenjl=jl+1
+  433 gosub69:ifc=0goto424
+  434 goto428
+  435 gosub769:sysl,1:syse,1:ifsvgoto430
+  436 gosub446:ifjl>1anda=133thenpokerf,14:gosub442:syse,1:sysco,2,0:jl=0
+  437 ifa=95andjl>1thenpokerf,14:gosub442:syse,1:sysco,2,0:jl=0
+  438 ifa=95thengosub63:gosub70:me=0:fo=0:goto118
+  439 ifa=48thenc=10:gosub772:df=dg:c=zn:gosub548:goto430
+  440 goto424
+  441 rem *** neue gesamtdarstellung **
+  442 syse,2:b=1:gosub31
+  443 gosub67:gosub63
+  444 ifp=1thengosub59
+  445 sysda,zn,dg,1,b:gosub75:gosub69:return
+  446 ifa=133andjl=0thenjl=1:pokerf,6:return
+  447 ifa=133andjl=1thenjl=0:pokerf,14
+  448 return
+  449 :
+  450 :
+  451 rem ********************************
+  452 rem *     rotation: 2d-eingabe     *
+  453 rem ********************************
+  454 :
+  455 u=0:gosub64:me=3
+  456 gosub65:syst1,2:gosub66:sysg,43,0,98,9,2,2
+  457 sysd4,2,2:sys22659,1,2:syse,2
+  458 ifpthengosub61
+  459 z=160:o=170:b=2
+  460 sysj2,z,o,1:gosub73
+  461 ifa<>0goto463
+  462 goto467
+  463 ifa=95thensyse,1:gosub64:me=0:goto118
+  464 ifa=67thensysci,b
+  465 ifa=147thensyse,2:poke40783,0:goto456
+  466 goto460
+  467 n=0:u=1:p(0,0)=z-160:p(0,1)=180-o:pa=z:pb=o
+  468 gosub143:gosub77:ifa$<>""goto152
+  469 ifj=0thenw=0:goto468
+  470 gosub142:ifj=128andu<29thengosub473:goto468
+  471 gosub122:ifo>180theno=180
+  472 goto468
+  473 ifpa=zandpb=othenreturn
+  474 ifu>48thenreturn
+  475 sysli,z,o,pa,pb,2,2
+  476 pa=z:pb=o:p(u,0)=z-160:p(u,1)=180-o:u=u+1:return
+  477 :
+  478 :
+  479 rem ********************************
+  480 rem *    rotation: einfuegen (3d)  *
+  481 rem ********************************
+  482 :
+  483 syse,0:gosub55:k=k+1
+  484 gosub41:gosub43:print"{home}{down} {rvon}      Rotationskoerper erstellen      {rvof} "
+  485 fc=0:input"{down}{rght}{rght}Anzahl der Facetten   ";fc
+  486 iffc<3thenprint"{up}{up}";:goto485
+  487 input"{down}{rght}{rght}Rotationswinkel         360{left}{left}{left}{left}{left}";rw
+  488 ifabs(rw)>360thenprint"{up}{up}";:goto487
+  489 input"{down}{rght}{rght}Verbindungsvorschrift   0{left}{left}{left}";vb
+  490 ifvb<0orvb>3thenprint"{up}{up}";:goto489
+  491 ifp<>0goto498
+  492 ifs=2thensyse,0:gosub55:print"{clr}{down}";
+  493 n$="":input"{down}{rght}{rght}Makro - Name          ";n$
+  494 if(n$="_"orn$="")ands=2thenprint"{up}{up}";:goto493
+  495 gosub79:ifn1thenk=k-1:a=95:goto463
+  496 gosub49:ifn1thenprint"{up}{up}";:goto493
+  497 b$(k)=n$
+  498 syse,1:w=rw*~/180:ifs=2thens=0:goto515
+  499 ze=4*(u-1)*fc:gosub915:iffthenb$(k)="":goto484
+  500 gosub890:z=0:fori=0tow-.000001stepw/fc:w=w/fc:w1=sin(i):w2=cos(i):pc=sin(i+w)
+  501 pd=cos(i+w):forq=0tou-2
+  502 sysc2,v+1,d,k,vb:sysc2,v+5,d+1,k,vb:d=d+1:v=v+1
+  503 sysc1,w1*p(q,1),w2*p(q,1),p(q,0),v:v=v+1
+  504 sysc1,pc*p(q,1),pd*p(q,1),p(q,0),v:v=v+1
+  505 sysc1,pc*p(q+1,1),pd*p(q+1,1),p(q+1,0),v:v=v+1
+  506 sysc1,w1*p(q+1,1),w2*p(q+1,1),p(q+1,0),v
+  507 next:w=w*fc
+  508 next:dg=k
+  509 :
+  510 :
+  511 rem ********************************
+  512 rem *      makros einfuegen        *
+  513 rem ********************************
+  514 :
+  515 z=159:o=100:jl=0:c=0
+  516 ifjl=0thengosub539
+  517 ifjl>0thenjl=jl+1:sysfl,4:gosub69
+  518 ifc<>0goto524
+  519 gosub72
+  520 ifa<>0goto528
+  521 ifz>43andz<98ando<9andas=0thena=95:goto528
+  522 ifz>137andz<182ando<9andasthena=95:goto528
+  523 wq=1
+  524 gosub749:ifc=0goto519
+  525 gosub762:ifc=0goto519
+  526 sysl,1
+  527 gosub70:sysum,c,3,dg,d,ei,j,w:gosub75:goto516
+  528 if(a=95ora=43)andjl>1thenpokerf,14:sysl,1:gosub539:jl=0
+  529 ifa=76andjl>0thenpokerf,14:jl=0
+  530 ifa=95thensysl,1:sysco,1,1:goto543
+  531 gosub446:ifa=133andjl>1thenpokerf,14:jl=0:sysl,1:gosub539
+  532 ifa=76thengosub268:me=1:k=k-1:goto543
+  533 ifa=43thenk=k+1:s=2:gosub290:syse,1:iffthena=95:goto528
+  534 ifa=43thendg=k:goto492
+  535 ifa=48thenc=10:gosub772:df=k:c=3:gosub548:goto527
+  536 gosub769:syse,1:ifsvgoto526
+  537 goto519
+  538 rem *** neu darstellen **********
+  539 gosub65:b=2
+  540 sysda,3,dg,1,b
+  541 sysco,2,2:gosub69:fo=2
+  542 sysfl,4:return
+  543 gosub70:fo=0:c=0:ei=0:ifas=0thengosub64
+  544 ifpandasthenas=0:return
+  545 ifas<>0thenas=0:gosub59
+  546 me=0:goto118
+  547 rem *** '0' bei umformungen *****
+  548 gosub70:sysum,1,c,df,d,1,0,w:sysum,2,c,df,d,1,0,w:ei=1:c=3:syse,1:return
+  549 :
+  550 :
+  551 rem ********************************
+  552 rem *     makro - hauptmenue       *
+  553 rem ********************************
+  554 :
+  555 gosub41
+  556 print" {rvon}           MAKRO -Hauptmenue          {rvof}"
+  557 gosub42
+  558 print"{home}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}A.Makro laden"
+  559 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}B.Makro speichern"
+  560 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}C.Diskettenkommando senden"
+  561 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}D.Makros auf Diskette"
+  562 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}E.Makros im Speicher"
+  563 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}F.Makro erstellen"
+  564 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}G.Makro einfuegen"
+  565 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}H.Alles Erstellte als Makro"
+  566 gosub81:if(a<65ora>72)anda<>95goto566
+  567 ifa=95thensyse,1:open1,8,15,"u9":close1:goto118
+  568 ona-64goto664,644,695,706,625,575,588,614
+  569 :
+  570 :
+  571 rem ********************************
+  572 rem *     makro erstellen          *
+  573 rem ********************************
+  574 :
+  575 ifp=1goto566
+  576 gosub41:gosub43
+  577 print" {rvon}           Makro erstellen            {rvof} "
+  578 gosub890:gosub44:ifn1goto555
+  579 gosub49:ifn1thenprint"{up}{up}{up}{up}{up}";:goto578
+  580 b$(k+1)=n$
+  581 p=1:k=k+1:mm=k:syse,1:zw=d:goto108
+  582 :
+  583 :
+  584 rem ********************************
+  585 rem *     makro einfuegen          *
+  586 rem ********************************
+  587 :
+  588 ifk=0goto566
+  589 gosub41:gosub43:print" {rvon}           Makro einfuegen            {rvof}{home}"
+  590 gosub44:ifn1goto555
+  591 ifn$<>b$(mm)goto598
+  592 ifd=zwthenas=1:p=0:sysda,0,v,1,1:syse,1:k=k-1:goto543
+  593 fori=1tod:sysd2,i:sa=usr(2):ifsa>mmthensysc2,usr(1),i,mm,usr(3)
+  594 next
+  595 zn=4:dg=mm:sysh,11,15,1:syst1,1:gosub67:sysmu,1:syskr,1,1
+  596 as=1:gosub59:sysda,zn,dg,1,1
+  597 syse,1:p=0:k=mm:mm=0:dg=k:goto515
+  598 gosub49:ifn1goto600
+  599 gosub51:goto555
+  600 dg=n1:i=1:k=k+1:ifp=1then605
+  601 gosub52:ifn1thenk=k-1:goto555
+  602 gosub49:ifn1thenprint"{up}{up}{up}{up}{up}";:goto601
+  603 b$(k)=n$:i=1
+  604 gosub918:gosub915:iffthenk=k-1:goto555
+  605 s=2:gosub291:as=1:zn=4:dg=k:gosub65:b=1:ifpgoto607
+  606 gosub59:gosub515:as=0:gosub59:goto118
+  607 gosub515:as=0:goto118
+  608 :
+  609 :
+  610 rem ********************************
+  611 rem *  alles erstellte als makro   *
+  612 rem ********************************
+  613 :
+  614 ifd=1orpgoto566
+  615 gosub41:gosub43:print" {rvon}      Alles Erstellte als Makro       {rvof} "
+  616 gosub44:ifn1goto555
+  617 b$(1)=n$:fori=1tod:sysd2,i:q=usr(1):vb=usr(3):sysc2,q,i,1,vb:next
+  618 k=1:syse,1:goto118
+  619 :
+  620 :
+  621 rem ********************************
+  622 rem *     makros im speicher       *
+  623 rem ********************************
+  624 :
+  625 za=0:a=1:e1=19:mr=k:ifp=1thenmr=mm
+  626 ifmr=0goto566
+  627 gosub41
+  628 print" {rvon}          Makros im Speicher          {rvof} ";:ife1>mrthene1=mr
+  629 gosub42:n1$=str$(1322-v):n1$=right$("0000"+right$(n1$,len(n1$)-1),4)
+  630 print"{home}{down}{down}":fori=zato18:print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}                   ":next
+  631 print"{home}{down}{down}":forx=atoe1
+  632 print"{rght}{rght}{rght}          ";left$(b$(x)+"..............",14):next
+  633 ife1=mrthenprint"{rght}{rght}{rght}     "n1$" Eckpunkte frei"
+  634 gosub47
+  635 ife1=mrgoto555
+  636 a=e1+1:e1=a+18:ife1>mrthene1=mr:ifa>mrthena=mr-1
+  637 goto630
+  638 :
+  639 :
+  640 rem ********************************
+  641 rem *     makro speichern          *
+  642 rem ********************************
+  643 :
+  644 ifk=0goto566
+  645 gosub41
+  646 print" {rvon}            Makro speichern           {rvof} "
+  647 gosub44:ifn1goto555
+  648 gosub49:ifn1goto650
+  649 print"{up}":gosub51:goto555
+  650 n2=n1:print:print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"n$"{up}"
+  651 n$="":input"{rght}{rght}{rght}File  - Name     ";n$:gosub79:ifn1goto555
+  652 iflen(n$)>13thenprint"{up}";:goto651
+  653 gosub918:open2,8,2,"ma."+n$+",s,w":gosub684:iff<>0goto555
+  654 print#2,ze:ifstgoto656
+  655 print#2,n$:sys21301,d,n2
+  656 close2:close1:gosub684:iff=0thengosub688
+  657 goto555
+  658 :
+  659 :
+  660 rem ********************************
+  661 rem *      makro laden             *
+  662 rem ********************************
+  663 :
+  664 gosub41:gosub43
+  665 print" {rvon}              Makro laden             {rvof} "
+  666 gosub890:n$="":input"{down}{down}{down}{rght}{rght}{rght}File - Name     ";n$:gosub79:ifn1goto555
+  667 iflen(n$)>13thenprint"{up}{up}{up}{up}";:goto666
+  668 open2,8,2,"ma."+n$+",s,r":gosub684:iff<>0goto555
+  669 input#2,ze:ifstgoto674
+  670 gosub915:iffthenclose2:close1:goto555
+  671 input#2,n$:ifstgoto674
+  672 k=k+1:ifp=0thenb$(k)=n$
+  673 sys21006,d,v,k
+  674 close2:close1:gosub684:iff=0goto676
+  675 k=k-1:goto555
+  676 gosub688:d=peek(2026)+256*peek(2027):v=peek(2028)+256*peek(2029)
+  677 goto735
+  678 :
+  679 :
+  680 rem ********************************
+  681 rem *     disk - status            *
+  682 rem ********************************
+  683 :
+  684 open1,8,15:input#1,f,f$,t,s:iff=0thenreturn
+  685 print:print"{down}{down}{rght}{rght}{rght}{rvon}Diskettenfehler :"
+  686 print"{down}{down}{rght}{rght}"f","f$","t","s
+  687 gosub47
+  688 close2:print#1,"u9":close1:return
+  689 :
+  690 :
+  691 rem ********************************
+  692 rem *     diskettenkommando senden *
+  693 rem ********************************
+  694 :
+  695 gosub41:gosub43
+  696 print" {rvon}       Diskettenkommando senden       {rvof} "
+  697 poke631,34:poke198,1:n$="":input"{down}{down}{rght}{rght}{rght}Kommando ";n$:gosub79:ifn1goto555
+  698 open1,8,15,n$:input#1,f,f$,t,s:print"{down}{down}{rght}{rght}{rght}{rvon}Diskettenstatus :"
+  699 gosub686:goto555
+  700 :
+  701 :
+  702 rem ********************************
+  703 rem *     makros auf diskette      *
+  704 rem ********************************
+  705 :
+  706 gosub41
+  707 print" {rvon}         Makros auf Diskette          {rvof} ";
+  708 print:open2,8,0,"$0:ma.*=seq":sys26134:close2
+  709 gosub684:close2:close1:iff=0thengosub47
+  710 goto555
+  711 :
+  712 :
+  713 rem ********************************
+  714 rem *      parameter-uebergabe     *
+  715 rem ********************************
+  716 :
+  717 w2=int(w/256):w1=w-256*w2:pokea+i,w1:pokea+i+1,w2:i=i+2:return
+  718 pokerf,15
+  719 printchr$(14)chr$(8)"{clr}{gry1}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}        Systemdiskette einlegen !"
+  720 gosub47:ifa$="_"thenreturn
+  721 open2,8,2,"cad.main,p,r":close2:gosub684:iffthena$="_":return
+  722 print#1,"u9":close1:return
+  723 forx=1tok:fory=1to13:w=peek(a+y):ifw=254theny=13:goto725
+  724 b$(x)=b$(x)+chr$(w)
+  725 nexty:a=a+14:nextx:a=49153:return
+  726 ifk=0thenreturn
+  727 forx=1tok:fory=1tolen(b$(x)):pokea+y,asc(mid$(b$(x),y,1)):nexty
+  728 pokea+y,254:a=a+14:nextx:a=49153:return
+  729 :
+  730 :
+  731 rem ********************************
+  732 rem *  geladenens makro einfuegen  *
+  733 rem ********************************
+  734 :
+  735 n$=b$(k):ifpgoto741
+  736 gosub49:ifn1<>kgoto738
+  737 goto740
+  738 print"{down}{down}":gosub52:b$(k)=n$
+  739 print"{up}{up}{up}{up}{up}{up}{up}{up}";:goto736
+  740 i=1:dh=k:dg=k:mm=k:as=1:gosub59:goto597
+  741 b$(k)=""
+  742 i=1:dh=k:goto605
+  743 :
+  744 :
+  745 rem ********************************
+  746 rem *     angewaehltes symbol      *
+  747 rem ********************************
+  748 :
+  749 ifz>=159oro<=100thenc=0:return
+  750 ifz<50thenpa=3:pc=49:pe=1:goto753
+  751 ifz<100thenpa=50:pc=99:pe=3:goto753
+  752 pa=100:pc=156:pe=2
+  753 ifo<135thenpb=102:pd=134:pf=2::goto756
+  754 ifo<165thenpb=135:pd=164:pf=1:goto756
+  755 pb=165:pd=196:pf=0
+  756 c=pf*3+pe:return
+  757 :
+  758 :
+  759 rem ********************************
+  760 rem *   verformung ueber joystick  *
+  761 rem ********************************
+  762 ifwqandei=0thenwq=0:b=3:gosub334
+  763 gosub77
+  764 ifj=128then767
+  765 ifint(j/2)=j/2then763
+  766 j=int(j/2)+1:return
+  767 b=3:gosub334:c=0
+  768 return
+  769 ifa<49ora>57thenc=0:sv=0:return
+  770 a=a-48:xa=int((9-a)/3)*3:xb=a-int((a-1)/3)*3
+  771 xb=3+(xb<2)*2+(xb>2)*1:c=xa+xb:sv=c:wq=1
+  772 ei=1:sysl,1:syse,0:gosub55:ifc=10goto775
+  773 ifc>6theninput"{clr}{down}{down}{rght}{rght}{rght}Drehwinkel   90{left}{left}{left}{left}";w:goto776
+  774 ifc>3theninput"{clr}{down}{down}{rght}{rght}{rght}Verschiebungssummand   50{left}{left}{left}{left}";w:goto776
+  775 input"{clr}{down}{down}{rght}{rght}{rght}Verzerrungsfaktor   1.5{left}{left}{left}{left}{left}";w:goto776
+  776 ifw=0thenc=0:sv=0:ei=0:sysfl,4
+  777 return
+  778 :
+  779 :
+  780 rem ********************************
+  781 rem *     hauptmenue loeschen      *
+  782 rem ********************************
+  783 :
+  784 gosub56
+  785 gosub41
+  786 print" {rvon}        Hauptmenue 'Loeschen'         {rvof} ";
+  787 gosub42
+  788 print"{home}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}A. Flaechen durchblaettern"
+  789 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}B. Makros durchblaettern"
+  790 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}C. Bekanntes Makro loeschen"
+  791 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}D. Alles loeschen "
+  792 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}E. Verbindungsvorschrift"
+  793 gosub81:if(a<65ora>69)anda<>95goto793
+  794 ifa=95goto880
+  795 ona-64goto802,828,854,866,877
+  796 :
+  797 :
+  798 rem ********************************
+  799 rem *    flaechen durchblaettern   *
+  800 rem ********************************
+  801 :
+  802 ifd=1goto793
+  803 syse,1:f=1:jl=0:n1=d-1:mo=1
+  804 gosub92
+  805 ifa=86thensysd2,f:sysc2,usr(1),f,usr(2),vb
+  806 ifa=95andjl>0thenpokerf,14:gosub820:gosub56:goto118
+  807 ifa=95thensysl,1:gosub56:goto118
+  808 gosub446:ifa=133andjl>1thenjl=0:pokerf,14:gosub820:f=f-1:goto804
+  809 ifa=94goto814
+  810 ifa=76andjl>0thenjl=jl+1:dg=f:sysl,1:gosub254:f=f-1:n1=d-1:goto804
+  811 ifa=76goto818
+  812 sysfl,4:gosub97:goto805
+  813 rem ***** '^' *******************
+  814 pokerf,14:sysl,1:b=2:gosub31
+  815 gosub56:dg=f:sysg,0,0,42,9,2,3
+  816 sysda,2,dg,1,2:sysco,1,0:u=2:goto214
+  817 rem *********** 'l' *************
+  818 sysl,1:b=2:gosub31:gosub58:dg=f
+  819 sysda,2,dg,1,2:syse,2:sysco,1,0:syse,1:gosub254:n1=d-1:goto804
+  820 sysl,1:b=2:gosub31:gosub58:sysda,0,d,1,2:syse,2
+  821 sysco,1,0:syse,1:return
+  822 :
+  823 :
+  824 rem ********************************
+  825 rem *     makros durchblaettern    *
+  826 rem ********************************
+  827 :
+  828 ifk=0goto793
+  829 syse,1:f=1:mo=3:n1=k
+  830 gosub92
+  831 ifa=95thensysl,1:gosub56:goto118
+  832 ifa<>86goto836
+  833 fori=1tod:sysd2,i:ifusr(2)<>kgoto835
+  834 sysc2,usr(1),i,usr(2),vb
+  835 nexti:syse,1
+  836 ifa=94goto840
+  837 ifa=76goto845
+  838 sysfl,4:gosub97:goto831
+  839 rem ******* '^' *****************
+  840 sysl,1:sysco,2,0:syse,2
+  841 b$=b$(f):gosub61:as=0:zn=0:gosub58
+  842 b=1:gosub31:gosub59:dg=f:sysda,4,dg,1,1:syse,1
+  843 as=1:goto515
+  844 rem ******* 'l' *****************
+  845 sysl,1:sysco,2,0:syse,2:gosub58
+  846 b=1:gosub31:sysda,4,f,1,1:syse,1
+  847 dg=f:gosub268:k=k-1:n1=k:goto118
+  848 :
+  849 :
+  850 rem ********************************
+  851 rem *   bekanntes makro loeschen   *
+  852 rem ********************************
+  853 :
+  854 ifk=0goto793
+  855 gosub41:gosub43
+  856 print" {rvon}  Makro mit bekanntem Namen loeschen  {rvof} ":gosub44
+  857 ifn1goto785
+  858 gosub49:ifn1thenf=n1:mo=3:n1=k:goto830
+  859 syse,1:gosub56:goto118
+  860 :
+  861 :
+  862 rem ********************************
+  863 rem *     alles loeschen           *
+  864 rem ********************************
+  865 :
+  866 print"{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}Sind Sie sicher ?{rvof}  ";
+  867 gosub47
+  868 printa$:ifa$<>"j"goto870
+  869 sys25919:clr:d=1:goto12
+  870 gosub56:syse,1:goto118
+  871 :
+  872 :
+  873 rem ********************************
+  874 rem *     verbindungsvorschrift    *
+  875 rem ********************************
+  876 :
+  877 i=1:gosub41:gosub43
+  878 print" {rvon}   Momentane  Verbindungsvorschrift   {rvof} "
+  879 gosub84
+  880 syse,1:gosub56:goto118
+  881 :
+  882 :
+  883 rem ********************************
+  884 rem *    mehr als 63 makros ?      *
+  885 rem ********************************
+  886 :
+  887 sysl,1:i=1:syse,0:gosub55:gosub41
+  888 print"{clr}":gosub84
+  889 sysfl,4:return
+  890 ifk<64andmm<64thenreturn
+  891 fori=1tod:sysd2,i:gosub74:ifsa<>0thensa=sa-1
+  892 sysc2,xa,i,sa,vb:next:fori=2tomm:b$(i-1)=b$(i):next:mm=mm-1:k=k-1:return
+  893 :
+  894 :
+  895 rem ********************************
+  896 rem *    parameter codieren        *
+  897 rem *********************************
+  898 gosub718:ifa$="_"thensyse,1:pokerf,14:goto118
+  899 a=49153:pokea+919,255:i=900:w=k:gosub717:w=d:gosub717:w=v:gosub717
+  900 gosub726:poke836,0:print"{gry3}{clr}load"chr$(34)"cad.main"chr$(34)",8"
+  901 print"{down}{down}{down}{down}run:":poke631,19:poke632,13:poke633,13:poke198,3:new
+  902 :
+  903 :
+  904 rem ********************************
+  905 rem *    parameter decodieren      *
+  906 rem ********************************
+  907 a=49153:k=peek(a+900)+256*peek(a+901):d=peek(a+902)+256*peek(a+903)
+  908 v=peek(a+904)+256*peek(a+905):gosub723:return
+  909 :
+  910 :
+  911 rem ********************************
+  912 rem *   zu viele daten ?           *
+  913 rem ********************************
+  914 :
+  915 ifv+ze<1320thenf=0:return
+  916 f=1:sysl,1:syse,0:gosub55:print"{clr}{down}{down}{down}    Fuer diese Operation reicht der "
+  917 print"{down}     Speicherplatz nicht mehr aus!":gosub47:return
+  918 ze=0:fori=1tod-1:sysd2,i:sr=usr(1)
+  919 ifusr(2)=dhthensysd2,i+1:ze=ze+usr(1)-sr
+  920 nexti:return
+

@@ -1,0 +1,225 @@
+
+
+;flaechen im ir^3.prg ==21ee==
+;version=70
+  150 color0,7:color1,2:color4,12:graphic1:graphic0
+  160 br=320:le=200:dx=25:dy=25
+  170 dimm(dx,dy,2):rem messwerte
+  180 goto 270
+  190 :
+  200 rem procedure punktsetzen
+  210 :
+  220 ifx=0andy=0then250
+  230 t=le/2*(1+(x/x1+y/y1)/2-fnz(x)*(x1+y1)*den):l=br/2*(1+y/(2*y1)-x/(2*x1))
+  240 ifl>=0andl<brandt>=0andt<le thendraw1,l,t
+  250 return
+  260 :
+  270 print"{clr}{down} {rvon}          flaechen im ir^3            {rvof} "
+  280 print"{down} grafikaufloesung :  320 * 200"
+  300 print"{down} {rvon}1{rvof} = grafikbildschirm speichern":print"{down} {rvon}2{rvof} = grafikbildschirm laden":print"{down} {rvon}3{rvof} = messwerte speichern":print"{down} {rvon}4{rvof} = messwerte laden"
+  310 print"{down} {rvon}5{rvof} = druckerroutine"
+  320 print"{down} {rvon}6{rvof} = grafik durch 2-par. funkt. "
+  330 print"{down} {rvon}7{rvof} = ende  "
+  340 gett$:ift$=""orasc(t$)<49orasc(t$)>55then340
+  350 :
+  360 :rem grafik saven
+  370 :
+  380 ift$="1"thenbegin:input"{down} namen des grafikfiles :";c$
+  390 graphic2,0,22:print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} das speichern dauert ca 5 min":c$="g>"+c$
+  410 dopen#3,(c$),w
+  420 fori=8192to16191:print#3,peek(i):next:dclose#3:graphic0:c$="":t$="":bend
+  440 :
+  450 rem grafik laden
+  460 :
+  470 ift$="2"thenbegin:input"{down} namen des grafikfiles :";c$:graphic1,1:c$="g>"+c$
+  480 dopen#3,(c$)
+  490 fori=8192to16191:input#3,b:pokei,b:next:dclose#3:t$="":c$=""
+  510 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}ZZ taste ZZ{rvof}"
+  520 do while h$=""
+  530 get h$:graphic1,0:sleep8
+  540 graphic2,0,23:printchr$(7);"{up}":sleep1:get h$:loop
+  550 h$="":print"{clr}":graphic0
+  560 bend
+  570 :
+  580 rem messwerte speichern
+  590 :
+  600 ift$="3"then begin:l$="d>"
+  610 input"{clr}{down}{down} name der messung :";c$
+  620 iflen(c$)>14thenprint"{down} {rvon}ZZ zu lang ZZ{rvof}":goto610
+  630 c$=l$+c$
+  640 input"{down} anzahl der x-werte:";ax
+  650 ifax<3orax>dxthenprint"{down} 3 < ax <";dx:goto640
+  660 input"{down} anzahl der y-werte:";ay
+  670 ifay<3oray>dythenprint"{down} 3 < ay <";dy:goto660
+  680 input"{down} x min , x max";x1,x2
+  690 input"{down} y min , y max";y1,y2
+  700 print"{down} sie koennen eine zeile 'datenhinweise'  eingeben ":s$="*"
+  710 input"{down}>";s$:print"{down} einen moment bitte"
+  720 forj=1toay:fori=1toax:fork=0to2:m(i,j,k)=0:next:next:next
+  730 print"{clr}{down} x & y sind die parameter"
+  740 print"{down} z ist der messwert (beachte gong){down}{down}"
+  750 ifm$=""thenbegin:forj=1toay:i=1:print"{down}{down}"
+  752 print using" {rvon}y{rvof} =  ####.###";y1+(y2-y1)*(j-1)/(ay-1)
+  754 input"{up}{rght}{rght}{rght}{rght}{rght}";m(i,j,1):print
+  756 fori=1toax:print using" x =  ####.###";x1+(x2-x1)*(i-1)/(ax-1):input"{up}{rght}{rght}{rght}{rght}{rght}";m(i,j,0):m(i,j,1)=m(1,j,1):printchr$(7)
+  758 printusing" z( ####.###";m(i,j,0)
+  760 printusing"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght} ,####.###) = ";m(i,j,1)
+  761 input"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";m(i,j,2):print
+  762 print:nexti:nextj
+  764 bend
+  800 ifm$="j"thenbegin:forj=1toay:i=1:print"{down}{down}"
+  802 print using" {rvon}y{rvof} =  ####.###";m(i,j,1)
+  804 input"{up}{rght}{rght}{rght}{rght}{rght}";m(i,j,1):print
+  806 fori=1toax:print using" x =  ####.###";m(i,j,0):input"{up}{rght}{rght}{rght}{rght}{rght}";m(i,j,0):m(i,j,1)=m(1,j,1):printchr$(7)
+  808 printusing" z( ####.###";m(i,j,0)
+  810 printusing"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght} ,####.###) = ";m(i,j,1)
+  812 printusing"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght} ####.###";m(i,j,2)
+  814 input"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";m(i,j,2):print
+  816 print:nexti:nextj:bend
+  860 print"{down} messwerte verbessern = {rvon}j"
+  870 get m$:ifm$=""then870
+  880 ifm$="j"then750
+  900 m$="":print"{down} speichern => {rvon}ZZ taste ZZ"
+  910 get j$:ifj$=""then910
+  920 dopen#4,(c$),w:print#4,s$:print#4,ax:print#4,x1:print#4,x2:print#4,ay
+  930 print#4,y1:print#4,y2
+  940 forj=1toay:fori=1toax:fork=0to2:print#4,m(i,j,k):nextk:nexti:nextj
+  950 dclose#4:print"{down} fertig":c$="":t$="":bend
+  970 :
+  980 rem messwerte zeichnen
+  990 :
+ 1000 ift$="4"thenbegin
+ 1010 input"{down} filename :";c$:iflen(c$)>14thenprint" {rvon}zu lang{rvof}":goto1010
+ 1020 c$="d>"+c$:dopen#4,(c$)
+ 1030 input#4,s$,ax,x1,x2,ay,y1,y2:print"{down} ";s$
+ 1040 forj=1toay:fori=1toax:fork=0to2
+ 1050 input#4,m(i,j,k):next:next:next:dclose#4:max=0:min=0
+ 1060 fori=1toax:forj=1toay
+ 1070 ifm(i,j,2)>maxthenmax=m(i,j,2)
+ 1080 ifm(i,j,2)<min thenmin=m(i,j,2)
+ 1090 next:next
+ 1100 cx=le/(max-min+x2-x1+y2-y1):ls=(le+(min-max)*cx)/2
+ 1110 print"{clr}{down} {rvon}g{rvof} = grafik"
+ 1120 print"{down} {rvon}t{rvof} = tabelle"
+ 1130 print"{down} {rvon}e{rvof} = ende"
+ 1140 geti$:if(i$<>"g"andi$<>"t"andi$<>"e")then1140
+ 1150 ifi$="g"then begin
+ 1160 color0,7:color1,2:color4,12
+ 1170 graphic1,1
+ 1180 forj=1toay:fori=1toax
+ 1190 x=m(i,j,0):y=m(i,j,1):z=m(i,j,2)
+ 1200 l=br/2*(1+(x-x1)/(x2-x1)-(y-y1)/(y2-y1))
+ 1210 t=le+(min-z)*cx-ls*((x-x1)/(x2-x1)+(y-y1)/(y2-y1))
+ 1220 ifhi=jthendraw1,l2,t2tol,t:else begin:draw1,l2,t2:draw1,l,t:bend
+ 1230 l2=l:t2=t:hi=j:next:next
+ 1240 fori=1toax:forj=1toay
+ 1250 x=m(i,j,0):y=m(i,j,1):z=m(i,j,2)
+ 1260 l=br/2*(1+(x-x1)/(x2-x1)-(y-y1)/(y2-y1))
+ 1270 t=le+(min-z)*cx-ls*((x-x1)/(x2-x1)+(y-y1)/(y2-y1))
+ 1280 ifhi=ithendraw1,l2,t2tol,t:else begin:draw1,l2,t2:draw1,l,t:bend
+ 1290 l2=l:t2=t:hi=i:next:next
+ 1300 char1,35,22,"x ->":char1,1,22,"<- y"
+ 1310 t1=le+min*cx:t3=t1-ls
+ 1320 t4=le+(min-m(1,1,2))*cx:t5=le+(min-m(ax,1,2))*cx-ls:t6=le+(min-m(1,ay,2))*cx-ls
+ 1330 ift1<le thenbegin:draw1,0,t3tobr/2,t1tobr-1,t3:draw1,0,t3to0,t6:draw1,br/2,le-1tobr/2,t1:draw1,br-1,t3tobr-1,t5
+ 1340 ift6<t3thenpaint,1,t3-1
+ 1350 ift5<t3thenpaint,br-2,t3-1
+ 1360 bend
+ 1370 ift1>=le thenbegin:draw1,0,t3tobr/2,le-1tobr-1,t3:draw1,0,t3to0,t6:draw1,br-1,t3tobr-1,t5:paint,1,t3-1:draw0,br/2,le-2tobr/2,t4:bend
+ 1390 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}ZZ taste ZZ{rvof}"
+ 1400 do while h$=""
+ 1410 get h$:graphic1,0:sleep8
+ 1420 graphic2,0,23:printchr$(7);"{up}":sleep1:get h$:loop
+ 1430 h$="":print"{clr}":graphic0
+ 1440 bend:rem ende grafik
+ 1450 ifi$="t"then begin
+ 1460 print"{clr}{down}  wertetabelle"
+ 1470 print"{down} x         y         z  {down}":sleep1
+ 1480 fori=1toax:forj=1toay
+ 1490 printm(i,j,0),m(i,j,1),m(i,j,2)
+ 1500 next:sleep1:print:next
+ 1510 bend :rem ende tabelle
+ 1520 print"{down} {rvon}ZZ taste ZZ"
+ 1530 get j$:ifj$=""then1530
+ 1540 ift$="4"andi$<>"e"then1110
+ 1550 bend :rem ende messwerte zeichnen
+ 1560 :
+ 1570 rem drucker
+ 1580 :
+ 1590 ift$="5"thenbegin
+ 1600 print"{down} bitte ab zeile 1600 einbauen":sleep2:t$="":bend:rem ende drucker
+ 1610 :
+ 1620 rem grafik von 2-parametr.funkt.
+ 1630 :
+ 1640 ift$="6"then begin print"{clr}"
+ 1650 print"{down} funkion einsehen (j/n) ?"
+ 1660 getk$:ifk$=""then1660
+ 1665 ifk$="j"then list1780
+ 1670 print"{down} moechten sie die funktion aendern (j/n)"
+ 1680 getg$:ifg$=""then1680
+ 1690 ifg$="j"thenprint"{clr}":list1700-1780:end
+ 1700 rem *****************************
+ 1710 rem * sie sind im direktmodus!  *
+ 1720 rem * waehlen sie fnz(x) als    *
+ 1730 rem * funktion von x und y.pole *
+ 1740 rem * und unstetige stellen in  *
+ 1750 rem * zeile 220 ausschliessen.  *
+ 1760 rem *****************************
+ 1770 :
+ 1780 def fnz(x)=0
+ 1800 :
+ 1810 :
+ 1820 rem menue 2
+ 1830 :
+ 1840 print"{clr}{down} {rvon} parameter der grafischen darstellung {rvof}"
+ 1850 input"{down} intervallgrenze x:[-x1..x1] ";x1
+ 1860 ifx1=0thenprint"{down} {rvon}##  x1<>0  ##{rvof}":goto1850
+ 1870 input"{down} intervallgrenze y:[-y1..y1] ";y1
+ 1880 ify1=0thenprint"{down} {rvon}##  y1<>0  ##{rvof}":goto1870
+ 1890 x1=abs(x1):y1=abs(y1)
+ 1900 input"{down} dehnungsfaktor fuer z-achse:";den
+ 1910 ifden<=0thenprint"{down} {rvon}## den>0 ##{rvof}":goto1900
+ 1920 print"{down} achsenkreuz zeichnen (j/n) ?"
+ 1930 get a$:ifa$=""then1930
+ 1940 print"{down} bitte waehlen"
+ 1950 print"{down} {rvon}k{rvof}  =  karthesische koordinaten"
+ 1960 print"{down} {rvon}p{rvof}  =  polare       koordinaten"
+ 1970 getp$:ifp$=""then1970
+ 1980 if(p$<>"p"andp$<>"k")then1970
+ 1990 ifp$="k"thenbegin
+ 2000 print"{clr}"
+ 2010 print"{down} linienanzahl (2..";le/4;")":input"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";la
+ 2020 ifla<2orla>le/4orla-int(la)<>0thenprint"{down} {rvon}##  1<la<";le/4;"{left}   ##{rvof}":goto2010
+ 2030 la=la-1:bend
+ 2040 ifp$="p"thenbeginprint"{clr}"
+ 2050 print"{down} ringanzahl (2..";br/2;")":input"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";ra
+ 2060 ifra<1orra>br/2orra-int(ra)<>0thenprint"{down} {rvon}##  1<ra<";br/2;"{left}   ##":goto2050
+ 2070 input"{down} strahlenanzahl (pro 2*~)";sa
+ 2080 ifsa<3orsa>64orsa-int(sa)<>0thenprint"{down} {rvon}##  3<sa<64  ##{rvof}":goto2070
+ 2090 bend
+ 2100 :
+ 2110 rem grafikmodus
+ 2160 graphic1,1
+ 2190 ifa$="j"thenbegin
+ 2200 char1,37,24,"y {SHIFT-@}":char1,0,24,"L x":char1,19,0,"NM z":draw1,br/4,le/4tobr-1,le-1:draw1,0,le-1tobr*3/4,le/4
+ 2250 draw1,br/2,0tobr/2,le/2:bend
+ 2280 rem   karthesisch
+ 2300 ifp$="k"thenbegin
+ 2310 fori=0tola:fork=1tobr/2:x=x1*(1-4*k/br):y=y1*(1-2*i/la)
+ 2320 gosub200:next:next
+ 2330 fori=0tola:fork=1tobr/2:x=x1*(1-2*i/la):y=y1*(1-4*k/br)
+ 2340 gosub200:next:next:bend
+ 2360 rem   polar
+ 2380 ifp$="p"thenbegin
+ 2390 forr=1tora:a=r/ra*(br+le):q=2*~/a:x2=x1*r/ra:y2=y1*r/ra:forp=1toa:x=x2*cos(q*p):y=y2*sin(q*p):gosub200:next:next
+ 2400 forp=1tosa:x2=x1/le*cos(2*~*p/sa):y2=y1/le*sin(2*~*p/sa):forr=1tole:x=r*x2:y=r*y2:gosub200:next:next:bend
+ 2430 graphic2,0,23:print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}       weiter : {rvon}ZZ taste ZZ{rvof}":sleep2
+ 2440 do while h$=""
+ 2450 get h$:graphic1,0:sleep8
+ 2460 graphic2,0,23:printchr$(7);"{up}":sleep2:get h$:loop
+ 2470 h$="":print"{clr}":graphic0:bend
+ 2490 :rem ende
+ 2510 ift$="7"then2530
+ 2520 goto 270
+ 2530 end
+

@@ -1,0 +1,90 @@
+
+
+;cad.hard.mps802.prg ==0801==
+   10 a=peek(836)+1:poke836,a
+   20 ifa=1thenpoke55,0:poke56,31:clr:load"mps802.cad.obj",8,1
+   25 di=128:sys50192,11,15,1:sys50192,11,15,2:poke53280,14:poke53281,15
+   30 open1,8,15,"u9":close1:printchr$(14)chr$(8)
+   40 print"{gry1}{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+   50 print" {rvon}        Hardcopy - Hauptmenue         {rvof}"
+   60 fori=1to21:print" {CBM-H}                                    {CBM-N}":next
+   70 print" {rvon}    Druckertyp: MPS-802/1526          {rvof}{home}"
+   80 print"{home}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght} A. - Einzelne Grafik laden"
+   90 print"{down}{rght}{rght}{rght}{rght} B. - Grafik ansehen"
+  100 print"{down}{rght}{rght}{rght}{rght} C. - Diskettenkommando senden"
+  110 print"{down}{rght}{rght}{rght}{rght} D. - Directory anzeigen"
+  120 print"{down}{rght}{rght}{rght}{rght} E. - Einfache";:ifdi=0thenprint"{left}{left}{left}{left}{left}{left}{left}{left}Doppelte";
+  121 print" Dichte"
+  122 print"{down}{rght}{rght}{rght}{rght} F. - Hardcopy 1-fach"
+  123 print"{down}{rght}{rght}{rght}{rght} G. - Hardcopy 4-fach"
+  124 print"{down}{rght}{rght}{rght}{rght} H. - Hardcopy 10-fach"
+  130 poke198,0
+  140 getx$:ifx$=""goto140
+  150 a=asc(x$)-64:ifa<1ora>8goto140
+  160 onagoto1000,2000,3000,4000,1300,5000,6000,7000
+ 1000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 1010 print" {rvon}              Grafik laden            {rvof}":gosub1200
+ 1020 input"{home}{down}{down}{down}{down}{down}{rght}{rght} Name ";n$:ifn$=""orn$="_"goto30
+ 1030 iflen(n$)>10goto1020
+ 1040 sys50192,11,15,2:sys50299,2
+ 1050 open2,8,2,"pi."+n$+",p,r":fk=1:open1,8,15:gosub1105
+ 1060 iffgoto30
+ 1070 sys50442,2:close2:close1
+ 1080 sys50299,0:goto30
+ 1100 open1,8,15:fk=0
+ 1105 input#1,f,f$,t,s:iff=0thenreturn
+ 1110 iffkthensys50299,0:printchr$(14);chr$(8)
+ 1120 print:print"{down} {rvon}Diskettenstatus :"
+ 1130 print"{down}"f","f$","t","s
+ 1140 getx$:ifx$=""goto1140
+ 1150 close2:close1:return
+ 1200 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{home}{down}"
+ 1210 return
+ 1300 di=128-di:goto80
+ 1500 forx=8086to8092:pokex,0:nextx:poke8090,1:ifmthenpoke8092,2
+ 1510 poke780,17+d+m:sys50555:return
+ 2000 bs=1:poke198,0
+ 2010 sys50299,bs
+ 2020 getx$:ifx$=""goto2020
+ 2030 ifx$="1"thenbs=1:goto2010
+ 2040 ifx$="2"thenbs=2:goto2010
+ 2050 sys50299,0:poke53272,23:goto130
+ 3000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 3010 print" {rvon}       Diskettenkommando senden       {rvof}":gosub1200
+ 3020 poke631,34:poke198,1
+ 3030 input"{home}{down}{down}{down}{down}{down} Kommando ";c$:ifc$=""orc$="_"goto30
+ 3040 fk=0:open1,8,15,c$:gosub1105:iff=0thengosub1120
+ 3050 close2:close1:goto30
+ 4000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 4010 print" {rvon}          Directory anzeigen          {rvof}"
+ 4020 print"{home}{down}{down}":open2,8,0,"$0":gosub1100:iffgoto30
+ 4030 sys50475:close2:close1:poke198,0
+ 4040 getx$:ifx$=""goto4040
+ 4050 goto30
+ 5000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 5010 print" {rvon}            Hardcopy 1-fach           {rvof}":gosub1200
+ 5020 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}      Drucker eingeschaltet (j/n) ?":poke198,0
+ 5030 getx$:ifx$<>"j"andx$<>"n"goto5030
+ 5040 ifx$="n"goto30
+ 5050 m=0:d=di:gosub1500
+ 5060 goto30
+ 6000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 6010 print" {rvon}            Hardcopy 4-fach           {rvof}":gosub1200:m=64:d=0
+ 6020 n$="":input"{down}{down}{down}{down}{down}{rght}{rght}{rght}File - Name ";n$:ifn$=""orn$="_"goto30
+ 6030 forq=1to4step2:open2,8,2,"hv."+n$+str$(q)+",p,r":gosub1100:iffgoto7090
+ 6040 sys50442,1:close2:close1
+ 6050 open2,8,2,"hv."+n$+str$(q+1)+",p,r":gosub1100:iffgoto7090
+ 6060 sys50442,2:close2:close1
+ 6070 gosub1500:nextq
+ 6080 goto30
+ 7000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 7010 print" {rvon}            Hardcopy 10-fach          {rvof}":gosub1200:m=64:d=0
+ 7020 n$="":input"{down}{down}{down}{down}{down}{rght}{rght}{rght}File - Name ";n$:ifn$=""orn$="_"goto30
+ 7030 forq=1to10step2:open2,8,2,"hz."+n$+str$(q)+",p,r":gosub1100:iffgoto7090
+ 7040 sys50442,1:close2:close1
+ 7050 open2,8,2,"hz."+n$+str$(q+1)+",p,r":gosub1100:iffgoto7090
+ 7060 sys50442,2:close2:close1
+ 7070 gosub1500:nextq
+ 7080 goto30
+ 7090 q=20:nextq:goto30
+

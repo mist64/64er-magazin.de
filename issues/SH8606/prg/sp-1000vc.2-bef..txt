@@ -1,0 +1,219 @@
+
+
+;sp-1000vc.2-bef..prg ==0801==
+   10 rem **** kurzbeschreibung (befehlsliste) des programmes 'p3 sp-1000vc .2' ***
+   20 rem             (druckersteuerung mit basicerweiterung)
+   25 rem *** programmname 'bef p3 sp-tvc .2' ***
+   26 rem  **** horst novak  doeblingerhauptstrasse  1190 wien  ****
+   30 dr$="SEIKOSHA SP-1000VC"
+   31 k=0:fori=0to2:k=k+peek(50566+i):next
+   32 ifk=184 then 40
+   33 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rvon} druckerprogramm laden !!! ":print:print:print:print
+   34 print"load "chr$(34)"p3 sp-1000vc .2"chr$(34)",8,1{up}{up}{up}":end
+   40 sys49152:_rm:_rt:_d:_rd:_ml,03:_mr,74:_m
+   42 _d:gosub 990
+   50 _wl:_pq
+   60 _b:_st2,19:print"Druckersteuerung"
+   70 _st3,17:printdr$
+   80 _st3,00:print"Basicerweiterung";:_b0:_st3,53:print"Kurzbeschreibung"
+   90 gosub994
+  100 _eq:rem ******* _f
+  110 print"Programmname:"chr$(34)"P3 SP-1000VC .2"chr$(34);
+  120 print" Bereich:$C000-$CFFF";:_h:_lc:_st3,52:print"Horst NOVAK"
+  130 _t3:print"Doeblinger Hauptstrasse 44/16"
+  140 print"Aktivieren: SYS 49152  Desaktivieren: SYS 50601";
+  150 _h:_t3:print"1190 WIEN"
+  160 gosub994
+  170 print"Bei Aktivierung und Desaktivierung werden die Vektoren anderer Basic";
+  180 print"erweiterungen beruecksichtigt."
+  190 print"Parameter fuer Randeinstellung,Zeilenvorschub,Tabulatoren,Zeilen/Sei";
+  200 print"te & Grafikdaten werden in einer Tabelle abgelegt."
+  210 print"Diese Tabelle kann mit _RT oder _HP,_HF,_HE mit Normalwerten";
+  220 print" geladen werden."
+  230 _szr,209:_sz1,0110000:_z1:_z1:_z0:_la:_wl:_st1,36:_wl
+  240 _lf
+  245 rem =================================
+  250 _pq:print"_D  ";
+  251 _c:print"Druckerverbindung ein (Secundaeradr => Zeichensatz)";
+  252 _t1:_pq:print"_D0 ";
+  253 _c:print"Verbindung aus (Files,Tab & Druckerwerte bleiben "
+  254 _pq:print"_SS,n";
+  255 _c:_le:print"  Secundaeradresse (_D) setzen (n=0..Gross/Grafik,  ";
+  256 _t1:print"                       & _B0 & _Z0)"
+  257 _c:print"  n=7..Klein/Gross) wirksam in _D nur nach _RM !";
+  258 _t1:_pq:print"_RT ";:_c:_lf:print"Tabelle mit Normwerten laden & _D0"
+  260 _pq:print"_RD  ";
+  261 _c:print"Druckerreset (Tab & Druckerverbindung bleiben)";
+  262 _t1:_pq:print"_RM ";
+  263 _c:_lb:print"Masterreset (Files closed & _D0)"
+  264 gosub992:_wl
+  265 _pq:print"_P   ";
+  266 _c:print"Pica ein "
+  270 _pq:print"_PQ  ";
+  271 _c:print"Pica High Quality ein"
+  280 _pq:print"_E   ";
+  281 _c:print"Elite ein "
+  290 _pq:print"_EQ  ";
+  291 _c:print"Elite High Quality ein "
+  300 _pq:print"_C   ";
+  301 _c:print"Condensed (Komprimiert) ein"
+  310 _pq:print"_H   ";
+  311 _c:print"Hoch (Superscript) ein"
+  320 _pq:print"_T   ";
+  321 _c:print"Tief (Subscript) ein"
+  330 _pq:print"_K   ";
+  331 _c:print"Klein/Gross Zeichensatz ein"
+  340 _pq:print"_G   ";
+  341 _c:print"Gross/Grafik Zeichensatz ein"
+  350 _pq:print"_I   ";
+  351 _c:print"Italik (Kursiv) ein ";
+  352 _t1:_pq:print"_I0 ";
+  353 _c:print"Italic (Kursiv) aus"
+  360 _pq:print"_B   ";
+  361 _c:print"Breitschrift (Double Width) ein & _Z0";
+  362 _t1:_pq:print"_B0 ";
+  363 _c:print"Breitschrift (Double Width) aus & _Z0"
+  370 _pq:print"_F   ";
+  371 _c:print"Fettscrift (Double Strike) ein";
+  372 _t1:_pq:print"_F0 ";
+  373 _c:print"Fettschrift (Double Strike) aus"
+  380 _pq:print"_R   ";
+  381 _c:print"Revers ein ";
+  382 _t1:_pq:print"_R0 ";
+  383 _c:print"Revers aus"
+  400 _pq:print"_U   ";
+  401 _c:print"Unterstreichen ein ";
+  402 _t1:_pq:print"_U0 ";
+  403 _c:_lb:print"Unterstreichen aus "
+  404 gosub992:_wl
+  410 _pq:print"_W   ";
+  411 _c:print"Nur Wagenruecklauf (CS)"
+  420 _pq:print"_WL  ";
+  421 _c:print"Wagenruecklauf & Zeilenvorschub (LF)";
+  422 _t1:_pq:print"_WQ ";
+  423 _c:print"Wagenruecklauf,Zeilenvorschub & Quote cleared (CR) "
+  430 _pq:print"_X   ";
+  431 _c:print"Unidirectionaler Druck ein ";
+  432 _t1:_pq:print"_X0 ";
+  433 _c:print"Unidirectionaler Druck aus "
+  440 _pq:print"_FF  ";
+  441 _c:print"Formfeed (Formulartransport) (norm 54)  ";
+  442 _t1:_pq:print"_SZS,n";
+  443 _c:_lb:print"  Zeilen/Seite (max 127) setzen              *) "
+  444 gosub992:_wl
+  450 _pq:print"_L1  ";
+  451 _c:print"Zeilenvorschub aus Tabelle (norm 1/2 Punkt)        ";
+  452 _t1:_pq:print"_SL1,n";
+  453 _c:_lf:print"  Zeilenvorschub n*1/144 in(1/2 Pkt)setzen   *) "
+  460 _pq:print"_L2 _L3 ";
+  461 _c:print"  wie _L1 (norm 1 Pkt bzw 7.5 Pkte)";
+  462 _t1:_pq:print"_SL2,n _SL3,n";
+  463 _c:print"  wie _SL1                       *) "
+  470 _pq:print"_LA _LB _LC ";
+  471 _c:print"Zeilenvorschub fuer _H (Grafik{CBM-V}Minimum{CBM-V}Normal{CBM-V})"
+  480 _pq:print"_LD _LE _LF _LG _LH ";
+  481 _c:_lb:print"Zeilenvorschub fuer _E,_P ";
+  482 print"(Grafik{CBM-V}Minimum{CBM-V}Normal{CBM-V}1 Zeile{CBM-V}1 1/2 Zeilen{CBM-V})"
+  494 gosub992:_wl
+  500 _pq:print"_M   ";
+  501 _c:print"Linker & rechter Rand aus Tabelle (norm 00 & 72) ";
+  502 _t1:_pq:print"_ML,nm ";
+  503 _c:_lf:print"Linken Rand in Tabelle (nm Pica) setzen"
+  512 _t1:_pq:print"_MR,nm ";
+  513 _c:print"Rechten Rand in Tabelle (nm Pica) setzen"
+  520 _pq:print"_TA  ";
+  521 _c:print"Tabulator aus Tabelle (norm 16*1/60 in)";
+  522 _t1:_pq:print"_STA,n,m ";
+  523 _c:print"Tabulator (n*250 + m 1/60 inch) setzen  *)"
+  530 _pq:print"_TB  ";
+  531 _c:print"Tabulator aus Tabelle (nicht normalisiert !! )";
+  532 _t1:_pq:print"_STB,n,m ";
+  533 _c:print"Tabulator (n*250 + m 1/60 inch) setzen  *)"
+  540 _pq:print"_T1  ";
+  541 _c:print"Tabulator aus Tabelle (norm 01 Pica) ";
+  542 _t1:_pq:print"_ST1,nm ";
+  543 _c:print"Tabulator (nm Pica) setzen                *)"
+  550 _pq:print"_T2 _T3 ";
+  551 _c:print"Tabulator aus Tabelle (norm 35 bzw 55 Pica)";
+  552 _t1:_pq:print"_ST2,nm _ST3,nm ";
+  553 _c:_lb:print"Tabulator (nm Pica) setzen  *)"
+  554 gosub992:_wl
+  570 _pq:print"_NB  ";
+  571 _c:print"Tab & Drucker fuer Brief A4 (_PQ,......   ) ";
+  580 _t1:_pq:print"_NL  ";
+  581 _c:_lb:print"Tab & Drucker fuer Listing(_C,...........  )"
+  594 gosub992:_wl
+  600 _pq:print"_Z   ";
+  601 _c:print"Grafikmode ein  ";
+  602 _t1:_pq:print"_Z0 ";
+  603 _c:_lf:print"Grafikmode aus"
+  610 _pq:print"     ";
+  611 _c:print"                                                   ";
+  612 _t1:_pq:print"_SZR,n ";
+  613 _c:print"Grafikrepeat (n=1-255,n=0..256) setzen    "
+  620 _pq:print"_Z1  ";
+  621 _c:print"Grafikdaten1 aus Tabelle Grafikrepeat mal zeichnen ";
+  622 _t1:_pq:print"_SZ1,nnnnnnn ";
+  623 _c:print"Grafdaten mit 0 oder 1 setzen       "
+  630 _pq:print"_Z2 _Z3 .. _Z9 ";
+  631 _c:print"Wie _Z1 ";
+  632 _t1:_pq:print"_SZ2,nnnnnnn .._SZ9, ";
+  633 _c:print"Wie _Sz1,nnnnnnn"
+  640 _pq:print"_ZF  ";
+  641 _c:_lb:print"Grafikdaten1-8 aus Tabelle Grafikrepeat mal zeichnen;z.B. ";
+  642 print"Tab normal & Repeat=10:    ";
+  643 _szr,10:_zf:_z0:_wl
+  659 gosub992:_wl
+  660 _pq:print"_HL";:_eq:printchr$(34)"Bildname";chr$(34);" ";
+  661 _c:print"Hiresbild (33 Bloecke) von Disk laden ";
+  662 _t1:_pq:print"_HP ";
+  663 _c:_lf:print"Hiresbild (A000-BFFF) drucken (_TB..linker Rand)"
+  670 _pq:print"_HF  ";
+  671 _c:print"Wie _HP aber Fettdruck (doppelte Zeit)";
+  672 _t1:_pq:print"_HE ";
+  673 _c:_lb:print"Wie _HP aber entzerrter Fettdruck (4fache Zeit)"
+  800 gosub993:_wl
+  802 _pq:_lf:print"_IN(X,Y),F,"chr$(34)"T"chr$(34)",L,"chr$(34)"Z"chr$(34)",";
+  804 print"VV$      ";:_c:print"Formatierter INPUT Befehl fuer max. 255 Zeichen
+  806 _st1,05
+  808 print"X...Spalte(0-39) Y...Zeile(0-24) ,F...Farbe von Text & Eingabefeld ";
+  810 _le:print"(0-15) T...Text(vor Eingabefeld)"
+  811 _t1:print"L...Laenge Eingabefeld ";
+  812 print"Z...Beschraenkung auf erlaubteZeichen(<30) VV$...Stringvariable";
+  814 print"(max. 255 Zeichen)"
+  816 _st1,07:print",F   "chr$(34)"T"chr$(34)"   "chr$(34)"Z"chr$(34);
+  818 _lb:print"  koennen weggelassen werden  _IN(X,Y)L,VV$  _IN(X,Y),F,L,VV$ usw"
+  820 gosub992:_wl
+  822 _pq:_lf:print"_TX(X,Y),F,"chr$(34)"T"chr$(34)"  oder VV$  ";
+  824 _c:print"    PRINT Text AT Befehl"
+  826 _st1,05
+  828 print"X...Spalte(0-39) Y...Zeile(0-24) ,F...Farbe des Textes";
+  830 _le:print"(0-15) T...Text oder VV$...Stringvariable"
+  832 _st1,07:print",F   kann weggelassen werden     _TX(X,Y)"chr$(34)"T";
+  834 _lb:print chr$(34) "oder _TX(X,Y)VV$
+  836 gosub992:_wl
+  838 _pq:_lf:print"_SC,A       ";
+  840 _c:print"    SCROLL UP Befehl    "
+  842 _st1,05
+  844 _le:print",A...Anzahl der zu scrollenden Zeilen";
+  846 _lb:print"     ,A   kann weggelassen werden     _SC "
+  848 gosub992:_wl
+  850 _pq:_lf:print"_CL,Y,A       ";
+  852 _c:print"    CLEAR{$a0}LINE Befehl    "
+  854 _st1,05
+  856 _le:print"Y...Zeile(0-24)  ,A...Anzahl der zu loeschenden Zeilen";
+  858 _lb:print
+  860 gosub992:_wl
+  862 _pq:_lf:print"_CS           ";
+  864 _c:_lb:print"    CLEAR{$a0}SCREEN Befehl    "
+  866 gosub993:_wl
+  870 _c:print"*) ";:_h:print"Werte werden in Tabelle gesetzt & zu Drucker ";
+  872 print"gesendet":_lb: _wl
+  900 gosub990:_rd:_rm:end
+  910 rem *** grafiksubroutinen
+  990 _d:_sz1,0001000:_sz2,0011100:_sz3,0110110:_sz4,1100011
+  991 _szr,59:_z1:_z2:_z3:_szr,64:_z4:_szr,59:_z3:_z2:_z1:_z0:return
+  992 _szr,209:_sz2,0000010:_z2:_z2:_rt:_d:_le:_ml,03:_mr,74:_m:_st1,36:return
+  993 _st1,36:_w:_szr,209:_sz2,0000011:_z2:_z2:_z0:_lf:return
+  994 _szr,209:_sz5,1100000:_z5:_z5:_z0:_la:_wl:_lc:return
+

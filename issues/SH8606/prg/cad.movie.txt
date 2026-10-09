@@ -1,0 +1,103 @@
+
+
+;cad.movie.prg ==0801==
+    5 rem  **********************************
+   10 rem *   giga-cad     graphic-system  *
+   15 rem *          'cad.movie'           *
+   20 rem * by s. vilsmeier & s. lippstreu *
+   25 rem **********************************
+   30 :
+   35 :
+   40 a=peek(836)+1:poke836,a:ifa=1thenload"movie.cad.obj",8,1
+   45 poke55,0:poke56,24:clr
+   50 c1=11:c4=15:c5=15:c2=12:c3=0
+   55 poke53280,14:poke53281,15:poke646,11
+   60 open1,8,15,"u9":close1:printchr$(14);chr$(8);
+   65 :
+   70 :
+   75 print"{clr}{rvon}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D}{CBM-D} {rvof}";
+   80 print"{rvon} oo                                  oo {rvof}";
+   85 print"{rvon} {rvof}  {rvon}(       Movie - Hauptmenue       ){rvof}  {rvon} {rvof}";
+   90 print"{rvon} ><                                  >< {rvof}";
+   95 print"{rvon}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C}{CBM-C} {rvof}";
+  100 print"{rvon}{CBM-D}{rvof}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{rvon}{CBM-F}{rvof}";
+  105 fori=1to18:print"{CBM-H}                                      {CBM-N}";:next
+  110 print"{rvon}{CBM-C}{rvof}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{home}":poke2023,254:poke56295,11
+  115 print"{home}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght} A. - Film laden"
+  120 print"{down}{rght}{rght}{rght}{rght} B. - Einzelnes Bild laden"
+  125 print"{down}{rght}{rght}{rght}{rght} C. - Diskettenkommando senden"
+  130 print"{down}{rght}{rght}{rght}{rght} D. - Directory"
+  135 print"{down}{rght}{rght}{rght}{rght} E. - Ablauf : zyklisch        ";
+  140 ifzthenprint"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}vor-/rueckwaerts";
+  145 print:print"{down}{rght}{rght}{rght}{rght} F. - Modus  : Hires     ";
+  150 ifmthenprint"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}Multicolor";
+  155 print:print"{down}{rght}{rght}{rght}{rght} G. - Farben aendern"
+  160 print"{down}{rght}{rght}{rght}{rght} H. - Film ansehen":poke198,0
+  165 getx$:ifx$<"a"orx$>"h"goto165
+  170 onasc(x$)-64goto185,350,310,275,400,405,420,485
+  175 :
+  180 :
+  185 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  190 print" {rvon}              Film laden              "
+  195 gosub495:n$="":input"{home}{down}{down}{down}{down}{down}{rght}{rght}File - Name ";n$:ifn$=""orn$="_"goto55
+  200 iflen(n$)>10goto195
+  205 a=6144:forx=1to24:print"{home}{down}{down}{down}{down}{down}{down}{down}  Bild"x
+  210 open2,8,2,"fi."+n$+str$(x)+",p,r":gosub230:iffgoto55
+  215 sys50187,a:close2:close1:a=a+2048:ifa=49152thena=51200
+  220 nextx
+  225 goto55
+  230 open1,8,15
+  235 input#1,f,f$,t,s:iff=0thenreturn
+  240 print:print"{down} {rvon}Diskettenstatus :"
+  245 print"{down}"f","f$","t","s
+  250 poke198,0
+  255 getx$:ifx$=""goto255
+  260 close2:close1:return
+  265 :
+  270 :
+  275 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  280 print" {rvon}          Directory anzeigen          ":print
+  285 open1,8,15:open2,8,0,"$0":gosub235:iffgoto55
+  290 sys50772:close2:gosub235:iff=0thengosub250
+  295 goto55
+  300 :
+  305 :
+  310 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  315 print" {rvon}       Diskettenkommando senden       ":gosub495
+  320 poke631,34:poke198,1
+  325 input"{home}{down}{down}{down}{down}{down}  Kommando ";c$:ifc$=""goto55
+  330 open1,8,15,c$:gosub235:iff=0thengosub240
+  335 goto55
+  340 :
+  345 :
+  350 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  355 print" {rvon}         Einzelnes Bild laden         ":gosub495
+  360 input"{home}{down}{down}{down}{down}{down}{rght}{rght}File - Name des Bildes ";n$:ifn$=""goto55
+  365 iflen(n$)>13goto360
+  370 print"{home}{down}{down}{down}{down}{down}{down}{down}  An welche Stelle im Film soll das"
+  375 n=-1:input"{down}  Bild geladen werden    ";n
+  380 ifn<1orn>24goto370
+  385 a=4096+n*2048:ifn>21thena=a+2048
+  390 open2,8,2,"fi."+n$+",p,r":gosub230:iffgoto55
+  395 sys50187,a:close2:close1:goto55
+  400 z=1-z:goto115
+  405 m=1-m:goto115
+  410 :
+  415 :
+  420 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  425 print" {rvon}            Farben aendern            ":gosub495
+  430 ifmgoto455
+  435 print"{home}{down}{down}{down}  Vordergrund  "c1;:input"{left}{left}{left}{left}{left}";c1:ifc1<0orc1>15goto435
+  440 print"{home}{down}{down}{down}{down}{down}  Hintergrund  "c4;:input"{left}{left}{left}{left}{left}";c4:ifc4<0orc4>15goto440
+  445 print"{home}{down}{down}{down}{down}{down}{down}{down}  Rand         "c5;:input"{left}{left}{left}{left}{left}";c5:ifc5<0orc5>15goto445
+  450 goto55
+  455 print"{home}{down}{down}{down} Farbe 1      "c1;:input"{left}{left}{left}{left}{left}";c1:ifc1<0orc1>15goto455
+  460 print"{home}{down}{down}{down}{down}{down} Farbe 2      "c2;:input"{left}{left}{left}{left}{left}";c2:ifc2<0orc2>15goto460
+  465 print"{home}{down}{down}{down}{down}{down}{down}{down} Farbe 3      "c3;:input"{left}{left}{left}{left}{left}";c3:ifc3<0orc3>15goto465
+  470 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down} Hintergrund  "c4;:input"{left}{left}{left}{left}{left}";c4:ifc4<0orc4>15goto470
+  475 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} Rand         "c5;:input"{left}{left}{left}{left}{left}";c5:ifc5<0orc5>15goto475
+  480 goto55
+  485 print"{clr}";:ifmthenpoke53280,c5:poke53281,c4:sys50284,z,m,c1,c2,c3:goto55
+  490 poke53280,c5:sys50284,z,m,c1,c4,c3:goto55
+  495 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{home}":return
+

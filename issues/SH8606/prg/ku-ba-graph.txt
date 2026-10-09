@@ -1,0 +1,95 @@
+
+
+;ku-ba-graph.prg ==0801==
+   10 poke53272,23:poke53280,7:poke53281,7
+   20 print"{clr}{down}{down}{blk}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}";
+   25 print"{rvon}****************************************";
+   30 print"***     Kurven- u. Balkengraphik     ***";
+   35 print"****************************************{rvof}";
+   40 print"{down}{down}           (c)  E. Witte 1985"
+   50 print"{down}{down}{down}           Unterprogramm fuer"
+   60 print"{down}             Epson-Support"
+   70 print"{down}              (c)  64'er"
+   80 print"{down}{down}{down}              {rvon} * TASTE * {rvof}"
+   90 getx$:ifx$=""then90
+  100 input"{clr}{down}Wieviel Kurven (1 - 3) :";k
+  110 dima(12,k-1):forx=1tok:gosub120:next:goto290
+  120 print"{clr}         Angaben fuer Kurve";x
+  130 input"{down}Sind Daten auf Disk gespeich.(j/n)   j{left}{left}{left}";x$:ifx$<>"j"then160
+  140 print"{down}Name der Datei (max. 15 Zeichen):":inputy$(x)
+  150 open2,8,2,y$(x)+",s,r":fory=0to12:input#2,a(y,x-1):next:close2
+  160 ifx=1theninput"{down}{down}Ausdruck integer od. kaufm. (i/k) :";a$
+  170 print"{clr}         Angaben fuer Kurve";x
+  180 print"{down}{down}Jahressoll:";a(0,x-1):print"Januar    :";a(1,x-1):print"Februar   :"a(2,x-1)
+  190 print"Maerz     :";a(3,x-1):print"April     :";a(4,x-1):print"Mai       :"a(5,x-1)
+  200 print"Juni      :";a(6,x-1):print"Juli      :";a(7,x-1):print"August    :"a(8,x-1)
+  210 print"September :";a(9,x-1):print"Oktober   :";a(10,x-1):print"November  :"a(11,x-1)
+  220 print"Dezember  :";a(12,x-1):print"{down}{down}Ausdruck bis Monat (1-12):"
+  230 print"{down}{down}Daten auf Disk speichern ? (j/n)"
+  240 print"{home}{down}{down}":fory=0to12:input"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a(y,x-1):next
+  250 input"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";m(x)
+  260 input"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}j{left}{left}{left}";y$:ify$<>"j"then280
+  270 ifx$<>"j"thenprint"{down}Name der Datei (max. 15 Zeichen):":inputy$(x)
+  275 open2,8,2,"@:"+y$(x)+",s,w":fory=0to12:print#2,a(y,x-1):next:close2
+  280 y$="":return
+  290 poke53272,21:print"{clr}{down}{down}{down}ueberschrift   (max. 17 zeichen):":inputy$:iflen(y$)>17then290
+  295 y=int((17-len(y$))/2):x$="         ":y$=left$(x$,y)+y$+left$(x$,y)
+  300 rem raster-graphik
+  320 &clear:&line0,0,799,0:&line799,0,799,531:&line799,531,0,531:&line0,531,0,0
+  330 &line1,1,798,1:&line798,1,798,530:&line798,530,1,530:&line1,530,1,1
+  340 forx=99to699step10:fory=40to480step10:&dotx,y:print".";:next:next
+  350 forx=104to694step10:fory=60to480step30:&dotx,y:print".";:next:next
+  360 forx=99to699step50:fory=45to485step10:&dotx,y:print".";:next:next
+  370 &line99,480,699,150:&line319,30,455,30
+  380 x=145:y=490:&textx,y,"j":&textx,y+10,"a":&textx,y+20,"n"
+  390 x=x+50:&textx,y,"f":&textx,y+10,"e":&textx,y+20,"b"
+  400 x=x+50:&textx,y,"m":&textx,y+10,"r":&textx,y+20,"z"
+  410 x=x+50:&textx,y,"a":&textx,y+10,"p":&textx,y+20,"r"
+  420 x=x+50:&textx,y,"m":&textx,y+10,"a":&textx,y+20,"i"
+  430 x=x+50:&textx,y,"j":&textx,y+10,"u":&textx,y+20,"n"
+  440 x=x+50:&textx,y,"j":&textx,y+10,"u":&textx,y+20,"l"
+  450 x=x+50:&textx,y,"a":&textx,y+10,"u":&textx,y+20,"g"
+  460 x=x+50:&textx,y,"s":&textx,y+10,"e":&textx,y+20,"p"
+  470 x=x+50:&textx,y,"o":&textx,y+10,"k":&textx,y+20,"t"
+  480 x=x+50:&textx,y,"n":&textx,y+10,"o":&textx,y+20,"v"
+  490 x=x+50:&textx,y,"d":&textx,y+10,"e":&textx,y+20,"z"
+  500 &invtext40,30,"mtl.":&invtext729,30,"lfd.":&invtext319,20,y$
+  510 rem einzelpunkt-graphik
+  520 forv=1tok:x=99:y=480
+  530 forz=1tom(v):x1=x+50:y1=y-int(330*a(z,v-1)/a(0,v-1)):ify1<0theny1=0
+  535 ifv>1thengosub700:goto545
+  540 q=q+a(z,v-1):&linex,y,x1,y1:gosub560
+  545 x=x+50:y=y1:next:next
+  550 &print:gosub750:print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}             e n d e":end
+  560 rem *** werte-druck ***
+  565 i=1:ifa$="k"theni=100
+  570 x$="        ":z$=right$(x$,9-len(str$(q*i)))+str$(q*i):v$=".":v1$=v$
+  580 q$=right$(x$,9-len(str$(a(z,v-1)*i)))+str$(a(z,v-1)*i):ifa$="k"then630
+  585 ifq<1000ora(z,v-1)<1000thenv1$=" "
+  590 v$=".":ifleft$(z$,3)="   "thenv$=" "
+  600 z$=left$(z$,3)+v$+mid$(z$,4,3)+v1$+right$(z$,3):&text699,y1-4,z$
+  610 v$=".":ifleft$(q$,3)="   "thenv$=" "
+  620 q$=left$(q$,3)+v$+mid$(q$,4,3)+v1$+right$(q$,3):&text0,y1-4,q$:return
+  630 v$=".":ifleft$(z$,4)="    "thenv$=" "
+  640 z$=left$(z$,4)+v$+mid$(z$,5,3)+","+right$(z$,2):&text699,y1-4,z$
+  650 v$=".":ifleft$(q$,4)="    "thenv$=" "
+  660 q$=left$(q$,4)+v$+mid$(q$,5,3)+","+right$(q$,2):&text0,y1-4,q$:return
+  700 rem *** punkt-kurve ***
+  710 b=y-y1:fora1=0to50:b1=int(b/50*a1+.5):b2=int(b/50*(a1+v)+.5)
+  720 ifv>2then740
+  730 &dotx+a1,y-b1:print"*";:a1=a1+1:next: return
+  740 &linex+a1,y-b1,x+a1+v,y-b2:a1=a1+v+5:print"*";:next:return
+  750 rem *** balkengraphik ***
+  760 &clear:&line0,0,799,0:&line799,0,799,180:&line799,180,0,180:&line0,180,0,0
+  770 &line1,1,798,1:&line798,1,798,179:&line798,179,1,179:&line1,179,1,1
+  780 forx=99to699step10:fory=20to160step10:&dotx,y:print".";:next:next
+  790 forx=99to699step50:fory=25to155step10:&dotx,y:print".";:next:next
+  800 &line79,90,719,90:&text30,86,"soll":&text749,86,"soll"
+  810 x=120:y=165:&textx,y,"j":x=x+50:&textx,y,"f":x=x+50:&textx,y,"m"
+  820 x=x+50:&textx,y,"a":x=x+50:&textx,y,"m":x=x+50:&textx,y,"j"
+  830 x=x+50:&textx,y,"j":x=x+50:&textx,y,"a":x=x+50:&textx,y,"s"
+  840 x=x+50:&textx,y,"o":x=x+50:&textx,y,"n":x=x+50:&textx,y,"d"
+  850 i=30/k:forv=1tok:x=109:ifv>1thenx=x+i:ifv>2thenx=x+i
+  860 forz=1tom(v):y=160:x1=x+i:y1=y-int(840*a(z,v-1)/a(0,v-1)):ify1<0theny1=0
+  870 forq=y1toystepv:&linex,q,x1,q:next:x=x+50:next:next:&print:return
+

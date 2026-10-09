@@ -1,0 +1,590 @@
+
+
+;s.c.s..prg ==0901==
+ 1000 rem
+ 1010 rem *****************************
+ 1020 rem *                           *
+ 1030 rem *  sprite construction set  *
+ 1040 rem *                           *
+ 1050 rem *           v12.1           *
+ 1060 rem *                           *
+ 1070 rem *     c64 grundversion      *
+ 1080 rem *                           *
+ 1090 rem *    by carsten fuehrmann   *
+ 1100 rem *                           *
+ 1110 rem *       hopfenleithe 21     *
+ 1120 rem *                           *
+ 1130 rem *    8521 weisendorf-buch   *
+ 1140 rem *                           *
+ 1150 rem *      tel. 01932/4769      *
+ 1160 rem *                           *
+ 1170 rem *****************************
+10000 :
+10010 rem *** initialisieren ***
+10015 :
+10025 gosub 10030:goto 11330
+10028 :
+10030 v=53248
+10040 for i=0 to 7
+10050 :read b(i)
+10055 :sx(i)=160:sy(i)=120
+10060 :poke 2040+i,b(i)
+10070 next
+10080 data 11,13,14,15,32,33,34,35
+10150 dim f$(15)
+10160 for i=0 to 15:read f$(i):next
+10170 data schwarz.,weiss...,rot.....
+10180 data tuerkis.,violett.,gruen...
+10190 data blau....,gelb....,orange..
+10200 data braun...,hellrot,grau 1.
+10210 data grau 2.,hellgrn,hellbl.
+10220 data grau 3.
+10230 fr=54272:j2=56320:cf=5
+10240 poke 650,128
+10290 :
+10300 rem *** mapro-adressen ***
+10310 :
+10320 nf=49152
+10330 mf=nf+3:co=nf+6:ho=nf+9:nm=nf+12
+10340 mm=nf+15:cl=nf+18:tu=nf+21
+10350 rl=nf+24:rr=nf+27:ru=nf+30
+10360 rd=nf+33:xr=nf+36:kp=nf+39
+10370 bs=nf+42:ps=nf+45:sq=nf+48
+10372 sp=nf+51:pu=nf+54:ct=nf+57
+10374 sr=nf+60
+10380 :
+10390 for i=0 to 15 step 2
+10400 :poke v+i,15:poke v+i+1,60
+10410 next
+10420 poke v+16,255
+10440 mo$=ro$+"+":fi=2
+10450 cl$=chr$(147):ro$=chr$(18)
+10460 rf$=chr$(146):ho$=chr$(19)
+10470 bk$=chr$(157):cr$=chr$(13)
+10480 de$=chr$(20)
+11000 :
+11020 rem *** bildschirm-maske ***
+11030 :
+11050 m1$=ro$+"                           "+rf$+" "+ro$
+11060 m2$=rf$+"                        "+ro$+" "+rf$+" "+ro$
+11070 m3$="76543210":m3$=ro$+"  "+m3$+m3$+m3$+" "+rf$
+11080 sys (kp) 0,0,cf,cl$
+11090 print m3$
+11100 print ro$;" 0";m2$
+11110 print ro$;" 3";m2$
+11120 print ro$;" 6";m2$
+11130 print ro$;" 9";m2$
+11140 print ro$;"12";m2$
+11150 print ro$;"15";m2$
+11160 print ro$;"18";m2$
+11170 print ro$;"21";m2$;"0 "
+11180 print ro$;"24";m2$;"4 nummer:"
+11190 print ro$;"27";m2$;"5 farbe 1: "
+11200 print ro$;"30";m2$
+11210 print ro$;"33";m2$;"6 farbe 2: "
+11220 print ro$;"36";m2$
+11230 print ro$;"39";m2$;"7 farbe 3: "
+11240 print ro$;"42";m2$
+11250 print ro$;"45";m2$;"8 hintergr."
+11260 print ro$;"48";m2$
+11270 print ro$;"51";m2$;"9 rahmen:  "
+11280 print ro$;"54";m2$
+11290 print ro$;"57";m2$;"a schrift: "
+11300 print ro$;"60";m2$
+11310 print ro$;m1$;"  vergr.:"
+11320 gosub 12042
+11325 return
+11328 :
+11330 if (peek(v+28) and fm) goto 14042
+11340 goto 13045
+12000 :
+12020 rem *** parameteranzeige ***
+12040 :
+12042 fm=2^bi
+12045 f(2)=peek(v+39+bi)and15
+12048 f(1)=peek(v+37)and15:f(3)=peek(v+38)and15
+12050 sys (kp) 30,9,cf,ro$;
+12055 mc=(peek(v+28) and fm)/fm
+12060 if mc goto 12100
+12070 print "normal   "
+12080 goto 12130
+12100 print "multicol "
+12130 sys (kp) 37,10,cf,bi
+12150 sys (kp) 28,12,cf,str$(f(1));" ";f$(f(1))
+12170 sys (kp) 28,14,cf,str$(f(2));" ";f$(f(2))
+12190 sys (kp) 28,16,cf,str$(f(3));" ";f$(f(3))
+12220 f=peek(v+33) and 15
+12230 sys (kp) 28,18,cf,str$(f);" ";f$(f)
+12240 f=peek(v+32) and 15
+12250 sys (kp) 28,20,cf,str$(f);" ";f$(f)
+12252 f=peek(55296) and 15
+12260 sys (kp) 28,22,cf,str$(f);" ";f$(f)
+12270 sys (kp) 37,23,cf,"  ";bk$;bk$;
+12275 ex=(peek(v+29) and fm)/fm
+12280 if ex then print "x";
+12285 ey=(peek(v+23) and fm)/fm
+12290 if ey then print "y";
+12300 poke v+21,fm
+12999 return
+13000 :
+13020 rem *** normal-editieren ***
+13040 :
+13045 mo$=ro$+"+"
+13050 sys (nf) bi
+13060 j=peek(j2)
+13070 if (jand1) goto 13090
+13080 :if y then y=y-1
+13090 if (jand2) goto 13110
+13100 :if y<20 then y=y+1
+13110 if (jand4) goto 13130
+13120 :if x then x=x-1
+13130 if (jand8) goto 13160
+13140 :if x< 23 then x=x+1
+13150 :
+13160 sys (kp) 2+x,2+y,f(2),mo$
+13180 get x$:if x$="" goto 13230
+13190 :if x$="+" then mo$=ro$+x$:goto 13230
+13200 :if x$="-" then mo$=x$:goto 13230
+13210 :goto 15050
+13230 if peek(653)=4 goto 16042
+13240 if (jand16) goto 13400
+13250 :de=b(bi)*64+3*y+int(x/8)
+13260 :m=2^(7-(xand7))
+13270 :if mo$="-" goto 13350
+13280 : poke de,peek(de) or m
+13290 : goto 13400
+13300 :
+13350 : poke de,peek(de) and (255-m)
+13400 goto 13050
+14000 :
+14020 rem *** multicolor-editieren ***
+14030 :
+14042 x=x and 254
+14046 mo$=ro$+"0"+right$(str$(fi),1)
+14048 :
+14050 sys (mf) bi
+14060 j=peek(j2)
+14070 if (jand1) goto 14090
+14080 :if y then y=y-1
+14090 if (jand2) goto 14110
+14100 :if y<20 then y=y+1
+14110 if (jand4) goto 14130
+14120 :if x then x=x-2
+14130 if (jand8) goto 14160
+14140 :if x<22 then x=x+2
+14150 :
+14160 sys (kp) 2+x,2+y,f(fi),mo$
+14180 get x$:if x$="" goto 14220
+14190 if x$>="1" and x$<="3" then mo$=ro$+"0"+x$:fi=val(x$):goto 14220
+14200 if x$="-" then mo$="--":goto 14220
+14210 goto 15050
+14220 if peek(653)=4 goto 16042
+14225 if (jand16) goto 14400
+14230 :de=b(bi)*64+3*y+int(x/8)
+14240 :m=2^(7-(xand7))
+14250 :poke de,peek(de) and (255-m*1.5)
+14260 :if mo$="--" goto 14400
+14270 : poke de,peek(de) or m*(fi/2)
+14400 goto 14050
+15000 :
+15020 rem *** parameter verstellen ***
+15040 :
+15050 if x$="0" then sys (xr) v+28,fm
+15070 if x$="4" then bi=(bi+1) and 7
+15080 if x$="5" then poke v+37,(peek(v+37)+1)and15
+15090 if x$="6" then poke v+39+bi,(peek(v+39+bi)+1)and15
+15100 if x$="7" then poke v+38,(peek(v+38)+1)and15
+15110 if x$="8" then poke v+33,(peek(v+33)+1)and15
+15120 if x$="9" then poke v+32,(peek(v+32)+1)and15
+15130 if x$="x" then sys (xr) v+29,fm
+15140 if x$="y" then sys (xr) v+23,fm
+15150 if x$="a" then cf=(cf+1)and7:sys (sr) cf
+15990 gosub 12042
+15995 poke 198,0
+15998 if mc goto 14042
+15999 goto 13045
+16000 :
+16020 rem *** befehle ***
+16040 :
+16042 gosub 38030
+16050 sys (kp)1,0,cf," befehl:"
+16060 gosub 50025
+16065 le$=left$(be$,3):ri$=right$(be$,3):ri=val(right$(ri$,2))and7
+16070 if le$="rol" then gosub 27050
+16080 if le$="cop" then gosub 20030
+16090 if le$="xor" then sys (co) b(bi),b(ri),81
+16100 if le$="or " then sys (co) b(bi),b(ri),17
+16110 if le$="and" then sys (co) b(bi),b(ri),49
+16120 if le$="swa" then sys (ho) b(bi)
+16130 if le$="fli" then sys (nm) b(bi):if mc then sys (mm) b(bi)
+16140 if le$="rot" then sys (tu) b(bi)
+16150 if le$="cle" then sys (cl) b(bi)
+16170 if le$="sav" and ri$="ldr" then gosub 29030
+16180 if le$="sav" and ri$="prg" then gosub 30030
+16190 if be$="save" then gosub 31030
+16200 if be$="load" then gosub 32030
+16210 if le$="seq" then gosub 33070
+16220 if le$="dis" then gosub 42022
+16229 if le$="puz" then gosub 34070
+16230 if le$="cat" then gosub 41030:gosub 40050:gosub 37030:gosub 11080
+16250 if le$="sav" and ri$="all" then gosub 35030
+16260 if le$="loa" and ri$="all" then gosub 36030
+16270 gosub 38030
+16980 gosub 12042
+16990 if mc goto 14042
+16995 goto 13045
+20000 :
+20010 rem *** kopieren ***
+20020 :
+20030 sys (co) b(bi),b(ri),4
+20040 if (peek(v+23) and 2^ri)/2^ri = (peek(v+23) and fm)/fm goto 20050
+20045 sys (xr) v+23,fm
+20050 if (peek(v+29) and 2^ri)/2^ri = (peek(v+29) and fm)/fm goto 20060
+20055 sys (xr) v+29,fm
+20060 if (peek(v+28) and 2^r)/2^ri = (peek(v+28) and fm)/fm goto 20070
+20065 sys (xr) v+28,fm:mc=1-mc
+20070 poke v+39+bi,peek(v+39+ri)
+20999 return
+27000 :
+27020 rem *** verschieben ***
+27040 :
+27050 j=peek(j2)
+27060 mo=(jand16)
+27070 if (jand1) goto 27080
+27075 sys (ru) b(bi),mo
+27080 if (jand2) goto 27090
+27085 sys (rd) b(bi),mo
+27090 if (jand4) goto 27100
+27092 sys (rl) b(bi),mo
+27095 if mc then sys (rl) b(bi),mo
+27100 if (jand8) goto 27110
+27102 sys (rr) b(bi),mo
+27105 if mc then sys (rr) b(bi),mo
+27110 if mc=0 then sys (nf) bi
+27115 if mc   then sys (mf) bi
+27120 get a$:if a$="x" then poke 198,0:return
+27130 goto 27050
+29000 :
+29010 rem *** basic lader saven ***
+29020 :
+29030 gosub 38030
+29040 print ho$;" name:"
+29050 gosub 50025:f$="l."+be$
+29060 gosub 38030
+29070 print ho$;" block:"
+29080 gosub 50025:if vb<0 or vb>1023 goto 29080
+29085 sb=vb
+29090 gosub 38030
+29100 print ho$;" 1.zeile:"
+29102 gosub 50025:if vb<0 or vb>65535 goto 29102
+29105 zn=vb
+29110 gosub 38030
+29120 print ho$;" schrittw:"
+29125 gosub 50025:if vb<0 or vb>255 goto 29125
+29130 s=vb
+29135 open 1,8,1,f$
+29140 sys (bs) sb,b(bi),zn,s
+29150 close1
+29152 print cl$:gosub 40050
+29155 gosub 41040
+29158 gosub 37030
+29160 goto 11080
+30000 :
+30010 rem *** save programm ***
+30020 :
+30030 gosub 38030
+30040 print ho$;" name:"
+30050 gosub 50025:f$="p."+be$
+30060 gosub 38030
+30070 print ho$;" startadr:"
+30075 gosub 50025:if vb<0 or vb>65535 goto 30075
+30080 sa=vb
+30090 open 1,8,1,f$
+30100 sys (ps) sa,b(bi)
+30110 close 1
+30112 print cl$:gosub 40050
+30115 gosub 41040
+30118 gosub 37030
+30120 goto 11080
+31000 :
+31010 rem *** save ***
+31020 :
+31030 gosub 38030
+31040 print ho$;" name:"
+31050 gosub 50025:f$="s."+be$
+31060 open 1,8,1,f$
+31070 for i=0 to 62
+31080 :print#1,chr$(peek(64*b(bi)+i));
+31090 next
+31110 print#1,ey;cr$;ex;cr$;mc;cr$;f(1);cr$;f(2);cr$;f(3)
+31120 close1
+31125 print cl$:gosub 40050
+31130 gosub 41040
+31140 gosub 37030
+31999 goto 11080
+32000 :
+32010 rem *** load ***
+32020 :
+32030 gosub 41030
+32040 print ho$;" name:"
+32050 gosub 50025:f$="s."+be$
+32060 open 1,8,0,f$
+32061 close 1
+32062 gosub 40050
+32063 if en$<>"00" then gosub 37030:goto 11080
+32064 open 1,8,0,f$
+32070 for i=0 to 62
+32080 :gosub 39030
+32110 :poke 64*b(bi)+i,d
+32120 next
+32130 input#1,ey,ex,mc,f(1),f(2),f(3)
+32140 poke v+23,peek(v+23) and 255-fm or ey*fm
+32160 poke v+29,peek(v+29) and 255-fm or ex*fm
+32180 poke v+28,peek(v+28) and 255-fm or mc*fm
+32200 poke v+37,f(1)
+32220 poke v+39+bi,f(2)
+32240 poke v+38,f(3)
+32250 close 1
+32999 goto 11080
+33000 :
+33020 rem *** sequenz ***
+33040 :
+33050 rem *** seq.eingabe ***
+33060 :
+33070 a$=""
+33080 gosub 38030
+33090 print ho$;" sequenz:"
+33100 ls=len(s$)
+33110 sys (kp) 10,0,cf,s$;"_";str$(ls);"  "
+33120 if ls=0 goto 33130
+33122 b2=val(mid$(s$,ls,1))
+33124 poke v+21,2^b2
+33126 if mc=0 then sys (nf) b2
+33128 if mc   then sys (mf) b2
+33130 get a$
+33140 if a$<"0" or a$>"7" goto 33170
+33150 :if ls>22 goto 33170
+33160 ::s$=s$+a$
+33170 if a$=cr$ goto 33230
+33180 if ls and a$=de$ then s$=left$(s$,ls-1)
+33190 goto 33100
+33200 :
+33210 rem *** kompilieren ***
+33220 :
+33230 for i=1 to ls
+33240 :poke 51199+i,val(mid$(s$,i,1))
+33250 next
+33260 poke 51199+i,99
+33270 :
+33280 gosub 38030
+33290 print ho$;" verzoeg:"
+33300 gosub 50025
+33310 if vb<0 or vb>255 goto 33300
+33320 sys (sq) vb
+33330 poke 198,0
+33340 return
+34000 :
+34020 rem *** puzzle ***
+34040 :
+34050 rem *** plazieren ***
+34060 :
+34070 for i=0 to 7
+34080 :sys (sp) i,sx(i),sy(i)
+34090 next
+34100 :
+34110 print cl$;" plazieren sprite";sn
+34120 poke v+21,2^sn*2-1
+34130 j=peek(j2)
+34140 if (jand1) goto 34160
+34150 if sy(sn)> 30 then sy(sn)=sy(sn)-1
+34160 if (jand2) goto 34180
+34170 if sy(sn)<249 then sy(sn)=sy(sn)+1
+34180 if (jand4) goto 34200
+34190 if sx(sn)>  1 then sx(sn)=sx(sn)-1
+34200 if (jand8) goto 34220
+34210 if sx(sn)<343 then sx(sn)=sx(sn)+1
+34220 if (jand16) goto 34240
+34230 sn=(sn+1)and7:goto 34110
+34240 sys (sp) sn,sx(sn),sy(sn)
+34250 get a$:if a$<>"x" goto 34130
+34260 :
+34270 rem *** seq.eingeben ***
+34280 :
+34285 ss=-1
+34290 gosub 38030
+34295 ss=ss+1
+34300 poke v+21,2^ss*2-1
+34310 a$=""
+34320 print ho$;" seq.";ss;":"
+34330 ls(ss)=len(s$(ss))
+34340 if ls(ss) = 0 goto 34380
+34350 for i=0 to ss
+34355 :m$=mid$(s$(i),ls(ss),1)
+34360 :poke 2040+i,b(val(m$))
+34370 next
+34380 sys (kp) 10,0,cf,s$(ss);"_";str$(ls(ss));"  "
+34390 get a$
+34400 if a$<"0" or a$>"7" goto 34440
+34410 if ls(ss)>22 goto 34440
+34420 :s$(ss)=s$(ss)+a$
+34440 ls(ss)=len(s$(ss))
+34460 if a$=cr$ and ls(ss)=ls(0) goto 34500
+34470 if a$=de$ and ls(ss) then s$(ss)=left$(s$(ss),ls(ss)-1)
+34480 if a$="x" goto 34540
+34490 goto 34340
+34500 if ss<sn goto 34290
+34505 goto 34285
+34510 :
+34520 rem *** weiter parameter ***
+34530 :
+34540 print cl$;" delta x:"
+34550 gosub 50025
+34560 if vb<-127 or vb>128 goto 34550
+34570 dx=vb
+34580 print cl$;" delta y:"
+34590 gosub 50025
+34600 if vb<-127 or vb>128 goto 34590
+34610 dy=vb
+34620 print cl$;" verzoeg:"
+34630 gosub 50025
+34640 if vb<0 or vb>255 goto 34630
+34650 d=vb
+34660 print cl$;" rate:"
+34670 gosub 50025
+34680 if vb<1 or vb>255 goto 34630
+34690 r=vb
+34691 print cl$
+34692 :
+34695 rem *** kompilieren ***
+34698 :
+34699 poke v+21,2^sn*2-1
+34700 for i= 0 to ls(0)-1
+34710 :for i2=0 to sn
+34720 ::m$=mid$(s$(i2),i+1,1)
+34725 ::pw=b(val(m$))
+34730 ::poke 51200+(sn+1)*i+i2,pw
+34740 :next
+34750 next
+34760 poke 51200+(sn+1)*i,99
+34770 :
+34780 sys (pu) dxand255,dyand255,r,sn,d
+34970 for i=0 to 7:poke 2040+i,b(i):next
+34980 gosub 10390
+34985 poke 198,0
+34990 return
+35000 :
+35010 rem *** save all ***
+35020 :
+35030 gosub 38030
+35040 print ho$;" name:"
+35050 gosub 50025:f$="a."+be$
+35060 open 1,8,1,f$
+35061 close 1
+35062 print cl$:gosub 40050
+35065 if en$<>"00" then goto 35230
+35066 open 1,8,15,"s:"+f$:close 1
+35068 open 1,8,1,f$
+35070 for i=704 to 1023
+35080 print#1,chr$(peek(i));
+35090 next
+35100 for i=2048 to 2303
+35110 print#1,chr$(peek(i));
+35120 next
+35130 for i=v to v+46
+35140 print#1,chr$(peek(i));
+35150 next
+35160 print#1,bi;cr$;cf;cr$;mc;cr$;s$
+35170 for i=0 to 7
+35180 print#1,sx(i);cr$;sy(i);cr$;s$(i)
+35200 next
+35215 close 1
+35230 gosub 41040
+35240 gosub 37030
+35250 goto 11080
+36000 :
+36010 rem *** load all ***
+36020 :
+36030 gosub 41030
+36040 print ho$;" name"
+36050 gosub 50025:f$="a."+be$
+36060 open 1,8,0,f$:close 1
+36070 gosub 40050
+36080 if en$<>"00" then gosub 37030:goto 11080
+36090 open 1,8,0,f$
+36100 for i=704 to 1023
+36110 gosub 39030:poke i,d
+36120 next
+36130 for i=2048 to 2303
+36140 gosub 39030:poke i,d
+36150 next
+36160 for i=v to v+46
+36170 gosub 39030:poke i,d
+36180 next
+36190 input#1,bi,cf,mc,s$
+36195 sys (sr) cf
+36200 for i=0 to 7
+36210 input#1,sx(i),sy(i),s$(i)
+36220 next
+36228 close 1
+36230 goto 11080
+37000 :
+37010 rem *** auf taste warten ***
+37020 :
+37030 poke 198,0:wait 198,1:poke 198,0
+37040 return
+38000 :
+38010 rem *** obere zeile loeschen ***
+38020 :
+38030 print ho$;"                                       "
+38040 return
+39000 :
+39010 rem *** disk-get ***
+39020 :
+39030 get#1,d$:if d$="" then d$=chr$(0)
+39040 d=asc(d$)
+39999 return
+40000 :
+40010 rem *** fehlerkanal ***
+40020 :
+40050 open 1,8,15
+40060 input#1,en$,e$,sp$,se$
+40070 gosub 38030
+40080 print ho$;" ";en$;",";e$;",";sp$;",";se$
+40090 close 1
+40999 return
+41000 :
+41010 rem *** katalog ***
+41020 :
+41030 print cl$
+41040 sys ct:close 1
+41050 return
+42000 :
+42010 rem *** disk-befehle ***
+42020 :
+42022 gosub 41030
+42030 gosub 38030
+42040 print ho$;" disk-bef:"
+42050 gosub 50025
+42060 open 1,8,15,be$
+42070 close 1
+42080 print cl$:gosub 40050
+42090 gosub 41040
+42100 gosub 37030
+42110 goto 11080
+42999 return
+50000 :
+50010 rem *** eingabe ***
+50020 :
+50025 be$=""
+50028 a$="":print ho$,"              "
+50029 sys (kp) 11,0,cf,be$;"_ "
+50030 get a$:if a$="" goto 50030
+50040 ls=len(be$)
+50050 if a$<" " or a$>"z" goto 50120
+50060 if ls>26 goto 50120
+50070 :be$=be$+a$
+50120 if ls and a$=de$ then be$=left$(be$,ls-1)
+50140 if a$<>cr$ goto 50029
+50150 vb=val(be$)
+50999 return
+

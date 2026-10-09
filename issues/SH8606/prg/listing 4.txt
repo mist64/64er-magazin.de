@@ -1,0 +1,273 @@
+
+
+;listing 4.prg ==0801==
+    5 rem  **********************************
+   10 rem *   giga-cad     graphic-system  *
+   15 rem *        'cad.paint'             *
+   20 rem * by s. vilsmeier & s. lippstreu *
+   25 rem **********************************
+   30 :
+   35 :
+   40 a=peek(836)+1:poke836,a:ifa=1thenpoke55,0:poke56,56:clr:a=1
+   45 ifa=1thenload"hires5.cad.obj",8,1
+   50 ifa=2thenload"hires7.cad.obj",8,1
+   55 dimq(30,3),b$(64):c1=39718:d1=40052:d2=40344
+   60 print"{clr}{blk}";:ifdf=0thengosub1305
+   65 :
+   70 :
+   75 rem **********************************
+   80 rem *      sprungtabelle bzuegl. gr  *
+   85 rem **********************************
+   90 :
+   95 sys37021:open1,8,15,"xr-":print#1,"u9":close1:poke192,192
+  100 ifgr<>1theninput"{clr}{gry1}{down}{down}{down}{down}{rght}{rght}{rght}{rght}File - Name ";n$:print"{clr}"
+  105 gosub995:ifgr<>.5andwqthengosub870
+  110 g1=gr*h:g2=g1:ifgr=1goto425
+  115 ifgr=2andri=1goto165
+  120 ifgr=2andri=0goto370
+  125 ifgr=.5goto220
+  130 ifgr=3goto460
+  135 :
+  140 :
+  145 rem *********************************
+  150 rem *     10 - fache aufloesung     *
+  155 rem *********************************
+  160 :
+  165 g1=(gr+1.125)*h:g2=(gr+1.2)*h:forfi=1to5
+  170 fk=fi*200-200:gosub615:ifrnthengosub1065
+  175 ifrnandfi=5thensys21764,0,199,319,199,1,3
+  180 n1$="hz.":br=1:gosub1020:br=2:gosub1020
+  185 nextfi:goto1225
+  190 :
+  195 :
+  200 rem *********************************
+  205 rem *       film - schleife         *
+  210 rem *********************************
+  215 :
+  220 a=49153:i=942:dr=peek(a+940):dl=peek(a+941):gosub1190:fx=w
+  225 gosub1190:fy=w:gosub1190:fz=w:gosub1190:vf=w
+  230 gosub1190:kf=w:vx=wx:vy=wy:vz=wz:du=peek(a+952):f3=f1:f4=f2:h2=h:ke=ke-kf
+  235 ifdu=0thendu=dr
+  240 forfi=1to24:h3=(vf-100)/100/24*fi+1
+  245 ifdu=1thensys22873,8,0,1,df,1,0,15*fi
+  250 ifdu=2thensys22873,7,0,1,df,1,0,15*fi
+  255 ifdu=3thensys22873,9,0,1,df,1,0,15*fi
+  260 ifzvthensys22873,8,0,1,df,1,0,zv
+  265 w1=cos(fi*~/12):w2=sin(fi*~/12)
+  270 ifdl=1thenwy=vy*w1:wz=vz*w2
+  275 ifdl=2thenwx=vx*w1:wz=vz*w2
+  280 ifdl=3thenwx=vx*w1:wy=vy*w2
+  285 a1=a1+fx:a2=a2+fy:a3=a3+fz
+  290 ke=ke+kf:ifvf<>0thenh=h2*h3:f2=f4-(100/h3-100)/h2:f1=f3-(160/h3-160)/h2
+  295 g1=gr*h:g2=g1:ifwq=1and(fi=1ordl<>0ordr<>0)thengosub870
+  300 gosub615:m=0:n2$=n$:ifrnthensys51800,0,0,159,95,1,3
+  305 open2,8,2,"fi."+left$(n2$,10)+str$(fi)+",p,w":gosub1080:iff=0goto320
+  310 iff=99thenclose2:gosub990:goto325
+  315 close2:open1,8,15,"s:fi."+left$(n2$,10)+str$(fi):close1:goto305
+  320 sys22299:close2:close1:gosub990
+  325 if(wm=1orb=1)andm=0thensys50292,2,0:m=1:n2$="h."+n$:goto305
+  330 nextfi:wx=vx:wy=vy:wz=vz:a1=a1-fi*fx:a2=a2-fi*fy:a3=a3-fi*fz:h=h2
+  335 f1=f3:f2=f4:goto1225
+  340 :
+  345 :
+  350 rem *********************************
+  355 rem *      4 - fache aufloesung     *
+  360 rem *********************************
+  365 :
+  370 forfi=1to2
+  375 fk=(fi-1)*200:gosub615:ifrnthengosub1065
+  380 ifrnandfi=2thensys21764,0,199,319,199,1,3
+  385 n1$="hv.":br=1:gosub1020:br=2:gosub1020
+  390 nextfi:goto1225
+  395 :
+  400 :
+  405 rem *********************************
+  410 rem *        einzelne grafik        *
+  415 rem *********************************
+  420 :
+  425 gosub615:goto1225
+  430 :
+  435 :
+  440 rem *********************************
+  445 rem *        einzelnes filmbild     *
+  450 rem *********************************
+  455 :
+  460 gr=.5:gosub615:m=0:ifrnthensys51800,0,0,159,95,1,2
+  465 open2,8,2,"fi."+n$+",p,w":gosub1080:iff=0goto480
+  470 iff=99thenclose2:gosub990:goto490
+  475 close2:open1,8,15,"s:fi."+n$:close1:goto465
+  480 sys22299:close2:close1:gosub990
+  485 if(wm=1orb=1)andm=0thensys50292,2,0:m=1:n$="h."+n$:goto465
+  490 goto1225
+  495 :
+  500 :
+  505 rem *********************************
+  510 rem *umrechnung in bildschirmkkoord.*
+  515 rem *********************************
+  520 :
+  525 sysd2,i:xa=usr(1):vb=usr(3):sysd2,i+1:xb=usr(1):vr=0:ifvb=1thenvr=1
+  530 un=0:fora=xatoxb-1
+  535 sysd1,a:x1=usr(2):y1=usr(1):z1=usr(3)
+  540 iffl=0then565
+  545 ify1-a2=0thent=0:goto565
+  550 t=y1/(y1-a2)
+  555 x1=x1-t*(x1-a1)
+  560 z1=z1-t*(z1-a3)
+  565 x1=((x1+160)-f1)*g1:z1=((z1+100)-f2)*g2
+  570 ifrithend5=x1:x1=640-z1:z1=d5
+  575 z1=z1-fk:sysc1,x1,y1,z1,a:q(un,1)=x1:q(un,2)=y1:q(un,3)=z1:un=un+1:nexta
+  580 return
+  585 :
+  590 :
+  595 rem *********************************
+  600 rem *         extrema               *
+  605 rem *********************************
+  610 :
+  615 sys50181,11,15,1:sys50181,11,15,2:bs=1:ifgr=.5andwm=0andb=0thenbs=2
+  620 sys50707,bs
+  625 bv=2:ifgr>.5andwm=0thenbv=1
+  630 ifmcthensys21839,11,12,0,bv
+  635 fm=0:ifborgr>1thensys51480,0:fm=1
+  640 ifgr=.5andfithensys51800,310,0,319,194,1,3:sys50859,311,1,318,fi*8+1,1,3
+  645 gg=gr*320-1:ec=8000:ed=-ec:fori=1todf-1
+  650 qx=8000:px=-qx:qy=qx:py=px:gosub525
+  655 forx=0toun-1
+  660 ifq(x,1)<qxthenqx=q(x,1)
+  665 ifq(x,1)>pxthenpx=q(x,1)
+  670 ifq(x,3)<qythenqy=q(x,3)
+  675 ifq(x,3)>pythenpy=q(x,3)
+  680 nextx
+  685 ifqy<ecthenec=qy
+  690 ifpy>edthened=py
+  695 ifqy<0thenqy=0
+  700 ifpy>199thenpy=199
+  705 ifqy>199thenqy=199
+  710 ifpy<0thenpy=0
+  715 if(qx>gg)or(px<0)thenpoke18908+2*i,py:poke18909+2*i,qy:goto725
+  720 poke18908+2*i,qy:poke18909+2*i,py
+  725 nexti
+  730 if(ed<0)or(ec>199)thenreturn
+  735 ifed>199thened=199
+  740 ifec<0thenec=0
+  745 if(gr=.5)and(ed>95)thened=95
+  750 :
+  755 :
+  760 rem *********************************
+  765 rem *   eigentliche darstellung     *
+  770 rem *********************************
+  775 :
+  780 sys14857,sl,wq,mc,wm,b,se,ke,df,gr,ec,ed,bs
+  785 :
+  790 rem ******* systemdaten laden *******
+  795 sys51507,1:sys50707,0
+  800 open2,8,2,"cad.paint.datas,s,r":gosub1075:iff=0goto830
+  805 gosub1050:print"{clr}{down}{down} Diskette mit Systemdaten einlegen !"
+  810 print"{down}{down} Noch ein Versuch (j/n) ?"
+  815 gosub1055:ifa$="j"thenclose2:close1:print"{clr}":goto800
+  820 ifa$="n"thenclose2:close1:sys25919:print"{clr}":df=1:vi=0:mn=0:goto1225
+  825 goto815
+  830 sys22541,df,vi:close2:close1:sys40206,vi+1,df,0,0
+  835 gosub990:return
+  840 :
+  845 :
+  850 rem *********************************
+  855 rem *   winkel des normalenvektors  *
+  860 rem *********************************
+  865 :
+  870 ou=sqr(wx*wx+wy*wy+wz*wz):fori=1todf-1
+  875 sysd2,i:xa=usr(1):sysd2,i+1:xb=usr(1)
+  880 pn=0:fora=xatoxb-1
+  885 sysd1,a:q(pn,1)=usr(1):q(pn,2)=usr(2):q(pn,3)=usr(3):pn=pn+1
+  890 ifpn<2goto910
+  895 ifq(pn-2,1)<>q(pn-1,1)goto910
+  900 ifq(pn-2,2)<>q(pn-1,2)goto910
+  905 ifq(pn-2,3)=q(pn-1,3)thenpn=pn-1
+  910 nexta
+  915 ax=q(0,1)-q(2,1):bx=q(1,1)-q(2,1)
+  920 ay=q(0,2)-q(2,2):by=q(1,2)-q(2,2)
+  925 az=q(0,3)-q(2,3):bz=q(1,3)-q(2,3)
+  930 nx=ay*bz-az*by:ny=az*bx-ax*bz:nz=ax*by-ay*bx
+  935 bn=sqr(nx*nx+ny*ny+nz*nz):ifbn=0thenbn=.00000001
+  940 wi=(nx*wy+ny*wx+nz*wz)/(bn*ou)
+  945 fa=192-abs(int(wi*192)):iffa<0thenfa=0
+  950 poke20058+i,fa
+  955 nexti:return
+  960 :
+  965 :
+  970 rem *********************************
+  975 rem *      unterprogramme           *
+  980 rem *********************************
+  985 :
+  990 open1,8,15,"u9":close1:return
+  995 open1,8,15,"s:cad.paint.datas":close1
+ 1000 open2,8,2,"cad.paint.datas,s,w":gosub1080:iff=0goto1015
+ 1005 iff=99thenclose2:gosub990:return
+ 1010 close2:goto995
+ 1015 sys22520,df,vi:close2:close1:gosub990:return
+ 1020 x$=n1$+left$(n$,10)+str$(fi*2+(br-2))+",p,w":open2,8,2,x$:gosub1080
+ 1025 iff=0goto1040
+ 1030 iff=99thenclose2:gosub990:return
+ 1035 close2:open1,8,15,"s:"+x$:close1:goto1020
+ 1040 sys26068,br:close2:close1
+ 1045 gosub990:return
+ 1050 sys51507,1:sys50707,0:printchr$(14)chr$(8)"{clr}":return
+ 1055 geta$:ifa$=""goto1055
+ 1060 return
+ 1065 sys21764,0,0,0,199,1,1:iffi=1thensys21764,0,0,319,0,1,3
+ 1070 sys21764,319,0,319,199,1,2:return
+ 1075 open1,8,15:input#1,f,f$,t,s:return
+ 1080 gosub1075:iff=0thenreturn
+ 1085 close1:gosub1050:print"{clr}{down} {rvon}Diskettenstatus :{down}":printf","f$","t","s
+ 1090 print"{down}{down} Noch ein Versuch (j/n) ?"
+ 1095 gosub1055:ifa$="n"thenf=99:print"{clr}":return
+ 1100 ifa$="j"thenf=1:print"{clr}":return
+ 1105 goto1095
+ 1110 :
+ 1115 :
+ 1120 rem ********************************
+ 1125 rem *    parameter - uebergabe     *
+ 1130 rem ********************************
+ 1135 :
+ 1140 w2=int(w/256):w1=w-256*w2:pokea+i,w1:pokea+i+1,w2:i=i+2:return
+ 1145 w=w*10+32768:gosub1140:return
+ 1150 gosub1050:print"{gry1}{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}        Systemdiskette einlegen !":poke192,0
+ 1155 gosub1055:open2,8,2,"cad.main,p,r":close2:gosub1075:close1:iff<>0goto1150
+ 1160 poke646,peek(53281):return
+ 1165 forx=1tomn:fory=1to13:w=peek(a+y):ifw=254theny=13:goto1175
+ 1170 b$(x)=b$(x)+chr$(w)
+ 1175 nexty:a=a+14:nextx:a=49153:return
+ 1180 forx=1tomn:fory=1tolen(b$(x)):pokea+y,asc(mid$(b$(x),y,1)):nexty
+ 1185 pokea+y,254:nextx:a=49153:return
+ 1190 w=((peek(a+i)+256*peek(a+i+1))-32768)/10:i=i+2:return
+ 1195 :
+ 1200 :
+ 1205 rem ********************************
+ 1210 rem *    parameter codieren        *
+ 1215 rem ********************************
+ 1220 :
+ 1225 a=49153:w=fl+2*wq+4*mc+8*ri+16*se+32*wm+64*b+128*hd:pokea+912,w
+ 1230 i=900:w=mn:gosub1140:w=df:gosub1140:w=vi:gosub1140
+ 1235 w=a1:gosub1145:w=a2:gosub1145:w=a3:gosub1145:i=i+1:w=wx:gosub1145
+ 1240 w=wy:gosub1145:w=wz:gosub1145:i=i+2:w=f1:gosub1145:w=f2:gosub1145
+ 1245 w=ke:gosub1145:pokea+919,gr*2:pokea+954,sl:i=898:w=zv:gosub1145
+ 1250 pokea+920,rn:w$=str$(h):pokea+927,len(w$)
+ 1255 forw=1tolen(w$):pokea+927+w,asc(mid$(w$,w,1)):nextw:ifmnthengosub1180
+ 1260 gosub1150:poke192,0:open1,8,15,"xr+":print#1,"u9":close1
+ 1265 poke836,0:print"{clr}load"chr$(34)"cad.main"chr$(34)",8":print"{down}{down}{down}{down}run:"
+ 1270 poke55,0:poke56,80:clr:poke53263,1:poke631,19:poke632,13:poke633,13
+ 1275 poke198,3:new
+ 1280 :
+ 1285 rem ********************************
+ 1290 rem *    parameter decodieren      *
+ 1295 rem ********************************
+ 1300 :
+ 1305 a=49153:mn=peek(a+900):df=peek(a+902)+256*peek(a+903)
+ 1310 vi=peek(a+904)+256*peek(a+905):i=906:gosub1190:a1=w:gosub1190:a2=w
+ 1315 gosub1190:a3=w:i=i+1:gosub1190:wx=w:gosub1190:wy=w:gosub1190:wz=w
+ 1320 i=i+2:gosub1190:f1=w:gosub1190:f2=w:gosub1190:ke=w:gr=peek(a+919)/2
+ 1325 i=898:gosub1190:zv=w:w=peek(a+912)
+ 1330 fl=wand1:wq=(wand2)/2:mc=(wand4)/4:ri=(wand8)/8:se=(wand16)/16
+ 1335 wm=(wand32)/32:b=(wand64)/64:hd=(wand128)/128:gosub1165:rn=peek(a+920)
+ 1340 n$="":forx=1topeek(a+927):n$=n$+chr$(peek(a+927+x)):nextx:h=val(n$)
+ 1345 sl=peek(a+954):return
+

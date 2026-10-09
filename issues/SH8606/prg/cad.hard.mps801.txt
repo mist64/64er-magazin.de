@@ -1,0 +1,61 @@
+
+
+;cad.hard.mps801.prg ==0801==
+   10 a=peek(836)+1:poke836,a
+   20 ifa=1thenpoke55,0:poke56,32:clr:load"mps801.cad.obj",8,1
+   25 sys50192,11,15,2:poke53280,14:poke53281,15
+   30 open1,8,15,"u9":close1:printchr$(14)chr$(8)
+   40 print"{gry1}{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+   50 print" {rvon}        Hardcopy - Hauptmenue         {rvof}"
+   60 fori=1to21:print" {CBM-H}                                    {CBM-N}":next
+   70 print" {rvon}    Druckertyp: MPS-801/803           {rvof}{home}"
+   80 print"{home}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght} A. - Grafik laden"
+   90 print"{down}{down}{rght}{rght}{rght}{rght} B. - Grafik ansehen"
+  100 print"{down}{down}{rght}{rght}{rght}{rght} C. - Diskettenkommando senden"
+  110 print"{down}{down}{rght}{rght}{rght}{rght} D. - Directory anzeigen"
+  120 print"{down}{down}{rght}{rght}{rght}{rght} E. - Hardcopy"
+  130 poke198,0
+  140 getx$:ifx$=""goto140
+  150 a=asc(x$)-64:ifa<1ora>5goto140
+  160 onagoto1000,2000,3000,4000,5000
+ 1000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 1010 print" {rvon}              Grafik laden            {rvof}":gosub1200
+ 1020 input"{home}{down}{down}{down}{down}{down}{rght}{rght}{rght} Name ";n$:ifn$=""orn$="_"goto30
+ 1030 iflen(n$)>10goto1020
+ 1040 sys50192,11,15,2:sys50299,2
+ 1050 open2,8,2,"pi."+n$+",p,r":fk=1:open1,8,15:gosub1105
+ 1060 iffgoto30
+ 1070 sys50442,2:close2:close1
+ 1080 sys50299,0:goto30
+ 1100 open1,8,15:fk=0
+ 1105 input#1,f,f$,t,s:iff=0thenreturn
+ 1110 iffkthensys50299,0:printchr$(14);chr$(8)
+ 1120 print:print"{down} {rvon}Diskettenstatus :"
+ 1130 print"{down}"f","f$","t","s
+ 1140 getx$:ifx$=""goto1140
+ 1150 close2:close1:return
+ 1200 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{home}{down}"
+ 1210 return
+ 2000 sys50299,2:poke198,0
+ 2010 getx$:ifx$=""goto2010
+ 2020 sys50299,0:poke53272,23:goto130
+ 3000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 3010 print" {rvon}       Diskettenkommando senden       {rvof}":gosub1200
+ 3020 poke631,34:poke198,1
+ 3030 input"{home}{down}{down}{down}{down}{down} Kommando ";c$:ifc$=""orc$="_"goto30
+ 3040 fk=0:open1,8,15,c$:gosub1105:iff=0thengosub1120
+ 3050 close2:close1:goto30
+ 4000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 4010 print" {rvon}          Directory anzeigen          {rvof}"
+ 4020 print"{home}{down}{down}":open2,8,0,"$0":gosub1100:iffgoto30
+ 4030 sys50475:close2:close1:poke198,0
+ 4040 getx$:ifx$=""goto4040
+ 4050 goto30
+ 5000 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 5010 print" {rvon}               Hardcopy               {rvof}":gosub1200
+ 5020 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}      Drucker eingeschaltet (j/n) ?":poke198,0
+ 5030 getx$:ifx$<>"j"andx$<>"n"goto5030
+ 5040 ifx$="n"goto30
+ 5050 sys50555
+ 5060 goto30
+

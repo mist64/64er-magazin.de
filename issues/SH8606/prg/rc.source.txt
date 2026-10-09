@@ -1,0 +1,126 @@
+
+
+;rc.source.prg ==0801==
+    1 rem * random copy - source text
+    2 rem *               (profimat)
+    3 rem *
+    4 rem * (c) 1985 fras
+    5 rem *
+    6 rem * stephan arndt
+    7 rem * suedwestkorso 62
+    8 rem * 1000 berlin 41
+    9 rem *
+   10 poke53280,1
+   20 poke53281,1
+   30 print"{clr}{gry1}"
+   40 :
+   50 sys9*4096
+   60 .opt oo
+   70 *=  828
+   80 ;
+   81 rand = $d41b
+   82 get = $fb
+   83 put = $fd
+   87 ;
+   88 ; random copy
+   89 ;
+   90 ; uebertragen einer grafikseite
+   91 ; mit zufaelligen punkten
+   92 ;
+  100 lda #$05
+  101 sta count+2
+  102 jsr random
+  103 sei
+  104 lda #53        ;kernel und
+  105 sta $1         ;basic weg
+  106 ;
+  110 start lda rand       ;zufallszahl
+  115 adc count+1
+  120 sta get        ;
+  130 sta put        ;low-bytes
+  140 lda rand       ;zufallszahl
+  145 adc count
+  150 and #%00011111 ;0-31
+  160 sta get+1      ;fuer hi-byte
+  170 sta put+1      ;
+  180 ;
+  200 clc            ;
+  210 lda get+1      ;source-addresse
+  220 adc source     ;berechnen
+  230 sta get+1      ;
+  240 clc            ;
+  250 lda put+1      ;target-adresse
+  260 adc target     ;berechnen
+  270 sta put+1      ;
+  280 ;
+  300 lda rand       ;zufallszahl
+  305 eor #$ff
+  310 and #%111      ;0-7 fuer
+  320 tax            ;
+  330 lda bits,x     ;zweierpotenzen
+  340 sta mask       ;punktadressierung
+  350 ;
+  400 ldx #$0        ;
+  410 lda (get),x    ;byte holen
+  420 and mask       ;punkt nehmen
+  425 beq cl
+  430 ora (put),x    ;einschluerfen
+  440 sta (put),x    ;uebertragen
+  445 jmp nt
+  450 cl lda mask
+  455 eor #$ff
+  460 and (put),x
+  465 sta (put),x
+  495 ;
+  500 nt dec count
+  510 bne start
+  520 dec count+1
+  530 bne start
+  540 dec count+2
+  550 bne start
+  560 ;
+  600 lda source
+  610 sta get+1
+  630 lda target
+  640 sta put+1
+  650 lda #$0
+  660 sta get
+  670 sta put
+  680 ldy #0
+  690 ldx #31
+  700 lp lda (get),y
+  710 sta (put),y
+  720 dey
+  730 bne lp
+  740 inc get+1
+  750 inc put+1
+  760 dex
+  765 bmi rd
+  770 bne lp
+  775 ldy #64
+  780 bne lp
+  782 ;
+  785 rd lda #55        ;kernel und
+  786 sta $1         ;basic normal
+  787 cli
+  790 ;
+  795 rts
+  799 ;
+  800 random nop
+  810 lda #$80       ;zufallszahl
+  820 sta $d418      ;aus register
+  830 lda #$80       ;#27 des sid
+  840 sta $d40e      ;(rauschgenerator
+  850 sta $d40f      ;der 3. stimme)
+  870 lda #$0        ;
+  875 sta $d412      ;aus
+  880 lda #$81       ;ein
+  885 sta $d412      ;
+  890 rts
+  895 ;
+  900 bits   .byte $1,$2,$4,$8,$10,$20,$40,$80
+  910 count  .byte $ff,$ff,$05
+  920 mask   .byte $0
+  930 source .byte $e0
+  940 target .byte $20
+

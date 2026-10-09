@@ -1,0 +1,321 @@
+
+
+;koalacopy v3.0.prg ==0801==
+    0 hi=24576:d1=32576:d2=33576:d0=0:poke650,128:poke649,1:poke56,32
+    5 f1$=chr$(133):f3$=chr$(134):f5$=chr$(135):f7$=chr$(136)
+    7 f2$=chr$(137):f4$=chr$(138):f6$=chr$(139):f8$=chr$(140)
+    8 poke53280,0:poke53281,6:gosub5000:restore
+   10 geta$:ifa$="h"then100
+   20 ifa$="h"then100
+   30 ifa$="l"then1000
+   40 ifa$="s"then2000
+   50 ifa$="d"then1500
+   60 ifa$="e"then3000
+   65 ifa$="g"then9000
+   70 ifa$="m"then3500
+   75 ifa$="x"then7000
+   80 ifa$="c"then4000
+   85 ifa$="f"then6000
+   90 goto10
+  100 sys49920
+  150 c=peek(1024):c1=cand15:c2=int(c/16)
+  160 c3=peek(55296)and15:c4=peek(53281)and15
+  200 geta$:ifa$=f1$then300
+  210 ifa$=f1$then300
+  215 ifa$=f2$then340
+  220 ifa$=f3$then350
+  225 ifa$=f4$then390
+  230 ifa$=f5$then400
+  235 ifa$=f6$then440
+  240 ifa$=f7$then450
+  245 ifa$=f8$then490
+  249 ifa$=chr$(13)then500
+  250 ifa$=chr$(141)then510
+  290 goto200
+  300 c1=c1+1:ifc1>15thenc1=0
+  310 poke2,c1+c2*16
+  320 sys49334
+  330 goto200
+  340 c1=c1-1:ifc1<0thenc1=15
+  342 goto310
+  350 c2=c2+1:ifc2>15thenc2=0
+  360 goto310
+  390 c2=c2-1:ifc2<0thenc2=15
+  392 goto310
+  400 c3=c3+1:ifc3>15thenc3=0
+  410 poke2,c3
+  420 sys49353
+  430 goto200
+  440 c3=c3-1:ifc3<0thenc3=15
+  442 goto410
+  450 c4=c4+1:ifc4>15thenc4=0
+  460 poke53281,c4
+  470 goto200
+  490 c4=c4-1:ifc4<0thenc4=15
+  492 poke53281,c4
+  494 goto200
+  500 sys49154
+  510 sys49395
+  520 goto8
+ 1000 na$=""
+ 1005 input"{rvof}{clr}{lblu}{down}{down}  enter name";na$
+ 1007 ifna$=""then8
+ 1010 k=len(left$(na$,16))
+ 1020 poke49419,k
+ 1025 poke49432,32
+ 1030 fori=1tok
+ 1040 poke49436+i,asc(mid$(na$,i,1))
+ 1050 next
+ 1055 sys49920
+ 1060 sys49411
+ 1062 goto4500
+ 1500 print"{clr}{rvof}{lblu}":sys49664
+ 1505 geta$:ifa$=""then1505
+ 1590 goto8
+ 2000 input"{rvof}{clr}{lblu}{down}{down}  enter letter";le$
+ 2010 le$=(left$(le$,1))
+ 2015 na$=""
+ 2020 input"{down}  enter name";na$
+ 2025 ifna$=""then8
+ 2030 na$=left$(na$+"       ",8)
+ 2040 fi$="{orng}pic "+le$+" "+na$
+ 2050 k=len(fi$)
+ 2060 poke49462,k
+ 2070 fori=1tok
+ 2080 poke49487+i,asc(mid$(fi$,i,1))
+ 2090 nexti
+ 2092 fori=0to5
+ 2094 reada
+ 2096 poke34577+i,a
+ 2098 nexti
+ 2099 data48,,,253,67,66
+ 2100 open1,8,15,"s:{orng}pic "+le$+"*":close1
+ 2105 sys49456
+ 2110 goto8
+ 3000 sys49920
+ 3010 sys49769
+ 3020 goto4500
+ 3500 print"{rvof}{clr}{lblu}{down}  $2000 bit-map"
+ 3510 pa=2
+ 3520 geta$
+ 3530 ifa$=chr$(13)then3750
+ 3540 ifa$="{down}"thenpa=pa+2:ifpa>14thenpa=2
+ 3550 ifa$="{up}"thenpa=pa-2:ifpa<2thenpa=14
+ 3560 on(pa/2)gosub3600,3605,3610,3615,3620,3625,3630
+ 3570 goto3520
+ 3600 print"{home}{down}{rght}{rght}{rght}2":return
+ 3605 print"{home}{down}{rght}{rght}{rght}4":return
+ 3610 print"{home}{down}{rght}{rght}{rght}6":return
+ 3615 print"{home}{down}{rght}{rght}{rght}8":return
+ 3620 print"{home}{down}{rght}{rght}{rght}a":return
+ 3625 print"{home}{down}{rght}{rght}{rght}c":return
+ 3630 print"{home}{down}{rght}{rght}{rght}e":return
+ 3750 sys49318:poke2,33:sys49334:poke2,6:sys49353:poke53281,0
+ 3755 fori=0to999:next
+ 3760 sys49792,pa*4096
+ 3780 goto4500
+ 3999 end
+ 4000 print"{lblu}{clr}{down}{down}{down}  color ({rvon}1{rvof}) or ({rvon}2{rvof})?"
+ 4010 geta$:ifa$<"1"ora$>"2"then4010
+ 4015 ifa$="1"thenpoke49584,4
+ 4017 ifa$="2"thenpoke49584,216
+ 4020 print"{down}  color "a$:na$=""
+ 4030 input"{down}  enter name ";na$
+ 4032 ifna$=""then8
+ 4035 na$=left$(na$,16)
+ 4037 sys49920
+ 4040 open1,8,2,na$
+ 4050 sys49568
+ 4100 close1
+ 4102 goto4500
+ 4500 poke198,0
+ 4505 geta$
+ 4510 ifa$=chr$(13)thensys49154:sys49395:goto8
+ 4520 ifa$=chr$(141)thensys49395:goto8
+ 4530 goto4505
+ 5000 sys50432:poke896,255:poke725,255:sys49520:return
+ 6000 sys49920
+ 6010 x1=0 :y1=0
+ 6020 x2=39:y2=24
+ 6025 cu=1
+ 6030 vc=53248
+ 6040 pokevc+21,3
+ 6050 poke2040,14:poke2041,11
+ 6075 o1=x1*8+24:p1=y1*8+50
+ 6080 o2=x2*8+24:p2=y2*8+50
+ 6100 pokevc,o1and255:pokevc+1,p1
+ 6105 ifo1<=255thenpokevc+16,peek(vc+16)and254
+ 6107 ifo1>255thenpokevc+16,peek(vc+16)or1
+ 6110 pokevc+2,o2and255:pokevc+3,p2
+ 6115 ifo2<=255thenpokevc+16,peek(vc+16)and253
+ 6117 ifo2>255thenpokevc+16,peek(vc+16)or2
+ 6150 ifcu=2then6350
+ 6250 geta$
+ 6260 ifa$="{up}"andy1>0theny1=y1-1:goto6075
+ 6270 ifa$="{down}"andy1<y2theny1=y1+1:goto6075
+ 6280 ifa$="{left}"andx1>0thenx1=x1-1:goto6075
+ 6290 ifa$="{rght}"andx1<x2thenx1=x1+1:goto6075
+ 6295 ifa$=" "then6345
+ 6297 ifa$=chr$(13)then6800
+ 6299 ifa$=chr$(141)then6810
+ 6300 goto6250
+ 6345 cu=2
+ 6350 geta$
+ 6360 ifa$="{up}"andy2>y1theny2=y2-1:goto6075
+ 6370 ifa$="{down}"andy2<24theny2=y2+1:goto6075
+ 6380 ifa$="{left}"andx2>x1thenx2=x2-1:goto6075
+ 6390 ifa$="{rght}"andx2<39thenx2=x2+1:goto6075
+ 6395 ifa$=" "then6500
+ 6397 ifa$=chr$(13)then6800
+ 6399 ifa$=chr$(141)then6810
+ 6400 goto6350
+ 6500 c=peek(1024+x1+y1*40)
+ 6510 c1=cand15:c2=(cand240)/16
+ 6520 c3=peek(55296+x1+y1*40)and15
+ 6530 c4=peek(53281)and15
+ 6540 sys50084, 1024,x1,y1,x2,y2,c1+c2*16
+ 6550 sys50084,55296,x1,y1,x2,y2,c3
+ 6560 poke53281,c4
+ 6600 geta$
+ 6610 ifa$=f1$then6700
+ 6615 ifa$=f2$then6710
+ 6620 ifa$=f3$then6720
+ 6625 ifa$=f4$then6730
+ 6630 ifa$=f5$then6740
+ 6635 ifa$=f6$then6750
+ 6640 ifa$=f7$then6760
+ 6645 ifa$=f8$then6770
+ 6650 ifa$=" "then6010
+ 6660 goto6600
+ 6700 c1=c1+1:ifc1>15thenc1=0
+ 6705 goto6540
+ 6710 c1=c1-1:ifc1<0thenc1=15
+ 6715 goto6540
+ 6720 c2=c2+1:ifc2>15thenc2=0
+ 6725 goto6540
+ 6730 c2=c2-1:ifc2<0thenc2=15
+ 6735 goto6540
+ 6740 c3=c3+1:ifc3>15thenc3=0
+ 6745 goto6540
+ 6750 c3=c3-1:ifc3<0thenc3=15
+ 6755 goto6540
+ 6760 c4=c4+1:ifc4>15thenc4=0
+ 6765 goto6540
+ 6770 c4=c4-1:ifc4<0thenc4=15
+ 6775 goto6540
+ 6800 sys49154
+ 6810 sys49395:pokevc+21,0:goto8
+ 7000 print"{clr}{lblu}{down}{down}"
+ 7015 print" load:
+ 7020 print"<1> to $6000
+ 7030 print"<2> to origin
+ 7040 print"<3> koala
+ 7050 print"<4> blazing paddles
+ 7060 print"<5> paint magic
+ 7100 print"{down}{down} show:"
+ 7110 print"<0> origin
+ 7120 print"<x> menue
+ 7200 geta$:ifa$="0"then8000
+ 7220 ifa$="x"then8
+ 7222 ifa$="4"then8300
+ 7223 ifa$="5"then8400
+ 7225 ifa$="1"then8200
+ 7227 ifa$="3"then8200
+ 7230 ifa$="2"then8100
+ 7999 goto7200
+ 8000 print"{clr}{down}Qshow originQ
+ 8005 na$=""
+ 8010 input"{down}  enter name";na$
+ 8020 ifna$=""then7000
+ 8030 open1,8,2,na$
+ 8040 get#1,a$,b$
+ 8045 ifst<>0thenprint"{down}  U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{down}{left}{left}{left}{left}{left}{left}{left}{SHIFT--}huh?!{SHIFT--}{down}{left}{left}{left}{left}{left}{left}{left}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K":goto8090
+ 8050 ifa$=""thena$=chr$(0)
+ 8060 ifb$=""thenb$=chr$(0)
+ 8070 ad=asc(a$)+256*asc(b$)
+ 8080 print"{down}  origin:"ad
+ 8090 close1
+ 8092 poke198,0:wait198,1
+ 8095 goto7000
+ 8100 print"{clr}{down}Qload to originQ
+ 8105 na$=""
+ 8110 input"{down}  enter name";na$
+ 8120 ifna$=""then7000
+ 8130 sys57812na$,8,1:poke780,0:sys65493
+ 8140 print"{down}  U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{down}{left}{left}{left}{left}{left}{left}{left}{SHIFT--}ready{SHIFT--}{down}{left}{left}{left}{left}{left}{left}{left}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K":goto8092
+ 8200 print"{clr}{down}Qload to $6000Q
+ 8205 na$=""
+ 8210 input"{down}  enter name";na$
+ 8215 ifna$=""then8
+ 8217 ifleft$(na$,1)="{SHIFT-*}"thenna$="{orng}pic ? "+mid$(na$,2,8)+"*"
+ 8220 k=len(left$(na$,16))
+ 8230 poke49419,k
+ 8240 poke49432,96
+ 8250 fori=1tok
+ 8260 poke49436+i,asc(mid$(na$,i,1))
+ 8270 next
+ 8280 sys49411
+ 8282 ifa$="1"then8
+ 8285 sys49920
+ 8290 goto4500
+ 8300 print"{clr}{down}Qload blazing paddlesQ
+ 8305 na$=""
+ 8310 input"{down}  enter name";na$
+ 8315 ifna$=""then8
+ 8320 k=len(left$(na$,16))
+ 8330 poke49419,k
+ 8340 poke49432,64
+ 8350 fori=1tok
+ 8360 poke49436+i,asc(mid$(na$,i,1))
+ 8370 next
+ 8380 sys49411
+ 8390 hi=16384:c1=24576:c2=25600
+ 8395 goto9200
+ 8400 print"{clr}{down}Qload paint magicQ
+ 8405 na$=""
+ 8410 input"{down}  enter name";na$
+ 8415 ifna$=""then8
+ 8420 sys57812na$,8,1:poke780,0:sys65493
+ 8500 sys49318
+ 8510 sys49792,16384
+ 8520 poke49638,4
+ 8530 sys49616,24576
+ 8540 poke2,peek(24387)
+ 8550 sys49353
+ 8560 poke53281,peek(24388)
+ 8590 goto4500
+ 9000 print"{clr}{down}{lblu}Qgrab pictureQ
+ 9010 print"{down} grab:{down}"
+ 9020 print"<0>hires  :"hi
+ 9030 print"<1>color 1:"d1
+ 9040 print"<2>color 2:"d2
+ 9045 print"<3>back   :"d0
+ 9060 print"{down} do  :{down}"
+ 9070 print"<g>perform grab
+ 9080 print"<x>see menue
+ 9100 geta$:ifa$=""then9100
+ 9110 ifa$="x"then8
+ 9120 ifa$="g"then9200
+ 9130 ifa$="0"then9300
+ 9140 ifa$="1"then9400
+ 9145 ifa$="2"then9500
+ 9150 ifa$="3"then9600
+ 9190 goto9100
+ 9200 sys49318
+ 9210 sys49792,hi
+ 9220 poke49638,4
+ 9230 sys49616,d1
+ 9240 poke49638,216
+ 9250 sys49616,d2
+ 9255 poke53281,d0
+ 9260 goto4500
+ 9300 input"{clr}{down}{down}  enter hires:";hi
+ 9310 goto9000
+ 9400 input"{clr}{down}{down}  enter color 1:";d1
+ 9410 goto9000
+ 9500 input"{clr}{down}{down}  enter color 2:";d2
+ 9510 goto9000
+ 9600 input"{clr}{down}{down}  enter border:";d0
+ 9610 ifd0>15then9600
+ 9620 goto9000
+

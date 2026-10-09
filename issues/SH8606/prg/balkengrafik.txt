@@ -1,0 +1,57 @@
+;balkengrafik.prg ==1c01==
+;version=70
+ 9000 rem * * * * * * * * * * * * * * * * * *
+ 9010 rem *       balkendiagramm  80 z      *
+ 9020 rem *              fuer               *
+ 9030 rem *             c- 128              *
+ 9040 rem *                                 *
+ 9050 rem *        thomas spitzhorn         *
+ 9060 rem *           ahornstr.23           *
+ 9070 rem *        6272 niedernhausen       *
+ 9080 rem * * * * * * * * * * * * * * * * * *
+10000 a =14:    rem *** farbwiederholzykl.(14)
+10010 b =22:    rem *** anzahl balken (70)
+10020 c =2 :    rem *** balkenbreite 1-74
+10030 d =20:    rem *** hoehe balken (22)
+10040 e =3 :    rem *** rasterabstand 1-74
+10050 s =4 :    rem *** anfang der graphic links (50)
+10060 rem benutzte variablen ****** we(x) / lw(x) / iv(x) / a-v
+10070 data164,175,185,162,184,183,163
+10080 data28,150,30,153,31,154,155,5,129,156,151,159,149,158
+10090 rem ***** ^ farbe der balken
+10100 fast:   dimwe(b),lw(b),iv(b)
+10105 fort=1tob:we(t)=int(rnd(1)*350):next :rem **** zufallsgen.
+10110 scnclr:printtab(20)"balkendiagramm wird errechnet":
+10120 g=0:for h=1to b  :rem **** anpassung der werte
+10130 i=0:lw(1)=146
+10140 ifwe(h)/(10^i)>dtheni=i+.3  :ifg<ithen g=i:rem ** +.3=aufloesung
+10150 ifwe(h)/(10^i)>dthen10140
+10160 nexth
+10170 forh=1tob:we(h)=(we(h)/(10^g)):j=int(we(h)):rem **** teiler
+10180 fork=0to6:ifwe(h)>j+(.142*k)thenreadl:iv(h)=146:ifk>3theniv(h)=18
+10190 nextk:restore10070:lw(h)=l:l=0:nexth :rem  **** letztes graph. zeichen
+10200 forh=1tob:form=0to23
+10210 ifint(we(h))=mthenwe(h)=23-m:goto10230 :rem **** reziprogwert der zahlen
+10220 nextm
+10230 nexth
+10240 scnclr :rem **** nummerierung y-achse
+10250 sys52332,,22-d,2:printtab(s)"{wht}> indexmultiplikator ="int((10^g)*2+.5)/2;"<{grn}":rem **** anz. des multipl.
+10255 forh=dto1step-1:ifh<10thenprinttab(s-4)"{wht}"h"{grn}O":elseprinttab(s-4)"{left}{wht}"h"{grn}O"
+10260 nexth
+10270 sys52332,,23,s-1
+10280 forh=1to (b*e)+(c-e)+2:print"{grn}{CBM-T}";:nexth:print :rem **** nummerierung x-achse
+10290 printtab(s+1):fort=1to(b*e)+s:ife>1then foru=1to10:v=2:ifu=10thenu=0
+10300 ife<2then10330
+10310 do whilev<eandt>1:print" ";:v=v+1:loop:t=t+e:print"{wht}{left}"u;:ift>b*e then10350
+10320 nextu,t :rem **** einteilung bei balkenabstand <1
+10330 i=0:forh=1toe*b:i=i+1:print"{wht}"mid$("1234567890",i,1);:ifi=10theni=0
+10340 nexth
+10350 n=0:o=0:restore10080:forh=1to(b*e)stepe:readr:o=o+1:ifo=atheno=0:restore 10080 :rem **** balkenfarbe lesen
+10360 n=n+1
+10370 forp =22towe(n)step-1
+10380 sys52332,,p,h+s
+10390 ifwe(n)>22then10400:elseprintchr$(r);chr$(18);:forf=1toc:printchr$(32);:nextf :rem **** grundbalken darstellen
+10400 nextp:ifwe(n)=23thenq=p+1:elseq=p
+10410 sys52332,,q,h+s:printchr$(r);chr$(iv(n));:forf=1toc:printchr$(lw(n));:nextf,h : rem **** graph. zeichen aufsetzen
+10420 getkeyw$:scnclr:forh=1tob:lw(h)=0:we(h)=0:iv(h)=0:nexth :rem **** variable loeschen
+10430 rem * return bei unterroutine

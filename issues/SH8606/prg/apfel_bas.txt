@@ -1,0 +1,116 @@
+;apfel_bas.prg ==0801==
+   10 rem ********************************
+   11 rem *                              *
+   12 rem *         apfelprinter         *
+   13 rem *         written 1985         *
+   14 rem *        by peter siepen       *
+   15 rem *     von-stephan-strasse 6    *
+   16 rem *       4200 oberhausen 1      *
+   17 rem *                              *
+   18 rem ********************************
+  100 a=a+1:ifa=1thenload"apfel/obj",8,1
+  110 poke55,0:poke56,32:clr
+  120 rem *** speichergrenze setzen ***
+  130 :
+  140 :
+ 1000 rem ********** menue ***********
+ 1003 poke53280,11:poke53281,0:printchr$(5);
+ 1005 printchr$(8)chr$(14)
+ 1010 print"{clr}{down}"tab(15)"M e n u e"
+ 1020 print"{down}{down}{down} {rvon} 1 {rvof} Berechnen"
+ 1030 print"{down} {rvon} 2 {rvof} Drucken"
+ 1040 print"{down} {rvon} 3 {rvof} Speichern"
+ 1050 print"{down} {rvon} 4 {rvof} Laden"
+ 1100 geta$:ifa$=""then1100
+ 1110 ifval(a$)<1orval(a$)>4then1100
+ 1120 on val(a$)goto2000,3000,5000,6000
+ 1130 goto1000
+ 1140 :
+ 1150 :
+ 1900 rem ****** werte eingeben *******
+ 2000 print"{clr}{down}{down} W e r t e :"
+ 2010 input "{down}{down} Linker Rand  ";li
+ 2020 input "{down} Rechter Rand ";re
+ 2030 input "{down} Unterer Rand ";un
+ 2040 input "{down} Oberer Rand  ";ob
+ 2050 input "{down}{down} Tiefe        ";t
+ 2060 ift<5ort>254then2050
+ 2065 rem maschinenprg aufrufen
+ 2070 poke821,0
+ 2080 poke52999,t
+ 2090 sys 49152,li,re,un,ob
+ 2100 poke53280,0
+ 2110 goto1000 : rem menue
+ 2120 :
+ 2130 :
+ 3000 rem ********** drucken **********
+ 3010 print"{clr}{down}{down} D r u c k e n "
+ 3020 print:print:print" Wollen Sie normal oder invers Drucken ?"
+ 3030 geta$:ifa$<>"n"anda$<>"i"then3030
+ 3040 ifa$="n"thenpoke820,0   :rem Maske
+ 3050 ifa$="i"thenpoke820,255
+ 3060 print:print:print" Fertig ?"
+ 3070 geta$:ifa$=""then3070
+ 3080 poke821,255 : rem aufruf mc-prg
+ 3090 sys49161
+ 3100 print"{clr}{down} Fertig"
+ 3110 print:print" Wollen Sie die Werte ausdrucken lassen"
+ 3120 geta$:ifa$<>"j"anda$<>"n"then3120
+ 3130 ifa$="n"then1000  :rem menue
+ 3140 open 4,4,7 :rem werte drucken
+ 3150 fori=1to3:print#4:next
+ 3160 print#4,"Linker Rand  : ";li;
+ 3170 print#4,chr$(16)"40";
+ 3175 print#4,"Rechter Rand : ";re
+ 3178 print#4,chr$(13)
+ 3180 print#4,"Unterer Rand : ";un;
+ 3185 print#4,chr$(16)"40";
+ 3190 print#4,"Oberer Rand  : ";ob
+ 3200 print#4,chr$(13)
+ 3210 print#4,"Tiefe : ";peek(52999)
+ 3220 close4
+ 3230 goto1000 :rem menue
+ 3240 :
+ 3250 :
+ 5000 rem ******** speichern *********
+ 5005 print"{clr}{down}{down} S p e i c h e r n"
+ 5010 print:print:input " Name ";na$
+ 5015 rem name uebergeben
+ 5020 iflen(na$)>16thenna$=left$(na$,16)
+ 5030 fori=1tolen(na$)
+ 5040 poke828+i-1,asc(mid$(na$,i,1))
+ 5050 next
+ 5055 poke822,len(na$)
+ 5060 sys49155 : rem aufruf mc-prg
+ 5070 open15,8,15 : rem fehlerkanal
+ 5080 input#15,en,er$,a,a
+ 5090 print"{down}"en,er$
+ 5100 close15
+ 5110 geta$:ifa$=""then5110
+ 5120 goto1000: rem menue
+ 5130 :
+ 5140 :
+ 6000 rem ********* laden ************
+ 6005 print"{clr}{down}{down} L a d e n"
+ 6010 print:print:input " Name ";na$
+ 6015 rem name uebergeben
+ 6020 iflen(na$)>16thenna$=left$(na$,16)
+ 6030 fori=1tolen(na$)
+ 6040 poke828+i-1,asc(mid$(na$,i,1))
+ 6050 next
+ 6055 poke822,len(na$)
+ 6060 sys49158 : rem aufruf mc-prg
+ 6070 open15,8,15 :rem fehlerkanal
+ 6080 input#15,en,er$,a,a
+ 6090 print"{down}"en,er$
+ 6100 close15
+ 6110 geta$:ifa$=""then6110
+ 6115 rem werte ausgeben
+ 6120 print"{down}Rechter Rand : ";re
+ 6130 print"{down}Linker Rand  : ";li
+ 6140 print"{down}Oberer Rand  : ";ob
+ 6150 print"{down}Unterer Rand : ";un
+ 6160 print"{down}Tiefe        : ";peek(52999)
+ 6170 geta$:ifa$=""then6170
+ 6180 goto1000:rem menue
+ 6190 rem ende
