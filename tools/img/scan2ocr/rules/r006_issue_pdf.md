@@ -442,7 +442,7 @@ ship with their photographs crushed, consistent with SH8602 and with the rest
 of the archive. So a crushed halftone is a known, accepted cost — report it,
 do not silently fix it.
 
-### A FIXED 35 % threshold, where the owner asks for one — and Otsu otherwise
+### ONE FIXED 35 % THRESHOLD FOR EVERY BILEVEL PAGE — Otsu is not a shipping setting
 
 **Otsu adapts to CONTENT, not to paper**, which is the opposite of what it
 looks like it is doing. Step 005 has already normalised paper to p95 = 255 on
@@ -469,18 +469,67 @@ pages; 35 % deliberately under-inks so the dots stay separate.
 **A check for this must measure INSIDE the halftone region.** A whole-page
 black fraction cannot see it.
 
-The switch is `BILEVEL_THRESHOLD="35%"` in
-`tools/img/issue_pdf/make_issue_pdf_mixed.sh`. Unset
-means Otsu, unchanged. **It has its own JBIG2 cache directory**, because the
-cache was keyed by page alone — changing the threshold without a new dir
-silently re-embeds the Otsu images.
+The knob is `BILEVEL_THRESHOLD` in
+`tools/img/issue_pdf/make_issue_pdf_mixed.sh`, and **unset now means 35 %**.
+**Each setting has its own JBIG2 cache directory** — `jbig2-t35` against
+`jbig2` — because the cache was keyed by page alone, so changing the threshold
+without a new dir silently re-embeds the previous images. The build banner
+prints both the value and the cache it used; read it.
 
-**35 % IS NOT THE DEFAULT, and no issue is rebuilt for it.** Owner,
-2026-10-05, asked both questions directly: *"Does the fixed 35 % threshold
-become the default — no. case by case decision. Do SH8602's and the
-monthlies' PDFs get rebuilt with it — nope."* So: Otsu remains the default,
-the switch is offered to the owner at the PDF review on an issue whose
-halftones are being crushed, and the archive is not reprocessed.
+**35 % IS THE DEFAULT.** Owner, 2026-10-09, on SH8606: *"didnt we decide
+against otsu? we should have one value for all, otherwise small dark areas
+become black."* `BILEVEL_THRESHOLD` now defaults to `35%` in
+`make_issue_pdf_mixed.sh`; `BILEVEL_THRESHOLD=OTSU` restores the per-page Otsu
+for a comparison and is not a shipping setting.
+
+**This supersedes the ruling of 2026-10-05**, which was *"Does the fixed 35 %
+threshold become the default — no. case by case decision."* Keep the old
+ruling in view, because what overturned it is not a change of mind but a
+MEASUREMENT the first ruling did not have — and the reason it did not have it
+is itself the lesson.
+
+**WHY CASE-BY-CASE COULD NOT WORK, MEASURED ON SH8606.** Otsu ran on all 176
+bilevel pages. **24 of them have at least 1 % of their area where a mid-grey
+GROUND floods solid black, 10 of them at 3 % or more:**
+
+| page | Otsu cutoff | box ground | black at Otsu | black at 35 % |
+|---|---|---|---|---|
+| p033 | 175/255 (68 %) | 173 | **55.6 %** | 18.0 % |
+| p030 | 174/255 (68 %) | 192 | **52.7 %** | 13.5 % |
+| p029 | 167/255 (65 %) | 186 (range 127–232) | **42.1 %** | 20.0 % |
+| p036 | 175/255 (68 %) | 185 | **36.0 %** | 13.6 % |
+| p080 | 156/255 (61 %) | 145 | 16.5 % | 12.3 % |
+
+The owner found 029, 033 and 080 by eye and missed 030 and 036, which are hit
+as hard. That is the whole case against a per-issue judgement call: **it needs
+the right page to come up under the right eye.**
+
+**AND p080 IS WHY NO GATE CAN STAND IN FOR THAT EYE.** Its box is 4.9 % of the
+page, so the whole-page black fraction stays at an ordinary-looking **16.5 %**
+while the box itself is ruined — indistinguishable, at page level, from p100's
+untouched 14.1 %. This is the same blind spot the halftone section above
+records ("a whole-page black fraction cannot see it"), in a second form: there
+the mid-greys of a photograph, here the ground of a tint box.
+
+**p029 shows the third failure mode: PARTIAL flooding.** Its ground is not one
+level but a range, 127–232, against a 167 cutoff — so the darker half of the
+tint goes black and the lighter half stays white, and the box comes out
+blotched rather than uniformly dark.
+
+**WHY 35 % AND NOT HIGHER.** A cutoff floods any ground darker than itself, so
+the value has to sit below the darkest ground worth keeping. SH8606's p040
+measures **92/255** against 35 %'s 89 — three levels of margin — and 40 %
+(102) would flood it. 35 % is the highest value that leaves every measured
+tint white, and it under-inks deliberately so halftone dots stay separate.
+**Ordinary pages barely move**: 13–17 % black under Otsu, 11–14 % at 35 %, so
+this is not a trade of tint boxes against body type.
+
+**The archive is a separate question and is NOT answered here.** The 2026-10-05
+ruling that SH8602's and the monthlies' PDFs are not rebuilt was given when
+35 % was case-by-case; making it the default reopens it, and it is the owner's
+call. The five issues this chain has shipped under Otsu are SH8601, 8609,
+8610, 8611 and 8612. The ~100–104 MB `ccitt`+`jpeg` files are inherited scans
+and were never thresholded here at all.
 
 ### Three smaller things from the same review
 

@@ -84,21 +84,48 @@ HALFTONE_MAX=0.002
 [[ -d "$CACHE" ]] || { echo "no OCR cache at $CACHE -- run make_issue_pdf.sh first"; exit 1; }
 command -v jbig2 >/dev/null || { echo "jbig2enc not installed"; exit 1; }
 
-# BILEVEL_THRESHOLD="35%": a fixed grey cutoff for the bilevel pages instead of
-# Otsu.  Unset = Otsu per page, unchanged.  Otsu adapts to page CONTENT once
-# step 005 has normalised the paper, so a page with a halftone photograph gets a
-# darker cutoff and the photo's mid-greys merge to solid black (MEASURED on
-# SH8603: 9 pages lose 62-82 % of their photograph).  Owner, SH8603: 35 %.
-# The JBIG2 cache is keyed by page only, so each setting gets its own cache dir --
-# otherwise a changed threshold silently reuses the old images.
-if [[ -n "${BILEVEL_THRESHOLD:-}" ]]; then
+# BILEVEL_THRESHOLD: ONE FIXED GREY CUTOFF FOR EVERY BILEVEL PAGE, AND 35 % IS
+# THE DEFAULT.  Owner, 2026-10-09: "we should have one value for all, otherwise
+# small dark areas become black."
+#
+# Otsu is per page and adapts to page CONTENT, not to paper -- step 005 has
+# already normalised paper to p95 = 255, so what is left for it to adapt to is
+# how much ink the page carries.  It therefore lands HIGHEST where the page is
+# LIGHTEST, and anything whose ground sits below that cutoff goes solid black:
+#
+#   MEASURED on SH8606 (176 bilevel pages, Otsu):  24 pages have >= 1 % of
+#   their area where a mid-grey GROUND floods black, 10 of them >= 3 %.
+#     p033  Otsu 175/255, box ground 173  ->  55.6 % black, 18.0 % at 35 %
+#     p030  Otsu 174/255, box ground 192  ->  52.7 % black, 13.5 % at 35 %
+#     p036  Otsu 175/255, box ground 185  ->  36.0 % black, 13.6 % at 35 %
+#     p080  Otsu 156/255, box ground 145  ->  16.5 % black, 12.3 % at 35 %
+#   MEASURED on SH8603: 9 pages lost 62-82 % of their halftone photograph.
+#
+# p080 is why this cannot be a per-issue judgement call: its box is 4.9 % of the
+# page, so the WHOLE-PAGE black fraction stays at an ordinary 16.5 % while the
+# box itself is ruined.  No page-level gate can see that, and "offer the switch
+# at review" needs someone's eye to land on the right page.
+#
+# WHY 35 % AND NOT MORE.  A cutoff floods any ground darker than itself, so the
+# value must sit below the darkest ground worth keeping.  SH8606's p040 measures
+# 92/255 against 35 %'s 89 -- three levels of margin -- and 40 % (102) would
+# flood it.  35 % is the highest value that leaves every measured tint white,
+# and it deliberately under-inks so halftone dots stay separate.  Ordinary text
+# pages barely move: 13-17 % black under Otsu, 11-14 % at 35 %.
+#
+# BILEVEL_THRESHOLD=OTSU (or explicitly empty) restores the per-page Otsu for a
+# comparison; it is not a shipping setting.  The JBIG2 cache is keyed by page
+# only, so each setting gets its own cache dir -- otherwise a changed threshold
+# silently reuses the old images.
+BILEVEL_THRESHOLD="${BILEVEL_THRESHOLD-35%}"        # unset -> 35%; see above
+if [[ -n "$BILEVEL_THRESHOLD" && "$BILEVEL_THRESHOLD" != [Oo][Tt][Ss][Uu] ]]; then
   THRESH=(-threshold "$BILEVEL_THRESHOLD"); JB="$CACHE/jbig2-t${BILEVEL_THRESHOLD%\%}"
 else
   THRESH=(-auto-threshold OTSU);            JB="$CACHE/jbig2"
 fi
 mkdir -p "$JB"
 exec >> "$LOG" 2>&1
-echo "=== $(date '+%H:%M:%S') mixed build $IN -> $OUT  mode=$MODE  bilevel-threshold=${BILEVEL_THRESHOLD:-OTSU} ==="
+echo "=== $(date '+%H:%M:%S') mixed build $IN -> $OUT  mode=$MODE  bilevel-threshold=${BILEVEL_THRESHOLD:-OTSU}  cache=$(basename "$JB") ==="
 
 pages=""
 for f in "$IN"/[0-9][0-9][0-9].png "$IN"/[0-9][0-9][0-9].tiff; do
