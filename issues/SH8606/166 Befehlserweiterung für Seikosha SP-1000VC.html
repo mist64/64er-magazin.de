@@ -21,7 +21,7 @@
         <h1>Befehlserweiterung für Seikosha SP-1000VC</h1>
         <p class="intro">Der Seikosha SP-1000VC ist ein Drucker mit vielen Möglichkeiten. Sie sind nur etwas schwer einzustellen. Wir bieten Ihnen über 90 neue Befehle, damit Sie ohne großen Aufwand alle Funktionen im Griff haben.</p>
 
-        <p>Der Seikosha SP-1000VC ist ein Drucker mit großer Leistungsvielfalt. Diese Möglichkeiten werden aber getrübt durch die umständlichen Aufrufe über die Sekundäradressen. Das zieht endlos lange OPEN...PRINT #...-Sequenzen mit den entsprechenden FILE OPEN- beziehungsweise FILE NOT OPEN-Errors nach sich. Das Handbuch spendet zweifelhaften Trost: »Denken Sie daran, der C64 kann 10 Files gleichzeitig offen halten!«</p>
+        <p>Der Seikosha SP-1000VC ist ein Drucker mit großer Leistungsvielfalt. Diese Möglichkeiten werden aber getrübt durch die umständlichen Aufrufe über die Sekundäradressen. Das zieht endlos lange OPEN...PRINT #...-Sequenzen mit den entsprechenden FILE OPEN- beziehungsweise FILE NOT OPEN-Errors nach sich. Das Handbuch spendet zweifelhaften Trost: »Denken Sie daran, der C 64 kann 10 Files gleichzeitig offen halten!«</p>
 
         <p>Die nächste Enttäuschung: Der 9-Nadeldrucker druckt Grafik mit 7 Nadeln! Außerdem nur einfache Punktdichte und nicht einmal Fettdruck.</p>
 
@@ -29,7 +29,7 @@
 
         <p>Das Programm »SP-1000VC.2« (Listing 1) wird absolut (,8,1) geladen und über SYS 49152 aktiviert. Zum Desaktivieren dient SYS 50601. Eventuelle andere Basic-Erweiterungen müssen vorher aktiviert werden, da das Programm beim Initialisierungsaufruf den Vektor $308/$309 (Basic-Befehl ausführen) speichert und bei Desaktivierung wieder zurückschreibt. Mehrfache Aktivierungen werden abgefangen und führen nicht zum Systemabsturz (Selbstaufruf).</p>
 
-        <p>Die neuen Basic-Befehle erkennt das Programm an dem vorangestellten Symbol (voreingestellt ist der Pfeillinks). Dieses Symbol kann durch POKE 51683,ASC$...geändert werden. Im folgenden sind alle Befehle ohne das (immer zu beachtende) Symbol beschrieben. Das heißt, »BEFEHL« muß als »- Befehl« interpretiert werden.</p>
+        <p>Die neuen Basic-Befehle erkennt das Programm an dem vorangestellten Symbol (voreingestellt ist der Pfeil links). Dieses Symbol kann durch POKE 51683,ASC$...geändert werden. Im folgenden sind alle Befehle ohne das (immer zu beachtende) Symbol beschrieben. Das heißt, »BEFEHL« muß als »← Befehl« interpretiert werden.</p>
 
         <p>Die kompletten Befehle zur Druckersteuerung sind in einer Tabelle zusammengefaßt (Tabelle 1). Die Werte in dieser Tabelle können Sie mit Setzbefehlen ändern (meist werden durch das Setzen auch die entsprechenden Befehle zum Drucker gesendet). Diese Tabelle wird durch RT, HP, HF und HE mit Normwerten neu gesetzt.</p>
 
@@ -300,7 +300,7 @@
             <figcaption>Tabelle 1. Hier finden Sie alle Befehle von SP-1000VC.2 in übersichtlicher Form dargestellt</figcaption>
         </figure>
 
-        <p>Die Bildschirmfarben (Rahmen, Hintergrund und Schrift) sind für die Betriebszustände »Files und Kanal offen« in den Speicherzellen dezimal 50201 bis 50203, für »Files offen und Kanal geschlossen« in 50198 bis 50200 und für »Files und Kanal geschlossen« in 50195 bis 50197 gespeichert und können durch POKESs (O bis 15) in die betreffenden Stellen verändert werden.</p>
+        <p>Die Bildschirmfarben (Rahmen, Hintergrund und Schrift) sind für die Betriebszustände »Files und Kanal offen« in den Speicherzellen dezimal 50201 bis 50203, für »Files offen und Kanal geschlossen« in 50198 bis 50200 und für »Files und Kanal geschlossen« in 50195 bis 50197 gespeichert und können durch POKEs (0 bis 15) in die betreffenden Stellen verändert werden.</p>
 
         <h2>Verbindung Drucker ein/aus</h2>
 
@@ -1067,7 +1067,7 @@ $C120  $33          $31
 
         <p>Falls das Programm in einen anderen Speicherbereich verschoben werden soll: Die Tabellen befinden sich von $C11B bis $C13E, von $C3E7 bis $C43A und von $C560 bis $C585.</p>
 
-        <p>In der Eröffnungsroutine ($CO03, $C030, $CO5C) sowie in der Endroutine ($C042, $C072) werden die aktuellen Zustände der Files und des Druckerkanals überprüft und entsprechend in Unterroutinen verzweigt. Es stört daher nicht, wenn die Aufrufe mehrfach erfolgen.</p>
+        <p>In der Eröffnungsroutine ($C003, $C030, $C05C) sowie in der Endroutine ($C042, $C072) werden die aktuellen Zustände der Files und des Druckerkanals überprüft und entsprechend in Unterroutinen verzweigt. Es stört daher nicht, wenn die Aufrufe mehrfach erfolgen.</p>
 
         <h3>2) Maschinenprogramm für 92 Basic-Befehle</h3>
 
@@ -1082,7 +1082,7 @@ $C120  $33          $32
 </code></pre>
 
 
-        <p>Für die Einbindung eigener Erweiterungen steht $C93D (derzeit: JMP AFO8) zur Verfügung. Der nach dem Symbol eingegebene Buchstabe befindet sich im Accu. Es sind noch die Buchstaben A, E, J, O, Q und V frei.</p>
+        <p>Für die Einbindung eigener Erweiterungen steht $C93D (derzeit: JMP AF08) zur Verfügung. Der nach dem Symbol eingegebene Buchstabe befindet sich im Accu. Es sind noch die Buchstaben A, E, J, O, Q und V frei.</p>
 
         <p>Bei der Aktivierung der Erweiterung ($C586) wird der Vektor $308/$309 (Basic-Befehl ausführen) gelesen und in $C5B9 gespeichert. Als neue Adresse wird $C5BB ( Routine prüft auf Symbol) in $308/$309 geschrieben. Wird kein neuer Basic-Befehl erkannt, erfolgt der Einsprung in den alten Vektorinhalt. Irrtümliche Mehrfachaktivierungen erkennt die Routine $C586 und verhindert Selbstaufrufe, die zum Systemabsturz führen könnten.</p>
 
