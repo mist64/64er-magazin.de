@@ -586,3 +586,22 @@ Reported independently by all three 280 agents.
 - "Beautify touched files" names no tool; "`<pre>` IS in scope" vs "Do NOT touch
   … `<code>`" collide when every hand-typed `<pre>` is `<pre><code>`; r280 never
   mentions `adjudicated.txt`, though briefs (mine) said "append per the rule".
+
+## 005/006 — my pre-PAUSE-1 saturation census was wrong in both directions
+
+**What I did.** Counted pixels with chroma `max-min > 80` on the thumbs, cropped
+3–93 % × 4–96 %, and reported plate colour at 600 dpi on 009 020 026 031 162.
+
+**What 006 measured.** 162 is bilevel — its rainbow logo is printed grey; my 0.74 %
+came from bed/prop at the frame edge that the percentage crop did not exclude on
+that sheet. And 019 is plate colour — a pale blue printed tint (197/220/237,
+chroma ≈ 40) under my cutoff of 80. The 006 classifier + r006's blob/strong-chroma
+measure got both right.
+
+**What it cost.** A wrong line in LOG.md (corrected) and a wrong "fact" in my
+messages to control; no wrong build.
+
+**Suggested.** The census entry I proposed earlier should say: "chroma > 80
+finds MARKINGS and saturated ink; it misses pale printed tints and is fooled by
+the bed — use it to find hand marks, and r006's classifier (on the A4 page,
+edge band guarded) to decide colour."
