@@ -659,3 +659,12 @@ time this step runs, the issue has been through … r320 (omission) and r330
 325, 330. I run 330 before 325, because both rule texts agree and 325's readers
 then read 330's fixes too. **Suggested.** Renumber, or have r000's table say
 "330 runs before 325".
+
+## 006 — a dark hand mark is invisible to the colour census
+
+The 006 census hunts hand marks by chroma (highlighter, coloured pen). p37's
+margin tick is dark brown pen: low enough chroma to pass as ink, dark enough to
+binarise solid black, so it went into the JBIG2 page and nobody saw it until the
+320 crop survey looked at every page by eye. **Suggested.** r006 (or r005b):
+"a hand-mark sweep is a LOOK at every page's margins, not a chroma threshold —
+dark pen survives bilevel".
