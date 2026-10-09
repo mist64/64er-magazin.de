@@ -135,6 +135,7 @@ Seite 80
 - **Tips & Tricks zu Vizawrite (9)** (Ausgabe 9/86, Seite 159)
 - **Datasette als Sirene** (Ausgabe 7/86, Seite 80)
 - **Giga-CAD** (Sonderheft 6/86, Seite 9ff)
+- **Basic-Listings** (Sonderheft 8/86)
 - **Leserforum (C 64 als Lichtorgel)** (Ausgabe 8/86, Seite 18)
 - **Leserforum (SX an der Autobatterie)** (Ausgabe 8/86, Seite 17)
 - **Schnelle Spielegrafik beim C 16** (Sonderheft 3/86, Seite 57)

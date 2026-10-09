@@ -628,3 +628,25 @@ pre-commit discipline: "read `git status` for unexpected `D` lines in the issue
 directory before every commit — a pathspec commit of the directory would record
 the deletion"; and r006: "keep the `<tmp>` build copy until the issue ships — it
 is the restore source".
+
+## 300 — an erratum addressed to a whole Sonderheft has no routing
+
+10/86 p80 prints an item headed only "Sonderheft 8/86", with no article or
+page: in "einem Basic-Listing" read »SYNTH.:130«/»SYNTH:132« as FLASH-ON/OFF.
+Step 1 routes by "start-page + title overlap" and has nothing to match on, and
+`Fehlerteufelchen.md` never indexed the item (its 10/86 list skips it), so an
+index-driven run finds only the 11/86 Grafik item. The stopped agent found it
+by reading the 10/86 rubric itself and attributed it with a tesseract sweep over
+all 166 masters (only p122, Apple Panic Listing 3, prints the token). I added the
+missing index line as `**Basic-Listings** (Sonderheft 8/86)`. **Suggested.** "Read
+every later rubric for items headed only by the issue; route them by searching
+this issue's print for the token the erratum names, and add them to the index."
+
+## 300 — the `;inkl.` header is easy to miss when the disk is already right
+
+The agent wrote `Disk-Version bereits korrigiert` in 108's aside but left
+`prg/grafik c16.txt` without its header; I added `;inkl. Fehlerteufelchen 11/1986
+(Zeile 280; Disk-Version bereits korrigiert)`. The Verification block checks the
+asides only, so it passes with the header missing. **Suggested.** A check: every
+aside with `Disk-Version bereits korrigiert` or `Korrektur im Programm angewendet`
+has a `prg/*.txt` naming its `Fehlerteufelchen M/YYYY` in the header.
