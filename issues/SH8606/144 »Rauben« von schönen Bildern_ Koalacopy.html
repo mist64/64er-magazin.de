@@ -105,98 +105,126 @@
 
         <p>Eine andere Version ist die Funktion »GRAB«. Wenn man mit »MEMORY« die Adresse eines Bildes gefunden hat, kann man mit »GRAB« die Umgebung dieses Bildes nach Farbtafeln absuchen, da diese oft genau hinter der Bitmap liegen. Dazu ein Beispiel:</p>
 
-        <p>Bitmap 16384</p>
+        <p>Bitmap 16384<br>Color1 24384 (+8000)<br>Color2 25384 (+1000)<br>Bitmap 24576<br>Color1 25600 (+8192 = $2000)<br>Color2 26624 (+1024 = $0400)</p>
 
-        <p>Color1 24384 (+8000)</p>
+        <p>Natürlich können die Farbtafeln auch vor der Bitmap liegen:</p>
 
-        <p>Color2 25384 (+1000)</p>
-
-        <p>Bitmap 24576</p>
-
-        <p>Colori 25600 (+8192 = $2000)</p>
-
-        <p>Color2 26624 (+1024 = $0400) Natürlich können die Farbtafeln auch vor der Bitmap liegen: Bitmap 24576</p>
-
-        <p>Colori 23552 (-1024 = $0400)</p>
-
-        <p>Color2 22528 (-1024 = $0400)</p>
-
-        <p>Bitmap 16384</p>
-
-        <p>Colori 15384 (-1000)</p>
-
-        <p>Color2 14384 (-1000)</p>
+        <p>Bitmap 24576<br>Color1 23552 (–1024 = $0400)<br>Color2 22528 (–1024 = $0400)<br>Bitmap 16384<br>Color1 15384 (–1000)<br>Color2 14384 (–1000)</p>
 
         <p>Selbstverständlich gibt es noch unendlich mehr Möglichkeiten, aber es ist erstaunlich, wieviele Programme sich doch an diese Regeln halten. Das liegt wohl in erster Linie daran, daß auch professionelle Programmierer ihre Programme gern übersichtlich ablegen.</p>
 
         <ol>
-            <li>Bilder im Directory: Bei vielen mehrteiligen Programmen befinden sich Titelbilder oder Ähnliches in den Formaten verschiedener Grafikprogramme im Directory: 40 "TITLE " PRG</li>
+            <li>Bilder im Directory: Bei vielen mehrteiligen Programmen befinden sich Titelbilder oder Ähnliches in den Formaten verschiedener Grafikprogramme im Directory:</li>
         </ol>
 
 
+        <pre><code>40 "TITLE           " PRG
+</code></pre>
+
         <p>Verdacht auf Koala-Format!</p>
 
-        <p>41 "SCREEN1 " PRG</p>
+        <pre><code>41 "SCREEN1         " PRG
+</code></pre>
 
         <p>Verdacht auf Blazing Paddles!</p>
 
-        <p>37 "PICTURE " PRG</p>
+        <pre><code>37 "PICTURE         " PRG
+</code></pre>
 
         <p>Verdacht auf Paint Magic!</p>
 
         <p>Man kann diese dann mit »X-LOAD« laden. Dabei ist zu beachten, daß man bei einigen Bildern sicher ein wenig experimentieren muß, bevor man die endgültige Version fertig im Speicher hat. _</p>
 
-        <p>SYS49154: Übergabe des Bildes ans Koala-Format. SYS49318: Anschalten des HiRes-Bildes. HIRES: 8192 ($2000)</p>
-
-        <p>COLOR!: 1024 ($0400)</p>
-
-        <p>COLOR2: 55296 ($D800)</p>
-
-        <p>SYS49334: Farbtafel $0400 setzen. Dies betrifft die Farben O und 1. Vorher müssen diese Farben in die Speicherstelle 2 gePOKEt werden: POKE2,C0+C1%16</p>
-
-        <p>SYS49353: Farbtafel $D800 setzen. Dies betrifft die Farbe 2. Vorher wird wiederum der Farbwert gesetzt:</p>
-
-        <p>POKE2,C2</p>
-
-        <p>SYS49395: HiRes-Bild ausschalten.</p>
-
-        <p>SYS49411: Ladenaneine bestimmte Adresse. Das höherwertige Byte der Startadresse liegt dabei in 49432, der Filename ab 49437 und die Länge des Filenamens bei 49419. SYS49456: Speichern des Koala-Bildes. Der Filename liegt ab 49488 und die Länge des Filenamens bei 49462 im Speicher.</p>
-
-        <p>SYS49520: Bilinken der Sprites O und 1. Dieser SYS-Befehl ruft eine IRQ-Routine auf, die die beiden Sprites in allen Farben blinken läßt. Das ist wichtig, weil nur so die beiden Sprite-Cursor bei »FINECOL&lt;« auf allen Farben sichtbar sind. SYS49568: Farbtafeln nachladen. Vorher muß das zu lesende File mit OPEN geöffnet werden. Das höherwertige Byte der Adresse der Farbtafel steht bei 49584 im Speicher. (4 für $0400 oder 216 für $D800)</p>
-
-        <p>SYS49611, Farbtafel kopieren. Bei 49638 steht das Farbtafel: höherwertige Byte der Farbtafel, auf die die Farbtafel, die durch den SYS-Befehl übergeben wurde, kopiert werden soll. (4 für $0400 oder 216 für $D800)</p>
-
-        <p>SYS49664: Directory anzeigen.</p>
-
-        <p>SYS49769: Bitmap löschen. Die Bitmap 8192=$2000</p>
-
-        <p>wird nach Aufruf dieser Routine gelöscht.</p>
-
-        <p>SYS49792, Bitmap holen. Die Bitmap, deren Anfangsa-</p>
-
-        <p>Bitmap: dresse durch den SYS-Befehl übergeben</p>
-
-        <p>wurde, wird nach $2000 kopiert.</p>
-
-        <p>SYS49920: Koala-Bild holen. Nach Aufruf dieser Routine</p>
-
-        <p>wird ein im Speicher vorhandenes Koala-Bild in den Grafikspeicher geholt. Außerdem wird das so erzeugte HiRes-Bild eingeschaltet.</p>
-
-        <p>SYS50084, Mit dieser Routine kann man in einer Farbtafel</p>
-
-        <p>Farbtafel,X1, ein Rechteck, das durch X1, Y1, X2 und Y2</p>
-
-        <p>Y1X2Y2, beschrieben wird, mit durch »Color«</p>
-
-        <p>Color: bestimmte Farben versehen.</p>
-
-        <p>Farbtafel: 1024 oder 55296.</p>
-
-        <p>x1, Y1: obere linke Ecke</p>
-
-        <p>x2, Y2: untere rechte Ecke des Rechtecks</p>
-
-        <p>Color: bei 1024, CO+C1* 16; bei 55296, C2</p>
+        <table class="plain">
+            <tr>
+                <td>SYS49154:</td>
+                <td>Übergabe des Bildes ans Koala-Format.</td>
+            </tr>
+            <tr>
+                <td>SYS49318:</td>
+                <td>Anschalten des HiRes-Bildes.</td>
+            </tr>
+            <tr>
+                <td>HIRES:</td>
+                <td>8192 ($2000)</td>
+            </tr>
+            <tr>
+                <td>COLOR1:</td>
+                <td>1024 ($0400)</td>
+            </tr>
+            <tr>
+                <td>COLOR2:</td>
+                <td>55296 ($D800)</td>
+            </tr>
+            <tr>
+                <td>SYS49334:</td>
+                <td>Farbtafel $0400 setzen. Dies betrifft die Farben 0 und 1. Vorher müssen diese Farben in die Speicherstelle 2 gePOKEt werden:<br><code class="mono">POKE2,C0+C1*16</code></td>
+            </tr>
+            <tr>
+                <td>SYS49353:</td>
+                <td>Farbtafel $D800 setzen. Dies betrifft die Farbe 2. Vorher wird wiederum der Farbwert gesetzt:<br><code class="mono">POKE2,C2</code></td>
+            </tr>
+            <tr>
+                <td>SYS49395:</td>
+                <td>HiRes-Bild ausschalten.</td>
+            </tr>
+            <tr>
+                <td>SYS49411:</td>
+                <td>Laden an eine bestimmte Adresse. Das höherwertige Byte der Startadresse liegt dabei in 49432, der Filename ab 49437 und die Länge des Filenamens bei 49419.</td>
+            </tr>
+            <tr>
+                <td>SYS49456:</td>
+                <td>Speichern des Koala-Bildes. Der Filename liegt ab 49488 und die Länge des Filenamens bei 49462 im Speicher.</td>
+            </tr>
+            <tr>
+                <td>SYS49520:</td>
+                <td>Blinken der Sprites 0 und 1. Dieser SYS-Befehl ruft eine IRQ-Routine auf, die die beiden Sprites in allen Farben blinken läßt. Das ist wichtig, weil nur so die beiden Sprite-Cursor bei »FINECOL« auf allen Farben sichtbar sind.</td>
+            </tr>
+            <tr>
+                <td>SYS49568:</td>
+                <td>Farbtafeln nachladen. Vorher muß das zu lesende File mit OPEN geöffnet werden. Das höherwertige Byte der Adresse der Farbtafel steht bei 49584 im Speicher. (4 für $0400 oder 216 für $D800)</td>
+            </tr>
+            <tr>
+                <td>SYS49611,<br>Farbtafel:</td>
+                <td>Farbtafel kopieren. Bei 49638 steht das höherwertige Byte der Farbtafel, auf die die Farbtafel, die durch den SYS-Befehl übergeben wurde, kopiert werden soll. (4 für $0400 oder 216 für $D800)</td>
+            </tr>
+            <tr>
+                <td>SYS49664:</td>
+                <td>Directory anzeigen.</td>
+            </tr>
+            <tr>
+                <td>SYS49769:</td>
+                <td>Bitmap löschen. Die Bitmap 8192=$2000 wird nach Aufruf dieser Routine gelöscht.</td>
+            </tr>
+            <tr>
+                <td>SYS49792,<br>Bitmap:</td>
+                <td>Bitmap holen. Die Bitmap, deren Anfangsadresse durch den SYS-Befehl übergeben wurde, wird nach $2000 kopiert.</td>
+            </tr>
+            <tr>
+                <td>SYS49920:</td>
+                <td>Koala-Bild holen. Nach Aufruf dieser Routine wird ein im Speicher vorhandenes Koala-Bild in den Grafikspeicher geholt. Außerdem wird das so erzeugte HiRes-Bild eingeschaltet.</td>
+            </tr>
+            <tr>
+                <td>SYS50084,<br>Farbtafel,X1,<br>Y1,X2,Y2,<br>Color:</td>
+                <td>Mit dieser Routine kann man in einer Farbtafel ein Rechteck, das durch X1, Y1, X2 und Y2 beschrieben wird, mit durch »Color« bestimmte Farben versehen.</td>
+            </tr>
+            <tr>
+                <td>Farbtafel:</td>
+                <td>1024 oder 55296.</td>
+            </tr>
+            <tr>
+                <td>X1, Y1:</td>
+                <td>obere linke Ecke</td>
+            </tr>
+            <tr>
+                <td>X2, Y2:</td>
+                <td>untere rechte Ecke des Rechtecks</td>
+            </tr>
+            <tr>
+                <td>Color:</td>
+                <td>bei 1024, C0+C1*16; bei 55296, C2</td>
+            </tr>
+        </table>
 
         <p>Die Routinen wurden hier nicht in logischer, sondern in arithmetischer Reihenfolge beschrieben, also in der Reihenfolge, in der sie programmiert wurden. Und das istleider nicht immer die logische Reihenfolge.</p>
 
