@@ -533,3 +533,41 @@ plain running-head bar is head1, not a banner."
   says fix them) as "matching no article". **Suggested.** "a row corrected at
   application is recorded in `reviewed/r220-orphan-rows.txt` with the fix as the
   reason". And the comment "keys it in COLUMN 4" is stale (the code uses `r[3]`).
+
+## 006 — the build did not stop at the by-product; the session limit stopped it (and a check that passed the by-product)
+
+**What happened.** The 006 sub-agent ran step 2 (plain `make_issue_pdf.sh`,
+populating `<A4>/.ocrcache/`), which wrote `scratch.pdf` at 00:18 — 98.3 MB, 166
+JPEG, 0 JBIG2, PDF/A-3B: the by-product r006 names. The agent did NOT treat it as
+done: its last output was "Meanwhile, the 2400 dpi set from the scans", i.e.
+gathering the colour-census inputs for step 4. It was then killed, with the three
+280 agents, by the account session limit (HTTP 429, "resets 3:20am"). I (the
+orchestrator) was waiting on its completion notification, not on PAUSE 2, crops,
+or any sentence that read "the PDF is done". Nothing in r006 misled me; nothing
+told me either that the run had been killed — the notification arrived only with
+the next turn.
+
+**The rule defect that WAS real** (found by control, fixed in bc4057c8): r006's
+six Verification items all PASS on the by-product, so a build that had stopped
+at step 2 would have shipped it. Item 3 is now size AND provenance:
+`pdfimages -list | awk 'NR>2{print $9}' | sort | uniq -c` must show jbig2 and
+jpeg, and Producer must name jbig2enc.
+
+**The log ambiguity.** The `[search] q=` lines appear in both the plain and the
+mixed script, so a log alone does not say which ran. I had not believed the mixed
+build ran — I had no report at all — but a reader of the log could.
+
+**What it cost.** The 3 h between 00:18 and the reset; the 280 work of three
+agents (only the 108–162 one had edited, 7 files, kept for re-verification).
+
+**Suggested.** r000, *AN AGENT CAN BE STOPPED MID-STEP*: "a session limit stops
+EVERY running agent at once; after a reset, list every agent that was running and
+re-assess its step from the artefacts (git status, `<tmp>` mtimes), before
+anything else". And the provenance check above in r006 (done).
+
+## 005b — dating note: 165/166 stamps predate the note fix by three minutes
+
+The insert stamps were written 10-08 14:40; `1a39670f` (cut() emits the window's
+note) landed 14:43. The artefact is right (both 3386×4921, fabricated 52.07 /
+52.40 % = the card on an A4 window); only the record is thin. Not re-run; it will
+pick up the note whenever 005b next runs before the PDF.
