@@ -605,3 +605,14 @@ messages to control; no wrong build.
 finds MARKINGS and saturated ink; it misses pale printed tints and is fooled by
 the bed — use it to find hand marks, and r006's classifier (on the A4 page,
 edge band guarded) to decide colour."
+
+## 290 — the rule bans an audit pass and then briefs one
+
+"❌ Never run a heading-level audit pass … Walk every article and re-check the
+heading hierarchy is banned", against the briefing's "For every article …
+1. List heading hierarchy … 2. For each suspicious heading … check the print
+scan" and "count the print's bold subheads for the article". The agent read the
+ban as "no bulk heuristic"; per-heading scan comparison changed nothing here.
+Also: the Verification's `PY=${PYTHON:-.venv/bin/python}` only works from the
+repo root. **Suggested.** "Banned: changing levels by a heuristic. Required:
+comparing each heading against the print. Run from the repo root."
