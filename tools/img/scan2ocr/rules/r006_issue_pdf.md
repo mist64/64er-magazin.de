@@ -372,6 +372,52 @@ a 2400 dpi page the classifier calls colour-free is still a page to look at —
 but **the sweep for colour, and the sweep for a previous hand, both go over
 EVERY page regardless of dpi.**
 
+### AND A COLOUR CENSUS CANNOT FIND A DARK MARKING AT ALL
+
+**Chroma collapses as a colour darkens.** A green highlighter on light paper is
+a huge chroma signal; the same pen in dark brown, or a ballpoint in black ink,
+keeps almost none — it lands on top of print ink, which is where every chroma
+gate has to put its threshold. MEASURED on SH8608's three marks, at 600 dpi
+against the print ink on their own pages:
+
+| page | mark | grey median | chroma median |
+|---|---|---|---|
+| p037 | brown pen tick, left margin | 67 | 35 |
+| p121 | brown blot, beside a listing line | 53 | 32 |
+| p104 | round black ink dot, left margin | **6** | **9** |
+| — | *print ink on those pages* | *36-41* | *9-10* |
+
+p037 and p121 are chromatic enough to separate. **p104 is not: chroma 9 is
+exactly print ink's.** What distinguishes it is that it is far DENSER than the
+type (grey 6 against 36) — a liquid deposit that pooled — and that it is a
+clean isolated ellipse of about 1.8 x 2.3 mm sitting in an otherwise blank
+margin, serving no printing purpose. Colour says nothing about it either way.
+
+**So the hand-mark sweep is a LOOK at every page, not a threshold.** The
+working discriminator is **shape and position**:
+
+- an isolated blob or stroke, **outside the text block** or clear of any
+  printed element;
+- denser or lighter than the type around it;
+- serving no purpose the page's layout would explain.
+
+Colour is a CONFIRMATION where it is present, never the test. All three of
+SH8608's marks were found by eye during the 320 crop survey — which looks at
+every editorial page anyway — after the chroma census had been run and had
+found only p003's green highlighter. All three then survived into the shipped
+PDF as solid black, indistinguishable from print.
+
+**This was the over-generalised claim, in the instrument itself.** The census
+was built against SH8606 p003: a GREEN mark on a LIGHT ground, where chroma is
+enormous. It worked, so it shipped, and nobody asked which members of the set
+it had counted — r000, *A CLAIM ABOUT A SET MUST STATE WHICH MEMBERS IT
+COUNTED*. The same error appeared twice more in measuring these very pages: a
+`chroma > 40` probe of p003 was catching halftone colour fringing rather than
+pen, and a `chroma > 80` census read p162's bed as plate colour while missing
+p019's pale blue printed tint at chroma 40 entirely. Use `chroma > 80` to find
+SATURATED marks and nothing else; use this step's classifier, on the A4 page
+with the edge band guarded, to decide COLOUR; and use your eyes for a hand.
+
 **And then flag the mark itself to the owner — it must not reach the PDF.** Owner,
 2026-10-08: *"if you encounter notes or markings that survive into the PDF, flag
 this for me — i need to patch the input master file."* `FORCE_BILEVEL` only
@@ -848,6 +894,40 @@ shasum -a 256 "issues/$ISSUE/$(basename "$PDF")" >> "issues/$ISSUE/LOG.md"
 
 Uncommitted is fine — the point is a second copy outside `<tmp>` and a hash
 the next reader can check a replacement against.
+
+**AND THE `issues/<ID>/` COPY IS NOT DURABLE EITHER. KEEP THE `<tmp>` ONE
+UNTIL THE ISSUE SHIPS — it is the restore source.** Three occurrences now, and
+the cause is still not established:
+
+| issue | where it vanished | state |
+|---|---|---|
+| SH8604 | `<tmp>`, both PDFs, within 27 min of being built | logs intact |
+| SH8606 | `issues/SH8606/`, untracked, inside a ~65 min window | rebuilt |
+| SH8608 | `issues/SH8608/`, **committed** — `git status` showed `D` | restored from `<tmp>` |
+
+Ruled OUT by measurement, so do not re-propose them: iCloud Drive eviction
+(`~/Documents` is not the iCloud Documents folder — different inode, no `git`
+directory in the iCloud one, and the repo holds no `.icloud` placeholders);
+disk pressure (89 % full, 1.6 TiB free); Time Machine, which does not delete
+sources. **Record the phenomenon, not a theory.**
+
+**To restore a committed one:** hash the `<tmp>` build copy against the HEAD
+blob and restore by COPY.
+
+```bash
+git show "HEAD:issues/$ISSUE/$(basename "$PDF")" | shasum -a 256
+shasum -a 256 "<tmp>/$(basename "$PDF")"          # the two must match
+cp "<tmp>/$(basename "$PDF")" "issues/$ISSUE/"
+```
+
+Not `git checkout` or `git restore`: those would hand you a file you have not
+compared to anything, and if the `<tmp>` copy and HEAD disagree you need to
+know that BEFORE one of them overwrites the other.
+
+**NEVER FILTER THE PDF OUT OF A STATUS CHECK.** SH8606's disappearance could
+only be narrowed to a 65-minute window because the builder's routine
+`git status` calls were piped through `grep -v pdf` to keep the output short. A
+filter that hides the artefact hides the moment it goes missing.
 
 ### The whole procedure, in order
 

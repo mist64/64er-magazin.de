@@ -51,6 +51,33 @@ In the other direction the file carries spurious ROWS, which cost a line and
 nothing more: a prose mention `(Bild 5)` or a DATA line `BILD 7` opens like a
 caption and becomes a candidate. Read the row, not the count.
 
+### THE page -> Bild MAP IS DERIVABLE. DO NOT HAND-KEEP IT.
+
+The block index already answers it, per page, in one line:
+
+```bash
+grep -ohE '\bBild [0-9]+[a-z]?\.' <OUT_DIR>/blocks/pNNN.txt
+```
+
+Run it per page and the map falls out. It misses exactly the captions set
+INSIDE a frame — the ones listed above, which the worklist documents as folded
+away — so the gaps are known, small and already written down.
+
+**MEASURED on SH8606, which is why this is here.** The pre-150 survey wrote
+`73-1..3` on p74 as *Bild 5/6/7* and `73-4..6` on p76 as *Bild 1/2/3*, because
+it assumed delivery order equals page order. It does not: the magazine prints
+**Bild 5-7 on p74, BEFORE Bild 1-3 on p76**. The delivered PNGs, the printed
+pages 074/076/077 and the shipped `<figcaption>`s all agree that file number =
+Bild number, so **the HTML was never wrong — only the worklist was**, and the
+one-line grep above would have caught it the day it was written.
+
+**AND A WORKLIST CORRECTION REWRITES THE ROW. It never appends a footnote.**
+Step 150 DID notice this one (`73-5 earth = Bild 5`) and added a correction
+line below the table while leaving the wrong rows standing. Four days later
+control built the owner's croplist from that table and walked straight into the
+same swap. A note under a table is not a correction; it is a second claim, and
+the reader who needs it is the one who did not scroll. Fix the row.
+
 ## TWO ARTICLES CAN SHARE A START PAGE — the second one's lead image is `-00`
 
 Figure files are `<article-start-page>-<n>.png`, so two articles beginning on

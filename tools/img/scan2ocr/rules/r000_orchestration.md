@@ -2267,6 +2267,32 @@ Two cheaper companions worth running at the same time:
   but on 8612 it was wrong in both directions — ads counted into a range, and
   the Centronics article given as 52—57 where it actually runs 52-67.
 
+## READ `git status` FOR UNEXPECTED `D` LINES BEFORE EVERY COMMIT
+
+Commit by pathspec while a sibling build shares the tree — a bare `git commit`
+sweeps whatever the sibling has staged. That much was already practice. The
+trap underneath it is newer:
+
+**A pathspec commit of the issue directory records a DELETION you did not
+make, inside a commit about something else.** The issue PDF has gone missing
+from the working tree three times (r006 tables them, cause unestablished). On
+SH8608 it was already committed, so `git status` showed
+`D issues/SH8608/64er_Sonderheft_1986-08.pdf` — and `git commit -- issues/SH8608`
+would have written that deletion into history under a message about step 330.
+
+So, before every commit:
+
+```bash
+git status --porcelain | grep '^.D\|^D' || echo "(no D lines)"
+```
+
+Anything there that you did not delete yourself stops the commit. Restore it
+first — r006, *AND THE `issues/<ID>/` COPY IS NOT DURABLE EITHER* has the
+procedure — then commit. It costs one command and it is the difference between
+a missing file and a missing file that git now believes was deleted on purpose.
+
+And never `git add -A` an issue directory.
+
 ## A CHECK SHIPS ONLY ONCE IT HAS BEEN SEEN TO FAIL
 
 Write the check, then **plant the fault it is meant to catch** and watch it
