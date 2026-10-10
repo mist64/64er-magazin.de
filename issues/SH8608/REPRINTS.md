@@ -76,3 +76,11 @@ are therefore younger.
   `112`, `115`, `117`, `123`, `131`, `132`, `135`, `144`, `154` — no
   candidate sharing ≥ 5 shingles, no block, no table above noise: original to
   this issue by this measure.
+
+## Step 1 outcome (2026-10-10)
+
+Every lead confirmed from both printed pages (LOG.md, `## Step 330 (reprint_compare)`): CONFIRMED 129, 139, 150; PARTIAL 10, 44, 57, 130, 146 ×2, 157 ×5. None refuted, none unresolved, none reversed. 157's hex course follows SH8605/164's wording, which re-edits and extends 8603/79.
+
+Credited (step 7): 44, 139, 150, 157. Standing reprints, never credited: 129, 130. Table-only or single-passage reuse (owner 2026-10-07), recorded and not credited:
+
+Recorded, not credited: `10 Basic-Kurs für C 16-Einsteiger.html`, `57 C 128-Programme auf dem C 16_.html`, `146 SMON für den VC 20.html`
