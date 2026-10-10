@@ -689,3 +689,29 @@ UNPARSEABLE line and nothing else; counted with its own LINE regex it parsed
 another way (Bild 2 byte for byte against the Plus/4 BASIC ROM at $8180–$81B7;
 H-command results against the ROM). **Suggested.** Print `parsed N of M`, and
 teach it the TEDMON `>` row form, the commonest dump form in a C 16 issue.
+
+## 330 — `verify` reads the FIRST `## Step 330` heading, and a killed run leaves one
+
+A session limit killed the first 330 agent after it had logged "## Step 330
+(reprint_compare) — STARTED, agent killed…", and Step 0 then wrote its own
+"## Step 330 Step 0 (leads)". `r330_reprint_compare.py verify` parses the first
+`## Step 330` section it meets, so the real section at the end of LOG.md was
+invisible to it until the body agent demoted the two earlier headings to `###`
+(text unchanged). Cost: one probe run on a scratch LOG. **Suggested.** r330:
+"Your section is the only `## Step 330` heading in LOG.md; an earlier partial or
+Step 0 record goes under `###`." Better: `verify` takes the LAST such heading.
+
+## 325 / 320 — rules that saved the build
+
+- r325 *"skip `<pre data-filename>`", not "skip `<pre>`"*: 25 of the 43 read-for-
+  sense fixes were column spacing and line structure inside hand-typed `<pre>`
+  (measured glyph pitch 40.5–41.7 px), plus 110 Life's two printed rows that
+  had been filled from the disk. A brief that excused `<pre>` would have found
+  none of them.
+- r280 / r325 *typos in print remain typos*: reader E restored "mit mit" (p104),
+  which an earlier step had silently de-duplicated.
+- r150 *the worklist comes from LOOKING AT EVERY EDITORIAL PAGE*: 16 in-frame
+  captions were absent from `figure_captions.txt`; the by-eye survey also found
+  the p37/p104/p121 hand marks that the colour census could not see.
+- r300 *A REPRINT … check every reprint against its original's errata*: settled
+  in one pass (p157 already prints 8604's corrected `SYS15000`).
