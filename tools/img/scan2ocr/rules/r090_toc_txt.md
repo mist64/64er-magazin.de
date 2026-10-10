@@ -49,24 +49,25 @@ Rubriken
 
 ## Procedure
 
-1. Find the TOC pages in the issue's PDF (usually pages 6–7; sometimes
-   4–5 for older issues). Render them as PNGs so you can read them
-   clearly:
-   ```bash
-   for p in 6 7; do
+Before step 1, resolve the masters directory once. **The repo venv, not bare
+`python3`:** `r010_ocr_blocks` imports numpy and scipy, which the system python
+does not have, so a bare `python3` leaves `SRC` silently EMPTY and every crop
+below then fails on `/NNN.png` (MEASURED on 8611).
 
 ```bash
-# The repo venv, not bare "$PY": r010_ocr_blocks imports numpy and scipy,
-# which the system python does not have, so `"$PY"` makes SRC silently EMPTY
-# and every crop below then fails on "/NNN.png". MEASURED on 8611.
 PY=${PYTHON:-.venv/bin/python}
 SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
 ```
 
-     # masters600 is 600 dpi, so 150 dpi is -resize 25%.  NOT pdftoppm of
-     # the issue PDF: that file is assembled at step 006 and does not exist
-     # while the issue is being built.  See r000, "THE PAGE IMAGE IS masters600".
+1. Find the TOC pages in the issue's PDF (usually pages 6-7; sometimes
+   4-5 for older issues). Render them as PNGs so you can read them
+   clearly:
+   ```bash
+   # masters600 is 600 dpi, so 150 dpi is -resize 25%.  NOT pdftoppm of
+   # the issue PDF: that file is assembled at step 006 and does not exist
+   # while the issue is being built.  See r000, "THE PAGE IMAGE IS masters600".
+   for p in 6 7; do
      magick "$SRC/$(printf %03d $p).png" -colorspace Gray -resize 25% \
        <scratch>/toc_p$p.png
    done

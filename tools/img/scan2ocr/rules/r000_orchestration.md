@@ -1517,6 +1517,25 @@ exactly that reason**, both found by a builder rather than by the author:
 - r145's long fence was **never closed**, so 105 lines of prose, headings and
   two tables from *Known limits* onward rendered as code.
 
+**And then the census itself could not see a fifth of them.** Its detector was
+`line.startswith('```bash')`, which is false for a fence INDENTED inside a
+numbered step -- so it read 142 fences and skipped 20, and the skipped set is
+where the next two defects were living:
+
+- r090's step 1 had a column-0 ```` ```bash ```` recipe pasted INSIDE its
+  indented `for p in 6 7; do` fence, cutting the loop in two so it could not be
+  copied as written. SH8608's builder reported it by hand, because the census
+  could not reach it.
+- r000's own `OUT_DIR` fence ended `` ``` There is nothing to schedule `` --
+  prose on the closing line. In CommonMark that is **not** a closing fence, so
+  eleven lines of prose rendered as code in the contract file.
+
+That is this rule's own failure mode, *A CLAIM ABOUT A SET MUST STATE WHICH
+MEMBERS IT COUNTED*, committed by the check written to enforce it. The census
+below now matches `^\s*```(bash|sh)` and dedents, closes only on a BARE
+```` ``` ````, and **prints how many fences it read** -- so "0 failing" can be
+read against a number that would drop if the detector silently stopped matching.
+
 Run this after touching any `.md` in this directory. It takes seconds and it is
 the cheapest check in the chain:
 
@@ -1524,39 +1543,55 @@ the cheapest check in the chain:
 cd tools/img/scan2ocr/rules
 PY=${PYTHON:-../../../../.venv/bin/python}
 "$PY" - <<'FENCECHECK'
-import glob, re, subprocess, sys
+import glob, re, subprocess, sys, textwrap
 PH = re.compile(r'<([A-Za-z0-9_][^<>\n]{0,40})>')      # <YYMM>, <ID>, <A4> ...
-bad = 0
+# A fence INDENTED inside a numbered step is still a fence.  Anchoring this at
+# column 0 is what hid r090's broken loop and r000's own unclosed fence.
+OPEN = re.compile(r'^(\s*)```(bash|sh)\b')
+# A closing fence is BARE.  '``` and then prose' is not one -- that is the
+# r000 defect above, and the one shape `bash -n` alone can never report.
+SHUT = re.compile(r'^\s*```\s*$')
+bad = tot = 0
 for p in sorted(glob.glob('r[0-9]*.md')):
     lines = open(p, encoding='utf-8').read().split('\n')
-    i = k = 0
+    i = 0
     while i < len(lines):
-        if lines[i].startswith('```bash') or lines[i].startswith('```sh'):
-            j = i + 1
-            while j < len(lines) and not lines[j].startswith('```'):
-                j += 1
-            k += 1
-            body = '\n'.join(lines[i + 1:j])
-            # A PLACEHOLDER IS A VALUE HERE, NOT A REDIRECT.  Substitute it, or
-            # every fence carrying one is a false positive: 38 of 141 "fail"
-            # without this, every one of them spurious, and a check with a 27 %
-            # false-positive rate is one nobody runs twice.
-            body = PH.sub(lambda m: 'PH_' + re.sub(r'[^A-Za-z0-9]', '_',
-                                                   m.group(1))[:20], body)
-            r = subprocess.run(['bash', '-n'], input=body, text=True,
-                               capture_output=True)
-            if r.returncode:
-                bad += 1
-                print(f"  {p} fence {k}: {r.stderr.strip().splitlines()[0]}")
-            i = j
-        i += 1
-print(f"{bad} fence(s) do not parse")
+        m = OPEN.match(lines[i])
+        if not m:
+            i += 1
+            continue
+        j = i + 1
+        while j < len(lines) and not SHUT.match(lines[j]):
+            j += 1
+        if j >= len(lines):
+            print(f"  {p}:{i+1}: fence never closed by a bare ```")
+            bad += 1
+            break
+        tot += 1
+        body = '\n'.join(lines[i + 1:j])
+        if m.group(1):                      # nested in a list item
+            body = textwrap.dedent(body)
+        # A PLACEHOLDER IS A VALUE HERE, NOT A REDIRECT.  Substitute it, or
+        # every fence carrying one is a false positive: 38 of 141 "fail"
+        # without this, every one of them spurious, and a check with a 27 %
+        # false-positive rate is one nobody runs twice.
+        body = PH.sub(lambda m: 'PH_' + re.sub(r'[^A-Za-z0-9]', '_',
+                                               m.group(1))[:20], body)
+        r = subprocess.run(['bash', '-n'], input=body, text=True,
+                           capture_output=True)
+        if r.returncode:
+            bad += 1
+            print(f"  {p}:{i+1}: {r.stderr.strip().splitlines()[0]}")
+        i = j + 1
+print(f"{bad} of {tot} fence(s) do not parse")
 sys.exit(1 if bad else 0)
 FENCECHECK
 ```
 
-MEASURED: **141 fences** across the rules, **0 failing** once the two above were
-fixed.
+MEASURED: **162 fences** across the rules -- 142 at column 0 and 20 indented
+inside a step -- and **0 failing** once the four above were fixed. If that total
+ever falls while the rules keep growing, the detector has stopped matching
+something; fix the detector, not the number.
 
 ## Cross-cutting rule: PREFLIGHT the free space, before step 005
 
@@ -1659,7 +1694,9 @@ PY=${PYTHON:-.venv/bin/python}
 OUT_DIR=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.OUT_DIR)')
 ls "$OUT_DIR/blocks/" | head
-``` There is nothing to schedule and nothing to wait for:
+```
+
+There is nothing to schedule and nothing to wait for:
 step 010 has already OCR'd every page and already knows every bbox, so the index
 is a projection of data we have rather than a second OCR pass. It costs no OCR
 and cannot disagree with the corpus.
