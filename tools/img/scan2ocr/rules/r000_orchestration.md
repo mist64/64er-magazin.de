@@ -738,7 +738,10 @@ them through this table.
 | 280 | 27 | ocr_word_cleanup |
 | 290 | 28 | heading_hierarchy |
 | 300 | 29 | fehlerteufelchen_errata |
+| 310 | — | issue_invariants — the whole issue's structural invariants, re-checked regardless of which rule last touched a file. HARD must be 0. **Code only — `r310_issue_invariants.py`, no `.md`**, so its contract is the module docstring |
+| 320 | — | omission — "is anything MISSING" (`r320_omission.md`, `r320_coverage_check.py`, `r320_dropped_listings.py`). Needs the OCR intermediates as well as `issues/<ID>/` |
 | 325 | — | read_for_sense (added 2026-08, SH8601) |
+| 330 | — | reprint_compare — each reprint against its already-published original (`r330_reprint_compare.md`). **Two parts, run at different times** — see below |
 | 340 | — | workflow_errata — what these rules got wrong, written while it hurt. **Kept from the first confusion onward, signed off last** |
 
 Two rules were removed rather than renumbered:
@@ -750,6 +753,36 @@ Two rules were removed rather than renumbered:
   Rule 190 owns every aside now.
 
 There was never a 23.
+
+**This table omitted 310, 320 and 330 until 2026-10-10.** A build driven from it
+went 300 -> 325 -> 340 and skipped all three end-of-issue gates; they survived
+only in prose elsewhere in this file. That is the r006 by-product defect in
+another costume -- the authoritative artefact could not tell the complete case
+from the incomplete one. If you add a rule, add its row here in the same commit.
+
+### THE RUN ORDER AT THE END OF AN ISSUE IS NOT THE NUMERIC ORDER
+
+    300  ->  330 Step 0  ->  325  ->  310  ->  320  ->  330 body  ->  340
+
+- **330 Step 0 measures the leads** into `REPRINTS.md` and runs BEFORE 325, so
+  the sense-readers know which articles have a second independent witness. It
+  needs only the post-280 text.
+- **325 is the step most likely to change prose** -- it is a human sense-read,
+  so everything that reasons over finished text waits for it.
+- **310 and 320 reason over the WHOLE article set** and cannot be trusted until
+  325 has touched its last file. Running them earlier is a free smoke test; the
+  BINDING run is after 325. MEASURED: SH8606 re-ran 320 after a single 325 word
+  fix (`a20be620`, the dup-passage record had to be re-keyed), and SH8608 re-ran
+  r310 after 325.
+- **330's BODY needs finished HTML**, because it diffs our text against a
+  published original and 325's fixes are part of our text.
+
+**310 and 320 are issue-wide; 330 is per-article.** That is what decides whether
+a gate may start while readers are still working. 330 may run on articles that
+finished readers have frozen, provided no `REPRINTS.md` lead is still in flight
+-- SH8606's 330 legitimately started early on exactly that basis. 310 and 320
+cannot start until the last article is done: run r310 against an incomplete set
+and it flags things it could never clear.
 
 ## The rule
 

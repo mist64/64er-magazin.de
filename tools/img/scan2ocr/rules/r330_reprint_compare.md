@@ -36,13 +36,37 @@ version of forgetting one of these three sentences.
    reading the printed page on each side; a difference nobody looked at a page
    for is `UNRESOLVED`, not "probably theirs".
 
-## Run order — LAST, after rule 300
+## Run order — TWO PARTS, AT TWO DIFFERENT TIMES
 
-Later than everything, including rule 300:
+This heading used to read *"LAST, after rule 300"*, while a hundred lines below
+the same rule said the leads are measured *"after 280 and before 325"*. Both
+sentences are true, **of different parts of this rule**, and the rule never said
+so. SH8608 read the heading, ran 330 before 325, and threw the partial run away.
+
+**Step 0 — measure the leads: after 280, BEFORE 325.** It writes
+`issues/<ID>/REPRINTS.md` from this issue's own prose and needs no finished
+HTML. It belongs before 325 so the sense-readers know which articles have a
+second independent witness to read against.
+
+**The body — step 1 onward: LAST, after 300 AND after 325.**
+
+Both parts write under a `## Step 330 …` heading in `LOG.md`, and so does a run
+that gets killed mid-step. `verify` reads the **LAST** such heading, which is the
+one the current run wrote; an abandoned partial or a Step 0 record above it is
+harmless. It used to read the first, and on SH8608 — where a session limit
+killed the first 330 agent and Step 0 then added its own heading — it was blind
+to the real section at the end of the log until both earlier headings were
+demoted to `###` by hand.
+
+Later than everything, including rule 300 and rule 325:
 
 - it compares **finished** HTML, so every text pass — heading case (260),
-  autolink (270), OCR cleanup (280), hierarchy (290) — must already have run,
-  or the diff reports our own pipeline against itself;
+  autolink (270), OCR cleanup (280), hierarchy (290) and **read-for-sense
+  (325)** — must already have run, or the diff reports our own pipeline against
+  itself. 325 is the likeliest of them to change prose, being a human
+  sense-read over every word: SH8606's reader F edited the Impressum, which is
+  a comparison target here, and SH8606 had to re-key 320's record after a
+  single 325 word fix;
 - rule 300 may add an `<aside class="fehlerteufelchen">` to either side, which
   is a block present on one side only and pure noise here if it lands later;
 - a `THEIRS` finding re-opens a published issue, and that decision wants the
@@ -141,7 +165,8 @@ overlap pass first writes that file (r140, *Check 4 CANNOT see a reprint*);
 never replaces it. A lead already in `reprints.txt` has been confirmed against
 the page and does not go back through step 1.
 
-Then **measure the leads before step 1**, after 280 and before 325:
+Then **measure the leads before step 1**, after 280 and before 325 — this is
+Step 0 of the run order above, and the only part of this rule that runs early:
 
 > For every article of this issue, compute the 8-word-shingle overlap of its
 > normalised text against every article in `issues/`. Anything above ~0.5 is a

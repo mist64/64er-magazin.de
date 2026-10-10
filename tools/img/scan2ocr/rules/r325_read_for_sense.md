@@ -32,8 +32,19 @@ flood means a form it cannot parse, not an issue full of errors.
 ## Why this exists: every other pass is blind in the same way
 
 By the time this step runs, the issue has been through r280 (word cleanup),
-r290 (headings), r310 (invariants), r320 (omission) and r330 (reprint
-comparison). Every one of them is **pattern-driven or diff-driven**:
+r290 (headings) and **r330's Step 0** (the reprint leads, so you know which
+articles have a second independent witness). The three end-of-issue gates —
+r310 (invariants), r320 (omission) and **r330's body** — run AFTER this step,
+because this step changes prose and all three reason over finished text; see
+r000, *THE RUN ORDER AT THE END OF AN ISSUE IS NOT THE NUMERIC ORDER*.
+
+This sentence used to list all five as already run. Together with r330's old
+*"Run order — LAST, after rule 300"* heading it formed a circle, and SH8608
+resolved it the only way the two texts allowed: it ran 330 before 325, and
+threw the partial run away.
+
+Every one of those passes, before this step or after it, is **pattern-driven or
+diff-driven**:
 
 | pass | what it does | what it cannot see |
 |---|---|---|

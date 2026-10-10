@@ -517,10 +517,18 @@ def _cells(line):
 
 
 def _log_section(log_text):
-    m = STEP_HEAD.search(log_text)
-    if not m:
+    # THE LAST '## Step 330' HEADING, NOT THE FIRST.  This step runs in two
+    # parts at two different times (Step 0 writes the leads long before the
+    # body runs), and a run killed mid-step leaves its own started-and-abandoned
+    # heading behind.  Taking the first match read one of those stubs and
+    # reported the real section at the end of LOG.md as missing -- SH8608, where
+    # a session limit killed the first 330 agent and Step 0 then wrote its own
+    # heading, so verify was blind until both earlier ones were demoted to '###'
+    # by hand.  The last one is the one this run wrote.
+    matches = list(STEP_HEAD.finditer(log_text))
+    if not matches:
         return None
-    rest = log_text[m.end():]
+    rest = log_text[matches[-1].end():]
     nxt = NEXT_H2.search(rest)
     return rest[: nxt.start()] if nxt else rest
 
