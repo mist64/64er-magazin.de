@@ -13,9 +13,15 @@ Measured 2026-10-09 after step 280 (8-word shingles over normalised prose, `<pre
 | `114 Grafik 2000 – eine Basic-Erweiterung, die es in sich hat.html` | SH8504/76 | 0.87 | the original ran in a Sonderheft (4/85); credit SH8504 |
 | `142 Grafikbücher für C 64 und C 128.html` | 8605/107 | 0.69 | PARTIAL — some of the eight reviews |
 | `142 Grafikbücher für C 64 und C 128.html` | 8508/115 | 0.40 | PARTIAL — some of the eight reviews |
-| `178 Impressum.html` | (SH8604/162 0.93, SH8605/194 0.92 …) | — | masthead boilerplate, not an article reprint — no row needed |
+
+`178 Impressum.html` scores 0.93/0.92 against the SH8604/162 and SH8605/194 mastheads: boilerplate, not an article reprint — not a lead, no row (kept out of the table so `verify` does not read it as one).
 
 No other article scores ≥ 0.15 against any file in `issues/` (the next entries below 0.40 are the Impressum copies). Per-block (merged/partial) measure: to be run by step 330 over the whole corpus as the rule asks.
 
 ## Claimed original content
 Everything else in SH8606 is, by this measure, original to the issue.
+
+## Credits (step 7)
+- **Credited:** 114 (CONFIRMED ← SH8504/76), 142 (PARTIAL ← 8605/107 + 8508/115: six of the eight reviews are re-set whole body texts).
+- Standing reprints 6/7 (checksummer, mse): compared, never credited (owner 2026-10-06).
+- Recorded, not credited: (none)
