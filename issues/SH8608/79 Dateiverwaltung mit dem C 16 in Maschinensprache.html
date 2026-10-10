@@ -325,6 +325,7 @@ JSR $FFC9 ;AUFRUF VON CKOUT</code></pre>
 LDA #$41 ;ASCII-CODE VON »A«
 JSR $FFD2 ;»A« IN DIE DATEI SCHREIBEN
 ...
+...
 ...</code></pre>
 
         <h3>BASIN ($FFCF): Dateneingabe von logischer Datei</h3>
@@ -338,6 +339,7 @@ JSR $FFCF ;EIN ZEICHEN AUS DER DATEI LESEN
 STA $xxx1 ;ZEICHEN SPEICHERN
 JSR $FFCF ;NAECHSTES ZEICHEN LESEN
 STA $xxx2 ;EBENFALLS SPEICHERN
+...
 ...</code></pre>
 
         <h3>CLRCH ($FFCC): Standardein-/-ausgabegeräte setzen</h3>
@@ -349,6 +351,7 @@ STA $xxx2 ;EBENFALLS SPEICHERN
 ... ;DATEN LESEN ODER SCHREIBEN
 JSR $FFCC ;STANDARDEIN-/-AUSGABEGERAETE SETZEN
 ... ;(TASTATUR/BILDSCHIRM)
+...
 ...</code></pre>
 
         <h3>CLOSE ($FFC3): Logische Datei schließen</h3>
@@ -452,11 +455,11 @@ LABEL JSR $FFCF ;DATEN LESEN
 . 06A8 JSR $FFCF ;BASIN AUFRUFEN
 . 06AB JSR $FFD2 ;ZEICHEN AUSGEBEN
 . 06AE JSR $FFB7 ;READST AUFRUFEN
-. 06B1 AND # $40 ;ALLE AUSSER BIT 6 AUSMASKIEREN
+. 06B1 AND #  $40 ;ALLE AUSSER BIT 6 AUSMASKIEREN
 . 06B3 BEQ $06A8 ;WEITER, WENN NICHT DATEIENDE
 
 . 06B5 JSR $FFCC ;STANDARDGERAETE SETZEN
-. 06B8 LDA # $01 ;LOGISCHE FILENUMMER
+. 06B8 LDA #  $01 ;LOGISCHE FILENUMMER
 . 06BA JSR $FFC3 ;LOGISCHE DATEI SCHLIESSEN
 . 06BD RTS ;RUECKKEHR ZUM BASIC</code></pre>
 
@@ -638,7 +641,6 @@ ANLEG   LDY LENGTH       ;RUECKPOINTER/RUECKPOINTER+1
         LDA POINTR+1
         STA (DESPOI),Y
         STA STREND+1
-
         RTS              ;ZURUECK ZUM BASIC</code></pre>
 
         <p>Dem Längendescriptor des Strings wird nun die Länge LENGTH und den beiden Adressendescriptoren (Low/High) die geänderte Startadresse POINTR/POINTR+1 zugewiesen. Da der von den reservierten 255 Zeichen unbenutzte Bereich durch das Verschieben des Strings wieder freigegeben wurde, muß natürlich auch STREND/STREND+1 entsprechend der endgültigen Stringadresse korrigiert werden.</p>

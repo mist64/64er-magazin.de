@@ -678,3 +678,14 @@ Step 0's "after 280 and before 325" is about MEASURING THE LEADS (REPRINTS.md,
 so 325's readers know which articles have a second witness). Order run here:
 330 Step 0 → 325 → 330 body. **Suggested.** r330 splits its run-order heading
 into the two parts, and r000's table lists "330.0" before 325.
+
+## 325 — the dump cross-checker still prints no parsed count
+
+r325: "It must print how many rows it PARSED, so that '0 parsed' reads
+differently from '0 wrong'." `r325_dump_crosscheck.py` on SH8608 printed one
+UNPARSEABLE line and nothing else; counted with its own LINE regex it parsed
+**0 of 164** hand-typed lines in article 67 — every dump there is TEDMON's
+`>addr bb bb … :` form, which it does not read. Reader E checked those dumps
+another way (Bild 2 byte for byte against the Plus/4 BASIC ROM at $8180–$81B7;
+H-command results against the ROM). **Suggested.** Print `parsed N of M`, and
+teach it the TEDMON `>` row form, the commonest dump form in a C 16 issue.
