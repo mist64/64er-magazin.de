@@ -668,3 +668,13 @@ binarise solid black, so it went into the JBIG2 page and nobody saw it until the
 320 crop survey looked at every page by eye. **Suggested.** r006 (or r005b):
 "a hand-mark sweep is a LOOK at every page's margins, not a chroma threshold —
 dark pen survives bilevel".
+
+## 325 / 330 — ruling (control, 2026-10-10) on the order question above
+
+My "330 before 325" was half right. r330 says two things about two parts of
+itself and never separates them: the heading "Run order — LAST, after rule 300"
+is about the BODY (diff, dispositions, credits: needs finished HTML), while
+Step 0's "after 280 and before 325" is about MEASURING THE LEADS (REPRINTS.md,
+so 325's readers know which articles have a second witness). Order run here:
+330 Step 0 → 325 → 330 body. **Suggested.** r330 splits its run-order heading
+into the two parts, and r000's table lists "330.0" before 325.
