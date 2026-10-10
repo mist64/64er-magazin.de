@@ -267,17 +267,28 @@ file="issues/<YYMM>/<START> Leserforum.html"
 # 8610/23 included.
 grep -qE '<article class="qa( [a-z-]+)*"' "$file" || echo "  FAIL: missing class=qa"
 
-# 2. banner image present
+# 2. banner image -- ONLY WHERE THE PAGE PRINTS A BANNER MOTIF.
+# NOT EVERY Q&A PAGE HAS ONE.  This demanded a <header><img> on every file and
+# was a permanent FAIL on correct output wherever the page prints just the plain
+# running-head bar: SH8605/155, and SH8608's article 8, which IS Leserforum-
+# banded and still has no motif.  Check 3 three lines down had already learned
+# this exact lesson ("three permanent FAILs on SH8605/155's correct output") and
+# check 2 did not.  The check cannot see the page, so it asks instead of
+# asserting -- and it still verifies the file whenever the <img> IS there.
+#
 # -z: step 080 beautifies the article, so <header> and its <img> are always
 # on separate lines. A single-line grep here fails on every correct file.
-grep -qz '<header>[[:space:]]*<img src="<START>-0\.png"' "$file" || \
-  echo "  FAIL: missing banner"
-ls "issues/<YYMM>/<START>-0.png" >/dev/null || echo "  FAIL: banner file missing"
-# A BANNER NOT CUT YET IS NOT A FAILURE -- it is PAUSE 2 work.  Pointing an
-# <img> at a file that does not exist ships a broken image, so until the crop is
-# delivered the banner stays OUT of the HTML (the <h1> remains) and the page
-# goes on the crop worklist as `<page>-0.png`.  Checks 2 and this one are then
-# DEFERRED to after PAUSE 2, exactly as r150's figure checks are.
+if grep -qz '<header>[[:space:]]*<img src="<START>-0\.png"' "$file"; then
+  ls "issues/<YYMM>/<START>-0.png" >/dev/null || echo "  FAIL: banner file missing"
+else
+  echo "  look: no <header> banner. Correct if the page prints only the plain" \
+       "running-head bar (SH8605/155, SH8608/8); crop it if it prints a motif."
+fi
+# A BANNER NOT CUT YET IS NOT A FAILURE EITHER -- it is PAUSE 2 work.  Pointing
+# an <img> at a file that does not exist ships a broken image, so until the crop
+# is delivered the banner stays OUT of the HTML (the <h1> remains) and the page
+# goes on the crop worklist as `<page>-0.png`.  That case lands in the `look`
+# branch above, exactly as r150's figure checks defer.
 
 # 3. required metas -- CONDITIONAL, because the three Leserforum values are the
 #    monthly RUBRIC's and this rule applies to any reader-question article.

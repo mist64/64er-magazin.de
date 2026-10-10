@@ -376,6 +376,7 @@ printed on the owner's ruling (2026-10-04).
 ## Verification
 
 ```bash
+PY=${PYTHON:-.venv/bin/python}   # the repo venv; this block used to leave $PY unset
 dir=issues/<YYMM>
 # every aside is well-formed and anchored
 grep -rl 'aside class="fehlerteufelchen" id="fehlerteufelchen"' "$dir"/*.html
@@ -385,10 +386,16 @@ grep -rl 'aside class="fehlerteufelchen" id="fehlerteufelchen"' "$dir"/*.html
 # -rl ...)` splits each one into fragments and reports a dozen missing files
 # per issue.  It fails identically on issues that have been correct for
 # months -- run it over SH8501's eight known-good asides and watch.
-# --null, NOT -Z: `grep` here is ugrep, where -Z means --fuzzy, so -rlZ emits
-# newline-separated names and `read -d ''` consumes none of them. This loop ran
-# ZERO times on every issue until it was fixed.
-grep -rl --null 'class="fehlerteufelchen"' "$dir"/*.html | while IFS= read -r -d '' f; do
+# NO NUL PIPELINE.  This read `grep -rl --null ... | while IFS= read -r -d ''`,
+# on the theory that ugrep's -Z means --fuzzy so --null is the portable spelling.
+# MEASURED 2026-10-10: neither ugrep NOR /usr/bin/grep emits a NUL for
+# `-rl --null` over an explicit file list -- both print newlines -- so
+# `read -d ''` never sees a terminator and the loop BLOCKS.  On SH8606 the whole
+# Verification block hit the 120 s timeout and every check below this one was
+# silently skipped; the first version of this loop, with -Z, had run zero times.
+# The shell's own glob handles the spaces in every article filename.
+for f in "$dir"/*.html; do
+  grep -q 'class="fehlerteufelchen"' "$f" || continue
   # PER ASIDE AND PER CORRECTION, not per file.  A two-source aside -- one
   # <aside> with one <p> per correction, from DIFFERENT issues -- needs one
   # trailer each, in issue order, and a per-file `grep -q` passes as soon as
@@ -422,6 +429,50 @@ for f in "$dir"/*.html; do
 done
 # no leftover placeholder comments alongside an aside
 grep -rl '<!-- Fehlerteufelchen' "$dir"/*.html
+
+# THE LISTING'S OWN HEADER, WHICH THIS BLOCK USED TO IGNORE ENTIRELY.
+# Every check above reads the asides, so an issue whose prg/*.txt never got
+# their `;inkl. Fehlerteufelchen M/YYYY` header note passed clean -- the
+# always-GREEN mirror of a check that can never pass (r000).  MEASURED on
+# SH8608: article 108's aside said `Disk-Version bereits korrigiert` while
+# `prg/grafik c16.txt` carried no header note at all, and this block was happy.
+# A status comment is a claim about a FILE, so read the file.
+#
+# WHAT THIS CAN AND CANNOT ASSERT.  The HTML does not say WHICH listing a
+# status comment is about, and one aside may cite an erratum that corrected
+# PROSE, which no `prg/*.txt` will ever record.  So this asks the weaker
+# question it can actually answer -- does ANY listing header name ANY of the
+# errata this article cites -- and that is enough to catch "no header note
+# anywhere", which is the defect seen in the wild.  A wrong PAIRING still
+# needs a human.
+"$PY" - "$dir" <<'PYEOF'
+import glob, os, re, sys
+d = sys.argv[1].rstrip('/')
+STATUS = ('Disk-Version bereits korrigiert', 'Korrektur im Programm angewendet')
+ERR = r'Fehlerteufelchen\s+(\d{1,2}/\d{4})'
+
+named = set()
+for t in glob.glob(os.path.join(d, 'prg', '*.txt')):
+    for ln in open(t, encoding='utf-8', errors='replace'):
+        # LEADING BLANK LINES COME FIRST IN THESE FILES.  Breaking on the first
+        # line that is not a `;` comment read nothing at all: every prg/*.txt
+        # in SH8606 opens with two empty lines before `;name.prg ==addr==`.
+        if not ln.strip():
+            continue
+        if not ln.startswith(';'):
+            break
+        named |= set(re.findall(ERR, ln))
+
+for p in sorted(glob.glob(os.path.join(d, '*.html'))):
+    s = open(p, encoding='utf-8').read()
+    if not any(st in s for st in STATUS):
+        continue
+    cites = set(re.findall(r"<!--\s*64'er\s+(\d{1,2}/\d{4})", s))
+    if cites and not (cites & named):
+        print("  FAIL %s: carries a status comment citing %s, but no "
+              "prg/*.txt header in this issue names any of them"
+              % (os.path.basename(p), ', '.join(sorted(cites))))
+PYEOF
 ```
 
 Cross-check against the full checklist in
@@ -646,18 +697,51 @@ Don't compose erratum text from memory or training knowledge — every word must
 - Standard PRG workflow: rule `r120_prg_from_d64.md`
 - Anti-memory enforcement: `r000_orchestration.md`, "OCR cleanup granularity"
 
-## EVERY PRINT/DISK DIFFERENCE IS AN OWNER DECISION, ALWAYS
+## PRINT/DISK DIFFERENCES: THE DEFAULTS, AND WHAT STILL GOES TO THE OWNER
 
-Owner, 2026-10-04: *"difference between the printed listing and the disk —
-always ask me."*
+This section read *EVERY PRINT/DISK DIFFERENCE IS AN OWNER DECISION, ALWAYS*,
+from the owner's 2026-10-04 *"difference between the printed listing and the
+disk — always ask me."* **Two later owner rulings narrowed that, and the
+absolute outlived them.** It blocked three SH8606 items the corpus already
+answers, and the build had to park on each one. An absolute in a rule costs a
+builder a blocked item every time it fires.
 
-**Where the printed listing and the disk file differ — in content, in line
-range, in presentation, or because a later issue corrected one of them — the
-difference is reported to the owner at PAUSE 2 with the evidence, and the owner
-decides whether anything is said on the page. The builder does not decide it,
-and a previous issue's answer is not a precedent for this one.**
+The two rulings, and the corpus that matches them:
 
-Three shapes seen so far, all of them this one question:
+- **A print error stays as printed** (owner, 2026-10-08) — no Futureteufelchen.
+- **An unimportant difference gets a German HTML comment and nothing else.**
+  The corpus has shipped `<!-- Disk-Version bereits korrigiert -->` 12 times
+  and `<!-- Korrektur im Programm angewendet -->` 8 times.
+
+So decide these three yourself, in this order:
+
+- **(a) The disk already carries the fix.** Header `;inkl. Fehlerteufelchen
+  N/YYYY (Zeilen …; Disk-Version bereits korrigiert)` plus `<!-- Disk-Version
+  bereits korrigiert -->`, and do NOT patch the `.txt`. **Verify that every
+  line you name really is the corrected form** before claiming it is.
+- **(b) The disk still carries the bug.** Patch it; keep the original as
+  `;vor Fehlerteufelchen N/YYYY` with the old line commented out beneath it,
+  header note `;inkl. Fehlerteufelchen N/YYYY (Zeilen …)`, and
+  `<!-- Korrektur im Programm angewendet -->`.
+- **(c) The erratum's own words make it conditional** — it tells a reader who
+  uses some configuration to change something. Record it, and never write
+  *Korrektur im Programm angewendet*, which would be a false claim about what
+  the file contains.
+
+**AND AN ERRATUM'S LINE SET IS THE LINES IT NAMES**, not every line that
+matches the pattern. SH8606's MPS 802 erratum changes `,2` to `,1` at disk
+lines 1040 and 1070. The same file carries `sys50442,1` at 6040 and
+`sys50442,2` at 6060, and `sys50192,11,15,2` at line 25: the double-density
+hardcopy block uses BOTH arguments, so `,2` there is a mode selector and not
+the bug. A blanket substitution would have corrupted three working lines. Name
+the set, then check the thing you are about to change is IN it (r000).
+
+**What still goes to the owner:** a difference that changes what the program
+DOES, with no erratum to lean on and none of (a)-(c) to fall back on — the
+*Hyper-Graphics* shape below, where 12 instructions differ and nothing
+anywhere explains why. Report it at PAUSE 2 with the evidence.
+
+Three shapes seen so far:
 
 | shape | example |
 |---|---|
@@ -668,7 +752,8 @@ Three shapes seen so far, all of them this one question:
 **On SH8603 the owner declined a note in both of its cases. That is the
 outcome of two decisions, not a default for the next issue.** A first reading
 of that run of refusals as a standing "say nothing" rule was wrong and is
-withdrawn: the rule is *ask*, and the answer may differ next time.
+withdrawn: where a difference is still open, *ask* — and the answer may differ
+next time. What is no longer open is (a)-(c) above.
 
 ## When an erratum corrects a listing, check the disk file FIRST
 

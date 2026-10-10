@@ -921,10 +921,28 @@ against them:
   the transform started skipping fenced code; the check did not.
 - **a threshold above its own documented calibration**: a finder shipped at
   1.40 against a docstring worked example of 1.35, and found nothing all issue.
-- **a GNU flag that means something else here**: `grep` on this machine is
-  ugrep, where `-Z` is `--fuzzy`, not NUL-output. `grep -rlZ … | while read -d
-  ''` therefore looped zero times on every issue. Use `--null`, and prefer the
-  long flag whenever the short one is doing something structural.
+- **a GNU flag that means something else here**: `grep` on this machine is a
+  shell function that execs **ugrep**, where `-Z` is `--fuzzy`, not NUL-output.
+  `grep -rlZ … | while read -d ''` therefore looped zero times on every issue.
+  This line used to say "use `--null`" — **and that is wrong too.** MEASURED
+  2026-10-10 on an explicit file list: neither ugrep nor `/usr/bin/grep`
+  emits a NUL byte for `grep -rl --null … *.html`; both print newlines. So
+  `read -r -d ''` never sees a terminator and the loop **blocks forever** —
+  r300's trailer check hung until the 120 s timeout and every check after it in
+  the block was skipped (SH8606).
+  **Do not build a NUL pipeline at all.** Loop over the shell's own glob,
+  which handles the spaces in every article filename without help:
+
+  ```bash
+  for f in "$dir"/*.html; do
+    grep -q 'class="fehlerteufelchen"' "$f" || continue
+    # … the per-file check …
+  done
+  ```
+
+  `find -print0 | xargs -0` stays fine — that NUL comes from `find`, not grep.
+  And prefer the long flag whenever the short one is doing something
+  structural.
 - **a tag pattern that matches a longer tag**: `<p[^>]*>` matches `<pre>`,
   because `[^>]*` eats the `re`. A sweep for code-in-paragraphs built on it
   reported every correct `<pre>` listing as a defect, and the corpus counts
@@ -2268,6 +2286,44 @@ MEASURED on 8612 — five shipped checks could not fail at all:
 Four of the five were found by planting a fault. None had ever been seen to
 fail. Test **output non-empty**, not exit status, unless the script sets the
 status deliberately — and never pipe a check's findings into `head`.
+
+## AND A CHECK THAT CANNOT PASS IS THE SAME DEFECT, WEARING THE OTHER FACE
+
+A check that can never fail buys false confidence. A check that can never pass
+spends attention on every build until the builder learns to skip it -- and a
+skipped check is not a check, nor are the ones standing next to it. **A GATE
+THAT ALWAYS REPORTS STOPS BEING READ.**
+
+MEASURED on SH8608 — **nine shipped checks were permanently red on correct
+output**, all found by one build:
+
+| rule | red on correct output because |
+|---|---|
+| r005 check 4 | the bottom 6 mm band reads 2-9 % dark on most pages: the printed SONDERHEFT footer bar sits INSIDE the band (p032 8.7 %, p044 8.2 %, both 0 % prop) |
+| r005b check 1 | asserts an off-size insert's stamp carries `UNIFIED`, which `unify_inserts()` wrote only when it PADDED, so a correct unpadded unification was red (165/166) |
+| r090 check 2 | counts the commented-out `<!-- <meta name="64er.toc_category" content="XXX"> -->` that r080 writes, so it always prints `missing from toc.txt: 'XXX'` |
+| r130 check 6 | FAILs a `Listing N` caption with nothing after it, claiming every printed caption carries a description — Basic-Kurs prints three BARE (p32, p34, p36) |
+| r130 check 5 | carries a literal `<YYMM>` after the substitution the block documents: `line 80: YYMM: No such file` |
+| r200 check 2 | requires a banner motif `<img src="<START>-0.png">` on every Q&A page; p8, like SH8605/155, prints only the plain LESERFORUM running-head bar |
+| r210 check 1 | counts Leserforum by FILENAME and asserts "0 on every Sonderheft"; SH8608's article 8 is Leserforum-banded |
+| r220 orphan check | reports every row whose typo the builder fixed at application — which step 4 instructs — as "matching no article" |
+| r280 checks 1-2 | grep whole files, so `data-filename`, ids and `text-decoration` count as hyphen and space candidates; the counts never reach zero on a clean issue |
+
+And the inverse, once: **r300's Verification reads the asides only**, so a
+`prg/*.txt` missing its `;inkl. Fehlerteufelchen` header passed. Always-green
+and always-red are the same defect — the check does not know what correct looks
+like.
+
+**So both halves are required: plant the fault and watch it fire, THEN run it
+against an issue you believe is correct and require it to print nothing.**
+Planting proves the check can speak; a clean run proves its speaking means
+something. All nine above shipped with the first half done and the second
+skipped.
+
+A check that cannot be made quiet does not belong in Verification. If the thing
+it asks about is a genuinely open question, or an artefact not made yet, put it
+in the rule's prose or give it a documented exception — as r200's *A BANNER NOT
+CUT YET IS NOT A FAILURE* tried to, and did not go far enough.
 
 ## End-of-issue gate: the issue must BUILD
 

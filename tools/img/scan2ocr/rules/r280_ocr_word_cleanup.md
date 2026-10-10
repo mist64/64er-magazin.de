@@ -722,25 +722,57 @@ a candidate is acceptable; claiming an unverified fix is not.
 ## Verification
 
 ```bash
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
-# NO `| head` HERE.  r000: A CHECK SHIPS ONLY ONCE IT HAS BEEN SEEN TO FAIL --
-# and a check truncated to ten lines cannot be seen to fail, because the
-# eleventh finding is indistinguishable from none.  Both of these were piped
-# into `head`.  Print the COUNT, then a sample: the count is the signal and the
-# sample is the lead.
+# 1-2. hyphen-rejoin and lost-space candidates -- AS A DELTA, NOT A LIST.
+#
+# TWO DEFECTS, BOTH FOUND ON SH8608.
+#
+# These greps ran over the RAW HTML, so `data-filename`, `64er.id` and
+# `text-decoration` counted as hyphen candidates: stripping tags takes
+# SH8606 from 47 to 8 and SH8608 from 39 to 14.  A CHECK THAT GREPS MARKUP
+# ALSO GREPS ATTRIBUTE VALUES.  <code> goes too -- this rule's scope excludes
+# it -- while <pre> stays, because the scope includes it.
+#
+# And both lists are non-empty on a CORRECT issue BY CONSTRUCTION, so neither
+# can ever be "cleared": the hyphen survivors are genuine German compounds,
+# and all 29 of SH8608's lost-space survivors are right -- POKEn, PEEKs,
+# POKEte, geLISTet, gePOKEt, DATAs, CLOSEn, KByte, HiRes, MHz, ROMs, CIAs,
+# and "BInary digiT", which is the magazine's own capitalisation of B-I-T.
+# So these are list-gates: record what was walked and report only what is
+# NEW.  See r000, *A LIST-GATE REPORTS THE DELTA, NOT THE LIST*, and
+# r000_reviewed.py.  Commit `issues/<ID>/reviewed/` or the next build reports
+# the whole list again.
+"$PY" - "$dir" <<'PY'
+import glob, os, re, sys
+sys.path.insert(0, 'tools/img/scan2ocr/rules')
+import r000_reviewed as R
+d = sys.argv[1].rstrip('/')
 
-# 1. obvious hyphen-rejoin candidates remaining
-n=$(grep -hoE '[A-Za-zäöüÄÖÜß]+-[a-zäöüß]+' "$dir"/*.html | sort -u | wc -l | tr -d ' ')
-echo "  hyphen-rejoin candidates: $n"
-grep -hoE '[A-Za-zäöüÄÖÜß]+-[a-zäöüß]+' "$dir"/*.html | sort -u | sed -n '1,12p;$p'
-# review by hand — most remaining should be genuine compounds.
 
-# 2. obvious lost-space candidates remaining
-n=$(grep -hoE '\b[a-zA-Z]+[A-Z]+[a-z]+\b' "$dir"/*.html | sort -u | wc -l | tr -d ' ')
-echo "  lost-space candidates: $n"
-grep -hoE '\b[a-zA-Z]+[A-Z]+[a-z]+\b' "$dir"/*.html | sort -u | sed -n '1,12p;$p'
-# legitimate CamelCase only.
+# AN ATTRIBUTE VALUE MAY CONTAIN '>'.  `<[^>]+>` ends the tag at the first
+# one and spills the rest of the tag into the "text": SH8606's
+# `data-name="G>WELLEN"` is why `data-name` was reported as a hyphen
+# candidate.  Skip over quoted values instead.
+TAG = re.compile(r'''<(?:"[^"]*"|'[^']*'|[^'">])*>''')
+
+
+def text(p):
+    s = open(p, encoding='utf-8').read()
+    s = re.sub(r'<!--.*?-->', ' ', s, flags=re.S)
+    s = re.sub(r'<code\b[^>]*>.*?</code>', ' ', s, flags=re.S | re.I)
+    return TAG.sub(' ', s)
+
+
+body = '\n'.join(text(p)
+                 for p in sorted(glob.glob(os.path.join(d, '*.html'))))
+for kind, rx in (('hyphen', r'[A-Za-zäöüÄÖÜß]+-[a-zäöüß]+'),
+                 ('lost-space', r'\b[a-zA-Z]+[A-Z]+[a-z]+\b')):
+    items = sorted(set(re.findall(rx, body)))
+    key = 'r280-' + kind
+    R.report(kind + ' candidates', R.delta(d, key, items), len(items), d, key)
+PY
 
 # 3. spot a known fix landed.
 #
@@ -762,7 +794,7 @@ grep -h "$CANARY" "$dir"/*.html >/dev/null && echo "  canary fix landed ✓"
 #    three greps above and only Pass 3 found it. Pass 3 IS the check:
 #    It takes the issue DIRECTORY, not a glob, and it never fails a build --
 #    every finding needs a human. Report its count.
-$PY tools/img/scan2ocr/rules/r280_word_jams.py "$dir"
+"$PY" tools/img/scan2ocr/rules/r280_word_jams.py "$dir"
 ```
 
 Two things about the sample lines above, both found on SH8604:

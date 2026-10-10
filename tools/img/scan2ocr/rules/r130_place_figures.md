@@ -319,7 +319,11 @@ and they cover all three kinds.
 # numpy, scipy and PIL, which the system python here does not have, so as
 # `python3` this check failed at the import rather than checking anything.
 PY=${PYTHON:-.venv/bin/python}
-dir=issues/<YYMM>
+# ONE VARIABLE FOR THE ISSUE, USED EVERYWHERE BELOW.  A bare <YYMM> left in
+# a command is a REDIRECT to bash, not a value: check 5 shipped reading
+# `--issues <YYMM>` and died with `line 80: YYMM: No such file` (SH8608).
+ID=<YYMM>            # e.g. SH8608
+dir=issues/$ID
 
 # 1. prg.txt is empty (every listing placed) — or only contains
 #    listings explicitly marked "no home in this issue" with a note.
@@ -394,7 +398,7 @@ for f in sorted(os.listdir(d)):
 PY
 
 # 5. Build the issue and confirm no listing-related errors:
-.venv/bin/python generate.py --issues <YYMM> --future local 2>&1 | grep -iE 'listing|prg|figure|binary_download' | head
+"$PY" generate.py --issues "$ID" --future local 2>&1 | grep -iE 'listing|prg|figure|binary_download'
 
 # 6. Every <figcaption>Listing N…</figcaption> must have a description
 #    after "Listing N.". Bare `<figcaption>Listing N</figcaption>` is
@@ -424,8 +428,16 @@ for f in sorted(os.listdir(d)):
         # Maschinencode-Programm »Tacco«" -- and the >=3-word test called every
         # one bare.  What this check is for is a caption that is ONLY the label,
         # which is 8607/96's shape.
+        # AND AN EMPTY DESCRIPTION IS A LOOK TOO, NOT A FAIL.  Some pages
+        # print the label and nothing else: SH8608's Basic-Kurs sets
+        # "Listing 4a", "Listing 4b" and "Listing 5" bare on p32/p34/p36,
+        # confirmed on the crops, and this check FAILED all three on correct
+        # output.  The check cannot see the page, so it cannot know which case
+        # it has: 8607/96 shipped 10 bare captions whose pages DID print
+        # descriptions, and that is the same string.  Ask; do not assert.
         if not rest:
-            print(f"  FAIL {f}: nothing after {m.group(1)!r}")
+            print(f"  look {f}: nothing after {m.group(1)!r}"
+                  " -- does the PAGE print a description? (crop it)")
         elif len(rest.split()) < 3:
             print(f"  look {f}: {m.group(1)!r} + {rest[:40]!r}"
                   " -- short; verbatim on the page?")

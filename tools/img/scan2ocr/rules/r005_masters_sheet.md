@@ -1479,6 +1479,17 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
           " | ".join(cells))
 PY
 
+# 4a. READING CHECK 4: `dark` WITHOUT `prop` IS PRINT, NOT BED.
+#     A dark band with 0 % prop is ink that legitimately reaches the trim, and
+#     on this corpus it usually is.  MEASURED on SH8608: the bottom band reads
+#     2-9 % dark on most pages (p032 8.7 %, p044 8.2 %, both 0 % prop) because
+#     the black "SONDERHEFT 8/86" footer BAR itself ends about 5 mm above the
+#     trim, inside the 6 mm band.  This rule used to account for "the printed
+#     footer rule, 5-6 mm inside the trim" on SH8601 only, so a whole issue of
+#     correct pages read as a finding.  Crop one page's foot to confirm the
+#     shape, then move on.  What is NOT explainable this way is dark WITH prop,
+#     which is bed or the prop shadow, and that is the finding this check is for.
+
 # 5. THE STAMP: every master names the grade that made it, and it is the CURRENT
 #    one.  This is the check that would have caught the three silently stale
 #    masters -- a string comparison, not a judgement about colour.

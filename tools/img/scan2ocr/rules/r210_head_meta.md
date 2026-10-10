@@ -87,10 +87,15 @@ SRC=$("$PY" -c 'import sys; sys.path.insert(0, "tools/img/scan2ocr/rules")
 import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
 ```
 
-1. The page image is `"$SRC/NNN.png"` from `masters600` — 600 dpi, A4,
-   deskewed. For a 300 dpi look, `-resize 50%` of that; never a render of
-   the issue PDF, which does not exist until step 006. See r000, *THE PAGE
-   IMAGE IS `masters600`*.
+1. The page image is `<A4>/NNN.png` — 600 dpi, deskewed, **the A4 page**:
+   `a4600` on a `sheet` binding, `masters600` on a `spread` one, exactly as
+   r006 tables it. `"$SRC"` above resolves to `masters600`, which on a `sheet`
+   issue is the traced-trim canvas (SH8608: 5457x7181) and NOT the A4 cut
+   (4961x7016) — the band geometry in this rule and the apply script's
+   `PAGE_W = 4961` are both the A4 page's, so a sheet issue read through
+   `masters600` measures bands against the wrong canvas. For a 300 dpi look,
+   `-resize 50%`; never a render of the issue PDF, which does not exist until
+   step 006.
 2. Build article → start-page map from each file's
    `<meta name="64er.pages" content="N-M">`.
 3. Skip the rubrics: `editorial`, `impressum`, `inhalt`, `vorschau`
@@ -102,7 +107,13 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
    - Crop the top ~250 px header strip (`magick … -crop FULLW x250+0+0`).
    - Sub-sub-agent returns `head1=...|head2=...` (head2 may be
      empty when the print shows no machine label).
-5. Apply OCR-cleanup substitutions before writing:
+5. **The OCR is a DRY-RUN LEAD, not the source — the band crop is.** On
+   SH8608 this script returned junk for 28 of 39 articles (`TIPIS&ETRICKS`,
+   `C16lı`, `5SBIELE`): the band is reversed-out display type on a dark
+   ground, which tesseract reads badly however it is cleaned. Read the bands
+   off the crops by eye and use the script only to generate the worklist and
+   to catch a page you forgot. Substitutions below are for the cases it does
+   get nearly right:
    - `C 64IC 128` / `C 64 IC 128` / `C 64_C 128` → `C 64/C 128`
    - `C_64AIVC 20` → `C 64/VC 20`
    - similar slash recovery patterns.
@@ -165,8 +176,14 @@ done
 # Leserforum, where rule 200 already set head1 by hand -- and NOT every issue
 # has one: no Sonderheft does, so a formula that always subtracts it is off by
 # one on every Sonderheft.  Count it instead of assuming it.
-lf=$(ls "$dir" | grep -ci leserforum || true)
-echo "  Leserforum articles: $lf  (0 on every Sonderheft)"
+# AND COUNT IT BY ITS BAND, NOT BY ITS FILENAME.  `ls | grep -ci leserforum`
+# finds the monthly rubric, whose file is named for it, and misses a
+# Leserforum-BANDED article filed under its own title: SH8608's `8 ...` carries
+# head1="Leserforum" from r200 and this counted 0, so the arithmetic below was
+# off by one and the gap read as a missed article.  The claim "(0 on every
+# Sonderheft)" was wrong for the same reason -- it was a claim about filenames.
+lf=$(grep -lE '64er\.head1" content="Leserforum"' "$dir"/*.html | wc -l | tr -d ' ')
+echo "  Leserforum-banded articles: $lf  (counted by head1, not by filename)"
 echo "  → n plus the front-matter files WITHOUT a band plus $lf should be $total;"
 echo "    any other gap is a missed article, and the crop decides which."
 

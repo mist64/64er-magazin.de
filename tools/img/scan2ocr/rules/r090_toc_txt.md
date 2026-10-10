@@ -159,9 +159,16 @@ grep -nE '^$|[[:space:]]$|^[[:space:]]' issues/<YYMM>/toc.txt && echo "BAD"
 import glob, re
 issue = '<YYMM>'   # e.g. '8608' — set to the issue being built
 toc = set(line.strip() for line in open(f'issues/{issue}/toc.txt') if line.strip())
+# A CHECK THAT MATCHES MARKUP ALSO MATCHES COMMENTS ABOUT MARKUP (r000).
+# r080 writes a commented-out placeholder,
+# `<!-- <meta name="64er.toc_category" content="XXX"> -->`, so without stripping
+# comments first this printed `missing from toc.txt: 'XXX'` on every correct
+# issue at the step it belongs to -- red before step 100 had even run (SH8608).
+COMMENT = re.compile(r'<!--.*?-->', re.S)
 missing = set()
 for f in glob.glob(f'issues/{issue}/*.html'):
-    for m in re.finditer(r'<meta name="64er\.toc_category" content="([^"]+)"', open(f).read()):
+    src = COMMENT.sub('', open(f, encoding='utf-8').read())
+    for m in re.finditer(r'<meta name="64er\.toc_category" content="([^"]+)"', src):
         if m.group(1) not in toc:
             missing.add(m.group(1))
 for m in sorted(missing): print(f"missing from toc.txt: {m!r}")

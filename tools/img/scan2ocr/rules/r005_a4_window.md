@@ -255,6 +255,28 @@ print("expected", want, "| found", dict(sizes))
 assert not bad, f"off-size pages with no UNIFIED/OVERRIDE in the stamp: {bad}"
 PY
 
+# 1a. IF CHECK 1 IS RED, ASK WHETHER THE STAMP IS STALE BEFORE CHANGING ANYTHING.
+#     A stamp is the record of what the program did AT THE TIME IT RAN, so a
+#     stamp written before a fix to the program does not carry the fix, and this
+#     check is then red on an artefact a re-run would make green.  MEASURED on
+#     SH8608: 165/166 were cut at 14:40 and `1a39670f` -- cut() emits the
+#     window's note -- landed at 14:43.  Their stamps carry no UNIFIED line, and
+#     `<tmp>/a4win/a4_windows.json` still holds the PRE-fix note text ("padded
+#     +0/+0 px to the insert's common size 3386x4921", with no `UNIFIED` prefix),
+#     which is how you tell: compare the note in the json against the string
+#     `unify_inserts()` writes today.
+#
+#     AND NEVER FIX IT IN THE RECORD.  The builder's first instinct on SH8608
+#     was to append the UNIFIED line to the two stamps by hand; that is the
+#     wrong direction, because it makes the stamp say something the program did
+#     not do.  Fix the program or the check, then RE-RUN -- and re-run the
+#     recovery script afterwards, because `r005_a4_window.py` has no per-page
+#     mode and re-cuts all pages, silently restoring the WRONG automatic window
+#     on every recovered page (SH8608 p009 and p142).  The recovery script lives
+#     in `<tmp>`, covers every recovered page, is idempotent (it refuses on an
+#     a4600 that already carries an OVERRIDE), and its path is recorded in
+#     LOG.md.
+
 # 2. The anchor lands on the glyph -- check the overlay on a sample, per
 #    parity, rather than trusting the transform.  (By eye: `overlay()` writes
 #    them.  Check 3 is the measurement, but it cannot tell a logo from a

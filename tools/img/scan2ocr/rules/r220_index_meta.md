@@ -301,6 +301,15 @@ for page, title in rows:
     # and BOTH gates agreed -- this check said 0 of 17 and the count said
     # 17 = 17.  Only deleting the row by hand made the count disagree.
     if not fs:
+        # A ROW WHOSE TYPO YOU FIXED AT APPLICATION LANDS HERE, AND IT IS NOT A
+        # DEFECT.  Step 4 tells you to correct the CSV's spelling when you
+        # apply it, so the row's title no longer equals the article's <title>
+        # and this check cannot match it -- it reported every such row as
+        # "matching no article" on correct output (SH8608).  That is what the
+        # reviewed/ delta is for: walk it once, then record it with the FIX as
+        # the reason ("CSV 'Hypra-Load' -> article 'Hypra-Load '"), and it stops
+        # being reported.  Record the reason, not just the row: the next build
+        # reads the file, not this conversation.
         orphans.append((page, title))
         continue
     f = fs[0]
@@ -401,8 +410,12 @@ csv="Jahresinhaltsverzeichnis <YYYY>.csv"    # replaced below for a Sonderheft
 #
 # THE SONDERHEFT CSV IS A DIFFERENT SHAPE AND A DIFFERENT FILE.  The monthly
 # Jahresinhaltsverzeichnis keys the issue in COLUMN 1 ("8612,..."); the
-# Gesamtinhaltsverzeichnis Sonderhefte keys it in COLUMN 4, unpadded and with
-# a slash ("Buchbesprechungen,C16/VC20,Bücher zum C16 und VC20,3/86,52").  So
+# Gesamtinhaltsverzeichnis Sonderhefte keys it in the FOURTH FIELD -- `r[3]`
+# zero-based, which is what the code below uses and what the paragraph *The
+# apply script HAS a Sonderheft reader* calls "column 3".  The two countings
+# read as a contradiction (SH8608 flagged this comment as stale against the
+# code); they are the same field.  Unpadded and with a slash
+# ("Buchbesprechungen,C16/VC20,Bücher zum C16 und VC20,3/86,52" -> `3/86`).  So
 # `grep -c "^SH8603,"` finds 0 rows, 0 == 0 is reported as a PASS, and the
 # routing check below filters on the monthly columns and passes too.  Both
 # were vacuous on SH8601, SH8602 and SH8603.
