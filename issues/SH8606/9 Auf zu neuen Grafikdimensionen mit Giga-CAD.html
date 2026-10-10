@@ -2412,11 +2412,11 @@ ZN = 4 :  alles bis auf das Makro »DG«
             <figcaption>Listing 24. Quelltext zur Ausgabe des Directories</figcaption>
         </figure>
         <figure>
-            <pre>********************************************************
-*                                                      *
-*        Source - Listing : Hardcopy - Routine         *
-*                                                      *
-********************************************************
+            <pre> ********************************************************
+ *                                                      *
+ *        Source - Listing : Hardcopy - Routine         *
+ *                                                      *
+ ********************************************************
 
   10  -.EQ LINFLG   = $033D
   20  -.EQ XL       = $14
@@ -2446,191 +2446,191 @@ ZN = 4 :  alles bis auf das Makro »DG«
  260  -.EQ CLRCHN   = $FFCC
  270  -.BA $C51B
 
-******************* Komma - Check **********************
+ ******************* Komma - Check **********************
 
- 280  -CHKCOM   JSR $0079      ; letztes Zeichen holen
- 290  -         CMP #$2C       ; Komma ?
- 300  -         BEQ KOM        ; ja
- 310  -         JMP $AF08      ;  ' ?SYNTAX ERROR
- 320  -KOM      RTS            ; Ruecksprung
+ 280  -CHKCOM    JSR $0079     ; letztes Zeichen holen
+ 290  -          CMP #$2C      ; Komma ?
+ 300  -          BEQ KOM       ; ja
+ 310  -          JMP $AF08     ; ' ?SYNTAX ERROR
+ 320  -KOM       RTS           ; Ruecksprung
 
-***************** Illegal  Quantity ********************
+ ***************** Illegal  Quantity ********************
 
- 330  -ILLQUAN  LDX #14        ; Fehlernummer
- 340  -         JMP $A43A      ; Ausgabe des Fehlers
+ 330  -ILLQUAN   LDX #14       ; Fehlernummer
+ 340  -          JMP $A43A     ; Ausgabe des Fehlers
 
-********************* Hardcopy *************************
+ ********************* Hardcopy *************************
 
- 350  -HARDCOPY LDA #0         ; Variablen ruecksetzen :
- 360  -         STA ROW1       ; Drucker-Hilfsbyte 1
- 370  -         STA ROW2       ; Drucker-Hilfsbyte 2
- 380  -         STA ROW        ; Druckerbyte
- 390  -         STA LINFLG     ; Flag fuer letzte Zeile
- 400  -         STA SPALTE     ; Spalte 0-39
- 410  -         LDX #$04       ; Kanal fuer Ausgabe
- 420  -         JSR CHKOUT     ; vorbereiten
+ 350  -HARDCOPY  LDA #0        ; Variablen ruecksetzen :
+ 360  -          STA ROW1      ; Drucker-Hilfsbyte 1
+ 370  -          STA ROW2      ; Drucker-Hilfsbyte 2
+ 380  -          STA ROW       ; Druckerbyte
+ 390  -          STA LINFLG    ; Flag fuer letzte Zeile
+ 400  -          STA SPALTE    ; Spalte 0-39
+ 410  -          LDX #$04      ; Kanal fuer Ausgabe
+ 420  -          JSR CHKOUT    ; vorbereiten
 
- 430  -         JSR $AEFD      ; Zeilenoffset (320*Zeile)
- 440  -         JSR FRMNUM     ; aus BASIC-Text holen
- 450  -         JSR FACTOADR   ; in Adressformat wandeln
- 460  -         LDA XL         ; LO-Byte
- 470  -         STA OFFSET     ; speichern
- 480  -         LDA XH         ; HI-Byte
- 490  -         STA OFFSET+1   ; speichern
- 500  -         JSR CHKCOM     ; Modus (Druckdichte)
- 510  -         JSR GETBYT     ; aus BASIC-Text lesen
- 520  -         STX MODUS      ; und speichern
- 530  -         JSR CHKCOM     ; Druckbeginn (1./2.Zeile)
- 540  -         JSR GETBYT     ; lesen
- 550  -         STX START      ; und abspeichern
- 560  -         JSR CHKCOM     ; Groesse (1 oder 2 Bilder
- 570  -         JSR GETBYT     ; nebeneinander ) lesen
- 580  -         STX GROESSE    ; und speichern
- 590  -         LDA OFFSET     ; Absolute Adresse in der
- 600  -         STA LIN1       ; Bit-Map berechnen und
- 610  -         LDA OFFSET+1   ; speichern:
- 620  -         CLC            ; 1. Zeile
- 630  -         ADC #$A0
- 640  -         STA LIN1+1
- 650  -         LDA LIN1       ; 2. Zeile (fuer doppelte
- 660  -         CLC            ; Dichte)
- 670  -         ADC #$40
- 680  -         STA LIN2
- 690  -         LDA LIN1+1
- 700  -         ADC #$01
- 710  -         STA LIN2+1
- 720  -         LDA OFFSET     ; letzte Zeile ?
- 730  -         CMP #&lt;(7680)   ; Ueberpruefung notwendig,
- 740  -         BNE NXTSP      ; da sonst bei doppelter
- 750  -         LDA OFFSET+1   ; Dichte eine nicht vor-
- 760  -         CMP #&gt;(7680)   ; handene Zeile 26 mitge-
- 770  -         BNE NXTSP      ; druckt wuerde !
- 780  -         LDA #$01       ; letzte Zeile =&gt; Flag
- 790  -         STA LINFLG     ; setzen
- 800  -NXTSP    LDA #7         ; Bitposition im
- 810  -         STA BITNUM     ; jeweiligen Byte
- 820  -BITLOOP  LDA START      ; 'Bit-Zeile' in der je-
- 830  -         STA BITLIN     ; weiligen 8x8-Gruppe
- 840  -LINLOOP  SEI            ; Interrupt verhindern,
- 850  -         LDA #$35       ; RAM selektieren
- 860  -         STA 01
- 870  -         LDA LIN1       ; Jeweilige Startadressen
- 880  -         STA $FA        ; der momentanen
- 890  -         LDA LIN1+1     ; 8x8-Gruppen setzen
- 900  -         STA $FB
- 910  -         LDA LIN2
- 920  -         STA $FC
- 930  -         LDA LIN2+1
- 940  -         STA $FD
- 950  -         LDY BITLIN     ; 'Bit-Zeile'
- 960  -         LDA ($FA),Y    ; Byte aus der 8x8-Gruppe
- 970  -         STA BYTE1      ; holen und speichern
- 980  -         LDA ($FC),Y    ; Entsprechendes Byte aus
- 990  -         STA BYTE2      ; der 2.Zeile (d. Dichte)
-1000  -         LDA #$37       ; ROM selektieren,
-1010  -         STA 01
-1020  -         CLI            ; Interrupt wieder ein
-1030  -         LDY BITNUM     ; Maske zum 'filtern' des
-1040  -         LDA BASE,Y     ; Bytes holen
-1050  -         STA MASKE
-1060  -         LDA BYTE1
-1070  -         AND MASKE      ; und Bit herausfiltern
-1080  -         BEQ NULL       ; falls Bit gesetzt, ins
-1090  -         LDA ROW1       ; senkrechte Drucker-
-1100  -         SEC            ; Hilfsbyte einbauen
-1110  -         JMP WEITER
-1120  -NULL     LDA ROW1
-1130  -         CLC
-1140  -WEITER   ROL
-1150  -         STA ROW1
-1160  -         LDA BYTE2      ; die selbe 'Filterung'
-1170  -         AND MASKE      ; mit dem Byte aus der
-1180  -         BEQ NULL2      ; 2.Zeile wiederholen
-1190  -         LDA ROW2
-1200  -         SEC
-1210  -         JMP WEITER2
-1220  -NULL2    LDA ROW2
-1230  -         CLC
-1240  -WEITER2  ROL
-1250  -         STA ROW2
-1260  -         LDA MODUS      ; bei doppelter Dichte
-1270  -         BEQ EINFACH    ; muss 'Bit-Zeile' mit
-1280  -         INC BITLIN     ; Step 2 erhoeht werden
-1290  -EINFACH  INC BITLIN     ; naechste 'Bit-Zeile',
-1300  -         LDA BITLIN     ; bis das entsprechende
-1310  -         CMP #$08       ; senkrechte Byte der
-1320  -         BCC LINLOOP    ; 8x8-Gruppe komplett ab-
-1330  -         LDA ROW1       ; getastet ist
-1340  -         STA ROW        ; senkrechtes Drucker-Byte
-1350  -         LDA MODUS      ; einfache Dichte ?
-1360  -         BEQ OUTPUT     ; ja   =&gt; Byte ausgeben
-1370  -         LDA LINFLG     ; letzte Zeile ?
-1380  -         BEQ OKAY       ; nein =&gt; Bytes verbinden
-1390  -         LDA #0         ; Byte aus der imaginaeren
-1400  -         STA ROW2       ; Zeile 26 auf 0 setzen
-1410  -OKAY     LDA ROW1       ; die beiden senkrechten
-1420  -         CLC            ; Drucker-Bytes zu einem
-1430  -         ASL            ; verschmelzen, um den
-1440  -         ASL            ; Ausdruck in doppelter
-1450  -         ASL            ; Dichte bei einem Zeilen-
-1460  -         ASL            ; vorschub von einem
-1470  -         CLC            ; halben Punkt zu
-1480  -         ADC ROW2       ; ermoeglichen
-1490  -         STA ROW
-1500  -OUTPUT   LDA ROW        ; Drucker-Byte holen
-1510  -         JSR CHROUT     ; und ausgeben
-1520  -         LDA #0         ; Drucker-Bytes fuer den
-1530  -         STA ROW        ; naechsten Durchlauf
-1540  -         STA ROW1       ; loeschen
-1550  -         STA ROW2
-1560  -         DEC BITNUM     ; naechste 'Bit-Spalte' im
-1570  -         LDA BITNUM     ; 8x8-Feld berechnen
-1580  -         BMI CHKSP      ; 8x8-Gruppe ausgegeben ?
-1590  -         JMP BITLOOP    ; nein =&gt; weitermachen
-1600  -CHKSP    LDA LIN1       ; Startadressen der neuen
-1610  -         CLC            ; 8x8-Gruppe berechnen
-1620  -         ADC #$08       ; und speichern
-1630  -         STA LIN1
-1640  -         LDA LIN1+1
-1650  -         ADC #$00
-1660  -         STA LIN1+1
-1670  -         LDA LIN2
-1680  -         CLC
-1690  -         ADC #$08
-1700  -         STA LIN2
-1710  -         LDA LIN2+1
-1720  -         ADC #$00
-1730  -         STA LIN2+1
-1740  -         INC SPALTE     ; ist die Zeile komplett
-1750  -         LDA SPALTE     ; ausgegeben ?
-1760  -         CMP #40
-1770  -         BCS CHKGR
-1780  -         JMP NXTSP      ; nein =&gt; weitermachen
-1790  -CHKGR    LDA GROESSE    ; einfache Groesse ?
-1800  -         BEQ ENDE       ; ja   =&gt; fertig
-1810  -         LDA #0         ; nein =&gt; entsprechende
-1820  -         STA GROESSE    ; Zeile des 2.Bildschirms
-1830  -         STA SPALTE     ; ausgeben
-1840  -         STA ROW1
-1850  -         STA ROW2
-1860  -         STA ROW
-1870  -         LDA OFFSET
-1880  -         STA LIN1
-1890  -         LDA OFFSET+1
-1900  -         CLC
-1910  -         ADC #$E0
-1920  -         STA LIN1+1
-1930  -         LDA LIN1
-1940  -         CLC
-1950  -         ADC #$40
-1960  -         STA LIN2
-1970  -         LDA LIN1+1
-1980  -         ADC #$01
-1990  -         STA LIN2+1
-2000  -         JMP NXTSP
-2010  -ENDE     JSR CLRCHN     ; Ausgabekanal ruecksetzen
-2020  -         RTS            ; Ruecksprung zu BASIC
-2030  -BASE     .BY1,2,4,8,16,32,64,128
+ 430  -          JSR $AEFD     ; Zeilenoffset (320*Zeile)
+ 440  -          JSR FRMNUM    ; aus BASIC-Text holen
+ 450  -          JSR FACTOADR  ; in Adressformat wandeln
+ 460  -          LDA XL        ; LO-Byte
+ 470  -          STA OFFSET    ; speichern
+ 480  -          LDA XH        ; HI-Byte
+ 490  -          STA OFFSET+1  ; speichern
+ 500  -          JSR CHKCOM    ; Modus (Druckdichte)
+ 510  -          JSR GETBYT    ; aus BASIC-Text lesen
+ 520  -          STX MODUS     ; und speichern
+ 530  -          JSR CHKCOM    ; Druckbeginn (1./2.Zeile)
+ 540  -          JSR GETBYT    ; lesen
+ 550  -          STX START     ; und abspeichern
+ 560  -          JSR CHKCOM    ; Groesse (1 oder 2 Bilder
+ 570  -          JSR GETBYT    ; nebeneinander ) lesen
+ 580  -          STX GROESSE   ; und speichern
+ 590  -          LDA OFFSET    ; Absolute Adresse in der
+ 600  -          STA LIN1      ; Bit-Map berechnen und
+ 610  -          LDA OFFSET+1  ; speichern:
+ 620  -          CLC           ; 1. Zeile
+ 630  -          ADC #$A0
+ 640  -          STA LIN1+1
+ 650  -          LDA LIN1      ; 2. Zeile (fuer doppelte
+ 660  -          CLC           ; Dichte)
+ 670  -          ADC #$40
+ 680  -          STA LIN2
+ 690  -          LDA LIN1+1
+ 700  -          ADC #$01
+ 710  -          STA LIN2+1
+ 720  -          LDA OFFSET    ; letzte Zeile ?
+ 730  -          CMP #&lt;(7680)  ; Ueberpruefung notwendig,
+ 740  -          BNE NXTSP     ; da sonst bei doppelter
+ 750  -          LDA OFFSET+1  ; Dichte eine nicht vor-
+ 760  -          CMP #&gt;(7680)  ; handene Zeile 26 mitge-
+ 770  -          BNE NXTSP     ; druckt wuerde !
+ 780  -          LDA #$01      ; letzte Zeile =&gt; Flag
+ 790  -          STA LINFLG    ; setzen
+ 800  -NXTSP     LDA #7        ; Bitposition im
+ 810  -          STA BITNUM    ; jeweiligen Byte
+ 820  -BITLOOP   LDA START     ; 'Bit-Zeile' in der je-
+ 830  -          STA BITLIN    ; weiligen 8x8-Gruppe
+ 840  -LINLOOP   SEI           ; Interrupt verhindern,
+ 850  -          LDA #$35      ; RAM selektieren
+ 860  -          STA 01
+ 870  -          LDA LIN1      ; Jeweilige Startadressen
+ 880  -          STA $FA       ; der momentanen
+ 890  -          LDA LIN1+1    ; 8x8-Gruppen setzen
+ 900  -          STA $FB
+ 910  -          LDA LIN2
+ 920  -          STA $FC
+ 930  -          LDA LIN2+1
+ 940  -          STA $FD
+ 950  -          LDY BITLIN    ; 'Bit-Zeile'
+ 960  -          LDA ($FA),Y   ; Byte aus der 8x8-Gruppe
+ 970  -          STA BYTE1     ; holen und speichern
+ 980  -          LDA ($FC),Y   ; Entsprechendes Byte aus
+ 990  -          STA BYTE2     ; der 2.Zeile (d. Dichte)
+1000  -          LDA #$37      ; ROM selektieren,
+1010  -          STA 01
+1020  -          CLI           ; Interrupt wieder ein
+1030  -          LDY BITNUM    ; Maske zum 'filtern' des
+1040  -          LDA BASE,Y    ; Bytes holen
+1050  -          STA MASKE
+1060  -          LDA BYTE1
+1070  -          AND MASKE     ; und Bit herausfiltern
+1080  -          BEQ NULL      ; falls Bit gesetzt, ins
+1090  -          LDA ROW1      ; senkrechte Drucker-
+1100  -          SEC           ; Hilfsbyte einbauen
+1110  -          JMP WEITER
+1120  -NULL      LDA ROW1
+1130  -          CLC
+1140  -WEITER    ROL
+1150  -          STA ROW1
+1160  -          LDA BYTE2     ; die selbe 'Filterung'
+1170  -          AND MASKE     ; mit dem Byte aus der
+1180  -          BEQ NULL2     ; 2.Zeile wiederholen
+1190  -          LDA ROW2
+1200  -          SEC
+1210  -          JMP WEITER2
+1220  -NULL2     LDA ROW2
+1230  -          CLC
+1240  -WEITER2   ROL
+1250  -          STA ROW2
+1260  -          LDA MODUS     ; bei doppelter Dichte
+1270  -          BEQ EINFACH   ; muss 'Bit-Zeile' mit
+1280  -          INC BITLIN    ; Step 2 erhoeht werden
+1290  -EINFACH   INC BITLIN    ; naechste 'Bit-Zeile',
+1300  -          LDA BITLIN    ; bis das entsprechende
+1310  -          CMP #$08      ; senkrechte Byte der
+1320  -          BCC LINLOOP   ; 8x8-Gruppe komplett ab-
+1330  -          LDA ROW1      ; getastet ist
+1340  -          STA ROW       ; senkrechtes Drucker-Byte
+1350  -          LDA MODUS     ; einfache Dichte ?
+1360  -          BEQ OUTPUT    ; ja   =&gt; Byte ausgeben
+1370  -          LDA LINFLG    ; letzte Zeile ?
+1380  -          BEQ OKAY      ; nein =&gt; Bytes verbinden
+1390  -          LDA #0        ; Byte aus der imaginaeren
+1400  -          STA ROW2      ; Zeile 26 auf 0 setzen
+1410  -OKAY      LDA ROW1      ; die beiden senkrechten
+1420  -          CLC           ; Drucker-Bytes zu einem
+1430  -          ASL           ; verschmelzen, um den
+1440  -          ASL           ; Ausdruck in doppelter
+1450  -          ASL           ; Dichte bei einem Zeilen-
+1460  -          ASL           ; vorschub von einem
+1470  -          CLC           ; halben Punkt zu
+1480  -          ADC ROW2      ; ermoeglichen
+1490  -          STA ROW
+1500  -OUTPUT    LDA ROW       ; Drucker-Byte holen
+1510  -          JSR CHROUT    ; und ausgeben
+1520  -          LDA #0        ; Drucker-Bytes fuer den
+1530  -          STA ROW       ; naechsten Durchlauf
+1540  -          STA ROW1      ; loeschen
+1550  -          STA ROW2
+1560  -          DEC BITNUM    ; naechste 'Bit-Spalte' im
+1570  -          LDA BITNUM    ; 8x8-Feld berechnen
+1580  -          BMI CHKSP     ; 8x8-Gruppe ausgegeben ?
+1590  -          JMP BITLOOP   ; nein =&gt; weitermachen
+1600  -CHKSP     LDA LIN1      ; Startadressen der neuen
+1610  -          CLC           ; 8x8-Gruppe berechnen
+1620  -          ADC #$08      ; und speichern
+1630  -          STA LIN1
+1640  -          LDA LIN1+1
+1650  -          ADC #$00
+1660  -          STA LIN1+1
+1670  -          LDA LIN2
+1680  -          CLC
+1690  -          ADC #$08
+1700  -          STA LIN2
+1710  -          LDA LIN2+1
+1720  -          ADC #$00
+1730  -          STA LIN2+1
+1740  -          INC SPALTE    ; ist die Zeile komplett
+1750  -          LDA SPALTE    ; ausgegeben ?
+1760  -          CMP #40
+1770  -          BCS CHKGR
+1780  -          JMP NXTSP     ; nein =&gt; weitermachen
+1790  -CHKGR     LDA GROESSE   ; einfache Groesse ?
+1800  -          BEQ ENDE      ; ja   =&gt; fertig
+1810  -          LDA #0        ; nein =&gt; entsprechende
+1820  -          STA GROESSE   ; Zeile des 2.Bildschirms
+1830  -          STA SPALTE    ; ausgeben
+1840  -          STA ROW1
+1850  -          STA ROW2
+1860  -          STA ROW
+1870  -          LDA OFFSET
+1880  -          STA LIN1
+1890  -          LDA OFFSET+1
+1900  -          CLC
+1910  -          ADC #$E0
+1920  -          STA LIN1+1
+1930  -          LDA LIN1
+1940  -          CLC
+1950  -          ADC #$40
+1960  -          STA LIN2
+1970  -          LDA LIN1+1
+1980  -          ADC #$01
+1990  -          STA LIN2+1
+2000  -          JMP NXTSP
+2010  -ENDE      JSR CLRCHN    ; Ausgabekanal ruecksetzen
+2020  -          RTS           ; Ruecksprung zu BASIC
+2030  -BASE      .BY1,2,4,8,16,32,64,128
                                ; Daten fuer die 'Filter'-
                                ; Masken
 </pre>
