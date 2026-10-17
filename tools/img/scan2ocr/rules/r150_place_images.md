@@ -546,6 +546,19 @@ a worklist row for one normally comes back undelivered — and that silence is
 the answer, not an omission to chase. But if a crop IS in the delivery, the
 decision has already been made and it is not ours to revisit: place it.
 
+**But it governs THIS build's delivery. Crops already in the directory from an
+earlier hand are re-judged at 150.** A long-running issue can carry files
+placed months or years before, by a pass that worked to different rules, and
+step 150 naturally looks only at what just arrived.
+
+MEASURED on SH8606, 2026-10-17: the delivery was 17 files and step 150 placed
+them without re-judging the 62 already in the directory. `108-0.png` had been
+there since 2025-10-23 and was a cartoon in leftover space; the owner removed
+it after the issue was closed and published. The check is cheap — for every
+pre-existing `-0`/`-00` file, its placed line number against the article's
+length. An old `-0` sitting mid-article is the leftover-space case and goes to
+the owner as a candidate for removal, **with its position as the evidence**.
+
 This is the same principle as *owner crop wins* elsewhere in the chain. Judging
 a delivered PNG against this section and holding it back inverts who decides.
 MEASURED on SH8605: `6-00` and `6-000`, the p8 bit and byte cartoons, were

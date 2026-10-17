@@ -247,6 +247,26 @@ the image, not in any check. The owner found it by reading the page.
 a black or tinted band does not survive binarisation as text, so it is absent
 rather than garbled — and absence is what no downstream check can see.
 
+**AND WHEN YOU FIND ONE, IT JOINS THE HEADLINE — print sets the distinction
+with a typeface, and HTML has to use punctuation.** The separator is ours, not
+the print's, so take it from the corpus:
+
+| the prefix is | separator | corpus |
+|---|---|---|
+| a **standing rubric** — *Listing des Monats*, *Wettbewerb*, *Vorschau*, *Leserservice* | **colon** | 91 titles |
+| a **program or product name** — *Strubs*, *Merge*, *Fast Tape*, *Text-Manager* | **dash** | 221 titles |
+
+**En or em dash follows the ISSUE's own existing titles, not the corpus
+average**, which is near even (107 en, 114 em). SH8608 and SH8606 use the en
+dash — *"Cave – Sternenkampf im Labyrinth"*, *"Grafik 2000 – eine
+Basic-Erweiterung"* — while the 1986 monthlies lean em. Decide it from the
+issue in hand; this is r150's *TEXT IS THE PRINT'S. POSITION IS OURS.* applied
+to typography.
+
+Then apply it through **r260**, never by hand, so the `<title>`, the filename
+and the TOC move with the `<h1>`, and check for an r220 title-match orphan
+afterwards.
+
 What to do instead, at the moment the `<h1>` is decided:
 
 - **For EVERY article with a lead image, look at the page from the top of that

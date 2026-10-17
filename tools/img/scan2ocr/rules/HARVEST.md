@@ -937,3 +937,41 @@ one of them read the name. It took the owner looking at the published page.
 > time, including when you think nothing else is staged.** Caught by a builder
 > reading the tree, which is the fourth correction a builder has made to this
 > supervisor today.
+
+## Harvest of the THIRD errata files -- 2026-10-17, after both issues were published
+
+Both issues were reopened once each after closure, for an owner correction the
+chain had no way to catch, and each builder opened a third errata file with one
+LIVE entry. Both are harvested here and deleted.
+
+| issue | entry | applied |
+|---|---|---|
+| SH8606 | a delivered `-0` is not evidence of the lead slot, and the lead-slot exception keys on that suffix | r150, two places: *-0 IN THE NAME IS NOT EVIDENCE* (8f17fb87) and, here, *A CROP THAT ARRIVES IS PLACED* gains the re-judging of crops already in the directory |
+| SH8608 | a headline prefix set as reversed type on a tint band is lost at OCR, and nothing downstream looks for it | r080, the unconditional lead-image look (cf729c59, d8b540a5) and, here, how a recovered prefix JOINS the headline |
+
+**Each entry had a second half I had not applied when I patched the rules from
+the builders' messages.** I harvested what the message in front of me said and
+stopped there; the written entries went further, and the further half was the
+better half in both cases:
+
+- SH8606's: step 150 placed the 17 new crops **without re-judging the 62
+  already in the directory**, which is exactly how a 2025 cartoon survived into
+  a 2026 publication. I had fixed how a `-0` is READ and not when the old ones
+  are LOOKED AT. The check is one line per pre-existing `-0` file: its placed
+  line number against the article's length.
+- SH8608's: having found a lost prefix, the chain still had to be told how to
+  JOIN it — the print makes the distinction with a typeface and HTML cannot.
+  The corpus answers it: colon for a standing rubric (91 titles), dash for a
+  program or product name (221), and en-or-em from the ISSUE's own titles
+  rather than the corpus average, which is near even.
+
+**So a message is not an errata entry.** The entry is written against the rule,
+quotes what it says, and names what it cost; a message to the supervisor is
+written to settle the thing in hand. Harvesting from messages as they arrive
+felt efficient all day and dropped half of two findings. **Read the file, even
+when you think you already know what is in it.**
+
+**Both reopenings were worth it on their own terms.** Each cost one commit and
+each produced a rule change that applies to every future issue -- which is the
+argument for r340's reopen rule, written this morning after a mid-build harvest
+left SH8608 with nowhere to write.
