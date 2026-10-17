@@ -222,11 +222,68 @@ headline. An `<h1>` that is a substring of `toc_title` gives 278, because the
 TOC routinely prefixes a rubric (*"Listing des Monats: X"*) to a headline of
 *"X"*. Do not build either.
 
+**A THIRD PLAUSIBLE DETECTOR ALSO FAILS.** An `<h1>` that does not CONTAIN its
+`toc_title` flags 4 of SH8608's 5 articles with one and 12 of SH8606's 19, and
+the three SH8606 hits shaped exactly like the real case — *"Name – headline"*,
+articles 122 ROM 80, 134 Charset-Master, 155 Super-Hardcopy — print no prefix
+at all. Measured by the builder, 2026-10-17. That is three dead detectors now;
+stop looking for a fourth and do the look instead.
+
+**AND THE MISSING PIECE IS NOT ALWAYS THE WHOLE HEADLINE. IT IS OFTEN A
+PREFIX.** This section used to begin *"if the headline did not come from the
+page's own text"*, which made the look conditional on finding no headline. The
+commoner case is a headline that IS in the text layer with a **program or
+product name set above it in display type** that is not.
+
+MEASURED on SH8608's p94, 2026-10-17: the article shipped as *"Briefe
+schreiben leichtgemacht"*. The page prints **"Text-Manager"** above it, white
+out of a grey band between the lead drawing and the headline. OCR returned no
+block for it at all — heading block 16 reads only *"Briefe schreiben
+leichigemacht"* — and the `94-0` crop stops at the drawing's frame, ABOVE the
+band. So the prefix appeared nowhere in the edition: not in the text, not in
+the image, not in any check. The owner found it by reading the page.
+
+**Reversed display type is the signature.** White or light type knocked out of
+a black or tinted band does not survive binarisation as text, so it is absent
+rather than garbled — and absence is what no downstream check can see.
+
 What to do instead, at the moment the `<h1>` is decided:
 
-- **If the headline did not come from the page's own text, look at the opening
-  picture before accepting a substitute.** Display type inside a photograph is
-  invisible to every check downstream, including the filename rule below.
+- **For EVERY article with a lead image, look at the page from the top of that
+  image down to the first body line before accepting the `<h1>`.** Not only
+  when the headline is missing: read what is printed in that strip and check
+  that all of it is in the heading. Display type inside a photograph, or
+  reversed out of a band beneath it, is invisible to every check downstream,
+  including the filename rule below.
+- **Check the crop's top edge too.** A lead crop cut to the artwork's frame
+  excludes a band sitting below it, so "it is in the image" is not a defence
+  unless the delivered crop actually contains it.
+- **Decide "has a lead image" FROM THE PAGE, not from the placed crops.** An
+  article can open with artwork that was never cropped — because the worklist
+  judged it a cartoon, because it is a frame the headline sits inside, or
+  because nobody asked for it. Scanning only the articles with a `<page>-0`
+  file looks in the places where someone has already looked.
+
+**How the look is actually done, measured on SH8606, 2026-10-17** — a clean
+negative over a whole issue, for the shape of the evidence rather than the
+result:
+
+1. a 1/6-scale overview of the FIRST PAGE of all 27 articles, each classified
+   lead image / no lead image. 12 had one; only 9 had a placed `-0` crop;
+2. for those 12, the strip from the top of the image to the first body line
+   cut at 600 dpi and read at 1/3 scale;
+3. everything printed in each strip grepped against that article's HTML —
+   headline, deck, caption — 1 hit each, all 12 present.
+
+Nothing was found: no reversed display type out of a band, no product name set
+above a headline in another style, and no gap between artwork and headline
+that could hide one. Note what the report does NOT say — it does not say "the
+issue is clean", it lists the 27 articles read and the 12 strips cut. A claim
+about a set states which members it counted (r000).
+
+**And record the negative in `issues/<ID>/reviewed/`, not `LOG.md`.** A check
+that found nothing is the one most likely to be repeated, and `LOG.md` is
+git-ignored.
 - The genre that does this is the feature opener with a full-width lead image
   (`-0` / `-00`). It is not universal: 8408/10, 8503/8 and 8508/8 are the same
   kind of trade-show report and their lead photos carry no headline at all.
