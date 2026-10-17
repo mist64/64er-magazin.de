@@ -184,6 +184,23 @@ frame, so the page shows the caption twice — once as pixels, once as the
 accessible and searchable copy. Report it to the owner as a re-cut (SH8603's
 `31-3` is the precedent), and leave the figure in place meanwhile.
 
+**AND THE OPPOSITE EDGE MATTERS TOO: A LEAD CROP THAT STOPS JUST ABOVE A BAND
+OF DISPLAY TYPE.** A crop cut tight to the artwork's frame excludes whatever
+is set beneath it, and what is set beneath an opening illustration is often
+part of the headline. Reversed type on a black or tinted band is the case to
+watch, because OCR returns no block for it either — so the words are in
+neither the image nor the text, and nothing downstream can miss something that
+is not there.
+
+MEASURED on SH8608's p94, 2026-10-17: `94-0` ends at the drawing's frame, and
+immediately below it the page prints **"Text-Manager"** in white on a grey
+band, above the headline *"Briefe schreiben leichtgemacht"*. The article
+shipped without the prefix; the owner found it by reading the page.
+
+**So when a lead crop's lower edge sits on a band or a tint, read what is in
+that band and check it is in the `<h1>`** — see r080, *THE HEADLINE CAN BE SET
+INSIDE THE LEAD PHOTO*, which also gives the separator to join it with.
+
 ## NEVER LEAVE AN ORPHAN AT THE END — place it where it fits best
 
 **Owner, 2026-10-06:** *"could not be placed so it's at the end. it's clearly
