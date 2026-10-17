@@ -2566,10 +2566,31 @@ if __name__ == '__main__':
     elif CONFIG.start_local_server:
         PORT = 8000
         class Handler(http.server.SimpleHTTPRequestHandler):
+            # A SILENT CONNECTION MUST NOT OWN ITS THREAD FOREVER.  A browser
+            # that preconnects and then changes its mind leaves a socket open
+            # with no request on it; without a timeout the worker blocks in
+            # readline() until the client closes, which may be never.
+            timeout = 10
+
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, directory=OUT_DIRECTORY, **kwargs)
+
+        # THREADED, BECAUSE A SINGLE-THREADED SERVER HANGS ON PRECONNECTS.
+        # This was socketserver.TCPServer, which handles ONE request at a
+        # time.  Safari and Chrome open speculative connections before they
+        # know whether they will use them, and a page here pulls a dozen
+        # figures, so six connections per host is normal.  An accepted socket
+        # that sends nothing blocks the whole server inside readline() --
+        # every other request waits behind it, the page appears to hang, and
+        # reloading works because it opens a fresh connection that is served
+        # once the stale one dies.  Intermittent, load-dependent, and present
+        # for as long as this project has had a local server.
+        #
+        # MEASURED 2026-10-17: with one idle preconnect open, TCPServer did
+        # not answer a normal request within 4 s; ThreadingHTTPServer served
+        # it in 0.01 s.
         try:
-            httpd = socketserver.TCPServer(("", PORT), Handler)
+            httpd = http.server.ThreadingHTTPServer(("", PORT), Handler)
         except OSError as e:
             # A BUSY PORT IS NOT A FAILED BUILD.  The site is already written
             # by the time we get here, and an unhandled bind error ended the
