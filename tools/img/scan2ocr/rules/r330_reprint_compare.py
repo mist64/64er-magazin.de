@@ -763,8 +763,18 @@ def verify(repo, issue_dir):
                             + ", ".join(f"D-{i:03d}" for i in missing[:10])
                             + (" …" if len(missing) > 10 else ""))
         if extra:
+            # NAME THE COMMONEST CAUSE. A THEIRS we later fixed in the
+            # published issue vanishes from the diff and renumbers every D
+            # after it -- SH8606's pair 7 <- 8602/57, 2026-10-17, where one
+            # applied dash took D-022 to D-021 and THEIRS 1 to 0. Without
+            # this sentence the builder reasonably suspects its own edits
+            # first. See r330, EDITING A PUBLISHED ISSUE INVALIDATES EVERY
+            # PAIR THAT POINTS AT IT.
             problems.append(f"{key}: disposition for a difference the diff no longer reports: "
-                            + ", ".join(f"D-{i:03d}" for i in sorted(extra)))
+                            + ", ".join(f"D-{i:03d}" for i in sorted(extra))
+                            + "\n    A THEIRS applied outside this issue removes its row and"
+                              " renumbers the rest -- re-read the diff and remap by CONTENT,"
+                              " never by a fixed offset.")
         # The table's own counts must agree with the dispositions below it --
         # otherwise a summary row can quietly say "all editorial" over a list
         # that says otherwise.

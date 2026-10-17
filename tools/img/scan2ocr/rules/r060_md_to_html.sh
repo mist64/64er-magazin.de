@@ -2,6 +2,13 @@
 # Convert a 64'er OCR .md to .html via Discount in GFM mode (same engine
 # Marked 2 uses). Writes the .html next to the .md.
 set -e
+# THE REPO VENV, NOT BARE python3 (CLAUDE.md, r000).  This wrapper used to
+# invoke `python3` by name, so it ran on whichever python was first on PATH --
+# it worked only because its body happens to be stdlib-only, and r000's sweep
+# had fixed the Verification FENCES and never the wrapper BODIES (SH8608).
+R000_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PY="${PYTHON:-$R000_DIR/../../../../.venv/bin/python}"
+
 if [ -z "$1" ]; then
   echo "usage: $0 <md-file>" >&2
   exit 1
@@ -44,7 +51,7 @@ rm -f "$tmp"
 # arriving glued to the end of a code block. Indented code blocks do NOT
 # have this problem, only fenced ones (+fencedcode), and it is independent
 # of -G. Issue 8609 had 19 occurrences.
-python3 - "$out" <<'UNWRAP'
+"$PY" - "$out" <<'UNWRAP'
 import io, re, sys
 p = sys.argv[1]
 s = io.open(p, encoding="utf-8").read()

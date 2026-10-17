@@ -25,6 +25,17 @@ This rule is `Applies to: monthly`, and on a `"kind": "sonderheft"` issue the
 orchestrator records it `not applicable — kind` rather than running it. The
 evidence, from the published corpus:
 
+- **Vorwort** — a 1986 Sonderheft's Vorwort DOES carry an image, and this rule
+  used to say it "holds no image at all". MEASURED: `issues/SH8602/3-0.png`,
+  `SH8603/3-0.png`, `SH8604/3-0.png` and `SH8605/3-0.png` all exist (~353x502
+  each), placed by r150 as `<figure><img src="3-0.png" alt="Titelseite eines
+  64'er-Sonderhefts »…«: …">` directly after the `<h1>` — a reproduction of the
+  issue's OWN cover, set between the Vorwort's columns. SH8606's p3 prints the
+  same and the owner delivered `3-0.png` for it.
+  **It is not the monthlies' editor portrait and it is not this rule's banner**,
+  so the disposition below is unchanged; but the old wording pointed the next
+  build at `<img class="inline">` and a step-150 agent had to establish the real
+  precedent by grepping the corpus.
 - **Fehlerteufelchen** — no Sonderheft has the article at all
   (`ls issues/SH85*/*ehlerteufelchen*` → no matches). Errata that correct a
   Sonderheft article are printed in a later MONTHLY and arrive via step 300,

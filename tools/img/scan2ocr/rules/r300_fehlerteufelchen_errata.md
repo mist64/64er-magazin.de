@@ -579,6 +579,21 @@ For each item in `Fehlerteufelchen.md`, find the source article. The pattern:
 
 Match by start-page + title overlap. Multi-page articles cover ranges; use `pages` meta from HTML, not filename.
 
+**AN ERRATUM HEADED ONLY BY THE ISSUE HAS NOTHING TO MATCH ON — ROUTE IT BY THE
+TOKEN IT NAMES.** 10/86 p80 prints an item headed just "Sonderheft 8/86", with
+no article and no page: in "einem Basic-Listing", read »SYNTH.:130« / »SYNTH:132«
+as FLASH-ON/OFF. Start-page overlap has nothing to work with, and
+`Fehlerteufelchen.md` never indexed the item at all — its 10/86 list skips it —
+so an index-driven run finds only that month's other item and this one is
+invisible twice over.
+
+So: **read every later rubric for items headed only by the issue**, and route
+such an item by searching THIS issue's print for the token the erratum names.
+On SH8608 a tesseract sweep over all 166 masters found »SYNTH« on exactly one
+page (p122, Apple Panic Listing 3), which settled it. Then **add the missing
+line to the index**, as `**Basic-Listings** (Sonderheft 8/86)`, so the next
+index-driven run can see it.
+
 Many references will be to articles not yet imported (in older or out-of-range issues / Sonderhefte). Note those, skip.
 
 ### 6. Add erratum aside to source article

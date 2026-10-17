@@ -98,7 +98,20 @@ assembler listings with line-number / location / code columns — 95 instruction
 rows in one half of SH8602 alone. **It must print how many rows it PARSED**, so
 that "0 parsed" reads differently from "0 wrong". (The same defect as r320's
 dropped-listings companion, which reported a clean 0 on two issues while
-examining nothing.) Its recommended `pdftotext` locator also does not exist
+examining nothing.)
+
+**AND IT STILL DOES NOT.** MEASURED on SH8608: `r325_dump_crosscheck.py`
+printed one UNPARSEABLE line and nothing else, and counted with its own LINE
+regex it had parsed **0 of the 164** hand-typed dump rows in article 67 —
+every dump there is TEDMON's `>addr bb bb … :` form, which it does not read.
+That is the commonest dump form in a C 16 issue, so on such an issue the
+checker currently examines nothing and says so only by being quiet. Reader E
+had to check those dumps another way (Bild 2 byte for byte against the Plus/4
+BASIC ROM at $8180-$81B7, and the H-command results against the ROM).
+
+So until it prints `parsed N of M` and reads the `>` row form, **do not treat
+its silence as coverage**: count the hand-typed dump rows yourself and say in
+the report how many the checker actually read. Its recommended `pdftotext` locator also does not exist
 before step 006.
 
 **In a hand-typed `<pre>`, LINE STRUCTURE is in scope.** Most of the damage

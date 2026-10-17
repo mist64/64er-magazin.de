@@ -209,6 +209,14 @@ $PY -c "import json,sys; d=json.load(open(sys.argv[1])); \
   "$OUT_DIR"/<NNN>.labels.json '<word>'
 ```
 
+**EVIDENCE IS THE CROP, PLUS THE INDEX LINE AS A LOCATOR.** The evidence
+section used to ask for block-index output "showing the other engine read the
+**corrected** form", which this rule's own next sentence says the index cannot
+do. All three of SH8608's 280 agents reported the contradiction independently:
+for every fix they made, the index showed the UNCORRECTED form and the crop was
+what decided. So the evidence for a fix is **the crop (path + box) and the
+index line as a locator** — never the index as a second opinion.
+
 **The block index is a LOCATOR, not a second engine.** It tells you which page
 and which block to crop. It cannot confirm or refute anything, because it is
 the HTML's own ancestor: it always shows the same oddity, and on 8612 the

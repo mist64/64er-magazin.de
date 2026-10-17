@@ -10,6 +10,13 @@
 # `issues/8607/` -> "7/86"). For Sonderhefte and other naming schemes the
 # 2nd arg must be passed explicitly.
 set -e
+# THE REPO VENV, NOT BARE python3 (CLAUDE.md, r000).  This wrapper used to
+# invoke `python3` by name, so it ran on whichever python was first on PATH --
+# it worked only because its body happens to be stdlib-only, and r000's sweep
+# had fixed the Verification FENCES and never the wrapper BODIES (SH8608).
+R000_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PY="${PYTHON:-$R000_DIR/../../../../.venv/bin/python}"
+
 if [ -z "$1" ]; then
   echo "usage: $0 <html-file> [64er.issue]" >&2
   exit 1
@@ -34,7 +41,7 @@ fi
 echo "splitting $src as 64er.issue=$issue"
 
 # Run split logic in input dir so the per-article files land beside the source.
-( cd "$dir" && python3 - "$base" "$issue" <<'PY'
+( cd "$dir" && "$PY" - "$base" "$issue" <<'PY'
 # Adapted from tools/split.py: split one consolidated HTML into per-article
 # files. Each <h1> ends with [page-numbers]; extracted into 64er.pages.
 # (p)(author)(/p) becomes <address class="author"> and feeds <meta name="author">.

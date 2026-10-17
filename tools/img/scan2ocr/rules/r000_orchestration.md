@@ -263,7 +263,57 @@ this for me — i need to patch the input master file."* The fix belongs upstrea
 in the scan, not in our pixels: **do not retouch it in the chain, and do not
 ship it silently.** This is one of the few findings that goes to the owner
 rather than being settled by the rules, because only they can repaint the
-master. Report the page, what the mark is, and where on the page.
+master.
+
+**YOU ARE SURFACING A FINDING, NOT REQUESTING A REMOVAL — THERE ARE THREE
+OUTCOMES.** This used to read as though flagging and removing were the same
+act. They are not, and on SH8608 the owner's answer split three marks two ways:
+
+| the owner's verdict | what it means | what happens |
+|---|---|---|
+| **dirt** | on the paper, not in the ink — a speck, a smudge, a blot | the owner repaints the master; it is not the plate |
+| **a previous hand** | pen, felt-tip, highlighter, a reader's correction | same: not the plate, the owner repaints |
+| **the plate** | a printing fault — a plate defect, ink spatter, a broken letter | **it stays.** It is what the magazine printed, and we publish the plate |
+
+MEASURED on SH8608: p37's brown tick and p121's brown blot were **dirt**;
+p104's black dot, which no measurement could separate from print ink (chroma 9
+against ink's 9-10), was ruled **a printing plate problem and left in**
+(2026-10-17). So the mark you cannot attribute by measurement is not
+automatically a hand — it may be the press.
+
+**SHOW IT, DO NOT DESCRIBE IT.** "Page, what the mark is, and where" is not
+enough and was measured not to be: given exactly that for all three, the owner
+checked all three pages and could not find any of them — they are 1.0 x 1.7 mm
+to 2.2 x 2.8 mm. Hand over **a crop at magnification, the colour scan beside
+the same spot in the delivered PDF, at the same scale**, with the size in mm.
+That is what let the owner decide in one pass.
+
+**AND RECORD THE VERDICT WHERE THE NEXT BUILD WILL READ IT:
+`issues/<ID>/reviewed/marks.txt`**, one line per mark — page, what it is, its
+size in mm, and the verdict in the owner's own word (`dirt`, `hand`, `plate`).
+
+**A SIZE IN THAT FILE STATES THE CUTOFF IT WAS MEASURED AT, and every mark in
+it uses the SAME one.** A bare "1.6 x 2.0 mm" cannot be checked, and the first
+version of SH8608's file mixed two measures without saying so: p037 and p121
+from a chroma locator, p104 from `lum < 25`. The builder re-measured p104
+independently, got 1.65 x 2.16 against the recorded 1.6 x 2.0, and only the
+cutoff explained the gap — both numbers were right about different things.
+Use the connected component at **`lum < 153/255` after a 2x2 opening**: at
+`lum < 25` a brown mark has no solid core to measure (p037 and p121 reduce to
+2x2 px), while 153 isolates all three without running into neighbouring print.
+Record the pixel size beside the mm so the conversion can be recomputed.
+A re-scan or a later build will detect the same mark again and must read the
+verdict instead of re-asking; asking the owner the same question twice is its
+own defect (see *leser-info!* and the standing page-input review waiver).
+
+**Not `LOG.md` — it is NOT durable.** `.gitignore` is whitelist-governed here:
+`issues/*/*` ignores everything and nothing un-ignores `LOG.md`, so **zero
+issues in this repo have a tracked one**. It is a local working file and it
+does not survive a clone. `reviewed/` is whitelisted precisely so that a
+"we looked at this and dispositioned it" record outlives the build
+(r000_reviewed.py, *THE FILE MUST BE COMMITTED, or the mechanism is
+pointless*). Write the LOG entry too, by all means — but the LOG is the
+working record and `reviewed/` is the durable one.
 
 Every step that reads the page therefore has to attribute what it sees to the
 PLATE or exclude it: the colour classifier (r006), the dpi witness (r005), and
@@ -453,6 +503,13 @@ The build is also a test of these files, and step 340 is where it reports.
 once you have worked out what a rule meant you can no longer reconstruct what you
 thought it meant, and that misreading is the finding. Signed off last; started
 the first time a rule does not say what you need. See `r340_workflow_errata.md`.
+
+**IF THE FILE IS HARVESTED WHILE THE BUILD IS STILL RUNNING, IT IS REOPENED IN
+THE SAME COMMIT — EMPTY, NOT ABSENT.** A harvest empties the file; it does not
+end the build's obligation to keep one. MEASURED on SH8608, 2026-10-17: a
+mid-build harvest's hand-back said *"open a fresh one if you start another
+build"*, the builder read "another build" as another ISSUE, and step 150 ran
+with no errata file open at all. See r340, *A HARVEST EMPTIES THE FILE*.
 
 Record the cost too -- wall-clock, and how many commands it took to recover.
 Nobody can recover that number afterwards, and it is what ranks the fixes.
@@ -1130,6 +1187,25 @@ prevent it. Make it harmless instead:
 - **Prefer one script over forty small commands.** Each call is an opportunity
   to be stopped, and a sub-agent that greps forty times has forty of them.
 
+**AND AN ACCOUNT SESSION LIMIT STOPS EVERY RUNNING AGENT AT ONCE.** This is the
+case the rest of this section does not cover: not one agent halted, but all of
+them, simultaneously, mid-step, with the orchestrator still waiting on
+completion notifications that will never arrive. MEASURED on SH8608: an HTTP
+429 took out the 006 agent and all three 280 agents together at 00:18, and the
+notifications only surfaced on the next turn, hours later.
+
+So after any reset, **before anything else, list every agent that was running
+and re-assess its step from the ARTEFACTS** — `git status`, `<tmp>` mtimes, the
+step's own outputs — and never from the log's last line. SH8608's 006 agent had
+written the by-product `scratch.pdf` at 00:18 and its log read like a finished
+step; what it was actually doing when it died was gathering inputs for step 4.
+Of the three 280 agents, only one had edited anything (7 files), and that had to
+be established by looking, not by asking.
+
+The owner's standing position is *"do not worry about session limits … i am in
+charge of the limit, i'll handle it"* — so this is not about avoiding the stop.
+It is about the state the stop leaves behind.
+
 ## End-of-issue gates (run before declaring an issue done)
 
 The per-rule verifications catch per-rule failures; these catch what
@@ -1661,10 +1737,14 @@ So budget per page, not per issue — SH8602's 160 interior pages at 600 dpi and
 So before dispatching 005:
 
 ```bash
-ISS=$($PY -c 'import r000_issue; from r000_issue import ISSUE
-i = r000_issue.load(ISSUE); print(i.tmp, i.pages)')
-set -- $ISS
-df -g "$(dirname "$1")" | tail -1         # free GB on the volume holding <tmp>
+# READ THE TWO FIELDS SEPARATELY.  `set -- $ISS` does not word-split under
+# zsh, so $1 became the whole "tmp pages" string and `dirname` was handed a
+# path with a page count glued to it (see THE VERIFICATION BLOCKS ARE BASH).
+ISS_TMP=$($PY -c 'import r000_issue; from r000_issue import ISSUE
+print(r000_issue.load(ISSUE).tmp)')
+ISS_PAGES=$($PY -c 'import r000_issue; from r000_issue import ISSUE
+print(r000_issue.load(ISSUE).pages)')
+df -g "$(dirname "$ISS_TMP")" | tail -1   # free GB on the volume holding <tmp>
 # Per page, at that page's OWN resolution: a 600 dpi page costs ~1/16 of a
 # 2400 dpi one, so a fixed per-page figure over-books a mixed issue badly.
 $PY - <<'BUDGET'
@@ -2293,6 +2373,135 @@ a missing file and a missing file that git now believes was deleted on purpose.
 
 And never `git add -A` an issue directory.
 
+## THE VERIFICATION BLOCKS ARE BASH — AND THIS MACHINE'S SHELL IS ZSH
+
+A `## Verification` block is "runnable as shell", and the shell it is written
+for is **bash**. The default shell here is **zsh**, and the two differ on the
+one thing these blocks lean on hardest:
+
+> **zsh does not word-split an unquoted `$VAR`.**
+
+```
+V="a b c"                zsh                    bash
+for x in $V              1 iteration: "a b c"   3 iterations: a, b, c
+set -- $V                $# = 1                 $# = 3
+```
+
+So a loop over a space-separated list **runs once and reports nothing** — a
+silent pass, in the safe direction, which is the hardest kind to notice. It
+cost r140's check 4 exactly that: `for slug in $SLUGS` ran once, `prev` came
+back empty, the test short-circuited and the check printed nothing. The agent
+noticed only because `prev=NONE` looked wrong, and under `bash` the same block
+reported all four slugs and caught a planted rename.
+
+**Run them with `bash`** — `bash <<'EOF' … EOF`, or `bash -c`, or a script file
+invoked as `bash file.sh` — never pasted into an interactive zsh. The fence
+census (above) already runs every block through `bash -n` for syntax; this is
+the runtime half, and `bash -n` cannot see it.
+
+**And where the rule can, write the list literally**: `for slug in impressum
+checksummer vorwort mse` needs no splitting and is immune to which shell reads
+it. MEASURED over the rules: only two sites relied on splitting — r140's check
+4 and r000's own `set -- $ISS` — and both are now literal or read field by
+field. Keep it that way. The sweep has to look **inside the fences and skip comment
+lines**, or it reports this very section and every comment that mentions the
+trap -- a plain grep returns seven hits here and all seven are prose:
+
+```bash
+cd tools/img/scan2ocr/rules
+PY=${PYTHON:-../../../../.venv/bin/python}
+"$PY" - <<'SPLITCHECK'
+import glob, re
+OPEN, SHUT = re.compile(r'^(\s*)```(bash|sh)\b'), re.compile(r'^\s*```\s*$')
+BAD = re.compile(r'\bfor\s+\w+\s+in\s+\$(?!\()[A-Za-z_]\w*\s*(;|$)'
+                 r'|\bset\s+--\s+\$(?!\()[A-Za-z_]\w*')
+n = 0
+for p in sorted(glob.glob('r[0-9]*.md')):
+    L = open(p, encoding='utf-8').read().split('\n')
+    i = 0
+    while i < len(L):
+        if not OPEN.match(L[i]):
+            i += 1
+            continue
+        j = i + 1
+        while j < len(L) and not SHUT.match(L[j]):
+            j += 1
+        for k, ln in enumerate(L[i + 1:j]):
+            if ln.lstrip().startswith('#'):      # a comment, not code
+                continue
+            if BAD.search(ln):
+                print(f"  {p}:{i + 2 + k}  {ln.strip()[:70]}")
+                n += 1
+        i = j + 1
+print(f"{n} site(s) rely on word-splitting")
+SPLITCHECK
+```
+
+## AN OPEN QUESTION IS SCOPED BY WHAT MADE IT HARD, NEVER BY ITS SUBJECT
+
+When a rule records a question it could not settle, the sentence that introduces
+it decides which later issues will stop on it. Introduce it by **what made this
+case difficult**, not by what it was about — a question scoped by subject
+catches every later issue that shares the subject and none of the difficulty.
+
+MEASURED on SH8608. r080 carried *Eingabehinweise beside the Checksummer — AN
+OPEN QUESTION, NOT A PRECEDENT*, ending "a later issue meeting this shape goes
+to the owner". SH8608 prints the Checksummer on p129 and *Wie unsere
+Basic-Programme einzugeben sind* on p130: two Inhalt lines, two start pages,
+nothing shared. The SUBJECT matched, so the build stopped and asked. The corpus
+had shipped that exact shape fifteen or more times and never folded them. What
+made SH8603 hard was its **geometry** — the piece shared a page with a third
+article and its figures were printed on the Checksummer's page — and not its
+subject at all. Cost: one round trip; the reversible default the builder built
+meanwhile turned out to be right.
+
+So an open question needs a **discriminator**, in the form "this is the hard
+case when X, Y and Z hold", and the reader has to be able to check X, Y and Z
+on the page. r080 has such a table now. The same applies to a note that says
+"ask the owner": say what about this instance you could not resolve.
+
+## A CLAIM ABOUT A SET MUST STATE WHICH MEMBERS IT COUNTED
+
+**The commonest defect this process produces is a true number carried past the
+set it was true of.** HARVEST.md keeps the running instance table and the
+reasoning; this is the operating rule, because a builder reads r000 and not the
+harvest record.
+
+> **Name the set, then check the thing you are worried about is IN it.**
+
+Each such claim is measured, honest and written down carefully. What is wrong is
+the **quantifier**, and a quantifier is invisible in the sentence that carries
+it: *"the dpi witness can be a hand marking"* and *"SH8605's markings happened
+to be at 2400 dpi"* read identically to the person who just measured the second.
+The instances now number about thirteen. They have cost a shipped PDF with three
+hand marks in it (r006's chroma census was built against ONE green mark on a
+light ground), a rule that escalated every later issue sharing a SUBJECT rather
+than the difficulty (r080), and three separate censuses of mine in a single
+build.
+
+**Two mechanical habits, each one command:**
+
+- **Print the denominator.** A census says `N of M`, never `N`. r006's fence
+  census read 142 of 162 fences and reported only "0 failing", so a fifth of the
+  set was invisible for as long as the number looked good. Every count in this
+  chain should be readable as a fraction whose bottom half would move if the
+  instrument stopped matching.
+- **Scope to the pages or files the thing APPLIES to, and derive that scope
+  rather than assuming it.** A bilevel threshold does not apply to a contone
+  page; a paper-class fix does not apply to another class; a Verification over
+  `issues/<ID>/*.html` does not apply to `prg/`. Every artefact here already
+  carries its own membership and will answer in one grep — a master's stamp says
+  `paper-class`, a field file names its class, an article says its `64er.pages`,
+  and the built PDF says which pages are JBIG2
+  (`pdfimages -list "$PDF" | awk 'NR>2{print $1, $9}'`).
+
+The scope error alone has fired three times: a flood census that counted the
+contone wrapper pages (24 of 176 presented as 32 of 181), a residual measured
+over a band that included the colour wrapper (+1.88 DN against the interior's
++0.17), and a draft check whose 1529 "findings" were almost all pages the
+setting never touches. **Two of those three were in censuses written to enforce
+this very rule.**
+
 ## A CHECK SHIPS ONLY ONCE IT HAS BEEN SEEN TO FAIL
 
 Write the check, then **plant the fault it is meant to catch** and watch it
@@ -2510,6 +2719,25 @@ routine:
   Read the screenshot. This proves the patched line EXECUTES, which the
   autostart does not; it does not prove the program reaches that line on its
   own. Say which of the two you did.
+
+- **A PROGRAM THAT WRITES A FILE NEEDS TRUE DRIVE EMULATION, AND THE SCREEN IS
+  NOT THE RESULT.** With VICE's default fast-disk traps the VC 20 format loader
+  on SH8608 printed `DATAS OK` and wrote **four wrong bytes** (+2 each at
+  offsets 91, 273, 596 and 816). With `-drive8truedrive` the written file is
+  byte-identical to the disk's. A passing screen message over a corrupted
+  output file is the worst possible result, because it reads as a test that
+  passed.
+
+  ```bash
+  x64sc -warp -autostart /tmp/t.prg -limitcycles 120M \
+        -drive8truedrive -8 /tmp/work.d64 \
+        -exitscreenshot /tmp/t.png
+  c1541 -attach /tmp/work.d64 -read "<written-name>" /tmp/out.bin
+  cmp /tmp/out.bin issues/<ID>/prg/<name>.prg     # THIS is the result
+  ```
+
+  So: true drive emulation, then read the written file back with `c1541` and
+  compare it. The screen alone does not prove the write.
 
   **Three traps met while building such a test, all on SH8604:**
 

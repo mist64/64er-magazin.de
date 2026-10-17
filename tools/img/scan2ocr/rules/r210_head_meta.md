@@ -110,10 +110,27 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
 5. **The OCR is a DRY-RUN LEAD, not the source — the band crop is.** On
    SH8608 this script returned junk for 28 of 39 articles (`TIPIS&ETRICKS`,
    `C16lı`, `5SBIELE`): the band is reversed-out display type on a dark
-   ground, which tesseract reads badly however it is cleaned. Read the bands
-   off the crops by eye and use the script only to generate the worklist and
-   to catch a page you forgot. Substitutions below are for the cases it does
-   get nearly right:
+   ground, which tesseract reads badly however it is cleaned.
+
+   **And `r210_head_meta_apply.py`'s size gates are calibrated for the
+   monthlies' thin two-line heads, so a Sonderheft's filled black bar fails
+   them all.** MEASURED on SH8606, run dry: `total=27 to_fill=6 skipped=1
+   flagged=26` — a head1 on 6 of 27 start pages and NO head2 anywhere, though
+   all 26 interior start pages carry a legible bar. Step 010 boxes the whole
+   bar, glyphs and ground, so the blocks are bigger than the gates expect:
+   `GRAFIK-ERWEITERUNG` measures 1730-1856 px wide against `HEADER_W_MAX`
+   1600, a one-line combined band is 4244-4252 px, and the `C64` blocks are
+   218-246 px tall against `HEADER_H_MAX` 200. The six it did read it would
+   have written in CAPS (`EINGABEHILFEN`, `HARDCOPY`) and with the machine
+   name closed (`C64`), both against this rule's own text, and `vorwort` is
+   not in its `SKIP_IDS`, so the front matter is treated as a body article.
+
+   **So on a Sonderheft with a black bar, take the crop route from the
+   start** — SH8606's 27 values were read off band crops by hand, which is
+   the vision-only path this rule already describes, so nothing was lost but
+   the dry run. Read the bands off the crops by eye and use the script only
+   to build the worklist and catch a page you forgot. Substitutions below are
+   for the cases it does get nearly right:
    - `C 64IC 128` / `C 64 IC 128` / `C 64_C 128` → `C 64/C 128`
    - `C_64AIVC 20` → `C 64/VC 20`
    - similar slash recovery patterns.

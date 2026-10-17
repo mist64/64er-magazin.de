@@ -8,6 +8,13 @@
 # Exits 0 if verification passes (and removes prg.txt). Exits non-zero
 # with the failing check if anything's off.
 set -e
+# THE REPO VENV, NOT BARE python3 (CLAUDE.md, r000).  This wrapper used to
+# invoke `python3` by name, so it ran on whichever python was first on PATH --
+# it worked only because its body happens to be stdlib-only, and r000's sweep
+# had fixed the Verification FENCES and never the wrapper BODIES (SH8608).
+R000_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PY="${PYTHON:-$R000_DIR/../../../../.venv/bin/python}"
+
 if [ -z "$1" ]; then
   echo "usage: $0 <issue-dir>" >&2
   exit 1
@@ -15,7 +22,7 @@ fi
 dir="$1"
 [ -d "$dir" ] || { echo "no such dir: $dir" >&2; exit 1; }
 
-python3 -c "$(cat <<'PY'
+"$PY" -c "$(cat <<'PY'
 import os, re, sys, collections
 d = sys.argv[1]
 problems = 0

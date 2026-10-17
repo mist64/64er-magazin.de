@@ -484,6 +484,37 @@ evidence at the time:
 | "front-of-book residual +1.88 DN" | a band that included the COLOUR WRAPPER | the interior stock; interior-only it is **+0.17** |
 | "the re-sweep rewrites sheets600, so the owner's title is stale" | the `low` class the fix touched | the cover, which is `high` and never read that file |
 
+**Six more, from the SH8606 and SH8608 round (2026-10-10 to 10-16):**
+
+| the claim | the set it was true of | what it was applied to |
+|---|---|---|
+| r006's chroma census finds a hand marking | SH8606 p003, a GREEN mark on a LIGHT ground | every marking — SH8608's p104 black dot is chroma **9**, exactly print ink's, and all three of its marks shipped in the PDF |
+| "0 failing" from the fence census | the **142** fences at column 0 | all **162**; the 20 indented inside a list were invisible, and two of them were broken |
+| r180's "0 of 12 Sonderhefte carry the editor key" | the `xx = Name` spelling | the key as such — SH8608's and SH8606's both carry it as `Name (xx)` |
+| r120 check 4's "round-trip failures" | listings that HAVE a disk file and were not patched | all 85 listings, counting print-only ones and r300 patches: 3 and 12 "failures" that were 0 and 0 |
+| r000 check 1's "no exceptions" | the step files | the whole directory, so its own four non-step files made the verifier exit 1 on a clean tree |
+| my own tile-ground draft | nothing yet | 1529 "findings" on SH8606 at the shipping threshold, because it scoped neither to bilevel pages nor away from halftones |
+
+That last one is the instructive one: it was written **to enforce this rule**,
+during the harvest **of this rule**, and still skipped both scoping steps. So
+did r006's fence census. Knowing the failure mode is not protection against it;
+printing the denominator is.
+
+**And two more the day after, both mine, both caught by a builder reading what
+I had written rather than doing what I had said:**
+
+| the claim | what was missing | how it surfaced |
+|---|---|---|
+| "record the verdict in the issue's `LOG.md`, where the next build will read it" | `issues/*/*` ignores it and nothing un-ignores it — **zero** issues here have a tracked LOG.md | SH8608 mentioned in passing that LOG.md is git-ignored, having recorded the verdict there as told |
+| "p104 is 1.6 x 2.0 mm" | the cutoff it was measured at — the file mixed a chroma locator for two marks with `lum < 25` for the third | SH8608 re-measured at 60 %, got 1.65 x 2.16, and offered it as measuring tolerance; it was two different measures |
+
+Neither was a count. Both are the same shape one level up: **a statement whose
+qualifier is missing cannot be checked, and reads as fact.** The durability
+claim was about a file, not a set; the size claim was about a threshold. The
+remedy is the same as the denominator — say the thing that would let a reader
+disagree with you, and a second measurement becomes possible instead of
+redundant.
+
 **Why it is hard to see from the inside.** Each claim was *true*, measured, and
 written down honestly. What was wrong was the quantifier, and a quantifier is
 invisible in the sentence that carries it: "the dpi witness can be a marking"
@@ -513,3 +544,396 @@ written into a rule and acted on. The cheapest was the only one caught before it
 shipped: SH8608 re-checking a ruling it had been given, at a step where it
 happened to have the tooling, and coming back rather than building on it.
 
+
+
+# ============================================================
+# Harvest of SH8606's and SH8608's WORKFLOW_ERRATA.md -- 2026-10-16
+# ============================================================
+
+**SH8608: 44 entries. SH8606: 16.** Two issues built in parallel in one working
+tree, both held at PAUSE 2 while this ran, so no rule moved under a live build
+(r000 forbids it; the harvest waited six days for the second builder to pause).
+
+Three entries were duplicates across the two logs and SH8606's wording won each
+time; four of SH8608's carry no proposal by design — two "a rule that saved me"
+records and two records of the rules moving mid-build, which r340 asks for.
+SH8606's 000 entry needed no change: r000's *TWO ISSUES AT ONCE* already goes
+further than it proposed.
+
+| `dcad8f51` | r000's fence census read 142 of 162 fences; the two it could not see were broken |
+| `c6cab0a9` | r000's chain table had no 310/320/330 row at all; r325 and r330 contradicted each other on run order; r330 `verify` reads the LAST heading |
+| `627e8b3e` | **nine checks that could never pass**, and one that could never fail -- r090, r130 x2, r200, r210, r220, r280, r005, r005b, r300 |
+| `acd14a53` | r006: a colour census cannot see a dark hand mark; the PDF copy is not durable; r000's `D`-line commit guard; r150's derivable page->Bild map |
+| `22d32641` | r006: 35 % is an asymmetry argument, not an optimum; r000 gains *A CLAIM ABOUT A SET* and the session-limit case |
+| `2862c500` | SH8606's errata: the Verification blocks are bash; three checks that read a different artefact from the step they check; r120 check 4 |
+| `39f5c9ad` | four wrappers called bare `python3`; r000's own numbering verifier exited 1 on a clean tree |
+| `08124538` | SH8608's remaining: six rules that contradicted themselves, r120's 3b and fifth routing case, r040, r325, the emulator write test |
+
+## What this harvest says about the rules
+
+**The dominant class is the MIRROR of SH8605's.** That round's lesson was *a
+check that cannot see the defect it is named for*; this round's is **a check
+that can never pass**. Nine of them, all found by SH8608 in one build:
+r005 check 4 (the printed footer bar sits inside the band it measures), r005b
+check 1 (a tag the program only wrote when it padded), r090 check 2 (r080's own
+commented-out placeholder), r130 check 6 (a bare printed caption) and check 5 (a
+`<YYMM>` that bash reads as a redirect), r200 check 2 (a banner not every page
+prints), r210 check 1 (Leserforum counted by filename), r220's orphan rows (the
+typos step 4 tells you to fix), r280 checks 1-2 (markup counted as text).
+
+The two faces are one defect — **the check does not know what correct looks
+like** — and r000 now requires both halves: plant the fault and watch it fire,
+THEN run it against an issue you believe is correct and require silence. All
+nine had the first half done. Two more of the same kind turned up in r000's own
+numbering verifier when it was finally run.
+
+**A rule that says two things in two places is a tax on every later build.**
+Six in SH8608's log alone: r190's aside heading (absolute in one place,
+relative in another), r190's dash lists (the ruling sat 250 lines below the
+instruction that contradicted it, with a stale example further down still),
+r290 (bans an audit pass, then briefs one), r325/r330 (each claimed the other
+had already run), r190's closing-run check against a printed text that ends in
+a table, r280's evidence form against its own locator paragraph. None was
+expensive alone; together they cost three agents' time on one issue, and the
+325/330 circle cost a whole partial run that had to be thrown away.
+
+**Two things only a build can tell you.** The Verification blocks are bash and
+this machine's shell is zsh, so `for slug in $SLUGS` ran once over the whole
+string and r140's check 4 printed nothing — a silent pass in the safe
+direction. And a program that writes a file needs true drive emulation: VICE's
+default traps let SH8608's VC 20 format loader print `DATAS OK` while writing
+four wrong bytes. Neither is visible from reading the rules.
+
+**What the builders did well, and it is worth naming.** Both logs quantify: a
+cost in minutes, the measurement that settled it, and a concrete replacement
+sentence. SH8608 corrected its own earlier entry twice when a later step
+disproved it (the 005b UNIFIED note, the pre-PAUSE-1 census that was "wrong in
+both directions"), and corrected one of MY measurements — the 120 dump's
+next-row-address pattern is exact for five rows and displaced in two, so its
+German comment is worded to be true of all eight. SH8606 caught its
+supervisor's claim that a re-sweep had staled the owner's title crop: the
+defect was a `low`-class profile and the cover is `high`, which one
+`grep paper-class` settles. That is the habit this chain depends on.
+
+## Harvest of SH8608's crop delivery -- 2026-10-17
+
+The owner cut 44 of the 49 crops SH8608's worklist asked for, I checked the
+delivery against the worklist and the masters before handing it to the builder,
+and four of r150's defects fell out of that one check. None was found by a
+build: they were found by someone reading the delivery against the rule that
+was supposed to govern it.
+
+| what was wrong in r150 | how it surfaced | the fix |
+|---|---|---|
+| `(see *renaming is authorised* above)` pointed at a section **that was never written** — the only rename guidance was step 4, which covers a wrong page PREFIX and is silent on the suffix | eight delivered files needed exactly that rename and the rule I went to cite did not exist | new *THE SUFFIX FOLLOWS THE PRINT*: the owner owns which crops exist, the print owns what each is called; rename and place, record the mapping in `reviewed/` |
+| the two-bucket table warned only that a colour figure at 600 dpi is "not a visible defect, just a 3.9 MB download" | three crops of colour figures came back bilevel with the ground gone -- the visible direction the table never mentions | added the other face, plus the owner's ruling that the bucket is theirs and a worklist note that a page is colour is **not** a bucket assignment |
+| nothing said what a dark bar in a bilevel crop means | I reported `131-1`'s black band as a conversion defect that "eats two rows". The master has a pale glare band in the same place that already wipes out the same characters -- the loss is in the plate, only its colour changed | new *A PRINT DEFECT CAN FLIP POLARITY UNDER BILEVEL*: open the same box in the master and name the content it still has before calling the conversion guilty |
+| *A crop that covers SEVERAL Bild numbers is ONE figure* did not say the rule survives a frame with a rule down its middle, and gave `26-5_9` as a form without noting that `_` means *a part of* in the corpus's other two instances | owner reversed an earlier same-day ruling: the combined `10-1_2` stays combined | folded into the existing section -- see below, this one is why the entry is worth reading twice |
+
+**I wrote a duplicate section before checking whether the rule already said it.**
+*ONE CROP MAY CARRY TWO PRINTED BILDER* went in as a new `###` -- and r150 had
+carried *A crop that covers SEVERAL Bild numbers is ONE figure* since SH8601,
+saying the same thing and more precisely (it fixes the figure's position at the
+FIRST member's, which my version omitted). I caught it only on the `grep '^### '`
+I ran afterwards to check my own headings. **A new section is a claim that the
+file does not already cover the case, and that claim is a one-line `grep` away
+from being checked.** It belongs with *A CLAIM ABOUT A SET MUST STATE WHICH
+MEMBERS IT COUNTED* in r000: I had counted the corpus for the naming form and
+not counted the rule file for the rule. The three genuinely new facts were
+folded into the section that already existed.
+
+**And the delivery itself was clean where the rules had been sharpened.** Every
+crop whose worklist row warned of a caption printed inside the frame -- `6-x`,
+`47-1`, `47-3`, `47-5`, `10-6`, `131-1` -- came back with the caption cut away,
+and `44-1` was re-cut to drop the printer's repro note on one sentence of
+report. The worklist carrying each bbox, the frame's hazard and the caption's
+position is what made that possible, and it is the half of PAUSE 2 that is
+working.
+
+### The same delivery, second pass: two worklist rows that were never crops
+
+The owner answered the four undelivered rows by delivering two of them (`10-0`,
+`129-2`) and telling me what the other two actually are. Both answers were
+already in the corpus, and the worklist had asked for them anyway:
+
+| row | the worklist asked for | what it is | where the answer was |
+|---|---|---|---|
+| `10-t1` | the whole p14 key table as one crop, *"the ZEICHEN column is reverse PETSCII and cannot be typeset"* | a typeset `<table>` whose ZEICHEN cells hold 32x32 glyphs **rendered from the C 64 character ROM** | `issues/SH8605/40-t1_*.png`, 36 files, the SAME table one Sonderheft earlier in the SAME course, and SH8605's build commit 2c7e1db8 says so in its message |
+| `129-1` | a framed crop, because the sample lines carry overlined graphic characters | a listing | *"consistent with all other copies of this article, the one 'image' is a listing"* -- the article is boilerplate the magazine reprints |
+
+r150's *A listing full of unreadable glyphs is cut WHOLE* was being read as
+covering anything full of unreadable glyphs. It says **listing**, and both of
+these are something else. Two new sections now say so, and the erratum on the
+old one says why it was mis-read.
+
+**The cost is not the crop, it is the round trip.** A worklist row asking for
+something the project does not cut makes a complete delivery look incomplete:
+I reported four files "never came" and chased two of them that were never
+coming. The check that would have caught both is cheap and is the same check in
+each case -- *has this been set before?* For `10-t1`, one `ls issues/*/40-t1_*`.
+For `129-1`, r330's reprint comparison, run at worklist time instead of at the
+end of the build.
+
+**And I did the builder's work while doing it.** Owner, 2026-10-17:
+*"stop doing your siblings' homework."* Checking a delivery file by file --
+dimensions, colour modes, bbox montages, caption inclusion, master comparisons
+-- is the placing step's own job, and r150's Verification already requires the
+builder to produce exactly that evidence. What supervision owed here was the
+two rulings and the two rule fixes, which is a fraction of the work and the
+only part the builder could not do. The tell was that none of my measuring
+changed a decision: the owner settled the bucket question in four words and the
+two missing rows in two sentences.
+
+**What the builder did right, and it is the rule working.** SH8608 held `10-0`
+and `129-2` rather than placing crops my message had called undelivered, and
+asked -- correct, because my message and the directory disagreed and only one
+of them could be current. It also separated the two defects in `131-1` exactly
+as the new rule asks: the black band is the plate (the master's glare already
+wipes those characters), while the reverse-video header fields -- Name
+`test/demo 1/85`, ID `84`, Format `2a` -- ARE legible in the master and are
+dither in the bilevel crop. That second one is a real conversion loss and went
+to the owner. *A claim that the conversion destroyed content must name the
+content the master still has* -- it named it.
+
+### And the rule caught its own author, one commit later
+
+4286396c's *A RECURRING ARTICLE'S FIGURES FOLLOW ITS OTHER PRINTINGS* told the
+builder to check how the other printings set a figure. I wrote it from the
+owner's one-sentence ruling on `129-1` and **did not run the check the section
+demands.** SH8608 ran it, found **six prior printings of the Checksummer and an
+`<img>` crop for Bild 1 in every one**, and held the article out of its commit
+rather than ship what I had told it to do.
+
+| printing | Bild 1 |
+|---|---|
+| 8508/53, SH8503/6, SH8505/6, SH8506/16, SH8507/6 *Checksummer 64 … Neu* | `<img>` |
+| SH8603/76 *Checksummer 20 V3* (the same VC 20 pair) | `<img src="76-1.png">` |
+| SH8608/129 | `<pre>` -- mine, and the only one |
+
+The command is one line, and it is the one the section itself asks for:
+`grep -rl "So koennte ein Teil eines Listings" issues/*/*.html`.
+
+**The failure is a relay, not a reading.** The owner's *"consistent with all
+other copies of this article, the one 'image' is a listing"* is a statement
+ABOUT the article -- its one picture is a picture of a listing -- and I turned
+it into an instruction to typeset one. Then I wrote the inversion into a rule,
+where it would have outlived the issue. **A one-sentence ruling relayed without
+the count behind it is a guess wearing the owner's voice.** Doing that count
+before passing a ruling on is exactly the supervision work that survived
+*stop doing your siblings' homework*: not measuring the delivery, which the
+builder owns, but checking the claim I am about to make permanent.
+
+**This is the second time in one day that a builder corrected its supervisor by
+counting**, after SH8608 separated the two defects in `131-1`. Both times the
+builder had an explicit instruction from me and checked it anyway. That habit
+is the only thing standing between a mis-relayed sentence and a published
+mistake, and it is worth more than compliance.
+
+### Three worklist rows, two issues, one mistake: asking the owner for what the chain can build
+
+By the end of 2026-10-17 the owner had declined to cut three figures across
+SH8606 and SH8608, and every one of them was the same error -- a crop worklist
+asking for something the repository could already produce. None was a judgement
+call; each was one command:
+
+| row | the worklist said | what it actually was | the command |
+|---|---|---|---|
+| SH8608 `10-t1` | "the ZEICHEN column is reverse PETSCII and cannot be typeset" | 41 glyphs rendered from the C 64 character ROM, as SH8605 did for the same table | `ls issues/*/40-t1_*` |
+| SH8608 `129-1` | a framed crop, the sample lines carry overlined graphic characters | an `<img>` in all six prior printings, and the corpus shares 47 PNGs across issues | `grep -rl "So koennte ein Teil eines Listings" issues/*/*.html` |
+| SH8606 `114-l2` | "whole listing as one image (screen printout with reverse-video PETSCII glyphs)" | `titel.prg`, on the disk. It differs from the print in lines 91-93 and two texts -- which **the article's own HTML comment already recorded** -- i.e. r120 check 4's *expected r300 patch* | `ls issues/SH8606/prg/` |
+
+Owner, on the last of them: *"why 114-l2? it's a listing, isnt it on the disk?
+cant youtype?"*
+
+**The common thread is that reverse or graphic PETSCII was treated as a reason
+to photograph.** It is not. It is a rendering question with three settled
+answers in this corpus -- the magazine's own `{CLR}` brace names, the
+`<u>`/overline convention from 8610/80, and a rendered glyph. The camera is for
+a photograph of a screen or a printout that no source reproduces.
+
+r150 now opens the listing/table part of the worklist with those three
+questions, each with its one-line check, before the *cut it WHOLE* section that
+was being over-read.
+
+**Why it kept happening is worth naming.** Each row was written with a real
+reason attached -- the glyphs genuinely cannot be typed as plain characters,
+the lines genuinely are overlined, the disk fassung genuinely differs from the
+print. The reason was true and the conclusion was wrong, because the worklist
+asked *can I transcribe this as text?* when the question is *can anything in
+the repository produce this?* A true premise makes a row read as checked when
+nobody checked the thing that mattered.
+
+**And the cost landed on the owner, not on us.** Three round trips, and a
+delivery that looked incomplete twice when it was complete both times.
+
+### The harvest that switched off the instrument it harvests from
+
+The 2026-10-16 harvest took 60 entries out of SH8606's and SH8608's
+`WORKFLOW_ERRATA.md` **while both builds were still running**, and deleted both
+files. r340 says the harvest happens *"once the issue is COMPLETE -- never
+earlier"*, so the rule had no instruction for what I had just done, and I
+supplied one by hand: *"open a fresh one if you start another build."*
+
+SH8608 read "another build" as **another issue** -- a fair reading -- and so
+**step 150 ran with no errata file open**: 47 crops placed, a table typeset
+from the character ROM, and two findings that only surfaced because I asked the
+builder what its file contained on 2026-10-17. They are now in a reopened file
+(eb5de625):
+
+- **340 has no instruction for reopening after a mid-build harvest.** This one.
+- **r330 has no remap tool.** "Re-diff and remap by content" cost roughly 25
+  commands and a hand-written difflib script across pairs 10, 44 and 129, and a
+  plain index shift would have been WRONG on pair 10: 17 old 8512 table-cell
+  differences now pair with our new Tabelle 1 instead. A `remap` subcommand is
+  proposed. **Recorded, not built** -- a tool is not a mid-build change.
+
+**The defect is the shape of the thing, not the wording.** Deleting a build's
+log of where the rules failed, mid-build, removes the only instrument that
+records what happens next -- and the removal is invisible from inside the
+build, because a builder has no reason to look for an artefact it did not
+delete. r340 and r000 now say the file is reopened empty in the same commit as
+the harvest, and that **reopening is the harvester's job**.
+
+**It also cost a second thing.** The same harvest means this session's two
+issues now have TWO errata files each to harvest at completion, and the first
+of each is already in the rules. HARVEST.md's SH8606/SH8608 section of
+2026-10-16 is the boundary: anything in a reopened file starts after it.
+
+### A gate that ran against an empty directory and called it a pass
+
+SH8608 corrected one of its own reported passes on 2026-10-17: the
+"r320 dropped listings 0" in its step-150 report was hollow. It had run
+`r320_dropped_listings.py` against `<tmp>/ocr`, while this build's OCR output
+is `<tmp>/ocr/out`. The glob matched nothing, the loop never executed, and the
+script printed `dropped listing blocks: 0 … 0` and **exited 0**.
+
+This is r000's *A CHECK SHIPS ONLY ONCE IT HAS BEEN SEEN TO FAIL* wearing its
+other face, in a script that already had the right instinct everywhere else: it
+separates `dropped` from `checkable` precisely so "0 findings" can be told from
+"0 looked at", and prints a NOTE saying `"0" here is not evidence of coverage`
+-- but only when `dropped and not checkable`. With no input at all, both are
+zero, no NOTE fires, and the hollow case is the one case it does not catch.
+
+**Three fixes, and the third is the one that mattered:**
+
+1. `r320_dropped_listings.py` now exits 2 with `CANNOT RUN` on a directory with
+   no `labels.json`, in the same words its sibling `r320_coverage_check.py`
+   already used. Seen to fail before shipping.
+2. r340's Verification check 2 took `tail -1` -- the OLDEST add of
+   `WORKFLOW_ERRATA.md`. After the mid-build reopen that reaches past the live
+   file to the deleted one, so the check passes on a file that no longer
+   exists. Now `head -1`. **I added the reopen rule this morning and left the
+   check that reads the file's history stale in the same file.**
+3. **r320's gate block invoked only ONE of its two scripts.** Step 320 is
+   `r320_coverage_check.py` AND `r320_dropped_listings.py`; the block headed
+   *The gate* ran the first. A builder following it ran half the step, then had
+   to find the other script by itself and invent its argument -- which is
+   exactly how the wrong directory got passed. The block now runs both, with
+   `OCR=<tmp>/ocr/out` spelled out and `NOT <tmp>/ocr` beside it.
+
+**The script was not the hole; the instruction was.** A gate documented as one
+command when it is two will be run as one command, and the half left out has no
+advocate. Fix 1 makes the mistake loud, fix 3 makes it unlikely.
+
+**And it was caught by the builder re-reading its own report, not by any gate.**
+SH8608 volunteered the correction with nothing prompting it, after the step was
+reported, committed and signed off -- the third time in one day it has
+contradicted something already in writing. The sibling's refusal
+(`exit 2 CANNOT RUN`) was the clue, which is an argument for every check in the
+pair refusing identically: a check that is loud makes its quiet neighbour
+visible.
+
+## Harvest of SH8606's and SH8608's SECOND errata files -- 2026-10-17
+
+Both issues completed today, so this harvest is the one r340 actually
+describes: *once the issue is COMPLETE*. Six entries, three of which were
+already applied during the day as they surfaced in the builders' messages:
+
+| entry | disposition |
+|---|---|
+| SH8608 340 — nothing says the build reopens its errata file after a mid-build harvest | applied 759eecac (the reopen is the HARVESTER's job) + a983da1d (check 2 is stated, not claimed, after a reopen) |
+| SH8608 320 — `r320_dropped_listings.py` reports 0 on a directory with no OCR output | applied 935d1c97, all three parts: the script exits 2, the gate block runs BOTH scripts, and it names `<tmp>/ocr/out` |
+| SH8606 330 — a THEIRS applied outside the issue renumbers the pair and the vocabulary cannot say so | applied aa63000c (`APPLIED`, and the obligation to tell builds in flight), completed here: `verify`'s failure text now names the cause |
+| SH8606 150 — the worklist asked for a crop of a listing that was on the disk | r150 applied e392223f; completed here — **r170 now carries the cross-reference**, because r170's sentence is what sends a listing to the worklist and r150's new questions were invisible from there |
+| SH8606 150 — an uncaptioned figure the PROSE numbers was listed as `-0` | applied here: *the print includes the body text*. A prose-numbered figure takes that number, goes at the first prose reference, and carries no `<figcaption>` |
+| SH8608 330 — "re-diff and remap by content" has no tool | **recorded, not built.** See below |
+
+**The r330 remap tool is the one thing deliberately left undone.** SH8608's
+entry is specific — the subcommand's inputs, what it must rewrite, what it must
+print — and the cost is measured: ~25 commands and a hand-written difflib
+script across three pairs, with a matcher that lost the last D block of each
+diff to a regex edge case all three times. It is also not a one-issue problem:
+**step 150 runs after 330's body whenever crops arrive after PAUSE 2, which is
+the normal order**, so every figure-carrying reprint pair needs this remap, and
+SH8605 hit it too. A tool written against three pairs of one issue would be
+fitted to them. It should be written when the next issue gives it a second
+body of evidence.
+
+**What this harvest confirms about the fix made this morning.** The reopened
+files were worth reopening: four of the six entries are from AFTER the
+mid-build harvest, and two of them -- the hollow 320 gate and the 330 vocabulary
+gap -- are defects in the rules' own instruments. Had the files stayed closed,
+those would have reached SH8607 intact.
+
+**And the two builders' entries differ in a way worth noting.** SH8606's say
+what the rule says, what it did, what was actually true and what it cost, then
+propose replacement wording specific enough to paste. SH8608's do the same and
+add the operator detail that makes a tooling gap actionable -- the exact
+commands, the edge case its own matcher hit, and why a cheaper fix would have
+been wrong. Both are harvestable without a conversation, which is the standard.
+
+Per r340's lifecycle both files are now deleted. SH8606's second file is
+recoverable at 3ddc87e2's parent, SH8608's at c86e5b54's parent; the first
+files remain recoverable at 0433909e and 888d8d3d.
+
+### The lead-slot exception keys on the one thing that can lie
+
+Owner, 2026-10-17, hours after the exception was added: *"cropping
+SH8606/108-0 was a mistake, remove file and dont img src it."*
+
+`108-0.png` is a cartoon -- a boy with his arms spread before a computer,
+*"Deine Manieren lassen ganz schön zu wünschen übrig!"*, the machine answering
+*"Rüülps!"* -- with no printed caption, never referred to by the prose. It was
+placed a year ago (f39d844e) as the article's lead image. **It sits at line 223
+of 532**, between two paragraphs on interrupt handling.
+
+So the owner's removal CONFIRMS *EXCEPT IN THE LEAD SLOT*, which already says a
+filler "dropped into leftover space further down" stays omitted. What it
+exposes is how the cartoon got past that test: **the exception keys on the
+`<page>-0` suffix, and the suffix is a claim that can be wrong.** A cartoon
+named `-0` walks straight through a test that asks whether it is named `-0`.
+
+This is *THE SUFFIX FOLLOWS THE PRINT* meeting the lead-slot rule, and the two
+had not been read against each other. Every other use of a suffix in this file
+is descriptive -- it records what the print says. This one is **load-bearing**:
+it is the single place where the filename decides whether a picture is
+published at all. The section now says to check the position on the page and
+names the trap explicitly.
+
+**The age of the error is the point.** It survived a full build, a placement
+run, r150's five verifications and an owner review of the issue, because every
+one of them read the name. It took the owner looking at the published page.
+
+> **ERRATUM on this file's own commits, 2026-10-17.** `f6954f8b` is titled
+> *"Harvest SH8606's and SH8608's second errata files, and delete them"* and
+> its message lists three rule changes. **It contains only the two deletions.**
+> I ran `git rm` / `git add` for the errata files and then a bare
+> `git commit -m`, which commits what is STAGED -- so the three modified rule
+> files, which were unstaged, were silently left out while the message went on
+> describing them. The r150 half was then swept into `8f17fb87`, a commit about
+> something else, and r170 and `r330_reprint_compare.py` stayed uncommitted
+> until 64er_SH8606 noticed them in the tree and said so.
+>
+> So the real landing places are: r150's *the print includes the BODY TEXT* in
+> `8f17fb87`; r170's cross-reference and r330's `verify` text in the commit
+> below. `f6954f8b`'s message overstates it and is left standing, because a
+> rewrite would break the hashes two builders have already quoted back.
+>
+> **The rule this breaks is already in r000** -- *commit by pathspec while a
+> sibling builds* -- and I broke it in the safe-looking direction. Pathspec
+> protects against sweeping a sibling's work IN; the same discipline is what
+> keeps your own work from being left OUT, because `git commit -m` with
+> nothing named commits the index, not your intent. **Name the paths every
+> time, including when you think nothing else is staged.** Caught by a builder
+> reading the tree, which is the fourth correction a builder has made to this
+> supervisor today.

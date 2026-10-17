@@ -394,6 +394,7 @@ eighth that means "I did not look":
 | `MOVED` | both sides carry the SAME WORDS, in a different place on the page — the aligner cannot pair them, so the prose between them comes out unpaired on both sides as `BLOCK ONLY IN` | **nothing.** Closed, like `PRINT` |
 | `MARKUP` | the words are the same and only the tagging differs — one side wraps a run in `<code>`, the other does not | **nothing.** Closed |
 | `CROP` | one side publishes the content as a delivered owner CROP (*owner crop wins*) and the other as text. Same printed content, different **medium** | **nothing.** Closed |
+| `APPLIED` | a `THEIRS` that has since been FIXED in the published issue — the difference is gone, and every later difference in the pair renumbered | **nothing.** Closed, but the section is rewritten, not re-diffed blind: see below |
 | `UNRESOLVED` | the scan could not settle it (page not in the corpus, region illegible, original issue not imported) — **and neither could anything else: see r325, *"the glyphs are identical" means the glyph cannot decide*. Improving the render, the series the item sits in, a redundant encoding in the artefact, the external standard and the language all come first, and the entry says which were tried** | stays open in `LOG.md` as a known gap |
 
 **A `PRINT` LINE MUST NOT CARRY A `THEIRS` CANDIDATE IN ITS PROSE.** The
@@ -463,6 +464,37 @@ better-reading sentence is sitting right there in the other column. Copying a
 phrase across from the monthly is re-typing from another source, not
 transcribing our page. If a passage needs more than word-level repair, hand it
 back: OCR the region again, or escalate.
+
+### EDITING A PUBLISHED ISSUE INVALIDATES EVERY PAIR THAT POINTS AT IT
+
+A reprint comparison is a diff against a file in another issue's directory.
+**That file is not frozen.** When anyone — the supervisor, a later build, a
+correction run — edits a published issue, every in-progress pair whose original
+is that article shifts underneath, and the shift is silent: the numbers still
+line up, they just mean something else.
+
+MEASURED, 2026-10-17: the supervisor changed a hyphen to an en dash in
+`issues/8602/57 MSE – Abtippen sicher und leicht gemacht.html` (commit
+`90e8bc76`), which was a `THEIRS` that SH8606's pair `7 ← 8602/57` had already
+reported. Fixing it **removed D-001 from the pair** and renumbered all 22
+differences to 21, `THEIRS 1 → 0`, while SH8606 was mid-build. The builder
+caught it on a re-verify and rewrote the section by hand.
+
+**So the vocabulary needed a word for it**, `APPLIED` — a `THEIRS` we have
+since fixed. Without one, the only honest options were to call a resolved
+difference `PRINT`, which is false, or to leave it listed as outstanding, which
+is also false.
+
+**Two obligations follow:**
+
+- **Whoever edits a published article says so to every build in flight.** The
+  edit is cheap; the renumbering it causes is not, and a builder that
+  re-verifies without knowing why the count moved will reasonably suspect its
+  own work first.
+- **Rewrite the section, do not re-diff it blind.** The differences that remain
+  are the same differences with new numbers. A plain index shift is NOT safe —
+  see the SH8608 pair 10 case, where 17 old table-cell differences re-paired
+  against newly typeset content instead of simply moving up.
 
 ### A SYSTEMATIC RENAME DEFEATS A SIMILARITY SCORE
 

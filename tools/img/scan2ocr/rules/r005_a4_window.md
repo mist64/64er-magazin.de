@@ -222,9 +222,47 @@ So, in order:
    page lum ~6 -> ~105 -> ~200 at row ~7005; dark-brown ground ~10 against bed
    ~3, a step at x~4948.
 
-Cut from `masters600`, pad outside the frame with paper white, write into
-`<tmp>/a4600/`, and keep the automatic window as a backup. Note in the stamp
-which fallback was used.
+**AND MEASURE THE PROP FRACTION PER COLUMN AND ROW, NOT ONLY LUMINANCE — A RAMP
+MEANS THE SHEET IS TILTED AGAINST THE TYPE.** Recovery C said "cut from row and
+column luminance profiles" and said nothing about what to do when the edges are
+not square to the content. MEASURED on SH8608 p142: the prop fraction ramps
+0 -> 30 px down the left edge, 0 -> 21 px across the top, and the foot runs
+7018 -> 7060, which is the sheet lying about 0.25 deg off the levelled type.
+An axis-aligned A4 does not fit inside it at all — the usable area is about
+4939 x 6996 against 4961 x 7016.
+
+So when the ramps say tilted: **centre the window on the deficit** (p142 took
+`(20, 12)`) and **paint only the prop/bed that is CONNECTED TO THE WINDOW
+BORDER** with paper white, recording the painted fraction as fabricated (p142:
+0.09 %). Do not paint an interior region that merely matches the bed's
+luminance.
+
+**The colour test for the prop still works on the graded master** (`G-B > 60`,
+`lum > 120`) — it is the dark GROUND against the bed that is hard to separate,
+not the prop. p009 and p142 both traced `uncropped` at 005 and 005b's automatic
+windows were wrong on both: p009's at x=150 cut 6.3 mm of left content while
+the summary reported `fabricated 0.00 %`, exactly as this rule warns.
+
+**READ THE PROFILES OFF THE RAW THUMB, NEVER THE GRADED MASTER.** On a dark
+ground the grade sends the ground to within a few levels of the bed and the
+step this recovery looks for stops existing. MEASURED on SH8606 p151 (the te-wi
+ad, full-bleed dark brown): on `masters600` the ground is lum 3-5 and the bed
+0-8, so nothing separates them, and the only steps in the profile are the lit
+prop and the fabricated white beyond the raw frame. On the RAW 150 dpi thumb
+the same trim is a clean step in both profiles — ground lum 27-29, bed 5 (left)
+and 23 (right).
+
+**And on the thumb you can use colour as well:** the paper ground is warm
+(R-B >= 2), the bed neutral (R-B 0-1). Scale the trim by 600/150 into the
+master frame; the levelling moves a centre-band edge by well under a pixel, so
+the reading is first-order invariant (SH8606 p151 levelled 0.20 deg).
+
+Cut from `masters600`, write into `<tmp>/a4600/`, and keep the automatic window
+as a backup. Note in the stamp which fallback was used.
+
+**Fill the strip beyond the trim by MIRRORING the page, not with paper white**
+(r005's fill rule): a full-bleed dark page has no paper white, and painting it
+white draws a bright border round the ad.
 
 ## Verification
 

@@ -76,6 +76,17 @@ Three further shapes this rule never named, all met on 8612:
 
 **When a printed table interleaves drawings with per-item legends, keep the pairing.** Do not regroup the legends below the images: the legends differ per item (on 8612's EPROM tables the 2516 has CS, the 2532 has none, the 2564 has CS(X)), so a pile of legends under a row of drawings is not untidy, it is **misleading**. One column per item, each drawing above its own legend.
 - **The `<figcaption>` ALWAYS goes BELOW the table** inside the `<figure>`, even if the print places it above. Project convention.
+- **Text printed INSIDE a named box, above its table, is a `<p>` inside the
+  `<figure>`, before the table.** SH8608's p130 and p146 boxes each print an
+  intro sentence inside the ruled box; the agent reached for the figure-series
+  clause because nothing covered this. It is simpler than that: the box is the
+  figure, so its own prose belongs in the figure.
+- **Section labels inside ONE ruled box under ONE caption stay spanning `<th>`
+  rows.** *A spanning header row that labels a section is a heading, not a row*
+  is about labels that sit BETWEEN separate tables; it does not reach inside a
+  single captioned box. SH8608's p150 box has five such labels, and promoting
+  them to `<h2>` would have broken the figure apart. Both readings were
+  defensible and neither was written down.
 - **Table with a heading or no caption marker** → bare `<table>`, no `<figure>`.
 - **NEVER fabricate a caption.** A `<figcaption>` is only allowed when its exact text is printed on the page (read it off step 010's block index or a 600 dpi scan crop; the PDF text layer is void, see r000); transcribe it verbatim. Do not compose a plausible-sounding descriptive title of your own — that is a fabrication. When in doubt, emit a bare `<table>` with no caption rather than an invented one. (Conversely, don't delete a real caption as "invented" without checking the scan: 8608/142 `Listing 1. Laufzeit-Testschleife in »C«` IS printed in bold on p145.)
 

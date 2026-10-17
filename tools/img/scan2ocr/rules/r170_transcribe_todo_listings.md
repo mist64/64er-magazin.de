@@ -39,6 +39,18 @@ numbers IS the program. So it does not stay as page text — it goes into
 | MSE hex | decode the hex to the binary with `tools/mse.py`, write `prg/<name>.prg` | `<pre data-filename="<name>.prg" data-name="<Name>" data-mse=mse1></pre>` |
 | A **monitor dump** (TEDMON, VC-20 monitor, C64 monitor) | assemble the bytes at their printed addresses, write `prg/<name>.prg` | `<pre>` carrying the dump **as printed** — not `data-mse`, which would render MSE's row format and addresses the magazine never set |
 | A dump in the **program's own format with a row sum** | same, and verify every row sum | as printed |
+| **A printed BASIC program the disk lacks** — the general row | `petcat` the transcription as above; there is nothing to compare against, so a second independent read replaces the round trip | as for Checksummer BASIC, minus `data-checksummer` where the print has no sums |
+
+Two shapes SH8608 had that the rows above do not name, both of which became
+`prg` files under the general row: a **DATA loader with ONE total sum** (p79,
+not per-row) and an **input program with no sums at all** (p110). Neither has
+a per-line gate, so each needs the second read the general row calls for.
+
+**VC 20 BASIC loads at `$1201` with ≥8K expansion, unless the article POKEs
+otherwise.** The corpus is inconsistent — SH8501 uses $1201, SH8503 and SH8505
+use $1001 and $0801, SH8603's `tacco` $0801 — so take the address from the
+article's own POKEs where it gives them and default to $1201 only when it does
+not.
 
 **`-l <addr>` IS THE ADDRESS THE ARTICLE'S OWN POKES SET, not `$0801`.** The
 table says `-l <addr>` and left the address to be assumed, and `0801` is what
@@ -392,6 +404,11 @@ principle):
 
 ## An unreadable PETSCII glyph is never guessed and never `[ILLEGIBLE]`
 
+**Name the crop `<article-page>-l<N>.png`** — the `l` for listing, the number
+the printed Listing number: SH8602's `20-l6.png`, SH8606's `114-l2.png`. Write
+the worklist row that way every time, so r150 and the owner and this rule's
+Verification are all talking about the same file.
+
 A reverse or graphic PETSCII character in a listing that has **no checksum** to
 verify against cannot be named from the scan with any confidence, and a wrong
 guess ships looking exactly as certain as a right one.
@@ -399,6 +416,23 @@ guess ships looking exactly as certain as a right one.
 **The listing is cropped from the page and placed as an image** (see r150), and
 owner-crop-wins replaces the transcription. Never name the glyph by hand, and
 never ship an `[ILLEGIBLE]` marker: a reader cannot type either.
+
+> **BUT RUN r150's THREE QUESTIONS BEFORE WRITING THAT WORKLIST ROW** — see
+> r150, *BEFORE A LISTING OR A TABLE GOES ON THE CROP WORKLIST, ASK WHETHER
+> THE CHAIN CAN PRODUCE IT*. **`ls issues/<ID>/prg/` first.** A listing whose
+> program is on the disk is TYPED from the disk with the printed differences
+> applied; its control codes are named from the magazine's own table
+> (`tools/checksummer.py`) and its shifted letters take the `<u>` convention
+> (8610/80). Only a screen or a printout that no source reproduces is cropped.
+>
+> MEASURED on SH8606, 2026-10-17: `114-l2`, Grafik 2000's Listing 2, went on
+> the worklist from the sentence above. `titel.prg` was on the disk the whole
+> time and is named in the `binary_download` two lines below the `TODO` — which
+> this rule's own Verification had been reporting as DEFERRED for seven days.
+> The owner declined to cut it: *"it's a listing, isnt it on the disk? cant you
+> type?"*
+
+
 
 MEASURED on SH8602: 39 such glyphs across articles 20, 39 and 152. The build
 first marked them `[ILLEGIBLE]`; the owner's ruling (2026-10-04) replaced all
@@ -419,6 +453,16 @@ grep -l '<pre>TODO</pre>' "$dir"/*.html && echo "  FAIL: <pre>TODO</pre> survive
 
 # 2. no <p>TODO LISTING</p> left
 grep -l '<p>TODO LISTING</p>' "$dir"/*.html && echo "  FAIL: TODO LISTING survived"
+
+# 2a. A WHOLE-LISTING CROP NOT CUT YET IS NOT A FAILURE -- it is PAUSE 2 work,
+#     exactly as r200 says of its banner.  An unreadable PETSCII glyph sends the
+#     listing to r150's crop worklist as `<article-page>-l<N>.png`, and the crop
+#     arrives at PAUSE 2 -- so checks 1 and 3 report the placeholder on every run
+#     until the owner delivers it, with nothing in the rule saying that is the
+#     expected state.  On SH8606 it is Grafik 2000's Listing 2 (p120, a screen
+#     printout with reverse-video glyphs and no checksums) waiting on `114-l2.png`.
+#     So: list every such listing BY NAME in LOG.md, treat checks 1 and 3 as
+#     DEFERRED for exactly those figures, and re-run both once the crop is placed.
 
 # 3. every <figcaption>Listing N…</figcaption> has a non-empty <pre>
 #    body before it (filled, not the placeholder)

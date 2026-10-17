@@ -154,6 +154,21 @@ them — `10-6abc.png`, and SH8601's `26-5_9.png` — and it becomes **one
 on its own line** (`<br>`-separated inside the one `<figcaption>`). Not one
 figure per number: there is one image.
 
+**AND IT STAYS ONE FILE EVEN WHEN THE FRAME HAS A RULE DOWN THE MIDDLE.** Owner
+on SH8608's `10-1_2.png`, 2026-10-17: *"the two in one will need to stay
+combined"* — Bild 1 and Bild 2 of the Basic-Kurs, set in one frame split by a
+vertical rule, with the two captions side by side beneath it. This reversed an
+earlier ruling the same day for two separate files; the later word governs, and
+the earlier one is not evidence of a convention.
+
+**Mind what `_` means elsewhere in the corpus before reading a digit off it.**
+There are 3 underscore names in 4001 PNGs. `26-5_9` is this form — and its own
+digits do not describe its contents, since it carries Bild 9 and Bild 6. The
+other two, `36-4_1` and `36-4_2`, use `_` for **a part of** Bild 4: two halves
+of one numbered figure, placed as `old_edition` / `new_edition` inside a single
+`<figure>`. So the separator alone does not tell you which case you have — read
+the captions.
+
 ### PROSE PRINTED INSIDE A CUT FRAME GOES WITH THE CROP
 
 *Owner crop wins* named tables and listings. It covers **any text the crop's
@@ -471,6 +486,59 @@ proposed names because each sits INSIDE its article on the article's own
 subject, and a placement test never fired. **Lettering inside the art is not a
 label**: a caption is set as a caption, in caption type, outside the drawing.
 
+### EXCEPT IN THE LEAD SLOT: A DRAWING UNDER THE HEADLINE IS A FIGURE
+
+Owner, 2026-10-17, on all four of SH8608's: **a drawing in the LEAD position is
+cropped, even when the prose never references it and the print never labels
+it.** That is the one place where position decides, against the paragraph above
+— and it is a narrow place, so check all of it before claiming it:
+
+- the drawing sits **directly under the article's headline**, before the body;
+- it is the article's **`<page>-0`**, i.e. nothing else occupies the lead slot;
+- it is **framed or set as an opening illustration**, not dropped into leftover
+  space further down.
+
+**AND `-0` IN THE NAME IS NOT EVIDENCE OF ANY OF THAT.** The suffix is a claim
+about where the PRINT puts the picture, and a claim can be wrong — see *THE
+SUFFIX FOLLOWS THE PRINT*. **Check the position on the page, not the
+filename**, and note the trap: this exception is the one place where `-0`
+carries a decision, so a mis-named `-0` is exactly the thing it cannot catch.
+A cartoon named `-0` walks through a test that keys on `-0`.
+
+MEASURED on SH8606, 2026-10-17: `108-0.png` was placed a year ago as the lead
+image of *IRQ-Basic – eine Erweiterung für Sprite-Fans* and the owner removed
+it — *"cropping SH8606/108-0 was a mistake."* It is a cartoon with no printed
+caption that the prose never mentions, and **it sits at line 223 of 532**,
+between two paragraphs on interrupt handling. The `-0` said lead slot; the page
+said leftover space. The position settles it and the name never could.
+
+MEASURED on SH8608: `10-0` (teacher at a blackboard, with the article's own
+headline lettered on the board), `67-0` (a key tagged MONITOR unlocking a door
+marked RAM ROM), `92-0` (a computer trailing smoke) and `94-0` (a robot with a
+lettered speech bubble). All four are signed "bo", none is referenced by its
+text, and the last two were filed as cartoon candidates. All four are crops.
+
+**This does NOT reopen the cartoons already omitted**, and the distinction is
+checkable rather than a matter of taste. SH8605's p8 bit and byte cartoons were
+named `6-00` and `6-000` precisely BECAUSE the lead slot was taken — `6-0.png`
+is a colour photograph of a C 64 mainboard. They sat inside the article, below
+the opening, which is the "leftover space" case and is still omitted. So is
+SH8602's `58-29`, a signed cartoon at the END of the Sprites article.
+
+**"On the opening PAGE" is not the lead slot either.** MEASURED on SH8608:
+p105's Einstein-at-a-monitor and p144's "Turbo" car are both signed "bo", both
+on their article's first page, and both sit in the text flow BELOW the bold
+intro with body text above them — the headline is followed immediately by the
+intro, not by the drawing. Neither is referenced. Both stay off the worklist.
+If the opening page alone counted, every filler that happens to land on a first
+page would become a figure, which is the omission the owner settled in 2026-10.
+
+The reason the lead slot is different: an opening illustration is part of how
+the magazine presents the article, the way the headline and the kicker are. A
+filler further down is the layout using up a hole. Both are drawn by the same
+hand and neither is labelled, which is why nothing short of position separates
+them.
+
 **BUT THIS RULE GOVERNS THE WORKLIST, NOT THE DELIVERY. A CROP THAT ARRIVES IS
 PLACED.** Owner, 2026-10-07: *"if they are delivered, they are not dropped. i
 am deliberate about what goes into crops."* The owner does not cut cartoons, so
@@ -486,7 +554,69 @@ in this section tells you what not to ASK for. It never tells you to refuse
 what you were given.**
 
 (The NAME of a delivered crop is a different matter and may well be wrong —
-see *renaming is authorised* above. Rename it and place it; do not drop it.)
+see *THE SUFFIX FOLLOWS THE PRINT* below. Rename it and place it; do not drop
+it.)
+
+### THE SUFFIX FOLLOWS THE PRINT, EVEN WHEN THE DELIVERED NAME DOES NOT
+
+> **ERRATUM, 2026-10-17.** The parenthesis above used to read *"see renaming is
+> authorised above"*. **There was no such section, above or below** — the only
+> renaming guidance in this file was step 4 of the procedure, which renames a
+> wrong PAGE PREFIX and says nothing about a suffix. A cross-reference to a
+> section that was never written is a rule that cannot be followed: the builder
+> looks, finds nothing, and either asks or guesses. Found on SH8608's delivery,
+> where eight files needed exactly this rename. The section below is what the
+> parenthesis was always pointing at.
+
+**The owner decides WHICH crops exist. The print decides what each one is
+CALLED.** Those are different authorities and they settle different halves of
+the filename:
+
+- **the prefix and the file's existence** are the owner's. A delivered crop is
+  placed; an undelivered worklist row is an answer, not an omission.
+- **the suffix** — `-0`, `-0a`, `-<n>`, `-x`, `-x<n>`, `-<n>x`, `-t<n>` — is a
+  claim ABOUT THE PRINT: it says the page labels this figure "Bild 3", or
+  labels it with no number at all. A cropping tool numbers its output files in
+  the order they were cut; it has not read the page. So the suffix that arrives
+  is frequently a count, not a claim, and the two collide hardest on an
+  **unnumbered** figure, which a tool will happily call `-1`.
+
+**AND THE PRINT INCLUDES THE BODY TEXT.** An uncaptioned figure that the PROSE
+numbers — *"Ausdrucke wie in den Bildern 1 und 2 möglich"*, *"Bild 2 zeigt"* —
+takes that number as its suffix, is placed **at the first prose reference
+rather than in the lead slot**, and carries **no `<figcaption>`**, because the
+print sets none. `-0` is for a lead picture the text never numbers; naming a
+prose-numbered one `-0` leaves the reader's "Bilder 1 und 2" pointing at
+nothing.
+
+MEASURED on SH8606, 2026-10-17: `176-1` (prose numbers it Bild 1, the print
+captions only Bild 2) and `155-0` (prose numbers it Bild 2, the print captions
+only Bild 1) **are the same case and the worklist named them differently** —
+one `-1`, one `-0` with the lead slot. The owner delivered `176-1`, which
+settled it that way round.
+
+So: **rename to what the print says, then place.** Do not ask about it, do not
+hold the file back, and do not place it under a name the page contradicts — a
+`-1` on a figure the print labels only "Bild." tells every later step that a
+"Bild 1" exists on that page.
+
+MEASURED on SH8608, 2026-10-17: of 44 delivered crops, **eight** carried `-1`
+or `-2` on a figure the print leaves unnumbered — `6-1`, `94-1`, `102-1`,
+`102-2`, `106-1`, `108-1`, `112-1`, `117-1`, renamed to `6-x`, `94-x`,
+`102-x1`, `102-x2`, `106-x`, `108-x`, `112-x`, `117-x`. Every one was an
+unnumbered printed "Bild." or a caption with no Bild label at all, and the
+worklist row for each already said so.
+
+**RECORD THE MAPPING IN `issues/<ID>/reviewed/`**, not in `LOG.md`, which is
+git-ignored and does not survive. The delivered name is a fact about what the
+owner handed over and the next build must be able to read it back, which is
+the same reason the mark verdicts live in `reviewed/marks.txt`.
+
+**This is NOT the same as *THE FILE NAME DOES NOT MOVE WITH THE IMAGE*.** That
+rule governs a correctly-named crop placed under a different caption, where the
+mismatch is deliberate and records where the crop came from. Here the suffix
+was never true of anything. Renaming it destroys no information; keeping it
+asserts something the page denies.
 
 ## A listing full of unreadable glyphs is cut WHOLE, not glyph by glyph
 
@@ -494,6 +624,13 @@ When a listing carries reverse or graphic PETSCII that cannot be named from the
 scan, do **not** propose one crop per glyph, and never ship `[ILLEGIBLE]`.
 **Crop the whole listing as one image**, and owner-crop-wins then replaces the
 transcription.
+
+> **ERRATUM, 2026-10-17.** This section said *listing* and was read as *anything
+> full of unreadable glyphs*. **Two things that are not listings were put on
+> SH8608's worklist as whole-frame crops, and neither was ever going to come.**
+> Both had an answer already in the corpus. A worklist row that asks the owner
+> for a crop the project does not cut costs a round trip and makes the delivery
+> look incomplete when it is not. The two sections below are that erratum.
 
 MEASURED on SH8602: the worklist proposed 39 individual glyph crops; the owner
 cut five whole listings instead (article 20's Listings 6-9 and article 39's
@@ -505,6 +642,116 @@ printed. Propose that shape FIRST.
 `20-t2a` + `20-t2b` because the chart runs from one column onto the next page;
 the owner cut it whole and it places once. The unit is the TABLE, not the page.
 
+
+## BEFORE A LISTING OR A TABLE GOES ON THE CROP WORKLIST, ASK WHETHER THE CHAIN CAN PRODUCE IT
+
+**The owner cuts what only a camera can get. Everything the chain can build,
+the chain builds.** A worklist row that asks for a crop of something we can
+produce costs a round trip, and it makes a complete delivery look incomplete:
+the file never arrives, because it was never the owner's to cut.
+
+Run these three questions against every listing and every table before writing
+its row. Each has a one-line check and each has now been got wrong:
+
+| ask | check | MEASURED |
+|---|---|---|
+| **Is the program on the disk?** | `ls issues/<ID>/prg/` for the name the figure's caption or the neighbouring `binary_download` gives | SH8606's `114-l2`, *Listing 2* of Grafik 2000, went on the worklist as *"whole listing as one image (screen printout with reverse-video PETSCII)"*. `titel.prg` is on the disk. The printed listing differs from it — lines 91-93 and the texts GRAFIK 2000 / SCHRIFT-DEMO against the disk's PRODUCED 1984 / BY / FRANK BRENDEL — and **the article's own HTML comment already said so**, which is r120 check 4's *expected r300 patch* outcome, not a reason to photograph it |
+| **Can the glyphs be rendered?** | is it a key/character table with a reverse-PETSCII column? | SH8608's `10-t1` — see the section above; the C 64 character ROM draws them |
+| **Has a prior printing already set it?** | `grep -rl "<a distinctive caption phrase>" issues/*/*.html` | SH8608's `129-1` — six printings, every one an `<img>`, and the corpus shares 47 PNGs across issues, so a reprint's existing crop is reusable where the two printings are the same picture |
+
+**WHEN YOU REUSE A REPRINT'S CROP, REUSE THE PICTURE AND NOTHING ELSE.** The
+caption is always THIS printing's, read off this issue's own page, and the two
+printings may well differ in it. MEASURED on SH8608/129 against SH8603/76,
+2026-10-17: the picture is identical to the pixel, and the captions are not —
+ours prints *"Taste und <B> erzeugt werden."* where SH8603 prints *"Taste und B
+erzeugt werden."*, and ours ends *"(Bild 1) so aus"* with no full stop where
+SH8603 has *"so aus."* Both were read on both scans and both are PRINT
+differences, left as printed. **Record the provenance** beside the crop in
+`issues/<ID>/reviewed/` — which file it was copied from, and what you checked
+it against — so a later build does not read a borrowed crop as one cut for this
+issue.
+
+**Reverse or graphic PETSCII inside a listing is not by itself a reason to
+crop.** It is a rendering question with three established answers — the
+`{CLR}` / `{4DOWN,2SPACE}` brace names the magazine itself prints, the
+`<u>`/overline convention (8610/80), and a rendered glyph (`40-t1_*`). Reach
+for the camera only when the printed thing is a photograph of a screen or a
+printout that no source reproduces.
+
+MEASURED, 2026-10-17: **three of the rows the owner did not deliver across two
+issues were this same mistake**, and in each case the answer was already in the
+repository — on the disk, in the character ROM, or in a prior issue. None of
+the three was a judgement call; each was one command.
+
+## A TABLE's reverse-character column is RENDERED FROM THE CHARACTER ROM
+
+A key table whose ZEICHEN column shows the reverse PETSCII character for each
+control key is **not** a crop at all, whole or glyph by glyph. **Typeset the
+table, and render each reverse character from the C 64 character ROM.** Owner,
+2026-10-17: *"previously, you used the C64 charset and created the pixel
+characters."*
+
+The corpus precedent is SH8605's Tabelle 1 in *40 Basic-Kurs von Anfang an*:
+the table is an ordinary HTML `<table>` with its FUNKTION / TASTE(N) / ZEICHEN
+/ ASCII columns, and each row's ZEICHEN cell holds one **32×32 bilevel PNG**
+named `<page>-t<n>_<ascii>.png`, alt `reverses Zeichen für CHR$(<ascii>)`.
+36 of them, `issues/SH8605/40-t1_5.png … 40-t1_159.png`, and SH8605's build
+commit `2c7e1db8` records them as *"40 Tabelle 1 with its reverse characters
+rendered from the C 64 character ROM"*.
+
+**Why this is not the glyph-by-glyph crop the section above bans.** That ban is
+about cutting 39 fragments out of a SCANNED listing, where each crop is a
+different piece of one continuous printed image and the result is a mosaic. A
+character rendered from the ROM is not a crop of anything: it is the glyph the
+machine draws, generated once per ASCII code, identical in every issue, and it
+restores a table the reader can actually read instead of a picture of one.
+
+MEASURED on SH8608: the worklist asked the owner for `10-t1`, the whole p14
+table, as one image — *"the ZEICHEN column is reverse PETSCII and cannot be
+typeset"*. It can. It is the same table, in the same Basic-Kurs course, one
+Sonderheft after the one that already rendered it.
+
+## A RECURRING ARTICLE'S FIGURES FOLLOW ITS OTHER PRINTINGS
+
+The magazine reprints a handful of boilerplate articles almost unchanged —
+*Wie unsere Basic-Programme einzugeben sind*, the Checksummer, the disk notes.
+**Before putting a figure from one of them on the worklist, look at how the
+other printings set it.** They are the same article and they settle the
+question without asking anyone.
+
+**This is r330's reprint comparison used at worklist time rather than at the
+end.** If the article is a reprint, its figure decisions are already made; the
+only question is whether THIS printing differs, and that is a diff, not a
+judgement. A worklist row for a recurring article that cites no other printing
+has not been checked.
+
+**AND NEITHER HAS A RULING ABOUT ONE.** MEASURED on SH8608's `129-1`,
+2026-10-17: this section first said *"the other copies set it as a listing, so
+this one is a listing too"* — written from the owner's *"consistent with all
+other copies of this article, the one 'image' is a listing"* without counting
+the copies. **There are six prior printings of the Checksummer and every one of
+them sets Bild 1 as an `<img>` crop:**
+
+| printing | file |
+|---|---|
+| `8508/53 Checksummer 64 – Neu` | `53-1.png` |
+| `SH8503/6`, `SH8505/6`, `SH8507/6 Checksummer 64 … Neu` | `6-1.png` |
+| `SH8506/16 Checksummer 64 — Neu` | `16-1.png` |
+| `SH8603/76 Checksummer 20 V3` | `76-1.png` |
+
+One command settles it, and it is the command this very section asks for:
+
+```bash
+grep -rl "So könnte ein Teil eines Listings" issues/*/*.html
+```
+
+Found by the builder, which had been told to type the listing, counted the
+corpus instead of complying, and held the article out of its commit. **The
+owner's sentence is about the ARTICLE — the one picture in it is a picture of a
+listing — not an instruction to typeset it.** A one-sentence ruling relayed
+without the count behind it is a guess wearing the owner's voice, and it is the
+supervisor's job to do that count before passing the ruling on, not the
+builder's to undo it afterwards.
 ## Two resolution buckets, and which one a figure is in
 
 `tools/convert-scans.sh` states the project's convention for every image file
@@ -526,6 +773,48 @@ Shipping a colour figure at 600 dpi is not a visible defect on the page — it i
 a 3.9 MB download where 209 KB was intended, and nothing in the chain measures
 it. Compare against the analogous figure in the previous issue before
 committing the file.
+
+**AND THE OTHER FACE: A TINTED FIGURE SENT TO THE BILEVEL BUCKET LOSES THE
+TINT — AND THAT IS THE OWNER'S CALL, NOT A DEFECT TO CORRECT.** The paragraph
+above warns only about the harmless direction. The harmful one is a figure
+printed on a coloured or tinted ground that goes to `bw/`: the ground does not
+survive the threshold, and unlike a 3.9 MB download that IS visible on the
+page. But the bucket belongs to whoever cuts the crop.
+
+MEASURED on SH8608, 2026-10-17: three delivered crops dropped their colour —
+`10-1_2` (memory maps on a blue ground, 77 % of the box above chroma 25),
+`10-3` (a green/orange/blue two-level slab, 93 %) and `10-4` (an orange header
+band, 19 %). The worklist had named all three pages as colour. Shown the
+comparison, the owner ruled: **on purpose.** The grey-ground drawings in the
+same delivery (`10-6`, `44-1`, `47-4`, `47-5`, `47-8`) read better as clean
+line art than as screened grey, and nothing is lost.
+
+So: **a worklist note that a page is printed in colour is not a bucket
+assignment.** Say what the page is; do not say which bucket the crop must be
+in. And **never re-render, re-threshold or re-bucket a crop that arrives** —
+that is *owner crop wins* applied to the pixels, not just to the choice of
+image. Report what you measured once, then place what you were given.
+
+### A PRINT DEFECT CAN FLIP POLARITY UNDER BILEVEL
+
+A pale flaw on a tinted ground — a glare band across a photographed printout, a
+fold, a light scuff — is brighter than its surround in the master and darker
+than its surround after thresholding. It changes from a white streak nobody
+notices into a **solid black bar**, which looks exactly like damage the
+conversion caused.
+
+MEASURED on SH8608's `131-1`, 2026-10-17: a black band across the directory
+listing covers part of the `dos 5.1` row and the row below it. It was reported
+as a conversion defect that "eats two rows". **It does not.** The master has a
+pale glare band in the same place that already wipes out the same characters —
+the magazine photographed a printout with a highlight across it, so the loss is
+in the plate and ships either way. Only the colour of the loss changed.
+
+**So before reporting a dark band, bar or blob in a bilevel crop, open the same
+box in the master and say what is there.** If the characters are already gone,
+it is the plate (r000, *WHAT WE PUBLISH IS THE ORIGINAL PRINTING PLATE*) and
+there is nothing to fix. A claim that the conversion destroyed content must
+name the content the master still has.
 
 ## Alt text — describe only what is visible
 

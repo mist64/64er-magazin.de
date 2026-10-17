@@ -77,9 +77,15 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
      whitespace.
    - Drop a trailing `<br>` immediately before `</p>`.
    - Convert prose-looking enumeration to `<ul>` / `<ol>` **only**
-     when the print shows a real bullet glyph or number prefix on
+     when the print shows a **bullet (•)** or a number prefix on
      each item; if the print is just numbered prose ("1. ein,
      2. zwei, 3. drei" running text), leave it as `<p>`/`<br>`.
+     **A printed DASH list is not a bullet list** — it stays
+     `<p>— …</p>` with an em dash. This said "a real bullet glyph",
+     which read literally makes a printed `–` one, and all three of
+     SH8608's agents had to go and find the resolution 250 lines
+     below (*Dash lists stay `<p>— …</p>`*, 8609-8611 and the 8612
+     ruling) before they could act on step 4. It is stated here now.
 5. Beautify touched files (`npx --yes js-beautify --type html
    --indent-size 4 --wrap-line-length 0 --replace`). **Verify
    `<pre>` blocks survived** (js-beautify preserves them by default
@@ -447,8 +453,10 @@ never acceptable.
   see whether they're code, list, or numbered prose; they need not
   all be the same shape.
 - `157 Maintext 64` had a 40-item Funktionsübersicht where the
-  print showed real dash bullets — that's a `<ul>`, not a
-  `&nbsp;`-flattened paragraph.
+  print showed dash bullets. This note used to call that a `<ul>`;
+  under the dash-list ruling above it is `<p>— …</p>` with an em
+  dash. Either way it is not a `&nbsp;`-flattened paragraph — the
+  defect being recorded here was the flattening, not the tag.
 - `36 Modem mit Wählautomatik`'s monitor-patch stanzas read as
   TODO BOX but were really indented monospace — `<pre>` was the
   right shape, not `<aside>`.
@@ -472,7 +480,12 @@ background** or inside a **ruled border** is an `<aside>`:
   always a bordered box, so always an `<aside>`
 
 Shape rules:
-- The aside's heading is an **`<h2>`**.
+- The aside's heading is **one level below the article's highest section
+  heading** — see *An aside's heading is one level below …* above, which is the
+  binding form. This bullet used to read "the aside's heading is an `<h2>`",
+  flatly, which contradicted it; all three SH8608 r190 agents quoted both
+  sentences, and it happened not to matter only because 10, 47 and 94 have
+  `<h2>` sections. The relative rule stands; the absolute one is gone.
 - **An aside need not have a heading at all** — the p146 address block is a
   grey box with no title; wrap it in a bare `<aside>` rather than inventing one
   or tagging it `<p class="source">`.
@@ -526,6 +539,19 @@ Tabelle, its caption already tells the reader which one it is. Where the float
 is mid-article in print and its caption does NOT number it, prefer moving it
 to just BEFORE the closing run rather than after the byline, so it stays
 inside the article's body.
+
+**AND THE CHECK CANNOT EXPRESS "THE PRINTED TEXT ENDS IN A TABLE".** Both this
+rule's check and r310's `<%s> splits the byline from its text` read document
+order only, so an article whose printed text genuinely finishes with a table and
+then its byline is reported as a split. SH8608's 157 Plachetta item is exactly
+that: two tables, then the byline, exactly as p158 sets them. Moving the tables
+would have separated them from the sentence that introduces them — the opposite
+of what the rule is for.
+
+So: **a table (or figure, or `<pre>`) that IS the last printed element before
+the byline stays where it is.** Adjudicate it, citing the page, and record the
+adjudication — the element was never floated in from elsewhere, so there is
+nothing to move.
 
 ## BEFORE RESTORING A "MISSING" PASSAGE, CHECK IT IS NOT ALREADY THERE
 

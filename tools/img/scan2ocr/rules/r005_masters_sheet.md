@@ -94,6 +94,20 @@ Two stronger witnesses, both free:
    any bound-in card sit far from the interior with a clear gap: SH8604 reads
    163 (136), 002 (125), 164-166 (91), 168 (90), 167 (85), then NOTHING until
    p016 at 20.
+
+   **READ THE GAP, NOT THE ABSOLUTE NUMBERS**, because own-white is the sheet's
+   **p90** measured against the pool's **p2** — so the interior baseline is
+   whatever that pair gives on this issue, not zero. On SH8608 (`W 188 169 158`)
+   the 600 dpi interior sits at **60-70**, which makes SH8604's figures above
+   unusable as thresholds.
+
+   **And the gap does not separate a printed-tint back cover from 2400 dpi
+   interior colour.** MEASURED on SH8608: 002 157, 165 136, 166 134 (wrapper and
+   card), then 164 99, 034 95, 025 94, 021 92, **163 87**, 010 80, 004 77,
+   015 77, 001 57 — the back cover leaf 163/164 lands INSIDE the 2400 dpi
+   interior band. No contradiction arose because the owner had answered PAUSE 1,
+   but this witness would not have found it. Where a leaf sits in that band,
+   only the owner's answer places it on the good stock.
 2. **The scan resolution marks COLOUR, not stock.** The owner scans COLOUR
    pages at 2400 dpi and everything else at 600 (owner, 2026-10-06: *"several
    pages were color, for which i was using 2400 dpi. but you dont have to treat
@@ -127,8 +141,31 @@ Two stronger witnesses, both free:
    lines of p003 — is on a **600 dpi** page too, while all six of its 2400 dpi
    interior pages are real plate colour and none is a marking. So a marking is
    not a 2400 dpi phenomenon and the dpi witness will never point at one. Sweep
-   for colour and for markings over EVERY page, independent of dpi (r006 has
-   the measure); read dpi only as "the owner saw something here".
+   for colour and for markings over EVERY page, independent of dpi; read dpi
+   only as "the owner saw something here".
+
+   **BEFORE PAUSE 1 THAT CENSUS RUNS ON THE THUMBS.** This used to say "r006
+   has the measure" and stop, but r006's measure opens `masters600` and no
+   master exists yet — the census is wanted before PAUSE 1, because a marking
+   goes to the owner with the PAUSE 1 evidence. On the 150 dpi thumbs, cropped
+   3-93 % x 4-96 % to stay off the bed and the prop: the fraction of pixels
+   with chroma `max-min > 80`, then an OVERLAY montage of every page above
+   0.015 %, attributing each hit PLATE / HAND / FOXING by eye. **A number
+   cannot tell a highlighter from a logo** — SH8608's p003 marking scores
+   0.80 % and its p162 rainbow logo 0.74 %. The overlay can.
+
+   MEASURED on SH8606: chroma > 80 is 0.000 % on all 176 interior pages and
+   4.7-19.1 % on the four wrapper pages; the chroma >= 60 tail (0.2-0.38 % on
+   006, 009, 020, 022, 023, 120) is frame border plus halftone fringing in
+   p009's dithered title art. No hand marking.
+
+   **And know what this measure misses**, or it becomes another claim about a
+   set nobody scoped: chroma > 80 finds saturated ink and saturated MARKINGS.
+   It misses a pale printed tint — SH8608 p019's blue is chroma ~40 — and the
+   bed at the frame edge fools it, which is where p162's 0.74 % came from.
+   r006's classifier, on the A4 page with the edge band guarded, is the second
+   pass and decides COLOUR. A **dark** hand mark neither of them finds: see
+   r006, *AND A COLOUR CENSUS CANNOT FIND A DARK MARKING AT ALL*.
 
    **Read the dpi from the PNG header, not from `identify`.** These scans carry
    `pHYs` in pixels per METRE, and `identify -format '%x'` converts to pixels
@@ -308,9 +345,22 @@ trace to 209.2 × 296.9 mm (p050). Derive that issue's thumbs at
 ```bash
 cd tools/img/scan2ocr/rules
 PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare "$PY"
-$PY r005_field.py                    # ONCE, first
-$PY r005_masters_sheet.py            # every page
+$PY r005_field.py                    # ONCE, first after PAUSE 1
 $PY r005_masters_sheet.py 6 41 56 92 # named pages
+
+# EVERY PAGE -- AND FAN IT OUT, because the program has no pool of its own.
+# `r005_masters_sheet.py` with no arguments is ONE serial process (no `lanes(`,
+# no pool), while r000 requires every step that fans out over pages locally to
+# size its lanes and forbids hardcoding a number.  Page order below is plain
+# ascending, which is fine; on an issue with many 2400 dpi pages, feed THOSE
+# first instead (19 GB is their peak, a 600 dpi page needs far less, so the big
+# ones running early keeps the tail short).  Their list comes from the pHYs
+# walk in witness 2 -- not from `identify -format '%x'`, which reports
+# pixels per CENTIMETRE.
+seq 1 "$($PY -c 'import r000_issue; from r000_issue import ISSUE
+print(r000_issue.load(ISSUE).pages)')" \
+  | OMP_NUM_THREADS=1 xargs -P "$($PY -c 'import r000_issue
+print(r000_issue.lanes(19))')" -n 1 $PY r005_masters_sheet.py
 ```
 
 **`$PY` is that line, in every fence in this file.** It is spelled relative to
@@ -362,8 +412,10 @@ descriptor. Page
 numbers are positional purely so the work can be split across processes, exactly
 as in `r010`.
 
-~45 s per page; ~2 h for 152 pages. Deterministic and local — no model is
-called.
+~45 s per page SERIAL, so ~2 h for 152 pages that way; on `lanes(19)` — 9 on
+this box — it is a fraction of that. Deterministic and local: no model is
+called, which is why fanning it out is free of the concurrency limits that
+constrain the model-calling steps.
 
 **After any change to this step, wipe `<tmp>/masters600` and start again from
 page 1.** `r010`'s block ids and `r020`'s cache are keyed on the masters, and a
@@ -1150,12 +1202,50 @@ one line per class saying so and every stamp of every page of that class reads
 things — see *The first action* — and "nobody has measured this stock's field
 yet" is not one of them.
 
+## MEASURE THE LEVEL LINES AT THE THREE-PAGE GATE, NOT AFTER THE SWEEP
+
+*"The levels stay the identity because nobody has measured that stock"* says
+what the default is, not WHEN the measurement falls due. It falls due at the
+gate pages, before the full sweep — because the symptom appears at
+Verification 6, by which time the sweep has already run.
+
+MEASURED on SH8606: identity levels were shipped as every sister issue does,
+the 17-minute sweep ran, and the paper graded to **236-248 instead of 255** on
+every window. The cause was bare-paper ink p99 of 11/11/13/7 %, leaving 4-7
+levels of headroom, so the paper could not clamp. Cost: about an hour, five
+measurement scripts, and a SECOND full sweep plus 005b and 010 again.
+
+So, at the gate:
+
+> After the three gate pages are rendered, measure the **p99 of C/M/Y/K over
+> three bare-paper patches** of their `cmyk2400/NNN.tif`. If any ink's p99 is
+> above ~5 %, the paper will not clamp: set that ink's level low point to its
+> p99 and re-render the gate pages. Then check the paper p50 reaches 255 **and**
+> that the glyph p50 stays inside the sister issues' range — SH8606 went 27-33
+> before, 38-43 after.
+
+**And a W percentile does not fix grey paper.** The W section below is long and
+the levels sentence is one line, which is why SH8606 reached for W first. A W
+whose joint clamp is already ~97 % has nothing left to give; the levels are the
+knob.
+
 ## The stamp — every artefact says which grade made it
 
 A finished master used to carry no record of the numbers that produced it, and
 this issue paid for that: `colors.txt` was re-measured, the four masters
 standing in `masters600/` were now stale, and it took a **human eye noticing
 yellow corners** to find out. Nothing mechanical could have.
+
+**A FIX'S BLAST RADIUS IS A PAPER CLASS, NOT AN ARTEFACT.** When a grade
+changes, name the class that changed and check the artefact you are worried
+about is IN it — `grep paper-class <tmp>/masters600/NNN.stamp.txt` — before
+telling anyone it is stale. A profile edit to `colors.txt` touches the **`low`**
+class only; the wrapper and any bound-in card are `high`, graded with the
+built-in anchors and identity levels, and nothing in LC/LM/LY/LK reaches them.
+MEASURED on SH8606: the re-sweep rewrote the cover with identical pixels
+(`paper-class high`, `grade-sha cec3ff863b36`) and the owner was nearly asked to
+re-crop a title page for nothing. See r000, *A CLAIM ABOUT A SET MUST STATE
+WHICH MEMBERS IT COUNTED*.
 
 So everything this step writes carries the grade's fingerprint — the 8 anchors,
 the 4 level lines, and a 12-hex `grade-sha` over exactly those — plus
@@ -1426,6 +1516,18 @@ PY
 
 # 3. RESIDUAL SKEW of the published masters is ~0 -- re-measured, not trusted.
 #    This is the check the rotation-sign trap defeats when it is skipped.
+#
+#    AND IT READS THE GRADED MASTER, SO A CHANGE OF GRADE READS AS A ROTATION.
+#    The STEP measures skew on the raw levelled sheet and asserts the residual
+#    there; this re-measures on masters600, where contrast changes the
+#    projection profile.  MEASURED on SH8606 p147: +0.00 deg after the first
+#    sweep, +0.22 deg after the second -- same scan, same traced edges
+#    (L +0.00 R -0.21 T +0.02 B -0.24), same page size, same step log line
+#    `skew +0.00 -> +0.00`; the only change between passes was the level lines.
+#    004/072/115 at +-0.12 deg are the same effect, smaller.
+#    So a non-zero reading here means "read the step's own `skew a -> b` line
+#    for this page", not "the page is tilted".  Compare the two before calling
+#    a page tilted.
 $PY - <<'PY'
 import numpy as np, os
 from PIL import Image
@@ -1581,6 +1683,18 @@ PY
 #     current one for that page's paper class -- or the IDENTITY digest, which
 #     is what a page whose traced box the field could not be anchored on must
 #     carry.  A string comparison, like check 5, and for the same reason.
+#
+#     AT THE FIELD WINDOW'S BOUNDARY, TRUST THE STAMP'S OWN `field` LINE OVER
+#     THIS RE-DERIVATION.  The step tests the UNROUNDED page size; the stamp
+#     prints it rounded, and re-deriving field_box_ok() from the rounded number
+#     can disagree.  MEASURED on SH8606 p168: the stamp says `page-size
+#     209.3 x 301.0 mm` and `FIELD not applied: 301.0 mm is outside the
+#     205-212 x 293-301 mm` -- the real height is a hair over 301 -- while this
+#     check read 301.0 as anchored and asserted the master was STALE.  It was
+#     not; the step's own decision is in the stamp.  Where the page size is
+#     within 0.05 mm of a FIELD_PAGE_MM bound, the stamp's "NOT APPLIED" wins.
+#     (Same family as check 3: a check that reads a different artefact from the
+#     step it checks.)
 $PY - <<'PY'
 import hashlib, os, re
 import r005_masters_sheet as R

@@ -422,8 +422,19 @@ with the edge band guarded, to decide COLOUR; and use your eyes for a hand.
 2026-10-08: *"if you encounter notes or markings that survive into the PDF, flag
 this for me — i need to patch the input master file."* `FORCE_BILEVEL` only
 stops the page being rastered as colour; the stroke is still there, in grey. Do
-NOT retouch it here. Report the page, what the mark is and where, and leave the
-pixels alone: the repair is a new scan.
+NOT retouch it here, and leave the pixels alone whatever the answer turns out
+to be.
+
+**Flagging is not the same as removing: see r000, the three outcomes.** The
+owner may rule the mark **dirt**, **a previous hand** — both of which they
+repaint in the master — or **the plate**, in which case it STAYS, because a
+printing fault is what the magazine printed. On SH8608, p37 and p121 were dirt
+and p104 was ruled a plate problem and kept.
+
+**Hand over a crop, not a description.** Given page, mark and position for all
+three, the owner checked all three pages and found none of them; they are
+1.0 x 1.7 mm to 2.2 x 2.8 mm. What settled it was a montage — colour scan
+beside the same spot in the delivered PDF, same scale, size in mm.
 
 That one page is **p032**, and it is why this check exists. The largest-blob
 measure cannot see it: its colour survives the 3x3 opening as 55 crumbs whose
@@ -603,6 +614,79 @@ call. The five issues this chain has shipped under Otsu are SH8601, 8609,
 8610, 8611 and 8612. The ~100–104 MB `ccitt`+`jpeg` files are inherited scans
 and were never thresholded here at all.
 
+### 35 % IS AN ASYMMETRY ARGUMENT, NOT AN OPTIMUM — the real fix is per-region
+
+Be clear about what the fixed cutoff buys, because the tone-optimal value is
+**not** 35 %. MEASURED on both 1986 Sonderhefte, sweeping the cutoff and
+scoring how close each bilevel page's ink coverage lands to its contone
+reference: **40 % wins on tone** — SH8606 by 1.65 points, SH8608 by 2.41.
+
+35 % ships anyway, and the reason is that the two errors are not
+interchangeable:
+
+- a **flooded flat tint panel** is unrecoverable — ground and type go solid
+  black together and nothing in the file distinguishes them afterwards;
+- an **under-inked halftone** is still legible — the dots thin, the picture
+  stays a picture.
+
+And the tiles 40 % costs are overwhelmingly the first kind. Of the tiles that
+newly flood at 40 % but not at 35 %, split by tile standard deviation
+(`<= 45` a flat panel, `> 45` a photo's shadow):
+
+| | tiles newly flooding at 40 % | FLAT TINT | HALFTONE |
+|---|---|---|---|
+| SH8606 | 717 | **524 (73.1 %)** | 193 (26.9 %) |
+| SH8608 | 1355 | **1116 (82.4 %)** | 239 (17.6 %) |
+
+So 40 % buys tone and pays in panels, three to four times over. **Keep 35 %.**
+
+**The actual fix is a per-region threshold** — one cutoff for the flat-tint
+panels and another for the halftones, chosen per region rather than per page,
+since Otsu run on halftone pixels ALONE lands at 42-50 % while a flat panel
+needs the cutoff below its ground. That is deferred, not rejected: a single
+global number cannot serve both populations, and no amount of tuning it will
+change that. Recorded here so the next person does not re-derive the sweep and
+"discover" 40 %.
+
+### THE REGRESSION GUARD: NO LIGHT PANEL MAY FALL BELOW THE CUTOFF
+
+At a fixed 35 % this failure mode is **structurally impossible**, and that is
+worth stating plainly: anything whose ground is below 89/255 is genuinely
+darker than a third of white, so rendering it black is defensible. The SH8606
+incident happened because **Otsu chose up to 175** per page, which is above the
+ground of an ordinary light tint.
+
+So the check is not "does anything flood" — at 35 % the honest answer is yes,
+and all of it legitimately. The check is **"is the cutoff still below every
+page's light panels"**:
+
+> Over the **bilevel pages only**, tile the page at 64 px and take each tile's
+> **90th percentile** as its ground — the paper or tint BEHIND the type. A tile
+> whose ground is in **[120, 235)** and whose standard deviation is **<= 45** is
+> a light flat panel. **No such tile's ground may be below the cutoff.**
+
+At 35 % that set is empty by construction (120 > 89) and the check is silent.
+Under Otsu it fires: **32 of SH8606's 181 pages** had at least 1 % of their
+area flooding, p033 at 27.3 %, p180 at 7.8 %, p002 at 6.8 %.
+
+**Two scoping rules, both learned the hard way, both mine:**
+
+- **Only the pages the setting applies to.** A contone page is never
+  thresholded and cannot flood. Get the list from the built PDF —
+  `pdfimages -list "$PDF" | awk 'NR>2{print $1, $9}'` — not by guessing:
+  SH8606's contone set is 1, 2, 179, 180 and SH8608's is seventeen pages. A
+  first version of this census counted the contone wrapper pages and turned 24
+  of 176 into 32 of 181.
+- **Flat panel is not halftone.** Without the std split, the census reports a
+  photograph's shadow as a lost panel, and r006 has already said no single
+  cutoff saves a halftone.
+
+Drafting this check WITHOUT those two rules produced **1529 "findings" on
+SH8606 at the shipping threshold** — a gate that always reports, which is the
+exact defect this chain spent a harvest removing. It was the third time in one
+build that a census of mine failed to say which members of the set it counted
+(r000, *A CLAIM ABOUT A SET MUST STATE WHICH MEMBERS IT COUNTED*).
+
 ### Three smaller things from the same review
 
 - **The PDF tag is zero-padded**: `Sonderheft 03/86`, not `3/86`.
@@ -641,9 +725,19 @@ need to patch the input master file."* So before handing the PDF over, look at
 every page the colour cross-check put in the first direction (a marking is why
 some of them are at 2400 dpi) and every page whose stamp or log mentions a
 mark, and list what you found: page, what the mark is, where on the page.
-**Flag it; do not retouch it.** The repair is a new scan, which is the owner's
-to make — see r000, *WHAT WE PUBLISH IS THE ORIGINAL PRINTING PLATE, NOT THIS
-COPY*. That list goes in the handover message, not only into LOG.md.
+**Flag it; do not retouch it.** The repair, if there is one, is a new scan and
+the owner's to make — see r000, *WHAT WE PUBLISH IS THE ORIGINAL PRINTING
+PLATE, NOT THIS COPY*, which also carries the three possible verdicts: dirt, a
+previous hand, or the plate itself. Only the first two get repainted.
+
+**The list goes in the handover message with a CROP of each mark**, not as
+prose — and the owner's verdict then goes into
+`issues/<ID>/reviewed/marks.txt`, which is committed. Not LOG.md: nothing
+un-ignores it, so no issue here has a tracked one and it does not survive a
+clone (r000, *AND RECORD THE VERDICT WHERE THE NEXT BUILD WILL READ IT*). Montage it: the colour scan beside the same spot
+in the delivered PDF, at the same magnification, with each mark's size in mm.
+A list of page numbers and descriptions was tried on SH8608 and the owner could
+not find a single one of the three on the page.
 
 ### The reasoning, kept — why a review set has to show both paths
 

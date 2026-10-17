@@ -45,8 +45,24 @@ def main(issue_dir, ocr):
     for f in glob.glob(issue_dir + '/*.html'):
         for p in pages_of(f): p2a.setdefault(p, []).append(f)
     bad = []
+    # A DIRECTORY WITH NO labels.json IS NOT A CLEAN RUN -- it is no run.
+    # MEASURED 2026-10-17: SH8608 pointed this at <tmp>/ocr when the build's
+    # output is <tmp>/ocr/out. The glob matched nothing, the loop never ran,
+    # and this printed "dropped listing blocks: 0 ... 0" and exited 0. The
+    # builder reported a clean gate that had looked at nothing, and found out
+    # only because the sibling r320_coverage_check.py refused the same path
+    # with exit 2. Refuse it here too, and in the same words.
+    label_files = sorted(glob.glob(f'{ocr}/*.labels.json'))
+    if not label_files:
+        print(f'CANNOT RUN: no <page>.labels.json under {ocr}')
+        print('  This check reads the OCR intermediates to find listing blocks')
+        print('  that classification dropped. Point it at the build\'s OCR out')
+        print('  directory (usually <tmp>/ocr/out, NOT <tmp>/ocr), or rebuild')
+        print('  them if <tmp> has been swept.')
+        return 2
+
     dropped = checkable = 0        # so "0 findings" can be told from "0 looked at"
-    for lf in sorted(glob.glob(f'{ocr}/*.labels.json')):
+    for lf in label_files:
         p = int(os.path.basename(lf)[:3])
         lab = json.load(open(lf))
         order = {str(i) for i in lab.get('order', [])}

@@ -134,8 +134,23 @@ The sub-agent must:
      masthead does not carry.** MEASURED: 8612's Impressum has 14
      `xx = Name` keys; SH8602's and SH8603's have **0**, so every
      initial comes back UNDEFINED and the check reports the whole
-     set. For a Sonderheft, resolve against the nearest MONTHLY
-     Impressum instead, and say in LOG.md which issue was used.
+     set. **READ THIS ISSUE'S OWN IMPRESSUM FIRST, IN EITHER FORM**, and only
+     fall back to the nearest monthly if it has none. The claim that no
+     Sonderheft carries the key was measured on the `xx = Name` spelling only:
+     SH8608's Impressum lists `Achim Hübner (ah), Karsten Schramm (ks), …` —
+     the key, in `Name (xx)` form — which the `\b[a-z]{2} = [A-ZÄÖÜ]` grep
+     cannot see. So grep for both:
+
+     ```bash
+     grep -oE '\b[a-z]{2} = [A-ZÄÖÜ][a-zäöüß]+|[A-ZÄÖÜ][a-zäöüß]+ \([a-z]{2}\)' \
+       "issues/<ID>/<NNN> Impressum.html"
+     ```
+
+     Say in LOG.md which issue's Impressum was used. **And split every slash
+     token, not only the last** — the SILENT/UNDEFINED one-liner kept the last
+     one, so `Name/tr/bj` read as SILENT. For a Sonderheft `<PREV_DIR>` is the
+     previous SONDERHEFT, and recurring rubrics match by `64er.id`, not by
+     title.
 4. Sweep `grep -E '<p>\(([a-z]+|[A-Z][a-zA-Z]+)' issues/<YYMM>/*.html`
    for surviving `(byline)` paragraphs. If real bylines (not
    formula connectives like `(und)`, `(oder)`), convert to

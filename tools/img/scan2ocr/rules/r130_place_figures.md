@@ -169,6 +169,19 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
   magazine never set. Read the printed dump's shape before choosing, and where
   it is not MSE, the `<pre>` carries the dump as printed and the download
   carries the file.
+- **A printed TEDMON dump that HAS a disk file is built at 130 FROM the file,
+  and checked row by row against the print.** The rule said the `<pre>`
+  "carries the dump as printed" without saying who produces it (130 or 170) or
+  what becomes of TEDMON's trailing `:`+reverse-video ASCII column. Both of
+  SH8608's 130 agents independently generated the `<pre>` from the disk, checked
+  it against the print, and dropped that column — as SH8603/165 had already
+  done. So that is the convention: **generate from the file, verify every
+  printed row, drop the ASCII column** (unreadable in a scan and derivable from
+  the bytes), and treat any **differing byte as a print/disk difference** for
+  r300 to dispose of. MEASURED on SH8608's 120 Listing 2: eight of ten printed
+  rows carry the NEXT row's address in their first two data bytes — the address
+  column bled into the data column — while the disk holds a coherent 8x8
+  character set. That is a print error, left as printed with a German comment.
 - **Where this rule and r170 both touch a caption, r170 wins on page
   pointers.** This rule says captions are verbatim; r170 says drop a standalone
   "… auf Seite N" pointer. The same printed caption can be both ("Bitte

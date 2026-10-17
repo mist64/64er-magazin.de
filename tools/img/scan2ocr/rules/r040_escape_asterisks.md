@@ -28,7 +28,25 @@ BASIC or monitor listing line are two literals, and they pair with each other:
 Both were kept as bold delimiters, so 060 would have wrapped listing text in
 `<strong>`. **Test the line, not the run:** it is a listing line if it begins
 with a line number, or carries `PRINT` / `REM` / `POKE` / `SYS` / `DATA` or a
-checksum `<NNN>` token. In a listing line, escape both.
+checksum `<NNN>` token, **or the run sits in a BANNER line** — a line that is
+nothing but runs of `*`, `%`, `#` or `;` around at most four words in capitals,
+which is how a listing marks its sections. In a listing line, escape both.
+
+**`r040_escape_asterisks.sh` does not implement this test.** It pairs `**`
+within a line and has no notion of a listing line at all, so on SH8608 two
+literal pairs survived its run *and its own summary* (`**bold** pairs=0` — the
+pair regex cannot span the `\*` between them). Only the rule's per-line `**`
+readout found them:
+
+- l.4383 `100 REM \*%** DATEN SCHREIBEN \*%**` — a line number AND `REM`, so
+  the rule said escape and the script did not;
+- l.4687 `**%\* STRING EINLESEN %%**` — an assembler section banner just before
+  its fenced listing: no line number, no BASIC keyword, so even the rule's test
+  missed it. That is the case the banner clause above adds.
+
+Both were escaped by hand from the orchestrator. Until the script implements
+the test, **read the per-line `**` output yourself** — the script's `pairs=0`
+is not evidence.
 
 That covers:
 - `*` (one) → `\*` (BASIC multiply, wildcard, literal star)

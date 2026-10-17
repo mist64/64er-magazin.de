@@ -178,6 +178,14 @@ PY
 #    "ERROR: category not in toc.txt:" lines appear.
 ```
 
+## A SONDERHEFT WITH NO PRINTED RUBRIKEN BOX STILL LISTS `Rubriken`
+
+"Record both" did not say what happens to `Rubriken` on a Sonderheft that
+prints no Rubriken box. MEASURED over the corpus: **`toc.txt` carries
+`Rubriken` last** (SH8602-SH8605, and SH8608 followed them), because the
+Impressum needs a category; **`toc_entries.txt` gets no line for it**, because
+nothing is printed. SH8608's agent had to derive that from the sister issues.
+
 ## Lessons
 
 - The first three sub-categories under a parent in the printed TOC are

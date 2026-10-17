@@ -402,6 +402,15 @@ for c in chunks:
     files = re.findall(r'data-filename="([^"]+)"', c)
     if not files:
         continue
+    # A SECTION'S PAGE IS ITS LAST *NUMBERED* SEPARATOR; AN ALL-DASH BAR IS A
+    # FRAME, NOT A SECTION.  SH08.D64 frames every section as
+    # `****` / `---c16-NN` / `-- name --` / `----------------`, and the closing
+    # all-dash bar matches the split pattern too -- so 3b reported
+    # "SEPARATOR CARRIES NO PAGE NUMBER" for 9 of SH8608's sections and its
+    # whole mapping was unusable until the agent re-keyed on the last numbered
+    # separator by hand.
+    if sep and not re.search(r"-+\d+", sep):
+        continue                      # a frame bar: not a section boundary
     m = re.search(r"-+(\d+)", sep or "")
     pg = int(m.group(1)) if m else None
     art = pages.get(pg)
@@ -427,21 +436,57 @@ PYEOF2
 #    It re-implements nothing: the address/version/petcat call is
 #    generate.py's petcat2prg (generate.py:59-94), so a pass here is a
 #    pass on the site.
+#
+#    THREE OUTCOMES, NOT TWO.  This counted every .txt without a .prg as a
+#    round-trip FAILURE, and a listing with no disk file is the normal case --
+#    it was transcribed from print at r170, so there is nothing to round-trip
+#    against.  MEASURED: 9 of SH8608's 48 listings and 1 of SH8606's 37.
+#    Counting them turned a 3-item triage list into 12 and a 1-item one into 3.
+#
+#    AND A DELIBERATELY PATCHED .txt CANNOT ROUND-TRIP, BY DESIGN.  r300 case
+#    (b) patches the listing to the erratum and keeps the original commented
+#    out, so the .txt no longer re-tokenises to the disk .prg it came from.
+#    MEASURED on SH8606 `cad.hard.mps802.txt`: patched at lines 1040 and 1070
+#    (`,2` -> `,1`), it mismatches at IDENTICAL length -- 2845 vs 2845 bytes --
+#    which is the signature of a one-character edit and exactly what a
+#    correct r300 patch looks like.  The marker is the file's own
+#    `;vor Fehlerteufelchen` / `;inkl. Fehlerteufelchen` header, so honour it:
+#    an EXPECTED mismatch is reported and not counted.
+#    AND THE DISK FILE'S TAIL IS NOT PART OF THE PROGRAM.  A .prg read off a
+#    D64 can carry bytes past the BASIC end-of-program marker, so comparing
+#    whole files fails on a correct listing.  MEASURED: all five remaining
+#    "failures" across SH8606 and SH8608 were this -- first difference exactly
+#    at len(got), program identical, disk file 1-3 bytes longer.  Compare the
+#    program, i.e. `want[:len(got)] == got`.
+#
+#    Anything left is a real triage list -- a decoded text that no longer
+#    re-tokenises means the reader's download is wrong bytes.
 dir=issues/<YYMM>
 $PY - "$dir" <<'PY'
 import os, re, subprocess, sys
 d = os.path.join(sys.argv[1], "prg")
-bad = 0
+bad = nodisk = expected = 0
 for f in sorted(os.listdir(d)):
     if not f.endswith(".txt"):
         continue
-    listing = open(os.path.join(d, f), encoding="utf-8", errors="replace").read()
+    # LATIN-1, EXACTLY AS generate.py:petcat2prg DOES -- "so a pass here is a
+    # pass on the site".  Read as UTF-8 with errors="replace", a raw byte >= $80
+    # becomes U+FFFD and .encode() emits three UTF-8 bytes, so a .txt carrying
+    # the very fix this rule prescribes (`der kl. hobbit`'s $A0 after REM) could
+    # not pass check 4 at all.  The check contradicted the remediation beside it
+    # (SH8606; same result there either way, because apfel_bas's $CD is
+    # expressible in petcat's own text convention -- which is why it went
+    # unnoticed).
+    listing = open(os.path.join(d, f), encoding="latin-1").read()
     m = re.findall(r"^;.*==([0-9A-Fa-f]{4})==", listing, re.M)   # the opener
     addr = m[0] if m else "0801"
     v = re.search(r"^;version=(.*)$", listing, re.M)             # optional tag
     v = v.group(1) if v else "2"
     got = subprocess.run(["petcat", f"-w{v}", "-l", addr, f"-{v}"],
-                         input=listing.encode(), capture_output=True).stdout
+                         input=listing.encode("latin-1"),
+                         capture_output=True).stdout
+    # an r300 patch is a deliberate divergence from the disk file
+    patched = re.search(r"^;(vor|inkl\.) Fehlerteufelchen", listing, re.M)
     stem = f[:-4]
     for cand in (os.path.join(d, stem + ".prg"),
                  os.path.join(d, "del", stem + ".prg")):
@@ -449,13 +494,35 @@ for f in sorted(os.listdir(d)):
             want = open(cand, "rb").read()
             break
     else:
-        print(f"  NO .prg   {f}"); bad += 1; continue
+        # NOT A FAILURE: a listing transcribed from print at r170 has no disk
+        # file to round-trip against.  9 of SH8608's 48, 1 of SH8606's 37.
+        print(f"  no disk file (print-only)  {f}")
+        nodisk += 1
+        continue
     if got == want:
         print(f"  ok  v{v:<6} {f}")
+    elif want[:len(got)] == got:
+        # THE DISK FILE'S TAIL IS NOT PART OF THE PROGRAM.  A .prg read off a
+        # D64 can carry a few bytes past the BASIC end-of-program marker --
+        # leftover sector content -- and comparing whole files called that a
+        # round-trip failure.  MEASURED: every one of the five "failures" on
+        # SH8606 and SH8608 had its first difference AT len(got), i.e. the
+        # program re-tokenised byte-identically and the disk file was 1-3 bytes
+        # longer (`checksummer` +3 `00 00 65`, `versuchskaninch.` +1 `00`).
+        print(f"  ok  v{v:<6} {f}  (disk file has "
+              f"{len(want) - len(got)} trailing byte(s) past the program end)")
+    elif patched:
+        # EXPECTED: r300 case (b) patched this listing away from the disk.
+        print(f"  expected mismatch (r300 patch: {patched.group(0).strip()}) "
+              f"v{v:<6} {f}: {len(got)} vs {len(want)} bytes")
+        expected += 1
     else:
         print(f"  MISMATCH v{v:<6} {f}: {len(got)} vs {len(want)} bytes")
         bad += 1
-print("round-trip failures:", bad)
+print(f"round-trip failures: {bad}   "
+      f"(print-only, no disk file: {nodisk}; expected r300 patches: {expected})")
+assert not bad, f"{bad} listing(s) no longer re-tokenise to their disk .prg"
+
 PY
 ```
 
@@ -511,9 +578,19 @@ bytes is a defect until it is dispositioned in `LOG.md`.
 8610 finishes at **4 mismatches, all of them cases 2 and 3**, and that is the
 state a finished issue is allowed to be in.
 
-## Four cases the extractor does not route correctly
+## Five cases the extractor does not route correctly
 
-Each of these was found on 8612 and fixed by hand; none is in the script.
+Four were found on 8612 and one on SH8608; each was fixed by hand, none is in
+the script.
+
+- **Machine code at a `…01` load address with NO BASIC stub.** SH8608's article
+  87 has four TEDMON monitor listings loading at **$1001** (the C 16 BASIC
+  start), so the extractor took them for BASIC and `petcat` produced garbage.
+  A VC 20 equivalent sits at $1201. Promote them to `.prg`; **how to DISPLAY
+  one is 130's decision, read from the print**, and r170's table already says a
+  monitor dump is shown as printed rather than as MSE. The fix arrived on
+  SH8608 only by way of check 4 case 2 → Remediation, whose display choices
+  (Hypra-Ass / MSE) do not fit a monitor listing at all.
 
 - **BASIC at a load address not ending in `01`.** `find c128` loads at $242B.
   The extractor routes it to the PRG branch and `petcat` produces garbage.

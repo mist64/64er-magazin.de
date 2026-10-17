@@ -10,6 +10,37 @@ drift from. The harvest itself is recorded in
 `tools/img/scan2ocr/rules/HARVEST.md`, which says what was decided and where it
 landed, and the commits carry the detail.
 
+### A HARVEST EMPTIES THE FILE. IT DOES NOT CLOSE IT.
+
+**"Never earlier" is the intent, and it was broken.** On 2026-10-16 the
+supervisor harvested SH8606's and SH8608's errata while both builds were still
+running — 60 entries, 10 commits — and deleted both files, because the two
+issues were stalled on the owner's crops and the rules could be improved while
+they waited. That is a legitimate thing to do and this section now admits it.
+What it must not do is leave the build with nowhere to write.
+
+**So: the moment a file is harvested mid-build, open a new empty one in the
+same commit**, with a first line naming the harvest it follows:
+
+```markdown
+# WORKFLOW_ERRATA — <ID>, reopened after the harvest of <date>
+```
+
+The build is not over, so the errata are not over. Everything after that point
+goes in the new file and is harvested when the issue is actually complete.
+
+MEASURED on SH8608, 2026-10-17: the harvest's hand-back said *"open a fresh one
+if you start another build"*, which the builder read as **another issue**. It
+was not wrong to read it that way — "another build" is ambiguous exactly where
+it needed not to be — so **nothing was open while step 150 ran**, the step that
+placed 47 crops, typeset a table and produced two findings worth keeping. They
+were recovered only because the supervisor asked what the file contained. A day
+of a build ran with its own instrumentation switched off.
+
+**And the reopening is the harvester's job, not the builder's.** Whoever
+deletes the file creates its replacement in the same commit. A builder cannot
+be expected to notice that an artefact it did not delete is missing.
+
 Owner, 2026-10-04: "we also collect. we apply the errata at the END" and "when
 applied, delete all errata md files".
 
@@ -116,11 +147,42 @@ test -s "issues/$ID/WORKFLOW_ERRATA.md" || echo "FAIL: missing or empty"
 # 2. It was written DURING the build, not after it. Its first commit must not be
 #    the last commit of the issue -- a file whose only commit is the final one
 #    was written from memory, which this rule exists to prevent.
-first=$(git log --diff-filter=A --format=%H -- "issues/$ID/WORKFLOW_ERRATA.md" | tail -1)
+#
+#    AFTER A MID-BUILD HARVEST, TAKE THE NEWEST ADD, NOT THE OLDEST. `tail -1`
+#    reaches past the reopened file to the deleted one, so the check passes on
+#    the strength of a file that is no longer there and says nothing about the
+#    one you are signing off. MEASURED on SH8608, 2026-10-17: tail -1 returned
+#    the first file's add while the live file had been reopened at eb5de625.
+#    Both happened to pass; the check was reading the wrong file either way.
+first=$(git log --diff-filter=A --format=%H -- "issues/$ID/WORKFLOW_ERRATA.md" | head -1)
 last=$(git log -1 --format=%H -- "issues/$ID/")
 [ -n "$first" ] && [ "$first" != "$last" ] \
   && echo "OK: first written at $first, before the final commit" \
   || echo "WARN: written in a single commit -- was it kept as you worked?"
+
+# 2b. AFTER A MID-BUILD HARVEST, CHECK 2 IS NOT EVIDENCE EITHER WAY. Say so
+#     rather than reading its verdict. A reopened file is ADDED late by
+#     construction, so:
+#       - with `tail -1` it passed on the DELETED file's history;
+#       - with `head -1` it WARNs until any later commit lands, then passes
+#         for free -- and it passed SH8608's reopened file, whose two entries
+#         were written "the same day but late", i.e. the exact reconstruction
+#         this check exists to catch.
+#     MEASURED 2026-10-17 on both issues. Neither form can see what it is for
+#     once the file has been reopened, so do not claim it as a pass.
+#     INSTEAD, in the sign-off, state two things plainly:
+#       - the reopen commit, and what span of the build the file covers;
+#       - for EACH entry, which of three it is. "Live or reconstructed" was
+#         the first wording and it does not fit: SH8606 answered 2026-10-17
+#         with a category I had not offered, and it is the common one.
+#           LIVE          written within minutes of the confusion
+#           SAME SESSION  written hours later, the same working session,
+#                         sometimes only because someone asked -- still
+#                         first-hand, but the misreading is already repaired
+#                         and that is the part the harvest wants most
+#           LATER         reconstructed on another day, from the commits
+#         A LATER entry is still worth keeping; it is worth less, and the
+#         harvest should know which it is holding.
 
 # 3. Every entry names a step, and the steps named exist.
 #    .md OR .py: not every step is a markdown rule.  r310 exists only as

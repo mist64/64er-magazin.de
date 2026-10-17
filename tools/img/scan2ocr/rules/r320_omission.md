@@ -27,11 +27,25 @@ r030 also already claims a paragraph-accounting check in its own Verification
 block (the model-backed one that was never run), so a second check under the
 same number is ambiguous.
 
-## The gate
+## The gate — BOTH scripts, and the directory is `<tmp>/ocr/out`
 
 ```bash
-tools/img/scan2ocr/rules/r320_coverage_check.py issues/<YYMM> <ocr-out-dir>
+OCR=<tmp>/ocr/out        # NOT <tmp>/ocr -- see below
+tools/img/scan2ocr/rules/r320_coverage_check.py    issues/<YYMM> "$OCR"
+tools/img/scan2ocr/rules/r320_dropped_listings.py  issues/<YYMM> "$OCR"
 ```
+
+**Step 320 is both of these, and this block used to invoke only the first.**
+A builder running "the gate" ran half of it and had to find the other script
+elsewhere and invent its argument. MEASURED on SH8608, 2026-10-17: the
+dropped-listings half was pointed at `<tmp>/ocr`, which holds no
+`labels.json` at all. It printed `dropped listing blocks: 0 … 0` and exited 0,
+and a hollow pass was reported as a clean gate. Found only because the coverage
+half refused the same path with exit 2.
+
+`r320_dropped_listings.py` now refuses it the same way. **Both scripts exit 2
+on a directory with no `labels.json`: 2 means the check did not run, and it is
+not a pass.**
 
 Stage B records which blocks it selected as article content in
 `<page>.labels.json` as `order`. The invariant:

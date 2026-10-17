@@ -75,8 +75,19 @@ Both are the same trap. Both ignore the input's signal in favour of
 a structural-tidiness heuristic. Both have been re-introduced and
 manually reverted multiple times during 8607 work.
 
-❌ **Never run a heading-level audit pass.** "Walk every article and
-re-check the heading hierarchy" is banned as a workflow. Every bulk
+❌ **Never change a heading level by a HEURISTIC** — and that is what the ban
+is about, because this rule then briefs the opposite. Its own briefing says
+"For every article … 1. List heading hierarchy … 2. For each suspicious heading
+… check the print scan", and all of SH8608's agents had to decide which
+sentence won. They read it as "no bulk heuristic", compared each heading
+against the print, and changed nothing. So, exactly:
+
+- **Banned:** promoting or demoting a heading because the hierarchy "looks
+  odd", or because a pass over many articles found a pattern.
+- **Required:** comparing a suspicious heading against the printed page.
+
+"Walk every article and re-check the heading hierarchy" is banned *as a
+heuristic workflow*. Every bulk
 heading-hierarchy "audit" that was attempted during 8607 work
 re-introduced exactly the same wrong promotions and had to be
 manually reverted file by file. Per-article heading-level changes
@@ -203,7 +214,8 @@ banners".
 # The repo venv, not bare python3 (CLAUDE.md): the step modules import
 # numpy, scipy and PIL, which the system python here does not have, so as
 # `python3` this check failed at the import rather than checking anything.
-PY=${PYTHON:-.venv/bin/python}
+PY=${PYTHON:-.venv/bin/python}   # RUN FROM THE REPO ROOT: this path is
+                                 # relative, so it resolves nowhere else
 dir=issues/<YYMM>
 
 # 1. each article has exactly one h1
