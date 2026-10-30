@@ -232,3 +232,15 @@ It is the one defect class that reads as correct. An article missing a
 paragraph, a table, a heading or its last line passes spell-checks, markup
 greps, beautify, tag balance and the build. 8609 shipped with all four before a
 page-by-page read found them, and reading every page by hand does not scale.
+
+## A LISTING BLOCK CAN HIDE PROSE, AND UNACCOUNTED EXCLUDES IT (SH8607)
+
+The UNACCOUNTED half skips `listing-*` blocks, which is right for listings and
+wrong for a block that only *starts* as one. SH8607 p151's "Wichtiger Hinweis
+zum Abtippen" box was OCR'd into the head of a `listing-standalone` block and
+was therefore invisible to 020, 130, 190 and this step alike — the one defect
+class this rule exists to catch, hidden by its own exclusion.
+
+**List any `listing-*` block whose leading lines are prose** (no line number,
+no hex address, sentence punctuation) as `PROSE INSIDE A LISTING BLOCK`, even
+though the block itself is excluded from the count. See r020.

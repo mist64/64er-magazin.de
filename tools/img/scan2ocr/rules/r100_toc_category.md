@@ -326,6 +326,12 @@ PY
       for part in (m.group(1).split(',') if m else []):
           part = part.strip()
           a, _, b = part.partition('-')
+          # A LETTERED PAGE IS A PAGE.  r080 REQUIRES 139a/139b when two
+          # articles start on one page, so `a.isdigit()` alone drops both of
+          # them and this check prints "NO ARTICLE for ... p139" on a correct
+          # issue -- r000, A CHECK THAT CANNOT PASS.  (SH8607, Garbage 64 /
+          # Programmierhilfe.)  r080 check 4 already admits the letter.
+          a = a.rstrip('abcdefghijklmnopqrstuvwxyz') or a
           if a.isdigit():
               claimed.update(range(int(a), int(b or a) + 1))
   for line in io.open(ent, encoding='utf-8'):
@@ -379,3 +385,13 @@ PY
   So at 100, **list** the unused lines and leave them. Prune in the
   end-of-issue pass, when the article set really is final, and re-check that
   every `toc_category` value still resolves.
+
+## TWO SMALLER THINGS FROM SH8607
+
+- **`&` versus "und" in a toc_title is WORDING, not glyph normalisation.** This
+  rule points at r090 for glyph normalisation and leaves the question open.
+  SH8607's p164 article is *Tips & Tricks kunterbunt* where the TOC prints
+  *Tips und Tricks kunterbunt*: the two differ in words, so **set a
+  `toc_title`** rather than normalising one into the other.
+- **Edits made after the script has self-staged are left unstaged (`MM`).**
+  Commit **by pathspec**, or the hand-fixed half of the step never lands.

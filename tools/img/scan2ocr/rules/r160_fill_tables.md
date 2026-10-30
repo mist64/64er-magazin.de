@@ -730,3 +730,24 @@ operator boundary; and tokenise before joining.
 does not begin a new line number, the break is a wrap artefact. It is **wrong
 for unnumbered code** — 146's Tabelle 1 runs statements together with spaces in
 the print itself — so decide on the crop, never on this test alone.
+
+## BOX ANATOMY — four shapes this rule does not name (SH8607)
+
+1. **A box with BOTH a label line of its own and a printed caption.** p128's
+   box carries "Erklärung der benutzten Speicherstellen" above its table and a
+   caption below it; neither "text above its table is a `<p>` inside the
+   `<figure>`" nor "section labels stay as spanning `<th>` rows" fits. **Use a
+   `<th colspan>` first row** for the label and keep the caption as the
+   `<figcaption>`.
+2. **A captionless named box.** The SH860x precedent is
+   `<aside><h2>…</h2><table>` (the MSE-Befehle boxes); this rule never names
+   `<aside>`. **It is the right element** — a named box with no caption is an
+   aside, not a figure.
+3. **"Place after the first paragraph that references the table" has no answer
+   when the table floats.** p100's table sits at a page foot under a running
+   program; p149's floats into another section. **Place it at the nearest
+   point that splits neither a program nor a numbered sequence.** And where
+   OCR glued post-table text into the anchor paragraph (p12, p49), **split at
+   the print position**.
+4. **`tr.separator` is styled for `table.plain` only**, so a ruled table's
+   printed row groups run on with no gap — six of them on p100.

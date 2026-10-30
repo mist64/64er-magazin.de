@@ -2826,3 +2826,43 @@ routine:
 
 The default remains: record the errata state, do not patch. Patch only when the
 user asks for it.
+
+## PAPER: THE LEAF PARTNER SETTLES A DISAGREEMENT BEFORE THE OWNER DOES
+
+The paper section says "ask when the three witnesses disagree". On a build
+that may not ask, that is not an answer — and usually it does not need to be
+one, because r005_sheet witness 1 already says it: **one sheet of paper cannot
+be two stocks.**
+
+**When the witnesses disagree, settle each disputed page against its LEAF
+PARTNER (n/n+1) and record the leaf in LOG.md. Only a disagreement the leaf
+cannot settle — both sides of one sheet in doubt — goes to the owner.**
+
+SH8607: p180 disagreed (2400 dpi, but the edge finder would not offer it and
+its own white sat inside the interior band — a full-bleed printed back cover,
+as SH8608's p163). It is the back of p179, whose own white is 93 off the
+interior: high. Same for p001 via p002. Cost: three minutes of reading.
+
+**And plot own white against page number before reading the furthest-8 list.**
+On an issue that browns toward the back (SH8607: R-B 38 at p003 rising smoothly
+to 68 at p178) that list fills entirely with the last interior pages, at the
+same city-block distance as the bound-in cards. **A second stock is a STEP; a
+smooth ramp to the back is one stock browning.**
+
+## THE END GATE BEFORE `title.png` EXISTS — the scratch-copy recipe
+
+The end gate and r325's Verification 4 run `generate.py` on the real tree,
+which stops on `FileNotFoundError: issues/<ID>/title.png` until the owner
+delivers the cover — and the stand-in must never enter `issues/`. Three
+attempts on SH8607 found two traps; this is what worked, verbatim:
+
+1. copy the repo **without `.git`** and without the other issue directories;
+2. copy `issues/<ID>` **plus the shared directories `issues/fav` and
+   `issues/fonts`** — the generator copies
+   `issues/fav/apple-touch-icon-dev.png` and dies without it;
+3. put `<tmp>/title_source_150.png` in as `issues/<ID>/title.png`;
+4. `git init` **and make an EMPTY COMMIT** — `generate.py` runs
+   `git rev-parse --abbrev-ref HEAD` and dies on a repo with no HEAD;
+5. run `generate.py --issues <ID> --future --join` there.
+
+The stand-in stays in the scratch copy. Nothing is copied back.

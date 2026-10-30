@@ -632,3 +632,17 @@ intro before 190.
   split" section above. If a consolidated `.md` section contains two
   intros / two bylines / two h1-banner-looking lines for the same
   product, it stays one section (one `<h1>`) so the splitter emits one file.
+
+## A ONE-SIDED "FORTSETZUNG VON S. N" IS STILL A CONTINUATION (SH8607)
+
+The splice rule assumes the host page prints `Fortsetzung auf Seite M`. **It
+is not always there.** SH8607's Memory Map table ends on p65 with no forward
+pointer at all; only p106 carries the headline `Fortsetzung von S. 65`. Step
+030 requires BOTH directions to see a marker pair, found none, and glued
+p106's table to the end of the article that merely precedes it in page order
+— *Rechnen in Maschinensprache*, after its byline. ~45 paragraphs in the wrong
+article, caught by reading the page.
+
+**A page whose headline is `Fortsetzung von S. N` is a continuation even when
+page N prints no forward pointer.** Splice it at the END of the article that
+holds page N, and add the page to that article's `64er.pages`.

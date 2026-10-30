@@ -392,3 +392,18 @@ What is left for step 290: a headline whose two halves are separated by OCR
 garbage off an adjacent graphic still arrives split — p137's
 `Wie zählen die ® .. ®` + `### Zweifingerlinge?`. See its "A heading that is
 really a paragraph tail" section.
+
+## PROSE OCR'd INTO A LISTING BLOCK IS INVISIBLE TO EVERY TEXT STEP (SH8607)
+
+SH8607 p151: the ruled box *"Wichtiger Hinweis zum Abtippen — Bitte beachten
+Sie den neuen Checksummer 128 …"* was OCR'd as the HEAD of block 7, labelled
+`listing-standalone` (byline + box + the kernel 128 dump). From there it was
+invisible all the way through: **020** drops listing blocks from the text by
+design, **130** replaced the dump with the disk embed, **190** walked the page
+but the box was never in the HTML to repair, and **r320**'s UNACCOUNTED half
+excludes listing blocks. It survived to 290, found by an agent comparing bold
+heads against the page, and was restored from the crop.
+
+**A `listing-standalone` block whose leading lines are prose — no line number,
+no hex address, sentence punctuation — is split.** At the very least r320 must
+list it as "prose inside a listing block" so a human looks.

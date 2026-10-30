@@ -462,3 +462,21 @@ So a full name in parentheses is **correct**, and SH8602's and SH8603's
 `(Georg Klinge)` — kept as printed, against this rule's old wording — were
 right. The 2164-byline figure cannot be reproduced and should not be carried
 forward; re-measure before citing a number.
+
+## THE KEY COMES IN TWO FORMS AND THE SCRIPT GREPS ONE (SH8607)
+
+The prose says the Impressum key appears both as `xx = Name` and as
+`Name (xx)` and to look for both. **The SILENT/UNDEFINED one-liner matches only
+`xx = Name`**, so on an Impressum set the other way — SH8606's and SH8607's —
+it reports every initial as UNDEFINED.
+
+Match both:
+
+```bash
+grep -oE '\(([a-z]{2})\)|^[a-z]{2} *=' "$impressum"
+```
+
+**And a name printed without initials is permanently UNDEFINED.** SH8607's
+Koordination line prints *Georg Klinge*, who signs `gk`; no form of the grep
+can find it. Allow a one-line `adjudicated` key in the issue's `reviewed/`
+naming the initial and the evidence (the byline that uses it).

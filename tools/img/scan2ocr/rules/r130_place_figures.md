@@ -145,8 +145,15 @@ For each `<figure>` block in `prg.txt`, in order:
 |---|---|---|
 | BASIC source (`prg/<name>.txt` present, `.prg` in `prg/del/`) | `<pre data-filename="<name>"></pre>` (no `.prg` suffix) | Generator renders petcat text; binary download materialised via `petcat2prg`. |
 | MSE binary (`prg/<name>.prg`) | `<pre data-filename="<name>.prg" data-name="…" data-mse=mse1></pre>` + sibling `<div class="binary_download" data-filename="<name>.prg" data-name="…">` | MSE hex dump + download. |
-| Hypra-Ass source | `<pre data-filename="<name>.src" data-assembler="hypra-ass"></pre>` | Auto-decoded by generator. Master file is `prg/<name>.prg` or `prg/<name>.txt`. Add `data-charset="lower"` when the PRINTED listing is mixed case — see r120. |
-| Top-Ass source | `<pre data-filename="<name>.prg" data-assembler="top-ass"></pre>` | Auto-decoded. |
+| Hypra-Ass source | `<pre data-filename="<name>" data-assembler="hypra-ass"></pre>` | Auto-decoded by generator. **THE BASE NAME, NO EXTENSION** — the generator looks up `listings_bin[name + '.prg']` itself, so `<name>.src` and `<name>.prg` both miss. Master file is `prg/<name>.prg`. Add `data-charset="lower"` when the PRINTED listing is mixed case — see r120. |
+| Top-Ass source | `<pre data-filename="<name>" data-assembler="top-ass"></pre>` | Auto-decoded. Base name, as above. |
+
+**MEASURED on SH8607 p86:** the table said `.src` / `<name>.prg` and the
+precedent issues use the base name, so the agent followed the table and
+produced 10 FAILs — checks 1/2 here and check 1 in the wrapper look for
+`prg/<name>.txt` and cannot see a `data-assembler` listing at all. **A
+`data-assembler` pre resolves to `prg/<name>.prg`, not `.txt`**; teach the
+checks that before reading their output.
 | Compiled / binary-only download | `<div class="binary_download" data-filename="<name>.prg" data-name="…">` alone | No printed listing to display. |
 | Hidden BASIC companion (no printed listing, but section separator assigns it to this article) | wrap a `<pre data-filename="<name>">` (no `.prg`) inside `<div style="display: none;">` | Materialises a download link without rendering content. |
 | Hidden binary companion | `<div class="binary_download" data-filename="<name>.prg" data-name="…">` | Same intent; CSS hides body and shows only the download link. |

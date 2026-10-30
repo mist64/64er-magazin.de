@@ -974,3 +974,28 @@ data to do it properly is not currently kept.
 **Until then**, r310 flags `\b([A-ZÄÖÜ])\1[a-zäöüß]{2,}` as SOFT. It is not
 HARD because a legitimate population exists: command mnemonics with a
 placeholder tail, e.g. 8606's `Rechten Rand setzen RRxxx`.
+
+## `<pre>` AND ITS INNER `<code>` ARE IN SCOPE; INLINE `<code>` IS NOT (SH8607)
+
+Two internal contradictions, both met by every sub-agent on this issue:
+
+1. The briefing says "`<pre>` IS in scope" and "do NOT touch … `<code>`", and
+   the Verification strips `<code>…</code>` — **which removes every
+   `<pre><code>` listing**, and nearly all of SH8607's listings are
+   `<pre><code>`. Read as: **`<pre>`, with or without an inner `<code>`, is in
+   scope; inline `<code>` in prose is not.** The Verification must strip only
+   inline `<code>`, i.e. `<code>` that is not inside a `<pre>`.
+2. *Evidence-in-report* asks for "block-index output showing the other engine
+   read the **corrected** form", which this rule's own section *EVIDENCE IS
+   THE CROP, PLUS THE INDEX LINE AS A LOCATOR* says is impossible. **The
+   requirement is crop-plus-locator**; agents did that and were right to.
+
+## PASS 1 — `Hard-und → Hard- und` ONLY WHERE THE CROP SHOWS THE SPACE
+
+The example assumes the OCR lost a space after a compound hyphen. It is not
+always lost: SH8607 p79 prints "Die X-und Y-Register" and p77 "im HiRes-und im
+Multicolor-Modus" **closed, in the plate**. Kept as printed.
+
+**Read the crop before splitting.** And a note for the briefer: name the
+baseline keys the Verification actually reads — `r280-hyphen` and
+`r280-lost-space` — or the per-agent suffixes have to be merged afterwards.

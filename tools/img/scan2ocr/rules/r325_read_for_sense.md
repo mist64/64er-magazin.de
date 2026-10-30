@@ -376,3 +376,29 @@ silent for a long stretch gets killed by the watchdog and loses its work.
 ## Recorded in LOG.md
 
 The fix table, the reject table, and the coverage statement, per reader.
+
+## FOUR GAPS MET BY NINE READERS ON SH8607
+
+1. **Verification 4 cannot pass before the owner's `title.png` exists.**
+   `generate.py --issues <ID> --future --join` stops on `FileNotFoundError`.
+   Every reader reported it. **Run it on a scratch copy** with
+   `<tmp>/title_source_150.png` as the stand-in — never copied into `issues/`.
+   The full recipe is in r000's end gate.
+2. **The locator advice names `pdftotext -bbox <issue pdf>`, which does not
+   exist during the build** (r000: the page image is `masters600`). Readers
+   used `labels.json` `bbox_frac`. **Name that instead.**
+3. **"Monospace spacing, by glyph column" assumes a fixed pitch.** SH8607's
+   typewriter-like faces drift 36-44 px, so `""` vs `" "` is undecidable at
+   several sites. **Say the fallback: keep the transcription and record the
+   site as undecidable.** Do not let a reader invent a space from a drifting
+   column.
+4. **An image can fail to load silently for a sub-agent** ("media removed", a
+   request limit). Two readers first believed they had checked pages they had
+   never seen; one said so, and a second reader re-did them with vision.
+   **In the 325 brief: for every crop you rely on, confirm the image actually
+   loaded, and report the pages you could not see.**
+
+**Also, for r280 Pass 3:** step 010 joins a line break after `Low/` or `-/`
+**with a space** — 14 sites in SH8607's Memory Map ("Low-/ High", "VC 20/ C 64").
+A space after `/` before a capital is a line-break join; the print sets `x/Y`
+closed mid-line.

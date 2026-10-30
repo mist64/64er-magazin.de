@@ -236,3 +236,23 @@ issue with body prose means it did not run.
   want to look at it directly.
 - German guillemets `«` `»` `‹` `›` are NOT touched — they're the magazine's
   real quotation marks.
+
+## `‚` MUST REACH 0 BEFORE 080, AND A SCRIPT STEP DOES NOT RESOLVE IT (SH8607)
+
+This rule says "resolve each against the page… This step, not later", and r000
+classifies 040-070 as editorial-but-scripted. Neither says **who** resolves
+them or that the step is not finished until the count is zero. A dispatch
+briefed as "mechanical, no word fixes" — which is what "scripted" invites —
+correctly stopped with **54 sites still open**, and the step reported done.
+
+**Verification: `grep -c '‚' issues/<ID>/*.html` must be 0 before 080.** The
+sites are resolved by a crop-reading pass with evidence per site, not by the
+script.
+
+Two more from the same build:
+
+- **The dash pass is not idempotent.** `re.sub` takes non-overlapping matches,
+  so a run like ` - - - ` leaves the middle untouched; run it to a fixed point
+  or match the run.
+- **r050's planted test writes to `/tmp/t50.md`**, against r000's scope rule.
+  Write it into the step's own scratch directory.

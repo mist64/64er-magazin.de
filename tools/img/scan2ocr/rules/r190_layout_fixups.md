@@ -643,3 +643,27 @@ printed page disagree, the page wins.
 
 Related: the abbreviated forename in a speaker label (`M. Grewe:`) is the
 construct that Discount's alpha-list extension eats — see r060.
+
+## DECIDE THE GLYPH BEFORE YOU ATTRIBUTE IT TO THE HAND (SH8607 p54)
+
+A pen tail ran through the `#` in "CMD und PRINT#." on SH8607 p54. The build
+took the `#` for part of the reader's addition — it looks slanted and heavier —
+set the HTML as "PRINT.", and recorded the whole thing as one mark.
+
+The owner repainted only the tail. The plate then measured:
+
+- the full stop sits **after** the `#`, where a hand insertion would have had
+  to displace it;
+- the T-to-`#` gap is **14 px** against the line's **27 px** word space — that
+  is letter spacing, not a space;
+- this grotesque draws `#` with oblique stems throughout the issue;
+- 8603's original of the same text prints "PRINT#." as well.
+
+So the `#` is the plate, the HTML was wrong, and for a while the published
+page and the HTML disagreed.
+
+**When a mark crosses or touches a glyph, decide the glyph separately before
+attributing it to the hand.** Compare it with the same character elsewhere in
+the issue, measure the space it occupies against the line's letter and word
+space, and for a reprint read the original's page. **Record the mark as only
+the strokes that fail those tests.**

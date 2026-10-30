@@ -203,6 +203,11 @@ Critical guardrails:
 ## Verification
 
 ```bash
+# DEFINE $PY OR THE BLOCK DIES ON ITS FIRST FENCE.  Run as written without
+# this line, check 1 fails with `-: command not found` and the block still
+# EXITS 0 -- r000's "$PY used in three fences with no definition", which bit
+# again on SH8607.
+PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
 
 # 1. no h1/h2 left entirely in ALL CAPS

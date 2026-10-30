@@ -1313,3 +1313,54 @@ half you forget is the half that costs the eleven minutes. And **a tool that
 "exits 0 while failing" is almost always your pipe**; check `PIPESTATUS` before
 writing that sentence about someone else's script, and certainly before telling
 the owner.
+
+## SH8607, 2026-10-30: the nineteen errata that had not reached their rule
+
+Walking `WORKFLOW_ERRATA.md` to answer the owner's "have we extracted all
+learnings?" gave the honest answer: **seven of 26 entries had reached a rule,
+and the count was generous** — it credited an entry whenever its rule had been
+touched for any reason, so r160's "Box anatomy" and r330's merged-reprint
+problem were both counted and neither had been written down. The real figure
+was closer to five.
+
+They are all in now. Six were defects in code and are fixed in place:
+
+| rule | what it did |
+|---|---|
+| r100 | the TOC-coverage check dropped `139a`/`139b` and printed NO ARTICLE on a correct issue |
+| r250 | `grep … \| head -20` — r000 says never pipe findings into `head` |
+| r130 | the Hypra-Ass / Top-Ass rows named `.src` and `<name>.prg`; the generator appends `.prg` itself, so both missed and correct output produced 10 FAILs |
+| r260 | `$PY` used in three fences with no definition — the block died and still exited 0 |
+| r270 | ended on `grep … && echo FAIL`, so a CLEAN run exited 1 |
+| r290 | check 2 levelled EVERY heading inside an aside, flagging 44 correct subheads here and firing on published 8606 and 8609 |
+
+**Four of those six are the same defect: a check that cannot pass.** r000 names
+it, and it keeps arriving anyway — because a check is written while the output
+in front of you is wrong, and nobody runs it against output that is right.
+**Run a new check on a published issue before you ship it.** r290's would have
+failed on 8606 and 8609 the day it was written.
+
+The rest are rules that did not say enough: a whitelisted `<p>` inside a run of
+escaped placeholders is a placeholder (r050); `‚` must reach 0 before 080 and a
+script step does not resolve it (r070); a one-sided *Fortsetzung von S. N* is
+still a continuation (r080, r030); five gaps in the D64 extractor (r120); one
+answer on duplicate ids, and `reprints.txt` named where a briefer reads (r140);
+both Impressum key forms (r180); which band a shared start page takes (r210);
+`<pre>` and its inner `<code>` are in scope and inline `<code>` is not, and
+`Hard-und` splits only where the crop shows the space (r280); the owner's
+print-weight ruling overrides an earlier printing's levels (r290); prose OCR'd
+into a listing block is invisible to every text step (r020, r320); four gaps met
+by nine readers (r325); a merged reprint needs per-part diffs and content-hash
+keys (r330); decide a glyph before attributing it to the hand (r190); the leaf
+partner settles paper before the owner does, and the end gate's scratch-copy
+recipe (r000); run the PDF's first four steps before the cover arrives (r006);
+HARD_BAND bounds a level error, not browning, and one fence must not hide
+another (r005_masters_sheet).
+
+**The lesson that outlives all of them is the filing, not the content.**
+`WORKFLOW_ERRATA.md` is git-ignored. Twenty-six entries, each with a written
+fix, sat on one disk for a week while the build they came from was reviewed,
+accepted and pushed — and entry 25 described the exact defect the owner later
+found on three pages of the finished PDF. **An erratum that stays in the issue
+is a defect waiting for the next one.** r340's sign-off counts the entries; it
+should also refuse to sign while any of them is unharvested.

@@ -1351,3 +1351,23 @@ look at `git status` first.
 
 Which script was used, the guetzli quality the size search landed on, the
 final size, and — if any page was excluded or substituted — which and why.
+
+## THE PDF WAITS ONLY FOR `title.png` — so run the rest before it arrives
+
+r000 says the PDF does not wait for the figures, and the cover is the only
+thing it may wait on. But step 2 refuses to run without `TITLE_PNG`, and
+nothing here said the hours of OCR, guetzli and classification may happen
+first. They may, and they should.
+
+**Before the owner's cover exists:** run steps 2-4 and the Verification with
+`TITLE_PNG=<tmp>/title_source_150.png` into `<tmp>/trial/` — **never into
+`issues/`** — and record the quality the search lands on.
+
+**When `title.png` arrives**, all that remains is step 3 for page 001 plus one
+`QMIN=QMAX=q` assembly. On SH8607 that turned a multi-hour build into about
+five minutes.
+
+**And the mixed script's own exiftool stamp is not final.** It writes
+`-CreateDate="$NOW"` with no zone, so `pdfinfo` reads it two hours out; step 5
+here restamps it with the offset. The script's comment calls its stamp final —
+it is not.

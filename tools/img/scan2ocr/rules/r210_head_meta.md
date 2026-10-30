@@ -291,3 +291,18 @@ and must come from the print, not from the article's
   carry a head1, and the check assumed it does not. It also cannot detect a
   head1 on a rubric that is supposed to be excluded, so a wrong head there
   passes silently.
+
+## A SHARED START PAGE WHOSE ONLY BAND IS THE PREVIOUS ARTICLE'S (SH8607)
+
+Two clauses disagree here. For a shared unlettered page, "the band describes
+the page, so the starting article takes it". For an article whose pages carry
+another band, it "takes ITS page's band, because that is the band above its
+own text".
+
+SH8607 p73 has one band — C 128 / GRUNDLAGEN — and it sits over the tail of
+*66 Die Zeropage-Straße des C 128*. *73 Spielen mit Musik und Grafik* starts
+below it, is a C 64 piece, and its own p74 reads GRUNDLAGEN / C 64.
+
+**When the shared page's only band sits over the previous article's text, the
+starting article takes the band of its first page that is wholly its own.**
+The band above someone else's text is not a description of your article.

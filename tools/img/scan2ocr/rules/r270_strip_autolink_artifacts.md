@@ -83,8 +83,14 @@ grep -nE '<a href=' "$dir"/*.html && echo "  FAIL: <a href> left"
 #    Match the FLAG LINE, not the file: r060 carries a comment explaining
 #    that +autolink is deliberately omitted, so a bare grep matches its own
 #    explanation and reports a regression that does not exist.
+rc=0
 grep -E "^\s*-f '" tools/img/scan2ocr/rules/r060_md_to_html.sh \
-  | grep -E '\+autolink' && echo "  FAIL: rule 060 still passes +autolink"
+  | grep -E '\+autolink' && { echo "  FAIL: rule 060 still passes +autolink"; rc=1; }
+# A CLEAN RUN MUST EXIT 0.  As `grep ... && echo FAIL` the block's last command
+# is a grep that finds nothing, so a CORRECT issue exited 1 and any caller
+# reading the status saw a failure -- r000, red on correct output.  r250 has
+# the right shape; this now matches it.
+exit $rc
 ```
 
 ## Notes / lessons

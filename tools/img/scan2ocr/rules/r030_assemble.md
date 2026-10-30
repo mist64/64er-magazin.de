@@ -239,3 +239,13 @@ The omission check that used to be documented here is now **r320**, because
 it must run at the END of an issue (content can be lost at any later step)
 and because it needs the OCR intermediates, which r310 does not. See
 `r320_omission.md`.
+
+## REPORT A ONE-SIDED CONTINUATION MARKER (SH8607)
+
+A `Fortsetzung von Seite N` headline with no matching `Fortsetzung auf Seite M`
+on page N is not a non-event: this step attaches the text to the page-order
+predecessor **silently**, which on SH8607 put ~45 paragraphs of the Memory Map
+table into *Rechnen in Maschinensprache*.
+
+**Print a WARNING line naming both pages** instead, so 080 can splice it (see
+r080, *A ONE-SIDED "FORTSETZUNG VON S. N"*).

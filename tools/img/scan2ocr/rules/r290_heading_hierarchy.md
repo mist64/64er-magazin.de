@@ -250,7 +250,15 @@ for f in sorted(os.listdir(d)):
     lv = [int(x) for x in re.findall(r'<h([2-6])\b', outside)]
     top = min(lv) if lv else None
     for m in re.finditer(r'<aside\b[^>]*>(.*?)</aside>', s, re.DOTALL):
-        for lvl in re.findall(r'<h([1-6])\b', m.group(1)):
+        # ONLY THE ASIDE'S OWN TITLE IS AT ISSUE.  The rule says "an aside's
+        # heading sits AT the level of the article's top section headings" --
+        # that is the FIRST heading in the box, not every heading in it.  A box
+        # with its own subheads below its title is ordinary, and the print sets
+        # them lower: testing all of them flagged 44 correct h3 subheads under
+        # SH8607's 37 Texteinschub h2 titles, and fires on published 8606 (6 in
+        # 3 files) and 8609 (2 in 2).  Promoting them would contradict the
+        # print, and check 2 reads no adjudication, so it could not pass.
+        for lvl in re.findall(r'<h([1-6])\b', m.group(1))[:1]:
             n += 1
             lvl = int(lvl)
             # h1 is the article headline and never belongs in an aside.
@@ -476,3 +484,14 @@ shape: rule 300's **Fehlerteufelchen erratum box** carries an `<h3>`, three of
 them in 8609 (`48 Bar-Codes selbst gemacht`, `71 Cross-Referenz-Liste C128`,
 `156 Tips und Tricks zu Vizawrite (Teil 9)`). Leave those alone too — they are
 rule 300's, not this rule's.
+
+## THE OWNER'S PRINT-WEIGHT RULING OVERRIDES AN EARLIER PRINTING'S LEVELS
+
+Owner, 2026-10-08: **"looks like h3 in print → h3"**. Where a Sonderheft
+reprints material an earlier issue carried at a different level, the ruling
+decides it — not the precedent.
+
+SH8607: 9 body-size bold own-line heads moved h2 → h3 (86 ×2, 120 ×3, 122 ×3,
+125 ×1), as SH8608 did, against SH8606's reading of this rule which kept them
+at h2 BY DEFAULT. **The DEFAULT yields to the print.** Record the moved
+headings in the issue's `reviewed/`.

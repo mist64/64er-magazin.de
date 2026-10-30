@@ -123,3 +123,25 @@ Expected: `&lt;/&gt;` and `&lt;/1&gt;`, with `<br>` untouched.
 - Browser behavior for `<RETURN>foo`: the browser parses `<RETURN>` as an
   unknown empty element, then displays `foo`. The text inside the angle
   brackets disappears. This script prevents that.
+
+## A WHITELISTED NAME IN A RUN OF PLACEHOLDERS IS A PLACEHOLDER (SH8607)
+
+The whitelist is an exact-case name match, so a syntax line full of angle-
+bracket parameters escapes most of them and keeps the ones that happen to be
+HTML. SH8607's XMENU prints
+
+    MENU <x>, <y>, <l>, <p>, <t>, <m>, <s>, <ar>
+
+`<x>` `<y>` `<l>` `<t>` `<m>` `<ar>` escaped; **`<p>` and `<s>` survived as
+live tags** — a stray paragraph open and a strike-through opener in the
+published HTML, plus two more sites where the text explains `<p>`. **No
+Verification check can see this**, because the output is valid markup either
+way; it was caught by eye after 070.
+
+**A whitelisted name sitting in a comma-separated run of escaped placeholders
+is a placeholder: escape it.** Judge by the neighbours, not by the name.
+
+```bash
+# a bare <p>/<s>/<b>/<i> on a line that also carries an escaped placeholder
+grep -nE '&lt;[a-z]+&gt;' issues/<ID>/*.html | grep -E '<(p|s|b|i)>'
+```

@@ -866,3 +866,27 @@ Checks worth running over every extracted `prg/`:
   `$0801` for BASIC, or the address the article/caption states
 - the rendering must match what the print shows — a listing typeset as BASIC
   must not come out as an MSE hex dump, and vice versa
+
+## FIVE GAPS MET ON SH8607's SH07A/B
+
+1. **Check 3b drops whole sections.** The comment says "a section's page is its
+   last NUMBERED separator; an all-dash bar is a frame", but the code is
+   `if sep and not re.search(r"-+\d+", sep): continue` — it SKIPS the files
+   under a text label (`---- windows ---`, `---eingabehilfen`) instead of
+   re-keying them to the previous numbered separator. The check that exists to
+   show a missing section omitted p110's ten listings, p124 and the
+   Eingabehilfen. **Carry the last numbered page forward.**
+2. **3b strips the lettered suffix**, so `139a` and `139b` both map to
+   whichever article sorts last. **Report `AMBIGUOUS: 139a/139b`** and require
+   a `prg.txt` note naming the article.
+3. **The raw-byte rule covers only >= $80 after REM.** `label-demo 1-4` carry a
+   raw `$12` (RVS ON) in a REM banner; petcat writes `{rvon}`, which outside a
+   string re-tokenises as five literal bytes, so the download is five bytes
+   off. Writing the raw byte into the .txt would put an invisible control
+   character into the published text view. **Disposition: leave it, REM-only.**
+   Named here so the next build does not spend a test on it.
+4. **"Pass the dialect explicitly for anything that is not a C64 BASIC 7.0
+   program"** reads as if a C64 program were 7.0. It means **not C64 V2**.
+5. **The same filename on two disk sides** (SH8607: `dia-show` is a notice on A
+   and the program on B) — the extractor keeps whichever came last, silently.
+   **Print a collision line.**

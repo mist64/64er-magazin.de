@@ -292,7 +292,9 @@ grep -nE '<p>(<strong>|<em>|<b>)?(Info|Bezug|Hersteller|Vertrieb|Anbieter|Kontak
 
 # 2. spot-check source-tagged paragraphs are real footers (look at
 #    sample to eyeball)
-grep -hE '<p class="source">' "$dir"/*.html | head -20
+# r000: NEVER PIPE A CHECK'S FINDINGS INTO head -- the 21st is the one that
+# matters.  This is an eyeball sample, so print it all and read it.
+grep -hE '<p class="source">' "$dir"/*.html
 
 # 3. balanced tags
 $PY -c "$(cat <<'PY'
