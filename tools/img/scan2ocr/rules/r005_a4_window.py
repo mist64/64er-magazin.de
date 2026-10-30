@@ -708,6 +708,29 @@ def cut(page, win, rec, out_dir=None):
     """
     out_dir = Path(out_dir or OUT_A4)
     out_dir.mkdir(parents=True, exist_ok=True)
+    # A RECOVERED PAGE IS NOT THIS STEP'S TO RE-CUT.  This script has no
+    # per-page mode in the sense that matters: it recomputes every window from
+    # the automatic rules, so a page a recovery script placed from its OWN
+    # measured edges is silently reverted to the window the recovery existed to
+    # replace.  r005_a4_window.md check 1a has said so since SH8608 (p009,
+    # p142) and it happened again on SH8607 2026-10-30: the Bund fix re-cut
+    # p001 and p158 and wiped recovery D and recovery C, moving p158 by 3.3 mm
+    # in a PDF that had already been accepted.
+    # The stamp is the record, so the stamp is the guard.  RECUT_OVERRIDE=1 is
+    # the deliberate escape hatch, for when the automatic rule has genuinely
+    # become better than the recovery -- and then the OVERRIDE line, and the
+    # reason it is being dropped, go in the issue's reviewed/.
+    st = out_dir / f"{page:03d}.stamp.txt"
+    if st.exists() and "OVERRIDE" in st.read_text(encoding="utf-8"):
+        if os.environ.get("RECUT_OVERRIDE") != "1":
+            raise SystemExit(
+                f"r005b: {page:03d} carries an OVERRIDE -- a recovery script "
+                f"placed it from its own measured edges, and re-cutting would "
+                f"revert that.  Read {st}.  RECUT_OVERRIDE=1 to proceed anyway, "
+                f"and record why in the issue's reviewed/.")
+        print(f"  p{page:03d} RECUT_OVERRIDE=1 -- dropping: "
+              f"{[l for l in st.read_text(encoding='utf-8').splitlines() if 'OVERRIDE' in l][0]}",
+              flush=True)
     src = np.asarray(Image.open(MASTERS / f"{page:03d}.png").convert("RGB"))
     H, W = src.shape[:2]
     bx0, by0 = rec["sheet_box"][0], rec["sheet_box"][1]
