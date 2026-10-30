@@ -14,6 +14,10 @@ The annual index CSVs live at the repo root:
 - `Jahresinhaltsverzeichnis 1984-85.csv`
 - `Jahresinhaltsverzeichnis 1985.csv`
 - `Jahresinhaltsverzeichnis 1986.csv`
+- `Jahresinhaltsverzeichnis 1987.csv` — **built from two sources, not one; see
+  *THE 1987 INDEX CAME OFF A DISK* below.** 56 of its 818 rows carry an empty
+  category: those articles get no meta, which is correct, not a gap to fill by
+  guessing.
 
 Every row is keyed by a **monthly** `YYMM`. There is no Sonderheft row in any of
 the three:
@@ -514,3 +518,57 @@ mis-routing is a known failure mode (the 8607 CP/M-Ecke case).
   modifying the source CSV (the CSV is shared across multiple
   issues' apply runs, and per-issue fixes are lower-risk than
   rewriting the CSV).
+
+## THE 1987 INDEX CAME OFF A DISK, AND THE PRINT ONLY SUPPLIED THE HEADINGS
+
+The magazine printed the 1987 Jahresinhaltsverzeichnis in **1/88, pages
+75-80**, and said so at the foot of page 80:
+
+> Die Programmservice-Diskette zu dieser Ausgabe bietet einen echten
+> Leckerbissen: Das komplette 64'er-Jahres-Inhaltsverzeichnis 1987 befindet
+> sich im Master-Index-Format (einschließlich des Master-Index-Programms) auf
+> dieser Diskette.
+
+**That disk is `8801B.D64`** — "dieser Ausgabe" is 1/88, not 1/87. It holds
+`Master-Index` (the program), `titel` (two volume names, "64'er 86" and
+"64'er 87") and `stext`, 27,409 bytes of records in a fixed format:
+
+```
+<title, PETSCII>  00  <volume, 16-bit BE>  <month>  <page>  00
+```
+
+818 records, zero malformed, all volume 2 = 1987. Spot-checked against the
+printed pages four for four.
+
+**The record has no category field**, which is the whole reason the printed
+pages are still needed: the disk gives the entries exactly, the print gives the
+`Rubrik`/`Thema` grouping. So the CSV was built from three witnesses —
+
+1. **the disk**, authoritative for title, issue and page, with no OCR anywhere;
+2. **OCR** of a 600 dpi scan of pages 75-80, for the grouping;
+3. **a reading by eye** of the same six pages, recorded BEFORE the OCR output
+   was looked at, giving the canonical 129 `Rubrik`/`Thema` pairs.
+
+**The third witness is what made it honest.** Numbers from the entry above bled
+into the heading rows, so OCR produced category names like
+`1/87 156 Kurse/ Grundlagen` and `135 Kurse/Grundlagen` — **31 of them**, each
+confident and each wrong. Snapping every OCR heading to the eye-read canonical
+list cleared them. A two-way disk-against-OCR check would have shipped all 31,
+because the disk has nothing to say about categories.
+
+**And one pass had to be thrown away.** Pairing left-over OCR rows with
+left-over records by whole-line fuzzy match "closed" 55 of the last 57 — and
+inspection showed almost every one was nonsense: *Telefon-Safari* under
+`Aktuelles/Drucker`, *Jahresinhaltsverzeichnis im C 64* under
+`Kurse/Grundlagen/Grafik`. It was discarded entirely. What replaced it demands
+**three exact long-word hits and twice the runner-up**, and closes one.
+
+**56 rows therefore ship with no category**, spread 3-8 per month: lines the
+OCR never read at all. An empty category is a true statement; a fuzzy guess is
+not. Fill them by reading the page, or leave them.
+
+**The umlauts are restored from the print, not from a rule.** The disk
+transliterates (`Adventure-Loesungen`, `fuer`), so a word map was learned from
+the OCR'd printed vocabulary — 111 words, one ambiguous and skipped — and
+applied only where the transliteration matches exactly. 212 titles respelled.
+
