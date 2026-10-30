@@ -804,26 +804,94 @@ a 3.9 MB download where 209 KB was intended, and nothing in the chain measures
 it. Compare against the analogous figure in the previous issue before
 committing the file.
 
-**AND THE OTHER FACE: A TINTED FIGURE SENT TO THE BILEVEL BUCKET LOSES THE
-TINT — AND THAT IS THE OWNER'S CALL, NOT A DEFECT TO CORRECT.** The paragraph
-above warns only about the harmless direction. The harmful one is a figure
-printed on a coloured or tinted ground that goes to `bw/`: the ground does not
-survive the threshold, and unlike a 3.9 MB download that IS visible on the
-page. But the bucket belongs to whoever cuts the crop.
+### EVERY DELIVERED CROP IS RAW 600 DPI RGB, AND CLASSIFYING IT IS YOUR JOB
 
-MEASURED on SH8608, 2026-10-17: three delivered crops dropped their colour —
-`10-1_2` (memory maps on a blue ground, 77 % of the box above chroma 25),
-`10-3` (a green/orange/blue two-level slab, 93 %) and `10-4` (an orange header
-band, 19 %). The worklist had named all three pages as colour. Shown the
-comparison, the owner ruled: **on purpose.** The grey-ground drawings in the
-same delivery (`10-6`, `44-1`, `47-4`, `47-5`, `47-8`) read better as clean
-line art than as screened grey, and nothing is lost.
+**The owner's standing instruction, 2026-10-24: _"in the future, i'll never
+give you processed/bucketed crops, only raw 600 dpi rgb crops!"_** So there is
+nothing to detect and no second case to check for. A crop delivery is always
+8-bit sRGB straight off the scan, it always arrives unbucketed, and the build
+always sorts it into `png/{bw,gray,dots,c}/` and runs
+`tools/convert-scans.sh` before placing the output.
 
-So: **a worklist note that a page is printed in colour is not a bucket
-assignment.** Say what the page is; do not say which bucket the crop must be
-in. And **never re-render, re-threshold or re-bucket a crop that arrives** —
-that is *owner crop wins* applied to the pixels, not just to the choice of
-image. Report what you measured once, then place what you were given.
+This does **not** loosen *owner crop wins*. What the owner decided is the
+FRAMING and the CHOICE — which figure ships as a picture, where it is cut, what
+it includes. Never re-cut, re-frame, extend or substitute a delivered crop, and
+never set a table typeset that arrived as a crop. The bucket is a separate
+question, and it is now always open.
+
+**Why the conversion is not optional.** SH8607's 38 crops were **151 MB** as
+delivered and **1.8 MB** converted — 85x over the set, 180x on `66-1`
+(20.9 MB → 116 KB), 50x on `124-0` (12.2 MB → 246 KB). Placing a delivery
+as-is commits scan masters to the published repository, which is precisely what
+`.gitignore`'s `issues/*/*` exists to prevent.
+
+**Classify by what the figure IS, which is not what the page is printed in.** A
+worklist note that a page carries colour is not a bucket assignment: say what
+the page is, never which bucket the crop must be in. MEASURED on SH8608,
+2026-10-17, and ruled by the owner — three crops on strongly coloured grounds
+(`10-1_2`, memory maps on blue, 77 % of the box above chroma 25; `10-3`, a
+green/orange/blue slab, 93 %; `10-4`, an orange header band, 19 %) went to
+`bw/` and lost the colour, and the owner ruled it **on purpose**. Grey-ground
+drawings in the same delivery (`10-6`, `44-1`, `47-4`, `47-5`, `47-8`) read
+better as clean line art than as screened grey. So:
+
+| the figure is | bucket | why |
+|---|---|---|
+| line art, listing, table, text screenshot — black on white | `bw/` | 600 dpi bilevel, no resize |
+| line art or a screen on a **printed grey ground** | `dots/` | `-lat 41x41` reads the ground as ground; a plain threshold turns it into surviving dot noise |
+| a real halftone — a photograph, continuous tone | `gray/` | 150 dpi 8-bit, 25 %; a threshold would destroy it |
+| colour that carries MEANING, not just a ground | `c/` | 150 dpi colour; rare — SH8607 used it for nothing |
+
+A coloured or tinted ground going to `bw/` loses the ground, and that IS
+visible on the page, unlike the harmless direction above. It is still often
+right. **Settle the uncertain ones by rendering both ways and looking, not by
+argument** — SH8607's four doubtful files (`110-3`, `164-1`, `6-3`, `6-4`) all
+turned out to be `bw/`: what read as a ground was the face's own weight.
+
+**Then show the classification to the owner for a yes before placing
+anything**, and record it in `issues/<ID>/reviewed/crop-classification.txt`
+with the *reason* for each bucket, not just the file list. The next build's
+question is never "which bucket was `66-1` in", it is "why".
+
+**Keep the RGB sources, and NEVER COMMIT THEM.** Owner, 2026-10-24: *"i meant
+DO NOT COMMIT THE RAW PNGs, but do commit everything else including converted
+pngs. make it a rule to never commit the raw pngs."* The sources stay under
+`issues/<ID>/png/<bucket>/` and the converted files go to the issue root. Do
+not delete `png/` (*"KEEP the png dir"*).
+
+`.gitignore` does most of this for you: `issues/*/*` hides `png/` entirely,
+while `!issues/*/*.png` re-includes the root. **But the gitignore cannot tell a
+raw crop from a converted one** — it only knows where the file sits. A raw file
+copied or moved to the issue root instead of converted is 150 MB of scan master
+that git will take without complaint, and `issues/*/*.png` makes it look
+intentional.
+
+**So check before the commit, not after.** The converted file and its source
+share a name, so two cheap tests catch it:
+
+```bash
+ID=SH8607
+# 1. a root PNG byte-identical to its png/<bucket>/ source was never converted.
+#    find, not a glob: a renamed crop (118-1 -> 118-x1) has no source of its
+#    own name, and under zsh an unmatched glob ABORTS THE WHOLE LOOP.
+for f in issues/$ID/*.png; do b=$(basename "$f")
+  s=$(find "issues/$ID/png" -maxdepth 2 -name "$b" 2>/dev/null | head -1)
+  [ -n "$s" ] && cmp -s "$f" "$s" && echo "RAW AT ROOT (identical to source): $b"
+done
+# 2. and the shape of a raw crop: 8-bit sRGB at the source's own pixel size.
+#    title.png is legitimately 8-bit sRGB (1240x1754, the 150 dpi cover), so
+#    exclude it or it is flagged on every issue.
+magick identify -format '%f %[depth] %[colorspace] %wx%h\n' issues/$ID/*.png |
+  awk '$1!="title.png" && $2==8 && $3=="sRGB"'
+```
+
+Test 1 is the reliable one. Test 2 lists candidates, not culprits — a genuine
+`c/` figure is also 8-bit sRGB, so compare each hit against its source's
+dimensions: equal means raw, a quarter means converted.
+
+A commit that has already taken one is not fixed by deleting the file in a
+later commit — the blob stays in history, which is what `.gitignore`'s own
+comment records about the `_work.zip` that broke pushing. Catch it before.
 
 ### A PRINT DEFECT CAN FLIP POLARITY UNDER BILEVEL
 

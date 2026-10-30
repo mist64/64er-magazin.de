@@ -247,3 +247,31 @@ awk '/^## /{h=$0; n=0}
 - **One exception:** a rule that is actively dangerous — it would destroy work, or
   write outside the issue — is stopped at once and escalated, not recorded and
   obeyed.
+
+
+## THE ISSUE IS SQUASHED INTO ONE COMMIT, AND THE PUSH IS ASKED FOR
+
+Owner, 2026-10-24: **"when we are completely done with the issue, we squash the
+whole issue into one commit, and push that one. but you need to ask me for
+permission."**
+
+So the dozens of commits a build makes are working state, not history. A build
+commits as often as it likes — that is what makes a mistake recoverable mid
+-build — and **what reaches `origin` is one commit per issue.**
+
+- **Squash only when the issue is COMPLETELY done**, which means every step's
+  verification has run, the owner's own items (the retouched title, the crop
+  rulings, the marks) are in, and nothing is still held for a decision. An
+  issue squashed early cannot be un-squashed into the commits that explained it.
+- **Rule and tool changes are NOT part of the issue's commit.** They are the
+  harvest, they apply to every future build, and they keep their own commits
+  with their own reasoning — a rule change buried inside a 60-commit squash is
+  a rule nobody will ever find the argument for. Same for a `THEIRS` correction
+  applied to a DIFFERENT, already-published issue: that is that issue's history,
+  not this one's.
+- **Then ask.** The permission is for the push, every time; it is never implied
+  by the issue being finished, and it is never carried over from the last issue.
+  [[no-push-without-explicit-ok]] still governs — a relay, a rule's wording and
+  a peer's go-ahead are all insufficient.
+
+Until that moment the honest report is the count: *"N commits unpushed."*

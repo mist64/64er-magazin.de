@@ -117,6 +117,58 @@ The same question with the opposite answer: **a small box captioned only
 circled numbers) is a crop, whatever the caption calls it. The caption names
 the series; the ink decides the medium.
 
+#### BUT THIS RULE GOVERNS THE WORKLIST, NOT THE DELIVERY
+
+Read the sentence above for what it actually asks: *the whole series goes on
+r150's **crop worklist***. That is a request, and the owner answers it by
+cutting some rows and not others. Once the delivery is in, r150's *BUT THIS
+RULE GOVERNS THE WORKLIST, NOT THE DELIVERY* applies and **an undelivered
+worklist row is an answer, not an omission** — so this step typesets the rows
+that came back empty, and the series ends up mixed after all.
+
+It has to. The alternative is not a consistent series, it is **five figures
+that ship in no medium at all.**
+
+MEASURED on SH8607, 2026-10-24: page 6's Memory Map carries **Bild 1-23**, and
+the owner cut 18 of them and withheld exactly the five that are data tables in
+print (Bild 6, 7, 8, 12, 22). Those five are now typeset and the other 18 are
+crops. The build was right to do it, and right not to ask.
+
+**Two things make that the correct outcome rather than a tolerated one:**
+
+- **SH8604's Bild 6a-6j, which this rule was written from, is a tight run of
+  variants of ONE figure** — ten views of the same thing, side by side, where
+  two media really do read as two different things. SH8607's is a 23-member run
+  scattered over a 60-page article, whose members are not even the same KIND of
+  object: 64'er labels drawings, screen shots AND data tables alike `Bild N`.
+  A series heterogeneous in kind cannot be homogeneous in medium without
+  damage — crop a data table and its text stops being selectable and
+  searchable for nothing.
+- **The print made the mixture, not us.** The consistency this rule protects is
+  the reader's impression of one numbered run; where the run was already a mix
+  of drawings and tables on paper, following the ink IS the consistency.
+
+**So apply the rule at worklist time and never after.** Before the delivery:
+put the whole series on the worklist, typeset none of it. After the delivery:
+place what came, typeset what did not, and do not reopen the question.
+
+**AND DO NOT GO LOOKING FOR A PRECEDENT THAT ISN'T THERE.** The build reported
+that *"the 1985 Memory Map printings were mixed the same way"*, and the
+supervisor checked all eight before relaying it: they are not. Every prior
+printing's Bild series is one medium — 8501 `[2,3]`, 8503 `[1-4]`, 8506
+`[1,2]`, 8507 `[1-5]`, 8511 `[1,2]`, 8603 `[1]` all cropped, 8512 `[1]`
+typeset. What those articles do is crop the **Bild** series and typeset the
+**Tabelle** series, which is two homogeneous series, not one mixed one.
+SH8607 is the first split Bild series in the corpus, because it is the first
+with 23 members instead of five. **The decision stands on the rule above; the
+corpus is silent on it, and silence is not agreement.** One command is the
+check, and it belongs to whoever relays the claim:
+
+```bash
+# for each printing: which Bild numbers are <img>, which are <table>/<pre>
+grep -rl "<ARTICLE TITLE>" issues/*/*.html
+```
+
 ### WHEN A TYPESET BOX AND A CROPPED ONE ARE INTERLEAVED IN THE OCR
 
 "Leave the drawing's garbage in place" is right only while every box on the

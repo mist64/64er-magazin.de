@@ -265,6 +265,35 @@ ship it silently.** This is one of the few findings that goes to the owner
 rather than being settled by the rules, because only they can repaint the
 master.
 
+**A MARK THAT DOES NOT SURVIVE INTO THE DELIVERED ARTEFACT IS NEVER PUT TO THE
+OWNER.** Owner, 2026-10-24, on being handed marks annotated *vanishes*:
+***"dont give me those, they will vanish!!"*** The sentence above says
+*survives into the PDF*, and that is a GATE, not a description — run it before
+anyone sees a crop. A mark the reader will never see is not a decision; it is
+a line in the record.
+
+**"SURVIVES" IS MEASURED AGAINST THE PATH THAT PAGE ACTUALLY TAKES**, and the
+paths differ inside one issue:
+
+| where the mark sits | the test |
+|---|---|
+| a page the PDF ships **bilevel** | does it survive the PDF's threshold (35 %)? |
+| a page the PDF ships **contone** (covers, card, colour ads) | it survives — contone keeps everything |
+| inside a **crop** | its bucket decides: `bw`/`dots` threshold it away or keep it, `gray` keeps it at 150 dpi |
+
+So the same speck is a finding on p181 (card, contone) and nothing at all on
+p123 (bilevel, pale brown, gone at 35 %). MEASURED on SH8607: of 26 marks
+censused, `044c` (a purplish pen hairline, almost all of it paler than the
+cutoff) and `123x` (a pale-brown dash in the gutter) vanish outright, and
+`140x` mostly drops. Those three should never have reached the owner. On the
+same issue, a dirt spot in the corner of crop `164-1` disappeared the moment
+the crop went through `bw` — nobody had to rule on it either.
+
+**RECORD THEM, DO NOT SURFACE THEM.** They still go in `marks.txt`, with the
+path and the verdict `below the cutoff — not surfaced`, precisely so the next
+build does not find them again and ask. The census is complete; the owner's
+queue is not the census.
+
 **YOU ARE SURFACING A FINDING, NOT REQUESTING A REMOVAL — THERE ARE THREE
 OUTCOMES.** This used to read as though flagging and removing were the same
 act. They are not, and on SH8608 the owner's answer split three marks two ways:
@@ -1537,19 +1566,45 @@ path had they not). A variable two rules read and no rule writes is a path
 that silently resolves to the filesystem root. Export it, or run the steps
 that use it from an environment that has.
 
-## Cross-cutting rule: PARALLELISE TO HALF THE FREE RAM
+## Cross-cutting rule: PARALLELISE TO HALF OF WHAT IS FREE
 
-Every step that fans out over pages locally — 005 masters, 010 OCR, 145 figure
-extraction — sizes its lanes the same way, and none of them may hardcode a
-number:
+Every tool that fans out locally sizes itself the same way, and none of them
+may hardcode a number:
 
-> **As many lanes as fit in HALF the free RAM, capped at cores − 4.**
+> **As many lanes as fit in HALF the free RAM, and at most HALF the free
+> CORES — where free cores are `cores − load − 4`.**
 
-**ALWAYS.** There is no step, no machine state and no deadline that exempts a
-fan-out from this. FREE means free *at the moment the step starts*, read then,
-never carried over from an earlier step in the same build — this box regularly
-carries a **170–290 GiB model server** for another user, which appears and
-disappears between steps.
+**ALWAYS, AND FOR EVERY TOOL WE RUN — not only the lane steps.** There is no
+step, no machine state and no deadline that exempts a fan-out from this. The
+owner's rule, stated 2026-10-24: *use half of the free resources.*
+
+FREE means free *at the moment the step starts*, read then, never carried over
+from an earlier step in the same build — this box regularly carries a
+**170–290 GiB model server** for another user, which appears and disappears
+between steps. "Free cores" therefore subtracts the **current load**, not just
+a constant: a step started beside a running build asks for less than the same
+step started on an idle box.
+
+**HALF THE CORES IS NEW, AND IT IS HALF OF WHAT IS FREE, NOT OF WHAT EXISTS.**
+For a long time only the RAM half was written here and the core cap was
+`cores − 4` — which on a 32-core box is 28, not half of anything, and no
+smaller at all when the machine was already busy. That cap is what let three
+separate incidents through (below).
+
+**A JOB COUNT ALONE DOES NOT BOUND THE LOAD.** Every tool we run threads on
+its own, so N jobs × M threads is N×M runnable threads and the two multiply
+silently. One thread per lane is part of the rule, not a detail:
+`OMP_THREAD_LIMIT`, `OMP_NUM_THREADS` and `MAGICK_THREAD_LIMIT` all = 1.
+A shell tool gets both halves by sourcing
+`tools/img/issue_pdf/load_clamp.sh`, which exports the thread limits and
+clamps `JOBS` DOWN to the ceiling (never up, so a deliberately small run stays
+small).
+
+**THE TOOL CLAMPS ITSELF. THE CALLER IS NOT THE GUARD.** Each of the three
+incidents was written up afterwards as "pass the right JOBS", and that lesson
+is wrong: it puts a machine-wide outage behind a number every caller has to
+remember. `make_issue_pdf.sh` carried that advice in a comment for two issues
+and still went down, because the one caller that mattered forgot it.
 
 Ask for it, never write it down:
 
@@ -1577,8 +1632,27 @@ records that 32 concurrent `magick` processes drove the load to ~975 and the
 inference watchdog killed the server; on 2026-08-05 a comparable load panicked
 the machine outright, because the compositor missed its kernel check-ins while
 the GPU was held. The lane count from this rule is what keeps that from
-happening — a step that sizes itself by RAM also sizes itself by cores, and the
-`cores − 4` cap is not decoration.
+happening — a step that sizes itself by RAM also sizes itself by cores.
+
+**THE SAME SHAPE HAS NOW COST ANOTHER USER'S SERVER THREE TIMES.** Read these
+as one defect, not three:
+
+| when | what ran | what it cost |
+|---|---|---|
+| 8612 | `make_issue_pdf_mixed.sh`, NCPU jobs, each `magick` taking every core | load ~900, stalled 25+ min; fixed by `MAGICK_THREAD_LIMIT=1` **in that one file** |
+| SH8605 | 32 `tesseract` jobs where the lane rule gave 28 | survived only because it ran alone; the same over-subscription had already killed step 030 earlier in that build |
+| SH8607 | `make_issue_pdf.sh`, `JOBS=22`, **no thread limits at all** | 1-min load **386**; the memory watchdog emergency-killed another user's **231 GB** model server at 14:11 and again on every restart until the load fell. **It stayed down.** |
+
+The third one is the indictment: 8612's fix was written into the *mixed*
+script only, so the plain script never got even the `magick` half, and neither
+script ever set tesseract's. One shared file now holds both halves, so a tool
+cannot be missing one.
+
+**What this costs us, honestly.** Halving the free cores makes our own builds
+slower — on an idle 32-core box the step-005 ceiling drops from 28 to 14, and
+on a busy one to single digits. That is the trade the owner asked for, and it
+is the right way round: a build that takes longer is a build; a build that
+takes the machine down takes someone else's work with it.
 
 **`OMP_NUM_THREADS=1` stays.** It is what makes a lane exactly one core:
 numpy and ImageMagick both thread by default, and two layers of parallelism on

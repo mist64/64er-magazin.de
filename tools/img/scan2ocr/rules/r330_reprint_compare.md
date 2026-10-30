@@ -344,6 +344,52 @@ spelling · case · punctuation · quotation marks (`»…«` vs `"…"`) · das
 transcribed prose — they come from the Programm-Service disk via rule 120, and
 their errata state belongs to rule 300, not here.
 
+**BUT NOT EVERYTHING IN `<code>` CAME OFF THE DISK, AND WHAT DID NOT IS
+UNCHECKED BY ANY STEP.** The exclusion is keyed on the TAG; the reason behind
+it is the SOURCE. A Programm-Service listing is a disk LISTing and rule 300
+verifies it against the disk. A short direct-mode command in prose, or a worked
+example typeset inside a Texteinschub, is marked up the same way and has no
+disk to be verified against — so rule 300 has nothing to compare and this step
+does not look. It is transcribed from the page like any sentence, and it falls
+between the two.
+
+**The discriminator is mechanical, because a C 64 LISTing has no spaces at
+all.** `LIST` expands tokens without separators, so a real disk rendering reads
+`70 B=8192:FORI=0TO7999:POKEB+I,0:NEXTI` — joined everywhere, including after
+`FOR` and `NEXT`. A line that is spaced around its operators but joined at
+`FOR`/`NEXT` is therefore not a LISTing, and the join is a lost space:
+
+```
+ FAITHFUL   1100 FORP=1TO3                      no space anywhere
+ SUSPECT    50 FORI = 0 TO 111                   spaced at =, joined at FOR
+ SUSPECT    FORJ = 40960 TO 49151: POKE J, PEEK(J):
+```
+
+MEASURED over the whole corpus, 2026-10-24: inside `<pre>`/`<code>`, **91
+occurrences are faithful LIST style and 28 are inconsistent**, across 14
+issues (8406, 8408, 8411, 8412, 8501, 8504, 8507, 8510, 8511, 8512, 8601,
+8602, 8606, SH8604). The 28 are not only lost spaces — they are where the
+costly damage sits, because nothing has ever read them: `FORI = 2060T03072`
+and `1T0 40` (digit zero for `O` in `TO`), `FORJ=OTO 4` (letter for zero),
+`FORA = 1 T 1000` (`TO` reduced to `T`), `S=1—S` (an em dash for a minus),
+`20 FORX = 1 TO 10:READA 30 PRINT A,…` (two program lines merged). Several do
+not run.
+
+So: **when a reprint pair's prose yields a confirmed `THEIRS`, sweep the pair's
+`<code>` blocks by hand before closing it** — the diff will never show them,
+and all three of SH8607's listing-side findings (8411 `inRAM`'s neighbours,
+8501's missing `A`, 8506's `PRINT #l`) were caught by eye for exactly this
+reason. Report them as side findings, with the same blind second reading a
+`THEIRS` in prose gets.
+
+**AND DO NOT READ THE JOIN AS DAMAGE WITHOUT THE REST OF THE LINE.** The 91
+faithful ones are correct and must not be "fixed": `FORI=1TO10` is what the
+machine prints. The corpus count alone says nothing — it was 140 before the
+LIST signature split it, and 112 of those would have been edits into correct
+pages. This is the same trap as *corpus frequency is not evidence about a
+printed page*, one level down: a pattern is not a finding until the line it
+sits in, or the page, has been read.
+
 The diff is two-level: blocks are aligned first (exact matches anchor it, the
 rest pair by similarity), then differing blocks are diffed **word by word**.
 That is what keeps a single re-worded sentence from reporting as two
@@ -439,6 +485,33 @@ is always a printed page:
 A `PRINT` disposition needs evidence from **both** sides — that is precisely the
 claim it makes. `OURS` needs our page. `THEIRS` needs theirs. A disposition with
 no page behind it is `UNRESOLVED`, whatever it looks like.
+
+**AND CORPUS FREQUENCY IS NOT EVIDENCE ABOUT A PRINTED PAGE.** The tempting
+substitute for reading the page is counting the corpus: `in RAM` appears in 22
+files and `inRAM` in one, `PRINT#1` in 70 and `PRINT #l` in one, so the odd one
+out "must" be our OCR dropping a space or misreading a digit. That reasoning is
+about what 64'er USUALLY set. The disposition is about what THIS page set, and
+the two come apart precisely where it matters, because a print error is by
+definition the rare reading.
+
+MEASURED on SH8607, 2026-10-24. Its Memory Map and 8512/146 both print
+*Anfangsadressen der 4 Tabellen*, four keyboard decode tables. Row 4 differs:
+SH8607 prints `ab 60536`, 8512 prints `ab 64632`. Every cross-check favoured
+SH8607 — 60536 is `$EC78`, which makes the four addresses `$EB81 $EBC2 $EC03
+$EC78`, consistent and correct; 64632 is `$FC78`, which is not a decode table
+at all. By frequency, by arithmetic and by the KERNAL, 8512's HTML looked like
+a transcription error. **It is not.** A blind reader sent to 8512 p147 — asked
+to transcribe all four rows verbatim, not asked about this number — returned
+`ab 64632`, sure of every digit, and the published 8512 HTML matches its own
+print. 1985 printed `$FC78`; the Sonderheft corrected it. `PRINT`, each side as
+printed, and under r000's default 8512 keeps its error.
+
+So: **a reading that is demonstrably WRONG about the machine is still what the
+page says.** "Our transcription must have dropped it" is a hypothesis, never a
+disposition, and the corpus cannot promote it to one. The same trap catches the
+supervisor relaying a list as readily as the agent building it — a candidate
+whose only support is "this looks like OCR damage" has no page behind it and is
+`UNRESOLVED` until a blind reading of the ORIGINAL'S OWN SCAN settles it.
 
 **WHICH ORIGINAL TO CREDIT WHEN A HOUSE TEXT RAN MANY TIMES.** The
 Checksummer and MSE articles are reprinted every few issues — 8603/55,
@@ -550,6 +623,45 @@ nothing wrong to search for.
 For a correction that ADDS text, sweep differently: find the other printings
 of that article (`reprints.txt`, `REPRINTS.md`, or a title search) and check
 each for the **new** text. Absent means the same defect, present means clean.
+
+### A REMAP LEAVES REFERENCES STALE, AND NO SCRIPT CAN CATCH IT
+
+Dispositions get remapped by content after the originals change. **The prose
+beside them does not.** An entry that names another entry — "counterpart
+D-2253", "same spurious pairing as D-1067", "recorded as UNRESOLVED at
+D-375…D-379" — still carries the number and the verdict that were true before.
+
+MEASURED on SH8607, 2026-10-24, three in one day:
+
+- a mark's description still carried the reading its verdict had just replaced
+  (`d5e98cc3`);
+- a pair head said *"New THEIRS candidate, NOT yet blind-read, so recorded as
+  UNRESOLVED at D-375, D-376, D-378, D-379"* after the blind reading had
+  confirmed it, after control had CLOSED it, and after the remap had destroyed
+  all four numbers;
+- four `MARKUP` lines still pointed at *"D-280…D-284 (UNRESOLVED, THEIRS
+  candidate)"* after that candidate was closed.
+
+**This cannot be scripted, and the reason is worth knowing: D NUMBERS ARE PER
+PAIR.** `LOG.md` holds 23 pairs, each numbered from D-001, so `D-280` exists
+several times over with different dispositions. A draft check that resolved
+each reference and compared verdicts produced four true hits and six cross-pair
+false ones on this issue — and a check whose output has to be sifted is a check
+people learn to ignore.
+
+So it is a READING step, and it belongs to whoever did the remap:
+
+**After any remap or applied correction, re-read every entry that names another
+D number or a disposition word, and bring its prose up to date.**
+
+```bash
+# the entries that make a claim about something other than themselves
+grep -n 'D-[0-9]\+' "issues/$ID/LOG.md" | grep -c 'counterpart\|same \|see D-\|recorded as\|candidate'
+```
+
+The verdict and the sentence next to it are one thing, not two. A record whose
+prose contradicts its own disposition is worse than one with a gap, because it
+reads as settled.
 
 ### APPLYING A `THEIRS` CORRECTION REACHES BACKWARDS THROUGH THE CORPUS
 
@@ -1154,23 +1266,21 @@ fail=0
 git status --short -uno issues/ | grep -v "^.\{2\} \"\?issues/$ID/" && {
   echo "  a published issue was edited by this rule -- must be reported, not slipped in"; fail=1; }
 
-# 3. Every THEIRS line carries its disposition word.
-#    READ THE WHOLE ENTRY, NOT THE ONE LINE.  This grepped the `- D-NNN
-#    THEIRS` line alone, and this rule's OWN LOG examples wrap the state onto
-#    the following line -- so a correctly recorded finding failed the check.
-#    An entry runs to the next `- D-` or to a blank line.
-$PY - "issues/$ID/LOG.md" <<'PY' || fail=1
-import re, sys
-s = open(sys.argv[1], encoding='utf-8').read()
-bad = 0
-for m in re.finditer(r'^- D-\d{3,} THEIRS\b.*?(?=^- D-|\n\n|\Z)',
-                     s, re.M | re.S):
-    if not re.search(r'REPORTED|APPLIED|declined', m.group(0)):
-        print('  THEIRS finding with no REPORTED/APPLIED/declined state:')
-        print('   ', m.group(0).splitlines()[0][:90])
-        bad = 1
-sys.exit(bad)
-PY
+# 3. Every THEIRS finding carries its disposition word.
+#    READ THE WHOLE ENTRY, NOT THE ONE LINE.  An early version grepped the
+#    `- D-NNN THEIRS` line alone, and this rule's OWN LOG examples wrap the
+#    state onto the following line -- so a correctly recorded finding failed.
+#    AND DO NOT ANCHOR ON `- D-`.  A SIDE FINDING HAS NO D NUMBER: the ones
+#    found inside a MOVED pair or inside <code> read "side finding inside
+#    <code> THEIRS", so a D-anchored pattern never sees them and their state
+#    goes unchecked.  MEASURED on SH8607, 2026-10-24: of four applied side
+#    findings, three carried their state only in a comment ABOVE the group
+#    and the fourth carried it inline -- the check passed while the file
+#    contradicted itself.  Match on THEIRS, and check BOTH files.
+for f in "issues/$ID/LOG.md" "issues/$ID/reviewed/r330-theirs.txt"; do
+  [ -e "$f" ] || continue
+  $PY tools/img/scan2ocr/rules/r330_theirs_state.py "$f" || fail=1
+done
 
 # 4. Every UNRESOLVED is a known gap the end-of-issue sweep will see.
 grep -c '^- D-[0-9]\{3,\} UNRESOLVED' "issues/$ID/LOG.md"

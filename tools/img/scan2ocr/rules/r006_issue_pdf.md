@@ -937,6 +937,49 @@ may share inodes with the delivery's (`stat -f%l` reports the link count):
 writing into one then silently rewrites the other. Unlink before regenerating —
 `rm` the entry and make a new file, never edit in place.
 
+### DROPPING THE CACHES IS HALF THE INSTRUCTION — the script now refuses on the other half
+
+MEASURED on SH8607, 2026-10-30. Five cover pages were re-cut, their cache
+entries were correctly purged from every directory, and the build was started
+without re-OCR'ing them. `make_issue_pdf_mixed.sh` **never runs tesseract** —
+its own header says so — so it re-encoded all 176 bilevel pages, then died
+inside `assemble_pdf.py` on a missing `001.pdf`, eleven minutes in, with the
+diagnosis in a Python traceback.
+
+`NNN.pdf` and `NNN_150.png` are **inputs**, not caches the build refills. The
+mixed script now checks all of them up front and refuses with the three
+commands that rebuild them. The caches above still have to be dropped; this
+only makes the missing half loud.
+
+### THE BUILD LOG IS APPEND-ONLY, AND THAT DEFEATS A WHOLE-FILE GREP
+
+`make_issue_pdf_mixed.sh` does `exec >> "$LOG"`, so every run's output lands in
+one file behind its own `=== HH:MM:SS mixed build … ===` banner. A wrapper that
+greps the WHOLE log for `Traceback` reports the previous run's wreckage against
+this run's good build — which is what happened the second time on SH8607, and
+it declared a correct 42.4 MB PDF a failure. **Scope the grep to the last
+banner:**
+
+```bash
+awk 'BEGIN{p=0} /^=== .*mixed build/{p=NR} {a[NR]=$0} END{for(i=p;i<=NR;i++) print a[i]}' "$LOG"
+```
+
+### AND DO NOT PIPE THE BUILD WRAPPER TO `tail`
+
+`bash build.sh 2>&1 | tail -40` reports **`tail`'s** status, so a wrapper that
+carefully `exit 1`s on a bad artefact still comes back 0 — and a harness that
+watches exit codes calls the build a success. Both SH8607 rebuild attempts
+looked like "exit 0" for exactly this reason, and the build script itself was
+innocent: `set -e` aborted it correctly at `sz=$(build_at "$mid")` both times.
+**A claim that a build "exited 0 while failing" is almost always the pipe.**
+Use `tee`, or read `${PIPESTATUS[0]}`, or do not pipe at all.
+
+**THE ONLY GATE THAT MEANS ANYTHING IS THE ARTEFACT.** The PDF's mtime must
+change, and its content must be what was asked for — checked by pixels, not by
+trusting a cache key. On SH8607: p161 came out 21.84 % black against 21.06 %
+for a fresh 28 % threshold of the source and 30.51 % for 35 %, which is how you
+know the delivered page is the new one and not a stale `jbig2-t35` entry.
+
 ## Inputs
 
 - `<tmp>/masters600/NNN.png` — every page of the issue, 600 dpi
@@ -1091,10 +1134,27 @@ contone M pages @150dpi` read against the approved counts — no measurement
 inside the build could have, because both guards agreed. So: read N and M
 against the list you approved, and `pdfimages -list` the pages you overrode.
 
-`JOBS` defaults to r000's lane cap (cores − 4; 28 on this box). SH8605 ran 32
-tesseract jobs because the script took `NCPU`, which is the same
-over-subscription that killed step 030 in that build when two heavy steps
-overlapped. It survived only because it ran alone.
+**`JOBS` NEEDS NOTHING FROM YOU, AND AN EXPLICIT ONE IS CLAMPED DOWN.** Both
+scripts source `tools/img/issue_pdf/load_clamp.sh`, which exports one thread
+per job (`OMP_THREAD_LIMIT`, `OMP_NUM_THREADS`, `MAGICK_THREAD_LIMIT` = 1) and
+sizes `JOBS` at **half the free cores** — r000's *parallelise to half of what
+is free*. A `JOBS=` you pass is lowered to that ceiling and never raised, and
+the script says so on stderr when it bites. **Do not pass one** unless you are
+deliberately going smaller.
+
+The examples above still show `JOBS=28`; that number is now clamped on this
+box and is left in only because it is what the earlier builds recorded.
+
+Why the script guards itself instead of trusting the caller: on **SH8607** this
+step ran `make_issue_pdf.sh` with `JOBS=22` and no thread limits, tesseract and
+`magick` each multithreaded, the 1-minute load reached **386**, and the memory
+watchdog emergency-killed another user's 231 GB model server — repeatedly, and
+it stayed down. SH8605 had already run 32 tesseract jobs where the lane rule
+gave 28 (the same over-subscription that killed step 030 in that build when two
+heavy steps overlapped); it survived only because it ran alone. Both were
+written up as "pass the right `JOBS`". That advice sat in the script's own
+comment and did not prevent the third one, which is why it is no longer the
+guard.
 
 Watch for `[cover] page 001 carries .../title.png (N grey levels)` in the log.
 Its absence means the build died — check the log, not the exit status of a

@@ -61,17 +61,16 @@ LIMIT=$((100*1000*1000))
 # hours of guetzli.  The search is still the default and still what a keeper gets.
 QMIN="${QMIN:-84}"; QMAX="${QMAX:-97}"
 NCPU="$(sysctl -n hw.ncpu)"
-# JOBS, not NCPU: r000's lane rule reserves 4 cores so a heavy step does not
-# starve whatever else is running.  SH8605 ran 32 tesseract jobs here where
-# lanes() gives 28; it survived because it ran alone, and the same
-# over-subscription had already killed step 030 earlier in that build when two
-# heavy steps overlapped.  Pass JOBS explicitly for a RAM-bound run --
-# r000_issue.lanes(lane_gb) is the number.
-JOBS="${JOBS:-$(( NCPU > 5 ? NCPU - 4 : 1 ))}"
-# We already run NCPU jobs in parallel; letting each magick use all cores too
-# drove the load to ~900 and stalled for 25+ min on 8612.  With this it is
-# minutes.  (r000's lanes rule, in script form.)
-export MAGICK_THREAD_LIMIT=1
+# HALF OF WHAT IS FREE, and one thread per job.  This script used to export
+# MAGICK_THREAD_LIMIT=1 on its own (8612: letting each magick take every core
+# drove the load to ~900 and stalled for 25+ min) -- but tesseract's OMP limit
+# was never set here, and the plain make_issue_pdf.sh never got even the magick
+# half.  Both now come from one file, so neither script can be missing one.
+# An explicit JOBS is clamped DOWN to the ceiling, never up.
+_CLAMP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+# shellcheck source=load_clamp.sh
+. "$_CLAMP_DIR/load_clamp.sh"
+JOBS="$(clamp_jobs "${JOBS:-}")"
 AUTHOR="Markt & Technik"
 CREATOR="tesseract 5 + guetzli + jbig2enc + pikepdf"
 TITLE="64'er $TAG"
@@ -133,6 +132,30 @@ for f in "$IN"/[0-9][0-9][0-9].png "$IN"/[0-9][0-9][0-9].tiff; do
   b="$(basename "$f")"; pages="$pages ${b%.*}"
 done
 pages=$(printf '%s\n' $pages | sort -u)
+
+# THE OCR CACHE IS AN INPUT, AND A MISSING ENTRY IS A REFUSAL, NOT A TRACEBACK.
+# This script never runs tesseract (see the header): NNN.pdf carries the text
+# layer AND the page box, NNN_150.png is the contone raster, and both come from
+# make_issue_pdf.sh.  r006, RE-CUTTING A PAGE MEANS RE-OCR'ING IT, says to drop
+# them when a page is re-cut -- and dropping them is only half the instruction.
+# MEASURED on SH8607 2026-10-30: the five re-cut cover pages had their caches
+# purged and were NOT re-OCR'd, so this script encoded all 176 bilevel pages,
+# then died inside assemble_pdf.py on a missing 001.pdf, eleven minutes in.
+# The work was not wasted but the diagnosis was buried in a Python traceback.
+missing=""
+for n in $pages; do
+  [[ -s "$CACHE/$n.pdf"     ]] || missing="$missing $n:pdf"
+  [[ -s "$CACHE/${n}_150.png" ]] || missing="$missing $n:150"
+done
+if [[ -n "$missing" ]]; then
+  echo "OCR cache incomplete --$missing"
+  echo "  $CACHE/NNN.pdf and NNN_150.png are INPUTS; this script never makes them."
+  echo "  Re-OCR those pages with make_issue_pdf.sh's own parameters:"
+  echo "    magick <page>.png -resize 67% +repage -strip \$CACHE/NNN_o.png"
+  echo "    tesseract \$CACHE/NNN_o.png \$CACHE/NNN -l deu --psm 3 --oem 3 --dpi 402 pdf"
+  echo "    magick <page>.png -resize 25% +repage -strip \$CACHE/NNN_150.png"
+  exit 1
+fi
 
 # ---- THE COVER IS THE HAND-MADE FILE, AND THIS BUILD MUST PROVE IT ------------------------------
 # This script does not build the 150 dpi pages -- it consumes the cache make_issue_pdf.sh left

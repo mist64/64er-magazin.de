@@ -143,11 +143,18 @@ REQUIRED_KEYS = ("id", "kind", "pages", "scan_dir", "thumb_150", "tmp", "pdf")
 def lanes(lane_gb, reserve_cores=4):
     """How many lanes a LOCAL-COMPUTE step should run. See r000_orchestration.
 
-    THE RULE: parallelise to use HALF the free RAM, capped by the cores.
-    Half and not all, because the other half is the margin that keeps a long
-    run off the swap when something else on the machine wants memory
-    part-way through, and a run that starts swapping is slower than one that
-    never grew.
+    THE RULE: parallelise to use HALF OF WHAT IS FREE -- half the free RAM,
+    AND half the free cores. Half and not all, because the other half is the
+    margin that keeps a long run off the swap when something else on the
+    machine wants memory part-way through, and a run that starts swapping is
+    slower than one that never grew.
+
+    BOTH HALVES, because for a long time only the RAM one was here and the
+    core cap was `cores - 4`, which on a 32-core box is 28 -- not half of
+    anything, and no smaller at all when the machine is already busy. The
+    cores are now taken from what is FREE (cores minus the 1-minute load),
+    the same way the RAM is, so a step started beside a running build asks
+    for less than one started on an idle box.
 
     `lane_gb` is that step's MEASURED peak for one lane, which is the only
     number a caller has to supply and the only one worth arguing about.
@@ -160,9 +167,13 @@ def lanes(lane_gb, reserve_cores=4):
     NOT for a step whose lanes are model calls -- those are bound by rate
     limits and by the credential race in r000_llm, not by this machine.
     """
-    import multiprocessing, subprocess
+    import multiprocessing, os, subprocess
     cores = multiprocessing.cpu_count()
     free_gb = 0
+    try:
+        load1 = os.getloadavg()[0]
+    except Exception:
+        load1 = 0.0
     try:
         out = subprocess.run(["vm_stat"], capture_output=True, text=True).stdout
         page = int(out.split("page size of ")[1].split()[0])
@@ -173,7 +184,8 @@ def lanes(lane_gb, reserve_cores=4):
         free_gb = pages * page / 1073741824
     except Exception:
         pass                       # not macOS, or vm_stat moved: fall back to cores
-    n = max(1, cores - reserve_cores)
+    free_cores = max(2.0, cores - load1 - reserve_cores)
+    n = max(1, int(free_cores / 2))
     if free_gb:
         n = min(n, max(1, int(free_gb / 2 / lane_gb)))
     return n

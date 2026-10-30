@@ -75,13 +75,15 @@ ENCODER="${ENCODER:-guetzli}"
 if [[ "$ENCODER" == "fast" ]]; then QMIN=70; QMAX=95; else QMIN=84; QMAX=97; fi
 LANG="deu"; PSM=3; OEM=3; OCRSCALE=67; DPITAG=402; IMGSCALE=25
 NCPU="$(sysctl -n hw.ncpu)"
-# JOBS, not NCPU: r000's lane rule reserves 4 cores so a heavy step does not
-# starve whatever else is running.  SH8605 ran 32 tesseract jobs here where
-# lanes() gives 28; it survived because it ran alone, and the same
-# over-subscription had already killed step 030 earlier in that build when two
-# heavy steps overlapped.  Pass JOBS explicitly for a RAM-bound run --
-# r000_issue.lanes(lane_gb) is the number.
-JOBS="${JOBS:-$(( NCPU > 5 ? NCPU - 4 : 1 ))}"
+# HALF OF WHAT IS FREE, and one thread per job.  load_clamp.sh exports the
+# thread limits and computes the ceiling; it does NOT depend on the caller
+# remembering either, because forgetting them here once took another user's
+# model server down with it (SH8607, 2026-10-23 -- the file has the history).
+# An explicit JOBS is clamped DOWN to the ceiling, never up.
+_CLAMP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+# shellcheck source=load_clamp.sh
+. "$_CLAMP_DIR/load_clamp.sh"
+JOBS="$(clamp_jobs "${JOBS:-}")"
 CREATOR="tesseract 5 + guetzli + Ghostscript"      # honest
 AUTHOR="Markt & Technik"
 TITLE="64'er $TAG"

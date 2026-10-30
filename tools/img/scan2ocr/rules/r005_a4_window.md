@@ -155,6 +155,103 @@ Record per page which of the three was used, beside the grade stamp, so a page
 whose type sits differently from its neighbours can be explained rather than
 re-derived.
 
+## THE SURPLUS IS THE BUND, AND THE BUND IS ON THE BINDING SIDE
+
+A cover leaf traces WIDER than A4, so the fallback has to decide which end of
+the surplus to throw away. **Decide it from parity: a recto is bound on its
+LEFT, a verso on its RIGHT.** That is where the Bund is — the spine strip the
+scan catches beside the page, carrying the magazine's own vertical lettering
+(`64'er SONDERHEFT 7/86 PEEKs & POKEs`), which is not part of the page.
+
+**DO NOT TRY TO MEASURE WHICH SIDE IS BLANK.** The predecessor did — count the
+columns from each edge whose ink is under 0.2 %, discard the blanker side — and
+it got **all four** of SH8607's cover-leaf pages wrong, in the one direction the
+test could fail in. Found by the owner on the finished PDF, 2026-10-30, page by
+page: *"p2 isnt cropped right. maybe 2 cm on the left are missing"*, *"similarly
+to 2, p179 is clipped on the right"*, *"and 180 is clipped on the left. the
+vertical text is the »Bund«, not part of the page"*.
+
+| page | parity | Bund | shipped | correct | what the shipped crop lost |
+|---|---|---|---|---|---|
+| 001 | recto | left | trimmed right | trim left 219 px | "DM 14,–" off the right |
+| 002 | verso | right | trimmed left 249 px | trim right | the left column of the ad, 10.5 mm |
+| 179 | recto | left | trimmed right | trim left 186 px | the Fischertechnik column |
+| 180 | verso | right | trimmed left 211 px | trim right | the left bullet list, 8.9 mm |
+
+Three things defeat the blank-side measurement, and the third is the one to
+remember:
+
+1. **It read the wrong frame.** `sheet_box` is in the SHEET frame; the profile
+   was taken from `masters600`, where the page has been moved to the canvas
+   origin and everything outside the traced edge painted white. So on p002 the
+   first column of the slice was fabricated paper and scored as blank.
+2. **Its floor is below the scanner's noise.** 0.2 % of a 7000-px column is
+   14 pixels. p002's real 9.5 mm fore-edge margin measures **3 %** and its last
+   column **0.47 %** — both "inked". Neither side ever scored blank on any of
+   the four pages.
+3. **So the tie-break decided, every time.** `blank_l >= blank_r` with both
+   sides at zero trims the LEFT. On p002 the entire 10.5 mm crop came down to
+   one fabricated white column against a 0.47 % speckle — a measurement in
+   form, a constant in effect.
+
+**A Bund is not blank and a cover bleeds to both trims**, so the premise the
+test rests on — that one end of the surplus is empty paper — is false on
+exactly the pages the test exists for.
+
+### The file's own note said parity had been tried and had failed. Read it again
+
+`r005_a4_window.py` carried this, as the reason the ink profile replaced parity:
+
+> On SH8601 p002 the parity rule right-aligned the window, clipping printed
+> content off the LEFT while keeping the flap's white on the right: the flap is
+> on the right on that verso, the opposite of what the binding side predicts.
+
+Right-aligning a verso means trimming its LEFT — which is the same wrong crop
+we have just fixed on SH8607 p002, and the sentence's own observation ("the
+flap is on the right on that verso") is **what parity predicts here**. So
+SH8601 did not refute parity; it refuted an implementation that had the binding
+side inverted, and the fix threw out the rule instead of the sign. Five pages
+across two issues now agree: verso → Bund right, recto → Bund left.
+
+**A note saying "X was tried and failed" is evidence about one implementation
+of X, never about X** — and when the replacement is a measurement, check that
+it can actually come out both ways before trusting it over the thing it
+replaced. This one never could.
+
+### Only a cover leaf has a Bund
+
+An oversize box on any other page is step 005 failing to find a trim edge, not
+a Bund, and nothing names a side: **centre the window in the box**. SH8607 p158
+(`page-class: uncropped sheet`) is the full-bleed te-wi ad, 92 px oversize,
+where the page runs off every edge and 3.9 mm either way is black bleed. The
+class comes from the master's stamp; `place()` reads it, and the stamp it writes
+records the trim in words, so the next build reads the decision instead of
+re-deriving it:
+
+```
+  trim     249 px off the RIGHT (verso) -- the Bund, by parity
+  trim     92 px, centred -- 'uncropped sheet' is not a cover leaf, so no side is the Bund
+```
+
+### Backfill a field the cache predates; never re-measure to get it
+
+`<tmp>/a4win/measured.json` is MERGED, never replaced, so a cache written before
+`page_class` existed hands `place()` a `None` — and `None` is not a cover leaf,
+so every cover-leaf page silently centres and the Bund stays half in. **That is
+the original defect wearing the new code's clothes**, and it is exactly what the
+first run of the fix produced. `main()` now backfills the class from the
+master's stamp, which is a text read per page, instead of re-measuring 184
+pages to recover one line.
+
+### And purge the PDF's page cache after any re-cut
+
+`a4600/.ocrcache` is keyed by PAGE NUMBER alone — `002.pdf`, `jbig2-t35/158.jb2`,
+`guetzli-q97/179.jpg`. Re-cutting a page does not change its number, so the next
+build re-embeds the OLD image and the PDF looks unfixed while every input is
+right. Delete the re-cut pages' entries from every cache directory, and the
+`manifest-*.tsv` and `out-*.pdf` with them. (r006 records the same trap for
+`BILEVEL_THRESHOLD`, which is why each threshold has its own `jbig2-t<n>` dir.)
+
 ## A PAGE WHOSE TRACE FAILS IS CUT BY A SCRIPT — NEVER BY HAND, AND THE SCRIPT IS YOURS TO WRITE
 
 **NAMING, because the numbers collide.** The three above — logo, paper-edge,
@@ -462,6 +559,52 @@ moved = [f.name[:3] for f in sorted(A.OUT_A4.glob("*.stamp.txt"))
          if (PREV / f.name).exists() and win(A.OUT_A4, f.name) != win(PREV, f.name)]
 print("pages whose window moved across the regrade:", moved or "none")
 assert not moved, f"the field moves no pixels, so these are matcher artefacts: {moved}"
+PY
+
+# 6. THE BUND CHECK -- the one that would have caught SH8607's four cover-leaf
+#    pages before the PDF went to the owner.  Two halves, and the second one is
+#    a LOOK, not an assert.
+#
+#    6a (machine): every stamp that says it trimmed a Bund trimmed it on the
+#    binding side.  A recto is bound LEFT, a verso RIGHT.  This cannot catch a
+#    wrong window -- it only catches the code contradicting itself -- but it is
+#    free and it pins the convention in the artefact.
+$PY - <<'PY'
+import re
+import r005_a4_window as A
+bad = []
+for f in sorted(A.OUT_A4.glob("*.stamp.txt")):
+    m = re.search(r"^  trim\s+\d+ px off the (LEFT|RIGHT)", f.read_text(encoding="utf-8"), re.M)
+    if m:
+        want = "LEFT" if int(f.name[:3]) % 2 else "RIGHT"
+        if m.group(1) != want:
+            bad.append((f.name[:3], m.group(1), want))
+print("Bund trims against parity:", bad or "none")
+assert not bad, f"a Bund trimmed off the wrong side: {bad}"
+PY
+
+#    6b (eye): EVERY PAGE PLACED BY A FALLBACK GETS LOOKED AT.  There are a
+#    handful per issue -- SH8607 had 16, of which 5 were oversize -- and the
+#    delivered crop is the only thing that can say whether the window is right.
+#    Ink in the outer 3 mm is the cue, not the verdict: a running-head bar or a
+#    full-bleed ad legitimately reaches the trim, and clipped type does too.
+#    Print the table, then OPEN the pages it names.
+$PY - <<'PY'
+import re
+import numpy as np
+from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
+import r005_a4_window as A
+B = int(round(3.0 / 25.4 * A.DPI))
+print(" page  src          left%  right%   -- open every row")
+for f in sorted(A.OUT_A4.glob("*.stamp.txt")):
+    st = f.read_text(encoding="utf-8")
+    m = re.search(r"^  anchor\s+(\S+)", st, re.M)
+    if m.group(1) == A.SRC_LOGO:
+        continue                       # the wordmark placed it; 6b is for the rest
+    g = np.asarray(Image.open(A.OUT_A4 / (f.name[:3] + ".png")).convert("L")) < 200
+    print("  %s  %-11s %6.1f  %6.1f" % (f.name[:3], m.group(1),
+                                        100 * g[:, :B].mean(), 100 * g[:, -B:].mean()))
 PY
 ```
 

@@ -124,10 +124,6 @@ Image.MAX_IMAGE_PIXELS = None
 
 DPI = 600
 A4_W = int(round(210.0 / 25.4 * DPI))          # 4961
-# A column with less ink than this is blank paper -- used to decide which side
-# of an oversize sheet carries the fold flap, and whether an insert is smaller
-# than the issue's leaf on its own merits rather than by assumption.
-BLANK_COL_INK = 0.002
 # An insert this much smaller than A4 in BOTH axes is delivered AT ITS OWN
 # SIZE, not padded: SH8601's Zahlkarte is 144 x 205 mm, and an A4 page would
 # be 53% fabricated and would tell the reader the card is A4.
@@ -199,10 +195,12 @@ B_RANGE = (A4_H - 800, A4_H, DS)
 #                    and the bound-in Zahlkarte, which are not body pages
 # 2 and 3 place the window from the page's own measured box: centred, which is
 # what this chain's delivery already did.  The one exception is a page box WIDER
-# than A4 -- the cover leaf with its fold flap -- where centring would trim the
-# flap off both sides.  The flap is on the BINDING side, and step 005 measures
-# that side from parity (a verso tears on the right, a recto on the left), so
-# the trim is taken there and the outer trim is kept flush.
+# than A4.  On a COVER LEAF that surplus is the BUND -- the spine strip the
+# scan catches beside the page -- and it comes off the BINDING SIDE, which is
+# parity: a recto is bound on its left, a verso on its right.  On any other
+# page an oversize box is a measurement failure with no side to it, and the
+# surplus comes off both ends alike.  See r005_a4_window.md, THE SURPLUS IS
+# THE BUND, for the four pages that settled this.
 SRC_LOGO = "logo"
 SRC_PAPER = "paper-edge"
 SRC_TRACED = "traced-edge"
@@ -442,9 +440,13 @@ def sheet_box_of(page, gray):
     """
     st = (MASTERS / f"{page:03d}.stamp.txt").read_text(encoding="utf-8")
     finder = "ink/bed" if "ink/bed" in st else "paper/bed"
+    # The class decides where an oversize box's surplus comes off -- see
+    # place().  "cover leaf" is the only value that names a binding side.
+    mc = re.search(r"^page-class\s+(.+)$", st, re.M)
+    cls = mc.group(1).strip() if mc else ""
     m = re.search(r"sheet-box\s+(\d+) (\d+) (\d+) (\d+)", st)
     if m:
-        return [int(v) for v in m.groups()], finder, 1.0
+        return [int(v) for v in m.groups()], finder, 1.0, cls
     pw, ph = (int(v) for v in
               re.search(r"page-px\s+(\d+) (\d+)", st).groups())
     mg = np.asarray(Image.open(MASTERS / f"{page:03d}.png").convert("L"))[:ph, :pw]
@@ -453,7 +455,7 @@ def sheet_box_of(page, gray):
     _n, sc, _n2, loc = cv2.minMaxLoc(
         cv2.matchTemplate(gray, pat, cv2.TM_CCOEFF_NORMED))
     x0, y0 = loc[0] - (cx - 256), loc[1] - (cy - 256)
-    return [int(x0), int(y0), int(x0 + pw), int(y0 + ph)], finder, float(sc)
+    return [int(x0), int(y0), int(x0 + pw), int(y0 + ph)], finder, float(sc), cls
 
 
 def measure(page):
@@ -464,7 +466,7 @@ def measure(page):
     gray = np.asarray(im.convert("L"))
     tmpl = np.asarray(Image.open(TEMPLATE).convert("L"))
     found, side, score, ang, bbox = detect(gray, tmpl)
-    box, finder, box_sc = sheet_box_of(page, gray)
+    box, finder, box_sc, page_class = sheet_box_of(page, gray)
 
     small = np.asarray(im.reduce(MASK_REDUCE))
     pm = page_mask(small)
@@ -473,7 +475,7 @@ def measure(page):
            "score": round(float(score), 4), "angle": ang, "bbox": bbox,
            "anchor": anchor_of(side, bbox), "finder": finder,
            "page_frac": round(float(pm.mean()), 4), "sheet_box": box,
-           "sheet_box_match": round(box_sc, 5)}
+           "sheet_box_match": round(box_sc, 5), "page_class": page_class}
     np.savez_compressed(CACHE / f"{page:03d}.npz", ii=ii, shp=np.array(shp))
     return rec
 
@@ -528,6 +530,7 @@ def fit(recs, entries):
 def place(rec, off, entry):
     """The window for one page, and which of the three fallbacks put it there."""
     page = rec["page"]
+    trim = None
     par = "even" if page % 2 == 0 else "odd"
     if rec["found"] and par in off:
         ax, ay = rec["anchor"]
@@ -558,20 +561,30 @@ def place(rec, off, entry):
         bx0, by0, bx1, by1 = rec["sheet_box"]
         bw, bh = bx1 - bx0, by1 - by0
         if bw > A4_W:
-            # Wider than A4: the surplus is the cover leaf's fold flap.  TRIM
-            # THE BLANK SIDE, MEASURED -- do not infer it from parity.  On
-            # SH8601 p002 the parity rule right-aligned the window, clipping
-            # printed content off the LEFT while keeping the flap's white on
-            # the right: the flap is on the right on that verso, the opposite
-            # of what the binding side predicts.  The ink profile says which
-            # side is blank and cannot be wrong about it.
-            g = np.asarray(Image.open(MASTERS / f"{page:03d}.png").convert("L"))
-            box = g[max(by0, 0):by1, max(bx0, 0):bx1]
-            col = (box < 235).mean(0)
+            # Wider than A4.  THE SURPLUS ON A COVER LEAF IS THE BUND, and the
+            # Bund sits on the binding side: a recto is bound on its LEFT, a
+            # verso on its RIGHT.  Trim it there and the outer trim stays flush.
+            #
+            # DO NOT TRY TO MEASURE WHICH SIDE IS BLANK.  The predecessor did,
+            # with a 0.2 %-ink-per-column test, and got SH8607's 001, 002, 179
+            # and 180 ALL FOUR WRONG.  A Bund is not blank -- it carries the
+            # magazine's own vertical lettering -- a cover bleeds to both
+            # trims, and the floor sat below the scanner's own noise, so
+            # neither side ever scored as blank and the `>=` tie-break trimmed
+            # the left every time.  On p002 the whole 10.5 mm crop came down to
+            # one fabricated white column against a 0.47 % speckle.
             surplus = bw - A4_W
-            blank_l = int(np.argmax(col > BLANK_COL_INK))
-            blank_r = int(np.argmax(col[::-1] > BLANK_COL_INK))
-            x0 = bx0 + surplus if blank_l >= blank_r else bx0
+            if (rec.get("page_class") or "").startswith("cover"):
+                x0 = bx0 + surplus if page % 2 else bx0
+                trim = (f"{surplus} px off the "
+                        f"{'LEFT (recto)' if page % 2 else 'RIGHT (verso)'}"
+                        f" -- the Bund, by parity")
+            else:
+                # Not a cover leaf: step 005 did not find a trim edge, so the
+                # box is not the page and nothing names a side.  Centre it.
+                x0 = bx0 + surplus // 2
+                trim = (f"{surplus} px, centred -- {rec.get('page_class')!r} "
+                        f"is not a cover leaf, so no side is the Bund")
         elif (A4_W - bw > INSERT_MARGIN_PX) and (A4_H - bh > INSERT_MARGIN_PX):
             # AN INSERT KEEPS ITS OWN SIZE.  SH8601's Zahlkarte measures
             # 144 x 205 mm; an A4 page would be 53% fabricated and would tell
@@ -589,7 +602,7 @@ def place(rec, off, entry):
     a = alpha_at(entry, x0, y0)
     return {"x0": int(x0), "y0": int(y0), "w": A4_W, "h": A4_H,
             "src": src, "anchor": rec["anchor"] if rec["found"] else None,
-            "score": rec["score"], "side": rec["side"],
+            "score": rec["score"], "side": rec["side"], "trim": trim,
             "alpha_pct": round(100.0 * a / CELLS, 4)}
 
 
@@ -731,6 +744,7 @@ def cut(page, win, rec, out_dir=None):
                 f"template score {win['score']:.3f})" if win["anchor"] else
                 f" -- no wordmark on this page; the best corner match was "
                 f"{win['side']} at {win['score']:.3f}")
+             + (f"\n  trim     {win['trim']}" if win.get("trim") else "")
              + f"\n  window   {win['x0']} {win['y0']} {A4_W} {A4_H}  in the sheet"
                f"\n           {x0} {y0} {A4_W} {A4_H}  in the master"
                f"\n  alpha    {win['alpha_pct']:.2f}% of the window is not this "
@@ -880,6 +894,17 @@ def main():
     cache_json = CACHE / "measured.json"
     if cache_json.exists():
         recs = {r["page"]: r for r in json.load(open(cache_json))}
+    # BACKFILL, DO NOT RE-MEASURE.  A cache written before `page_class` existed
+    # has every other field right, and place() silently centred the Bund away
+    # when the field came back None -- which is the SH8607 defect wearing the
+    # new code's clothes.  The class is one line of the master's stamp, so read
+    # it; re-measuring 184 pages to recover it would be an hour for a grep.
+    for p, r in recs.items():
+        if not r.get("page_class"):
+            st = MASTERS / f"{p:03d}.stamp.txt"
+            m = re.search(r"^page-class\s+(.+)$", st.read_text(encoding="utf-8"),
+                          re.M) if st.exists() else None
+            r["page_class"] = m.group(1).strip() if m else ""
     todo = [p for p in all_pages if p not in recs
             or not (CACHE / f"{p:03d}.npz").exists()]
     if todo:

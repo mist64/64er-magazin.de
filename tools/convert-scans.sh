@@ -13,6 +13,14 @@
 #   DOTS_BLUR   gaussian sigma (px) that smooths the screen before the two
 #               tests; must flatten the screen's dots below DOTS_LOCAL, so a
 #               coarser screen needs more; too much and hairlines fade
+# HALF OF WHAT IS FREE (r000). This loop used to background EVERY file at once
+# with a single `wait`: 38 crops meant 38 concurrent multithreaded magick, the
+# shape that emergency-killed another user's model server on SH8607.
+_CLAMP="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)/img/issue_pdf/load_clamp.sh"
+# shellcheck source=img/issue_pdf/load_clamp.sh
+[ -r "$_CLAMP" ] && . "$_CLAMP"
+JOBS="$(clamp_jobs "${JOBS:-}" 2>/dev/null || echo 4)"
+
 DOTS_LOCAL=${DOTS_LOCAL:-20}
 DOTS_SOLID=${DOTS_SOLID:-30}
 DOTS_BLUR=${DOTS_BLUR:-1.5}
@@ -33,6 +41,9 @@ for dir in bw gray c dots; do
               \( -clone 0 -lat 41x41-${DOTS_LOCAL}% \) \( -clone 0 -threshold ${DOTS_SOLID}% \) -delete 0 \
               -compose multiply -composite "$out" ;;
     esac &
+    # sleep, NOT `wait -n`: this script runs under /bin/bash, which on macOS is
+    # 3.2 and has no -n. It failed on every iteration and throttled nothing.
+    while (( $(jobs -r | wc -l) >= JOBS )); do sleep 0.2; done
   done
 done
 wait

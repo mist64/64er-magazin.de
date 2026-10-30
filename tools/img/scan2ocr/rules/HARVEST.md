@@ -975,3 +975,341 @@ when you think you already know what is in it.**
 each produced a rule change that applies to every future issue -- which is the
 argument for r340's reopen rule, written this morning after a mid-build harvest
 left SH8608 with nowhere to write.
+
+## SH8607, 2026-10-24: a delivered crop is always raw, and r150 assumed the opposite
+
+`r150_place_images.md` carried, from SH8608, **"never re-render, re-threshold
+or re-bucket a crop that arrives"** — correct for the delivery it was written
+from, which arrived as 1-bit grey with the owner's bucketing already in it.
+SH8607's delivery arrived as **8-bit sRGB at 600 dpi** and the owner said on
+handing it over that it had to be classified and run through
+`tools/convert-scans.sh` first. Read literally, the rule covered both and gave
+the wrong answer for the second.
+
+The owner then asked the question that turned a one-off into a rule: *"so we
+have a new rule now? when the user supplies crops, we still have to do buckets
+and conversion?"* — and the answer is that bucketing was never new (r145 has
+always sorted chain-cut crops into `png/{bw,gray,dots,c}/`); what was missing
+was the test for **which kind of delivery is in front of you**, which
+`magick identify -format '%[depth]/%[colorspace] %wx%h'` settles per file.
+
+What it cost, measured: SH8607's 38 crops were **151 MB** of RGB and **1.8 MB**
+converted — 85x over the set, 180x on `66-1` (20.9 MB → 116 KB). Placing a raw
+delivery as-is would have committed scan masters to the published repository,
+which `.gitignore`'s `issues/*/*` exists to prevent.
+
+**The general shape, and the reason this is worth an entry rather than a line:**
+a rule written from one instance of a thing states the instance's accidents as
+if they were the rule's subject. SH8608's crops happened to arrive finished;
+"a crop that arrives" was never the real condition, "a crop whose bucket is
+already decided" was. **A prohibition needs the test that tells you when it
+applies, or the next instance that fails the test gets obeyed into the wrong
+outcome.** Harvested as a new r150 section, *FIRST ASK WHETHER A DELIVERED CROP
+IS FINISHED OR RAW*, with the two-row table and the classification kept the
+build's job — shown to the owner for a yes, recorded in
+`issues/<ID>/reviewed/crop-classification.txt` with the reason per bucket.
+
+**Then the owner closed the question rather than answering it:** *"in the
+future, i'll never give you processed/bucketed crops, only raw 600 dpi rgb
+crops! remove detection instructions"* — and the detection table written an
+hour earlier came straight back out. r150 now states the standing instruction,
+with the bucket criteria, the owner's SH8608 colour precedent and the SH8607
+cost figures, and no test for a case that will not occur.
+
+**Which is the better lesson of the two.** My first harvest reached for a
+discriminator: two cases, a `magick identify` test, a table to tell them apart.
+That is the reflex of a rule written to survive any input — and it encoded as a
+permanent branch something that was really one delivery's accident. **A
+standing instruction from the owner beats a detection rule, because it removes
+the branch instead of documenting it.** When a rule needs a test to decide
+which of two things is in front of it, ask first whether the owner can simply
+promise one of them; a branch nobody will ever take is still a branch every
+future reader has to understand and every future rule has to stay consistent
+with. Ask before building the discriminator, not after.
+
+## SH8607, 2026-10-24: r160's series rule and r150's undelivered-row rule collided, and only one of them can win
+
+`r160_fill_tables.md` said **"If ANY member has to be cropped, the whole series
+goes on r150's crop worklist and this step typesets none of it."**
+`r150_place_images.md` said **"an undelivered worklist row is an answer, not an
+omission."** SH8607's page-6 Memory Map put both in the same place: Bild 1-23,
+of which the owner cut 18 and withheld exactly the five that are data tables in
+print. Obey r160 and those five ship in **no medium at all**; obey r150 and the
+series is mixed. The build chose r150, typeset the five, and was right.
+
+**r160's rule was over-stated, not wrong.** It was written from SH8604's Bild
+6a-6j — ten variants of ONE figure, side by side, where two media genuinely
+read as two things. SH8607's is a 23-member run across a 60-page article whose
+members are not the same KIND of object, because 64'er labels drawings, screen
+shots and data tables alike `Bild N`. A series heterogeneous in kind cannot be
+homogeneous in medium without damage. r160 now says the rule governs the
+WORKLIST and never the delivery, with both halves of the reasoning.
+
+**The part that is mine and that I nearly let through: the build offered a
+corpus precedent, _"the 1985 Memory Map printings were mixed the same way"_,
+and it is false.** All eight prior printings have a single-medium Bild series
+(8501, 8503, 8506, 8507, 8511, 8603 cropped; 8512 typeset); what they do is
+crop the **Bild** series and typeset the **Tabelle** series — two homogeneous
+series, not one mixed one. SH8607 is the corpus's first split Bild series,
+because it is the first with 23 members rather than five.
+
+The decision survives on the rule alone, so nothing had to change — which is
+exactly why this is worth writing down. **A correct decision resting partly on
+a false reason is the dangerous kind**, because the next build inherits the
+reason and applies it where the rule would not reach. r150 already carries this
+lesson in the other direction (*"a one-sentence ruling relayed without the
+count behind it is a guess wearing the owner's voice"*); it binds the
+supervisor's own relaying too, and the count took one command.
+
+## SH8607, 2026-10-24: corpus frequency is not evidence about a printed page
+
+SH8607's Memory Map and 8512/146 both print *Anfangsadressen der 4 Tabellen*.
+Row 4 differs: SH8607 `ab 60536`, 8512 `ab 64632`. **Everything except the page
+said 8512's HTML had mistyped it** — 60536 is `$EC78`, giving the consistent
+set `$EB81 $EBC2 $EC03 $EC78`, while 64632 is `$FC78` and is not a decode table
+at all. The build read 8512's own scan anyway and a blind reader, asked only to
+transcribe all four rows and not told what was in question, returned `ab 64632`
+sure of every digit. 1985 printed `$FC78`; the Sonderheft corrected it. `PRINT`,
+and under r000's default 8512 keeps its error.
+
+**The supervisor's share of this, which is the reason it is an entry.** I had
+three older THEIRS leftovers in hand — 8411 `inRAM`, 8501 `FOR J= TO`, 8506
+`PRINT #l` — and told the owner they "have the shape of transcription loss
+rather than print error, which the corpus backs", citing 22 files with
+`in RAM`, 70 with `PRINT#1`. **That is an argument about what 64'er usually
+set, and a disposition is a claim about what one page set.** The two come apart
+exactly where it matters, because a print error IS the rare reading; the same
+frequency argument would have "proved" 60536 in 8512, where the page says
+64632. r330 already said a disposition with no page behind it is `UNRESOLVED`
+whatever it looks like — it did not say that a corpus count is not a page, and
+I used one as if it were.
+
+Harvested into r330's evidence block with the measurement, and ending on the
+part that generalises: **a reading that is demonstrably wrong about the machine
+is still what the page says.** "Our transcription must have dropped it" is a
+hypothesis, never a disposition. The rule now names the supervisor relaying a
+list as being as exposed to this as the agent building it.
+
+## SH8607, 2026-10-24: `<code>` is excluded from r330 by TAG, but the reason is SOURCE — and 28 lines fall in the gap
+
+All three of SH8607's confirmed listing-side `THEIRS` findings were caught **by
+eye, not by the diff**, and the LOG says why in one line: *"Outside the diff
+(inside `<code>`, which r330 does not compare)."* r330's exclusion is
+principled — a Programm-Service listing comes off the disk via r120 and r300
+verifies it against the disk, so comparing two printings of it is the wrong
+instrument. **But the exclusion is keyed on the tag and the reason is the
+source.** A direct-mode command in prose and a worked example inside a
+Texteinschub are tagged `<code>` too, have no disk behind them, and are
+therefore checked by NO step: r300 has nothing to compare, r330 does not look.
+
+**The discriminator turned out to be mechanical**, which is what makes this
+worth more than a note: a C 64 `LIST` expands tokens with no separators at all,
+so `70 B=8192:FORI=0TO7999:POKEB+I,0:NEXTI` is a faithful rendering, while a
+line spaced around its operators yet joined at `FOR`/`NEXT` cannot be one.
+Corpus-wide inside `<pre>`/`<code>`: **91 faithful, 28 inconsistent, in 14
+issues.** The 28 carry the damage nobody has ever read — `2060T03072` and
+`1T0 40` (digit zero inside `TO`), `FORJ=OTO 4` (letter for zero),
+`1 T 1000` (`TO` reduced to `T`), `S=1—S` (em dash for minus), and one pair of
+program lines merged into one. Several do not run.
+
+**And the near-miss is the better half of the entry.** My first census ignored
+the LIST signature and returned **140** occurrences, which I was about to
+report as a corpus-wide defect. 112 of them are correct machine output;
+"fixing" them would have put errors into 31 issues. That is the same mistake as
+this morning's *corpus frequency is not evidence about a printed page*, one
+level down and caught only because I looked at the lines instead of the count
+— **a pattern is not a finding until the line it sits in has been read.** Both
+halves are now in r330 next to the exclusion: sweep a pair's `<code>` by hand
+when its prose yields a confirmed THEIRS, and never read the join as damage
+without the rest of the line.
+
+## SH8607, 2026-10-24: two owner rules on what leaves the machine
+
+**Never commit the raw PNGs.** Owner: *"i meant DO NOT COMMIT THE RAW PNGs, but
+do commit everything else including converted pngs. make it a rule to never
+commit the raw pngs."* `.gitignore` covers the normal case — `issues/*/*` hides
+`png/` and `!issues/*/*.png` re-includes the root — but **it knows where a file
+sits, not what it is.** A raw crop moved to the issue root instead of converted
+is 150 MB of scan master that git takes without complaint and that
+`issues/*/*.png` makes look deliberate. r150 now carries the check: a root PNG
+byte-identical to its `png/<bucket>/` source was never converted. Written with
+`find` rather than a glob, because a renamed crop (`118-1` → `118-x1`) has no
+source of its own name and **an unmatched glob under zsh aborts the whole
+loop** — which is how the first version of the check failed on the very issue
+it was written for. The shape test (8-bit sRGB at the root) is a candidate
+list, not a verdict: a `c/` figure is 8-bit sRGB too, and `title.png` always
+is, so it needs excluding or it fires on every issue.
+
+**One commit per issue, and the push is asked for.** Owner: *"when we are
+completely done with the issue, we squash the whole issue into one commit, and
+push that one. but you need to ask me for permission."* So a build's dozens of
+commits are working state, not history — commit freely mid-build, squash when
+the issue is COMPLETELY done, ask before the push, every time. Written into
+r340 with the part the owner did not have to say: **rule and tool changes stay
+out of the squash.** They apply to every future build and they keep their own
+reasoning; a rule change buried inside a 60-commit squash is a rule nobody will
+find the argument for. The same goes for a `THEIRS` correction applied to a
+different, already-published issue — that is that issue's history, not this
+one's.
+
+## SH8607, 2026-10-24: a state in a group header is not a state, and the check that should have caught it was blind twice
+
+The four side findings applied to 8411/8501/8506 were recorded with
+`APPLIED … 276c001f` on the FOURTH line only; the other three carried it in a
+comment **above the group**. r330's own verification check passed, and the file
+contradicted itself — a finding whose line still read as unapplied. That is the
+same failure as `d5e98cc3` this morning, where a published line's prose kept
+the old reading after its verdict changed: **whoever greps for a finding reads
+its own line, not the comment above its neighbours.**
+
+**The check was blind for two independent reasons, and the second one is the
+better lesson.**
+
+- It was anchored on `^- D-\d{3,} THEIRS`. **A side finding has no D number** —
+  one found inside a MOVED or MARKUP block, or inside `<pre>`/`<code>` which
+  the diff does not compare, is written "side finding inside `<code>` THEIRS".
+  Three of four were invisible to the pattern.
+- Rewritten to match on `THEIRS`, it ended an entry only at a blank line. But
+  `reviewed/r330-theirs.txt` writes **one finding per line with no blank
+  between them**, so four consecutive findings matched as ONE entry, the
+  `APPLIED` on the last satisfied the check, and it **reported exit 0 on the
+  very file that had the defect it had just been written to catch.**
+
+I only saw that because I ran it expecting it to fail and it did not. **A new
+check is not verified by passing; it is verified by failing on the known
+defect first.** Extracted to `r330_theirs_state.py` so it has room for the
+three reasons it is not a grep, and an entry now ends where the next one begins
+— a line opening with a backtick or `- D-`.
+
+## SH8607, 2026-10-24: the check the builder asked me to widen, and the half of it I threw away
+
+The builder ran `r330_theirs_state.py` over `LOG.md` as asked and reported
+honestly: **two real stale entries and 103 false positives.** It classified all
+103 with a script rather than by eye, and it was right — they were entries that
+merely MENTION a THEIRS (`(grp6.png; THEIRS applied …)`, "not raised as
+THEIRS", `**THEIRS applied**` headings, a `THEIRS: 0` count), not findings
+missing a state. It proposed three narrowings and, correctly, did not touch my
+tool.
+
+**The fix was its first suggestion: match THEIRS in DISPOSITION position**, not
+anywhere — `THEIRS`, an optional parenthetical, then the em dash that opens
+every finding's description. That alone took LOG.md from 108 flagged to 0 while
+still failing on the three side findings it was written for.
+
+**Then I nearly shipped something worse.** Its two real findings were not
+check-A failures at all: they were *stale references* — a head saying "recorded
+as UNRESOLVED at D-375…D-379" after both the reading and the remap, and four
+MARKUP lines pointing at a candidate that had been closed. So I wrote a second
+check to resolve every `D-NNN` reference and compare verdicts. It found those
+four — and six false ones, because **D NUMBERS ARE PER PAIR and LOG.md holds
+23 pairs**: `D-280` exists several times with different dispositions, so the
+first match wins and the check confidently reports a contradiction between two
+unrelated pairs.
+
+I deleted it. **A check whose output has to be sifted is a check people learn
+to ignore — which is precisely what the 103 false positives had just
+demonstrated, one screen earlier.** The defect class is real and keeps biting
+(three instances on this issue in one day), so it is now a READING step in
+r330, *A REMAP LEAVES REFERENCES STALE, AND NO SCRIPT CAN CATCH IT*, owned by
+whoever did the remap, with the per-pair numbering written down as the reason
+there is no script.
+
+Two things generalise. **A check that cannot be made precise is better written
+as a rule than shipped imprecise.** And the thing I keep relearning: my own
+"verify a new check by failing on the known defect first" is necessary and not
+sufficient — the draft check B DID fail on the known defect, and was still
+wrong. It also has to pass on everything else.
+
+## SH8607, 2026-10-30: the owner found four clipped cover pages in the finished PDF, and the note that said parity had failed
+
+The owner opened the built PDF and reported, page by page: *"p2 isnt cropped
+right. maybe 2 cm on the left are missing"*, then *"similarly to 2, p179 is
+clipped on the right"*, then *"and 180 is clipped on the left. the vertical
+text is the »Bund«, not part of the page"*. p001 is the fourth, found by the
+same measurement; it does not ship, because the owner recropped the cover
+himself for `title.png` — **and that his own crop has no Bund and a complete
+"DM 14,–" was the confirmation that the chain's did.**
+
+All four are cover leaves, which trace wider than A4, where step 005b has to
+decide which end of the surplus to drop. It decided by counting the columns
+from each edge whose ink is under 0.2 %, and discarding the blanker side. It
+got all four wrong, always in the same direction — and the direction is the
+tell. **The test could not come out both ways.** Its floor is 14 pixels in a
+7000-px column; p002's real 9.5 mm margin measures 3 % and its last column
+0.47 %, so neither side ever scored as blank, and `blank_l >= blank_r` with
+both at zero trims the left. It also read `masters600` with `sheet_box`
+coordinates, two different frames, so the one column it did score as blank was
+fabricated white. A measurement in form, a constant in effect.
+
+The fix is parity — recto bound left, verso bound right — which is what the
+file had **before**, and had thrown away. Its own comment explained why:
+
+> On SH8601 p002 the parity rule right-aligned the window, clipping printed
+> content off the LEFT … the flap is on the right on that verso, the opposite
+> of what the binding side predicts.
+
+Right-aligning a verso trims its LEFT, which is the same wrong crop we have
+just fixed, and "the flap is on the right on that verso" is what parity
+predicts. SH8601 refuted an implementation with the sign inverted, not the
+rule — and the repair threw out the rule and kept the sign error, dressed as a
+measurement. **A note saying "X was tried and failed" is evidence about one
+implementation of X.** Read what it actually observed before you believe its
+conclusion; and when a measurement replaces a rule, check that it can come out
+both ways on the pages it exists for.
+
+Three more things, each of which bit during the fix itself:
+
+**The first run of the fix reproduced the defect.** `measured.json` is merged
+and never replaced, so a cache written before `page_class` existed handed
+`place()` a `None`, `None` is not a cover leaf, and every cover page quietly
+centred. The field is one line of the master's stamp: backfill it, do not
+re-measure 184 pages to recover it.
+
+**`a4600/.ocrcache` is keyed by page number alone.** A re-cut page keeps its
+number, so the next build re-embeds the old image and the PDF looks unfixed
+while every input is right. r006 already records this trap for
+`BILEVEL_THRESHOLD`; it is the same cache and the same lesson, so it is now
+written down on the re-cut side too.
+
+**Nothing here was found by a check — 005b's own verification was all green.**
+Checks 1-5 ask whether the window is A4, whether it moved between runs, whether
+the anchor sits on the glyph: every one of them is about pages the wordmark
+placed. The ~16 pages per issue that a FALLBACK places had no check at all, and
+they are the only ones that can be wrong in this way. Check 6 is now half assert
+and half instruction to LOOK, with the table short enough that looking is cheap.
+
+## SH8607, 2026-10-30: the rule told me both halves and I did one, then blamed the tool for my own pipe
+
+The four re-cut cover pages needed their PDF caches purged. r006 says so, in a
+section with its own heading — RE-CUTTING A PAGE MEANS RE-OCR'ING IT — and the
+same paragraph names the other half and the exact command: *"Re-OCR exactly the
+affected pages with the recipe's own parameters — they are one line in
+`make_issue_pdf.sh`: `-resize 67%`, `-l deu --psm 3 --oem 3 --dpi 402`."*
+
+I purged and did not re-OCR. The build encoded 176 bilevel pages, then died in
+`assemble_pdf.py` on a missing `001.pdf` eleven minutes in. **The rule was
+right, complete, and I had not re-read it** — I acted on the half I remembered.
+The fix is not more prose: `make_issue_pdf_mixed.sh` now checks every page's
+`NNN.pdf` and `NNN_150.png` up front and refuses with the three commands that
+rebuild them. Verified both ways — it fails with one entry moved aside, and
+passes on the complete cache.
+
+**And then I reported a defect that was mine.** I told the owner the build
+script "exited 0 while failing" and said I would harvest that. It did not. Both
+runs aborted correctly under `set -e` at `sz=$(build_at "$mid")`; the 0 came
+from my own wrapper, `bash build.sh 2>&1 | tail -40`, where the pipeline
+reports `tail`'s status. My second wrapper then declared a GOOD build a failure,
+because it grepped the whole build log for `Traceback` and the log is
+append-only (`exec >> "$LOG"`), so it matched the first run's wreckage.
+
+Three in a row, and they rhyme. **Every one was a guard I wrote failing in a way
+I would have caught by looking at the artefact instead of the wrapper.** The
+guard that actually worked was the one that read the PDF's own pixels: p161 at
+21.84 % black against 21.06 % for a fresh 28 % threshold and 30.51 % for 35 %,
+which is what proved the delivered page was not a stale `jbig2-t35` entry.
+
+Two things to carry: **before acting on a rule you remember, re-read it** — the
+half you forget is the half that costs the eleven minutes. And **a tool that
+"exits 0 while failing" is almost always your pipe**; check `PIPESTATUS` before
+writing that sentence about someone else's script, and certainly before telling
+the owner.
