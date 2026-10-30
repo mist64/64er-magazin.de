@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>HiRes-Dia-Show</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christian Coppes, tr">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="126-127">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips-und-Tricks-Listings">
+    <meta name="64er.index_title" content="HiRES Diashow">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Grafik">
+    <meta name="64er.id" content="hires-dia-show">
+</head>
+
+<body>
+    <article>
+        <h1>HiRes-Dia-Show</h1>
+        <p class="intro">Machen Sie aus Ihren HiRes-Grafiken eine professionelle Dia-Show! Das Besondere an diesem Programm ist das »weiche« Ein- und Ausblenden der einzelnen Bilder. Ihre Grafiken (zum Beispiel aus »Apfelmännchen«) sind somit »vorführungsreif«.</p>
+
+        <p>Dieses Programm (Listing 1) zeigt anhand einer Dia-Show mit den Grafiken von Apfelmännchen oder anderen HiRes-Grafiken die Möglichkeiten der Programme »HIRES-EFFEKT 1« und »HIRES-EFFEKT 2« (Listings 2 und 3). Das erste Programm wird dazu verwendet, um die hochauflösende Grafik auszublenden und damit zu löschen. Das zweite Programm »HIRES-EFFEKT 2« wird dazu verwendet, die Grafiken, die ständig von der Diskette nachgeladen werden, ineinander überzublenden, um einen fließenden Übergang zwischen den einzelnen Grafiken zu erhalten. Die auf dem Bildschirm sichtbare Grafik steht ab $2000, die Grafiken, die nachgeladen werden, ab $A000. Die Art, wie der Übergang vonstatten geht, wird von der RND(0)-Funktion gesteuert.</p>
+
+        <p>Im Sonderheft 2/86 wurde auf Seite 153/154 eine Idee vorgestellt, um die hochauflösende Grafik mit Hilfe des DIM-Befehls von Basic aus zu löschen. Darauf basierend kam mir der Einfall, diesen Einzeiler dahingehend zu erweitern, daß dieser nun auch dazu fähig ist, beliebige Bereiche des Speichers (in 255-Byte-Schritten) mit einem beliebigen Byte zu füllen. Dieser neue Einzeiler hat zwar äußerlich mit dem anderen nichts gemeinsam, benutzt aber die gleiche ROM-Routine zum Auffüllen des mit DIM dimensionierten Feldes mit dem Byte 0. Wenn man nun an geeigneter Stelle in das ROM springt, kann man sogar selbst bestimmen, mit welchem Byte der entsprechende Speicherbereich aufgefüllt werden soll. Der Einzeiler lautet folgendermaßen:</p>
+
+        <pre><code>1 POKE88,0:POKE89,EndeHigh:POKE 113,0:POKE 114,LängeHigh+1:POKE 780,Byte:POKE 12,1:SYS 45764
+</code></pre>
+
+        <p>In den beiden Speicherzellen 88/89 wird im Low/High-Byte-Format die Endadresse des Bereiches angegeben, bis zu der man einen Speicherbereich mit einem Byte füllen möchte. In den beiden Speicherstellen 113/114 wird, ebenfalls im Low/High-Byte-Format, die Länge+1 des zu füllenden Speichers angegeben. In die Speicherstelle 780 schreibt man nun nur noch das Byte, mit dem der Speicherbereich ausgefüllt werden soll. (Die Speicherstelle 780 ist das A-Register des Prozessors, was dem aktuellen Stand des Akkumulators entspricht. Von Basic aus kann man diese Speicherstelle sowie die folgenden (genaue Belegung siehe Handbuch Seite 165) als LDA-Befehl beziehungsweise LDX, LDY und so weiter benutzen. Die Register werden nach dem SYS-Befehl automatisch belegt.</p>
+
+        <p>Als letzter POKE in dieser Zeile muß der POKE 12,1 stehen, der dieser Routine mitteilt, daß sie vom DIM-Befehl angesprungen wurde und auch kein Fehler aufgetreten ist. Der SYS-Befehl ist der Einsprungspunkt der Fill-Routine.</p>
+
+        <p>An ROM-Routinen wurde im Programm DIA-SHOW noch eine Routine zum Löschen einzelner Bildschirmzeilen verwendet. Um sie zu verwenden, wird vorher ins X-Register des Prozessors die Zeilennummer hinterlegt, die gelöscht werden soll (POKE 781, Zeilennummer; Zeilennummer darf zwischen 0 und 24 liegen) und daraufhin die Routine aufgerufen, die mit SYS 59903 zu starten ist. Studiert man das ROM-Listing dieser Routine, kann man damit sogar noch mehr machen:</p>
+
+        <p>Hinterlegt man im Y-Register (Speicherstelle 782) eine Zahl zwischen 0 und 39 und springt man die Routine mit SYS 59905 an, wird die im X-Register hinterlegte Zeile nur bis zu der dem Y-Register entsprechenden Spalte gelöscht!</p>
+
+        <h3>Variablenbelegung des Programms</h3>
+
+        <p>Die Variable A wird im Programm als Statusvariable für die Ladevorgänge gebraucht. Die Variablen E1, E2, L1, L2 und Byte sind mit der Beschreibung des Einzeilers hinreichend erklärt worden. Die Variablen I,Z,T sind reine Schleifenvariablen. Die Variable A$ dient der Speicherung des aktuellen Filenamens für den Ladevorgang der einzelnen Bilder.</p>
+
+        <p>Das Programm wird geladen und mit »RUN« gestartet.</p>
+
+        <p>Zunächst werden die notwendigen Routinen und die einzelnen Bilder nachgeladen und in den sichtbaren Bildschirm mit Hilfe der Routine »HIRES-EFFEKT 2« eingeblendet. Dieser Vorgang wird solange wiederholt, bis sämtliche auf der Diskette vorhandenen Bilder nachgeladen worden sind. Zum Schluß wird das letzte Bild mit Hilfe der Routine »HIRES-EFFEKT 1 ausgeblendet. Möchte man die DIA-SHOW für eigene Bilder umschreiben, muß in Zeile 7300 die Nummer des letzten zu ladenden Bildes eingetragen werden (IF I &lt;Nummer THEN...). Der Name, den alle Bilder gemeinsam haben, steht in Zeile 7100 und kann ebenfalls nach Belieben geändert werden. (Für das erste Bild muß er auch in der Zeile 2000 geändert werden.) Die Bilder, die man nachlädt, sollten ab der Startadresse $A000 anfangen, dann braucht im Programm nichts gändert zu werden. Man kann die Grafiken aber auch in den $E000-Bereich verlegen. Ebenso ist es möglich, die Grafiken in allen 8K-Bereichen zu legen, die größer als $4000 sind. Die Startadresse dieser Grafik wird im ersten Parameter der Routine »HIRES-EFFEKT 2« dementsprechend geändert. Der SYS-Befehl zum Aufruf dieser Routine steht in der Zeile 7000. Auf jeden Fall müssen alle nachzuladenden Bilder die gleiche Startadresse haben! (Man kann sie bei Bedarf mit einem Diskmonitor ändern.)</p>
+
+        <address class="author">(Christian Coppes/tr)</address>
+        <figure>
+            <!-- Im Heft abgedruckt: 2000 IF A=1 THEN A=2:LOAD"BILD 1 .PIC",8,1. Auf der Diskette: LOAD"BILD 1 .PIC*  ",8,1. -->
+            <pre data-filename="dia-show" data-name="Dia-Show" data-checksummer="3"></pre>
+            <figcaption>Listing 1. Das Steuerprogramm »DIA-SHOW«</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="hires-effekt 1.prg" data-name="HiRes-Effekt 1" data-mse=mse1></pre>
+            <figcaption>Listing 2. »HIRES-EFFEKT 1«</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="hires-effekt 1.prg" data-name="HiRes-Effekt 1"></div>
+        <figure>
+            <pre data-filename="hires-effekt 2.prg" data-name="HiRes-Effekt 2" data-mse=mse1></pre>
+            <figcaption>Listing 3. »HIRES-EFFEKT 2«</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="hires-effekt 2.prg" data-name="HiRes-Effekt 2"></div>
+        <div class="binary_download" data-filename="bild 1 .pic.prg" data-name="Bild 1"></div>
+        <div class="binary_download" data-filename="bild 2 .pic.prg" data-name="Bild 2"></div>
+        <div class="binary_download" data-filename="bild 3 .pic.prg" data-name="Bild 3"></div>
+        <div class="binary_download" data-filename="bild 4 .pic.prg" data-name="Bild 4"></div>
+        <div class="binary_download" data-filename="bild 5 .pic.prg" data-name="Bild 5"></div>
+        <div class="binary_download" data-filename="bild 6 .pic.prg" data-name="Bild 6"></div>
+        <div class="binary_download" data-filename="bild 7 .pic.prg" data-name="Bild 7"></div>
+        <div class="binary_download" data-filename="bild 8 .pic.prg" data-name="Bild 8"></div>
+        <div class="binary_download" data-filename="bild 9 .pic.prg" data-name="Bild 9"></div>
+        <div class="binary_download" data-filename="bild 10.pic.prg" data-name="Bild 10"></div>
+        <div class="binary_download" data-filename="bild 11.pic.prg" data-name="Bild 11"></div>
+        <div class="binary_download" data-filename="bild 12.pic.prg" data-name="Bild 12"></div>
+        <div class="binary_download" data-filename="bild 13.pic.prg" data-name="Bild 13"></div>
+        <div class="binary_download" data-filename="bild 14.pic.prg" data-name="Bild 14"></div>
+        <div class="binary_download" data-filename="bild 15.pic.prg" data-name="Bild 15"></div>
+        <div class="binary_download" data-filename="bild 16.pic.prg" data-name="Bild 16"></div>
+        <div class="binary_download" data-filename="bild 17.pic.prg" data-name="Bild 17"></div>
+        <div class="binary_download" data-filename="bild 18.pic.prg" data-name="Bild 18"></div>
+    </article>
+</body>
+
+</html>

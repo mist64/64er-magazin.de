@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks kunterbunt</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Volker Imre, tr, Norbert Reuber, tr, Daniel Buchheit, tr, P. Plamper, tr, Oliver Koch, tr, Uwe Wiards, tr, Michael Rothmeier, tr, Christoph Gladenbeck, tr">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="164-177">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.toc_title" content="Tips und Tricks kunterbunt">
+    <meta name="64er.index_title" content="Das besondere Turbo Tape">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Datasette">
+    <meta name="64er.index_title" content="Die etwas andere Dateiverwaltung">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Datei">
+    <meta name="64er.index_title" content="Windows leicht gemacht">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Grafik">
+    <meta name="64er.index_title" content="Spitzengrafik auf MPS 802">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Grafik Drucker">
+    <meta name="64er.index_title" content="Besondere GOSUBs">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Programmieren">
+    <meta name="64er.index_title" content="Drei nützliche Befehle">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Programmieren">
+    <meta name="64er.index_title" content="Die Statuszeile">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Programmieren">
+    <meta name="64er.index_title" content="Der (fast) perfekte Listschutz">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Verschiedenes">
+    <meta name="64er.id" content="tips_tricks">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks kunterbunt</h1>
+        <p class="intro">Auf den nächsten Seiten finden Sie eine Auswahl an hervorragenden Programmen, Unterroutinen und Programmiertips für fast jeden Gebrauch. Erwähnenswert sind vor allem ein außergewöhnliches Turbo-Tape und ein neuartiges Prinzip der Dateiverwaltung, das sich auch hervorragend als Lernprogramm für angehende Taxi-Fahrer eignet.</p>
+
+        <p>Unsere beliebte Tips&amp;Tricks-Rubrik aus dem 64'er-Stammheft hat einen nicht unerheblichen Nachteil: Viele nützliche und sehr gute Programme sind einerseits zu kurz für einen eigenständigen Artikel, aber andererseits auch zu lang für eine Veröffentlichung unter »Tips &amp; Tricks«. Im Laufe der Zeit hat sich da natürlich eine ganze Menge an Programmen angesammelt. In diesem Sonderheft haben wir nun die Gelegenheit, diesen Stapel auszubauen und Ihnen eine geballte Ladung von Tips&amp;Tricks-Listings zu präsentieren.</p>
+
+        <p>Übrigens: Wenn Sie noch kein routinierter 64'er-Leser sind, sollten Sie vor dem Abtippen unbedingt unsere Eingabehinweise zum Checksummer und dem MSE auf den Seiten 119 und 120 lesen.</p>
+
+        <h2>Der (fast) perfekte Listschutz</h2>
+
+        <p>Bei diesem Programm »Invisible« (Listing 1) handelt es sich um eine Hilfe zur Listschutzerstellung. Nach Behandlung eines Basic-Programms mit »Invisible« sind davon nur noch die Zeilennummern sichtbar. Dies wird durch fünf hinter die Zeilennummer eingefügte Doppelpunkte erreicht, von denen der erste durch ein Null-Byte ersetzt wird.</p>
+
+        <p>Das ist soweit nichts Besonderes, doch mußte man bei ähnlichen Arten des Listschutzes bisher die Doppelpunkte von Hand einfügen. »Invisible« nimmt Ihnen diese Arbeit ab. Es fügt auf Tastendruck pro Zeile fünf Doppelpunkte ein. Zeilen, in die keine fünf Zeichen mehr passen, werden nicht verändert.</p>
+
+        <p>Ebenfalls auf Tastendruck werden die »Doppelpunktzeilen« unsichtbar gemacht. Hier bleiben Zeilen mit einer falschen Zahl an Doppelpunkten unberücksichtigt.</p>
+
+        <p>Will man sein Programm wieder sehen, sei es, um es zu ändern oder nur aus Spaß an der Freude, so kann man mit »Invisible« sämtliche Zeilen, die wie oben beschrieben geschützt wurden, wieder sichtbar machen. Sogar die fünf Doppelpunkte werden wieder entfernt. Hier bleiben nun Zeilen mit weniger als fünf Doppelpunkten unverändert (sie waren zuvor ja auch nicht geschützt).</p>
+
+        <h3>Beschreibung der einzelnen Programmteile:</h3>
+
+        <h3>1. Doppelpunkte einfügen:</h3>
+
+        <p>Als erstes wird die Startadresse der ersten Zeile in die Variable »by« geschrieben. Dann wird deren Zeilennummer in »lb« und »hb« festgestellt. Es folgt dann noch die Adresse der nächsten Zeile. Die Werte dieser Variablen müssen in Speicherzellen mit POKE zwischengespeichert werden, da sie bei der Änderung der Zeilen während des Einfügens der Doppelpunkte gelöscht werden würden.</p>
+
+        <p>Nun wird in der Variablen »bn« die Adresse der nächsten Zeile aus »12« und »h2« berechnet. Diese wird zur Bestimmung der Zeilenlänge benötigt. Es folgt noch eine Abfrage auf eventuell bereits vorhandene Doppelpunkte.</p>
+
+        <p>Steht in der Zeile kein Doppelpunkt, so wird der Bildschirm gelöscht und ein »LIST aktuelle Zeile« sowie ein »GOTO....« links oben auf den Bildschirm geschrieben. Dies wird für den nachfolgenden Direktmodus benötigt. Es wird nun anhand der Länge der Zeilennummer und der restlichen Zeile berechnet, wie viele Zeilen man mit Hilfe des Tastaturpuffers nach unten gehen muß, um auf das »GOTO...« zu kommen.</p>
+
+        <p>Nun wird noch die Länge der Zeilennummer festgestellt, da sie zum Einfügen der Doppelpunkte übersprungen werden muß. Dies geschieht in den Zeilen 63032 und folgende.....</p>
+
+        <p>Jetzt wird die zu bearbeitende Zeile gelistet. In Zeile 63240 wird mit Hilfe von Steuerzeichen alles, was hinter einer Zeilennummer steht, um fünf Zeichen nach rechts verschoben, wobei dann die Doppelpunkte eingefügt werden.</p>
+
+        <h3>2. Doppelpunkte löschen:</h3>
+
+        <p>Dieser Programmteil läuft ziemlich genauso ab wie der Teil »Doppelpunkte einfügen«. Lediglich die Abfrage der Doppelpunkte und deren »Einfügen« ist anders: Es wird nicht abgefragt, ob schon ein Doppelpunkt vorhanden ist, sondern ob es deren genau fünf sind. Statt dem Einfügen der Doppelpunkte werden diese mit fünf Leerzeichen überschrieben.</p>
+
+        <h3>3. Doppelpunktzeichen unsichtbar machen:</h3>
+
+        <p>Das Bestimmen der Zeilendaten geht analog zu den vorigen Teilen. Dann werden die ersten sechs Byte aus der eigentlichen Basic-Zeile gelesen und auf Doppelpunkte überprüft. Sind die ersten fünf Byte Doppelpunkte, so wird in das erste dieser fünf Byte eine Null gePOKEt. Dadurch listet der Computer nur noch die Zeilennummern.</p>
+
+        <h3>4. Zeilen wieder sichtbar machen:</h3>
+
+        <p>Im Unterschied zur vorherigen Routine wird hier geprüft, ob das erste Byte (in »a« gespeichert) eine Null und die restlichen vier Byte Doppelpunkte (Code 58) sind. Es stehen also wieder fünf Doppelpunkte hinter der Zeilennummmer und das Programm läßt sich wieder vollständig LISTen.</p>
+
+        <h3>5. Löschroutine:</h3>
+
+        <p>Hier wird die vorgegebene Zeilennummer (63000) in die linke obere Ecke des Bildschirms geschrieben und mittels des bereits oben beschriebenen »programmierten Direktmodus« in der ersten Zeile des Bildschirms (in der die Zeilenzahl steht), ein »carriage return« ausgeführt. Dadurch wird die Zeile gelöscht.</p>
+
+        <h3>So arbeitet man mit »INVISIBLE«</h3>
+
+        <ol>
+            <li>Laden des zu bearbeitenden Programms.</li>
+            <li>Eingeben: POKE 43, PEEK(45)-2:POKE 44,PEEK(46)</li>
+        </ol>
+
+        <p>In seltenen Fällen kann es passieren, daß der C 64 einen »illegal quantity error« meldet (Ihr Programm hat dann eine ungünstige Endadresse). Dies läßt sich beheben, indem Sie noch irgendwo eine Zeile einfügen (zum Beispiel ein REM), und die POKEs noch einmal eingeben.</p>
+
+        <ol start="3">
+            <li>Laden von »Invisible« (Listing 1)</li>
+            <li>Eingeben: POKE 43,1 : POKE 44,8</li>
+            <li>Starten von »Invisible« mit »RUN 63000«.</li>
+        </ol>
+
+        <address class="author">(Volker Imre/tr)</address>
+        <figure>
+            <pre data-filename="invisible" data-name="Invisible" data-checksummer="3"></pre>
+            <figcaption>Listing 1. »Invisible«, der (fast) perfekte Listschutz</figcaption>
+        </figure>
+
+        <h2>Besondere GOSUBs</h2>
+
+        <p>Da das C 64-Basic nicht über Label verfügt, habe ich ein Programm geschrieben, mit dem in Unterprogramme mit beliebigem Namen gesprungen werden kann. Im Programmlisting erscheint an Stelle des GOSUB-Befehls nur der Name des entsprechenden Unterprogramms. Dadurch wird die Lesbarkeit des Programms wesentlich verbessert und die Unterprogramme können frei verschoben werden, ohne Einsprungadressen verändern zu müssen. Mit einer geeigneten MERGE-Routine kann man nun aus einer Unterprogrammsammlung bequem Programme zusammenstellen. Die Benutzung sieht wie folgt aus: Auf ein vorangestelltes Ausrufezeichen folgt der Name des aufzurufenden Unterprogramms gefolgt von einem abschließenden Doppelpunkt. Alle Zeichen zwischen dem Ausrufezeichen und dem Doppelpunkt werden als Name interpretiert. Falls Basic-Befehlsworte im Namen vorkommen, muß der Name in Anführungszeichen gesetzt werden.</p>
+
+        <p>Damit das Unterprogramm gefunden werden kann, steht am Anfang des Unterprogramms eine REM-Zeile, gefolgt vom Namen des Unterprogramms. Dabei ist zu beachten, daß bei Basic-Befehlsworten die Anführungszeichen auch in der REM-Zeile stehen müssen. Listing 2 zeigt die eigentliche Befehlserweiterung; Listing 3 ein kleines Anwendungsbeispiel.</p>
+
+        <address class="author">(Norbert Reuber/tr)</address>
+        <figure>
+            <pre data-filename="!gosub.prg" data-name="!GOSUB" data-mse=mse1></pre>
+            <figcaption>Listing 2. Programmieren Sie strukturiert mit »!GOSUB«</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="!gosub.prg" data-name="!GOSUB"></div>
+        <figure>
+            <pre data-filename="beispiel gosub" data-name="Beispiel GOSUB" data-checksummer="3"></pre>
+            <figcaption>Listing 3. Anwendungsbeispiel für Listing 2</figcaption>
+        </figure>
+
+        <h2>Windows leichtgemacht</h2>
+
+        <p>Da in den meisten Programmen Menüs benötigt werden, und ich das entsprechende Unterprogramm bis jetzt jedesmal neu und in Basic verfaßte (was schlechte Benutzerfreundlichkeit und langsame Ausführungsgeschwindigkeit nach sich zog), entschloß ich mich, ein universelles Menü-Programm als Basic-Erweiterung in Assembler zu schreiben. Listing 4 zeigt das Ergebnis:</p>
+
+        <p>Merkmale:</p>
+
+        <p>— beliebig auf dem Bildschirm plazierbares Fenster mit Überschrift.</p>
+
+        <p>— frei definierbare Abbruchtaste (zum Beispiel für Undo-Funktion).</p>
+
+        <p>— Auswahl des Menüpunktes mit den Cursortasten und »RETURN« oder (wahlweise) wird jedem Menüpunkt (soweit möglich) ein Buchstabe zugeordnet, durch den er direkt aufgerufen werden kann.</p>
+
+        <p>— wahlweise wird der Bildschirm nach Verlassen des Menüs wieder hergestellt (oder später mit dem Basic-Befehl »KILLM«). Listing 5 zeigt ein Anwendungsbeispiel in Form einer simulierten Textverarbeitung.</p>
+
+        <p>Handhabung:</p>
+
+        <p>Laden Sie das Programm »XMENU« absolut von Diskette (anschließend »NEW« eingeben) und starten es mit »SYS 50175«. Ab jetzt stehen Ihnen zusätzlich folgende zwei Befehle zur Verfügung.</p>
+
+        <p>— MENU &lt;x&gt;, &lt;y&gt;, &lt;l&gt;, &lt;p&gt;, &lt;t&gt;, &lt;m&gt;, &lt;s&gt;, &lt;ar&gt;, &lt;rv&gt;</p>
+
+        <p>— KILLM</p>
+
+        <p>Mit »MENU« wird das Menü dargestellt und ausgeführt. Hier die Bedeutung der Parameter:</p>
+
+        <table class="plain">
+            <tr>
+                <td>&lt;x&gt;</td>
+                <td>X-Koordinate. Bereich von 0 bis 35</td>
+            </tr>
+            <tr>
+                <td>&lt;y&gt;</td>
+                <td>Y-Koordinate. Bereich von 1 bis 20</td>
+            </tr>
+            <tr>
+                <td>&lt;l&gt;</td>
+                <td>Breite der Menüpunkte. Bereich von 1 bis (36-x)</td>
+            </tr>
+            <tr>
+                <td>&lt;p&gt;</td>
+                <td>Anzahl der Menüpunkte. Bereich von 1 bis 11-int(y/2+.5)</td>
+            </tr>
+            <tr>
+                <td>&lt;t&gt;</td>
+                <td>ASCII-Code der Abbruchtaste (möglichst nicht 65 bis 90, da sonst die Tastaturwahl beeinträchtigt wird).</td>
+            </tr>
+            <tr>
+                <td>&lt;m&gt;</td>
+                <td>Auswahlmodus. Bereich von 0 bis 255.<br>0: keine Tastaturauswahl;<br>ungleich 0: Tastaturauswahl erlaubt.</td>
+            </tr>
+            <tr>
+                <td>&lt;s&gt;</td>
+                <td>Temporärmodus. Bereich von 0 bis 255<br>0: Hintergrund wird nach Verlassen des Menüs nicht (sofort wieder hergestellt);<br>ungleich 0: Hintergrund wird sofort wieder hergestellt.</td>
+            </tr>
+            <tr>
+                <td>&lt;ar&gt;</td>
+                <td>Eindimensionales Stringarray. Der Index ist der der Menü-Überschrift und zugleich die Basis für die Menüpunkte. Sollte das Array weniger als &lt;p&gt;+Index Elemente haben, so gibt es ein »Gewurschtel« auf dem Bildschirm.</td>
+            </tr>
+            <tr>
+                <td>&lt;rv&gt;</td>
+                <td>Numerische Variable. Enthält nach dem Aufruf die Nummer des Menüpunktes oder Null bei einem Abbruch. Achtung! Sollte die Variable vor dem Aufruf »MENU« nicht definiert sein, so gibt es ein Wirrwarr auf dem Bildschirm, da die Arraytabellen verschoben wurden. Der Befehl »KILLM« (ohne Parameter) holt den vor dem Aufruf von »MENU« gespeicherten Bildschirm in den aktuellen Bildschirm (das gleiche passiert, wenn der Temporärmodus eingeschaltet ist).</td>
+            </tr>
+        </table>
+
+        <h3>Technische Details</h3>
+
+        <p>Das Programm befindet sich nach dem (absoluten) Laden im Speicher von $C000 bis $C4E4. Nach dem Aufruf mit SYS 50175 wird der Basic-Befehls-Vektor ($0308/$0309) auf $C3FF verbogen. In der Zeropage wird, während das Menü dargestellt wird, der Bereich von $A3 bis $AF benützt. Außerdem werden der Bildschirm und zwei Arrays im Bereich von $D000 bis $D423 zwischengespeichert.</p>
+
+        <p>Der Assembler-Programmierer kann den Programmteil von $C3FF bis $C4E5 ignorieren. Die Parameter müssen nur in die Tabelle von $C3F6 bis $C3FE eingetragen und das Programm ab $C000 angesprungen werden. Der Befehl »KILLM« kann durch SEC, JSR $C39D ersetzt werden.</p>
+
+        <p>Um XMENU in einen anderen Bereich zu verschieben, sind folgende Schritte nötig:</p>
+
+        <ol>
+            <li>Der Bereich von $C000 bis $C4E4 muß nach der neuen Anfangsadresse verschoben werden (im folgenden Basis genannt).</li>
+            <li>Alle 3-Byte-Befehle, die sich auf den Bereich von $C000 bis $C4E4 beziehen, müssen an den Bereich von der Basis bis Basis +$4E4 angeglichen werden.<br>(V-Befehl bei SMON).</li>
+        </ol>
+
+        <ol start="3">
+            <li>Disassemblieren Sie den Bereich &lt;Basis+$3FF&gt; bis &lt;Basis+$402&gt;. Ersetzen Sie nun den Parameter des LDA-Befehls durch das Low-Byte und den Parameter des LDY-Befehls durch das High-Byte von &lt;Basis+$40A&gt;.</li>
+            <li>Disassemblieren Sie den Bereich &lt;Basis+$40D&gt; bis &lt;Basis+$410&gt;. Ersetzen Sie (wie in 3.) die entsprechenden Parameter der LDA-/LDY-Befehle durch das Low- beziehungsweise High-Byte von &lt;Basis+$4DA&gt;.</li>
+            <li>Disassemblieren Sie den Bereich &lt;Basis+$41D&gt; bis &lt;Basis+$420&gt;. Ersetzen Sie nun (wie in 3. und 4.) die Parameter der LDA-/LDY-Befehle durch das Low-/High-Byte von &lt;Basis+$4DF&gt;.</li>
+        </ol>
+
+
+        <p>Die Initialisierungsadresse entspricht der Basis+$3FF.</p>
+
+        <h3>Die einzelnen Routinen</h3>
+
+        <table class="plain">
+            <tr>
+                <th>Bezeichnung</th>
+                <th>Abstand zur Basis</th>
+                <th>Beschreibung</th>
+            </tr>
+            <tr>
+                <td>MENU</td>
+                <td>$0000=0</td>
+                <td>Maschinenroutine zum Darstellen des Menüs</td>
+            </tr>
+            <tr>
+                <td>KILLM</td>
+                <td>$039D=925</td>
+                <td>Danach: Angewählter Menüpunkt im Akku. Carry gelöscht: Hintergrund wird gespeichert. Carry gesetzt: Hintergrund wird wieder hervorgeholt.</td>
+            </tr>
+            <tr>
+                <td>X</td>
+                <td>$03F6=1015</td>
+                <td>X-Koordinate</td>
+            </tr>
+            <tr>
+                <td>Y</td>
+                <td>$03F7=1016</td>
+                <td>Y-Koordinate</td>
+            </tr>
+            <tr>
+                <td>L</td>
+                <td>$03F8=1017</td>
+                <td>Breite</td>
+            </tr>
+            <tr>
+                <td>P</td>
+                <td>$03F9=1018</td>
+                <td>Anzahl M.-Punkte</td>
+            </tr>
+            <tr>
+                <td>T</td>
+                <td>$03FA=1019</td>
+                <td>Abbruchtaste</td>
+            </tr>
+            <tr>
+                <td>M</td>
+                <td>$03FB=1020</td>
+                <td>Auswahlmodus</td>
+            </tr>
+            <tr>
+                <td>S</td>
+                <td>$03FC=1021</td>
+                <td>Temporärmodus</td>
+            </tr>
+            <tr>
+                <td>AR/L</td>
+                <td>$03FD=1022</td>
+                <td>Low-Byte des Zeigers auf Array-Tabelle (T.Format: Länge, Low-/High-Byte Adr. String).</td>
+            </tr>
+            <tr>
+                <td>AR/H</td>
+                <td>$03FE=1023</td>
+                <td>High-Byte des Zeigers auf Array-Tabelle</td>
+            </tr>
+        </table>
+
+        <p>Um sich mit den Fähigkeiten des Programms vertraut zu machen, sollten Sie unbedingt das Demo-Programm durchstudieren.</p>
+
+        <address class="author">(Daniel Buchheit/tr)</address>
+        <figure>
+            <pre data-filename="xmenu.prg" data-name="XMENU" data-mse=mse1></pre>
+            <figcaption>Listing 4. Die Befehlserweiterung »XMENU«</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="xmenu.prg" data-name="XMENU"></div>
+        <figure>
+            <pre data-filename="menu demo" data-name="Menü-Demo" data-checksummer="3"></pre>
+            <figcaption>Listing 5. Eine simulierte Textverarbeitung als Anwendungsbeispiel für »XMENU«</figcaption>
+        </figure>
+
+        <h2>Das besondere Turbo Tape</h2>
+
+        <p>»Extratape« ist ein Schnellladeprogramm für den C 64 und Datasette. Es erlaubt jedem, ohne aufwendiges Herumspulen, seine Programme jederzeit mit 8- bis 9facher Geschwindigkeit zu laden.</p>
+
+        <p>Das Besondere an »Extratape« ist, daß man zum Laden des Programms das Extratape-Programm nicht mehr benötigt! Die schnelle Laderoutine ist nämlich als kurzer Vorspann direkt vor dem gespeicherten Programm vorhanden. Man kann ein so behandeltes Programm also ganz normal mit »LOAD« laden.</p>
+
+        <p>Nachdem man das Maschinenprogramm (Listing 6) mit dem MSE eingegeben und auf Kassette oder Diskette gespeichert hat, muß man es wie ein Basic-Programm laden und mit »RUN« starten. Nach dem Start wird vom Programm der Save-Vektor ($0332/0333) auf eine eigene Save-Routine bei $CDE0 verbogen. Diese Routine simuliert ein neues Gerät mit der Gräteadresse 7, nämlich die Fasttape-Datasette. Speichert man nun ein Programm mit der Geräteadresse 7, zum Beispiel »SAVE"TEST",7«, so erscheint die Aufforderung, &lt;Record&gt; und &lt;Play&gt; zu drücken, und das Programm wird mit ungefähr 9facher Normalgeschwindigkeit auf Band geschrieben.</p>
+
+        <p>Man sollte übrigens bei Benutzung von »Extratape« keine Superbillig-Kassetten (Kaufhaus-Sonderangebot Wühltisch für 98 Pfennige) verwenden, da sonst häufig Ladefehler auftreten können. Diese werden durch einen »I/O ERROR« am Ende des Ladevorgangs angezeigt. Ladefehler können auch durch das Ein-/Ausschalten großer Elektrogeräte in der Nähe des Computers (zum Beispiel Staubsauger, Elektroheizung im gleichen Raum und so weiter) auf das Band gebracht werden. Deshalb empfiehlt es sich, bei wichtigen Programmen nach dem Speichern eine Kontrolle (durch Laden in den Computer) durchzuführen.</p>
+
+        <p>Die gespeicherten Programme laufen zwar trotz angezeigtem Fehler meist einwandfrei, aber es ist dennoch unschön, einen Fehler auf der Kassette zu haben. Wem diese Fehler zu häufig auftreten, obwohl die Programme immer laufen, der kann die Fehlerabfrage mit »POKE 52951,208« und »POKE 52952,16« (vor dem Speichern eines Programms) abschalten. Eventuell auftretende Fehler werden nun nicht mehr angezeigt.</p>
+
+        <p>Der Grund für diese relativ hohe Fehleranfälligkeit ist, daß in einer Sekunde ungefähr 3830 Impulse (Bit) auf das Band geschrieben werden. Und das wären dann 425 Byte in einer Sekunde! (Es werden neun Bit für ein ganzes Byte benötigt, da immer ein Bit zur Synchronisation dient.) Mit dieser Geschwindigkeit übertrifft man sogar die Floppy (zirka 300 Byte in der Sekunde).</p>
+
+        <p>Es fällt auch auf, daß nach dem SAVEn eines Programmes die Schriftfarbe immer auf Schwarz steht. Dieser Effekt kommt dadurch zustande, daß die spätere Laderoutine beim Speichern an den Namen des Programmes angehängt wird, und so das Ladeprogramm als wirrer Zeichensalat hinter dem »SAVING« kurz auf dem Bildschirm erscheint.</p>
+
+        <p>Mit einigen POKEs ist es auch möglich, ein Maschinenprogramm absolut (also an seiner Originaladresse) zu speichern: Man muß nur die Zeiger auf Programmstart und -ende in den Speicherstellen 43/44 (Start) und 45/46 (Ende) auf Start und Ende des Maschinenprogramms einstellen. Man muß allerdings aufpassen, daß »Extratape« ($CDE0 bis $CFE0) nicht überschrieben wird (Das gäbe beim nächsten SAVE-Befehl einen richtig schönen Systemabsturz...). Auch bei normalen Programmen sollte man darauf achten, daß dieser Bereich nicht gelöscht wird. Extratape läuft übrigens einwandfrei mit vielen Floppy-Speedern zusammen.</p>
+
+        <address class="author">(P. Plamper/tr)</address>
+        <figure>
+            <pre data-filename="extratape.prg" data-name="Extratape" data-mse=mse1></pre>
+            <figcaption>Listing 6. »Extratape«, ein Turbo-Tape-Programm mit Raffinessen.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="extratape.prg" data-name="Extratape"></div>
+
+        <h2>Spitzengrafiken auf MPS-802</h2>
+
+        <p>Mit dem Programm »Support-802« wird es auch den MPS-802-Benutzern ermöglicht, die wirklich erstklassige Basic-Erweiterung »MPS-Support« zu benutzen (Auflösung: 640 x 400 Punkte!). Die Druckroutine hat dieselben Funktionen wie die in der 64'er, Ausgabe 2/86, veröffentlichte. Die einzelnen Befehle und ihre Bedeutung entnehmen Sie deshalb bitte dem 64'er-Heft.</p>
+
+        <p>Beim Abtippen gehen Sie wie folgt vor:</p>
+
+        <ol>
+            <li>Falls Sie es noch nicht getan haben, tippen Sie das Programm »MPS-Support« aus der 64'er, Ausgabe 2/86, mit Hilfe des MSE ab und speichern es auf Diskette.</li>
+            <li>Jetzt tippen Sie Listing 7 mit dem MSE ab und speichern es unter dem Namen »dump 802« auf Diskette.</li>
+            <li>Laden Sie jetzt bitte »dump 802« absolut (also ,8,1) und geben Sie »NEW« ein.</li>
+            <li>Nun laden Sie MPS-Support aus Ausgabe 2/86.</li>
+            <li>Wenn Sie »SYS 49152« eingeben, wird die neue DUMP-Routine ins MPS-Support integriert und das ganze Programm unter dem Namen »support 802« auf Diskette gespeichert. Es ist jetzt ein Block länger geworden, aber Sie können es wie gewohnt laden und starten.</li>
+        </ol>
+
+
+        <p>In Bild 1 sehen Sie eine Netzgrafik, die mit »support 802« ausgedruckt wurde.</p>
+        <figure>
+            <img src="164-1.png" alt="Drahtgittergrafik einer glockenförmigen Erhebung auf einer Ebene">
+            <figcaption>Bild 1. Diese Netzgrafik (verkleinert) wurde auf einem MPS-802 ausgegeben.</figcaption>
+        </figure>
+
+        <p>Die Programmservice-Diskette enthält natürlich das fertige Programm »support 802«.</p>
+
+        <address class="author">(Oliver Koch/tr)</address>
+
+        <p>Nachfolgend eine kurze Befehlsübersicht. Die genaue Bedeutung finden Sie in der Ausgabe 2/86 ab Seite 59.</p>
+
+        <p>GRAPHIC / TEXT / WINDOW A,B / UPDATE / ZOOM INCREASE A,B / RESTART / CLEAR / COLOUR A,B,C / DOT A,B / CDOT A,B / LINE A,B,C,D / CLINE A,B,C,D / TEST A,B / PATTERN A / CHAR A,B,C / DUMP<br>POLY A,B,C,D,E,F,G,H<br>CPOLY A,B,C,D,E,F,G,H<br>FPOLY A,B,C,D,E,F,G,H<br>EPOLY A,B,C,D,E,F,G,H</p>
+
+        <figure>
+            <pre data-filename="dump 802.prg" data-name="Dump 802" data-mse=mse1></pre>
+            <figcaption>Listing 7. »Support 802«, fantastische Grafiken auf Ihrem MPS-802-Drucker</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="dump 802.prg" data-name="Dump 802"></div>
+        <div class="binary_download" data-filename="support-802.prg" data-name="Support 802"></div>
+        <h2>Die Statuszeile</h2>
+
+        <p>Dieses kurze Programm wurde aus der Not geboren, daß bei einem Dateiprogramm in Basic laufende Informationen über den aktuellen Zustand des Programms (aktueller Modus, freier Speicherplatz, Fehlerkanal der Floppy etc.) benötigt wurden.</p>
+
+        <p>Das Programm »Statuszeile« (Listing 8) ist leicht von Basic aus zu handhaben und löst das genannte Problem. Es wird mit »SYS 12*4096« gestartet. Listing 9 zeigt, wie man den Text im Speicher ablegen muß.</p>
+
+        <h3>Programmerklärung (siehe dazu auch Listing 10)</h3>
+
+        <p>In der »INIT«-Routine werden die Zeiger des Interrupt auf das Programm verbogen. Ab »START« liegt das eigentliche Programm. In der Schleife »LOOP« wird der Text (indirekt adressiert mit x) gelesen und in den Bildschirmspeicher abgelegt. Ab »END« wird mit Hilfe der Betriebssystemroutine »PLOT« die Cursorposition gelesen. Ist der Cursor innerhalb der ersten beiden Zeilen, wird er mit der Routine »SET« in die dritte Zeile gesetzt. »AUS« lenkt den Interrupt auf die normale Interruptroutine im Betriebssystem.</p>
+
+        <p>Wird mit SYS 49283 die Routine »STOP« aufgerufen, wird der IRQ-Zeiger wieder auf den ursprünglichen Wert gesetzt und das Programm somit abgeschaltet. Die Hintergrundfarbe der Statuszeilen läßt sich in Speicherstelle $C016 = dezimal 49174 verändern. Der Text, der maximal 80 Zeichen umfassen kann, liegt ab dezimal 49203 und kann dort direkt hineingePOKEt werden. In Listing 9 wird in der Zeile 110 gezeigt, wie man das macht.</p>
+
+        <p>Das Assemblerlisting ist ausführlich dokumentiert, um auch Anfängern das Leben leicht zu machen.</p>
+
+        <p>Mit anderen Programmen, die den Interrupt beeinflussen, wird dieses Programm ohne Anpassung nicht laufen.</p>
+
+        <address class="author">(Uwe Wiards/tr)</address>
+        <figure>
+            <pre data-filename="status.prg" data-name="Status" data-mse=mse1></pre>
+            <figcaption>Listing 8. »Status«, Statuszeile im Interrupt</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="status.prg" data-name="Status"></div>
+        <figure>
+            <pre data-filename="editor" data-name="Editor" data-checksummer="3"></pre>
+            <figcaption>Listing 9. »Editor«, so erstellt man mit Listing 8 Statuszeilen</figcaption>
+        </figure>
+        <figure>
+            <pre>;statuseinblendung im interupt
+;    uwe wiards
+;    2874 lemwerder
+
+; assi-fse-assembler 4.12 (c) d.zabel
+
+;2statuszeilen = max 80 zeichen
+;ab startadresse + dez 51 text!
+
+*=$c000   ;programmadresse
+
+nzei=2        ;anzahl der zeilen
+nlett=40*nzei ;anz. buchst.
+irqv=$0314    ;irq-pointer
+plot=$fff0    ;plot   cursor pos l/s
+norm=$ea31    ;norm irq
+scrb=$0400    ;screenbeginn
+farb=$d800    ;farbram beginn
+
+
+init  sei              ;irq aus
+      lda#&lt;start       ;pointer irqv
+      sta irqv         ;auf
+      lda#&gt;start       ;start setzen
+      sta irqv+1       ;lo u. hi-byte
+      cli              ;irq ein
+      rts
+start ldx#$00          ;x initalisieren
+loop  lda text,x       ;adr text + x
+      sta scrb,x       ;adr scrb + x
+      lda#$01          ;farbe
+      sta farb,x       ;setzt farbe
+      inx              ;x=x+1
+      cpx#nlett        ;vergleiche
+      beq end          ;0 dann end
+      jmp loop
+end   sec  ;carry setzen plot liest
+      jsr plot
+      cpx#nzei
+      bpl aus
+set   clc  ;carry loe. plot schreibt
+      ldx#nzei
+      jsr plot
+aus   jmp norm
+text  .text "STATUSZEILENEINBLENDUNG "
+      .text "BY UWE WIARDS   "
+      .text "ACHTZIG ZEICHEN TEXT    "
+      .text "REST AUFFUELLEN "
+
+stop  sei
+      lda#&lt;norm        ;irq-pointer
+      sta irqv         ;auf normwert
+      lda#&gt;norm        ;zuruecksetzen
+      sta irqv+1
+      cli
+      rts</pre>
+            <figcaption>Listing 10. Der dokumentierte Quelltext zu Listing 8</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="statuszeilen.ass.prg" data-name="Statuszeilen (Quelltext)"></div>
+        <div class="binary_download" data-filename="text.prg" data-name="Text"></div>
+        <div style="display: none;">
+            <pre data-filename="statuszeilen.bas" data-name="Statuszeilen"></pre>
+        </div>
+
+        <h2>Drei nützliche Befehle</h2>
+
+        <p>Die Befehlserweiterung »renumber« (Listing 11) stellt Ihnen drei sehr nützliche Befehle zur Verfügung. Als erstes sollten Sie das Programm mit Hilfe des MSE eingeben und speichern. Danach laden Sie es wie ein normales Basic-Programm und starten es mit »RUN«. Der Wortschatz Ihres C 64 umfaßt nun einige neue Kommandos:</p>
+
+        <table class="plain">
+            <tr>
+                <td>»-BYE«</td>
+                <td>Schaltet diese Befehlserweiterung aus.</td>
+            </tr>
+            <tr>
+                <td>»-OLD«</td>
+                <td>Holt bereits mit »NEW« gelöschte Programme wieder in den Speicher zurück.</td>
+            </tr>
+            <tr>
+                <td>»-RENUMBER x,y«</td>
+                <td>Numeriert das gesamte Programm neu. Alle Zeilennummern hinter (ON..)GOTO,GOSUB,LIST und RUN werden dabei berücksichtigt.</td>
+            </tr>
+            <tr>
+                <td>»-UNPACK x,y«</td>
+                <td>Zieht alle Befehle, soweit dies sinngemäß erlaubt ist, in extra Zeilennummern.</td>
+            </tr>
+            <tr>
+                <td>»-PACK x,y,z«</td>
+                <td>Fügt die einzelnen Befehle eines Programmes so eng wie möglich zusammen.</td>
+            </tr>
+        </table>
+
+        <p>x,y und z sind hier Variablen für Zahlen zwischen 0 und 63999, wobei x (Defaultwert 0) die Anfangszeilennummer des neuen Programmes, y (Defaultwert 1) den Abstand der einzelnen Zeilennummern und z (Defaultwert 253) die maximale Zeilenlänge in Bytes darstellen.</p>
+
+        <p>Es ist so auch möglich, eine kleinere Zeilennummer einer größeren folgen zu lassen (zum Beispiel zum Programmschutz). Man muß hier nur die Anfangszeilennummer oder die Schrittweite groß genug wählen. (Das kommt daher, daß die Summe zweier 16-Bit-Zahlen eine 17-Bit-Zahl ergeben kann, wobei das 17. Bit aus Speicherplatzmangel intern unter den Tisch fallengelassen wird.) Inwieweit dies sinnvoll ist, sei jedem selbst überlassen. Es sei aber vielleicht noch erwähnt, daß weder der Basic-Interpreter noch dieses Programm bei einem Sprungbefehl eine kleinere Zeilennummer hinter einer größeren vermuten (Fehlermeldung).</p>
+
+        <p>Die Defaultnummer der maximalen Zeilenlänge (z) wurde aus gutem Grund »nur« auf 253 gesetzt. Bei diesem Wert ist noch ein einwandfreies Laden, Listen und Verbessern möglich.</p>
+
+        <p>Wird z größer als 253 gewählt, so können folgende Probleme auftreten:</p>
+
+        <p>a) Beim Laden erscheint kein Cursor mehr. Dies tritt auf, weil der Basic-Interpreter nach jedem Laden versucht, das Basic-Programm neu zu »binden«. Falls 256 Byte lang kein 00-Byte auftritt, sucht er sich praktisch zu Tode. Abhilfe schaffen (vor dem Laden) folgende Eingaben:</p>
+
+        <pre><code>POKE44,191
+LOAD"name",8,1
+POKE44,8
+</code></pre>
+
+        <p>b) Ein List-Befehl listet nicht mehr das gesamte Programm. Falls eine Zeile mit mehr als 253 Zeichen auftritt, so werden nur diese aufgelistet und dann abgebrochen.</p>
+
+        <p>Es ist jetzt auch nicht mehr möglich, das Programm zu verändern (Programmierschutz).</p>
+
+        <p>Eine dritte Schwierigkeit wird vom Programm selbständig behoben. Ein Sprungbefehl über 253 Nicht-Null-Bytes einer Zeile ist nicht möglich.</p>
+
+        <p>Das Programm akzeptiert auch offengelassene Anführungsstriche und schließt sie bei einem Pack-Befehl selbständig.</p>
+
+        <p>Beispielsweise wird das folgende Basicprogramm</p>
+
+        <pre><code>5  PRINTCHR$(147);:B$=""
+10 IFLEN(B$)&lt;255 THENGETA$:B$=B$+A$
+15 PRINTB$:POKE53281,PEEK(53281)-1:GOTO10
+</code></pre>
+
+        <p>durch »-UNPACK« zu</p>
+
+        <pre><code>0  PRINTCHR$(147);
+1  B$=""
+2  IFLEN(B$)&lt;255THENGETA$:B$=B$+A$
+3  PRINTB$
+4  POKE53281,PEEK(53281)-1
+5  GOTO2
+</code></pre>
+
+        <p>und durch »-PACK 5,5« wieder zu ersterem.</p>
+
+        <p>Daß das Programm arbeitet, sieht man an dem blinkenden Stern am Bildschirmrand rechts oben.</p>
+
+        <p>Bei einem »PACK«-Befehl ändert der Stern mehrmals die Farbe, da hier zusätzlich ein »UNPACK«- und ein »RENUMBER«-Befehl durchgeführt wird.</p>
+
+        <h3>Fehlermeldungen</h3>
+
+        <p>Während der Arbeit gibt das Programm Fehlermeldungen in folgendem Format aus:</p>
+
+        <table class="plain">
+            <tr>
+                <td>xx yyyyy zzzzzzz,</td>
+                <td>wobei</td>
+            </tr>
+            <tr>
+                <td>xx</td>
+                <td>eine interne Fehlernummer,</td>
+            </tr>
+            <tr>
+                <td>yyyyy</td>
+                <td>die neue Fehlernummer, in welcher der Fehler auftritt</td>
+            </tr>
+            <tr>
+                <td>zzzzzzz</td>
+                <td>die Fehlermeldung selber ist.</td>
+            </tr>
+        </table>
+
+        <p>Es gibt folgende Fehlermeldungen:</p>
+
+        <table class="plain">
+            <tr>
+                <td>Syntax error</td>
+                <td>Eventuelle Variablen als Sprungadressen können nicht geändert werden.</td>
+            </tr>
+            <tr>
+                <td>No such line</td>
+                <td>Sprungbefehl zu einer nicht existierenden Zeile</td>
+            </tr>
+            <tr>
+                <td>Illegal line number</td>
+                <td>Zeilennummer zu groß</td>
+            </tr>
+        </table>
+
+        <p>Zeilennummern, die nicht gefunden werden, werden bei den letzten beiden Fehlern einheitlich in 64000 geändert. Hier besteht keine »Verwechslungsgefahr«, da in Basic keine Zeilennummern ab 63999 eingegeben werden können.</p>
+
+        <h3>Sonstiges</h3>
+
+        <p>Das Programm benötigt nur den Speicherbereich von $C000 bis $CFFF. Zu eventuellen Programmiererweiterungen verhält sich »renumber« tolerant, sofern sich nicht die Speicherbereiche überlappen. Hierzu sollte »renumber« als letzteres geladen werden. Zweimaliges Initialisieren führt zum Absturz.</p>
+
+        <address class="author">(Michael Rothmeier/tr)</address>
+        <figure>
+            <pre data-filename="renumber.prg" data-name="Renumber" data-mse=mse1></pre>
+            <figcaption>Listing 11. »Renumber«, Befehlserweiterung mit drei sehr nützlichen Befehlen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="renumber.prg" data-name="Renumber"></div>
+
+        <h2>Die etwas andere Dateiverwaltung</h2>
+
+        <p>»TAXI-SCHOOL« (Listing 12) ist ein System, welches die Erstellung von Dateien mit maximal 512 Zeilen x 24 Zeichen erlaubt. Das Besondere an diesem System ist die Möglichkeit, die einzelnen Zeilen auf bestimmte Weise zu verknüpfen.</p>
+
+        <h3>1. Starten des Programms</h3>
+
+        <p>— Laden Sie das Programm mit »LOAD"TAXI-SCHOOL",8«</p>
+
+        <p>— Starten Sie das Programm mit »RUN«</p>
+
+        <p>— Das Programm verwendet einen anderen Zeichensatz (Listing 13), als ihn der C 64 zur Verfügung stellt. Dieser Zeichensatz wird automatisch geladen. Er muß auf der Diskette unter dem Namen »SIGNS« gespeichert sein. Er beinhaltet einige Sonderzeichen, die zusammen mit der Commodore-Taste aufgerufen werden können.</p>
+
+        <p>— Wollen Sie einen eigenen Zeichensatz verwenden, so muß dieser unter dem Namen »SIGNS« auf Diskette gespeichert sein und von $C000 bis $C800 gehen (also nur ein einfacher Zeichensatz von 256 Zeichen).</p>
+
+        <h3>2. Editieren von Dateien</h3>
+
+        <p>— Es stehen 512 Zeilen x 24 Zeichen zur Verfügung.</p>
+
+        <p>— Eine Zeile wird durch &lt;RETURN&gt; in den Speicher übernommen.</p>
+
+        <p>— &lt;HOME&gt; setzt den Cursor an den Anfang der Zeile.</p>
+
+        <p>— &lt;CLR&gt; löscht die Cursorzeile (der Speicher bleibt dadurch unberührt.</p>
+
+        <p>— &lt;CTRL @&gt; löscht den gesamten Speicher.</p>
+
+        <p>— Die Cursortasten haben ihre übliche Funktion.</p>
+
+        <p>Funktionstasten:</p>
+
+        <p>F2: insert</p>
+
+        <p>— Alles ab Cursorzeile wird um eine Zeile hinuntergeschoben. Die Cursorzeile wird dadurch für einen Eintrag frei.</p>
+
+        <p>— Diesen Befehl sollten Sie nicht mehr verwenden, wenn Sie die »BASIS-STREET«-Beziehungen bereits festgelegt haben (siehe dazu etwas weiter unten).</p>
+
+        <p>F4: delete</p>
+
+        <p>— Die Cursorzeile wird gelöscht. Alle übrigen Einträge rücken auf.</p>
+
+        <p>— Für diesen Befehl gilt das gleiche wie für den Insert-Befehl.</p>
+
+        <h3>3. Laden und Speichern von Dateien</h3>
+
+        <p>F6: load</p>
+
+        <p>— Die Zeichen links vom Cursor werden als Filename interpretiert und der Befehl »LOAD"(FILENAME)",8,1« ausgeführt.</p>
+
+        <p>— Wurde ein $-Zeichen eingegeben, so erscheint das Inhaltsverzeichnis der Diskette.</p>
+
+        <p>F8: save</p>
+
+        <p>— Die Zeichen links vom Cursor werden als Filename interpretiert und der Befehl »SAVE"(FILENAME)",8,1« ausgeführt.</p>
+
+        <p>— Es wird von der ersten bis zur Zeile über dem Cursor (einschließlich) unter dem angegebenen Filenamen auf der Diskette gespeichert.</p>
+
+        <h3>4. Die BASIS-STREET-Verbindungen</h3>
+
+        <p>Das Programm gibt Ihnen die Möglichkeit, zu jeder der 512 Zeilen 20 Zeilen als Unterzeilen zu bestimmen. Eine Unterzeile bezeichnen wir mit »STREET«. Jede Zeile ist »BASIS«, aber nur die auserwählten Zeilen sind »STREETS«.</p>
+
+        <p>Wollen Sie eine Zeile als »STREET« kennzeichnen, so muß vorher festgelegt worden sein, welche Zeile die »BASIS« ist.</p>
+
+        <p>F3: basis</p>
+
+        <p>— Bringen Sie den Cursor in die Zeile, die die »BASIS« sein soll.</p>
+
+        <p>— Drücken Sie &lt;F3&gt;.</p>
+
+        <p>— Bis zum nächsten &lt;F3&gt; liegt die »BASIS« nun fest.</p>
+
+        <p>F5: street</p>
+
+        <p>— Bringen Sie den Cursor in die Zeile, die Sie als »STREET« kennzeichnen wollen.</p>
+
+        <p>— Drücken Sie &lt;F5&gt;.</p>
+
+        <p>— Die Zeile wird als »STREET« zur aktuellen »BASIS« gekennzeichnet.</p>
+
+        <p>Wollen Sie zu einer beliebigen Zeile die dazugehörigen »STREETS« auflisten lassen, so benutzen Sie dazu den Drive-Befehl &lt;F7&gt;. Dazu muß in der Cursorzeile der Inhalt der Zeile stehen, zu der Sie die »STREETS« auflisten wollen. Dies können Sie erreichen, indem Sie den Cursor in die entsprechende Zeile bringen oder den Text in die aktuelle Zeile schreiben.</p>
+
+        <p>F7: drive</p>
+
+        <p>— Es wird die ausgewählte »BASIS« am oberen Feldrand ausgegeben und darunter mit zwei Zeilen Abstand die dazugehörigen »STREETS«.</p>
+
+        <p>— Durch diesen Befehl werden die Funktionen &lt;F3&gt; und &lt;F5&gt; sowie das Übernehmen einer Zeile in den Speicher durch &lt;RETURN&gt; ausgeschaltet. Das heißt, daß bis zum nächsten &lt;F1&gt; oder Scrollen keine »BASIS« oder »STREET« gekennzeichnet werden kann und auch keine Zeile in den Speicher übernommen wird.</p>
+
+        <p>— Bewegen Sie den Cursor aus dem Feld oder rufen Sie den Search-Befehl auf, so wird zurück in die Liste gesprungen. Jetzt sind alle Befehle wieder aktiv.</p>
+
+        <p>Zum Auffinden einer bestimmten Zeile dient der Search-Befehl &lt;F1&gt;.</p>
+
+        <p>F1: search</p>
+
+        <p>— Es wird ein CLR ausgeführt.</p>
+
+        <p>— Beim nächsten &lt;RETURN&gt; wird nach einer Zeile gesucht, die mit der gleichen Zeilenfolge beginnt wie die aktuelle Cursorzeile.</p>
+
+        <p>— Zeichen, die aus dem Vergleich ausgeschlossen werden sollen, können durch ein »?« ersetzt werden.</p>
+
+        <h3>Anwendungsbeispiel Taxischule</h3>
+
+        <p>Beginnen Sie damit, die Straßennamen Ihrer Stadt zu speichern. Ordnen Sie die Straßen zum Beispiel nach Ortsteilen. In jeder Zeile steht nun ein Straßenname. Kennzeichnen Sie nun nacheinander die einzelnen Straßen als »BASIS« und die davon abzweigenden Straßen als »STREETS«.</p>
+
+        <p>Einige Zeilen können auch Informationen enthalten wie »Einbahnstraße« oder »Kirche« oder ähnliches. Soll einer Straße eine Information zugeordnet werden, so wird die Straße als »BASIS« gekennzeichnet und die Information als »STREET«.</p>
+
+        <p>Es kann auch der Name einer anderen Datei als »STREET« zu einer »BASIS« dienen. Sie erhalten beim Auflisten der »STREETS« dann zum Beispiel die Information, daß die Straße in einem anderen Ortsteil weitergeht.</p>
+
+        <p>Haben Sie die Dateien nach Ihren Vorstellungen erstellt und gespeichert, können Sie Ihre Lernfortschritte mit diesem Programm testen. Dazu wählen Sie zunächst einen Ausgangs- und einen Endpunkt.</p>
+
+        <p>Bringen Sie dann den Cursor in die Zeile, in der der Ausgangspunkt steht. Drücken Sie nun &lt;F7&gt;. Es wird der Ausgangspunkt angezeigt und alle davon aus erreichbaren Straßen. Wählen Sie eine aus und drücken Sie wieder &lt;F7&gt;. Dies wiederholen Sie so lange, bis Sie Ihr gewähltes Ziel erreicht haben. Sollte letzteres nicht gelingen, so haben Sie den Stadtplan noch nicht richtig im Kopf und müssen noch lernen.</p>
+
+        <p>Für diese oder ähnliche Anwendungen wurde das Programm »TAXI-SCHOOL« entwickelt. Da es sich im Grunde jedoch um ein kleines Datenbank-System handelt, können Sie natürlich auch andere Probleme damit bewältigen (Notizbuch, Wörterbuch und so weiter).</p>
+
+        <address class="author">(Christoph Gladenbeck/tr)</address>
+        <figure>
+            <pre data-filename="taxi-school.prg" data-name="Taxi-school" data-mse=mse1></pre>
+            <figcaption>Listing 12. »Taxi-school«, die etwas andere Dateiverwaltung</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="taxi-school.prg" data-name="Taxi-school"></div>
+        <figure>
+            <pre data-filename="signs.prg" data-name="Zeichensatz" data-mse=mse1></pre>
+            <figcaption>Listing 13. Der geänderte Zeichensatz zu »Taxi-school«</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="signs.prg" data-name="Zeichensatz"></div>
+    </article>
+</body>
+
+</html>

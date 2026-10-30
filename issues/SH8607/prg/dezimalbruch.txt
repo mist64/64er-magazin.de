@@ -1,0 +1,130 @@
+
+
+;dezimalbruch.prg ==0801==
+    0 rem *********************************
+    1 rem *                               *
+    2 rem *    berechnung periodischer    *
+    3 rem *        dezimalbrueche         *
+    4 rem *                               *
+    5 rem *    bernhard filpe             *
+    6 rem *    langgasse 28               *
+    7 rem *    6733 hassloch              *
+    8 rem *                               *
+    9 rem *********************************
+   10 poke53280,6:poke53281,6:printchr$(147),chr$(14),chr$(8)
+   20 print"Berechnung periodischer Dezimalbrueche"
+   30 print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+   40 print"{down}{down}{down}Eingabebeispiel:"
+   45 print"{down}                  {SHIFT-*}{SHIFT-*}{SHIFT-*}"
+   50 print"Zu berechnen: 0.76351"
+   60 print"{down}Eingabe     : 0.76351   Laenge 3"
+   70 print"{down}"
+   80 input"Dezimalbruch      : ";x$
+   90 input"Laenge der Periode: ";l$
+  100 l=val(l$):ifl<>int(l)orl<1thener$="Eingabe der Periode falsch":goto2000
+  105 if val(x$)=0thener$="Falsche Eingabe":goto2000
+  110 rem test auf korrekte eingabe
+  120 xl=len(x$)
+  130 for i=1toxl
+  140 t$=mid$(x$,i,1):t=val(t$)
+  150 if(t=>1)and(t<=9)thenfl=1:goto180
+  160 if t$="0"andfl=0then nu=nu+1:goto180
+  165 if t$="0"then180
+  170 if t$="."andpf=0thenfl=1:pf=1:pk=i:goto180
+  175 er$="Falsche Eingabe":el=i:goto2000
+  180 next
+  200 if fl then x$=mid$(x$,nu+1):pk=pk-nu
+  210 xl=len(x$)
+  220 if pf=0thener$="Dezimalpunkt fehlt":goto2000
+  230 if l>xl-pkthener$="Falsche Periodenangabe":goto2000
+  250 print"{clr}{down}Berechnung periodischer Dezimalbrueche"
+  260 print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  270 print"{down}Dezimalbruch       : ";:ifpk=1thenprint"0";
+  275 printx$
+  280 print"Laenge der Periode : ";l$
+  290 print
+  300 rem berechnung
+  310 n(1)=10^(xl-l-pk)
+  320 if pk=1thenv$=mid$(x$,2,xl-l-1):goto337
+  330 v$=mid$(x$,1,pk-1):vl=len(v$)
+  335 v$=v$+mid$(x$,pk+1,xl-vl-1-l)
+  337 z(1)=val(v$)
+  340 n(2)=10^(xl-pk)
+  350 z(2)=val(mid$(x$,xl-l+1)):ifz(2)=0thener$="Dezimalbruch trivial":goto2000
+  360 n(3)=1-10^(-l):z(3)=1
+  400 gosub3000
+  410 gosub4000:print
+  420 if z(1)=0then 450
+  430 g1=z(1):g2=n(1):gosub5000:rem ggt
+  440 z(1)=z(1)/gg:n(1)=n(1)/gg
+  450 z(2)=z(2)*z(3)
+  460 n(2)=n(2)*n(3)
+  510 g1=z(2):g2=n(2):gosub5000:rem ggt
+  520 z(2)=z(2)/gg:n(2)=n(2)/gg
+  530 gosub3000
+  540 if z(1)<>0thengosub4300
+  550 if z(1)=0thengosub4200:end
+  555 print
+  560 g1=n(1):g2=n(2):gosub5000
+  570 gg=n(1)*n(2)/gg:rem kgv
+  580 z(1)=z(1)*gg/n(1)
+  590 z(2)=z(2)*gg/n(2)
+  600 n(2)=gg:z(2)=z(1)+z(2)
+  610 g1=z(2):g2=n(2):gosub5000
+  620 z(2)=z(2)/gg:n(2)=n(2)/gg
+  630 gosub3000:gosub4200
+  700 end
+ 2000 rem fehleranzeige
+ 2010 print"{down}{down}{down}{rvon} ";er$;" "
+ 2015 if el=0then2030
+ 2017 print"{down}";x$:if el=1thenprint"^":goto2030
+ 2020 forj=1toi-1:print" ";:next:print"^"
+ 2030 for w=1to1000:geta$:ifa$=""then next
+ 2040 run
+ 3000 rem ausgabe der errechneten werte
+ 3005 z(1)=int(z(1)):z(2)=int(z(2)):n(1)=int(n(1)):n(2)=int(n(2))
+ 3010 z1$=str$(z(1)):n1$=str$(n(1))
+ 3020 z2$=str$(z(2)):n2$=str$(n(2))
+ 3030 z3$="1":n3$=str$(n(3))
+ 3040 l1=len(z1$):if l1<len(n1$)then l1=len(n1$)
+ 3050 l2=len(z2$):if l2<len(n2$)then l2=len(n2$)
+ 3060 l3=len(n3$)
+ 3070 if l1>len(z1$)thenz1$=" "+z1$:goto3070
+ 3080 if l1>len(n1$)thenn1$=" "+n1$:goto3080
+ 3090 if l2>len(z2$)thenz2$=" "+z2$:goto3090
+ 3100 if l2>len(n2$)thenn2$=" "+n2$:goto3100
+ 3110 if l3>len(z3$)thenz3$=" "+z3$:goto3110
+ 3120 n3$="0"+mid$(n3$,2)
+ 3130 return
+ 4000 print"  ";z1$;"   ";z2$;"   ";z3$
+ 4010 print"= ";
+ 4020 fori=1tol1:print"{SHIFT-*}";:next:print" + ";:fori=1tol2:print"{SHIFT-*}";:next:print" * ";
+ 4030 for i=1tol3:print"{SHIFT-*}";:next:print
+ 4040 print"  ";n1$;"   ";n2$;"   ";n3$
+ 4050 return
+ 4100 print"  ";z2$;"   ";z3$
+ 4110 print"= ";
+ 4120 fori=1tol2:print"{SHIFT-*}";:next:print" * ";
+ 4130 for i=1tol3:print"{SHIFT-*}";:next:print
+ 4140 print"  ";n2$;"   ";n3$
+ 4150 return
+ 4200 print"  ";z2$
+ 4210 print"= ";
+ 4230 for i=1tol2:print"{SHIFT-*}";:next:print
+ 4240 print"  ";n2$
+ 4250 return
+ 4300 print"  ";z1$;"   ";z2$
+ 4310 print"= ";
+ 4320 fori=1tol1:print"{SHIFT-*}";:next:print" + ";
+ 4330 for i=1tol2:print"{SHIFT-*}";:next:print
+ 4340 print"  ";n1$;"   ";n2$
+ 4350 return
+ 5000 rem ggt
+ 5010 g1=int(g1):g2=int(g2)
+ 5020 if g1<g2thenhi=g1:g1=g2:g2=hi
+ 5030 if g1/g2=int(g1/g2)thengg=g2:return
+ 5040 q=g1/g2:ifq>20 then g1=g1-int(q-10)*g2
+ 5050 if g1=g2thengg=g1:return
+ 5060 if g1>g2theng1=int(g1-g2):goto5050
+ 5070 g2=int(g2-g1):goto5050
+

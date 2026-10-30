@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Basic-Maker: Ein Recompiler für die gängigsten Compiler</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Frank Riemenschneider, ah">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="130-138">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips-und-Tricks-Listings">
+    <meta name="64er.toc_title" content="Recompiler für die gängigsten Compiler">
+    <meta name="64er.index_title" content="Basic-Maker: Ein Recompiler">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Programmieren">
+    <meta name="64er.id" content="basic-maker">
+</head>
+
+<body>
+    <article>
+        <h1>Basic-Maker: Ein Recompiler für die gängigsten Compiler</h1>
+        <p class="intro">Von jetzt an können Sie getrost Ihre Basic-Programme nach dem Compilieren löschen, denn jetzt gibt es Basic-Maker. Basic-Maker generiert aus jedem Compilat, das mit den Austro-Compilern erzeugt wurde, ein lauffähiges und editierbares Basic-Programm.</p>
+
+        <p>Ein Recompiler ist ein Übersetzer, der es ermöglicht, ein compiliertes Programm wieder in das Ursprungs-Basic-Programm zurückzuverwandeln. Da jeder Basic-Compiler unterschiedlichen Code erzeugt, kann man mit einem bestimmten Recompiler immer nur Compilate dieses Compilertyps verarbeiten.</p>
+
+        <p>Basic-Maker ist in der Lage, Compilate der in Deutschland am meisten verbreiteten Compiler zu verarbeiten, des Austro-Comps und dessen Nachfolgern Austro-Speed sowie Austro-Blitz. Diese Compiler unterscheiden sich nur geringfügig im Aufbau und erzeugen somit sehr ähnliche Compilate, die von Basic-Maker bearbeitet werden.</p>
+
+        <p>Zunächst scheint es unsinnig zu sein, einen Recompiler zu schreiben, da man ja gerade durch das Compilieren ein schnelleres und meistens auch kürzeres Programm erhalten hat. Man nimmt jedoch auch einen gewaltigen Nachteil in Kauf: Das Programm ist für immer in der vorliegenden Form fixiert, es können also keinerlei Änderungen mehr vorgenommen werden. Will man sich Weiterentwicklungen offenhalten, muß man neben dem Compilat auch noch das Ursprungsprogramm speichern. Darauf verzichten jedoch die meisten Anwender, weil Diskettenspeicherplatz nicht gerade billig ist. Basic-Maker ermöglicht es durch die Übersetzung des Compilats in Basic-Quelltext, doch noch Änderungen am Programm vorzunehmen. Anschließend kann man das geänderte Programm wieder compilieren.</p>
+
+        <p>Besonders tragisch sind die Fälle, in denen im Compilat eines Basic-Programms Fehler auftreten. Diese Programme waren bisher als Totalverlust zu werten, durch den Einsatz von Basic-Maker kann man das Programm jedoch noch retten.</p>
+
+        <h2>Die Bedienung von Basic-Maker</h2>
+
+        <p>Durch Basic-Maker ist es ebenso möglich geworden, gekaufte Software, die mit den Austro-Compilern compiliert wurde, nach eigenen Wünschen abzuändern und damit sogenannte »Schwachstellen« des Programms auszubessern. Ich habe zum Beispiel den Pascal-Compiler »PASCAL 64« recompiliert und so abgeändert, daß das Programm jetzt nach erneuter Compilierung um fast 25 Prozent schneller arbeitet.</p>
+
+        <h3>Der Start der Übersetzung</h3>
+
+        <p>Wenn Sie das Programm (Listing) mit RUN gestartet haben, sehen Sie das umfangreiche Menü auf dem Bildschirm. Die Recompilierung wird gestartet, indem man in den Menüpunkten 1 bis 3 den Typ des Compilers festlegt, mit dem das nun zu bearbeitende Compilat erstellt wurde. Nach dieser Wahl erscheint die Frage nach dem Namen des Compilats auf Diskette. Wenn Sie diesen eingegeben haben, beginnt die Übersetzung.</p>
+
+        <h3>Die Recompilierung: PASS 1</h3>
+
+        <p>Bei Basic-Maker handelt es sich um einen 2-Pass-Recompiler, der das Compilat also in zwei Arbeitsgängen übersetzt. In PASS 1 werden dabei die Zeilennummern für das Basic-Programm festgelegt, die Variablen geholt sowie grobe Aufbaufehler gesucht, die eine korrekte Übersetzung verhindern würden. Im Gegensatz zu allen bekannten Compilern werden diese Informationen nicht in eine Hilfsdatei auf Diskette, sondern in ein spezielles Feld im Speicher geschrieben. Dadurch wird der Zugriff erheblich beschleunigt. Das Feld befindet sich im Adreßraum von $A000 bis $FFFF, was einer Kapazität von 24 KByte entspricht. Damit lassen sich Compilate von einer Länge bis zirka 115 Blöcke recompilieren (das längste, mir bekannte Compilat ist das Programm »UNITAB« mit einer Länge von 106 Blocks).</p>
+
+        <h3>Die Recompilierung: PASS 2</h3>
+
+        <p>Die eigentliche Übersetzung wird von Basic-Maker in PASS 2 vorgenommen. Dabei wird der Code in Basic-Befehle umgewandelt und in einzelne Programmzeilen geschrieben. Das erzeugte Basic-Programm wird parallel auf dem Bildschirm gelistet und in eine Diskettendatei geschrieben, so daß Sie es mit LOAD"Name",8 laden können. Als Programmname wird der Name des Compilats mit dem Vorsatz »B—« verwendet. Es wird ein zum Ursprungsprogramm völlig ablaufkompatibles Programm erzeugt, das sich also im Ablauf gleich verhält. Dabei wird das Programm aus folgenden Gründen jedoch nie genau gleich zum Ursprungsprogramm sein: REM-Zeilen werden bei der Compilierung entfernt, da sie im Code sinnlos sind. Daher kann das Recompilat ebenso keine REM-Zeilen enthalten. Im Gegensatz zum Basic-Programm enthält das Compilat ebenso keine Zeilennummern, da der Code chronologisch vom Runtime-Modul des Compilers abgearbeitet wird. Es läßt sich nachträglich nicht mehr feststellen, welche Zeilennummern das Ursprungsprogramm enthielt und welche Befehle in welchen Zeilen standen. Basic-Maker beginnt daher normalerweise mit der Zeile 1 und erzeugt dann pro Programmzeile nur einen Befehl, damit das Basic-Programm leicht editierbar wird. Eventuell auftretende DATA-Codes werden vom Compiler an einer Stelle des Compilats »gesammelt«. Da die Position der DATA-Zeilen im Basic-Programm für die Reihenfolge der Bearbeitung unerheblich ist, bleibt dies ohne Folge für den Programmablauf. Basic-Maker kann natürlich nicht feststellen, woher die einzelnen DATAS kommen und hängt diese komplett an das erzeugte Basic-Programm an. Dadurch wird zwar das Aussehen, nicht aber die Funktion des Programms beeinflußt.</p>
+
+        <p>Nach Beendigung der Übersetzung werden die Anzahl der aufgetretenen Fehler und Erweiterungen sowie der Name des erzeugten Basic-Programms ausgegeben. Anschließend können Sie durch Drücken der Taste &lt;N&gt; einen Reset auslösen oder durch eine beliebige andere Taste Basic-Maker erneut starten.</p>
+
+        <h3>Die Befehle MID$, RUN, PRINT$ und die FOR-NEXT-Schleife</h3>
+
+        <p>Im Gegensatz zu den anderen Basic-Befehlen werden die oben genannten bei der Übersetzung durch den Compiler aus verschiedenen Gründen verändert. Der MID$-Befehl tritt normalerweise nur in Verbindung mit drei Parametern auf, wie zum Beispiel MID$(A$,2,3). Er kann aber auch mit nur zwei Parametern verwendet werden, zum Beispiel MID$(A$,2). Die Compiler können durch den Aufbau des Runtime-Moduls jedoch nur Befehle mit drei Parametern verwenden. Deshalb wird bei der Compilierung eine 255 als dritter Parameter angehängt. Die Wirkung des Befehls wird nicht verändert, da 255 die maximal zulässige Stringlänge ist. Bei der Recompilierung erzeugt Basic-Maker daher in jedem Fall einen MID$-Befehl mit drei Parametern.</p>
+
+        <p>Der RUN-Befehl wird bei der Compilierung durch zwei andere Basic-Befehle ersetzt, so daß keine eigene Interpretationsroutine für ihn erforderlich ist. Diese Befehle sind CLR und GOTO Z (Z: Erste Zeile des Basic-Programms). Durch sie wird genau das erreicht, was auch der RUN-Befehl bewirkt hätte. Basic-Maker »weiß« bei der Übersetzung nicht, ob diese Befehlsfolge einen »RUN«-Befehl ersetzt hat oder in der Form im Ursprungsprogramm vorhanden war. Deshalb wird sie unverändert in das Recompilat übernommen.</p>
+
+        <p>Für den PRINT #-Befehl besitzen die Compiler ebenso keine Interpretationsroutine. Beim Antreffen dieses Befehls geschieht deshalb folgendes: Zunächst wird der PRINT #-Befehl durch die Befehle CMD und PRINT ersetzt, wodurch die Ausgabe auf das angesprochene Gerät umgelenkt wird. Anschließend muß die Ausgabe auf den Bildschirm zurückgesetzt werden. Dafür benutzen die Compiler jedoch keinen Basic-Befehl. Basic-Maker fügt daher beim Antreffen der Befehlsfolge CMD und PRINT von sich aus einen PRINT #-Befehl an. Dadurch wird die Ausgabe wieder auf den Bildschirm geleitet.</p>
+
+        <p>Eine Schleife wird normalerweise in die Form »FOR I = Anfangswert TO Endwert:...:Next I« benutzt. Die Compiler ändern diese jedoch in die Form «I = Anfangswert:FOR I = I TO Endwert:...:NEXT I« ab. Die Wirkung bleibt unverändert. Basic-Maker übernimmt die Schleifenform des Compilats in das erzeugte Basic-Programm, da auch hier nicht festgestellt werden kann, ob dies ein Erzeugnis des Compilers ist oder vom Ursprungsprogramm stammt.</p>
+
+        <h3>Der erweiterte SYS-Befehl</h3>
+
+        <p>Die Austro-Compiler zeichnen sich unter anderem dadurch aus, jede Form des SYS-Befehls verarbeiten zu können. Basic-Maker ist in der Lage, diese erweiterten Befehle zurückzuübersetzen. Durch den Aufbau des Programms werden jedoch meistens Fehlermeldungen beim Antreffen eines erweiterten SYS-Befehls ausgegeben. Das hat jedoch hier keine Bedeutung. Der Befehl wird in jedem Fall korrekt übersetzt, so daß das Basic-Programm einwandfrei arbeiten kann.</p>
+
+        <h3>Die Fehlermeldungen von Basic-Maker</h3>
+
+        <p>Basic-Maker gibt zwei Arten von Fehlermeldungen aus: Zum einen gibt es die »leichten« Fehler, die in der Form »? RECOMPILE ERROR ?« mit Fehleradressen ausgegeben werden. Diese Fehlermeldungen werden durch den Aufbau von Basic-Maker bedingt auch bei Erweiterungen oder erweiterten SYS-Befehlen ausgegeben, ohne daß tatsächlich ein Fehler vorliegt. Meistens bedeutet ein »leichter« Fehler, daß Basic-Maker einen unbekannten Code gefunden hat. Wenn eine nicht interpretierbare Programmzeile gefunden wird, so wird in dem recompilierten Basic-Programm eine REM-Zeile erzeugt. Sie erkennen daher beim Listen dieses Programms sofort die fehlerbehafteten Stellen, da ja sonst keine REM-Zeilen existieren. Die Übersetzung kann in fast allen Fällen nach einem »leichten« Fehler korrekt fortgesetzt werden.</p>
+
+        <p>Im Gegensatz dazu können auch schwerwiegende, sogenannte »fatale« Fehler auftreten. Diese Fehler treten meist in PASS 1 auf und deuten auf einen schwerwiegenden Aufbaufehler des Compilats hin. Meistens treten »fatale« Fehler nur dann auf, wenn das Compilat nicht korrekt erzeugt wurde, das heißt wenn während der Compilierung von den Austro-Compilern Fehlermeldungen ausgegeben wurden. Basic-Maker kann nach dem Auffinden eines »fatalen« Fehlers nicht mehr korrekt weiterarbeiten und bricht die Recompilierung ab. Dabei werden alle Diskettendateien korrekt geschlossen, so daß eventuell bis zu diesem Zeitpunkt korrekt übersetzte Teile des Compilats nicht verlorengehen. Tritt innerhalb des Basic-Maker-Recompilers ein Fehler auf (zum Beispiel wenn das Programm im Direktmodus gestartet wurde), wird die Meldung »SYSTEM ERROR« ausgegeben und die Übersetzung ebenso abgebrochen. Basic-Maker liest zur Sicherheit nach jedem Zugriff auf die Diskettenstation den Fehlerkanal aus. Wird dabei eine Fehlermeldung gefunden, wird die Recompilierung sofort abgebrochen, da auf keinen Fall korrekt weitergearbeitet werden kann. Auch hier werden vor dem Abbruch alle Dateien richtig geschlossen.</p>
+
+        <h2>Basic-Maker für Compiler-Enthusiasten</h2>
+
+        <p>Nachdem grundsätzlich geklärt ist, wie man mit Basic-Maker eine Recompilierung vornehmen kann, soll jetzt auf die Menüpunkte 4 bis 9 eingegangen werden.</p>
+
+        <h3>Festlegen der Startzeile und Schrittweite</h3>
+
+        <p>Bisher wurde immer davon ausgegangen, daß Basic-Maker das erzeugte Basic-Programm mit der Zeilennummer 1 beginnt und in Einer-Schritten fortsetzt. Im Menüpunkt 4 können Sie jedoch eine andere Startzeile/Schrittweite festlegen. Erlaubt sind Werte von 1 bis 10. Aus programmtechnischen Gründen muß die Schrittweite immer der Startzeile des Basic-Programms entsprechen. Bei jedem Druck der Taste &lt;4> wird die Zahl um 1 erhöht, bis 10 erreicht ist. Daraufhin wird wieder mit 1 begonnen, und so weiter. Wenn Sie also vorhaben, viele Zeilen in das erzeugte Basic-Programm einzufügen, sollten Sie lieber eine etwas größere Schrittweite festlegen.</p>
+
+        <h3>Wahl der Bildschirmausgabe</h3>
+
+        <p>In Punkt 5 können Sie bestimmen, ob das recompilierte Programm in PASS 2 auf dem Bildschirm ausgegeben werden soll. Wenn Sie nichts anderes festlegen, wird das Listing immer auf dem Bildschirm ausgegeben. Bei äußerst langen Compilaten kann jedoch durch Abschalten der Bildschirmausgabe die Verarbeitungsgeschwindigkeit von Basic-Maker in PASS 2 um mehr als 35 Prozent erhöht werden. Wenn man daher nicht unbedingt an einer Ausgabe interessiert ist, kann man durch Drücken der Taste &lt;5> die Bildschirmausgabe abschalten. Fehlermeldungen und Erweiterungen werden jedoch in jedem Fall weiterhin ausgegeben. Durch erneute Betätigung der Taste wird die Ausgabe immer wechselweise ein- und ausgeschaltet. Der jeweilige Zustand wird hinter der Menü-Zeile angezeigt. Bei kleinen Compilaten ist der Geschwindigkeitsgewinn nicht lohnenswert, so daß man die Ausgabe eingeschaltet lassen kann.</p>
+
+        <h3>Bestimmung der Länge einer DATA-Zeile</h3>
+
+        <p>Im Menüpunkt 6 können Sie die maximale Länge einer erzeugten DATA-Zeile festlegen. Die Voreinstellung beträgt fünf Zeichen, wobei alle Werte ohne Zeilennummer und Befehlswort »DATA« gerechnet werden, so daß wirklich nur die Länge der eigentlichen DATAs betrachtet wird. Durch Drücken der Taste &lt;6> wird diese Einstellung jeweils um fünf Zeichen erhöht. Das Maximum beträgt durch die maximale Zeilenlänge (80 Zeichen) 70 Zeichen. Besonders bei Compilaten mit vielen DATAs kann man durch lange DATA-Zeilen eine erhebliche Anzahl von Programmzeilen einsparen. Wird ein DATA-Statement gefunden, dessen Länge die voreingestellte, maximale übertrifft, wie zum Beispiel eine Stringkette, so wird diese Voreinstellung natürlich ignoriert, das heißt das DATA-Element wird korrekt erzeugt.</p>
+
+        <h3>Die Recompilierung von Basic-Erweiterungen</h3>
+
+        <p>Die Austro-Compiler sind vor allen Dingen deshalb so beliebt, weil sie beliebige Basic-Befehlserweiterungen verarbeiten können. Basic-Maker ist in der Lage, verwendete Erweiterungsbefehle korrekt zu recompilieren. Es ist jedoch unbedingt erforderlich, den verwendeten Erweiterungstyp in den Menüpunkten 7 bis 9 festzulegen.</p>
+
+        <p>Voreingestellt ist der Punkt 7, das heißt keine Erweiterung. Durch Punkt 8 wird eine Erweiterung festgelegt, deren Befehle ausschließlich 1-Byte-Token sind. Der Commodore 64 verwendet bekanntlich die Token 128 bis 203 und das Token 255, so daß für eine Befehlserweiterung noch die Token 204 bis 254 zur Verfügung stehen. Haben Sie den Punkt 8 angewählt, so müssen Sie Basic-Maker das Start-Token (204 voreingestellt) und End-Token (254 voreingestellt) der Erweiterung angeben. Es ist ganz wichtig, daß Sie diese Frage korrekt beantworten, da Basic-Maker sonst nicht immer ein korrekt arbeitendes Basic-Programm erzeugen kann. Nach der Eingabe dieser Token wird hinter der Menü-Zeile angezeigt, daß Sie eine 1-Byte-Token-Erweiterung verwendet haben. Ein Beispiel für eine Basic-Erweiterung, die die Token 204 bis 254 benutzt, ist »GRAFIK-BASIC« aus der Zeitschrift »RUN Spezial Nr. 1«. Neben dieser Erweiterungsform gibt es jedoch auch Programme, die 2 Byte als Token verwenden. Dies ist immer dann erforderlich, wenn mehr als 51 neue Befehle vorhanden sind, da durch 1-Byte-Token ja nur maximal 51 solcher codiert werden können. Deshalb verwenden größere Erweiterungen immer das 2-Byte-Token-Prinzip: Dabei wird jedem neuen Befehl ein sogenanntes Erkennungs-Token vorangestellt, das nur die Funktion hat, anzuzeigen, daß ein Erweiterungsbefehl folgen wird. Dieses Erkennungs-Token ist bei allen Erweiterungsbefehlen identisch. Erst dann folgt das eigentliche Befehls-Token. Durch dieses Prinzip, was gegenüber dem 1-Byte-Token natürlich umständlicher ist, kann man auch die schon vom Commodore 64 verwendeten Token belegen und damit natürlich weit mehr Befehle codieren. Bei Punkt 9 des Menüs wird daher nur nach dem Erkennungs-Token der Erweiterung gefragt, die das Compilat verwendet. Auch hier gilt, daß bei falscher Eingabe eine korrekte Übersetzung unmöglich ist. Als Beispiel möchte ich »Simons Basic« mit dem Erkennungs-Token 100 anführen. Zu der Gruppe der 2-Byte-Token-Erweiterungen gehören übrigens auch diejenigen Erweiterungen, die vor jedem Befehl ein Ausrufezeichen oder ähnliches stehen haben und das Befehlswort uncodiert benutzen. Im Fall des Ausrufezeichens wäre das Erweiterungs-Token die 33 (ASCII-Code von »!«). Durch den Aufbau des Basic-Maker-Recompilers werden bei der Übersetzung von Erweiterungsbefehlen immer Fehlermeldungen erzeugt. Wie beim erweiterten SYS-Befehl bleiben diese jedoch ohne Auswirkung auf das recompilierte Basic-Programm.</p>
+
+        <h3>Wie man Erweiterungen erkennt</h3>
+
+        <p>Zunächst scheint es schwierig zu sein, den Typ einer Erweiterung festzustellen. Eindeutig ist der Fall bei Erweiterungen, die vor jedem Befehl ein bestimmtes Zeichen haben, zum Beispiel ein Ausrufezeichen. Hierbei handelt es sich immer um den 2-Byte-Token-Typ. Ist den Befehlen jedoch kein Zeichen vorangestellt, müssen Sie experimentieren. Dafür schreiben Sie am besten ein kleines Basic-Programm, was zirka fünf Erweiterungsbefehle benutzt. Jeder Befehl muß in einer neuen Programmzeile stehen. Dann sehen Sie sich mit einem Monitor den Basic-Speicher ab $0801 an. Wenn jede Programmzeile mit demselben Code beginnt, obwohl verschiedene Befehle verwendet wurden, handelt es sich in jedem Fall um eine 2-Byte-Token-Erweiterung. In einem anderen Fall kann es sich nur um eine 1-Byte-Token-Erweiterung handeln. Nun müssen Sie nur noch die verwendeten Befehls-Token feststellen: Geben Sie dazu im Direktmodus die folgenden Befehle ein:</p>
+
+        <pre><code>NEW (Return)
+POKE 2049,6:POKE 2050,8 (Return)
+POKE 2051,10:POKE 2052,0 (Return)
+POKE 2054,0:POKE 2055,0:POKE 2056,0 (Return)
+POKE 45,10:POKE 46,8:CLR: I=203 (Return)
+</code></pre>
+
+        <p>Nun müssen Sie immer folgende Zeile eingeben, bis I den Wert 254 erreicht hat:</p>
+
+        <pre><code>I=I+1:PRINT I:PRINT"(Down,10Space,2Up)":POKE 2053,I:LIST (Return)
+</code></pre>
+
+        <p>Wenn nach dem List-Befehl ein Befehlswort der Erweiterung gelistet wird, ist der Wert I ein 1-Byte-Token. Ist dies nicht der Fall, so wird nur das ASCII-Zeichen von I ausgegeben, das heißt I ist kein verwendetes Token. Auf diese Weise können Sie genau die verwendeten Token der Erweiterung bestimmen. Sie müssen die obige Zeile dabei immer mit dem Cursor überfahren und »RETURN« drücken. Das Start-Token stellt dabei den ersten ausgegebenen Wert von I dar, der als Befehlswort gelistet wird. Das End-Token der Erweiterung ist dann erreicht, wenn kein Befehl, sondern nur noch ein ASCII-Zeichen gelistet wird, also der ausgegebene Wert von I minus 1.</p>
+
+        <address class="author">(Frank Riemenschneider/ah)</address>
+        <figure>
+            <!-- Im Heft ist das MSE-Listing von $0801 bis $3CC8 abgedruckt. Die Datei auf der Diskette endet bei $3CA8 und weicht im hinteren Teil von der abgedruckten Fassung ab. -->
+            <pre data-filename="basic-maker.prg" data-name="Basic-Maker" data-mse=mse1></pre>
+            <figcaption>Listing. »Basic-Maker« generiert aus jedem Compilat, das mit den Austro-Compilern erzeugt wurde, ein lauffähiges und editierbares Basic-Programm</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="basic-maker.prg" data-name="Basic-Maker"></div>
+    </article>
+</body>
+
+</html>

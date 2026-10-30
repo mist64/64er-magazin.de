@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Spielen mit Musik und Grafik</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Michael Thomas, ks">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="73-83">
+    <meta name="64er.head1" content="Grundlagen">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Kurse/Grundlagen">
+    <meta name="64er.index_category" content="Software-Grundlagen|Sound">
+    <meta name="64er.id" content="musik-grafik">
+</head>
+
+<body>
+    <article>
+        <h1>Spielen mit Musik und Grafik</h1>
+        <p class="intro">Lernen Sie das Programmieren von Grafik und Sound auf Ihrem C 64. Daß das auch in Basic möglich ist, beweist der folgende Artikel.</p>
+
+        <p>Wie oft schon hat der Basic-Programmierer die hervorragenden Sound- und Grafikmöglichkeiten seines C 64 bestaunt, wenn er ein gekauftes Spiel, Grafik- oder Musikprogramm auf seinem Heimcomputer laufen ließ. Und wie oft hat er sich dabei gewünscht, ebensolche Klänge und Grafiken in seinen eigenen Basic-Programmen verwenden zu können.</p>
+
+        <p>Um sich diesen Wunsch zu erfüllen, gibt es zwei Möglichkeiten. Zum einen gibt es da die meist recht teueren Basic-Erweiterungen, die mit Zusatzbefehlen ohne großen Aufwand Sound- und Grafikprogrammierung in Basic möglich machen.</p>
+
+        <p>Nachteilig dabei ist jedoch, daß ein mit diesen speziellen Befehlen geschriebenes Programm nur mit der verwendeten Basic-Erweiterung lauffähig ist, da für den Standard-Basic-Interpreter zum Beispiel Befehle wie »PLOT« oder »MUSIC« Fremdwörter sind. Sie sind also zum normalen C 64-Basic vollkommen inkompatibel.</p>
+
+        <p>Die andere Möglichkeit ist die Programmierung mit dem Basic, das Ihrem C 64 zur Verfügung steht. Sie ist zwar ungleich komplizierter und, wenn es auf Geschwindigkeit ankommt, sehr viel langsamer. Die so geschriebenen Programme sind aber ohne Erweiterungen auf jedem C 64 zu betreiben.</p>
+
+        <p>Um die Programmierung von Sound und Grafik in Basic soll es auch in diesem Bericht gehen.</p>
+
+        <p>Zu diesem Zweck werden die dafür verantwortlichen C 64-Bausteine, der VIC 6569 (Grafik) und der SID 6581 (Sound), unter die Lupe genommen und deren Steuerung von Basic aus aufgezeigt. Schließlich betrachten wir noch die beiden Ein-/Ausgabechips CIA 1 und CIA 2, denn auch mit diesen Bausteinen läßt sich in Basic einiges anstellen.</p>
+
+        <p>Im allgemeinen geschieht die Steuerung der drei gerade erwähnten Chips durch Register, die in bestimmten Speicherbereichen des C 64 adressiert sind. Die direkte Speichermanipulation ist bekanntlich mit den beiden Basic-Befehlen »PEEK« und »POKE« möglich. So lassen sich auch die VIC-, SID- und CIA-Register ansprechen und verändern.</p>
+
+        <p>In den Action-Grafikspielen, Zeichen- und Soundprogrammen passiert im Prinzip dasselbe, nur in der sehr viel schnelleren Maschinensprache.</p>
+
+        <p>Der VIC ist derjenige Chip, der für das Bild auf Ihrem Monitor oder Fernseher sorgt, während Sie mit dem C 64 arbeiten. Er ist dafür verantwortlich, daß die Buchstaben und Zeichen ordnungsgemäß, leserlich und in der richtigen Farbe auf dem Bildschirm erscheinen. Auch die Verarbeitung der HiRes-Grafik mit 320*200 Punkten Auflösung und die Steuerung der vielgerühmten Sprites stehen in seinem Aufgabenbereich.</p>
+
+        <p>Zu diesem Zweck besitzt der VIC 47 Register, die im Speicher des C 64 ab $D000 (dezimal 53248) liegen. Welches Register für welche Funktionen zuständig ist, ist in Bild 1 zu sehen.</p>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="shaded">Register</th>
+                        <th>Beschreibung</th>
+                        <th class="shaded">Adresse</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="shaded">0</td>
+                        <td>X-Koordinate von Sprite 0</td>
+                        <td class="shaded">53248</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">1</td>
+                        <td>Y-Kooridnate von Sprite 0</td>
+                        <td class="shaded">53249</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">2–15</td>
+                        <td>X- und Y-Koordinaten der weiteren Sprites 1 bis 7</td>
+                        <td class="shaded">53250–53263</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">16</td>
+                        <td>Überlaufregister für alle X-Koordinaten der Sprites.<br>Bit 0 für Sprite 0, Bit 1 für Sprite 1 und so weiter</td>
+                        <td class="shaded">53264</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">17</td>
+                        <td>Steuerregister 1<br>Bit 4 0= Bildschirm aus<br>Bit 5 1= HiRes-Modus (hochauflösende Grafik)<br>Bit 6 1= Extended Color</td>
+                        <td class="shaded">53265</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">18–20</td>
+                        <td>zuständig für Rasterzeilen-Interrupt in Maschinensprache</td>
+                        <td class="shaded">53266–53268</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">21</td>
+                        <td>Sprites an/aus. Jedem Sprite ist ein Bit zugeordnet<br>1= Sprite an 0= Sprite aus</td>
+                        <td class="shaded">53269</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">22</td>
+                        <td>Steuerregister 2<br>Bit 4 1= Multicolor-Modus</td>
+                        <td class="shaded">53270</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">23</td>
+                        <td>Sprite-Vergrößerung in Y-Richtung.<br>Jedem Sprite ist ein Bit zugeordnet<br>1= Sprite wird in Y-Richtung vergrößert<br>0= Sprite wird normal dargestellt</td>
+                        <td class="shaded">53271</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">24</td>
+                        <td>Basisadressen von Zeichengenerator und Video-RAM<br>Bit 1–3 für Zeichengenerator<br>Bit 4–7 für Video-RAM</td>
+                        <td class="shaded">53272</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">25–26</td>
+                        <td>Interrupt Request- und Interrupt Mask-Registere</td>
+                        <td class="shaded">53273–53274</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">27</td>
+                        <td>Hintergrund/Sprite Priorität<br>Jedem Sprite ist ein Bit zugeordnet<br>1= Priorität der Hintergrundzeichen<br>0= Priorität des Sprites</td>
+                        <td class="shaded">53275</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">28</td>
+                        <td>Sprite Multicolor/Normal. Jedem Sprite ein Bit zugeordnet.<br>1= Sprite ist Multicolor-Sprite<br>0= Sprite ist normal</td>
+                        <td class="shaded">53276</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">29</td>
+                        <td>Sprite-Vergrößerung in X-Richtung<br>Jedem Sprite ist ein Bit zugeordnet<br>1= Sprite wird in X-Richtung vergrößert</td>
+                        <td class="shaded">53277</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">30</td>
+                        <td>Sprite-Sprite-Kollision. Jedem Sprite ist ein Bit zugeordnet<br>Bei einer Kollision zweier Sprites sind die entsprechenden Bits gesetzt</td>
+                        <td class="shaded">53278</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">31</td>
+                        <td>Sprite-Hintergrund-Kollision.<br>Jedem Sprite ist ein Bit zugeordnet<br>Bei der Kollision eines Sprites mit dem Hintergrund ist das entsprechende Bit gesetzt</td>
+                        <td class="shaded">53279</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">32</td>
+                        <td>Rahmenfarbe</td>
+                        <td class="shaded">53280</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">33–36</td>
+                        <td>Hintergrundfarbe 0–3</td>
+                        <td class="shaded">53281–53284</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">37–38</td>
+                        <td>Sprite Multicolor-Register 1 und 2</td>
+                        <td class="shaded">53285–53286</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">39-46</td>
+                        <td>Spritefarbe für Sprite 0 – Sprite 7</td>
+                        <td class="shaded">53287–53294</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 1. Die Register des VIC</figcaption>
+        </figure>
+
+        <p>Durch Setzen oder Löschen der jeweiligen Bits in den Registern kann die gewünschte Funktion ein- oder ausgeschaltet werden. So läßt sich der VIC auf verschiedene Darstellungsarten umschalten.</p>
+
+        <p>Der wohl bekannteste Zustand ist der Modus der normalen Zeichendarstellung, den der VIC nach dem Einschalten des Computers annimmt. In dieser Betriebsart holt sich der VIC der Reihe nach Bytes aus dem Video-RAM (auch Bildschirmspeicher genannt), und bringt dann das dazugehörige Bitmuster aus dem Charakter-ROM als entsprechendes Zeichen auf den Bildschirm.</p>
+
+        <p>Sämtliche 512 Zeichen, die der C 64 kennt, sind im Charakter-ROM als Bitmuster gespeichert und werden auf die eben beschriebene Weise auf dem Bildschirm sichtbar gemacht. Dabei ist es prinzipiell möglich, den Zeichensatz nach eigenem Belieben zu verändern. Um dies von Basic aus zu tun, ist einiger Programmieraufwand nötig, der im Rahmen dieses Kurses nicht erklärt werden soll.</p>
+
+        <p>Die Farbinformation für jedes Zeichen auf dem Monitor entnimmt der VIC aus einem extra eingerichteten Farb-RAM, in dem jeweils 4 Bit pro Bildschirmposition zur Festlegung der Zeichenfarbe vorgesehen sind.</p>
+
+        <p>Etwas komplizierter ist die Darstellung von sogenannten Multicolor-Zeichen. Hierbei kann jedes Zeichen bis zu vier Farben haben. Man erreicht dies, indem man das Bit 4 des VIC-Registers 22 setzt.</p>
+
+        <p>Der VIC kontrolliert in diesem Modus zuerst die entsprechenden 4 Farbbit eines Zeichens und untersucht das erste Bit. Ist es 0, wird das Zeichen »normal« in der Größe von 8*8 Punkten dargestellt. Sollte das Bit gleich 1 sein, so wird das Zeichen nur noch in einer 4*8-Punktematrix mit doppelt breiten Punkten behandelt. 2 Bit im Bitmuster des Zeichens entsprechen also jetzt einem Bildschirmpunkt. Diese beiden Bits geben nun dem Grafik-Chip an, wo er den Farbwert des doppelt breiten Punktes entnehmen soll:</p>
+
+        <table class="plain">
+            <tr>
+                <td>00</td>
+                <td>Hintergrund-Farbregister 0 (Register 33)</td>
+            </tr>
+            <tr>
+                <td>01</td>
+                <td>Hintergrund-Farbregister 1 (Register 34)</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>Hintergrund-Farbregister 2 (Register 35)</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>restliche 3 Bit aus dem Farb-RAM</td>
+            </tr>
+        </table>
+
+        <h2>Hochauflösende Grafik</h2>
+
+        <p>Setzt man im VIC-Register 17 das Bit mit der Nummer 5, so arbeitet der Video-Chip von nun an im Bitmap-Modus, das heißt jedes gesetzte Bit im Speicher entspricht einem Punkt auf dem Bildschirm. Der VIC verarbeitet eine Auflösung von 320*200 Punkten, wofür er einen Grafikspeicher von 8 KByte benötigt. Der normale Bildschirmspeicher wird dabei zum Farb-RAM »umfunktioniert« und liefert jetzt die Informationen für die Farbe der gesetzten und nichtgesetzten Bildschirmpunkte.</p>
+
+        <p>Jedes Byte enthält hierbei den Farbwert für eine 8*8-Matrix von Punkten. Die ersten 4 Bit bestimmen die Farbe der gesetzten Punkte, die letzten 4 Bit sind für die nicht gesetzten Punkte der Matrix zuständig. Eine recht kompliziert klingende Sache also, die, wie wir noch sehen werden, auch nicht gerade einfach zu programmieren ist.</p>
+
+        <p>Wem die zwei Farben einer 8*8-Matrix nicht genug sind, der mag den Multicolor-Modus benutzen, der durch Bit 5 im Register 17 und durch Bit 4 des Registers 22 aktiviert wird. Er ermöglicht eine hochauflösende Grafik in vier verschiedenen Farben gleichzeitig. Die Auflösung beträgt hier aber nur noch die Hälfte des normalen HiRes-Modus, nämlich 160*200 Punkte. Jeder Bildschirmpunkt ist nun doppelt so breit und wird durch je 2 Bit im Grafikspeicher repräsentiert. Wie im Multicolor-Zeichenmodus gibt dieses Bitpaar die Farbe an, die der Grafikpunkt bekommen soll. Die Zustände der beiden Bits lassen den VIC wissen, woher er den Farbwert holen soll:</p>
+
+        <table class="plain">
+            <tr>
+                <td>00</td>
+                <td>aus Hintergrund-Farbregister 0 (Register 33)</td>
+            </tr>
+            <tr>
+                <td>01</td>
+                <td>höherwertiges Halbbyte aus Video-RAM</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>niederwertiges Halbbyte aus Video-RAM</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>aus Farb-RAM</td>
+            </tr>
+        </table>
+
+        <p>Auf diese Weise lassen sich Grafikbilder mit bis zu vier Farben nebeneinander erzeugen.</p>
+
+        <p>Was wäre ein anständiger VIC 6569 ohne seine Sprites, von denen er acht gleichzeitig steuern kann. Durch die Manipulation von bestimmten VIC-Registern ist es möglich, diese Sprites ziemlich schnell über den Bildschirm zu bewegen.</p>
+
+        <h2>Sprites gibt's auch</h2>
+
+        <p>Weitere Register zeigen Zusammenstöße mit Hintergrundzeichen oder anderen Sprites an, weshalb die Sprites hervorragend für Spiele geeignet sind, in denen Figuren schnell bewegt werden müssen.</p>
+
+        <p>Wie bei der hochauflösenden Grafik gibt es auch zwei verschiedene Spritearten: die zweifarbigen HiRes-Sprites und die Multicolor-Sprites, die aus vier Farben bestehen dürfen. So ist auch die Auflösung der Multicolor-Sprites nur halb so groß wie die der Zwei-Farben-Sprites, nämlich nur 12*21 Punkte statt 24*21.</p>
+
+        <p>Doch wie, so wird mancher Basic-Programmierer fragen, kann man diese so kompliziert klingenden Dinge selbst programmieren?</p>
+
+        <p>Um diese Frage zu beantworten, beginnt man am besten mit dem Einfachsten, nämlich mit der Manipulierung von Zeichen und deren Farben.</p>
+
+        <p>Was Sie sicherlich schon oft in Ihren Programmen getan haben, ist die Änderung der Rahmen- und Hintergrundfarben. Mit »POKE 53280,1« und »POKE 53281,1« wird der Bildschirm beispielsweise vollkommen weiß, während die Zeichenfarbe gleich bleibt. Diese Befehle bewirken nichts anderes, als daß die VIC-Register 32 (Rahmenfarbe) und 33 (Hintergrundfarbe 0) jeweils mit dem Farbwert Eins belegt werden (Eins entspricht der Farbe Weiß). Genauso wird auch bei den anderen Registern verfahren. Die Adressen der einzelnen Register sind in Bild 1 dezimal und hexadezimal aufgeführt.</p>
+
+        <p>Die Zeichenfarbe selbst kann man, wie aus dem C 64-Handbuch ersichtlich, über die Tasten »1« bis »8« in Verbindung mit der CTRL- und der Commodore-Taste verändern. Die zweite Möglichkeit ist, die Farbwerte im Farb-RAM zu verändern. Im Normalfall befindet sich das Farb-RAM im Textmodus im Bereich von 55296 bis 56295 ($D800-$DBE7). »POKE 55299,1« bewirkt zum Beispiel, daß das vierte Zeichen in der obersten Zeile weiß wird. Ebenso kann man es mit allen Zeichen machen, wie das Beispielprogramm in Listing 1 zeigt.</p>
+        <figure>
+            <pre data-filename="farbdemo" data-name="Farbdemo" data-checksummer="3"></pre>
+            <figcaption>Listing 1. Farbdemo auf dem Textbildschirm</figcaption>
+        </figure>
+
+        <p>Nun aber zur interessanteren Seite des Video-Prozessors, der hochauflösenden Grafik. Sie ist leider auch am kompliziertesten zu programmieren. Schon einfache Dinge, wie das Setzen oder Löschen eines Grafikpunktes, können beträchtliche Schwierigkeiten bereiten. Schuld daran ist die ungewöhnliche Aufteilung des 8 KByte großen Grafikspeichers. Sie macht es erst durch einigen Programmieraufwand möglich, den Bildschirm in ein Koordinatensystem aufzuteilen und die einzelnen Punkte über die X- und Y-Koordinaten anzusprechen.</p>
+
+        <p>Im Normalfall, das heißt nach dem Einschalten des Computers, liegt der Grafikspeicher des VIC im Bereich von $2000 bis $3FFF (8192-16383) und das dazugehörige Farb-RAM an der Stelle des »normalen« Bildschirmspeichers, also von $0400 bis $07FF (1024-2047). Wie man sieht, liegt die Grafikseite direkt im Basic-Speicher und kann bei größeren Basic-Programmen zu Konflikten mit der Grafik führen. Es ist jedoch möglich, den Aktionsbereich unseres VIC im Gesamtspeicher zu verschieben und somit das Problem zu beseitigen. Wie man das macht, wird am Ende dieses Abschnitts beschrieben, da dies mit der eigentlichen Programmierung der Grafik nichts zu tun hat.</p>
+
+        <p>Bevor man eine Grafik erzeugen will, muß natürlich der VIC darüber informiert werden, daß er eine Grafik erzeugen und in welchem Modus dies geschehen soll.</p>
+
+        <p>Untersucht man die Tabelle in Bild 1, so entdeckt man in Register 17 und 22 die entprechenden Bits zum Ein- und Ausschalten des HiRes- und des Multicolor-Modus.</p>
+
+        <p>Doch wie, wird sich mancher Basic-Programmierer fragen, kann man von Basic aus einzelne Bits löschen oder setzen? Um diese Frage zu beantworten, muß man etwas in die Welt der Binär-Arithmetik mit ihren logischen Verknüpfungen eintauchen:</p>
+
+        <p>Das Basic des C 64 beherrscht unter anderem auch zwei logische Operatoren, nämlich »AND« und »OR«. Sie bewirken eine logische Und- beziehungsweise Oder-Verknüpfung zwischen zwei Werten. Bild 2 zeigt eine Wahrheitstabelle, die angibt, wie sich die Verknüpfung auswirkt.</p>
+        <figure>
+            <p>AND- und OR-Wahrheitstabellen</p>
+            <p>AND</p>
+            <table class="center">
+                <thead>
+                    <tr>
+                        <th>AND</th>
+                        <th>0</th>
+                        <th>1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>0</th>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <th>1</th>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>OR</p>
+            <table class="center">
+                <thead>
+                    <tr>
+                        <th>OR</th>
+                        <th>0</th>
+                        <th>1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>0</th>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <th>1</th>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Beispiele:</p>
+            <pre><code>    11001100
+AND 00001001
+    00001000
+
+    10011001
+OR  10100100
+    10111101</code></pre>
+            <figcaption>Bild 2. AND- und OR-Verknüpfungstafeln und Beispiele</figcaption>
+        </figure>
+
+        <h2>Etwas zur »Wahrheit«</h2>
+
+        <p>Dieses Verknüpfen der einzelnen Bits kann auch zum gezielten Setzen oder Löschen von bestimmten Bits verwendet werden. Dazu verknüpft man einfach das entsprechende Byte mit einem bestimmten Wert, so daß das gewünschte Bit 1 oder 0 wird. Hier einige Beispiele:</p>
+
+        <p>Wir haben ein Byte mit dem Wert 155. Binär umgeformt sähe der Wert so aus:</p>
+
+        <p>10011011 = 155 (dezimal)</p>
+
+        <p>Angenommen in diesem Byte wollen wir das vierte Bit von rechts (also Bit 3) löschen, das heißt gleich Null setzen. Nun braucht man einen Wert, der mit »AND« oder »OR« verknüpft das Bit Nummer 3 löscht, die restlichen Bits aber unverändert läßt.</p>
+
+        <p>Betrachtet man die Wahrheitstabellen für »AND« und »OR« (Bild 2), so stellt man fest, daß sich die Und-Verknüpfung dafür eignen würde.</p>
+
+        <pre><code>    10011011 = 155
+AND 11110111 = 247
+    10010011 = 147</code></pre>
+
+        <p>Und schon ist das besagte Bit gelöscht. Allgemein erreicht man den dezimalen Wert zur Und-Verknüpfung durch folgende Formel:</p>
+
+        <p>255-(dezimaler Wert des zu löschenden Bits)</p>
+
+        <p>In unserem Beispiel ist der Stellenwert unseres Bits Nummer 3 gleich Drei. Der Dezimalwert errechnet sich also aus 2<sup>3</sup>, das ergibt 8. Setzen wir ihn in die Formel ein, so erhalten wir den gewünschten Wert 247 zur Und-Verknüpfung:</p>
+
+        <p>155 AND (255-8) = 147</p>
+
+        <p>Nach demselben Muster läßt sich selbstverständlich auch ein Bit setzen. Hier allerdings bietet sich der »OR«-Operator, also die Oder-Verknüpfung an. Bleiben wir beim Beispiel von vorhin, nur daß nun Bit Nummer 6 (das zweite Bit von links) auf Eins gesetzt werden soll:</p>
+
+        <pre><code>    10011011 = 155
+OR  01000000 =  64
+    11011011 = 219</code></pre>
+
+        <p>Das entsprechende Byte muß nur mit dem dezimalen Wert des zu setzenden Bits ge-oder-t werden, um dieses Bit gleich Eins werden zu lassen. Der Stellenwert des Bits Nummer 6 beträgt 2<sup>6</sup>, und somit nach Adam Riese 64:</p>
+
+        <p>155 OR 64 = 219</p>
+
+        <p>Nach diesem Prinzip kann man sämtliche Bits in einem Byte setzen oder löschen. Genauso werden auch die einzelnen Bits in den Registern des VIC 6569 manipuliert.</p>
+
+        <p>Zum Einschalten der hochauflösenden Grafik sind einige POKE-Befehle nötig. Im folgenden einige Basic-Zeilen, die die hochauflösende Grafik einschalten:</p>
+
+        <pre><code>60000 REM ***GRAFIK EINSCHALTEN ***
+60100 REM
+60200 VIC=53248:REM STARTADRESSE VIC
+60300 POKE VIC+17, PEEK(VIC+17) OR 2↑5
+60400 POKE VIC+17, PEEK(VIC+17) OR 2↑6
+60450 POKE VIC+24, PEEK(VIC+24) OR 8</code></pre>
+
+        <p>Nun muß man noch entscheiden, ob man im vierfarbigen Multicolor-Modus mit einer niedrigeren Auflösung arbeiten will oder die Zweifarben-Grafik mit 320*200 ansprechbaren Punkten benutzen möchte.</p>
+
+        <p>Für die hochauflösende Grafik muß man im Normalzustand des Computers eigentlich nichts mehr verändern, sollte jedoch sicherheitshalber das Multicolor-Bit in Register 22 löschen. Das geschieht mit:</p>
+
+        <pre><code>60500 POKE VIC+22,PEEK(VIC+22) AND 255-16</code></pre>
+
+        <p>Soll der Multicolor-Modus eingeschaltet werden, ist ein entsprechender POKE-Befehl zu verwenden, der das Bit setzt:</p>
+
+        <pre><code>60500 POKE VIC+22,PEEK(VIC+22) OR 16</code></pre>
+
+        <p>Doch damit ist das Einschalten der Grafik genaugenommen noch nicht zu Ende. Startet man obiges Programm, so schaltet der VIC zwar auf Grafik um, doch man wird nur ein buntes Durcheinander von verschiedenfarbigen Punkten auf dem Bildschirm erkennen.</p>
+
+        <h2>Grafik einschalten</h2>
+
+        <p>Das liegt daran, daß der jetzt vom VIC als Grafikspeicher deklarierte Bereich (normalerweise $2000-$3FFF) zuvor anderweitig benutzt wurde. Daher ist er mit »wilden« Werten »gespickt«, die der Video-Chip in seinem Bitmap-Modus als wirres Muster auf den Bildschirm bringt.</p>
+
+        <p>Aus diesem Grund muß der Grafikspeicher vor Benutzung stets »leergeräumt«, das heißt sämtliche 64000 Bit gelöscht werden. Das ist mit einer einfachen FOR-NEXT-Schleife zu bewerkstelligen. Im folgenden Basic-Programm ist dies realisiert.</p>
+
+        <pre><code>61000 REM ***GRAFIKSPEICHER LÖSCHEN ***
+61100 REM
+61200 VD= 8192:REM STARTADRESSE GRAFIKSPEICHER
+61300 FOR X=VD to VD+8000
+61400 POKE X,0
+61500 NEXT X</code></pre>
+
+        <p>Fügt man diese Basic-Zeilen zu unserem Programm hinzu, kann man feststellen, daß das »Punktewirrwarr« langsam aber sicher verschwindet. Die Farben bleiben jedoch, wo sie sind. Wir erinnern uns, daß im Grafik-Modus die Farbe jedes 8*8-Kästchens in einem gesonderten Farb-RAM festgelegt ist. In unserem Fall liegt es, wie schon erwähnt, im Bereich des normalen Textbildschirms.</p>
+
+        <p>Jedem 8*8-Kästchen im Grafikspeicher ist ein Byte im Farb-RAM zugeordnet. Die vier höchstwertigen Bits eines jeden Bytes geben dabei die Farbe der gesetzten, die vier niederwertigen Bits die der nichtgesetzten Punkte an.</p>
+
+        <p>Um ein »anständiges« Grafikbild zu erzeugen, muß die Farbe jedes Kästchens einheitlich gesetzt werden, was wiederum in einer FOR-NEXT-Schleife geschehen kann:</p>
+
+        <pre><code>62000 REM ***FARBE SETZEN ***
+62100 REM
+62200 FR=1024:REM ANFANGSADRESSE FARBRAM
+62300 FARBE= 0*16 + 14:REM PUNKTE SCHWARZ-HINTERGRUND HELLBLAU
+62400 FOR X=FR TO FR+1000
+62500 POKE X,FARBE:REM FARBWERT SETZEN
+62600 NEXT X</code></pre>
+
+        <p>Jetzt haben wir einen leeren Grafik-Bildschirm mit blauem Hintergrund. Die Grafikpunkte werden später in der Farbe Schwarz auf dem Monitor erscheinen.</p>
+
+        <p>Drücken Sie nun RUN/STOP und RESTORE zugleich, gelangen Sie wieder in den normalen Text-Modus zurück. Ein laufendes Basic-Programm wird dabei aber unterbrochen. Soll dies nicht geschehen, muß man die Grafik vom Programm aus wieder abschalten. Dazu müssen lediglich die Bits wieder gelöscht werden, mit denen man den Grafik-Modus zuvor eingeschaltet hatte.</p>
+
+        <p>Das sind also die Bits 5 und 6 im VIC-Register 17:</p>
+
+        <pre><code>63000 REM ***GRAFIK AUSSCHALTEN ***
+63100 REM
+63200 VIC=53248:REM GRUNDADRESSE VIC
+63300 POKE VIC+17, PEEK(VIC+17) AND 255-32:REM BIT 5
+63400 POKE VIC+17, PEEK(VIC+17) AND 255-64:REM BIT 6</code></pre>
+
+        <p>Damit hat man alle Programmteile zusammen, um die HiRes-Grafik zu bedienen.</p>
+
+        <p>Jetzt zum schwierigeren Teil, dem Setzen und Löschen von einzelnen Punkten. Hierbei müssen einige Berechnungen angestellt werden, bevor der Punkt auf dem Bildschirm erscheint.</p>
+
+        <p>Es ist leider nicht möglich, Punkte direkt über X- und Y-Koordinaten in den Grafikspeicher einzugeben. Das liegt am recht unhandlichen Aufbau des Grafikspeichers.</p>
+
+        <p>So wird das Grafikbild nicht Zeile für Zeile hintereinander im Speicher abgelegt, sondern wie im Zeichengenerator die einzelnen Zeichen in Blöcken von jeweils 8*8 Punkten.</p>
+
+        <p>8 Bytes des Grafikspeichers sind jeweils für eine solche 8*8-Matrix (auch Grafik-Matrix oder Grafik-Kästchen genannt) zuständig. Je eine 8-Punkte-Reihe in dieser Matrix wird durch ein Byte dargestellt.</p>
+
+        <p>Die nächsten 8 Byte liefern dann die Information für die zweite Matrix, die folgenden acht für den dritten Block und so weiter bis zum rechten Rand des Bildschirms. Dann beginnt die zweite Matrix-Zeile nach dem gleichen Schema und wird so Kästchenzeile für Kästchenzeile bis zum unteren Bildschirmrand fortgeführt. Bild 3 veranschaulicht dieses Prinzip.</p>
+        <figure>
+            <img src="73-3.png" alt="Schema des Grafikspeichers mit Bitnummern 7 bis 0, den Marken »1. Zeichen« (Bytes 0 bis 15) und »41. Zeichen« (Bytes 320 bis 328) sowie Byte 640 darunter">
+            <figcaption>Bild 3. Bildschirmaufbau im HiRes-Modus</figcaption>
+        </figure>
+
+        <p>Insgesamt passen 320/8, also gleich 40 der 8*8-Blöcke in eine Reihe und 200/8, also gleich 25 8*8-Blöcke in eine Spalte der Grafik. Man sieht, daß dies dem Text-Modus ähnelt, da ja ein normales Zeichen auch aus einer 8*8-Matrix besteht.</p>
+
+        <p>Wegen diesem, für den Programmierer etwas komplizierten Bildaufbau einer HiRes-Grafik, ist es nur mit einigen Berechnungen möglich, die einzelnen Punkte wie in einem Koordinatensystem nach X- und Y-Koordinaten festzulegen. Die X-Achse legen wir dabei waagrecht von links nach rechts und numerieren die Punkte in dieser Richtung nach ihrer Anzahl von 0-319. Die Y-Achse wird senkrecht von oben nach unten von 0-199 angelegt. Jeder Punkt wird dadurch mit seinem X- und Y-Wert in seiner Position auf dem Bildschirm eindeutig bestimmt. Um von den Koordinaten (X,Y) eines Punktes auf das richtige Byte und Bit im Grafikspeicher zu schließen, bedarf es einiger Überlegungen. Betrachten wir zunächst die Y-Koordinate.</p>
+
+        <p>Im ersten Schritt wird der Y-Wert durch acht dividiert. Dadurch ermittelt man die Kästchenzeile des zu berechnenden Grafikpunktes:</p>
+
+        <p>Kästchenzeile = INT(Y/8)</p>
+
+        <p>Wie schon ausgerechnet, passen 40 Grafik-Kästchen in jeweils eine der Kästchenzeilen. Jede Grafik-Matrix benötigt 8 Byte. Eine Kästchenzeile belegt demnach 40 * 8 = 320 Byte des Grafikspeichers.</p>
+
+        <p>Multiplizieren wir nun das Ergebnis der oben beschriebenen Division mit 320, erhalten wir jetzt die relative Startadresse der errechneten Kästchenzeile im Grafikspeicher.</p>
+
+        <p>Adresse der Kästchenzeile = 320 * INT(Y/8)</p>
+
+        <p>Schließlich darf man die restlichen Bytes der obigen Division nicht vergessen und zählt sie zur besagten Adresse dazu.</p>
+
+        <p>Der Divisionsrest berechnet sich sehr einfach:</p>
+
+        <p>DivRest = Y-(Kästchenzeile*8)</p>
+
+        <p>Kennt man die Gesetze der Binärarithmetik, erkennt man sofort eine einfachere Berechnung des Restes einer Division durch den Wert 8:</p>
+
+        <p>DivRest = Y AND 7</p>
+
+        <p>Addieren wir den Rest zu unserer Adresse hinzu, erhalten wir letztendlich folgende Formel:</p>
+
+        <p>Y-Adresse = 320 * INT(Y/8) + (Y AND 7)</p>
+
+        <p>Jetzt benötigt man noch den X-Wert des Grafikpunktes. Wie oben dividiert man ihn durch 8, um analog dazu die Nummer der Kästchenspalte, in der sich der Punkt befindet, zu erhalten.</p>
+
+        <p>Kästchenspalte = INT(X/8)</p>
+
+        <p>Daraus läßt sich durch eine Multiplikation mit acht die Anzahl der Bytes berechnen, die zur vorhin ermittelten Y-Adresse dazugezählt werden müssen:</p>
+
+        <p>Bytes = 8 * INT(X/8)</p>
+
+        <p>Damit hätte man die Adresse des Grafik-Bytes, in dem der betreffende Punkt gespeichert ist, gefunden.</p>
+
+        <p>Grafikadresse = 320 * INT(Y/8) + (Y AND 7) + (8 * INT(X/8))</p>
+
+        <p>Was geschieht mit dem Rest der Division des X-Wertes; muß auch er eine Bedeutung haben? Er gibt an, welches Bit in der Adresse gesetzt werden muß, um unseren Grafikpunkt auf dem Bildschirm erscheinen zu lassen.</p>
+
+        <p>Man berechnet die Nummer des Bits folgendermaßen:</p>
+
+        <p>Bitnummer = 7-(X AND 7)</p>
+
+        <p>Nun kann der Grafikpunkt an der richtigen Stelle gesetzt oder gelöscht werden. Wie man einzelne Bits von Basic aus setzt oder löscht, ist Ihnen ja bereits bekannt.</p>
+
+        <p>Listing 2 und 3 zeigen zwei kleine Basic-Programme zum Setzen und Löschen von Grafikpunkten, die unsere erstellten Formeln verwenden.</p>
+        <figure>
+            <pre data-filename="hires-set" data-name="HiRes-Punkt setzen" data-checksummer="3"></pre>
+            <figcaption>Listing 2. Setzen eines Grafikpunktes im HiRes-Modus</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="hires-reset" data-name="HiRes-Punkt löschen" data-checksummer="3"></pre>
+            <figcaption>Listing 3. Löschen eines HiRes-Grafikpunktes</figcaption>
+        </figure>
+
+        <p>Durch weitere Berechnungen lassen sich daraus auch weitere Grafikfunktionen programmieren. Probieren Sie doch einmal ein Basic-Programm zu schreiben, das eine Linie zwischen zwei vorgegebenen Punkten (X1;Y1) und (X2;Y2) zieht.</p>
+
+        <p>Im Multicolor-Modus (Bit 4 = 1 im VIC-Register 22) läuft die Punkteberechnung ähnlich ab. Der entscheidende Unterschied ist die nur halbe Auflösung von 160, dafür aber doppelt breiten Punkten in X-Richtung. In Y-Richtung hat sich nichts geändert. Die Formel zur Berechnung der Y-Adresse des Grafikpunktes ist demnach im HiRes-und im Multicolor-Modus identisch (siehe auch Bild 4).</p>
+        <figure>
+            <img src="73-4.png" alt="Schema des Grafikspeichers wie im HiRes-Modus, die Punkte als doppelt breite Ovale über je zwei Bits gezeichnet">
+            <figcaption>Bild 4. So werden die Bildschirmpunkte im Multicolor-Modus beschrieben</figcaption>
+        </figure>
+
+        <p>Man erkennt, daß nun 2 Bit für einen Grafikpunkt zuständig sind. Ein Byte hat also nur noch für vier Punkte Platz. Das bedeutet eine Änderung bei den Formeln »Bytes« und »Bitnummer«. Auch das Setzen oder Löschen von Punkten ist nun etwas komplizierter.</p>
+
+        <p>Bytes = 8 * INT(x/4)</p>
+
+        <p>Bitnummer1 = (3-(X-(4*INT(X/4))))*2</p>
+
+        <p>Bitnummer2 = Bitnummer1 + 1</p>
+
+        <p>Da jetzt auch 2 Bit pro Punkt verändert werden müssen, gibt es auch zwei Bitnummern. Listing 4 zeigt das Setzen eines Punktes in Multicolor.</p>
+        <figure>
+            <pre data-filename="multi-set" data-name="Multicolor-Punkt setzen" data-checksummer="3"></pre>
+            <figcaption>Listing 4. Setzen eines beliebigen Punktes im Multicolor-Bildschirm</figcaption>
+        </figure>
+
+        <p>Als Anwendungsbeispiele sollen die Listings 5 und 6 dienen, die beide eine Sinuskurve auf den Bildschirm bringen. Das Programm in Listing 5 tut dies im HiRes-Modus; das Programm in Listing 6 verwendet die Multicolor-Grafik.</p>
+        <figure>
+            <pre data-filename="hires-sinus" data-name="HiRes-Sinuskurve" data-checksummer="3"></pre>
+            <figcaption>Listing 5. Dieses Programm zeichnet eine einfarbige Sinuskurve in HiRes auf den Bildschirm</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="multi-sinus" data-name="Multicolor-Sinuskurve" data-checksummer="3"></pre>
+            <figcaption>Listing 6. Nach dem Löschen des Grafik-Bildschirms erscheint eine bunte Sinuskurve in Multicolor-Grafik</figcaption>
+        </figure>
+
+        <h2>Sprites richtig programmiert</h2>
+
+        <p>Die Fähigkeit des VIC, Sprites zu erzeugen, ist wohl jedem bekannt. Sprites sind genau gesagt kleine Grafiken von 24*21 Punkten Größe, die frei über den Bildschirm bewegt werden können. Der VIC kann 8 Sprites gleichzeitig auf dem Bildschirm verwalten.</p>
+
+        <p>Er tut dies über einige seiner Register, die sämtliche Informationen über alle Sprites enthalten.</p>
+
+        <p>Anders als bei der hochauflösenden Grafik wird ein Sprite Punkt für Punkt, das heißt Bit für Bit der Reihe nach im Speicher abgelegt (siehe Bild 5).</p>
+        <figure>
+            <img src="73-5.png" alt="Raster eines Sprites mit Bitnummern, 21 Zeilen und 24 Spalten in drei Byte-Spalten von Byte 0 bis Byte 62">
+            <figcaption>Bild 5. Aufbau eines HiRes-Sprites mit 24*21 Punkten. Das ist die maximal erreichbare Auflösung.</figcaption>
+        </figure>
+
+        <p>So ist die Erstellung von Sprites etwas einfacher als die Erzeugung von Grafik.</p>
+
+        <p>Jedes Sprite besteht aus 24*21, also 504 Punkten und braucht somit 504/8 = 63 Byte Speicherplatz.</p>
+
+        <p>Die Farbinformationen für »normale« Sprites entnimmt der VIC aus eigens dafür angelegten Sprite-Farbregistern (VIC-Register 39-46; Adressen 53287 bis 53294). Eine Farbänderung von beispielsweise Sprite Nummer 3 auf rot ist mit POKE 53290,2 zu bewerkstelligen.</p>
+
+        <p>Damit liegt der Nachteil »normaler« Sprites schon auf der Hand. Sie können nur aus jeweils einer Farbe bestehen, die in das entsprechende Farbregister gePOKEt wird.</p>
+
+        <p>Wenn es normale Sprites gibt, so muß es wohl auch noch andersartige Sprites geben. Die gibt es auch: es sind die Multicolor-Sprites.</p>
+
+        <p>Wie bei der Multicolor-Grafik kann ein solches Sprite aus bis zu vier verschiedenen Farben bestehen (wenn man die Hintergrundfarbe mitrechnet). Doch wie sollte es anders sein, ein solch buntes Sprite besitzt nur noch die halbe Auflösung von 12*21 Punkten. Auch hier sind die Punkte wieder doppelt so breit wie normal und werden jeweils durch 2 Bit im Speicher repräsentiert. Dabei bestimmt wieder der Zustand der beiden Bits, woher der Farbwert für diesen Punkt stammen soll:</p>
+        <table class="plain">
+            <tr>
+                <td>00</td>
+                <td>Hintergrund-Farbregister</td>
+            </tr>
+            <tr>
+                <td>01</td>
+                <td>Multicolor-Register 0 (Register 37)</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>Multicolor-Register 1 (Register 38)</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>Sprite-Farbregister (Register 39-46)</td>
+            </tr>
+        </table>
+
+        <p>Man sieht, daß alle Multicolor-Sprites zwei gemeinsame Farbregister haben. Das sind die Multicolor-Register 0 und 1. Nur das Register für die vierte Farbe ist für jedes Sprite extra angelegt, und kann somit für alle Sprites unterschiedlich gewählt werden. Der Aufbau entspricht dem eines normalen Sprites mit dem einen Unterschied, daß nun 2 Bit einen Punkt darstellen (Bild 6).</p>
+        <figure>
+            <img src="73-6.png" alt="Raster eines Sprites mit 21 Zeilen und 12 Spalten, die Punkte als doppelt breite Ovale über je zwei Bits gezeichnet">
+            <figcaption>Bild 6. Ein Multicolor-Sprite verfügt nur mehr über eine Auflösung von 12*21 Punkten</figcaption>
+        </figure>
+
+        <p>Ob ein Sprite »normal« oder in Multicolor dargestellt werden soll, ist in einem besonderen VIC-Register festgehalten (Register 28; Adresse 53276). Jedem Sprite ist ein Bit dieses Registers zugeordnet. Ein gesetztes Bit bedeutet für den Video-Chip, daß es sich bei dem entsprechenden Sprite um ein Multicolor-Sprite handelt. POKE 53276,128 macht zum Beispiel das Sprite Nummer 7 zum Multicolor-Sprite.</p>
+
+        <p>Nachdem man sich überlegt hat, welche Sprites »normal« oder im Multicolor-Modus verwaltet werden sollen, stellt sich noch die Frage, wie man seinen Spriteentwurf am einfachsten in den Speicher bringt.</p>
+
+        <p>Hat man keinen Sprite-Editor zur Hand, muß man diese Arbeit wohl oder übel selbst tun. Dazu legt man sich auf Papier ein Raster von 24*21 Punkten an und zeichnet sich seinen Entwurf Punkt für Punkt hinein. Auf einem zweiten Entwurf zeichnet man sich sein Sprite im Bitmuster auf. Jeder gesetzte Punkt entspricht einer Eins im Muster, alle ungesetzten Punkte haben den Wert Null (Bild 7).</p>
+
+        <p>Für ein Multicolor-Sprite legt man entsprechend ein 12*21-Raster an und verfährt nach demselben Muster. Der Unterschied ist nur, daß man im zweiten Entwurf nun pro Punkt 2 Bit entsprechend der Farbe einträgt, die der Punkt später haben soll.</p>
+
+        <p>Anschließend rechnet man der Reihe nach 8 Bit (also immer ein Byte) in einen dezimalen Wert um und notiert sie neben dem Raster (Bild 7).</p>
+
+        <p>Hat man seine 63 Byte zusammengestellt, müssen sie durch POKE-Befehle an den richtigen Platz im Speicher gebracht werden. Dazu muß man sie in den 16-KByte-Adressierungsbereich des VIC legen, damit sie auch gelesen und verarbeitet werden können. Zu diesem Zweck wird der VIC-Bereich in Blöcke zu je 64 Byte eingeteilt. Jeder Block erhält eine Nummer von 0 bis 255. Unsere Spritedefinition muß nun in einem dieser Blöcke untergebracht werden.</p>
+
+        <p>In der Einschaltkonfiguration gibt es allerdings einige Einschränkungen. Hier überschneidet der Adreßbereich des VIC einige wichtige Teile des Speichers, wie zum Beispiel die Zeropage.</p>
+
+        <p>Block Nummer 0 hätte die Startadresse $0000, Block 1 die Adresse $0040 (dezimal 64) und so weiter.</p>
+
+        <p>Setzen wir unser Sprite in diesen Bereich, hätte das verheerende Folgen für die Funktionsbereitschaft unseres C 64. Die ersten Blöcke, die keinen so sehr wichtigen Speicher belegen, sind die Blöcke</p>
+
+        <table class="plain">
+            <tr>
+                <td>11</td>
+                <td>Bereich $02C0-02FE (704-766)</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>Bereich $0340-037E (832-894)</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>Bereich $0380-03BE (896-958)</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>Bereich $03C0-03FE (960-1022)</td>
+            </tr>
+        </table>
+
+        <p>Arbeiten Sie mit der Datasette, kann es dabei auch zu Problemen kommen, da sich die Blöcke 13, 14 und 15 im Kassettenpuffer befinden.</p>
+
+        <p>Danach ist es erst wieder ab Block 128, das heißt ab Adresse $2000 (8192) möglich, gefahrlos Sprite-Definitionen abzulegen. Vorsicht sei aber geboten bei großen Basic-Programmen oder wenn Sie gleichzeitig mit HiRes-Grafik arbeiten, da ja bekanntlich ab $2000 (8192) das Grafikbild abgelegt ist. Verschieben Sie den Adreßbereich des VIC, können Sie diesen Problemen teilweise aus dem Weg gehen. Wollen wir aber nur eine Spritedefinition abspeichern, genügen uns die Blöcke 11 und 13 bis 15.</p>
+
+        <p>Nehmen wir für unser Sprite den Block 11 und schreiben eine kleine Routine, die uns alle 63 Byte der Definition in diesen Block POKEt. Am besten legt man die Spritewerte in DATA-Zeilen ab und benutzt eine FOR-NEXT-Schleife (Listing 7 verwendet ein kleines Demo-Sprite).</p>
+        <figure>
+            <pre data-filename="spritedefinition" data-name="Spritedefinition" data-checksummer="3"></pre>
+            <figcaption>Listing 7. Dieses Programm erzeugt Spritedaten in Block 11 des VIC-Adreßbereichs</figcaption>
+        </figure>
+
+        <h2>So stehen sie im Speicher</h2>
+
+        <p>Damit ist die Arbeit der Definition noch nicht zu Ende. Jetzt muß dem VIC mitgeteilt werden, daß unser Sprite ab Block 11 gespeichert ist. Dazu benutzt der VIC je einen Zeiger für jedes der 8 Sprites. Er zeigt auf den Block, aus dem er die Definition für das augenblickliche Aussehen eines jeden Sprites nehmen soll.</p>
+
+        <p>Die Zeiger liegen am Ende des Video-RAMs. Das Video-RAM ist genau 1 KByte, also 1024 Byte groß. Zur Darstellung des Bildschirms werden aber nur 40*25 = 1000 Byte benötigt. Der Rest, das sind 24 Byte, liegt brach. Davon werden die letzten 8 Byte als Sprite-Zeiger benutzt. Das sind in unserem Fall die Adressen $07F8-07FF (dezimal 2040-2047). Die Adresse 2040 enthält den Zeiger für Sprite Nummer null, die Speicherstelle 2041 ist für Sprite 2 zuständig und so weiter bis zum Zeiger für Sprite 7 bei Adresse 2047.</p>
+
+        <p>Verlegen wir das Video-RAM in einen anderen Bereich (diese Möglichkeit besteht), liegen die Sprite-Zeiger selbstverständlich in anderen Speicherstellen. In diesen Zeigern stehen nun die Blocknummern, bei denen die Definitionen für jedes der 8 Sprites stehen.</p>
+
+        <p>Wollen wir dem Sprite 0 zum Beispiel das Aussehen unseres oben genannten Demo-Sprites geben, stellen wir den Zeiger für Sprite 0 auf Block 11 (in dem unsere Sprite-Definition gespeichert ist). Mit POKE 2040,11 ist das schnell geschehen. Soll ein zweites Sprite genauso aussehen, genügt ein entsprechender POKE-Befehl: POKE 2042,11.</p>
+
+        <p>Wir legen den gewünschten Zeiger auf denselben Block, und somit sieht Sprite Nummer 2 so aus wie Sprite Nummer 0. Man kann also jede beliebige Sprite-Definition für jedes beliebige Sprite nutzen. Eine Multicolor-Definition für ein normales Sprite zu verwenden, ist natürlich nicht ratsam. Sie können es ja zum Spaß einmal ausprobieren.</p>
+
+        <p>Es ist möglich, jederzeit die Definition eines Sprites zu wechseln, indem man den Zeiger auf einen anderen Block stellt. So kann man das Aussehen eines Sprites blitzschnell ändern und somit den Effekt einer Animation erzielen.</p>
+
+        <p>POKE 2040,13 ändert das Aussehen des Sprites 0 sofort auf die Definition in Block 13.</p>
+
+        <p>Bevor man jedoch ein Sprite auf dem Bildschirm sehen kann, muß es erst eingeschaltet werden. Dazu besitzt der VIC das Register 21 mit der Adresse 53269, das den Einschaltzustand aller Sprites enthält. Für jedes Sprite ist wieder ein Bit des Registers zuständig. Schalten wir also unser Sprite 0 ein:</p>
+
+        <p>POKE 53269,1 (Bit 0 wird gesetzt)</p>
+
+        <p>Jetzt ist möglicherweise immer noch nichts auf dem Bildschirm zu entdecken, das unserem Sprite gleicht. Womöglich steht es in einer Position außerhalb des sichtbaren Bildschirmbereichs.</p>
+
+        <p>Der Bereich, in dem sich ein Sprite befinden kann, ist wie ein Koordinatengitter in X- und Y-Richtung aufgeteilt. Das Gitter ist aber größer als der sichtbare Bildschirm. Es ist möglich, das Sprite einzelpunktweise von 0-511 in X-Richtung und von 0-255 in Y-Richtung zu bewegen.</p>
+
+        <p>Der Nullpunkt unseres Sprite-Koordinatengitters liegt weit außerhalb des Bildschirms in der linken oberen Ecke. Positionieren wir das Sprite auf die Koordinaten 20,30, ist es vollständig in der linken oberen Ecke sichtbar. Die Übergröße des Sprite-Bewegungsraumes führt zu dem recht schönen Effekt, daß man das Sprite zu allen Seiten des Bildschirms punktweise hinauswandern lassen kann. Doch wo werden die X,Y-Positionen für jedes Sprite gespeichert?</p>
+
+        <h2>Bewegung von Sprites</h2>
+
+        <p>Betrachtet man Bild 1, die Registertabelle des VIC, entdeckt man sie sofort. Die ersten 17 Register sind für die Position der 8 Sprites reserviert. Durch einfache POKE-Befehle kann man die X- und Y-Werte aller Sprites schnell verändern und somit jedes Sprite blitzartig an sämtliche Positionen des Sprite-Koordinatengitters versetzen:</p>
+
+        <p>POKE 53248,150<br>POKE 53249,111</p>
+
+        <p>Mit diesen Befehlen wird zum Beispiel Sprite 0 auf Position x=150 und y=111 plaziert.</p>
+
+        <p>Die X-und Y-Register aller Sprites können nur Werte von 0-255 annehmen. Will man ein Sprite auf eine X-Position verschieben, die größer als 255 ist (bis maximal 511), muß ein Übertrag auf ein anderes Register geschehen. Dabei muß im Register 16 (53264), dem Übertragsregister, das Bit für das betreffende Sprite gesetzt werden.</p>
+
+        <p>In Listing 8 wurde das eben Beschriebene in ein Programm umgesetzt, das die Bewegung eines Sprites verdeutlichen soll.</p>
+        <figure>
+            <pre data-filename="spritebewegung" data-name="Spritebewegung" data-checksummer="3"></pre>
+            <figcaption>Listing 8. Hier wird ein definiertes Sprite über den Bildschirm bewegt, wobei der Eindruck eines hüpfenden Balls entsteht</figcaption>
+        </figure>
+
+        <p>Doch damit sind die Fähigkeiten unseres Videoprozessors noch nicht ausgeschöpft. So kann jedes Sprite seine Größe in X- und Y-Richtung verdoppeln.</p>
+
+        <p>Für diesen Effekt sind die Register 23 (Adresse 53271) für die Y-Vergrößerung und 29 (Adresse 53277) für die X-Vergrößerung verantwortlich. Wieder ist in diesen Registern für jedes Sprite ein Bit zuständig, dessen Zustand dem VIC mitteilt, ob das Sprite normal oder vergrößert dargestellt werden soll. POKE 53271,64 beispielsweise vergrößert das Sprite Nummer 6 in Y-Richtung auf doppelte Höhe.</p>
+
+        <p>Betrachtet man die Registertabelle in Bild 1, entdeckt man noch einige andere Sprite-Register, mit deren Hilfe man weitere Eigenschaften der Sprites einstellen kann.</p>
+
+        <p>Register 27 (Adresse 53275) erlaubt für jedes Sprite die Wahl, ob es auf dem Bildschirm vor den Hintergrundzeichen oder dahinter bewegt werden soll. Ist das entsprechende Bit gesetzt, so erscheint das angesprochene Sprite hinter den Hintergrundzeichen. Ein gelöschtes Bit gibt dem Sprite Priorität vor dem Hintergrund.</p>
+
+        <p>Hintergrundzeichen sind in diesem Fall alle gesetzten Punkt die sich außer den Sprites noch auf dem Bildschirm befinden. Das können wahlweise Zeichen oder auch Grafikpunkte sein.</p>
+
+        <p>Stoßen 2 Sprites zusammen, so wird das von Register 30 (Adresse 53278) angezeigt. Der VIC setzt dabei die entsprechenden Bits der Sprites, die kollidiert sind. Sind beispielsweise Bit 5 und 6 gleich 1, zeigt dies eine Berührung von Sprite Nummer 5 mit Sprite Nummer 6 an.</p>
+
+        <p>Dabei ist aber Vorsicht geboten, da nach dem Zusammenstoß die Bits nicht mehr selbständig vom Videoprozessor zurückgesetzt werden. Nach jeder Kollisionsabfrage sollte daher das Register regelmäßig vom Basic-Programm gelöscht werden. Mit POKE 53278,0 ist das schnell getan.</p>
+
+        <p>Das nächste Register mit der Nummer 31 hat die Adresse 53279 und registriert eine Berührung eines Sprites mit einem Hintergrundzeichen. Wie in Register 30 besagt ein gesetztes Bit, daß das entsprechende Sprite gerade einen Punkt des Hintergrundes berührt hat. Auch hier muß das Register danach wieder von Hand gelöscht werden. So sollte der Befehl POKE 53279,0 nach der Kollisionsabfrage nicht fehlen.</p>
+
+        <p>Die Abfrage, ob bestimmte Bits gesetzt sind, ist mit einer IF-THEN-Abfrage leicht zu bewerkstelligen.</p>
+
+        <p>Wollen wir überprüfen, ob die Sprites 2 und 7 zusammengestoßen sind, so benutzen wir die folgende Basic-Zeile:</p>
+
+        <pre><code>IF (PEEK(53278) AND (2↑2) &lt; &gt;  0) AND (PEEK(53278)
+AND (2↑7) &lt; &gt;  0) THEN ...   :REM KOLLISION</code></pre>
+
+        <p>Damit hätten wir sämtliche Funktionen des VIC beisammen, um alle 8 Sprites auf dem Bildschirm »tanzen« zu lassen.</p>
+
+        <p>Bleibt nur noch die Möglichkeit, den Adreßbereich des VIC-Chips zu verschieben.</p>
+
+        <p>In manchen Fällen, wie bei besonders langen Basic-Programmen, ist es manchmal notwendig, den HiRes-Grafikspeicher in einen anderen Bereich zu verlegen, als er nach dem Einschalten steht. Durch bestimmte Register im VIC und im CIA 2 (den wir auch noch besprechen werden) kann der 16-KByte-Adreßbereich des VIC im Speicher verschoben werden. Zuständig dafür sind die Bits 0 und 1 im Register 0 der CIA 2, die je nach Zustand den Arbeitsbereich des VIC in bestimmte Speicherbereiche Ihres C 64 legen:</p>
+        <table class="plain">
+            <tr>
+                <th>Bits 1/0</th>
+                <th>Arbeitsbereich des VIC</th>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>$0000-$3FFF (0-16383)</td>
+            </tr>
+            <tr>
+                <td>01</td>
+                <td>$4000-$7FFF (16384-32767)</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>$8000-$BFFF (32768-49151)</td>
+            </tr>
+            <tr>
+                <td>00</td>
+                <td>$C000-$FFFF (49152-65535)</td>
+            </tr>
+        </table>
+
+        <p>Verlegen Sie zum Beispiel den Arbeitsbereich des VIC auf $4000-7FFF (16384-32767), werden auch sämtliche Bildspeicherfunktionen mitverschoben. So liegt nun das Video-RAM im Bereich von $4400-47FF. Auch der Zeichengenerator liegt an anderer Stelle und der Beginn der Sprite-Definitionsblöcke beginnt dann bei $4000 (16384), das heißt Block 0 fängt bei Adresse 16384 und nicht mehr bei Adresse 0 an.</p>
+
+        <pre><code>POKE 56576, PEEK(56576) AND (255-2)</code></pre>
+
+        <p>würde das eben Erklärte realisieren. Ohne weitere Veränderungen wäre aber so kein anständiges Arbeiten mit dem Computer mehr möglich.</p>
+
+        <p>Innerhalb des 16-KByte-Adressierungsbereiches läßt sich auch der Bildschirmspeicher in 1-KByte-Schritten verschieben. Um das durchzuführen, sind die Bits 4 bis 7 im VIC-Register 24 zuständig.</p>
+
+        <p>Diese 4 Bit repräsentieren die dezimalen Werte von 0 bis 15 und geben an, in welchem 1-KByte-Block sich das Video-RAM befindet. Im Einschaltzustand haben die 4 Bit den Binärwert %0001, was dezimal dem Wert 1 entspricht (Bildschirm in Block 1 bei $0400; dezimal 1024). Wollen wir den Bildschirm nach $0800 (2048), also nach Block 2 verschieben, ist es notwendig, die 4 Bit mit dem Wert 2 zu belegen. Die Bits müssen dann wie folgt gesetzt werden: %0010, was dem Wert 2 entspricht.</p>
+
+        <p>Wie das Video-RAM kann auch der Zeichengenerator, das heißt der Speicher, an dem die Bitmuster der Zeichen abgelegt sind, innerhalb des VIC-Arbeitsbereiches verschoben werden. Dies ist lediglich in 2-KByte-Schritten möglich und wird mit den Bits 1 bis 3 des VIC-Registers 24 ermöglicht.</p>
+
+        <h2>»Verschiebereien«</h2>
+
+        <p>Auch hier repräsentieren diese 3 Bit einen Wert, der beschreibt, in welchem 2-KByte-Block der Zeichengenerator liegt. Im Normalfall sind die Bits folgendermaßen gesetzt: %010, was dezimal dem Wert 2 entspricht. Der Zeichengenerator liegt also im zweiten 2-KByte-Block des VIC-Arbeitsbereiches. Theoretisch wäre dies der Bereich von $1000-1FFF (dezimal 4096-8191). Eine hardwaremäßige Verschaltung hat aber den Effekt, daß beim Zugriff des VIC auf diesen Adreßbereich automatisch auf das Charakter-ROM im Bereich $D000-DFFF zugegriffen wird. Dort steht der normale Zeichensatz des C 64 und bringt somit die Zeichen auf den Bildschirm.</p>
+
+        <p>Verschiebt man den Zeichengenerator beispielsweise auf den Bereich $2000-2FFF (dezimal 8192-12287; Bits 1 bis 3 auf %100), werden die Bitmuster für die Zeichen tatsächlich aus diesem Bereich geholt. Haben Sie dann dort keinen eigenen Zeichensatz gespeichert, wird sich ein heilloses Durcheinander auf dem Bildschirm einstellen. Diese Tatsache ermöglicht aber auch die Herstellung eigener Zeichensätze und kann somit von Vorteil sein.</p>
+
+        <p>Schließlich kann auch noch der Grafikspeicher innerhalb des 16-KByte-Arbeitsbereiches auf zwei Positionen verschoben werden. Position 0 wäre der untere 8-KByte-Bereich und Position 1 der beim Einschalten eingestellte obere 8-KByte-Bereich des VIC-Arbeitsspeichers. Liegt der VIC-Adreßbereich von $0000-3FFF (0-16383), so kann also wahlweise der Grafik-Bildschirm auf $0000-$1FFF oder auf $2000-3FFF gelegt werden. Ein Verlegen auf $0000 wäre allerdings nicht sehr ratsam, da sich sonst der Grafikspeicher mit der wichtigen Zeropage überschneiden würde.</p>
+
+        <p>Das Verschieben der eben genannten Bereiche erfordert aber einiges an Programmiererfahrung und sollte nur mit äußerster Vorsicht geschehen.</p>
+
+        <p>Damit wäre der Abschnitt über den VIC 6569 abgeschlossen. Sollte Ihnen aufgrund der Informationsfülle der Kopf noch nicht rauchen, wird er es spätestens am Ende des nächsten Abschnittes tun. Denn da nehmen wir den SID 6581 mit seinen Eigenschaften zur Klangerzeugung unter die Lupe.</p>
+
+        <p>Der SID 6581 ist ein sehr außergewöhnlicher Baustein. Anders als bei den üblichen Tongeneratoren in Computern, kann er als vollständiger dreistimmiger Mini-Synthesizer bezeichnet werden, da er alle Elemente für die einfache Tonerzeugung bis zur Herstellung komplexer Klänge besitzt.</p>
+
+        <p>So können mit ihm drei unabhängige Stimmen frei programmiert werden. Dafür bietet er vier Schwingungsarten (Dreieck, Sägezahn, Rechteck und rosa Rauschen) an, die auch gemischt werden können. Jede Stimme besitzt außerdem einen Hüllkurvengenerator (ADSR-Control), der den zeitlichen Ablauf der Lautstärke eines Tones bestimmt. Alle drei Stimmen lassen sich über drei ebenfalls mischbare Filter leiten, womit sich die Klangfarbe manipulieren läßt. Auch die Möglichkeit der Ringmodulation wurde nicht vergessen.</p>
+
+        <p>Der SID ist also ein sehr komplexer Baustein, der sich auch nicht gerade einfach programmieren läßt. Will man komplizierte Klänge erzeugen, bedarf es schon einiger Erfahrung und Kenntnisse im Bereich der Tonsynthese. Wie eine solche Klangerzeugung prinzipiell vor sich geht, soll hier erklärt werden.</p>
+
+        <p>Richten wir zunächst wieder einen Blick auf die Register des SID, von denen es deren 28 gibt. Bild 7 zeigt eine Aufstellung aller Register mit den Adressen, über die sie angesprochen werden können.</p>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="shaded">Register</th>
+                        <th>Bedeutung</th>
+                        <th class="shaded">Adresse</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="shaded">0</td>
+                        <td>Tonfrequenz für Stimme 1 höherwertiges Byte</td>
+                        <td class="shaded">54272</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">1</td>
+                        <td>Tonfrequenz für Stimme 1 niederwertiges Byte</td>
+                        <td class="shaded">54273</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">2–3</td>
+                        <td>Pulsbreite für Rechteckschwingung<br>höher- und niederwertiges Byte</td>
+                        <td class="shaded">54274–54275</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">4</td>
+                        <td>Steuerregister für Stimme 1<br>Bit 0 KEY: 1= Ton beginnt nach der entsprechenden Hüllkurve zu erklingen<br>Bit 1 SYNC: 1= synchronisiert Oszillator 1 und 3<br>Bit 2 RING: 1= Dreiecksausgang wird durch eine Modulation von Oszillator 1 und 3 ersetzt<br>Bit 4 TRI: 1= Dreiecksschwingung<br>Bit 5 SAW: 1= Sägezahnschwingung<br>Bit 6 PUL: 1= Rechteckschwingung (Pulsbreite in den Registern 2 und 3)<br>Bit 7 NSE: 1= Rauschen</td>
+                        <td class="shaded">54276</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">5</td>
+                        <td>Hüllkurvenregister 1<br>Bits 0-3 : Decay-Wert (0-15)<br>Bits 4-7 : Attack-Wert (0-15)</td>
+                        <td class="shaded">54277</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">6</td>
+                        <td>Hüllkurvenregister 2<br>Bits 0-3 : Release-Wert (0-15)<br>Bits 4-7 : Sustain-Wert (0-15)</td>
+                        <td class="shaded">54278</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">7–13</td>
+                        <td>Entsprechende Register für Stimme 2 Ausnahmen<br>SYNC synchronisiert Oszillator 2 und 1<br>RING Dreiecksausgang wird durch Modulation von Oszillator 2 und 1 ersetzt</td>
+                        <td class="shaded">54279–54285</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">14–20</td>
+                        <td>Entsprechende Register für Stimme 3 Ausnahmen<br>SYNC synchronisiert Oszillator 3 und 2<br>RING Dreiecksausgang wird durch Modulation von Oszillator 3 und 2 ersetzt</td>
+                        <td class="shaded">54286–54292</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">21–22</td>
+                        <td>Filterfrequenzregister nieder- und höherwertiges Byte<br>Die Frequenz errechnet sich mit diesem Wert (FW) durch F=(30+FW*5.8)</td>
+                        <td class="shaded">54293–54294</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">23</td>
+                        <td>Filterresonanz und Stimmenschalter<br>Bit 0 : 1= Stimme 1 wird über den Filter geleitet<br>Bit 1 : 1= Stimme 2 wird über den Filter geleitet<br>Bit 2 : 1= Stimme 3 wird über den Filter geleitet<br>Bit 4-7 : Filterresonanz (0-15)</td>
+                        <td class="shaded">54295</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">24</td>
+                        <td>Lautstärke und Filter an/aus<br>Bit 0-3 : Gesamte Lautstärke<br>Bit 4 : 1= Tiefpaß eingeschaltet<br>Bit 5 : 1= Bandpaß eingeschaltet<br>Bit 6 : 1= Hochpaß eingeschaltet<br>Bit 7 : 1= Stimme 3 wird stumm geschaltet</td>
+                        <td class="shaded">54296</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Die nächsten Register können nur gelesen werden:</th>
+                    </tr>
+                    <tr>
+                        <td>25–26</td>
+                        <td class="shaded">A/D-Wandler 1 und 2</td>
+                        <td>54297–54298</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td class="shaded">Rauschgenerator-Wert von Stimme 3<br>augenblicklicher Stand des Rauschgenerators; erzeugt gute Zufallszahlen</td>
+                        <td>54299</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td class="shaded">Hüllkurvengenerator-Wert von Stimme 3<br>augenblicklicher Stand der Lautstärke von Stimme 3 durch die Hüllkurve; geeignet zur Modulation anderer Parameter</td>
+                        <td>54300</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 7. Die Registerbelegung des SID 6581</figcaption>
+        </figure>
+
+        <p>Alle Funktionen, wie die Tonhöhe, Hüllkurve und Schwingungsformen, sind für jede der drei Stimmen extra vorhanden.</p>
+
+        <table class="plain">
+            <tr>
+                <td>Register 0-6</td>
+                <td>Stimme 1</td>
+            </tr>
+            <tr>
+                <td>Register 7-13</td>
+                <td>Stimme 2</td>
+            </tr>
+            <tr>
+                <td>Register 14-20</td>
+                <td>Stimme 3</td>
+            </tr>
+        </table>
+
+        <p>Die entsprechenden Register sind für jede Stimme identisch, kleine Änderungen sind in der Tabelle in Bild 5 besonders erwähnt.</p>
+
+        <p>Untersuchen wir nun die Register für Stimme 1. Dasselbe gilt dann analog für die anderen beiden Stimmen.</p>
+
+        <p>Das wichtigste Register für Stimme 1 ist das Register Nummer 4, das sogenannte Steuerregister, mit dem die wichtigsten Funktionen ein- und ausgeschaltet werden können. Durch Setzen und Löschen der entsprechenden Bits auf die schon bekannte Weise lassen sie sich einfach bedienen. Soll für Stimme 1 beispielsweise die Schwingungsform Rechteck eingestellt werden, ist lediglich Bit 6 in Register 4 zu setzen:</p>
+
+        <pre><code>POKE 54276, PEEK(54276) OR 2^6</code></pre>
+
+        <p>Das Puls-Pause-Verhältnis ist in Register 2 und 3 einstellbar. Register 5 und 6 geben dem SID die ADSR-Werte für die Hüllkurve in jeweils 4-Bit-Zahlen an. Jeder dieser Parameter kann Werte von 0-15 annehmen und ist einfach mit POKE zu beschreiben. Eine Einstellung des Decay-Wertes auf 7 ist zum Beispiel durch folgenden Befehl möglich:</p>
+
+        <pre><code>POKE 54277,16*7</code></pre>
+
+        <p>Damit werden die Bits 4-7 auf den dezimalen Wert 7 gestellt. Ebenso kann man auch Attack, Sustain und Release für jede Stimme programmieren.</p>
+
+        <p>Register 0 und 1 bestimmen schließlich die Tonhöhe. Man muß dabei die entsprechende Frequenz des Tones angeben. Welcher Ton welcher Frequenz entspricht, ist in einer Tabelle im C 64-Handbuch aufgelistet.</p>
+
+        <p>Wenn gewünscht, können alle drei Stimmen über einen Filter geleitet werden. In Register 23 dienen die Bits 0-2 als Schalter, welche der drei Stimmen gefiltert werden sollen. Zur Einstellung des Filters werden die Register 21-24 verwendet, über die Resonanz- und Filterfrequenz bestimmt werden können.</p>
+
+        <p>Mit den Bits 0-3 des Registers 24 läßt sich zusätzlich die Gesamtlautstärke (0-15) aller Stimmen verändern.</p>
+        <table class="plain">
+            <tr>
+                <td>POKE 54296,1</td>
+                <td>sehr leise</td>
+            </tr>
+            <tr>
+                <td>POKE 54296,15</td>
+                <td>sehr laut</td>
+            </tr>
+        </table>
+
+        <p>Die Register 27 und 28 bilden unter allen anderen Registern, die nur beschrieben werden können, eine Ausnahme. Sie lassen sich nur lesen. Register 27 mit dem Namen Rauschgenerator zeigt bei eingeschalteter Stimme 3 und der gewählten Schwingungsform Rauschen den augenblicklichen Stand des Rauschgenerators an. Da es sich um rosa Rauschen handelt, ist dieser Wert absolut zufällig und kann in Spielen als hervorragender Zufallszahlengenerator verwendet werden.</p>
+
+        <p>Durch Bit 7 im Register 24 läßt sich die Stimme 3 stummschalten, das heißt sie ist eingeschaltet, aber nicht zu hören.</p>
+
+        <pre><code>POKE 54296, PEEK(54296) OR 128</code></pre>
+
+
+        <p>schaltet Stimme 3 stumm.</p>
+
+        <p>So können die Werte auch ohne hörbare Stimme 3 gelesen und benutzt werden.</p>
+
+        <p>Das gleiche gilt auch für Register 28, das den augenblicklichen Stand der Hüllkurvenamplitude von Stimme 3 enthält. Dieser Parameter kann zum Beispiel auch bei stummgeschalteter Stimme 3 hüllkurvenabhängigen Änderungen der Parameter anderer Stimmen dienen, was schier unerschöpfliche Möglichkeiten der Klangerzeugung bietet. Was damit möglich ist, kann man am besten durch intensives Ausprobieren und Setzen und Löschen der einzelnen Bits erfahren. Ein Kochrezept gibt es dafür nicht. Listing 9 erzeugt einen Ton in allen Schwingungsformen. Es soll zeigen, wie die Erzeugung eines Tones prinzipiell abläuft.</p>
+        <figure>
+            <pre data-filename="tonerzeugung" data-name="Tondemo" data-checksummer="3"></pre>
+            <figcaption>Listing 9. Erzeugung eines Tons in allen vier Wellenformen des SID 6581</figcaption>
+        </figure>
+
+        <p>Zum Abschluß noch einiges über unsere Ein-/Ausgabe-Bausteine CIA 1 und 2. Sie sind für den Basic-Programmierer nur von geringer Bedeutung und müssen deshalb nur kurz erwähnt werden. Ein Bonbon jedoch gibt es, das sich von Basic aus erreichen läßt: Die eingebaute Echtzeituhr.</p>
+
+        <p>Wer schon öfters mit der softwaregestützten C 64-Uhr über die Variable TI$ gearbeitet hat, wird die enorme Ungenauigkeit dieses Zeitgebers bemängelt haben. Für diejenigen, die jedoch genaueste Uhrzeiten benötigen, bietet sich die CIA-Echtzeituhr mit ihrer recht guten Genauigkeit an. Als Taktgeber wird dafür die Netzfrequenz von 50 Hz (in Europa) verwendet, die, wie wir wissen, sehr gut stabilisiert und somit geradezu ideal dafür geeignet ist.</p>
+
+        <p>Die Uhr setzt sich aus Zehntelsekunden, Sekunden, Minuten und Stunden zusammen und ist in den Registern 8 bis 11 eines jeden CIA gespeichert. Die für die Uhr wichtige Belegung dieser Register ist in Bild 8 zusammengestellt.</p>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="shaded">Register</th>
+                        <th>Bedeutung</th>
+                        <th class="shaded">Adresse</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="shaded">8</td>
+                        <td>Zehntelsekunden der Echtzeituhr<br>Bits 0-3 Zehntelsekunden</td>
+                        <td class="shaded">56328</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">9</td>
+                        <td>Sekunden der Echtzeituhr<br>Bit 0-3 Einersekunden<br>Bit 4-6 Zehnersekunden</td>
+                        <td class="shaded">56329</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">10</td>
+                        <td>Minuten der Echtzeituhr<br>Bit 0-3 Einerminuten<br>Bit 4-6 Zehnerminuten</td>
+                        <td class="shaded">56330</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">11</td>
+                        <td>Stunden der Echtzeituhr<br>Bit 0-3 Einerstunden<br>Bit 4-6 Zehnerstunden<br>Bit 7 0 = vormittags (AM)<br>1 = nachmittags(PM)</td>
+                        <td class="shaded">56331</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 8. Notwendige Register des CIA zur Nutzung der Echtzeituhr</figcaption>
+        </figure>
+
+        <p>Beim Stellen der Uhr muß jedoch eine bestimmte Reihenfolge eingehalten werden. Schreibt man in das Stunden-Register, bleibt die Uhr stehen und läuft erst wieder an, wenn das Zehntelsekunden-Register beschrieben worden ist. Man sollte also mit dem Stellen bei den Stunden beginnen und die Zehntelsekunden zum Schluß setzen, damit die Uhr auch zum richtigen Zeitpunkt wieder anläuft. In Listing 10 und 11 sind kleine Basic-Programme abgedruckt, die das Stellen und Ausgeben der Echtzeituhr vornehmen. Sie können nach Belieben abgeändert werden, um sie in die eigenen Basic-Programme einzubauen.</p>
+        <figure>
+            <pre data-filename="uhr stellen" data-name="Echtzeituhr stellen" data-checksummer="3"></pre>
+            <figcaption>Listing 10. Mit diesem Programm können Sie die Echtzeituhr des CIA 1 auf die Sekunde genau stellen</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="uhrzeit anzeigen" data-name="Echtzeituhr lesen" data-checksummer="3"></pre>
+            <figcaption>Listing 11. Dieses Programm zeigt laufend die aktuelle Zeit der Echtzeituhr an</figcaption>
+        </figure>
+        <div style="display: none;">
+            <pre data-filename="uhr vollst." data-name="Echtzeituhr stellen und lesen"></pre>
+        </div>
+
+        <p>Welchen CIA Sie für Ihre Uhr verwenden, ist gleichgültig. Wenn Sie wollen, können Sie beide programmieren und haben somit zwei recht exakte Uhren zur Verfügung. In den beiden Basic-Programmen muß dazu lediglich die Startadresse des gewünschten CIAs eingesetzt werden.</p>
+
+        <p>Wie man sieht, lassen sich auch von Basic aus einige Dinge mit den Peripheriebausteinen VIC, SID und den beiden CIAs anstellen. Wichtig dabei ist das direkte Ausprobieren (insbesondere beim SID), um die Wirkung sofort zu erfahren. Dadurch bekommt man Erfahrung und lernt immer weitere Tricks und Kniffe bei der Programmierung von Grafik und Sound.</p>
+
+        <address class="author">(Michael Thomas/ks)</address>
+    </article>
+</body>
+
+</html>

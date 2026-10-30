@@ -1,0 +1,23 @@
+;datagen 128.prg ==1c01==
+;version=70
+    2 rem ***  datagen 128 ***
+    4 rem *** (c) t. fahle ***
+    6 :
+    8 scnclr
+   10 input"startadr.";sa$:if mid$(sa$,1,1)="$"then sa=dec(right$(sa$,4)):else sa=val(sa$)
+   12 input"endadr.";ea$:if mid$(ea$,1,1)="$"then ea=dec(right$(ea$,4)):else ea=val(ea$)
+   14 input"1.zeilennr.";zn:input"schrittweite";sw:ifzn<38 then 14
+   16 printchr$(147);zn;"fori="sa"to"ea"
+   18 zn=zn+sw:printzn;"read a$:poke i,dec(a$)":zn=zn+sw:printzn;"next i"
+   20 zn=zn+sw:printzn;":"
+   22 print"goto 26"
+   24 poke 842,19:for i=1to5:poke 842+i,13:next:poke208,6:end
+   26 zn=zn+sw:scnclr:printzn;"data";
+   28 for i=satosa+14
+   30 : printright$(hex$(peek(i)),2)+",";
+   32 next i:printchr$(20)
+   34 print"sa="sa":ea="ea":sw="sw":zn="zn
+   36 print"{down}{down}goto38":poke 842,19:fort=1to3:poke842+t,13:next:poke 208,5:end
+   38 sa=sa+15:ifsa<ea then 26
+   40 scnclr:print"delete-40":poke842,19:poke 843,13:poke208,2:end
+

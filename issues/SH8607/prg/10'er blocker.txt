@@ -1,0 +1,51 @@
+;10'er blocker.prg ==1c01==
+;version=70
+   10 rem
+   15 rem  * * *  10'er blocker  * * *
+   20 rem
+   25 rem  olaf pfeiffer          1985
+   30 rem
+   35 rem
+   40 rem  neubelegung der shift/10'er
+   50 rem  block - tasten ; durch ver-
+   60 rem  aendern der interruptrouti-
+   70 rem  ne und der tastaturbelegung
+   80 rem
+   90 rem
+  100 bank15:poke53280,0:poke53281,0
+  110 printchr$(147);chr$(30)
+  120 print"an welche adresse (in hex) soll die":print
+  130 print"routine? platzbedarf:1 block (256 bytes)":print
+  140 print:input"adresse ($)";a$:fast
+  150 a=dec(a$):ifa=0thena=5888:rem $1700
+  155 rem 1.schleife fuer data-zahlen
+  160 forn=atoa+139:readz:poken,z:s=s+z:next
+  170 ifs<>17017thenprint"fehler in data's!!!":stop
+  175 rem 2.schleife fuer data-zeichen
+  180 forn=a+140toa+165:readz$:z=val(z$):ifz=0thenz=asc(z$)
+  190 poken,z:next
+  200 printchr$(147);"initialisieren mit:":print:print:print
+  210 print"bank15:sys"a;chr$(145);chr$(145);chr$(145)
+  215 rem anpassen an die adresse a
+  220 l=(a+166)and255:h=int((a+166)/256)
+  230 poke(a+2) ,(a+13)and255
+  240 poke(a+7) ,int((a+13)/256)
+  250 poke(a+67),l:poke(a+68),h
+  260 poke(a+80),(a+148)and255
+  270 poke(a+81),int((a+148)/256)
+  280 poke(a+83),(a+231)and255
+  290 poke(a+84),int((a+231)/256)
+  300 poke(a+91),l:poke(a+93),h
+  310 slow:end
+  320 data 120,169,13,141,20,3,169,23,141,21,3,88,96,216,32,36
+  330 data 192,144,18,32,248,245,32,208,238,173,13,220,173,4,10,74
+  340 data 144,3,32,6,64,173,65,3,201,240,144,56,174,0,255,169
+  350 data 15,141,0,255,172,64,3,132,254,172,65,3,132,255,160,0
+  360 data 177,254,153,166,23,200,192,89,208,246,142,0,255,160,0,185
+  370 data 148,23,153,231,23,200,192,18,208,245,162,166,160,23,142,64
+  380 data 3,140,65,3,165,211,106,144,22,166,208,240,18,189,73,3
+  390 data 201,48,208,14,236,32,10,176,6,232,157,73,3,134,208,76
+  400 data 51,255,201,141,208,249,236,32,10,176,244,169,58,157,73,3
+  410 data 169,13,208,229,"%","e",24,"b","d","$","a",27,"*","/"
+  420 data 10,141,"f","&","c",8,48,","
+

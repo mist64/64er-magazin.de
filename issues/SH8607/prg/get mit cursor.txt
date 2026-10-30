@@ -1,0 +1,51 @@
+;get mit cursor.prg ==1c01==
+;version=70
+  100 rem ************************************
+  110 rem *                                  *
+  120 rem *    get mit blinkendem cursor     *
+  130 rem *    fuer c128 mit  40 oder 80     *
+  140 rem *         zeichen-schirm           *
+  150 rem *                                  *
+  160 rem ************************************
+  170 :
+  180 rem ***************** testprogramm
+  190 :
+  200 print"eingabe ? ";
+  210 gosub310:ifx$<>"j"andx$<>"n"then210
+  220 printx$
+  230 end
+  240 :
+  250 rem ***************** subroutine get
+  260 rem ***************** mit blinkendem
+  270 rem ***************** cursor
+  280 :
+  290 rem pruefe ob 40 oder 80 zeichen-schirm
+  300 :
+  310 if peek(215)=128 then begin:   rem 80 zeichen
+  320 :
+  330 :                              rem chr$(15)  = zeichenblink an
+  340 :                              rem chr$(18)  = rvs on
+  350 :                              rem chr$(146) = rvs off
+  360 :                              rem chr$(157) = cursor links
+  370 :                              rem chr$(143) = zeichenblink aus
+  380 :
+  390 :  printchr$(15)chr$(18);" ";chr$(146)chr$(157)chr$(143);
+  400 :
+  410 :  getkey x$:                  rem warte auf tastendruck
+  420 :
+  430 bend: else begin:              rem 40 zeichen
+  440 :
+  450 :  poke2599,0:                 rem schalte blinken ein
+  460 :
+  470 :  getkey x$:                  rem warte auf tastendruck
+  480 :
+  490 :  poke2599,1:                 rem schalte blinken aus
+  500 :
+  510 :  poke2600,1:                 rem schalte blinkzaehler aus
+  520 :
+  530 bend
+  540 :
+  550 return
+  560 :
+  570 rem ************************************
+

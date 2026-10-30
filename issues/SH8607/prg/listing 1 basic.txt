@@ -1,0 +1,33 @@
+
+
+;listing 1 basic.prg ==0801==
+   10 c=56328
+   20 poke c+14,peek(c+14) or 128
+   30 poke c+15,peek(c+15) and 127
+   40 input "zeit hhmmss";a$
+   50 if len(a$)<>6 then 40
+   60 h=val(left$(a$,2))
+   70 m=val(mid$(a$,3,2))
+   80 s=val(right$(a$,2))
+  100 if h>12 then h=h+68
+  110 pokec+3,16*int(h/10)+h-int(h/10)*10
+  130 pokec+2,16*int(m/10)+m-int(m/10)*10
+  150 pokec+1,16*int(s/10)+s-int(s/10)*10
+  160 poke c,0
+  180 print"{clr}"
+  200 c=56328
+  210 h=peek(c+3):m=peek(c+2):s=peek(c+1):t=peek(c)
+  230 f=0:if h>32 then h=h-128:f=1
+  240 h=int(h/16)*10+h-int(h/16)*16:if f=0 then 280
+  250 if h=12 then 290
+  260 h=h+12
+  280 if h=12 then h=0
+  290 m=int(m/16)*10+m-int(m/16)*16
+  300 s=int(s/16)*10+s-int(s/16)*16
+  320 t$=right$("0"+mid$(str$(h),2,2),2)+":"
+  340 t$=t$+right$("0"+mid$(str$(m),2,2),2)+":"
+  360 t$=t$+right$("0"+mid$(str$(s),2,2),2)+":"
+  380 t$=t$+right$(str$(t),1)
+  400 print"{home}{down}{down}{down}";t$
+  420 goto 210
+

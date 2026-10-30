@@ -1,0 +1,24 @@
+
+
+;editor.prg ==0801==
+   10 rem statuszeileneditor
+   11 rem by uwe wiards;lemwerder
+   12 ifu=1then15
+   13 u=1:load"status",8,1
+   15 poke53280,peek(53281):poke650,128
+   20 printchr$(14);"{clr}{down}{down}{down}Statuszeileneditor by Uwe Wiards{down}{down}{down}"
+   25 print"{down}{down} Rest mit 'Space' auffuellen!!"
+   26 print"{down}{down} Statuszeile ist mit SYS49283"
+   27 print" abzuschalten!{down}{down}{down}"
+   28 print"{down}{down}Cursorsteuerung nur mit 'DEL'!!"
+   30 dim a(80):fori=1to80:print"{rvon} {rvof}";:next
+   40 print"{up}{up}";
+   45 fori=1to80
+   50 geta$:ifa$=""then50
+   70 ifa$=chr$(13)then50
+   80 ifa$=chr$(20)andi>1 thenprint"{left}{rvon} {rvof}{left}";:i=i-1:goto50
+   85 ifa$=chr$(20)then50
+   90 printa$;:a(i)=asc(a$):next
+  110 fori=1to80:poke49202+i,a(i):next
+  120 sys12*4096
+

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Ein Hauch von Multitasking</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M. Dietz, og">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="128">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips-und-Tricks-Listings">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Programmieren">
+    <meta name="64er.id" content="multitasking">
+</head>
+
+<body>
+    <article>
+        <h1>Ein Hauch von Multitasking</h1>
+        <p class="intro">Ein kleines Programm im Kassettenpuffer ermöglicht es, zwei Basic-Programme quasi gleichzeitig ablaufen zu lassen. Von jedem der zwei Programme wird abwechselnd je ein Befehl ausgeführt.</p>
+
+        <p>Tippen Sie das Programm »Fenchel MD« (Listing 1) mit dem MSE ein. Geladen wird es später mit »,8,1«. Der Aufruf erfolgt mit</p>
+
+        <pre><code>SYS 828,Zeilennummer Programm 1, Zeilennummer Programm 2
+</code></pre>
+
+        <p>Daraufhin wird von jedem Programm abwechselnd je ein Basic-Befehl ausgeführt. Das laufende Programm wird mit &lt;←&gt; gestoppt. Es geht zwar auch mit &lt;RUN/STOP&gt;, jedoch wird dann der geänderte Vektor nicht zurückgestellt. Hier noch ein Beispielprogramm:</p>
+
+        <pre><code>10 sys828,100,200
+100 print "programm1 ";
+110 goto 100
+200 print "programm2 "
+210 goto 200
+</code></pre>
+
+
+        <p>Beim Start mit RUN werden die Zeilen (100, 110) sowie (200, 210) als zwei eigenständige Programme betrachtet. Schritt für Schritt führt »Fenchel MD« nun jeweils abwechselnd einen Befehl von beiden Programmen aus. Die Reihenfolge ist also: 100, 200, 110, 210, 100, 200 etc.</p>
+
+        <p>Eine END-Anweisung in einem Programm führt zum Anhalten des gesamten Programmlaufes. Gibt man dann ein »CONT« ein, so wird das andere Programm bis zu seinem Ende abgearbeitet. Weiterhin dürfen sich die zwei Programme auch »überkreuzen«, wie es bei der gemeinsamen Benutzung von Unterprogrammen vorkommen kann. Doch hier ist Vorsicht geboten, wenn die Programme sich »überholen« (zum Beispiel durch IF). Denn dann stimmen die auf dem Stack abgelegten Rücksprungadressen der RETURNS nicht mehr. Meistens erscheint dann eine Fehlermeldung. Für Interessierte haben wir den Source-Code in Listing 2 abgedruckt und im untenstehenden Kasten erklärt.</p>
+
+
+        <address class="author">(M. Dietz/og)</address>
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th colspan="2">Erklärung der benutzten Speicherstellen</th>
+                </tr>
+                <tr>
+                    <td>a/b</td>
+                    <td>Zwischenspeicher für Zeilennummer #1</td>
+                </tr>
+                <tr>
+                    <td>c/d</td>
+                    <td>Zwischenspeicher für Zeilennummer #2</td>
+                </tr>
+                <tr>
+                    <td>e</td>
+                    <td>Flag, welches Programm abgearbeitet wird</td>
+                </tr>
+                <tr>
+                    <td>$AEFD</td>
+                    <td>Prüft auf Komma</td>
+                </tr>
+                <tr>
+                    <td>$AD8A</td>
+                    <td>Zahl oder Term holen, auf numerisch prüfen und in FAC ablegen</td>
+                </tr>
+                <tr>
+                    <td>$B7F7</td>
+                    <td>FAC in 2-Byte-Zahl wandeln</td>
+                </tr>
+                <tr>
+                    <td>$A613</td>
+                    <td>Startadresse einer Programmzeile berechnen und in $5F/$60 ablegen</td>
+                </tr>
+                <tr>
+                    <td>$7A/$7B</td>
+                    <td>Programmzeiger</td>
+                </tr>
+                <tr>
+                    <td>$308/$309</td>
+                    <td>Vektor für Basic-Befehlsadresse holen</td>
+                </tr>
+                <tr>
+                    <td>$73</td>
+                    <td>CHRGET-Routine</td>
+                </tr>
+                <tr>
+                    <td>$A7ED</td>
+                    <td>Basic-Befehl ausführen</td>
+                </tr>
+                <tr>
+                    <td>198</td>
+                    <td>Anzahl der Zeichen im Tastaturpuffer</td>
+                </tr>
+                <tr>
+                    <td>$A480</td>
+                    <td>Direktmodus ohne READY</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle: Die von »Fenchel MD« benutzten Speicherstellen</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="fenchel md.prg" data-name="Fenchel MD" data-mse=mse1></pre>
+            <figcaption>Listing 1. »Fenchel MD« geben Sie bitte mit dem MSE ein</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="fenchel md.prg" data-name="Fenchel MD"></div>
+        <figure>
+            <!-- Im Heft stehen die Marken W1, Q1 und Q2 jeweils zwei Zeilen zu tief. Laut MSE-Listing und Diskette gehört W1 zu LDA A, Q1 und Q2 jeweils zum JSR $73 zwei Zeilen darüber. -->
+            <pre>      .OPT P4
+      *=   828
+A     =    $3E5
+B     =    $3E6
+C     =    $3E7
+D     =    $3E8
+E     =    $3E9
+      JSR  $AEFD
+      JSR  $AD8A
+      JSR  $B7F7
+      JSR  $A613
+      SEC
+      LDA  $5F
+      SBC  #01
+      STA  A
+      LDA  $60
+      SBC  #00
+      STA  B
+      JSR  $AEFD
+      JSR  $AD8A
+      JSR  $B7F7
+      JSR  $A613
+      SEC
+      LDA  $5F
+      SBC  #01
+      STA  C
+      LDA  $60
+      SBC  #00
+      STA  D
+      LDA  #$84
+      STA  $308
+      LDA  #$03
+      STA  $309
+      LDA  #00
+      STA  E
+      JMP  W1
+      LDX  E
+      BNE  Q1
+      BEQ  Q2
+      LDA  A
+      STA  $7A
+W1    LDA  B
+      STA  $7B
+      JMP  $A7AE
+      JSR  $73
+      JSR  $A7ED
+Q2    LDA  $7A
+      STA  A
+      LDA  $7B
+      STA  B
+      INC  E
+      LDA  C
+      STA  $7A
+      LDA  D
+      STA  $7B
+      JMP  $A7AE
+      JSR  $73
+      JSR  $A7ED
+Q1    LDA  $7A
+      STA  C
+      LDA  $7B
+      STA  D
+      DEC  E
+      LDA  203
+      CMP  #57
+      BEQ  Q3
+      JMP  W1
+Q3    LDA  #$E4
+      STA  $308
+      LDA  #$A7
+      STA  $309
+      LDA  #00
+      STA  198
+      JMP  $A480</pre>
+            <figcaption>Listing 2. Source-Code zu »Fenchel MD«</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

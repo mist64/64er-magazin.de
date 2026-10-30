@@ -1,0 +1,43 @@
+
+
+;multi-sinus.prg ==0801==
+  100 rem sinuskurve in multicolor
+  110 rem
+  120 rem grafik ein
+  130 vic=53248
+  140 poke vic+17, peek(vic+17) or 11*16:rem grafik ein
+  150 poke vic+22, peek(vic+22) or 16:rem muticolor ein
+  155 poke vic+24, peek(vic+24) or 8
+  160 rem grafikbild loeschen
+  170 gb=8192:rem staradresse grafik
+  180 for x=gb to gb+8000:pokex,0:next x
+  190 rem farbwerte setzen
+  200 vr=1024:rem startadresse videoram
+  210 fr=54272:rem staradresse farbram
+  220 f1=2*16+6:rem farbe 1 rot und 2 blau
+  230 f2=13:rem farbe 3
+  240 for x=vr to vr+1000:poke x,f1:next x
+  250 for x=fr to fr+1000:poke x,f2:next x
+  251 poke53280,0
+  260 rem sinuskurve zeichnen
+  270 for x=0 to 159
+  280 y=70* sin(x/25.6) +99:fa=int(rnd(1)*4)+1
+  290 gosub51000
+  300 next x
+ 9999 end
+51000 rem grafikpunkt setzen (multi-color)
+51010 ga=8192:rem startadresse grafikspeicher
+51020 ad=320 * int(y/8) + (y and 7) + (8 * int(x/4)):rem adresse berechnen
+51030 b1=(3-(x-(4*int(x/4))))*2:rem bitnummer 1
+51040 b2=b1+1:rem bitnummer 2
+51050 if fa =0 then f1=0:f2=0
+51060 if fa =1 then f1=0:f2=1
+51070 if fa =2 then f1=1:f2=0
+51080 if fa =3 then f1=1:f2=1
+51090 if f1=0 then goto51110
+51100 pokega+ad, peek(ga+ad) or 2^b1
+51110 if f2=0 then goto51130
+51120 poke ga+ad, peek(ga+ad) or 2^b2
+51130 return
+51140 rem fa= farbwert des punktes (0-3)
+

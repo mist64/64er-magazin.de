@@ -1,0 +1,204 @@
+;kernel.src.prg ==1c01==
+;version=70
+   10 open8,8,8,"@0:kernal,p,w"
+   20 sys9*4096:.opt p,o8:*= $c00
+   30 ; **********************************
+   40 ; *                                *
+   50 ; *           k e r n a l          *
+   60 ; *                                *
+   70 ; *        von frank probst        *
+   80 ; *                                *
+   90 ; *         im februar '86         *
+  100 ;*                                *
+  110 ;**********************************
+  120 conf   = $ff00                    ;konfigurationsregister
+  130 flag   = 996                      ;nr. der kernalroutine
+  140 jsrfar = $2cd                     ;jsrfar routine
+  150 jmpfar = $2e3                     ;jmpfar routine
+  160 ramcr  = $d506                    ;ramkonfigurationsreg.
+  170 usrvek = $1219                    ;vektor des usrbefehls
+  180 peek   = $ff50                    ;begin der peek/poke-routinen
+  190 ;
+  200 ;        ** kernal **
+  210 ; nummer der kernalroutine in 996
+  220 ;     aufruf durch jsr $c00
+  230 ;      von beliebiger bank
+  240 ;
+  250            sta 6                  ;register
+  260            stx 7                  ;in die
+  270            sty 8                  ;zeropage
+  280            lda #15                ;bank 15
+  290            sta 2                  ;in zp
+  300            lda #$44               ;lo-byte von sprungtabelle
+  310            sta 4                  ;in zp
+  320            lda #$ff               ;hi-byte von sprungtabelle
+  330            sta 3                  ;in zp
+  340            lda flag               ;flag lesen
+  350            cmp #20                ;kleiner als
+  360            bcc kleiner            ;20 dann bei kleiner weiter
+  370            inc 4                  ;lo-byte von sprungtabelle hochzaehlen
+  380 kleiner    asl                    ;akku=akku*2
+  390            adc flag               ;akku=akku+flag
+  400            adc 4                  ;akku=akku+lo-byte
+  410            sta 4                  ;akku in 4
+  420 ;
+  430 ;     ** jsrfar routine **
+  440 ;    parameteruebergabe wie        
+  450 ;    normale jsrfar-routine
+  460 ;   jedoch von jeder bank aus
+  470 ;    einfach durch jsr $c23
+  480 ;
+  490 jrfar      lda conf               ;akku=configuration
+  500            pha                    ;sichern
+  510            lda #0                 ;bank 15
+  520            sta conf               ;in conf
+  530            jsr jsrfar             ;jsrfar anspringen
+  540            pla                    ;conf holen
+  550            sta conf               ;wieder herstellen
+  560            lda 5                  ;akku=status
+  570            pha                    ;auf stack
+  580            lda 6                  ;register
+  590            ldx 7                  ;wieder
+  600            ldy 8                  ;herstellen
+  610            plp                    ;status-reg. herstellen
+  620            rts                    ;ruecksprung
+  630 ;
+  640 ;     ** initialisierung **
+  650 ;   vergroessert die common-area
+  660 ;auf 4k byte. passt basic zeiger an
+  670 ; und verschiebt peek/poke-routine
+  680 ;
+  690 init       lda #0                 ;bank 15
+  700            sta conf               ;in conf
+  710            lda ramcr              ;ram-configurations-reg.
+  720            ora #%00000101         ;4k ram gemeinsam
+  730            sta ramcr              ;von $0000 - $0fff
+  740            lda #0                 ;basic-
+  750            sta 47                 ;zeiger
+  760            sta 49                 ;an
+  770            lda #$10               ;neue
+  780            sta 48                 ;situation
+  790            sta 50                 ;anpassen
+  800 ;
+  810 ;  ** initialisiert usr-vektor **
+  820 ;bei usr erfolgt sprung nach $0f000
+  830 ;
+  840            lda #<start            ;lo-byte in
+  850            sta usrvek             ;usrvektor
+  860            lda #>start            ;hi-byte in
+  870            sta usrvek+1           ;usrvektor
+  880 ;
+  890 ; **verschiebt peek/poke-routinen**
+  900 ;
+  910            lda #$7f               ;bank 1
+  920            sta conf               ;in conf
+  930            ldy #end-peekr         ;schleifenzaehler
+  940 loop       lda peekr,y            ;verschieben der
+  950            sta peek,y             ;peek/poke-routinen
+  960            dey                    ;y=y-1
+  970            bpl loop               ;noch nicht fertig dann loop
+  980            rts                    ;ruecksprung
+  990 ;
+ 1000 ;     ** nach usr springen **
+ 1010 ;
+ 1020 start      lda #$3f              ;bank 0
+ 1030            sta conf              ;in conf
+ 1040            jmp $f000             ;sprung nach $0f000
+ 1050 ;
+ 1060 ;      ** peek aus bank 1 **
+ 1070 ;       holt byte aus nicht
+ 1080 ;        erreichbarem  ram
+ 1090 ; eingabeparameter :
+ 1100 ; x-reg =  lo-byte der peekadresse
+ 1110 ; y-reg =  hi-byte der peekadresse
+ 1120 ;
+ 1130 ; ausgabeparameter :
+ 1140 ; akku  =  gelesenes byte
+ 1150 ;
+ 1160           sta lob+1              ;zpadresse fuer lo-byte ablegen
+ 1170           sta hib+1              ;zpadresse fuer hi-byte ablegen
+ 1180           inc hib+1              ;hi-byte=hi-byte+1
+ 1190           lda conf               ;akku=configuration
+ 1200           pha                    ;sichern
+ 1210           lda #$7e               ;bank 1+i/o
+ 1220           sta conf               ;in conf
+ 1230 lob       lda 0                  ;lo-byte der zpadresse
+ 1240           sta pevek-peekr+peek+1 ;lo-byte der adresse
+ 1250 hib       lda 0                  ;hi-byte der zpadresse
+ 1260           sta pevek-peekr+peek+2 ;hi-byte der adresse
+ 1270           jsr peek               ;sprung nach peekroutine
+ 1280           sta flag               ;zwischenspeichern
+ 1290           pla                    ;configuration holen
+ 1300           sta conf               ;und herstellen
+ 1310           lda flag               ;ergebnis nach akku
+ 1320           rts                    ;ruecksprung
+ 1330 ;
+ 1340 ;      ** poke in bank 1 **
+ 1350 ;     schreibt byte in nicht
+ 1360 ;        erreichbares ram
+ 1370 ; eingabeparameter :
+ 1380 ; x-reg =  lo-byte der pokeadresse
+ 1390 ; y-reg =  hi-byte der pokeadresse
+ 1400 ; akku  =  der zu speichernde wert
+ 1410 ;
+ 1420 ; ausgabeparameter = keine
+ 1430 ;
+ 1440           sta flag               ;zwischenspeichern
+ 1450 pozpa     lda #$ff               ;poke zpadresse
+ 1460           sta lobp+1             ;zpadresse lo-byte ablegen
+ 1470           sta hibp+1             ;zpadresse hi-byte ablegen
+ 1480           inc hibp+1             ;hi-byte=hi-byte+1
+ 1490           lda conf               ;akku=configuration
+ 1500           pha                    ;sichern
+ 1510           lda #$7e               ;bank 1+i/o
+ 1520           sta conf               ;herstellen
+ 1530 lobp      lda 0                  ;lo-byte lesen
+ 1540           sta povek-peekr+peek+1 ;lo-byte der adresse
+ 1550 hibp      lda 0                  ;hi-byte lesen
+ 1560           sta povek-peekr+peek+2 ;hi-byte der adresse
+ 1570           lda flag               ;gesicherten wert holen
+ 1580           jsr poker-peekr+peek   ;poke anspringen
+ 1590           pla                    ;gesicherte configuration holen
+ 1600           sta conf               ;herstellen
+ 1610           rts                    ;ruecksprung
+ 1620 ;
+ 1630 ;     ** jmpfar routine **
+ 1640 ;    parameteruebergabe wie
+ 1650 ;    normale jmpfar-routine
+ 1660 ;   jedoch von jeder bank aus
+ 1670 ;    einfach durch jsr $cd0
+ 1680 ;
+ 1690           lda #0                 ;bank15
+ 1700           sta conf               ;herstellen
+ 1710           jmp jmpfar             ;sprung nach jmpfar
+ 1720 ;       peekroutine
+ 1730 peekr     sei                    ;interrupts aus
+ 1740           lda ramcr              ;akku=ram-configurations-register
+ 1750           and #%11110011         ;keine common-area
+ 1760           sta ramcr              ;herstellen
+ 1770 pevek     lda $ffff,y            ;byte holen
+ 1780           sta $fff0              ;zwischenspeichern
+ 1790           lda ramcr              ;akku=ramcr
+ 1800           ora #%00000100         ;common-area an
+ 1810           sta ramcr              ;und herstellen
+ 1820           lda $fff0              ;akku=ergebnis
+ 1830           cli                    ;irq an
+ 1840           rts                    ;ruecksprung
+ 1850 ;    poke
+ 1860 poker     sta $fff0              ;sichern
+ 1870           sei                    ;irq aus
+ 1880           lda ramcr              ;akku=ramcr
+ 1890           and #%11110011         ;common-area aus
+ 1900           sta ramcr              ;herstellen
+ 1910           lda $fff0              ;byte holen
+ 1920 povek     sta $ffff,y            ;schreiben
+ 1930           lda ramcr              ;akku=ramcr
+ 1940           ora #%00000100         ;common-area an
+ 1950           sta ramcr              ;herstellen
+ 1960           cli                    ;irq an
+ 1970 end       rts                    ;ruecksprung
+ 1980          .end
+ 1990 close8
+ 2000 save"@:kernal.s",8
+ 2010 verify"kernal.s",8
+

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Label im Basic 7.0</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Gerhard Seltzsam, dm">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="146">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.toc_title" content="Label in Basic 7.0">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Programmieren">
+    <meta name="64er.id" content="label-basic7">
+</head>
+
+<body>
+    <article>
+        <h1>Label im Basic 7.0</h1>
+        <p class="intro">Nun wird es auch mit Basic 7.0 möglich, Label anstatt feststehender Zeilennummern anzugeben. Dies erleichtert die Programmierung.</p>
+
+        <p>Obwohl das Basic 7.0 des C 128 sehr umfangreich ist, fehlt ihm eine Möglichkeit, die einige andere Computer schon aufweisen: die Angabe von Sprungzielen durch Label.</p>
+
+        <p>Eine große Schwierigkeit beim Erstellen umfangreicher Programme scheint es zu sein, daß man von Anfang an wissen muß, wohin ein Sprung führen soll. Auch die Zusammenstellung von Programmen durch Module ist nicht einfach, wenn Sprungadressen auftreten.</p>
+
+        <p>Mit diesem Programm (Listing 1) kann neben der bisherigen Möglichkeit, Sprungziele mit Zeilennummern anzugeben, folgendes programmiert werden:</p>
+
+        <p>1) GOTO und GOSUB auf eine errechnete Zeile.</p>
+
+        <pre><code>A=1000:GOTO A
+A=1000:GOSUB A/2+50
+</code></pre>
+
+        <p>Damit lassen sich Sprungverteiler vermeiden.</p>
+
+        <p>2) GOTO und GOSUB auf Inhalte von Feldelementen (numerisch). In einem numerischen Feld sind Sprungziele gespeichert. Hiermit ist möglich: GOTO (oder GOSUB) A(I) mit I aus zulässigem Bereich.</p>
+
+        <p>3) GOTO und GOSUB auf Marken. Die Marke muß in einer REM-Zeile stehen. Es ist folgendes möglich:</p>
+
+        <pre><code>...
+...
+550 GOTO"DRUCK"
+...
+...
+... REMDRUCK
+... PRINT"...
+</code></pre>
+
+        <p>Gleiches gilt auch für GOSUB.</p>
+
+        <p>4) GOTO und GOSUB auf den Inhalt von Feldelementen, die Strings enthalten. Verfahren wie unter Punkt 2).</p>
+
+        <p>5) GOTO und GOSUB auf definierte Stringvariable. Dabei muß stets eine REM-Zeile mit dem entsprechenden String vorhanden sein.</p>
+
+        <pre><code>10 A$="1000"
+20 GOSUB A$
+</code></pre>
+
+        <h3>Eingabehinweise</h3>
+
+        <p>Das Programm (Listing 1) geben sie bitte mit dem MSE im C 64-Modus ein und speichern es. Für Floppy-Besitzer scheint weiter folgender Weg der einfachste zu sein:</p>
+
+        <p>1) Erstellen einer Autoboot-Diskette<br>Name des Basic-Programms: INIT</p>
+
+        <p>2) Unter INIT wird folgender Einzeiler gespeichert:</p>
+
+        <pre><code>10 POKE 46,32:POKE 48,32:POKEDEC("2000"),0:CLR:BLOAD"SYS":SYSDEC("1300"):NEW
+</code></pre>
+
+        <p>Dieses Programm bewirkt folgendes:<br>a) Basic-Anfang auf $2000 einstellen<br>b) Variablen-Anfang auf $2000 einstellen<br>c) Der Befehl CLR bewirkt ein Anpassen der übrigen Zeiger auf den umgestellten Bereich<br>d) Nachladen des unter SYS gespeicherten Maschinenprogrammes<br>e) Einbinden in den Interpreter<br>f) Löschen</p>
+
+        <p>Statt f) könnte auch ein weiteres Programm nachgeladen und gestartet werden.</p>
+
+        <p>3) Das Maschinenprogramm ist dabei unter dem Namen SYS gespeichert.</p>
+
+        <p>Nicht-Floppy-Besitzer müssen folgenden Einzeiler laden und starten:</p>
+
+        <pre><code>10 POKE 46,32:POKE 48,32: POKEDEC("2000"),0:CLR:NEW
+</code></pre>
+
+        <p>Danach muß das Maschinenprogramm geladen und mit SYSDEC("1300") gestartet werden.</p>
+
+        <p>Die Listings 2 und 3 sollen Ihnen nur die Fähigkeiten der Erweiterung demonstrieren, müssen also nicht unbedingt abgetippt werden.</p>
+
+        <p>Um das Maschinenprogramm kurz zu halten, mußten folgende Restriktionen vereinbart werden:</p>
+
+        <p>1) Die erweiterte GOTO/GOSUB-Routine ist nur im Programm-Modus benutzbar</p>
+
+        <pre><code>..:GOTO..
+</code></pre>
+
+        <p>2) Soll nach THEN auf eine Marke gesprungen werden, muß die Syntax geändert werden</p>
+
+        <pre><code>IF..THEN:GOTO..
+</code></pre>
+
+        <p>3) Soll ELSE mit Marken verwendet werden, ist ebenfalls die Syntax zu ändern</p>
+
+        <pre><code>IF..:ELSE:GOTO..
+</code></pre>
+
+        <address class="author">(Gerhard Seltzsam/dm)</address>
+        <figure>
+            <pre data-filename="sys.prg" data-name="SYS" data-mse=mse1></pre>
+            <figcaption>Listing 1. Bitte mit dem MSE im C 64-Modus eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="sys.prg" data-name="SYS"></div>
+        <figure>
+            <pre data-filename="label-demo 1" data-name="Label-Demo 1"></pre>
+            <figcaption><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Listing 2. So können Sie mit Label arbeiten</a></figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="label-demo 2" data-name="Label-Demo 2"></pre>
+            <figcaption><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Listing 3. Auch hier wurden Zeilensprünge durch Label ersetzt</a></figcaption>
+        </figure>
+        <div style="display: none;">
+            <pre data-filename="label-demo 3" data-name="Label-Demo 3"></pre>
+            <pre data-filename="label-demo 4" data-name="Label-Demo 4"></pre>
+        </div>
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+
+            <p>Alle C 128 Basic-Listings aus dem oben genannten Sonderheft wurden mit falschen Prüfsummen abgedruckt. Daher sind diese Listings ohne den im gleichen Sonderheft veröffentlichten Checksummer einzugeben.</p>
+
+            <!-- Reiner Druckfehler -->
+            <!-- 64'er 8/1986 -->
+
+            <p>In den Listings 2 und 3 darf in den REM-Zeilen, die Label markieren, kein Leerzeichen zwischen REM-Befehl und Label eingegeben werden. Die Label-Routine findet sonst das Sprungziel nicht. Statt »100 REM ZAHL« muß es also beispielsweise heißen »100 REMZAHL«. Da dieses überflüssige Leerzeichen erst beim Ausdruck der Listings durch den Checksummer erzeugt wurde, sind die Programme auf der Programmservice-Diskette fehlerfrei.</p>
+
+            <!-- Disk-Version bereits korrigiert -->
+            <!-- 64'er 9/1986 -->
+        </aside>
+    </article>
+</body>
+
+</html>

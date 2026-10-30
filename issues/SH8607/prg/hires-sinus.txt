@@ -1,0 +1,31 @@
+
+
+;hires-sinus.prg ==0801==
+  100 rem sinuskurve in hi-res
+  110 rem
+  120 rem grafik ein
+  130 vic=53248
+  140 poke vic+17, peek(vic+17) or 11*16:rem grafik ein
+  150 poke vic+22, peek(vic+22) and 255-16:rem muticolor ein
+  155 poke vic+24, peek(vic+24) or 8:rem vic-arbeitsbereich auf $0000-$3fff
+  160 rem grafikbild loeschen
+  170 gb=8192:rem staradresse grafik
+  180 for x=gb to gb+8000:pokex,0:next x
+  190 rem farbwerte setzen
+  200 vr=1024:rem startadresse hires-farbram (=videoram)
+  220 farbe=0*16+14:rem hintergrund hellblau  punkte schwarz
+  240 for x=vr to vr+1000:poke x,farbe:next x
+  251 poke53280,0
+  260 rem sinuskurve zeichnen
+  270 for x=0 to 319
+  280 y=70* sin(x/25.6) +99
+  290 gosub51000
+  300 next x
+ 9999 end
+51000 rem grafikpunkt setzen (hires)
+51010 ga=8192:rem startadresse grafikspeicher
+51020 ad=320 * int(y/8) + (y and 7) + (8 * int(x/8)):rem adresse berechnen
+51030 bn=7-(x and 7):rem bitnummer berechnen
+51040 pokega+ad, peek(ga+ad) or 2^bn
+51050 return
+

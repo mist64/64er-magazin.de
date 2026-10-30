@@ -1,0 +1,39 @@
+;bildschirme.bas.prg ==1c01==
+;version=70
+   10 :rem bildschirme
+   20 :
+   30 :rem maschinensprachedaten einlesen
+   40 :bank0: fast
+   50 :for i = dec("b00") to dec ("b91")
+   60 :  read da$: poke i, dec(da$)
+   70 :  su = su + dec(da$)
+   80 :next i
+   90 :if su <> 11931 then print"{CTRL-O}Fehler in Datazeilen":end: else begin
+  100 :  print"{CTRL-O}Datazeilen sind richtig.": sleep3 :bend
+  110 :rem die steuerzeichen in zeile70/80 sind < control o >
+  120 bank 15:sysdec("c07b"): rem bildschirm initialisieren
+  130 :
+  140 :rem assemblerdaten
+  150 data 8e,00,d6,2c,00,d6,10,fb,8d,01,d6,60,8e,00,d6,2c
+  160 data 00,d6,10,fb,ad,01,d6,60,a9,00,e0,01,d0,07,a2,0c
+  170 data 20,00,0b,a2,01,8d,2e,0a,60,a9,08,e0,01,d0,05,a2
+  180 data 14,20,00,0b,8d,2f,0a,60,20,0c,0b,09,40,20,00,0b
+  190 data 4c,53,0b,48,8a,48,a2,19,98,d0,ed,20,0c,0b,29,bf
+  200 data 20,00,0b,68,c9,01,f0,04,c9,03,d0,08,68,aa,20,18
+  210 data 0b,4c,29,0b,c9,02,d0,0c,68,aa,a9,10,20,1a,0b,a9
+  220 data 18,4c,2b,0b,c9,04,d0,0a,68,aa,a9,10,20,1a,0b,4c
+  230 data 29,0b,c9,05,d0,0a,68,aa,a9,18,20,1a,0b,4c,29,0b
+  240 data 68,60
+  250 :
+  260 :rem mit sys2883,sichtbar,bildschirm,attribut werden die bildschirme
+  270 :rem eingeschaltet. sichtbar kann die werte 0 (nicht sichtbar) und 1 (sicht-
+  280 :rem bar) annehmen. Îicht sichtbar heisst, dass fuer die befehle print und
+  290 :rem char auf den neuen bildsch. zugegriffen wird, aber gleichzeit. der alte
+  300 :rem bildsch. angezeigt wird. bildschirm kann die werte von 1-5 annehmen.
+  310 :rem attribut kann die werte 0 (aus) und 1 (ein) annehmen.
+  320 :rem der befehl in zeile 120 zum initialisieren des bildschirms ist notwen-
+  330 :rem dig um das prg. bildschirme fehlerfrei ablaufen zu lassen. er muss ein-
+  340 :rem mal nach dem poken der maschinensprachedaten ausgefuehrt werden.
+  350 :
+  360 :rem christoph franzen   bonifatiusstrasse 70   4130 moers asberg
+

@@ -1,0 +1,164 @@
+
+
+;menu demo.prg ==0801==
+    0 sys57812"xmenu",8,1:poke780,0:sys65493:rem xmenu laden
+    5 sys 50175:am=0:me=0:pt=1
+   10 gosub 1100:gosub 1000:rem init
+   11 :
+   15 mt$="main":gosub 1200
+   20 menu 9,5,17,6,141,1,0,m$(0),am
+   21 :
+   22 ifam<6then:killm
+   23 ifam=0thengosub1220:gosub1022:goto15
+   24 ifam=1thenmd$=m$(am):gosub1250:goto20
+   25 ifam=6thengosub1220:poke214,23:sys58732:end
+   26 on am-1 goto 40,80,100,140
+   30 :
+   36 :
+   40 gosub 1280
+   41 mt$="print":gosub 1200
+   43 menu 9,5,17,5,141,1,1,p$(0),am
+   44 :
+   48 ifam=0thengosub1220:gosub1265:goto20
+   51 ifam=1then60
+   54 md$=p$(am):gosub1265:gosub1250:killm:goto43
+   55 :
+   60 mt$="ptype":gosub 1200
+   65 menu 9,5,17,5,141,1,1,pt$(0),am
+   70 ifam=0thengosub1220:goto43
+   73 pt=am:gosub 1265:gosub 1280:goto 65
+   74 :
+   80 mt$="edit":gosub 1200
+   83 menu 9,5,17,5,141,1,1,e$(0),am
+   86 :
+   89 ifam=0thengosub1220:goto20
+   92 md$=e$(am):gosub1250:goto83
+   93 :
+  100 mt$="disk":gosub 1200
+  105 menu 9,5,17,6,141,1,1,d$(0),am
+  108 :
+  110 ifam=0thengosub1220:goto20
+  112 ifam=2then120
+  114 md$=d$(am):gosub1250:goto105
+  115 :
+  120 mt$="dcmds":gosub1200
+  123 menu 9,5,17,4,141,1,1,dc$(0),am
+  126 :
+  130 ifam=0thengosub1220:goto105
+  135 md$=dc$(am):gosub1250:goto123
+  136 :
+  140 mt$="text":gosub1200
+  145 menu 9,5,17,5,141,1,1,t$(0),am
+  146 :
+  150 ifam=0thengosub1220:goto20
+  155 md$=t$(am):gosub1250:goto145
+  999 :
+ 1000 rem bildschirm
+ 1001 :
+ 1002 printchr$(14)"{clr}{cyn}{rvon}DemoWrite Name:demo.tex  St 1 Zl 16 Sp 5
+ 1003 print"{rvon}Hierarchie:                             {rvof}"
+ 1004 print"   Dies ist eine Textverarbeitungs-At-
+ 1005 print" trappe um Ihnen die Anwendung des Menu-";
+ 1006 print" Unterprogramms in der Praxis zu zeigen.
+ 1007 print"   In das Hauptmenu gelangen Sie mit
+ 1008 print" CTRL-M. In das nachste Menu kommen Sie
+ 1009 print" mit Return oder durch Drucken eines un-";
+ 1010 print" terlegten Buchstabens. Um in das vor-
+ 1011 print" hergehende Menu zu kommen mussen Sie
+ 1012 print" Shift-Return drucken. Die Menu-Hierar-
+ 1013 print" chie, die anzeigt in welcher Menu-Ebene";
+ 1014 print" Sie sich befinden, sehen Sie in der
+ 1015 print" dritten Bildschirmzeile.{down}
+ 1016 print"   Nachdem Sie eine Funktion angewahlt
+ 1017 print" haben, erscheint die Meldung "chr$(34)"Funktion
+ 1018 print" nicht implementiert"chr$(34)" und die Aufforder-";
+ 1019 print" ung eine Taste zu drucken. Wenn Sie
+ 1020 print" jetzt direkt in den Textmodus wollen,
+ 1021 print" mussen Sie '_' drucken."
+ 1022 :
+ 1023 rem auf ctrl-m warten
+ 1024 :
+ 1025 poke211,24:poke214,23:sys58732
+ 1027 poke204,0
+ 1030 wait198,1:poke198,0:ifpeek(631)<>13then1030
+ 1035 wait207,1,1:poke204,1
+ 1040 rem fertig
+ 1045 return
+ 1046 :
+ 1100 rem texte
+ 1101 :
+ 1105 dim m$(6),p$(5),e$(7),d$(6),t$(5),dc$(4),pt$(5)
+ 1110 m$(0)="Main Menu"
+ 1111 m$(1)="New Document"
+ 1112 m$(2)="Print"
+ 1113 m$(3)="Edit Functions"
+ 1114 m$(4)="Disk Handling"
+ 1115 m$(5)="Text Parameters"
+ 1116 m$(6)="Quit DemoWrite"
+ 1117 :
+ 1120 p$(0)="Print Menu"
+ 1121 p$(1)="Type of Printer"
+ 1122 p$(2)="Set Justification"
+ 1123 p$(3)="From/To Page"
+ 1124 p$(4)="Define Paper"
+ 1125 p$(5)="Print Text"
+ 1126 :
+ 1130 e$(0)="Edit Menu"
+ 1131 e$(1)="Find"
+ 1132 e$(2)="Delete"
+ 1133 e$(3)="Replace"
+ 1134 e$(4)="Copy"
+ 1135 e$(5)="Move"
+ 1136 :
+ 1140 d$(0)="Disk Menu"
+ 1141 d$(1)="Directory"
+ 1142 d$(2)="Commands of Disk"
+ 1143 d$(3)="Import Viza-Text"
+ 1144 d$(4)="Import SEQ-Text"
+ 1145 d$(5)="Export SEQ-Text"
+ 1146 d$(6)="Save Text"
+ 1147 :
+ 1150 t$(0)="Text Menu"
+ 1151 t$(1)="Text Width"
+ 1152 t$(2)="Rename Text"
+ 1153 t$(3)="Character Set"
+ 1154 t$(4)="Screen Color"
+ 1155 t$(5)="Storage Device"
+ 1156 :
+ 1160 dc$(0)="Dcommand Menu"
+ 1161 dc$(1)="Rename File"
+ 1162 dc$(2)="Delete File"
+ 1163 dc$(3)="Format Disk"
+ 1164 dc$(4)="Validate Disk"
+ 1165 :
+ 1170 pt$(0)="Printer Menu"
+ 1171 pt$(1)="Itoh 8510"
+ 1172 pt$(2)="Epson RX/FX"
+ 1173 pt$(3)="VC 1526"
+ 1174 pt$(4)="Brother HR-5C"
+ 1175 pt$(5)="Star Delta 10"
+ 1176 :
+ 1177 return
+ 1178 :
+ 1200 rem hierarchie erweitern
+ 1201 :
+ 1205 print"{home}{down}{down}{rvon}"tab(12+7*me)"->";mt$
+ 1210 me=me+1:return
+ 1211 :
+ 1220 rem hierarchie zurucksetzen
+ 1221 :
+ 1225 print"{home}{down}{down}{rvon}"tab(5+7*me)"       "
+ 1230 me=me-1:return
+ 1231 :
+ 1250 rem meldung ausgeben
+ 1251 :
+ 1255 print"{home}{down}"chr$(34);md$;chr$(34)" nicht impl. - Taste!";
+ 1260 poke198,0:wait198,1:poke 198,0:ifpeek(631)=95thenrun
+ 1265 print"{home}{down}                                        ";
+ 1270 return
+ 1271 :
+ 1275 rem aktuellen drucker ausgeben
+ 1276 :
+ 1280 print"{home}{down}Current selected printer:";pt$(pt)
+ 1285 return
+

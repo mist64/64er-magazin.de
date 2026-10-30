@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der Blanker</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M. Neetz, og">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="118">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips-und-Tricks-Listings">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Programmieren">
+    <meta name="64er.id" content="blanker">
+</head>
+
+<body>
+    <article>
+        <h1>Der Blanker</h1>
+        <p class="intro">Geschwindigkeit ist keine Hexerei. Immerhin läßt sich die Rechengeschwindigkeit mit dem »Blanker« um sagenhafte 5 Prozent steigern. Bei einer Stunde sind das ganze 3 Minuten. Während eines Compiler-Durchlaufs macht sich das bereits bemerkbar.</p>
+
+        <p>Das ganze Geheimnis dieses Programms ist, daß auf Tastendruck der Bildschirm abgeschaltet wird. Dadurch unterbricht der VIC den 6510 nicht mehr bei seinen Buszugriffen. Das Programm (siehe Listing 2 und Flußdiagramm) wird in den Interrupt eingebunden und prüft bei jedem dreißigsten Interrupt, ob die Tastenkombination &lt;CTRL&gt; &lt;B&gt; gedrückt ist. Ist dies der Fall, wird der Bildschirm ab- oder eingeschaltet. So lassen sich Compiler und langwierige Berechnungen in Basic beschleunigen. Geben Sie »Blanker« (Listing 1) bitte mit dem MSE ein und starten Sie ihn mit SYS 49152. Nach RUN/STOP RESTORE oder einem Reset ist ein Neustart erforderlich.</p>
+
+        <address class="author">(M. Neetz/og)</address>
+        <figure>
+            <img src="118-x1.png" alt="Flußdiagramm: Start, Interruptvektor auf neue Routine, Zähler dekrementieren, RTS">
+            <figcaption>Flußdiagramm zur Initialisierung des »Blanker«</figcaption>
+        </figure>
+
+        <figure>
+            <img src="118-x2.png" alt="Flußdiagramm des Interruptprogramms mit den Abfragen Zähler negativ, Zähler = 30, aktuelle Taste »b« und CTRL-Taste gedrückt">
+            <figcaption>Flußdiagramm, entsprechend dem Hauptprogramm in Listing 2</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="blanker.prg" data-name="Blanker" data-mse=mse1></pre>
+            <figcaption>Listing 1. »Blanker« geben Sie mit dem MSE ein</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="blanker.prg" data-name="Blanker"></div>
+        <figure>
+            <pre>100  -; ****** blanker ******
+110  -; ** written 1986 by **
+115  -; *** michael naatz ***
+120  -;
+130  -.eq irqvec   = $0314    ;irq-vektor
+140  -.eq taste    = $cb      ;aktueller tastencode
+150  -.eq altirq   = $ea31    ;adresse der alten irq-routine
+160  -.eq blank    = $d011    ;vic-register 17
+161  -.eq ctrlflag = $028d    ;flag fuer shift,c=,ctrl
+165  -.eq zaehl    = $b6      ;zaehler
+170  -;
+180  -.ba $c000
+185  -;
+190  -; initialisierung
+195  -;
+200  -          sei            ;interrupts verhindern
+210  -          lda #&lt;(main)
+220  -          ldy #&gt;(main)
+230  -          sta irqvec     ;irq-vektor setzen
+240  -          sty irqvec+1
+250  -          lda #30
+260  -          sta zaehl      ;zaehler setzen
+270  -          cli            ;interrupts zulassen
+280  -          rts
+290  -;
+295  -; hauptprogramm
+296  -;
+300  -main      ldx zaehl
+310  -          dex
+320  -          stx zaehl      ;zaehler dekrementieren
+330  -          bmi lab
+340  -ende      jmp altirq     ;weiter beim alten irq
+350  -lab       lda #30
+360  -          sta zaehl      ;zaehler setzen
+370  -          lda taste
+380  -          cmp #28        ;auf "b" pruefen
+390  -          bne ende
+391  -          lda #04
+392  -          bit ctrlflag   ;auf ctrl-taste pruefen
+393  -          beq ende
+400  -          lda blank
+410  -          eor #16        ;blank-bit flippen
+420  -          sta blank      ;und abspeichern
+430  -          jmp altirq     ;weiter beim alten irq</pre>
+            <figcaption>Listing 2. Source-Code, mit Hypra-Ass erstellt zu »Blanker«</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

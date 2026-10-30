@@ -1,0 +1,126 @@
+
+
+;invisible.prg ==0801==
+63000 rem menue
+63001 printchr$(147)chr$(5)chr$(14):poke53281,0:poke53280,0
+63002 print"{down}{down}{down}{down}"tab(2)"-- 1 --  ==> Doppelpunkte einfuegen."
+63003 print"{down}"tab(2)"-- 2 --  ==> Doppelpunkte entfernen."
+63004 print"{down}"tab(2)"-- 3 --  ==> Zeilen unsichtbar machen"
+63005 print"{down}"tab(2)"-- 4 --  ==> Zeilen sichtbar machen."
+63006 print"{down}"tab(2)"-- q --  ==> Ende !"
+63007 a$="":geta$:ifa$=""then63007
+63008 ifa$="q"thengoto63115
+63009 z=val(a$):ifz<1orz>4thenrun63001
+63010 ifz=3thenun=1:gosub63055
+63011 ifz=4thenun=0:gosub63055
+63012 ifz=1thengosub63016
+63013 ifz=2thengosub63074
+63014 un=2:goto63001
+63015 rem doppelpunkte einfuegen
+63016 by=2049:rem startadresse 1. zeile
+63017 lb=peek(2051):hb=peek(2052):rem zeilennummer 1. zeile
+63018 l2=peek(2049):h2=peek(2050):rem adresse naechste zeile
+63019 poke49160,int(by/256):poke49159,by-int(by/256)*256
+63020 poke49153,lb:poke49154,hb
+63021 poke49155,l2:poke49156,h2
+63022 ze=lb+256*hb:rem zeilennummer aus low- und highbyte
+63023 ifze>62999then63051:rem test ob schutzprogramm erreicht
+63024 bn=l2+256*h2:rem adresse naechste zeile
+63025 ifbn-by>60thenprint"{clr}{down}{down}{down}{down}{down}{down}{down}{down}Zeile"ze;"ist zu lang"
+63026 ifbn-by>60thenprint"Taste !":poke198,0:wait198,1:poke198,0:by=bn:goto63045
+63027 ifpeek(by+4)=58thenprint"{clr}{down}{down}{down}{down}{down}{down}{down}{down}In";ze;"ist bereits ein Doppelpunkt !"
+63028 ifpeek(by+4)=58thenprint"Taste !":poke198,0:wait198,1:poke198,0
+63029 ifpeek(by+4)=58thenby=bn:goto63045
+63030 print"{clr}list";lb+256*hb:print"{home}{down}{down}{down}{down}{down}gO63032:":print"gO63032":print"gO63032"
+63031 gosub63111:stop:rem cursor down bestimmen
+63032 ifze>9999thenx=6:goto63038
+63033 ifze>999thenx=5:goto63038
+63034 ifze>99thenx=4:goto63038
+63035 ifze>9thenx=3:goto63038
+63036 ifze<=9thenx=2:goto63038
+63037 rem ^ feststellen wieviel nach rechts wegen zeilennummer ^
+63038 print"{home}{down}{down}";
+63039 fori=1tox:print"{rght}";:next
+63040 print"{inst}{inst}{inst}{inst}{inst}:::::":rem einfuegen doppelpunkte
+63041 print"{down}{down}{down}{down}goto 63044:{up}{up}{up}{up}{up}"
+63042 poke631,145:poke632,145:poke633,145:poke634,145:poke635,13
+63043 poke636,17:poke637,17:poke638,17:poke639,17:poke640,13:poke198,10:stop
+63044 by=peek(49155)+256*peek(49156)+5:rem adresse alte zeile aus lb und hb
+63045 poke49159,by-int(by/256)*256:poke49160,int(by/256)
+63046 l2=peek(by):h2=peek(by+1):rem adresse neue zeile low und highbyte
+63047 poke49155,l2:poke49156,h2
+63048 lb=peek(by+2):hb=peek(by+3):rem zeilennummer neue zeile low- und highbyte
+63049 ze=lb+256*hb:rem zeilennummer neue zeile
+63050 ifze<63000thengoto63024:rem schutzprogramm erreicht ?
+63051 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}Endzeile erreicht !"
+63052 fori=1to1000:next:goto63001
+63053 rem zeilen unsichtbar machen
+63054 rem zeilen sichtbar machen
+63055 print"{down}{down}{rght}{rght}Einen Moment !":by=2049
+63056 lb=peek(2049):hb=peek(2050)
+63057 ze=peek(2051)+256*peek(2052)
+63058 ifze>62999thenreturn
+63059 a=peek(by+4)
+63060 b=peek(by+5)
+63061 c=peek(by+6)
+63062 d=peek(by+7)
+63063 e=peek(by+8)
+63064 f=peek(by+9):rem ^ erste 6 byte aus der eigentlichen zeile lesen ^
+63065 ifun=1thenifa=58andb=58andc=58andd=58ande=58andf<>58thenpokeby+4,0
+63066 ifun=0thenifa=0andb=58andc=58andd=58ande=58thenpokeby+4,58
+63067 rem ^ test auf 5 doppelpunkte bzw auf 1. byte = 0 ^
+63068 by=lb+256*hb:rem neue adresse
+63069 ze=peek(by+2)+256*peek(by+3):rem neue zeilennummer
+63070 ifze>62999thenreturn
+63071 lb=peek(by):hb=peek(by+1):rem low- und highbyte adresse naechste zeile
+63072 goto63059
+63073 rem doppelpunkte entfernen
+63074 print"{down}{down}EinenMoment bitte !":by=2049:rem adresse erste zeile
+63075 lb=peek(2051):hb=peek(2052):rem lb und hb der nummer der naechsten zeile
+63076 l2=peek(2049):h2=peek(2050):rem lb und hb der adresse der naechsten zeile
+63077 poke49160,int(by/256):poke49159,by-int(by/256)*256
+63078 poke49153,lb:poke49154,hb
+63079 poke49155,l2:poke49156,h2
+63080 ze=lb+256*hb:rem berechnen der zeilennummer
+63081 ifze>62999then63108:rem test ob im schutzprogramm
+63082 bn=l2+256*h2:rem adresse der naechsten zeile fuer laengenbestimmung
+63083 fori=4to8:ifpeek(by+i)<>58thenprint"{clr}{down}{down}{down}{down}{down}{down}{down}{down}In"ze"sind keine 5 Doppel";
+63084 ifpeek(by+i)<>58thenprint"punkte":print"Taste"
+63085 ifpeek(by+i)<>58thenpoke198,0:wait198,1:poke198,0
+63086 ifpeek(by+i)<>58thenby=bn:goto63102
+63087 nexti
+63088 print"{clr}list";lb+256*hb
+63089 print"{home}{down}{down}{down}{down}{down}gO63090:":print"gO63090":print"gO63090":gosub63111:stop
+63090 ifze>9999thenx=6:goto63095
+63091 ifze>999thenx=5:goto63095
+63092 ifze>99thenx=4:goto63095
+63093 ifze>9thenx=3:goto63095
+63094 ifze<=9thenx=2:goto63095:rem ^ bestimmen der zahl cursor rechts wegen zn
+63095 print"{home}{down}{down}";
+63096 fori=1tox:print"{rght}";:next
+63097 print"     ":rem doppelpunkte entfernen
+63098 print"{down}{down}{down}{down}goto 63101:{up}{up}{up}{up}{up}"
+63099 poke631,145:poke632,145:poke633,145:poke634,145:poke635,13
+63100 poke636,17:poke637,17:poke638,17:poke639,17:poke640,13:poke198,10:stop
+63101 by=peek(49155)+256*peek(49156)-5:rem adresse neue zeile
+63102 poke49159,by-int(by/256)*256:poke49160,int(by/256)
+63103 l2=peek(by):h2=peek(by+1):rem adresse naechste zeile
+63104 poke49155,l2:poke49156,h2
+63105 lb=peek(by+2):hb=peek(by+3):rem nummer aktuelle zeile
+63106 ze=lb+256*hb:rem nummer berechnen
+63107 ifze<63000thengoto63082
+63108 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}Endzeile erreicht !"
+63109 fori=1to1000:next
+63110 goto63001
+63111 poke631,19:poke632,13:poke633,17
+63112 poke634,13:poke198,4:stop
+63113 rem ^ cursor mittels tastaturpuffer auf goto setzen ^
+63114 rem loeschroutine
+63115 ze=63000
+63116 poke49165,int(ze/256):poke49166,ze-int(ze/256)*256
+63117 print"{home}"ze:print"{down}goto63119:"
+63118 poke631,19:poke632,13:poke633,17:poke634,13:poke198,4:stop
+63119 ze=peek(49166)+256*peek(49165):ze=ze+1:ifze<63117then63116
+63120 print"{clr}{down}{down}"ze:printze+1:printze+2:printze+3:printze+4:print"{home}";
+63121 poke631,13:poke632,13:poke633,13:poke634,13:poke635,13:poke198,5
+

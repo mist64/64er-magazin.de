@@ -1,0 +1,114 @@
+# The owner's review of the finished SH8607 PDF, 2026-10-30, and what each
+# finding cost.  A later build that re-cuts these pages or re-reads page 71
+# must READ THIS, not re-decide it.
+#
+# ---------------------------------------------------------------------------
+# 1. THE COVER LEAVES WERE CROPPED ON THE WRONG SIDE  (4 pages, FIXED)
+# ---------------------------------------------------------------------------
+# Owner: "p2 isnt cropped right. maybe 2 cm on the left are missing"
+#        "similarly to 2, p179 is clipped on the right"
+#        "and 180 is clipped on the left. the vertical text is the Bund, not
+#         part of the page"
+#
+# A cover leaf traces WIDER than A4 because the scan catches the Bund -- the
+# spine strip with the magazine's own vertical lettering.  Step 005b chose
+# which end to drop by an ink test that could not come out both ways, and
+# dropped the wrong one on all four.  Fixed by parity in r005_a4_window.py:
+# A RECTO IS BOUND ON ITS LEFT, A VERSO ON ITS RIGHT.  See the rule's section
+# THE SURPLUS IS THE BUND, and HARVEST.md 2026-10-30.
+#
+# page  parity  Bund   shipped window x0      re-cut window x0   trim
+# 001   recto   left   7    (kept the Bund)   226                219 px off the LEFT
+# 002   verso   right  249  (clipped 10.5mm)  0                  249 px off the RIGHT
+# 158   verso   --     92                     46                 92 px, CENTRED
+# 179   recto   left   7    (kept the Bund)   193                186 px off the LEFT
+# 180   verso   right  211  (clipped 8.9mm)   0                  211 px off the RIGHT
+#
+# 158 is NOT a cover leaf -- page-class 'uncropped sheet', the full-bleed te-wi
+# ad whose trim edge is not findable.  Nothing names a side there, so the
+# surplus comes off both ends alike.  3.9 mm either way is black bleed.
+#
+# 001 does not ship: the PDF's page 1 is the owner's own retouched title.png,
+# which he cropped himself -- no Bund, complete "DM 14,-".  That crop is what
+# told us the chain's was wrong.
+#
+# The old pages are kept at <tmp>/a4600_pre_bundfix/ (png + stamp).
+# The re-cut pages' entries were purged from a4600/.ocrcache (keyed by page
+# number alone, so a re-cut page would otherwise re-embed its old image).
+#
+# NO OTHER PAGE IS CLIPPED.  Measured over all 184 delivered pages: ink in the
+# outer 3 mm per edge.  Everything above 1 % that is not one of the five above
+# is 003, 166, 167, 170, 172, 176 and the 181-184 card -- all looked at, all
+# legitimate (the black running-head bar bleeds to the trim by design).
+#
+# ---------------------------------------------------------------------------
+# 2. p161 IS TYPE ON A GREY TINT PANEL  -> BILEVEL_THRESHOLD=28% (SETTLED)
+# ---------------------------------------------------------------------------
+# Owner: "p161 is too dark, discuss." then "p161: lighter?"
+#
+# Tabelle 2, the VIC register table: every other row is a grey screen carrying
+# dark type -- low contrast by design.  At the fixed 35 % cutoff the screen
+# shatters into a hard checkerboard and the numerals come through as blobs
+# with the screen punched through them; "53249" is barely a number.
+#
+# MEASURED: p161 is the heaviest bilevel page in the issue -- JBIG2 ratio 20 %
+# against 4-7 % for its neighbours, 30.5 % of the page black (3rd highest, and
+# the two above it are the cover and a full-bleed black ad).  Of the other 175
+# bilevel pages NONE has the same construction: p110 and p117 score high on
+# tint area but those are a screen dump and a product photo, the accepted cost
+# (r006, "a crushed halftone is a known, accepted cost").
+#
+# Whole-page black at each cutoff, p161 / issue mean:
+#   35 %  30.5 / 14.3     28 %  21.1 / 13.2
+#   25 %  18.1 / 12.6     20 %  13.6 / 11.4
+# Ordinary type is INSENSITIVE over that range -- body text on p003 and the
+# Impressum fine print on p178 are indistinguishable at 35 %, 25 % and 20 %,
+# and p123's 8-point listing is marginally cleaner at 25 %.  What a lighter
+# cutoff thins is SCREENS, not type: the pages that lose most from 35 % to
+# 25 % are exactly the tint-panel pages (161, 001, 027, 118, 009, 100, 067).
+#
+# Options put to the owner: ship as-is / lighter global cutoff / FORCE_CONTONE
+# ="161" at 150 dpi.  NOT re-screening -- owner, "no re-screen!!"
+#
+# RULED: the owner looked at the full page at 35 / 28 / 25 / 20 % and at the
+# 150 dpi contone, and said "28 is good", then "25 too".  SH8607 SHIPS AT 28 %
+# -- the value he named first and the smaller step away from the 35 % the rest
+# of the archive carries.  Verified in the delivered PDF BY PIXELS, not by
+# trusting the cache: p161 is 21.84 % black, against 21.06 % for a fresh 28 %
+# threshold of a4600/161.png and 30.51 % for 35 %.  The 0.8-point gap is
+# jbig2enc's lossy coding.
+#
+# THE COST WAS MEASURED BEFORE IT WAS TAKEN, AND THE FIRST NUMBER WAS A TRAP.
+# Type on white ground (16x16 blocks whose own mean is > 215, so no screen and
+# no photo) loses 19 % of its ink pixels at 28 % and 27 % at 25 %.  That reads
+# alarming and is not: it is the grey rim of every glyph, not the glyph.  On
+# p177, the worst page by that measure, the type is solid and unbroken at 35,
+# 28, 25 AND 20 % -- no stroke breaks, no glyph drops.  An ink-count is a proxy
+# for edge erosion, not for damage; the LOOK is the decision.
+#
+# The 35 % build is kept at <tmp>/64er_Sonderheft_1986-07.t35.pdf.
+# 28 % is NOT proposed as the archive default on one issue's evidence.
+# Delivered PDF: sha256 2cb6b937af8f0f0d..., 184 pp, 42,397,929 bytes, q97.
+# Owner, 2026-10-30: "pdf is perfect".
+#
+# ---------------------------------------------------------------------------
+# 3. p71 BILD 4 AND BILD 5 -- THE PRINT TRANSPOSED THEM  (FIXED)
+# ---------------------------------------------------------------------------
+# Owner: "p71 Bild 4 and 5 contents are swapped. captions ok"
+#
+# On the printed page the caption "Bild 4. Aufbau-Schema der Speicherstelle
+# 241" sits under the COLOUR TABLE, and "Bild 5. Kombinationen der Bits 0 bis
+# 3 ... und die sich ergebenden Farben" sits under the BIT-SCHEMA table.  The
+# magazine laid the two tables out under each other's captions.  The body text
+# and both captions are internally consistent; only the tables are transposed.
+#
+# Step 150 paired them BY CONTENT (LOG.md: "p71 prints Bild 4/5 captions
+# swapped -> 150 pairs by content"), which silently corrected the magazine.
+# WE PUBLISH THE PLATE: the tables are now back under the captions the print
+# put them under, with a German reader-facing comment in the HTML saying so.
+# File: "66 Die Zeropage-Straße des C 128.html".
+#
+# Checked while there and LEFT AS PRINTED: the bit-0 column is headed "J" in
+# both tables while the text says "I fuer Intensitaet".  The print is
+# unambiguous at 600 dpi -- a descending J with a clear hook.  A print error;
+# no Futureteufelchen (owner, 2026-10-08).

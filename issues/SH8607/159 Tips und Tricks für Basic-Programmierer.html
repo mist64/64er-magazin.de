@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips und Tricks für Basic-Programmierer</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Erhart, do">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="159-163">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.index_title" content="Tips &amp; Tricks für Basic-Programmierer">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Programmieren">
+    <meta name="64er.id" content="tips_basic">
+</head>
+
+<body>
+    <article>
+        <h1>Tips und Tricks für Basic-Programmierer</h1>
+        <p class="intro">Mit den folgenden kleinen Programmen geben wir Ihnen einige Hilfsmittel an die Hand, die Sie in Ihre Programme einbinden können, um sie schneller und effektiver zu machen.</p>
+
+        <p>Vielleicht geht es Ihnen wie mir. Sie kommen morgens nicht aus Ihrem Bett, verfluchen jeden Tag aufs neue Ihren Wecker, oder verbrauchen die Nerven Ihres Partners, der verzweifelt versucht, Sie zu wecken. Falls dies der Fall sein sollte, haben Sie sicher schon einmal versucht, sich durch Ihren Computer wecken zu lassen. Sollten Sie zu diesem Zweck die Variable TI$ (die sich ja geradezu aufdrängt) verwendet haben, so würden Sie zwar an diesem Morgen geweckt, jedoch sicher nicht zu dem Zeitpunkt, den Sie sich vorgestellt hatten. Die Variable TI$ hat leider die unangenehme Eigenschaft, eine recht ungenaue Uhr zu sein. Der maximale Fehler liegt bei 30 Minuten pro Tag. Aber zum Glück hat unser Computer, wie so oft, auch hierfür eine Lösung parat. Es handelt sich hierbei um die beiden CIAs (Complex Interface Adapter), welche je eine Echtzeituhr enthalten. Diese Echtzeituhr erhält ihren Takt aus der Netzfrequenz, die Variable TI$ hingegen wird von der Interruptroutine versorgt. Dieser Tatsache verdanken wir es, daß die CIA-Uhr eine so große Langzeitgenauigkeit vorweisen kann. Die Echtzeituhr hält aber noch eine weitere Überraschung für uns bereit. Es besteht die Möglichkeit, eine Alarmzeit anzugeben. Sobald diese Zeit erreicht wird, löst das CIA einen IRQ (Interrupt, beziehungsweise CIA 2 einen NMI = unmaskierter Interrupt) aus, aber dazu später noch mehr. Wie die Register der CIA-Bausteine belegt sind, können Sie aus Tabelle 1 entnehmen. Die Echtzeituhr belegt die Register 8 bis 11.</p>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="10">CIA (6526)</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th class="shaded">Bit 7</th>
+                        <th class="shaded">Bit 6</th>
+                        <th class="shaded">Bit 5</th>
+                        <th class="shaded">Bit 4</th>
+                        <th class="shaded">Bit 3</th>
+                        <th class="shaded">Bit 2</th>
+                        <th class="shaded">Bit 1</th>
+                        <th class="shaded">Bit 0</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="2">Register 0<br>$DC00</td>
+                        <td colspan="8">Port A</td>
+                        <td rowspan="2">56320</td>
+                    </tr>
+                    <tr>
+                        <td>PA7</td>
+                        <td>PA6</td>
+                        <td>PA5</td>
+                        <td>PA4</td>
+                        <td>PA3</td>
+                        <td>PA2</td>
+                        <td>PA1</td>
+                        <td>PA0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 1<br>$DC01</td>
+                        <td colspan="8" class="shaded">Port B</td>
+                        <td rowspan="2">56321</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">PB7</td>
+                        <td class="shaded">PB6</td>
+                        <td class="shaded">PB5</td>
+                        <td class="shaded">PB4</td>
+                        <td class="shaded">PB3</td>
+                        <td class="shaded">PB2</td>
+                        <td class="shaded">PB1</td>
+                        <td class="shaded">PB0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 2<br>$DC02</td>
+                        <td colspan="8">Datenrichtungsregister A</td>
+                        <td rowspan="2">56322</td>
+                    </tr>
+                    <tr>
+                        <td>DPA7</td>
+                        <td>DPA6</td>
+                        <td>DPA5</td>
+                        <td>DPA4</td>
+                        <td>DPA3</td>
+                        <td>DPA2</td>
+                        <td>DPA1</td>
+                        <td>DPA0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 3<br>$DC03</td>
+                        <td colspan="8" class="shaded">Datenrichtungsregister B</td>
+                        <td rowspan="2">56323</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">DPB7</td>
+                        <td class="shaded">DPB6</td>
+                        <td class="shaded">DPB5</td>
+                        <td class="shaded">DPB4</td>
+                        <td class="shaded">DPB3</td>
+                        <td class="shaded">DPB2</td>
+                        <td class="shaded">DPB1</td>
+                        <td class="shaded">DPB0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 4<br>$DC04</td>
+                        <td colspan="8">Timer A Low-Byte</td>
+                        <td rowspan="2">56324</td>
+                    </tr>
+                    <tr>
+                        <td>TAL7</td>
+                        <td>TAL6</td>
+                        <td>TAL5</td>
+                        <td>TAL4</td>
+                        <td>TAL3</td>
+                        <td>TAL2</td>
+                        <td>TAL1</td>
+                        <td>TAL0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 5<br>$DC05</td>
+                        <td colspan="8" class="shaded">Timer A High-Byte</td>
+                        <td rowspan="2">56325</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">TAM7</td>
+                        <td class="shaded">TAM6</td>
+                        <td class="shaded">TAM5</td>
+                        <td class="shaded">TAM4</td>
+                        <td class="shaded">TAM3</td>
+                        <td class="shaded">TAM2</td>
+                        <td class="shaded">TAM1</td>
+                        <td class="shaded">TAM0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 6<br>$DC06</td>
+                        <td colspan="8">Timer B Low-Byte</td>
+                        <td rowspan="2">56326</td>
+                    </tr>
+                    <tr>
+                        <td>TBL7</td>
+                        <td>TBL6</td>
+                        <td>TBL5</td>
+                        <td>TBL4</td>
+                        <td>TBL3</td>
+                        <td>TBL2</td>
+                        <td>TBL1</td>
+                        <td>TBL0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 7<br>$DC07</td>
+                        <td colspan="8" class="shaded">Timer B High-Byte</td>
+                        <td rowspan="2">56327</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">TBM7</td>
+                        <td class="shaded">TBM6</td>
+                        <td class="shaded">TBM5</td>
+                        <td class="shaded">TBM4</td>
+                        <td class="shaded">TBM3</td>
+                        <td class="shaded">TBM2</td>
+                        <td class="shaded">TBM1</td>
+                        <td class="shaded">TBM0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 8<br>$DC08</td>
+                        <td colspan="8">Uhr 1/10 Sekunde</td>
+                        <td rowspan="2">56328</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>T0</td>
+                        <td>T4</td>
+                        <td>T2</td>
+                        <td>T1</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 9<br>$DC09</td>
+                        <td colspan="8" class="shaded">Uhr Sekunde</td>
+                        <td rowspan="2">56329</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">0</td>
+                        <td class="shaded">SM4</td>
+                        <td class="shaded">SM2</td>
+                        <td class="shaded">SM1</td>
+                        <td class="shaded">SL0</td>
+                        <td class="shaded">SL4</td>
+                        <td class="shaded">SL2</td>
+                        <td class="shaded">SL1</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 10<br>$DC0A</td>
+                        <td colspan="8">Uhr Minuten</td>
+                        <td rowspan="2">56330</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>MH4</td>
+                        <td>MH2</td>
+                        <td>MH1</td>
+                        <td>ML0</td>
+                        <td>ML4</td>
+                        <td>ML2</td>
+                        <td>ML1</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 11<br>$DC0B</td>
+                        <td colspan="8" class="shaded">Uhr Stunden</td>
+                        <td rowspan="2">56331</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">PM</td>
+                        <td class="shaded">0</td>
+                        <td class="shaded">0</td>
+                        <td class="shaded">MH</td>
+                        <td class="shaded">ML0</td>
+                        <td class="shaded">ML4</td>
+                        <td class="shaded">ML2</td>
+                        <td class="shaded">ML1</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 12<br>$DC0C</td>
+                        <td colspan="8">Serial Data Register</td>
+                        <td rowspan="2">56332</td>
+                    </tr>
+                    <tr>
+                        <td>S7</td>
+                        <td>S6</td>
+                        <td>S5</td>
+                        <td>S4</td>
+                        <td>S3</td>
+                        <td>S2</td>
+                        <td>S1</td>
+                        <td>S0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 13<br>$DC0D</td>
+                        <td colspan="8" class="shaded">Interrupt Control Register</td>
+                        <td rowspan="2">56333</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">IRQ</td>
+                        <td class="shaded">0</td>
+                        <td class="shaded">0</td>
+                        <td class="shaded">FLG</td>
+                        <td class="shaded">SP</td>
+                        <td class="shaded">PLRM</td>
+                        <td class="shaded">T0</td>
+                        <td class="shaded">TA</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 14<br>$DC0E</td>
+                        <td colspan="8">Control Register A</td>
+                        <td rowspan="2">56334</td>
+                    </tr>
+                    <tr>
+                        <td>S0 HZ</td>
+                        <td>SP MODE</td>
+                        <td>IN MODE</td>
+                        <td>LOAD</td>
+                        <td>RUN MODE</td>
+                        <td>OUT MODE</td>
+                        <td>PB ON</td>
+                        <td>START</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Register 15<br>$DC0F</td>
+                        <td colspan="8" class="shaded">Control Register B</td>
+                        <td rowspan="2">56335</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">ALARM</td>
+                        <td class="shaded">IN MODE</td>
+                        <td class="shaded">IN MODE</td>
+                        <td class="shaded">LOAD</td>
+                        <td class="shaded">RUN MODE</td>
+                        <td class="shaded">OUT MODE</td>
+                        <td class="shaded">PB ON</td>
+                        <td class="shaded">START</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Registerbelegung der CIA</figcaption>
+        </figure>
+
+        <h2>Die Zeit starten</h2>
+
+        <p>Die CIA-Uhren sind im BCD-Format organisiert. Dadurch sparen wir uns zwar in Maschinensprache das lästige Umrechnen, von Basic aus ist die Umwandlung leider nicht zu umgehen. Im BCD-Format werden Zahlen zwar immer noch Bitweise gespeichert, jedoch jede Ziffer einzeln. Mit 8 Bit lassen sich also zwei Ziffern (2 mal 4 Bit, 00 bis 99) darstellen. Um nun eine Zahl, bestehend aus zwei Ziffern, in das BCD-Format umzuwandeln, wird die erste Ziffer (Wertigkeit 10) mit 16 multipliziert und zu der zweiten Ziffer (Wertigkeit 1) addiert.</p>
+
+        <p>Aber nun wieder zu unseren CIAs. Die Basisadresse des CIA 1 ist 56320 (CIA 2 = 56576). Eine kurze Registerbeschreibung entnehmen Sie bitte Bild 1. Zum Stellen der Uhr werden einfach die entsprechenden BCD-Werte in die jeweiligen Register geschrieben. Sobald Sie das <sup>1</sup>/<sub>10</sub> Sekunden-Register überschreiben, startet die Uhr (überschreiben Sie jedoch die Stundenregister, stoppt sie). An Bit 7 in Register 11 können Sie außerdem erkennen, ob es sich um eine AM- oder PM-Zeit handelt (AM = Vormittag, PM = Nachmittag). Bitte vergessen Sie nicht, Bit 7 in Register 14 zu setzen (Netzfrequenz 50 HZ (60 HZ)). Für den Fall, daß Sie Ihre Uhr auch lesen möchten (soll ja vorkommen), bietet das CIA eine weitere Besonderheit. Sobald Sie eines der Register lesen, wird die komplette Uhrzeit in einen Zwischenspeicher übernommen. Durch diesen Kniff können Sie in aller Ruhe die Daten auslesen, ohne daß eine Veränderung des Zwischenspeichers eintritt. Sobald Register 8 angesprochen wird, gibt das CIA den Speicher wieder frei. In Listing 1 wartet ein Basic-Programm auf Sie, mit welchem Sie die Zeit stellen und ablesen können (Start mit RUN, um sie zu stellen und RUN 200, um sie zu stoppen). Listing 2 enthält eine kurze Assemblerroutine, die in die Interruptroutine eingefügt wird und Ihnen die Uhrzeit laufend auf dem Bildschirm ausgibt. Die eigentliche Assemblerroutine liegt bei Adresse 830. Um das Programm zu aktivieren, befindet sich bei Adresse 900 ein Programmteil, welcher den Interruptvektor auf das Hauptprogramm legt (SYS 900 startet die Anzeige der Uhr).</p>
+        <figure>
+            <pre data-filename="listing 1 basic" data-name="Uhr stellen" data-checksummer="3"></pre>
+            <figcaption>Listing 1. Basic-Programm zum Stellen der Uhr</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="listing 2 mc.prg" data-name="Uhrzeit (Interrupt)" data-mse=mse1></pre>
+            <figcaption>Listing 2. Interruptroutine Uhrzeit</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 2 mc.prg" data-name="Uhrzeit (Interrupt)"></div>
+
+        <h2>Der Wecker im Computer</h2>
+
+        <p>Neben einer Uhr hat das CIA natürlich noch weitere Aufgaben. Es löst zum Beispiel das Interruptsignal aus, durch welches die bereits erwähnte Interruptroutine angesprungen wird. Dieses Ereignis tritt bei Unterlauf des Timers (die CIAs haben neben der Uhr noch zwei Timer) automatisch alle <sup>1</sup>/<sub>60</sub> Sekunden auf. Wir haben allerdings die Möglichkeit zu einem von uns vordefinierten Zeitpunkt einen zusätzlichen Interrupt auszulösen. Zu diesem Zweck müssen wir eine Zeit angeben, die wir als Alarmzeit heranziehen. Die Alarmzeit wird wie die normale Uhrzeit in die Register 8 bis 11 geschrieben, jedoch muß hierfür das Bit 7 in Register 15 gesetzt sein (Rücksetzen nicht vergessen). Stimmen nun die Uhrzeit und die von uns eingestellte Alarmzeit überein, wird ein zusätzlicher IRQ ausgelöst und der Programmzeiger springt zu der in den IRQ-Vektoren angegebenen Adresse. Die Unterscheidung zwischen einem Interrupt durch den Unterlauf eines Timers oder durch Erreichen der Alarmzeit wird durch Register 13 möglich. In diesem Register wird bei Auftreten des IRQ das zuständige Bit (siehe Tabelle 1) gesetzt. Zum besseren Verständnis erwartet Sie in Listing 3 eine kleine Routine, welche bei Erreichen der Alarmzeit die Farbe des Bildschirmrahmens verändert. Diese Routine wird ebenfalls mit SYS 900 gestartet.</p>
+        <figure>
+            <pre data-filename="listing 3 mc.prg" data-name="Alarmzeit (Interrupt)" data-mse=mse1></pre>
+            <figcaption>Listing 3. Interruptroutine Alarmzeit</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 3 mc.prg" data-name="Alarmzeit (Interrupt)"></div>
+
+        <h2>Bildschirm mal zwei</h2>
+
+        <p>Wäre es nicht praktisch, auf dem Monitor zwei voneinander unabhängige Bildschirmseiten unterzubringen? Würde sich ein HiRes-Bild und der dazugehörige Text nicht ungeheuer gut machen? Wenn Ihnen diese oder ähnliche Gedanken schon einmal durch den Kopf gingen, dann sind Sie hier genau richtig. Mittels des VICs (Videocontroller) ist es unserem Computer nicht nur möglich, Zahlen oder Buchstaben auf den Bildschirm zu bringen, er sorgt auch für die HiRes-Grafik, die Sprites und die Verwaltung von 16 KByte Speicherplatz. Da er nebenbei auch noch für die Erzeugung eines normgerechten PAL-Signals zuständig ist, muß er in jedem Augenblick genau wissen, an welcher Stelle sich der Elektronenstrahl Ihres Monitors gerade befindet. Mit einer kleinen Assemblerroutine und ein wenig Bastelei an den Interruptvektoren und -registern unseres Computers können Sie in dem Augenblick, in dem sich der Elektronenstrahl an einer von Ihnen bestimmten Position befindet, zum Beispiel von einem HiRes- auf einen Textbildschirm umschalten (und umgekehrt). Da wir dadurch dem Computer keine Chance lassen, eine Bildschirmseite zu vollenden und einen Bildwechsel vorzunehmen, erscheinen zwei (oder mehrere) Bilder gleichzeitig. Die Trennung dieser Bilder ist abhängig von der Position, an welcher die Umschaltung erfolgt. Die Assemblerroutine in Listing 4 ermöglicht die Darstellung von zwei Textbildschirmen (1024-2023 und 2024-3043) gleichzeitig. In der Speicherstelle 648 können Sie festlegen, auf welchem Bildschirmteil Ihre Eingaben erscheinen sollen. Alle Ausgaben auf den Bildschirm werden ebenfalls in die Bildschirmseite geschrieben, deren Adresse Sie in Speicherstelle 648 angegeben haben. Der Wert, den Sie an diese Adresse POKEn müssen, errechnet sich wie folgt: Adresse des Bildschirmspeichers durch 256. Sobald Sie sich für eine Bildschirmhälfte entschieden haben, können Sie das Programm mit SYS 900 starten (Hier wird der Interruptvektor gesetzt, das eigentliche Programm befindet sich ab Speicherplatz 830. Oberer Bildschirm POKE 648,4, unterer Bildschirm POKE 648,8).</p>
+        <figure>
+            <pre data-filename="listing 4 mc.prg" data-name="Bildschirmteilung" data-mse=mse1></pre>
+            <figcaption>Listing 4. Bildschirmteilung</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 4 mc.prg" data-name="Bildschirmteilung"></div>
+
+        <p>Der VIC hält für uns die Möglichkeit bereit, bei Auftreten eines bestimmten Ereignisses einen Interrupt (IRQ) auszulösen. Zu diesem Zweck stehen die Register 25 und 26 zur Verfügung. Die genaue Belegung dieser Register entnehmen Sie bitte Tabelle 2. Falls mindestens ein Bit aus Register 25 und Register 26 übereinstimmt, wird ein IRQ ausgelöst und der interne Programmzähler springt zu der im IRQ-Vektor (788/789) angegebenen Adresse. Sobald wir diesen Zeiger auf ein eigenes Programm zeigen lassen, wird bei jedem IRQ zuerst unser Programm angesprungen. Das Ende unseres Programmes sollte immer einen unbedingten Sprung in die eigentliche Interruptroutine beinhalten. In unserem Fall müssen wir die Interruptmaske (Register 26) so verändern, daß Register 18 als Auslöser anerkannt wird. Um eine Auslösung an einer bestimmten Stelle des Rasterstrahls zu erreichen, wird in Register 18 (17) die entsprechende Position angegeben. Register 18 hat folglich zwei Aufgaben: 1. wird es gelesen, so gibt es die aktuelle Position des Rasterstrahls an. 2. wird es beschrieben, so gilt der Wert, welcher in das Register geschrieben wurde als die Position des Strahls, an der der IRQ ausgelöst (und Bit 1/Register 25 ist gesetzt) wird. Als letztes Problem bleibt uns noch das CIA. Dieser Chip ist im Normalfall derjenige, welcher die IRQs auslöst. Für unseren Zweck benötigen wir jedoch nur das Interruptsignal, das vom VIC ausgelöst wurde. Aus diesem Grund wird zu Beginn der Routine mittels des IRQ-Flags in Register 25 abgefragt, ob der VIC den IRQ angefordert hat.</p>
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="shaded">Register</th>
+                        <th colspan="2" class="shaded">Adresse</th>
+                        <th rowspan="2" class="shaded">Bit 7</th>
+                        <th rowspan="2" class="shaded">Bit 6</th>
+                        <th rowspan="2" class="shaded">Bit 5</th>
+                        <th rowspan="2" class="shaded">Bit 4</th>
+                        <th rowspan="2" class="shaded">Bit 3</th>
+                        <th rowspan="2" class="shaded">Bit 2</th>
+                        <th rowspan="2" class="shaded">Bit 1</th>
+                        <th rowspan="2" class="shaded">Bit 0</th>
+                    </tr>
+                    <tr>
+                        <th class="shaded">dezimal</th>
+                        <th class="shaded">hex</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>53248</td>
+                        <td>$D000</td>
+                        <td colspan="8">X-Position Sprite Nr. 0</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">1</td>
+                        <td class="shaded">53249</td>
+                        <td class="shaded">$D001</td>
+                        <td colspan="8" class="shaded">Y-Position Sprite Nr. 0</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>53250</td>
+                        <td>$D002</td>
+                        <td colspan="8">X-Position Sprite Nr. 1</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">3</td>
+                        <td class="shaded">53251</td>
+                        <td class="shaded">$D003</td>
+                        <td colspan="8" class="shaded">Y-Position Sprite Nr. 1</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>53252</td>
+                        <td>$D004</td>
+                        <td colspan="8">X-Position Sprite Nr. 2</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">5</td>
+                        <td class="shaded">53253</td>
+                        <td class="shaded">$D005</td>
+                        <td colspan="8" class="shaded">Y-Position Sprite Nr. 2</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>53254</td>
+                        <td>$D006</td>
+                        <td colspan="8">X-Position Sprite Nr. 3</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">7</td>
+                        <td class="shaded">53255</td>
+                        <td class="shaded">$D007</td>
+                        <td colspan="8" class="shaded">Y-Position Sprite Nr. 3</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>53256</td>
+                        <td>$D008</td>
+                        <td colspan="8">X-Position Sprite Nr. 4</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">9</td>
+                        <td class="shaded">53257</td>
+                        <td class="shaded">$D009</td>
+                        <td colspan="8" class="shaded">Y-Position Sprite Nr. 4</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>53258</td>
+                        <td>$D00A</td>
+                        <td colspan="8">X-Position Sprite Nr. 5</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">11</td>
+                        <td class="shaded">53259</td>
+                        <td class="shaded">$D00B</td>
+                        <td colspan="8" class="shaded">Y-Position Sprite Nr. 5</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>53260</td>
+                        <td>$D00C</td>
+                        <td colspan="8">X-Position Sprite Nr. 6</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">13</td>
+                        <td class="shaded">53261</td>
+                        <td class="shaded">$D00D</td>
+                        <td colspan="8" class="shaded">Y-Position Sprite Nr. 6</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>53262</td>
+                        <td>$D00E</td>
+                        <td colspan="8">X-Position Sprite Nr. 7</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">15</td>
+                        <td class="shaded">53263</td>
+                        <td class="shaded">$D00F</td>
+                        <td colspan="8" class="shaded">Y-Position Sprite Nr. 7</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>53264</td>
+                        <td>$D010</td>
+                        <td>Sprite 7, msb X-Position</td>
+                        <td>Sprite 6, msb X-Position</td>
+                        <td>Sprite 5, msb X-Position</td>
+                        <td>Sprite 4, msb X-Position</td>
+                        <td>Sprite 3, msb X-Position</td>
+                        <td>Sprite 2, msb X-Position</td>
+                        <td>Sprite 1, msb X-Position</td>
+                        <td>Sprite 0, msb X-Position</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">17</td>
+                        <td class="shaded">53265</td>
+                        <td class="shaded">$D011</td>
+                        <td class="shaded">msb des Rasterregisters (Reg. 18)</td>
+                        <td class="shaded">Schaltbit für veränderten Hintergrundfarbmodus<br>1 = eingeschaltet</td>
+                        <td class="shaded">Schaltbit für Hochauflösungsmodus<br>1 = eingeschaltet</td>
+                        <td class="shaded">Schaltbit für Schirm löschen<br>0 = gelöscht</td>
+                        <td class="shaded">Schaltbit für Zeilenzahl<br>0 = 24 Zeilen<br>1 = 25 Zeilen</td>
+                        <td colspan="3" class="shaded">Wert der Zeilenverschiebung in Y-Richtung beim Smooth Scrolling</td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td>53266</td>
+                        <td>$D012</td>
+                        <td colspan="8">Rasterregister. Dazu kommt das msb in Bit 7, Register 17</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">19</td>
+                        <td class="shaded">53267</td>
+                        <td class="shaded">$D013</td>
+                        <td colspan="8" class="shaded">Lichtgriffel X-Position</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>53268</td>
+                        <td>$D014</td>
+                        <td colspan="8">Lichtgriffel Y-Position</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="shaded">21</td>
+                        <td rowspan="2" class="shaded">53269</td>
+                        <td rowspan="2" class="shaded">$D015</td>
+                        <td colspan="8" class="shaded">Ein- und Ausschalten von Sprites. 0 = Sprite aus, 1 = Sprite an</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">Sprite 7</td>
+                        <td class="shaded">Sprite 6</td>
+                        <td class="shaded">Sprite 5</td>
+                        <td class="shaded">Sprite 4</td>
+                        <td class="shaded">Sprite 3</td>
+                        <td class="shaded">Sprite 2</td>
+                        <td class="shaded">Sprite 1</td>
+                        <td class="shaded">Sprite 0</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>53270</td>
+                        <td>$D016</td>
+                        <td colspan="2">(unbenutzt)</td>
+                        <td>Reset-Bit, muß 0 sein, damit VIC-II-Chip arbeitet</td>
+                        <td>Schaltbild für Mehrfarbmodus<br>1 = eingeschaltet</td>
+                        <td>Schaltbit für Spaltenzahl<br>0 = 38 Spalten<br>1 = 40 Spalten</td>
+                        <td colspan="3">Wert der Spaltenverschiebung in X-Richtung beim Smooth Scrolling</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="shaded">23</td>
+                        <td rowspan="2" class="shaded">53271</td>
+                        <td rowspan="2" class="shaded">$D017</td>
+                        <td colspan="8" class="shaded">Sprite-Vergrößerung in Y-Richtung. 0 = normale Größe, 1 = doppelte Größe</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">Sprite 7</td>
+                        <td class="shaded">Sprite 6</td>
+                        <td class="shaded">Sprite 5</td>
+                        <td class="shaded">Sprite 4</td>
+                        <td class="shaded">Sprite 3</td>
+                        <td class="shaded">Sprite 2</td>
+                        <td class="shaded">Sprite 1</td>
+                        <td class="shaded">Sprite 0</td>
+                    </tr>
+                    <tr>
+                        <td>24</td>
+                        <td>53272</td>
+                        <td>$D018</td>
+                        <td colspan="4">Startadresse Textbildschirm</td>
+                        <td colspan="3">Startadresse Zeichengenerator oder HiRes-Bitmap</td>
+                        <td>(unbenutzt)</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">25</td>
+                        <td class="shaded">53273</td>
+                        <td class="shaded">$D019</td>
+                        <td colspan="4" class="shaded">Interrupt-Flag-Register</td>
+                        <td class="shaded">Lichtgriffel-Interrupt-Flag</td>
+                        <td class="shaded">Sprite/Sprite-Kollision</td>
+                        <td class="shaded">Sprite/Hintergrund-Kollision</td>
+                        <td class="shaded">Raster-Interrupt-Flag</td>
+                    </tr>
+                    <tr>
+                        <td>26</td>
+                        <td>53274</td>
+                        <td>$D01A</td>
+                        <td colspan="4">Interrupt-Masken-Register</td>
+                        <td>Lichtgriffel-Interrupt</td>
+                        <td>Sprite/Sprite-Kollision</td>
+                        <td>Sprite/Hintergrund-Kollision</td>
+                        <td>Raster-Interrupt-Maske</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="shaded">27</td>
+                        <td rowspan="2" class="shaded">53275</td>
+                        <td rowspan="2" class="shaded">$D01B</td>
+                        <td colspan="8" class="shaded">Sprite/Hintergrund-Prioritätenregister. 0 = Sprite hat Priorität, 1 = Hintergrund hat Priorität</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">Sprite 7</td>
+                        <td class="shaded">Sprite 6</td>
+                        <td class="shaded">Sprite 5</td>
+                        <td class="shaded">Sprite 4</td>
+                        <td class="shaded">Sprite 3</td>
+                        <td class="shaded">Sprite 2</td>
+                        <td class="shaded">Sprite 1</td>
+                        <td class="shaded">Sprite 0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">28</td>
+                        <td rowspan="2">53276</td>
+                        <td rowspan="2">$D01C</td>
+                        <td colspan="8">Sprite-Mehrfarbmodus-Register. 0 = Normaldarstellung, 1 = Mehrfarbmodus-Darstellung</td>
+                    </tr>
+                    <tr>
+                        <td>Sprite 7</td>
+                        <td>Sprite 6</td>
+                        <td>Sprite 5</td>
+                        <td>Sprite 4</td>
+                        <td>Sprite 3</td>
+                        <td>Sprite 2</td>
+                        <td>Sprite 1</td>
+                        <td>Sprite 0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="shaded">29</td>
+                        <td rowspan="2" class="shaded">53277</td>
+                        <td rowspan="2" class="shaded">$D01D</td>
+                        <td colspan="8" class="shaded">Sprite-Vergrößerung in X-Richtung. 0 = normale Größe, 1 = doppelte Größe</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">Sprite 7</td>
+                        <td class="shaded">Sprite 6</td>
+                        <td class="shaded">Sprite 5</td>
+                        <td class="shaded">Sprite 4</td>
+                        <td class="shaded">Sprite 3</td>
+                        <td class="shaded">Sprite 2</td>
+                        <td class="shaded">Sprite 1</td>
+                        <td class="shaded">Sprite 0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">30</td>
+                        <td rowspan="2">53278</td>
+                        <td rowspan="2">$D01E</td>
+                        <td colspan="8">Sprite/Sprite-Kollision. 0 = keine Berührung. 1 = Berührung</td>
+                    </tr>
+                    <tr>
+                        <td>Sprite 7</td>
+                        <td>Sprite 6</td>
+                        <td>Sprite 5</td>
+                        <td>Sprite 4</td>
+                        <td>Sprite 3</td>
+                        <td>Sprite 2</td>
+                        <td>Sprite 1</td>
+                        <td>Sprite 0</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="shaded">31</td>
+                        <td rowspan="2" class="shaded">53279</td>
+                        <td rowspan="2" class="shaded">$D01F</td>
+                        <td colspan="8" class="shaded">Sprite/Hintergrund-Kollision. 0 = keine Berührung, 1 = Berührung</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">Sprite 7</td>
+                        <td class="shaded">Sprite 6</td>
+                        <td class="shaded">Sprite 5</td>
+                        <td class="shaded">Sprite 4</td>
+                        <td class="shaded">Sprite 3</td>
+                        <td class="shaded">Sprite 2</td>
+                        <td class="shaded">Sprite 1</td>
+                        <td class="shaded">Sprite 0</td>
+                    </tr>
+                    <tr>
+                        <td>32</td>
+                        <td>53280</td>
+                        <td>$D020</td>
+                        <td colspan="4">(unbenutzt)</td>
+                        <td colspan="4">Farbe des Bildschirmrahmens</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">33</td>
+                        <td class="shaded">53281</td>
+                        <td class="shaded">$D021</td>
+                        <td colspan="4" class="shaded">(unbenutzt)</td>
+                        <td colspan="4" class="shaded">Hintergrundfarbe Nr. 0 (normale Hintergrundfarbe)</td>
+                    </tr>
+                    <tr>
+                        <td>34</td>
+                        <td>53282</td>
+                        <td>$D022</td>
+                        <td colspan="4">(unbenutzt)</td>
+                        <td colspan="4">Hintergrundfarbe Nr. 1</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">35</td>
+                        <td class="shaded">53283</td>
+                        <td class="shaded">$D023</td>
+                        <td colspan="4" class="shaded">(unbenutzt)</td>
+                        <td colspan="4" class="shaded">Hintergrundfarbe Nr. 2</td>
+                    </tr>
+                    <tr>
+                        <td>36</td>
+                        <td>53284</td>
+                        <td>$D024</td>
+                        <td colspan="4">(unbenutzt)</td>
+                        <td colspan="4">Hintergrundfarbe Nr. 3</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">37</td>
+                        <td class="shaded">53285</td>
+                        <td class="shaded">$D025</td>
+                        <td colspan="4" class="shaded">(unbenutzt)</td>
+                        <td colspan="4" class="shaded">Sprite-Mehrfarben-Register Nr. 0</td>
+                    </tr>
+                    <tr>
+                        <td>38</td>
+                        <td>53286</td>
+                        <td>$D026</td>
+                        <td colspan="4">(unbenutzt)</td>
+                        <td colspan="4">Sprite-Mehrfarben-Register Nr. 1</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">39</td>
+                        <td class="shaded">53287</td>
+                        <td class="shaded">$D027</td>
+                        <td colspan="4" class="shaded">(unbenutzt)</td>
+                        <td colspan="4" class="shaded">Sprite 0, Farbe</td>
+                    </tr>
+                    <tr>
+                        <td>40</td>
+                        <td>53288</td>
+                        <td>$D028</td>
+                        <td colspan="4">(unbenutzt)</td>
+                        <td colspan="4">Sprite 1, Farbe</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">41</td>
+                        <td class="shaded">53289</td>
+                        <td class="shaded">$D029</td>
+                        <td colspan="4" class="shaded">(unbenutzt)</td>
+                        <td colspan="4" class="shaded">Sprite 2, Farbe</td>
+                    </tr>
+                    <tr>
+                        <td>42</td>
+                        <td>53290</td>
+                        <td>$D02A</td>
+                        <td colspan="4">(unbenutzt)</td>
+                        <td colspan="4">Sprite 3, Farbe</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">43</td>
+                        <td class="shaded">53291</td>
+                        <td class="shaded">$D02B</td>
+                        <td colspan="4" class="shaded">(unbenutzt)</td>
+                        <td colspan="4" class="shaded">Sprite 4, Farbe</td>
+                    </tr>
+                    <tr>
+                        <td>44</td>
+                        <td>53292</td>
+                        <td>$D02C</td>
+                        <td colspan="4">(unbenutzt)</td>
+                        <td colspan="4">Sprite 5, Farbe</td>
+                    </tr>
+                    <tr>
+                        <td class="shaded">45</td>
+                        <td class="shaded">53293</td>
+                        <td class="shaded">$D02D</td>
+                        <td colspan="4" class="shaded">(unbenutzt)</td>
+                        <td colspan="4" class="shaded">Sprite 6, Farbe</td>
+                    </tr>
+                    <tr>
+                        <td>46</td>
+                        <td>53294</td>
+                        <td>$D02E</td>
+                        <td colspan="4">(unbenutzt)</td>
+                        <td colspan="4">Sprite 7, Farbe</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Alle Register des Video-Chips auf einen Blick</figcaption>
+        </figure>
+
+        <h2>Nachträglich Befehle einfügen</h2>
+
+        <p>Basic-Zeilen in ein laufendes Programm einfügen? Wollen Sie Funktionen austesten oder ein Basic-Programm entwickeln, welches sich selbst verändert? Mit unserem Basic »Listing 5« und der Assemblerroutine aus »Listing 5 MC« können Sie ohne Schwierigkeiten alle beliebigen Daten in Ihr Basicprogramm aufnehmen, ohne das Programm stoppen zu müssen. Für diese Aufgabe stellt das Betriebssystem unseres Computers einige sehr effektive Routinen zur Verfügung. Unsere Aufgabe besteht nur noch darin, die einzufügenden Daten in den Basic-Eingabepuffer (512-600) zu schreiben und die Routine aufzurufen. Nach Aufruf des Programms wird der Vektor zur Eingabe einer Zeile auf eine Adresse innerhalb unseres Programms gesetzt. Daraufhin wird die komplette Betriebssystemroutine zur Einfügung von Programmzeilen abgearbeitet. Zum Ende dieser Routine würde der Programmzeiger in die Eingabe-Warteschleife springen. Durch die anfängliche Änderung des entsprechenden Vektors wird der Programmzeiger jedoch wieder auf unsere Routine umgelenkt. Hier wird nun der Vektor wieder auf den ursprünglichen Wert verändert und das Basic-Programm erneut gestartet. Wie bereits zu Anfang erwähnt, eignet sich dieser kleine Trick hervorragend zur Eingabe von Funktionen.</p>
+
+        <h3>Basic optimieren</h3>
+        <figure>
+            <pre data-filename="listing 5 basic" data-name="Basic-Teil einfügen" data-checksummer="3"></pre>
+            <figcaption>Listing 5a. Basic-Teil einfügen</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="listing 5 mc.prg" data-name="Maschinen-Teil einfügen" data-mse=mse1></pre>
+            <figcaption>Listing 5b. Maschinen-Teil einfügen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 5 mc.prg" data-name="Maschinen-Teil einfügen"></div>
+
+        <p>Sie haben sich sicher schon oft über die schwache Leistung unseres Basic-Interpreters geärgert. Je komplexer die Anforderungen an ein Basic-Programm sind, desto langweiliger wird die Geschwindigkeit der betreffenden Programme. Viele scheuen jedoch den Schritt in Richtung Maschinensprache und ärgern sich weiterhin mit ihren »Schlafmützen«-Programmen. Betrachtet man aber die Arbeitsweise des Interpreters ein wenig genauer, so bieten sich einige Möglichkeiten zur Beschleunigung von Basic-Programmen. Einmal abgesehen von den verwendeten Algorithmen und der Struktur des Programmes gibt es mehrere Tricks, um den Interpreter ein wenig anzutreiben.</p>
+
+        <h3>Variable</h3>
+
+        <p>Sobald in einem Basic-Programm eine Variable benötigt wird, beginnt der Interpreter, vom Variablenstart an aufwärts zählend, nach der Variable zu suchen. Je später eine Variable definiert wurde, desto länger dauert der Suchvorgang. Ähnlich verhält es sich bei Konstanten. Werden Konstante im Programm angegeben, so müssen diese bei jedem Durchlauf erneut umgewandelt werden. Definiert man Konstante als Variable, dann fällt die Umrechnung nur einmal an.</p>
+
+        <p>(1) Konstante, Variable, und Felder in der Reihenfolge ihrer Zugriffshäufigkeit vordefinieren. Möglichst ein- oder zweistellige Variablennamen verwenden.</p>
+
+        <h3>Unterprogramme</h3>
+
+        <p>Unterprogramme müssen vom Interpreter, wie Variablen, erst einmal gesucht werden. Da die Suche mit der niedrigsten Zeilennummer beginnt, findet er Zeilen am Anfang natürlich schneller.</p>
+
+        <p>(2) Unterprogramme sollten am Anfang eines Programmes stehen.</p>
+
+        <h3>Verzweigungen</h3>
+
+        <p>IF-THEN-Abfragen mit mehreren, durch AND-Verknüpfungen verbundenen, Bedingungen sollten durch Hintereinanderlegen von mehreren IF-THEN-Abfragen verschachtelt werden. Beispiel:</p>
+
+        <p>a. IF (A kleiner 100 AND B größer 0) THEN<br>b. IF A kleiner 100 THEN IF B größer 0 THEN</p>
+
+        <p>Version b bricht sofort nach Nichterfüllung der ersten Bedingung ab und ist somit schneller.</p>
+
+        <p>(3) IF-THEN-Abfragen mit mehreren Bedingungen verschachteln.</p>
+
+        <h3>Leerzeichen</h3>
+
+        <p>REMs und Leerstellen verzögern den Programmlauf, da der Interpreter sie ja ignorieren muß. Je mehr Befehle sich in einer Programmzeile befinden, desto seltener muß der Computer nach neuen Zeilenanfängen suchen.</p>
+
+        <p>(4) Programme kompakter verfassen.</p>
+
+        <h3>Strings</h3>
+
+        <p>Die Garbage-Collection-Routine des Betriebssystems beseitigt den »String-Müll«. Werden mehrere Strings definiert, fällt auch mehr »Müll« an. Das Tragische an dieser Routine ist die Geschwindigkeit: verdoppelt sich die Anzahl der Strings, vervierfacht (!) sich die Laufzeit. Aus diesem Grund bringt das Anlegen von String-Konstanten auch keinen Zeitgewinn.</p>
+
+        <p>(5) So wenig Strings wie möglich benutzen.</p>
+
+        <h3>Potenzieren</h3>
+
+        <p>Falls in Ihrem Programm eine ganzzahlige Potenzierung (x<sup>2</sup>, x<sup>4</sup>..) vorkommt, ist es ratsam, die Potenzierung durch eine Mehrfachmultiplikation zu ersetzen. Da die Potenzierungsroutine des Interpreters auch Potenzierungen mit Brüchen berrechnen kann, ist sie 1½ mal langsamer als die entsprechende Multiplikation.</p>
+
+        <p>(6) Potenzierung durch Multiplikation ersetzen.</p>
+
+        <h3>Interrupt</h3>
+
+        <p>Das CIA 1 löst alle <sup>1</sup>/<sub>60</sub> Sekunden einen IRQ aus, um daraufhin den Programmzeiger in die Interruptroutine springen zu lassen. Hier wird die Tastatur abgefragt, die Zeit erhöht und noch einige andere Dinge erledigt. Die Bearbeitung und Beachtung des Interrupts zweigt natürlich einen Teil der ach so kostbaren Rechenzeit ab. Wenn wir den Interrupt verhindern, solange wir die Tastatur nicht benötigen, so kann auch mit dieser Technik ein Basic-Programm beschleunigt werden. POKE 56333,31 verhindert den IRQ, POKE 56333,159 gibt den IRQ wieder frei.</p>
+
+        <p>(7) Sperren des Interrupts.</p>
+
+        <p>Probieren Sie es aus. Verändern Sie Ihre alten Programme in der beschriebenen Weise und vergleichen Sie die Geschwindigkeit. Sie werden überrascht sein.</p>
+
+        <h2>Zeitsparen einmal anders</h2>
+
+        <p>Basic-Programme werden meist erst durch den Einsatz von Assemblerroutinen zu Programmen mit vernünftiger Laufgeschwindigkeit. Der Sprung in diese Routinen wird häufig durch einen SYS-Befehl realisiert. Die Parameterübergabe wird in diesen Fällen meist durch vorangehende POKE-Befehle bewerkstelligt. Sie sollen sich nun nicht mehr länger mit dieser umständlichen, uneleganten und vor allem langsamen Methode begnügen müssen. In unserem Computer verbirgt sich eine Funktion, die von vielen Handbüchern schlicht vergessen oder nur im Vorübergehen behandelt wird. Es handelt sich hierbei um die »USR-Funktion«. Im Gegensatz zum SYS-Befehl beinhaltet die USR-Funktion bereits eine vollständige Parameterübergabe. Sie kann also genauso benutzt werden wie alle anderen Funktionen des Basic-Interpreters (CHR$(x), ASC(x) ...). Der Vorteil dieser Funktion ist die freie Definition der eigentlichen Operation durch den Programmierer. Aber zunächst einmal die Form der Funktion: x1=USR(x2), wobei x2 der Wert ist, mit welchem die Routine arbeitet und x1 das Ergebnis der Operation darstellt. Die Parameter x1 und x2 können jede beliebige Form annehmen, wie zum Beispiel: Zahl, Variable, Zeichen, String (natürlich muß der Parameter zur jeweiligen Operation passen). x2 wird beim Aufruf der Routine automatisch in den FAC (Fließkommaakkumulator) übernommen. Analog dazu wird der Wert des FAC am Ende des Programmlaufs in x1 geschoben. Die weitere Funktionsweise der USR-Funktion ist ähnlich dem SYS-Befehl beziehungsweise dem Aufruf einer normalen Basic-Funktion. Nach Aufruf der Funktion wird ein Assemblerprogramm angesprungen. Die Adresse dieses Programmes muß jedoch nicht bei jedem Aufruf erneut angegeben werden, sondern wird im sogenannten USR-Vektor (785/786) vordefiniert. Falls Sie die USR-Funktion bereits einmal ausprobieren wollten und als Antwort ein »SYNTAX ERROR« erhielten, so lassen Sie sich bitte davon nicht irritieren. Der USR-Vektor wird, wie alle anderen Vektoren, während des »Start-Resets« auf eine festgelegte Routine des Betriebssystems gelegt. Der Startwert des USR-Vektors zeigt dann auf eine Routine, die einen »SYNTAX ERROR« ausgibt. Aber nun zu unserer ersten Anwendung. Sie finden in Listing 6 eine Routine, die von dem angegebenen Wert den Sinuswert errechnet und diesen mit 10 multipliziert (Start an Adresse 830). Innerhalb von 100 Durchläufen erreicht unsere Routine einen Vorsprung von 18/60 Millisekunden gegenüber einem entsprechenden Basic-Programm. Wie Sie an diesem Beispiel erkennen können, ermöglicht es die USR-Funktion, sowohl von Basic aus zugängliche Routinen wie auch Interpreter-interne Operationen aufzurufen und für eigene Zwecke zu nutzen. In Listing 7 haben wir für Sie bereits eine etwas anspruchsvollere Routine vobereitet. Dieses Programm berechnet aus einem beliebigen Variablenfeld (Array) die Summe der einzelnen Argumente. In diesem Fall muß bei Aufruf der USR-Funktion der Namen des Feldes angegeben werden und der USR-Vektor auf Adresse 828 gerichtet sein. Wenn Sie dieses Vorhaben von Basic aus realisieren möchten, müssen Sie schon eine Weile warten. Sie werden bereits bemerkt haben, daß Ihnen zur sinnvollen Nutzung der USR-Funktion nicht nur der Befehlssatz der 65xx-Prozessoren geläufig sein sollte. Der richtige Einsatz der ROM-Routinen ist mindestens genauso wichtig. Zu diesem Zweck ist die Benutzung eines ROM-Listings unumgänglich. Nachfolgend erwartet Sie eine kurze Aufstellung der wichtigsten Routinen. Bitte achten Sie bei der Benutzung der Arithmetik-Sequenzen auf die Einsprungadressen. Teilweise befindet sich zu Beginn der Routinen eine Abfrage auf FAC=0. Diese Abfrage sollte beim Aufruf über den USR-Vektor übergangen werden (Weitere ausführliche Informationen über Rechenoperationen und deren Anwendung finden Sie in dem Artikel »Rechnen in Maschinensprache«).</p>
+        <table class="plain">
+            <tbody>
+                <tr>
+                    <td>B849</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>FAC+0.5</td>
+                </tr>
+                <tr>
+                    <td>B850</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>Konstante-FAC</td>
+                </tr>
+                <tr>
+                    <td>B853</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>ARG-FAC</td>
+                </tr>
+                <tr>
+                    <td>B867</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>FAC+ARG</td>
+                </tr>
+                <tr>
+                    <td>BA28</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>Konstante*FAC</td>
+                </tr>
+                <tr>
+                    <td>BA2B</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>ARG*FAC</td>
+                </tr>
+                <tr>
+                    <td>BA8C</td>
+                    <td>:</td>
+                    <td>ARG</td>
+                    <td>=</td>
+                    <td>Konstante</td>
+                </tr>
+                <tr>
+                    <td>BAE2</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>FAC*10</td>
+                </tr>
+                <tr>
+                    <td>BB0F</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>Konstante/FAC</td>
+                </tr>
+                <tr>
+                    <td>BB12</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>ARG/FAC</td>
+                </tr>
+                <tr>
+                    <td>BBA2</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>Konstante</td>
+                </tr>
+                <tr>
+                    <td>BBFC</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>ARG</td>
+                </tr>
+                <tr>
+                    <td>BC0C</td>
+                    <td>:</td>
+                    <td>ARG</td>
+                    <td>=</td>
+                    <td>FAC</td>
+                </tr>
+                <tr>
+                    <td>BF78</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>ARG<sup>Konstante</sup></td>
+                </tr>
+                <tr>
+                    <td>BF7B</td>
+                    <td>:</td>
+                    <td>FAC</td>
+                    <td>=</td>
+                    <td>ARG<sup>FAC</sup></td>
+                </tr>
+            </tbody>
+        </table>
+        <figure>
+            <pre data-filename="listing 6 mc.prg" data-name="USR-Routine" data-mse=mse1></pre>
+            <figcaption>Listing 6. USR-Routine</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 6 mc.prg" data-name="USR-Routine"></div>
+        <figure>
+            <pre data-filename="listing 7 mc.prg" data-name="Array-Berechnungen" data-mse=mse1></pre>
+            <figcaption>Listing 7. Array-Berechnungen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 7 mc.prg" data-name="Array-Berechnungen"></div>
+
+        <p>Wie bereits erwähnt, können natürlich alle von Basic aus nutzbaren Routinen ebenfalls verwendet werden (SQR, SIN ...). Abschließend noch eine Anregung. Versuchen Sie einmal, mehrere Basic-Befehle unter der USR-Funktion zusammenzufassen. Auch durch diesen Trick kann man Basic beschleunigen.</p>
+
+        <h3>SYS und mehr</h3>
+
+        <p>Gerade haben wir behauptet, die USR-Funktion sei der Weisheit letzter Schluß, und jetzt beschäftigen wir uns doch wieder mit dem SYS-Befehl. Bitte glauben Sie nicht, wir wären inkonsequent. Es soll hier nur noch auf eine weitere Technik der Datenübergabe hingewiesen werden, die übrigens auch im Umgang mit der USR-Funktion verwendet werden kann. Auf einfachste Weise ist es möglich, nicht nur einen Parameter (USR), sondern beliebig viele zu übernehmen. Hierfür bieten sich gleich drei Routinen an:<br>AE83 : holt das nächste Element eines Ausdrucks in FAC<br>B79E : holt ein Byte in das X-Register<br>0073 : holt nächstes Zeichen in Akku</p>
+
+        <p>Das Betriebssystem hält sogar noch einige Routinen zur Prüfung der zu übergebenden Parameter bereit. Aber bitte bemühen Sie in diesen Fällen Ihr ROM-Listing. Zum Abschluß finden Sie in Listing 8 eine PRINT-AT-Simulation. Der Einsprung erfolgt über SYS 830, spalte, zeile, »text« (siehe auch »Rechnen in Maschinensprache«).</p>
+        <address class="author">(Erhart/do)</address>
+        <figure>
+            <pre data-filename="listing 8 mc.prg" data-name="Print AT-Simulation" data-mse=mse1></pre>
+            <figcaption>Listing 8. Print AT-Simulation</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="listing 8 mc.prg" data-name="Print AT-Simulation"></div>
+    </article>
+</body>
+
+</html>

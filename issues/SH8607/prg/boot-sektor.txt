@@ -1,0 +1,115 @@
+;boot-sektor.prg ==1c01==
+;version=70
+   10 rem:::::::::::::::::::::::::::::::::
+   20 rem  programm zur einrichtung eines
+   30 rem      boot-sektors  fuer den
+   40 rem         commodore 128 pc
+   50 rem
+   60 rem    (c)1986 hans-georg schmidt
+   70 rem     koenigsberger strasse 39
+   80 rem         2870 delmenhorst
+   90 rem:::::::::::::::::::::::::::::::::
+  100 print"{clr}":trap 1080
+  110 print"   boot-sektor fuer den commodore 128         (c) 1986  hans-georg schmidt"
+  120 open15,8,15
+  130 print#15,"io":print#15,"b-f 0 1 0"
+  140 if val(ds$)<>0 then 1040
+  150 print#15,"b-a 0 1 0":open5,8,5,"#"
+  160 print#15,"u1 5 0 1 0"
+  170 print#15,"b-p 5 0"
+  180 get#5,a$,b$,c$:dclose
+  190 if a$+b$=""then 340
+  200 if a$+b$+c$="cbm"then250
+  210 print"{down}{down}{down}  achtung!"
+  220 print"{down}{down}  der bootsektor  (sektor 0  in spur 1)   ist nicht frei !"
+  230 print"{down}{down}  wichtige daten zum retten ?"
+  240 print"{down}  oder weitermachen?":goto 290
+  250 print"{down}{down}{down} achtung!"
+  260 print"{down} auf der diskette befindet sich bereits  ein boot-sektor!"
+  270 print"{down} ueberschreiben ? ?"
+  280 print"{down} oder programm abbrechen ?"
+  290 print"{down}{down}  x =abbrechen         w = weiter"
+  300 getkey wx$
+  310 if wx$="w"then 340
+  320 if wx$="x"then 1120:else300
+  330 :
+  340 clr:print"{home}{home}{down}{down}{down}";chr$(27);"@{down}{down}"
+  350 print"  kein text = nur {rvon}return{rvof} !{up}{up}{up}"
+  360 poke 842,34:poke 208,1
+  370 input"  text hinter 'booting'               ";tx$
+  380 if tx$=""then print tab(int(peek(215)/3.2))"{up}...."
+  390 :
+  400 input"{down}  name des zu ladenen masch-programms ";mp$
+  410 if mp$=""then ru=len(tx$)+19:print"{up}{up}{up}":goto 650
+  420 print"{down}  soll das maschinen-programm"
+  430 print"  automatisch gestartet werden  ?  j/n"
+  440 getkey  am$
+  450 if am$="j"or am$="n" then 460:else 440
+  460 if am$="j" then jn=22:else jn=19
+  470 ru=len(tx$)+len(mp$)+jn
+  480 if am$="j" then 500
+  490 printtab(peek(215)/3.2+17)"{up}{up}{up}{up}= kein autostart";chr$(27)chr$(64):goto 650
+  500 printtab(peek(215)/3.2+17)"{up}{up}{up}{up}= mit autostart"chr$(27)chr$(64)
+  510 print"{down}":trap1080
+  520 :
+  530 input"{up}  adresse in hex     n{left}{left}{left}";he$
+  540 if he$="n" then 580
+  550 sy=dec(he$)
+  560 printtab(26)"{up}= sys";sy
+  570 goto 620
+  580 input"{up}  adresse in dezimal (sys)";sy
+  590 if sy=0 then print"{up}"chr$(27)"d":goto 530
+  600 if sy>65535 then print tab(28)"{up}=zu gross!":else620
+  610 sleep 2:print"{up}"chr$(27)"d":goto580
+  620 jh=int(sy/256)
+  630 jl=sy-jh*256
+  640 :
+  650 input"{down}  name des zu ladenen basic-programms ";bp$
+  660 if bp$=""then print"{up}";chr$(27)"d":goto 750
+  670 print"{down}  soll das basic-programm"
+  680 print"  automatisch gestartet werden  ?  j/n"
+  690 getkey  ab$
+  700 if ab$="j"or ab$="n" then 710:else 690
+  710 if ab$="j" then bs$="run":else bs$="dload"
+  720 if ab$="j" then 740
+  730 printtab(peek(215)/3.2+17)"{up}{up}{up}{up}= kein autostart";chr$(27)chr$(64):goto 750
+  740 printtab(peek(215)/3.2+17)"{up}{up}{up}{up}= mit autostart"chr$(27)chr$(64)
+  750 if tx$=""and mp$=""and bp$=""then 1120
+  760 :
+  770 print"{down}{down}{down} alles ok ?";chr$(27)"q"
+  780 print"{down} die richtige diskette im laufwerk ? ?"
+  790 print"{down}    j = weiter        n = neubeginn         x = abbruch"
+  800 getkey  ok$
+  810 if ok$="j"or ok$="n"or ok$="x" then 820:else 800
+  820 if ok$="n" then 340
+  830 if ok$="x" then 1120
+  840 :
+  850 cb$="cbm"
+  860 nb$=chr$(0)
+  870 :
+  880 open 15,8,15:open 5,8,5,"#"
+  890 print#15,"u1 5 0 1 0":print#15,"b-p 5 0"
+  900 print#5,cb$;nb$;nb$;nb$;nb$;
+  910 print#5,tx$;nb$;mp$;nb$;
+  920 if am$="n" or mp$="" then 940
+  930 print#5,chr$(32);chr$(jl);chr$(jh);
+  940 if bp$="" then bp$=chr$(96):goto 990
+  950 print#5,chr$(169);chr$(ru);chr$(133);chr$(61);
+  960 print#5,chr$(169);chr$(11);chr$(133);chr$(62);
+  970 print#5,chr$(76);chr$(209);chr$(77);
+  980 print#5,bs$;chr$(34);
+  990 print#5,bp$;chr$(0)
+ 1000 print#15,"u2 5 0 1 0"
+ 1010 close 5:close 15:trap
+ 1020 print "{up}{up}{up}{up}{up}  "chr$(27)"@"ds$
+ 1030 :
+ 1040 if val(ds$)=26 then print"{down}{down}  bitte schreibschutz entfernen":else 1060
+ 1050 print"{down}  und neu starten !":end
+ 1060 if val(ds$)<>0 then print"{down}{down}     bitte fehlermeldung beachten:  ",,ds$
+ 1070 end
+ 1080 if er=14 then 1100
+ 1090 if er=30 then resume:else print"{down}{rght}"err$(er):resume1070
+ 1100 print tab(21)err$(er):sleep 2:print"{up}";chr$(27)"d"
+ 1110 print"{up}{up}":resume 530
+ 1120 trap:print"{home}{down}{down}{down}{down}"chr$(27)"@   neuer start mit 'run' !{down}{down}":end
+

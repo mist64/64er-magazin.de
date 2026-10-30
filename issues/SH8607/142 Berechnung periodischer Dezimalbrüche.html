@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Berechnung periodischer Dezimalbrüche</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="B. Filpe, do">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="142-143">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64/C 16/C 128">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Programmieren">
+    <meta name="64er.id" content="dezimalbrueche">
+</head>
+
+<body>
+    <article>
+        <h1>Berechnung periodischer Dezimalbrüche</h1>
+        <p class="intro">Wahrscheinlich standen Sie auch schon vor dem Problem, einen periodischen Dezimalbruch in einen echten Bruch umzuwandeln. Dieses Programm berechnet Ihnen den echten Bruch automatisch. Ungenauigkeiten treten nicht auf.</p>
+
+        <p>Das Programm ist so geschrieben, daß eine Fehlbedienung so gut wie ausgeschlossen ist. Das Anfangsbild zeigt, wie die periodischen Dezimalbrüche eingegeben werden. Neben dem eigentlichen Ergebnis werden zusätzlich noch die wichtigsten Rechenschritte angezeigt. Nehmen wir doch einmal das Beispiel aus dem Anfangsbild:</p>
+
+        <p>Zu berechnen ist der Dezimalbruch</p>
+
+        <p>\[0.76\overline{351},\]</p>
+
+        <p>Einzugeben ist der Wert 0.76351 und die Länge der Periode = drei. Der Dezimalbruch wird nun wie folgt aufgespaltet:</p>
+
+        <p>\[0.76\overline{351} = \frac{76}{100} + \mathrm{Rest}\]</p>
+
+        <p>wobei für den Rest gilt,</p>
+
+        <p>\[\mathrm{Rest} = \sum_{K=0}^{\infty} \frac{351}{10^{5+3K}}\]</p>
+
+        <p>Dieses ist noch recht einfach zu verstehen. Daraus ergibt sich</p>
+
+        <p>\[= \frac{351}{10^5} \times \sum_{K=0}^{\infty} \frac{1}{10^{3K}}\]</p>
+
+        <p>dieses ist durch vollständige Iteration beweisbar.</p>
+
+        <p>\[= \frac{351}{100000} \times \frac{1}{0.999}\]</p>
+
+        <p>Somit gilt (siehe auch ersten Zwischenschritt beim Ausdruck):</p>
+
+        <p>\[0.76\overline{351} = \frac{76}{100} + \frac{351}{100000} \times \frac{1}{0.999}\]</p>
+
+        <p>Dies war der schwierigste Teil der Berechnung und erforderte zum ganzen Verständnis schon einige Grundkenntnisse in höherer Mathematik. Doch zum Glück ist das Verständnis keine Voraussetzung zum Benutzen des Programms.</p>
+
+        <p>Sehen wir weiter: Zunächst wird nun versucht, die vorhandenen Brüche so klein wie möglich zu machen. Das geschieht dadurch, daß man jeweils von Zähler und Nenner den GGT (größter gemeinsamer Teiler) berechnet und Zähler und Nenner dadurch dividiert. In unserem Beispiel ist beim ersten Bruch</p>
+
+        <p>\[\frac{76}{100}\]</p>
+
+        <p>der GGT = 4; nach der Division erhalten wir also</p>
+
+        <p>\[\frac{19}{25}\]</p>
+
+        <p>Beim anderen Bruch (der zweite Bruch wurde bereits mit dem dritten multipliziert) haben wir den GGT 27, dies führt dann zum Ergebnis</p>
+
+        <p>\[\frac{13}{3700}\]</p>
+
+        <p>Als zweites Zwischenergebnis steht nun:</p>
+
+        <p>\[= \frac{19}{25} + \frac{13}{3700}\]</p>
+
+        <p>Im folgenden sind jetzt also nur noch die beiden Brüche zu addieren. Das machen wir, wie in der Schule gelernt, indem wir zuerst das KGV (kleinstes gemeinsames Vielfaches) der beiden Nenner suchen. Da die Funktion GGT schon vorhanden ist und das KGV definiert ist als</p>
+
+        <p>\[\mathrm{KGV}(a,b) = \frac{a \times b}{\mathrm{GGT}(a,b)}\]</p>
+
+        <p>ist dies kein größeres Problem.</p>
+
+        <p>Anschließend muß dann nochmal durch den GGT des jetzt so entstehenden einzigen Bruches dividiert werden und wir erhalten:</p>
+
+        <p>\[= \frac{113}{148}\]</p>
+
+        <p>Wenn das Programm als Unterprogramm verwendet werden soll, so muß vor dem Aufruf der Dezimalbruch in X$ stehen und die Länge in L$. Zurückgegeben wird dann in Z2$ der Zähler und in N2$ der Nenner. Die Zeilen zum Ausdrucken der Ergebnisse müssen natürlich entfernt werden.</p>
+
+        <p>Das Programm wurde zwar für den C 64 geschrieben, kann aber im Prinzip auf jeden anderen Computer übertragen werden, sofern er Stringbefehle verarbeiten kann. Falls diese nicht zur Verfügung stehen, müssen wenige Anpassungs-Routinen geschrieben werden.</p>
+
+        <address class="author">(B. Filpe/do)</address>
+        <figure>
+            <pre data-filename="dezimalbruch" data-name="Dezimalbruch" data-checksummer="3"></pre>
+            <figcaption>Listing. Wandlungen eines periodischen Bruches in einen echten Bruch</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

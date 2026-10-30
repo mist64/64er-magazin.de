@@ -1,0 +1,23 @@
+
+
+;uhr stellen.prg ==0801==
+  100 rem echtzeituhr stellen
+  110 cia=56328:rem anfangsadresse von cia 1
+  120 print"geben sie die genaue uhrzeit ein"
+  130 print"   hhmmss{left}{left}{left}{left}{left}{left}{left}{left}";:inputz$
+  140 hh=val(left$(z$,2))
+  150 mm=val(mid$(z$,3,2))
+  160 ss=val(right$(z$,2))
+  170 ifhh>23ormm>59orss>59thenprint"eingabefehler":goto120
+  180 if hh>12thenhh=hh-12:tm=1
+  190 poke cia+7, peek(cia+7) and 255-2^7
+  200 poke cia+6, peek(cia+6) or 2^7
+  210 q= int(hh/10)*16+hh-int(hh/10)*10
+  220 if tm=1 then q=q+128
+  230 poke cia+3,q
+  240 q= int(mm/10)*16+mm-int(mm/10)*10
+  250 poke cia+2,q
+  260 q= int(ss/10)*16+ss-int(ss/10)*10
+  270 poke cia+1,q
+  280 poke cia+0,0: rem uhr starten
+

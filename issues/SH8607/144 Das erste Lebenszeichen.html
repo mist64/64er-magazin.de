@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Das erste Lebenszeichen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="og">
+    <meta name="64er.issue" content="Sonderheft 7/86">
+    <meta name="64er.pages" content="144">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C64|Verschiedenes">
+    <meta name="64er.id" content="reset-routine">
+</head>
+
+<body>
+    <article>
+        <h1>Das erste Lebenszeichen</h1>
+        <p class="intro">Was passiert in den ersten Sekunden nach dem Einschalten Ihres C 64? Woher weiß der Prozessor, was er zu tun hat? Was ist ein Reset-Taster, was ein Modul-Start? Auf diese Fragen finden Sie auf dieser Seite ausführlich Antwort.</p>
+
+        <p>Haben Sie sich nicht auch schon Gedanken darüber gemacht, warum sich Ihr C 64 nach dem Einschalten für kurze Zeit »totstellt«? Brauchen die Chips erst eine kurze Vorwärmzeit? Muß der Prozessor erst einmal wach werden?</p>
+
+        <p>Nein, während dieser Phase, in der der Computer zwar eingeschaltet ist, aber noch kein Lebenszeichen (sprich »READY.«-Meldung) von sich gibt, wird ein sogenannter »Reset« ausgeführt. Dieser Reset ist für den C 64 nicht eine »Anwärmphase«, sondern eine höchst arbeitsintensive und interessante Routine. Schauen wir uns einmal an, was in unserem C 64 nach dem Einschalten so alles vor sich geht.</p>
+
+        <p>Wenn Sie Ihren C 64 einschalten, so werden die Bausteine im Computer nahezu schlagartig mit Spannung versorgt. Würde die CPU sofort losstürmen, würde sie sofort wieder in den Tiefen des C 64 verschwinden. Daran hindert sie jedoch ein Signal am Reset-Eingang. Er liegt auf logisch »0« und lähmt somit den Prozessor. Zu diesem Zeitpunkt wird ein spezieller Timer-Baustein in Gang gesetzt, der die Reset-Leitung kontrolliert. Er wartet, bis sich die Betriebsspannung vollständig aufgebaut und stabilisiert hat. Erst nach Ablauf der hardwaremäßig vorgegebenen Zeitspanne wechselt der Timer seinen Pegel und gibt somit den Prozessor frei, der bis dahin noch nicht eine einzige Operation gemacht hat.</p>
+
+        <p>Doch dieser Reset (es gibt noch andere) betrifft nicht nur die CPU. Drei weitere Bausteine bekommen ihn auf die gleiche Weise zu spüren: der Sound-Chip (welch ein Lärm ohne Reset) und die zwei Port-Bausteine (CIAs). Primär betrifft der Einschalt-Reset also vier Bausteine. Doch nur beim Prozessor geht es aktiv weiter, die anderen drei werden nur in eine bestimmte Grundposition »gefahren«, um den Prozessor und uns nicht weiter zu stören.</p>
+
+        <h2>Am Anfang kommt ein Reset</h2>
+
+        <p>Wichtig ist, daß der Prozessor bei seinem ersten Zugriff das ROM vorfindet, denn nach Freigabe der Reset-Leitung führt die CPU einen bestimmten Befehl aus. Dafür sorgt der Prozessor selber, indem er an seinen Ausgangsports Basic, Kernel und I/O-Bereich selektiert. Der erste Befehl ist ein indirekter Sprung nach $FFFC, fast an das Ende des Speicherbereichs. Das heißt, der Prozessor »sieht nach«, welche 2-Byte-Adresse sich dort befindet, um sofort dorthin zu springen. Beim C 64 steht dort die Adresse $FCE2 (64738). Und dann geht es richtig los.</p>
+
+        <p>Zunächst wird der Prozessor gegen normale Interrupts abgesichert (Einen NMI, also RUN/STOP RESTORE, nimmt er nach wie vor an, stürzt aber dabei ab.), der Stack-Pointer wird zurückgesetzt und das Dezimal-Flag (für uns nicht so wichtig, es ist hier nur der Vollständigkeit halber erwähnt) wird gelöscht. Dann prüft der Computer, ob sich ein Modul im Expansions-Port befindet. Diese Routine befindet sich ab $FD02. Er vergleicht die Adressen $8004 bis $8008, ob deren Inhalt den Speicherstellen $FD10 bis $FD14 entspricht. Sie enthalten die Zeichen »CBM80«.</p>
+
+        <p>Läuft der Modul-Vergleich erfolgreich ab, wird wieder ein indirekter Sprung ausgeführt, diesmal nach $8000. Es wird also auf die dort vorgefundene Adresse verzweigt. Allerdings erkennt der Computer nicht das Modul, sondern lediglich die Meldung »CBM80«. So ist es möglich, einen solchen Modul-Start zu simulieren, indem man die Modul-Identifikation einfach an die entsprechende Adresse (ab $8004) schreibt und den Vektor bei $8000 auf eine eigene Routine verzweigt. Bei professionellen Spielen wird auf diese Weise der Reset unterdrückt. Dafür bieten einige Speeder wie zum Beispiel SpeedDos, PrologicDos, DolphinDos und das 64'er-Dos die Möglichkeit, während des Resets durch Drücken einer Taste (&lt;SPACE&gt; oder &lt;CTRL&gt;) den Modulstart zu unterbinden. Dies ist allerdings eine Veränderung der Systemsoftware, die im Commodore-Betriebssystem nicht besteht.</p>
+
+        <p>Findet der Computer keinen Modul-Start vor, dann wird als nächstes das Register 22 des VIC auf Null gesetzt – das sehen Sie, wenn Sie einen Reset-Taster haben, am Abschneiden des rechten und linken Bildrandes.</p>
+
+        <h2>Reset sorgt für Ruhe und Ordnung</h2>
+
+        <p>Im darauffolgenden Schritt, einem Unterprogramm ab $FDA3, werden die Portbausteine und der Sound-Chip, die ja auch einen Reset durchgeführt haben, abgehandelt. Bei letzterem wird nur die Lautstärke auf Null gesetzt, für den Fall, daß der Reset softwaremäßig ausgelöst wurde. In den CIAs dagegen werden die Timer für den Interrupt vorbereitet und gesetzt, die Datenrichtungs-Register, die CIA-Ports und sowie der Prozessor-Port definiert.</p>
+
+        <p>Jetzt erst kommt der C 64 dazu, seinen Arbeitsspeicher zu testen und zu initialisieren. Die Routine dazu steht ab $FD50 und ist zu etwa 98 Prozent verantwortlich für die Dauer des Resets. Der Bereich von $0002 bis $03FF wird komplett gelöscht, der gesamte Speicher von $0400 bis $9FFF wird durch zweimaliges Schreiben und Auslesen auf Funktion getestet. Daraufhin werden die Ober- und Untergrenze des Basic-Bereiches definiert und das Video-RAM (der Bildschirm) nach $0400 gelegt.</p>
+
+        <p>Hardware und Ein-/Ausgabe-Vektoren sind die nächste Station des Resets. Damit sind die Zeiger ab $0314 gemeint. Deren Inhalte werden von einer Routine ab $FD15 einfach aus einer Tabelle ab $FD30 kopiert.</p>
+
+        <p>Die letzte Station des Resets ist die Initialisierung des Video-Controllers. Eine Tabelle ab $ECB9 wird nach $D000 kopiert. Dadurch wird der VIC initialisiert. Danach wird die Tastatur-Eingabe vorbereitet, der Bildschirm gelöscht und nochmals der Interrupt-Timer gesetzt. Nachdem dann der Interrupt schließlich auch noch zugelassen wurde, wird der Basic-Kaltstart, durch einen indirekten Sprung nach $A000, ausgeführt.</p>
+
+        <p>Wir haben vorher angesprochen, daß es mehrere Möglichkeiten gibt, einen Reset auszulösen. Den Einschalt-Reset können Sie auslösen, indem Sie die Reset-Leitung kurzzeitig auf Masse ziehen, beispielsweise durch einen Taster. Eine Bauanleitung dafür finden Sie im 64'er, Ausgabe 6/85.</p>
+
+        <p>Einige Erweiterungen beinhalten Reset-Befehle, wie COLD bei Simons Basic, die dann einen Reset softwaremäßig auslösen. Dem entspricht ein SYS 64738 im normalen Basic. Allerdings ist dies kein »sauberer« Reset, da nicht automatisch auf das ROM geschaltet wird und auch der SID und die CIAs nicht davon betroffen sind. Der Einsprung ist allerdings derselbe, also mit Modul-Test und Initialisierung aller wichtigen Register, so daß Sie hier beliebig experimentieren können. Natürlich lassen sich die diversen Einsprünge auch unabhängig voneinander verwenden. So löst zum Beispiel SYS 64763 nur einen Video-Reset mit Basic-Kaltstart aus, ohne eventuell verstellte Interrupt-Vektoren zu korrigieren.</p>
+
+        <address class="author">(og)</address>
+    </article>
+</body>
+
+</html>
