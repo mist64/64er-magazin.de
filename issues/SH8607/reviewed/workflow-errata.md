@@ -13,9 +13,14 @@ and an OVERRIDE stamp, and did not change the rule. Ten days later the owner
 found the same defect on p002, p179 and p180 in the finished PDF. An
 erratum that stays in this file is a defect waiting for the next issue.
 
-HARVESTED SO FAR (rule changed): 005 x2, 006 x2, 160, 330, 005b.
-STILL OPEN: 050, 070, 080, 100, 120, 130, 140, 180, 210, 250/270, 260,
-280 x2, 290 x2, 020/190/320, 325, End gate, 190/marks.
+ALL 26 HARVESTED, 2026-10-30. Each entry's **Suggested.** fix is now in its
+rule; the rules it changed are listed in HARVEST.md under "SH8607: the
+nineteen errata that had not reached their rule". Six were code fixes made in
+place (r100's lettered page, r250's `head`, r130's table rows, r260's `$PY`,
+r270's exit status, r290's check 2); the rest are new sections.
+
+Kept here as the record of what was found DURING the build and what it cost,
+which is not the same thing as the rule that came out of it.
 -->
 
 # SH8607 — WORKFLOW_ERRATA
