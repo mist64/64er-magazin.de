@@ -112,3 +112,35 @@
 # both tables while the text says "I fuer Intensitaet".  The print is
 # unambiguous at 600 dpi -- a descending J with a clear hook.  A print error;
 # no Futureteufelchen (owner, 2026-10-08).
+
+# ---------------------------------------------------------------------------
+# 4. THE BUND RE-CUT CLOBBERED TWO RECOVERIES  (found 2026-10-30, FIXED)
+# ---------------------------------------------------------------------------
+# Found while walking WORKFLOW_ERRATA.md to answer "have we extracted all
+# learnings?" -- entry 25 is "005b -- on a full-bleed cover the wider-than-A4
+# branch keeps the spine and clips the cover".  THE BUILD FOUND THIS DEFECT ON
+# p001 AND FIXED IT PER PAGE, with recovery scripts and an OVERRIDE line in the
+# stamp, and never changed the rule.  That is why p002, p179 and p180 shipped
+# clipped and the owner found them in the PDF ten days later.
+#
+# Worse: the Bund re-cut of 2026-10-30 then re-cut p001 and p158, which carried
+# those OVERRIDEs, and reverted them --
+#   p001  recovery D (window 233 -12 in the master; fold 251, right trim 5176,
+#         cyan profile) -> parity's 226; 14 px = 0.59 mm.  Does not ship.
+#   p158  recovery C (window -31 -11 in the master; trim from the raw-scan R-B
+#         profiles, right 4930 foot 7005, 31 px left / 21 px top mirrored)
+#         -> centred 46 86; 3.3 mm.  SHIPPED, in the PDF the owner accepted
+#         and in the pushed commit cdcd70cb.
+# A recovery is measured from the page's own edges; parity and centring are
+# blind fallbacks.  Both pages restored from <tmp>/a4600_pre_bundfix/ and the
+# PDF rebuilt.  p158 in the delivered PDF now disagrees with a 28% threshold of
+# the restored source by 0.169%, which is jbig2's lossy coding.
+#
+# r005_a4_window.md check 1a has warned since SH8608 (p009, p142) that this
+# script re-cuts every page and silently restores the wrong automatic window on
+# a recovered one.  It is now a REFUSAL in r005_a4_window.py (85c03065), not a
+# warning: a page whose stamp carries OVERRIDE is not re-cut unless
+# RECUT_OVERRIDE=1, and then the dropped line and the reason go here.
+#
+# Delivered PDF after the restore: sha256 f6c85068c2becee1..., 184 pp,
+# 42,397,351 bytes, q97, 176 bilevel / 8 contone.
