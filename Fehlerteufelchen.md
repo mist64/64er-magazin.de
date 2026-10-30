@@ -119,7 +119,7 @@ Seite 61
 - **Computer-Simulation für Einsteiger** (Ausgabe 7/86, Seite 134)
 - **EDV für Lehrer** (Ausgabe 8/86, Seite 29ff)
 - **Tips & Tricks zum C 128** (Sonderheft 7/86, Seite 157)
-- **Label im Basic 7.0** (Sonderheft 17/86, Seite 146)
+- **Label im Basic 7.0** (Sonderheft 7/86, Seite 146)
 - **Tips & Tricks zum C 128** (Ausgabe 6/86, Seite 83)
 - **Tips & Tricks** (Ausgabe 7/86, Seite 80)
 - **Blockverschiebung** (Sonderheft 7/86, Seite 84)

@@ -59,7 +59,7 @@
 
         <h3>Adresse 51-52 ($33-$34)<br>Zeiger auf die untere Grenze des Speicherbereichs für den Text der Zeichenketten-Variablen</h3>
 
-        <p>Der Inhalt dieser Speicherzellen zeigt in Low/High-Byte-Darstellung auf dasjeweilige untere Ende (siehe Bild 1) des Textspeichers von Zeichenketten, er bezeichnet aber zugleich auch das obere Ende des frei verfügbaren RAM-Bereichs. Das entsteht dadurch, daß der Text der Zeichenketten vom Ende des RAM-Bereichs nach unten abgespeichert wird. In Bild 1 ist das durch den Pfeil dargestellt.</p>
+        <p>Der Inhalt dieser Speicherzellen zeigt in Low/High-Byte-Darstellung auf das jeweilige untere Ende (siehe Bild 1) des Textspeichers von Zeichenketten, er bezeichnet aber zugleich auch das obere Ende des frei verfügbaren RAM-Bereichs. Das entsteht dadurch, daß der Text der Zeichenketten vom Ende des RAM-Bereichs nach unten abgespeichert wird. In Bild 1 ist das durch den Pfeil dargestellt.</p>
 
         <p>Beim Einschalten des Computers und nach einem RESET wird dieser Zeiger auf das oberste Ende des RAM-Bereichs gesetzt. Beim C 64 ist das 40960 ($A000). Beim VC 20 hängt es von den eingesetzten Speichererweiterungen ab, ohne Erweiterung ist die Adresse 7680 ($1E00).</p>
 
@@ -140,7 +140,7 @@
 
         <p>Bei der Besprechung der Zeiger in 43-44 haben wir das auch schon gemacht, allerdings durch »Hochschieben« des Speicheranfangs. Mit dem Zeiger in 55-56 erreichen wir denselben Effekt, diesmal durch »Hinunterdrücken« des Speicherendes. Gegenüber den vier Schritten beim Hochschieben ist das Hinunterdrücken einfacher. Mit dem Befehl:
             <code>POKE 56,PEEK(56)-1:CLR</code>
-            schieben wir das Speicherende um 256 Byte nach unten, egal für welchen Computer und welche Speichererweiterung. Mit —2 verschiebt sich das Ende um 512, mit —4 um 1024 Byte (also 1 KByte) nach unten. Wenn Sie eine feinere Verschiebung als Vielfache von 256 benötigen, kommen Sie mit dem High-Byte in 56 allein nicht aus, sondern Sie müssen auch einen entsprechenden Wert in 55 hineinPOKEn.
+            schieben wir das Speicherende um 256 Byte nach unten, egal für welchen Computer und welche Speichererweiterung. Mit —2 verschiebt sich das Ende um 512, mit —4 um 1 024 Byte (also 1 KByte) nach unten. Wenn Sie eine feinere Verschiebung als Vielfache von 256 benötigen, kommen Sie mit dem High-Byte in 56 allein nicht aus, sondern Sie müssen auch einen entsprechenden Wert in 55 hineinPOKEn.
         </p>
 
         <p>Der Befehl CLR ist absolut notwendig, denn er setzt den Zeiger der Zellen 51-52 (siehe dort), das heißt das untere Ende des Speicherbereichs für Zeichenketten auf dieselbe Adresse wie Zeiger 55-56. Dadurch wird erzwungen, daß die Zeichenkette sozusagen als Ausgangslage unterhalb des heruntergedrückten Speicherendes abgelegt werden.</p>
@@ -175,7 +175,7 @@
             <p>Machen Sie jetzt bitte folgende Schritte:</p>
 
             <ol>
-                <li>direkt emgeben: POKE 648,16 (RETURN),</li>
+                <li>direkt eingeben: POKE 648,16 (RETURN),</li>
                 <li>RUN/STOP und RESTORE drücken, bis der Cursor wieder da ist,</li>
                 <li>direkt eingeben:<br>FOR J = 37888 TO 38399: POKE J,0: NEXT J (RETURN),</li>
                 <li>mit der DELETE-Taste (nicht mit CLR !) den ganzen Text des Bildschirms löschen,</li>
@@ -206,7 +206,7 @@
 
             <p>Wir wollen sie uns hier mit den Methoden anschauen, welche ich das letzte Mal für den C 64 und heute für den VC 20 in den Texteinschüben »Darstellung der normalen Variablen« beschrieben habe.</p>
 
-            <p>Beim C 64 ist allerdings ein Zusatz dabei. Sie müssen, ambesten gleich am Anfang, noch eingeben:
+            <p>Beim C 64 ist allerdings ein Zusatz dabei. Sie müssen, am besten gleich am Anfang, noch eingeben:
                 <code>POKE 44,4:NEW</code>
             </p>
 
@@ -223,7 +223,7 @@
             <p>Wir dimensionieren also ein Feld mit dem Namen AB, es hat drei Dimensionen, die erste Dimension hat zwei (0,1) Werte, die zweite hat drei und die dritte hat vier Werte. Sobald Sie die RETURN-Taste drücken, erscheint das Feld auf dem Bildschirm. Wir sehen:<br>
                 &hellip; (plus 120 Klammeraffen @ &hellip;)</p>
 
-            <p>Die ersten zwei Stellen sind der Name des Feldes in der Darstellung für Gleitkomma-Variable, wie in der letzten Folge beschrieben wurde. Die dritte und vierte Stelle geben im Bildschirmcode als Low- und High-Byte die Länge des Feldes an (das inverse c = 131, das @ = 0, bitte nachzählen). Die fünfte Stelle zeigt die Anzahl der Dimensionen (c = 3) an. Ab der sechsten Stelle stehen die Anzahl der Elemente der Dimension (diesmal als High- und Low-Byte) und zwar beginnend mit der letzten Dimension. In unserem Falle ist das also in Stelle 6 und 7 ein @ und d (0 — 3 = 4 = d), Stelle 8 und 9 sind dasselbe für die zweite Dimension und schließlich Stelle 10 und 11 für die erste Dimension (0 — 1 = 2 = b). Danach folgen entsprechend der Anzahl der dimensionierten Elemente (2x3x4 = 24) fünf Bytes pro Element (24x5 -120), die vorerst auf 0 = @ stehen, die aber mit den Werten der Elemente aufgefüllt werden.</p>
+            <p>Die ersten zwei Stellen sind der Name des Feldes in der Darstellung für Gleitkomma-Variable, wie in der letzten Folge beschrieben wurde. Die dritte und vierte Stelle geben im Bildschirmcode als Low- und High-Byte die Länge des Feldes an (das inverse c = 131, das @ = 0, bitte nachzählen). Die fünfte Stelle zeigt die Anzahl der Dimensionen (c = 3) an. Ab der sechsten Stelle stehen die Anzahl der Elemente der Dimension (diesmal als High- und Low-Byte) und zwar beginnend mit der letzten Dimension. In unserem Falle ist das also in Stelle 6 und 7 ein @ und d (0 — 3 = 4 = d), Stelle 8 und 9 sind dasselbe für die zweite Dimension und schließlich Stelle 10 und 11 für die erste Dimension (0 — 1 = 2 = b). Danach folgen entsprechend der Anzahl der dimensionierten Elemente (2x3x4 = 24) fünf Bytes pro Element (24x5=120), die vorerst auf 0 = @ stehen, die aber mit den Werten der Elemente aufgefüllt werden.</p>
 
             <p>Dieses Auffüllen wollen wir nachvollziehen. Geben Sie bitte direkt ein:
                 <code>AB(0,0,0)=5</code>
@@ -231,7 +231,7 @@
 
             <p>Wir weisen damit dem allerersten Element des Feldes den Wert 5 zu.</p>
 
-            <p>In der oberen Darstellung des Feldes AB ändern sich dadurch Byte 12 und 13. Das neu erschienene inverse C und die Leerstelle mit den drei nachfolgenden @ ist die Gleitkommadarstellung (Mantisse und Exponent) der Zahl 5, Auf diese Darstellung werde ich später im Verlauf dieses Kurses bei der Besprechung der Speicherzelle 97 noch genauer eingehen.</p>
+            <p>In der oberen Darstellung des Feldes AB ändern sich dadurch Byte 12 und 13. Das neu erschienene inverse C und die Leerstelle mit den drei nachfolgenden @ ist die Gleitkommadarstellung (Mantisse und Exponent) der Zahl 5. Auf diese Darstellung werde ich später im Verlauf dieses Kurses bei der Besprechung der Speicherzelle 97 noch genauer eingehen.</p>
 
             <p>Wenn wir jetzt (durch Überschreiben der vorigen Anweisung) zusätzlich noch eingeben:
                 <code>AB(1,0,0) = 6</code>
@@ -310,7 +310,7 @@
                 <code>AB$(1,2,3)"BB"</code>
             </p>
 
-            <p>Die letzten drei Stellen des Feldes ändern sich ebenfalls, wobei die erste mit dem b eine Zeichenkettenlänge von 2 angibt, dementsprechend muß die Anfangsadresse um 2 niedriger sein als die vorher definierte Kette; Das Low-Byte 250 — 2 = 248, in der Codetabelle finden wir dafür das, was auch im Feld steht. Das High-Byte bleibt unverändert.</p>
+            <p>Die letzten drei Stellen des Feldes ändern sich ebenfalls, wobei die erste mit dem b eine Zeichenkettenlänge von 2 angibt, dementsprechend muß die Anfangsadresse um 2 niedriger sein als die vorher definierte Kette: Das Low-Byte 250 — 2 = 248, in der Codetabelle finden wir dafür das, was auch im Feld steht. Das High-Byte bleibt unverändert.</p>
 
             <p>Bild 4 zeigt die grafische Darstellung des Zeichenketten-Feldes.</p>
 
