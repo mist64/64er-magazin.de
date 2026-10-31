@@ -536,9 +536,13 @@ category comes from the page.
 
 **35 rows carry an empty category, and that is the answer, not a gap:**
 
-- **26 are not in the printed index at all.** The disk indexes more than the
-  print did — mostly competitions and back-of-book reader pieces, pp159-193.
-  The magazine never classified them, so neither do we.
+- **26 are not in the printed index at all.** The disk simply holds more than
+  the print did: ~723 entry lines read off the six pages against 818 records.
+  23 of them sit at pp159-193 but 12 are ordinary articles in the body, so
+  there is no category they share. The magazine never classified them, so
+  neither do we. (They are not "the competitions": 1986's index lists
+  competitions happily, and 1987 lists at least one — `Wettbewerb High Tech
+  '87 ausgerufen`, 5/87 p10, under `Aktuelles/Sonstiges`.)
 - **9 are articles whose printed line has not been read yet.** For those the
   blank means "unknown".
 
