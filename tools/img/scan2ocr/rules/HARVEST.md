@@ -1364,3 +1364,50 @@ accepted and pushed — and entry 25 described the exact defect the owner later
 found on three pages of the finished PDF. **An erratum that stays in the issue
 is a defect waiting for the next one.** r340's sign-off counts the entries; it
 should also refuse to sign while any of them is unharvested.
+
+## 1987's index, 2026-10-31: three passes that reported success and were wrong
+
+The 1987 Jahresinhaltsverzeichnis had no CSV. The magazine printed it in 1/88
+pp75-80 and said at the foot of p80 that the whole thing was on that issue's
+Programm-Service disk. It was — `8801B.D64`, 818 records, exact. **But the
+record has no category**, so the printed pages still had to supply the
+grouping, and that is where everything went wrong.
+
+**Pass one shipped.** When OCR mangled a `Thema:` line the code kept the
+PREVIOUS theme and applied it to every entry that followed. Each lost heading
+mislabelled a whole run — on the order of a hundred rows — and **nothing
+objected, because every row still carried a plausible category**. It was
+committed, pushed, and only questioned because the owner asked *"blank
+categories — are we sure it's correct??"*. The check that exposed it is one
+line and both its inputs were already in hand: **every printed theme must
+receive at least one row.** 21 of 129 had received none.
+
+**Pass two "closed" 55 of the last 57 blanks and was nonsense** — pairing
+left-over OCR rows to left-over records by whole-line fuzzy match put
+*Telefon-Safari* under `Aktuelles/Drucker` and *Jahresinhaltsverzeichnis im
+C 64* under `Kurse/Grundlagen/Grafik`. Discarded entirely. Its replacement
+demands three exact long-word hits and twice the runner-up, and closes one.
+
+**Pass three was a sentence, not a script.** Having found 26 rows that are
+absent from the printed index, I wrote a regex to describe them, then reported
+"all 26 are competitions" as a finding. 17 are; about the other nine I knew
+only that they were absent. **A pattern fitted to the data it describes is not
+evidence about it** — and it is harder to catch than a bad script, because it
+arrives as a sentence in a report rather than as a number.
+
+Four lessons, in the order they cost time:
+
+1. **A check written while the output is wrong never meets output that is
+   right.** Run a new check against an already-published artefact before
+   shipping it. r290's aside check, fixed the same week, fires on published
+   8606 and 8609 — it had never been run on them.
+2. **Verify a pass by printing what it DID, not what it reported.** All three
+   above returned healthy-looking counts. One `print` of fifty pairings killed
+   pass two in ten seconds.
+3. **Distinguish "absent" from "unread".** Both are an empty field. The first
+   is a fact about the magazine; the second is a fact about us. The CSV cannot
+   hold the difference, so the rule and the commit message carry it.
+4. **A rule file is instructions; HARVEST is the story.** The first version of
+   this write-up went into r220 as 114 lines of narrative — which is this
+   file's job, not that one's. The owner caught it: *"it's more of your log,
+   no?"*

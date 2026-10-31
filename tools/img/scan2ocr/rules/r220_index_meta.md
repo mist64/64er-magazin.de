@@ -14,10 +14,9 @@ The annual index CSVs live at the repo root:
 - `Jahresinhaltsverzeichnis 1984-85.csv`
 - `Jahresinhaltsverzeichnis 1985.csv`
 - `Jahresinhaltsverzeichnis 1986.csv`
-- `Jahresinhaltsverzeichnis 1987.csv` — **built from two sources, not one; see
-  *THE 1987 INDEX CAME OFF A DISK* below.** 56 of its 818 rows carry an empty
-  category: those articles get no meta, which is correct, not a gap to fill by
-  guessing.
+- `Jahresinhaltsverzeichnis 1987.csv` — **built from two sources, not one, and
+  35 of its 818 rows have no category on purpose.** See *THE 1987 CSV* below
+  before touching it.
 
 Every row is keyed by a **monthly** `YYMM`. There is no Sonderheft row in any of
 the three:
@@ -519,117 +518,49 @@ mis-routing is a known failure mode (the 8607 CP/M-Ecke case).
   issues' apply runs, and per-issue fixes are lower-risk than
   rewriting the CSV).
 
-## THE 1987 INDEX CAME OFF A DISK, AND THE PRINT ONLY SUPPLIED THE HEADINGS
+## THE 1987 CSV: TWO SOURCES, AND 35 ROWS WITH NO CATEGORY ON PURPOSE
 
-The magazine printed the 1987 Jahresinhaltsverzeichnis in **1/88, pages
-75-80**, and said so at the foot of page 80:
-
-> Die Programmservice-Diskette zu dieser Ausgabe bietet einen echten
-> Leckerbissen: Das komplette 64'er-Jahres-Inhaltsverzeichnis 1987 befindet
-> sich im Master-Index-Format (einschließlich des Master-Index-Programms) auf
-> dieser Diskette.
-
-**That disk is `8801B.D64`** — "dieser Ausgabe" is 1/88, not 1/87. It holds
-`Master-Index` (the program), `titel` (two volume names, "64'er 86" and
-"64'er 87") and `stext`, 27,409 bytes of records in a fixed format:
+`Jahresinhaltsverzeichnis 1987.csv` was not transcribed from the printed page
+like its neighbours. The magazine put the whole 1987 index on the **1/88
+Programm-Service disk** (`8801B.D64`: `Master-Index`, `titel`, `stext`), and
+`stext` holds all 818 entries exactly:
 
 ```
 <title, PETSCII>  00  <volume, 16-bit BE>  <month>  <page>  00
 ```
 
-818 records, zero malformed, all volume 2 = 1987. Spot-checked against the
-printed pages four for four.
+`titel` names the volumes — volume 2 is "64'er 87". **The record has no
+category**, so the printed pages (1/88 pp75-80) still had to supply the
+`Rubrik`/`Thema` grouping. Title, issue and page come from the disk; the
+category comes from the page.
 
-**The record has no category field**, which is the whole reason the printed
-pages are still needed: the disk gives the entries exactly, the print gives the
-`Rubrik`/`Thema` grouping. So the CSV was built from three witnesses —
+**35 rows carry an empty category, and that is the answer, not a gap:**
 
-1. **the disk**, authoritative for title, issue and page, with no OCR anywhere;
-2. **OCR** of a 600 dpi scan of pages 75-80, for the grouping;
-3. **a reading by eye** of the same six pages, recorded BEFORE the OCR output
-   was looked at, giving the canonical 129 `Rubrik`/`Thema` pairs.
+- **26 are not in the printed index at all.** The disk indexes more than the
+  print did — mostly competitions and back-of-book reader pieces, pp159-193.
+  The magazine never classified them, so neither do we.
+- **9 are articles whose printed line has not been read yet.** For those the
+  blank means "unknown".
 
-**The third witness is what made it honest.** Numbers from the entry above bled
-into the heading rows, so OCR produced category names like
-`1/87 156 Kurse/ Grundlagen` and `135 Kurse/Grundlagen` — **31 of them**, each
-confident and each wrong. Snapping every OCR heading to the eye-read canonical
-list cleared them. A two-way disk-against-OCR check would have shipped all 31,
-because the disk has nothing to say about categories.
+The CSV cannot tell the two apart; `git log` for the file does.
 
-**And one pass had to be thrown away.** Pairing left-over OCR rows with
-left-over records by whole-line fuzzy match "closed" 55 of the last 57 — and
-inspection showed almost every one was nonsense: *Telefon-Safari* under
-`Aktuelles/Drucker`, *Jahresinhaltsverzeichnis im C 64* under
-`Kurse/Grundlagen/Grafik`. It was discarded entirely. What replaced it demands
-**three exact long-word hits and twice the runner-up**, and closes one.
+**Do not fill a blank by inference.** A category guessed from a neighbouring
+row looks exactly like one that was read, and nothing downstream can tell.
 
-### THE CHECK THAT SHOULD HAVE RUN FIRST: EVERY PRINTED THEME MUST GET A ROW
+### Verification: every printed theme must receive at least one row
 
-The first build of this file shipped at "93 %" and was wrong. When OCR mangled
-a `Thema:` line the code kept the PREVIOUS theme and applied it to every entry
-that followed, so each lost heading mislabelled a whole run. Nothing objected,
-because every row still carried a plausible-looking category.
-
-**21 of the 129 printed themes had received no row at all** — `Tips & Tricks /
-Spiele`, `Listings zum Abtippen / Drucker`, `Tips & Tricks / Drucker` and 18
-more, every one of which plainly has entries under it on the page. That is the
-check, it costs one line, and both lists were already in hand:
+A `Rubrik`/`Thema` heading always has entries beneath it, so a theme that ends
+up with no row means its entries were silently given some other theme.
 
 ```python
-empty = [t for t in themes_the_eye_saw if t not in themes_that_got_a_row]
-assert not empty          # a printed heading always has entries beneath it
+empty = [t for t in themes_seen_on_the_page if t not in themes_that_got_a_row]
+assert not empty
 ```
 
-The rebuild passes it: **129 of 129**. Two changes made that possible — the
-detected headings are aligned to the eye-read sequence as a SUBSEQUENCE (the
-first attempt raced a pointer to the end of the list on one bad match and
-aligned 5 of 109), and a run that spans a lost heading is split at its
-ALPHABETICAL RESET, because the print sorts titles within a theme.
+This is the check that caught the first build of this file, where 21 of 129
+themes had received nothing. **Run it on any index assembled this way.**
 
-**And a repeated title is a different record each time it is printed.**
-`Bücher-Vorstellungen` appears 11 times under 11 different themes and
-`Computerlexikon zum Sammeln` 10 times; matching by title alone collapses them
-onto one record. They are the file's weakest class and were read off the page
-by hand.
-
-### WHAT THE FILE IS WORTH, HONESTLY
-
-| | rows |
-|---|---|
-| category read off the page by eye | 126 |
-| category placed by the machine | 656 |
-| **no category** | **36** |
-
-The machine portion is not clean: 17 of the rows I checked by eye were wrong
-and were corrected, which means more wrong ones remain among the 656 — most
-likely wherever a run had to be split at a reset.
-
-**AND THE DISK CARRIES ENTRIES THE PRINT DOES NOT.** Of the rows left blank,
-**26 are absent from the printed index altogether**, and they sit at the back
-of the book, pages 159-193 with four exceptions. **17 of the 26 are plainly
-competitions** from their own titles — *2000 Mark für die beste
-Kernelumschaltung*, *Wir suchen den schönsten Briefkopf*, *Die Gewinner stehen
-fest …*, *Amiga 500 zu gewinnen!*. **About the other nine I know only that
-they are absent** (*Druck-Daten*, *Die ideale Diskette*, *20 Drucker für
-Schulen*, *Fit mit dem Computer*, *Durch Geos in die USA*, *Der
-Software-Palast*, *Unsere Leser testen Disketten*, *Goldene Zeiten für den
-C 64*, *Drucker unter Dampf*): calling them competitions too was a pattern
-fitted to the list after the fact, which is not evidence. **What was actually
-tested is absence**, and that holds for all 26: two OCR passes over all six pages return
-one hit for `Wettbewerb` and none for `gewinn`, and reading the pages by eye
-finds none of them, including at the alphabetical position each would occupy
-(*Amiga 500 zu gewinnen!* is absent from `Aktuelles / Hardware`, which runs
-"256-KByte-CMOS-RAM-Platine, 8-Kanal-Logikanalysator, Amiga als Speicherriese,
-Bezugsadresse …").
-
-So for those 26 the empty category is CORRECT: the magazine's own index did not
-classify them. The **other 10** are ordinary articles whose printed line simply
-has not been found yet, and for those a blank still means "we could not read
-it". The two cases look identical in the CSV, which is a limitation of the
-format, not of the data — they are listed in the commit that built it.
-
-**The umlauts are restored from the print, not from a rule.** The disk
-transliterates (`Adventure-Loesungen`, `fuer`), so a word map was learned from
-the OCR'd printed vocabulary — 111 words, one ambiguous and skipped — and
-applied only where the transliteration matches exactly. 212 titles respelled.
-
+**And treat the machine-placed rows as unverified.** 127 of the 783 categories
+were read off the page by hand; the rest were matched by script, and spot
+checks found errors in that portion — concentrated where a run of entries had
+to be split because a heading was unreadable. See HARVEST.md, 2026-10-31.
