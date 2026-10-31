@@ -563,9 +563,48 @@ inspection showed almost every one was nonsense: *Telefon-Safari* under
 `Kurse/Grundlagen/Grafik`. It was discarded entirely. What replaced it demands
 **three exact long-word hits and twice the runner-up**, and closes one.
 
-**56 rows therefore ship with no category**, spread 3-8 per month: lines the
-OCR never read at all. An empty category is a true statement; a fuzzy guess is
-not. Fill them by reading the page, or leave them.
+### THE CHECK THAT SHOULD HAVE RUN FIRST: EVERY PRINTED THEME MUST GET A ROW
+
+The first build of this file shipped at "93 %" and was wrong. When OCR mangled
+a `Thema:` line the code kept the PREVIOUS theme and applied it to every entry
+that followed, so each lost heading mislabelled a whole run. Nothing objected,
+because every row still carried a plausible-looking category.
+
+**21 of the 129 printed themes had received no row at all** — `Tips & Tricks /
+Spiele`, `Listings zum Abtippen / Drucker`, `Tips & Tricks / Drucker` and 18
+more, every one of which plainly has entries under it on the page. That is the
+check, it costs one line, and both lists were already in hand:
+
+```python
+empty = [t for t in themes_the_eye_saw if t not in themes_that_got_a_row]
+assert not empty          # a printed heading always has entries beneath it
+```
+
+The rebuild passes it: **129 of 129**. Two changes made that possible — the
+detected headings are aligned to the eye-read sequence as a SUBSEQUENCE (the
+first attempt raced a pointer to the end of the list on one bad match and
+aligned 5 of 109), and a run that spans a lost heading is split at its
+ALPHABETICAL RESET, because the print sorts titles within a theme.
+
+**And a repeated title is a different record each time it is printed.**
+`Bücher-Vorstellungen` appears 11 times under 11 different themes and
+`Computerlexikon zum Sammeln` 10 times; matching by title alone collapses them
+onto one record. They are the file's weakest class and were read off the page
+by hand.
+
+### WHAT THE FILE IS WORTH, HONESTLY
+
+| | rows |
+|---|---|
+| category read off the page by eye | 67 |
+| category placed by the machine | 656 |
+| **no category** | **95** |
+
+The machine portion is not clean: 17 of the rows I checked by eye were wrong
+and were corrected, which means more wrong ones remain among the 656 — most
+likely wherever a run had to be split at a reset. **A blank means "we could not
+read it", not "this article has no category"**, and that is the honest reading
+of all 95: the print has a category for every one of them.
 
 **The umlauts are restored from the print, not from a rule.** The disk
 transliterates (`Adventure-Loesungen`, `fuer`), so a word map was learned from
