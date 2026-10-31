@@ -2866,3 +2866,16 @@ attempts on SH8607 found two traps; this is what worked, verbatim:
 5. run `generate.py --issues <ID> --future --join` there.
 
 The stand-in stays in the scratch copy. Nothing is copied back.
+
+## THE END GATE ALSO SCANS FOR A HYPHEN LEFT AT A COLUMN BREAK
+
+```bash
+grep -rnE '[a-zäöüß]-</p>' issues/<ID>/*.html        # must print nothing
+```
+
+A paragraph ending on a line-break hyphen is text lost where the print's
+column ended. It reads as prose right up to the break, so no other check sees
+it, and it reached readers twice. Five hits over the whole published corpus,
+all real. See r320, *A PARAGRAPH THAT ENDS ON A LINE-BREAK HYPHEN*, for the
+three shapes and for the companion check that does not work.
+

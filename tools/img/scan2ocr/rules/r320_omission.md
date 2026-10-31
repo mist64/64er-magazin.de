@@ -244,3 +244,48 @@ class this rule exists to catch, hidden by its own exclusion.
 **List any `listing-*` block whose leading lines are prose** (no line number,
 no hex address, sentence punctuation) as `PROSE INSIDE A LISTING BLOCK`, even
 though the block itself is excluded from the count. See r020.
+
+## A PARAGRAPH THAT ENDS ON A LINE-BREAK HYPHEN IS TEXT LOST AT A COLUMN BREAK
+
+The print hyphenates at the end of every column. When the join fails, the
+hyphen survives into the HTML and whatever followed it is gone — and the page
+still reads as prose right up to the break, so nothing else in the chain sees
+it. Two readers reported one of these on 8610 p44 in October 2026; the scan of
+the corpus that followed found four more.
+
+```bash
+grep -rnE '[a-zäöüß]-</p>' issues/<ID>/*.html        # must print nothing
+```
+
+**MEASURED over the whole published corpus: five hits, all five real.** No
+false positive — a paragraph legitimately ending in a hyphen does not occur.
+Run it per issue at the end, and over `issues/*` after any step that joins or
+splits paragraphs.
+
+Three shapes, all of them seen:
+
+1. **The continuation is the very next `<p>`.** One paragraph split in two
+   (SH8505 p28: `gesteuert wer-` / `den.`). Join them.
+2. **The continuation follows a HEADING.** The print puts a heading at the foot
+   of a column and runs the paragraph straight through it — SH8601 p14
+   (`die Auflö-` + h2 + `sung von 320 Punkten …`) and 8506 p41 (`bei vielen
+   Ter-` + h2 + `minalprogrammen zurück …`). Join the paragraph and put the
+   **heading after it**: the text before the heading belongs to the section
+   above, so leaving the h2 in the middle puts half a sentence under the wrong
+   one.
+3. **The continuation is not in the file.** Read the master. 8610 p44 had lost
+   the standfirst's last line (`sten.`) at the column break. **Do not complete
+   the word from grammar** — SH8601 p78's `angege-` has exactly one plausible
+   completion and it is still open for that reason.
+
+### The companion check that does NOT work — do not re-invent it
+
+The obvious partner is "a `<p>` that starts lowercase after a `<p>` that ends
+without terminal punctuation", to catch the orphaned second half. **MEASURED:
+118 files, 291 pairs, and nearly all are correct** — it fires on the house
+pattern where a command line sits in its own `<p>` between two halves of a
+sentence (*"Das Maschinenprogramm kann nun mit"* / `SYS 49152` / *"gestartet
+werden"*). A plain `<p>` starting with a lowercase word is worse still: 172
+files, mostly glossary and listing entries. Neither is usable; the hyphen is
+the only precise signal.
+
