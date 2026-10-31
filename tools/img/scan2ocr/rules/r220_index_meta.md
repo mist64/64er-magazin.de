@@ -596,15 +596,37 @@ by hand.
 
 | | rows |
 |---|---|
-| category read off the page by eye | 67 |
+| category read off the page by eye | 126 |
 | category placed by the machine | 656 |
-| **no category** | **95** |
+| **no category** | **36** |
 
 The machine portion is not clean: 17 of the rows I checked by eye were wrong
 and were corrected, which means more wrong ones remain among the 656 — most
-likely wherever a run had to be split at a reset. **A blank means "we could not
-read it", not "this article has no category"**, and that is the honest reading
-of all 95: the print has a category for every one of them.
+likely wherever a run had to be split at a reset.
+
+**AND THE DISK CARRIES ENTRIES THE PRINT DOES NOT.** Of the rows left blank,
+**26 are absent from the printed index altogether**, and they sit at the back
+of the book, pages 159-193 with four exceptions. **17 of the 26 are plainly
+competitions** from their own titles — *2000 Mark für die beste
+Kernelumschaltung*, *Wir suchen den schönsten Briefkopf*, *Die Gewinner stehen
+fest …*, *Amiga 500 zu gewinnen!*. **About the other nine I know only that
+they are absent** (*Druck-Daten*, *Die ideale Diskette*, *20 Drucker für
+Schulen*, *Fit mit dem Computer*, *Durch Geos in die USA*, *Der
+Software-Palast*, *Unsere Leser testen Disketten*, *Goldene Zeiten für den
+C 64*, *Drucker unter Dampf*): calling them competitions too was a pattern
+fitted to the list after the fact, which is not evidence. **What was actually
+tested is absence**, and that holds for all 26: two OCR passes over all six pages return
+one hit for `Wettbewerb` and none for `gewinn`, and reading the pages by eye
+finds none of them, including at the alphabetical position each would occupy
+(*Amiga 500 zu gewinnen!* is absent from `Aktuelles / Hardware`, which runs
+"256-KByte-CMOS-RAM-Platine, 8-Kanal-Logikanalysator, Amiga als Speicherriese,
+Bezugsadresse …").
+
+So for those 26 the empty category is CORRECT: the magazine's own index did not
+classify them. The **other 10** are ordinary articles whose printed line simply
+has not been found yet, and for those a blank still means "we could not read
+it". The two cases look identical in the CSV, which is a limitation of the
+format, not of the data — they are listed in the commit that built it.
 
 **The umlauts are restored from the print, not from a rule.** The disk
 transliterates (`Adventure-Loesungen`, `fuer`), so a word map was learned from
