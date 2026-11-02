@@ -390,7 +390,7 @@ genuinely disagree with each other — a fold on one side and a torn fringe on t
 other — that is a real question and it goes to the owner; agreement is not a
 question.
 
-### PAPER: ASK ONLY WHEN THE THREE WITNESSES DISAGREE
+### PAPER IS DERIVED TOO — THE WITNESSES, THEN THE LEAF PARTNER
 
 The paper answer has three witnesses (r005, *What the step offers as evidence*):
 the own-white gap read per dpi, the edge-finder pre-fill, and the scan dpi.
@@ -398,11 +398,18 @@ the own-white gap read per dpi, the edge-finder pre-fill, and the scan dpi.
 SH8606's three agree exactly on `high_pages = [1, 2, 179, 180]`, and on SH8605
 and SH8608 the owner's answer was what the witnesses already said.
 
-**Ask when they disagree, or when one of them is blind** — which is the case the
-rules were built around and it is not rare: SH8605's bound-in Zahlkarte p198 was
-offered by the own-white gap alone (paper frac 0.116 against 0.10), and a
-full-bleed cover has no own white to read. A disagreement is a question about a
-physical object; an agreement is a measurement.
+**When they disagree, or one of them is blind, settle it against the LEAF
+PARTNER** (n/n+1 — one sheet of paper cannot be two stocks; see *PAPER: THE
+LEAF PARTNER SETTLES A DISAGREEMENT BEFORE THE OWNER DOES*). The blind witness
+is not rare: SH8605's bound-in Zahlkarte p198 was offered by the own-white gap
+alone (paper frac 0.116 against 0.10), and a full-bleed cover has no own white
+to read — SH8607's p180 and p001 were both settled by their partners in three
+minutes.
+
+**Owner, 2026-11-02: *"have it detect binding and paper type."*** Paper is
+derived, like binding. Only a disagreement the leaf CANNOT settle — both sides
+of one sheet in doubt — leaves the build, and it goes to **control**, not to
+the owner. Record which leaf settled each page in LOG.md.
 
 005 grades nothing until both are settled, however they were settled.
 
@@ -412,6 +419,37 @@ wrapper graded with the interior (decided 2026-09-27, 8610 and 8611). A spread
 descriptor carrying `paper` with `high_pages` is not honoured — every page is
 graded with the single profile, silently. So ask the owner only to CONFIRM that,
 not to choose.
+
+## WHAT THE OWNER IS ASKED FOR: THREE DELIVERABLES, AND NOTHING ELSE
+
+**Owner, 2026-11-02:** *"have sibling agent do all the work, have it detect
+binding and paper type, ask me for crops and title once the graded files are
+ready and ask me for confirming the handwritten notes so i can remove them
+from the master files."*
+
+**A QUESTION GOES TO CONTROL. A DELIVERABLE GOES TO THE OWNER.** The difference
+is whether the owner has to *do* something with their hands. A point the rules
+do not settle is a question, and it is control's to answer — every one that
+reaches the owner is evidence the rules fell short. These three are not
+questions; they are work only the owner can do:
+
+| # | deliverable | ready after | what the owner does |
+|---|---|---|---|
+| 1 | the **cover source**, `<tmp>/title_source_150.png` | 005, or 005b on a `sheet` binding | makes `title.png` by hand |
+| 2 | the **crop worklist** + `<tmp>/sheets600/` | the HTML is complete but for figures | cuts the figures from the graded pages |
+| 3 | the **marks**, each with a crop at magnification | the mark census, before the PDF ships | rules each `dirt` / `a previous hand` / `the plate`, and repaints the master for the first two |
+
+**Hand each one over the moment it exists and keep going** — see *An OWNER
+DELIVERABLE is handed over the MOMENT it exists*. 1 and 2 arrive together once
+the graded pages are ready, which is what "once the graded files are ready"
+means; 3 goes over as soon as the census is complete and gated (*A MARK THAT
+DOES NOT SURVIVE INTO THE DELIVERED ARTEFACT IS NEVER PUT TO THE OWNER*).
+
+**Everything else the build decides for itself**, and that includes the two it
+used to ask about: **binding** (*BINDING IS DERIVED FROM THE SCAN*) and
+**paper** (*PAPER IS DERIVED TOO*). A build that reaches the owner with a
+fourth thing has either found a gap in these rules — say so, in
+`WORKFLOW_ERRATA.md` — or has not read them.
 
 **PAUSE 2 — the image boundary.** The chain runs from 005 to the end of the HTML
 with **no cut figures**, then stops and hands over. What it delivers:
