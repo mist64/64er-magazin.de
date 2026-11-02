@@ -519,6 +519,24 @@ k    = np.percentile(box[m], 50, axis=0) if m.sum() > 5000 else None
 is the step where a wrong answer is invisible: a bed-derived K anchor grades
 every page of the issue.
 
+**ON A SPREAD, THE PAPER BBOX IS THE WHOLE SHEET — BOTH HALVES.** The recipe
+above was written for the sheet variant, where "the sheet's own paper bbox" is
+one page. Here it is a page *and its neighbour*, so the box runs past the fold
+and the mask can land on the facing page's ink. MEASURED on 8701 p017: the box
+reaches the neighbour strip on the left and a few mask pixels sit on p016's
+printed globe.
+
+That particular spill is harmless — it is **ink, not bed**, and a few thousand
+pixels cannot move the median of 173 000 — but it is harmless by luck, not by
+construction, and the next issue's neighbour may be a black ad. **Cut the box
+at the fold**: `fit_fold()` already knows where it is, and on a page where the
+fold has not been fitted yet, the neighbour boundary does.
+
+A spill that lands on the FOLD itself is a different matter and is not
+harmless: the clip holes are dark teardrops at 16–31 grey on graded paper, well
+under the mask's `lum < 70`, and six of them inside the box would drag K toward
+a hole, not toward ink.
+
 This requirement applies to `r005_masters_sheet.md` too, which does not mention
 the K anchor at all. **The level lines stay
 identity** until they are measured as the **p99 of each ink over bare interior
