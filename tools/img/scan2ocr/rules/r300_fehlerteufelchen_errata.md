@@ -403,10 +403,21 @@ for f in "$dir"/*.html; do
   $PY - "$f" <<'PYEOF'
 import io, re, sys
 s = io.open(sys.argv[1], encoding='utf-8').read()
-for m in re.finditer(r'<aside[^>]*id="fehlerteufelchen"[^>]*>(.*?)</aside>',
+# THIS CHECK HAD NEVER LOOKED AT ANYTHING.  Both patterns below were
+# written as `\b` and the file actually held a literal BACKSPACE (0x08)
+# in its place, so `<aside\x08` could not match any HTML ever written:
+# the loop body never ran, nothing was printed, and the block exited 0
+# on every issue since it was added -- including one with an aside
+# carrying no trailer at all.  Worse than a FAIL that exits 0, because
+# it produced no output to disbelieve.  Character classes instead: they
+# say the same thing and cannot be eaten by whatever wrote the file.
+for m in re.finditer(r'<aside[\s>][^>]*id="fehlerteufelchen"[^>]*>(.*?)</aside>',
                      s, re.S):
     body = m.group(1)
-    ps = len(re.findall(r'<p', body))
+    # `<p` alone also matches `<pre`, so an aside quoting a corrected
+    # listing counted its <pre> as a second correction and tripped the
+    # 'look' line below on correct output (8701).
+    ps = len(re.findall(r'<p[\s>]', body))
     tr = len(re.findall(r"<!-- 64'er ", body))
     # ONE TRAILER PER SOURCE ISSUE, not per correction: several corrections
     # can come from the SAME later issue, and then one trailer is right.  The

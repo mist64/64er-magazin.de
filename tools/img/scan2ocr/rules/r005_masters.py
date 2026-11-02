@@ -97,6 +97,29 @@ SKEW_INK_SIGMA = 0.4
 # asserted here.  Measured residuals after levelling: |0.02| deg or better.
 SKEW_RESIDUAL_MAX = 0.10                      # deg
 
+# AND THE RESIDUAL CANNOT CATCH A BAD MEASUREMENT, because it re-measures with
+# the same instrument: on 8701 p051 the coarse sweep said -3.06 and the levelled
+# page then reported a residual of -0.02, confirming itself.  The eye caught it.
+#
+# WHAT THE SCORE LOOKS LIKE WHEN IT HAS NOTHING TO BITE ON.  skew_score is the
+# variance of the row-sum profile; level type puts each line's ink into few rows
+# and the profile spikes.  A dark full-bleed ad has no text lines in the ink
+# mask at all, so the profile is near flat and its maximum is wherever the
+# artwork's own edges happen to line up.  MEASURED, the coarse peak over the
+# coarse median across 8701's 192 thumbs: median 14.9, p5 4.8, and the two worst
+# pages in the issue are the two the eye rejected -- p118 at 1.77 and p051 at
+# 3.25.  Every page that measured correctly scored 4.26 or better.
+#
+# So: a profile this flat may NOT move the page far.  Both halves matter -- a
+# weak profile that lands near zero is harmless (p109 scores 1.81 at +0.0, p188
+# 3.07 at +0.0, and both are right), and a strong profile at 3 degrees would be
+# a genuinely skewed sheet.  Only weak AND far is a refusal.  MEASURED on 8701,
+# this pair changes exactly 2 of 192 pages, and they are exactly the two pages
+# the eye flagged: p051 (false skew on a level sheet) and p118 (artwork printed
+# tilted 6.6 deg, which ruling 14 levels DELIBERATELY, by eye, not by this).
+SKEW_PEAK_MIN = 6.0          # coarse peak / coarse median; below this: no peak
+SKEW_WEAK_MAX_DEG = 1.0      # ...and then the page may not move further than this
+
 # --- the paper mask --------------------------------------------------------
 # A pixel is paper if its city-block distance from the profile's paper white is
 # under this AND it is not the prop (below).  MEASURED: paper white is uniform
@@ -396,6 +419,23 @@ def measure_skew(gray, around=None):
     fine = np.arange(coarse - SKEW_FINE_SPAN,
                      coarse + SKEW_FINE_SPAN + SKEW_FINE_STEP / 2, SKEW_FINE_STEP)
     return float(max(fine, key=lambda a: skew_score(ink, a)))
+
+
+def skew_peakiness(gray):
+    """How pronounced the skew score's maximum is: coarse peak / coarse median.
+
+    The same ink mask and the same coarse sweep measure_skew runs, scored for
+    SHAPE instead of position.  See SKEW_PEAK_MIN for what the numbers are.
+    """
+    h, w = gray.shape
+    t, b, l, r = SKEW_CROP
+    crop = gray[int(h * t):int(h * b), int(w * l):int(w * r)]
+    ink = (crop < crop.mean() - SKEW_INK_SIGMA * crop.std()).astype(np.float32)
+    lo, hi, step = SKEW_COARSE
+    sc = np.array([skew_score(ink, a)
+                   for a in np.arange(lo, hi + step / 2, step)])
+    med = float(np.median(sc))
+    return float(sc.max() / med) if med > 0 else float("inf")
 
 
 def prop_mask(rgb):

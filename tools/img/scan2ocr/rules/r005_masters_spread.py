@@ -61,7 +61,8 @@ from r005_masters import (
     SKEW_RESIDUAL_MAX, SKEW_COARSE, CLEAN_PCT, TRACE_BANDS, BODY_PAPER_FRAC,
     DEBUG_REDUCE, DEBUG_COLOR, DEBUG_WIDTH, DEBUG_STEP,
     ANCHORS, LEVELS, HAVE_PROFILE, GRADE_SHA,
-    PageFailed, measure_skew,
+    SKEW_PEAK_MIN, SKEW_WEAK_MAX_DEG,
+    PageFailed, measure_skew, skew_peakiness,
     separate_and_render, archive_cmyk, save_master, write_profile, stamp_text,
     paper_mask, prop_mask, boundaries, trace, tilt,
 )
@@ -203,6 +204,9 @@ def backing_top(rgb):
     first = np.argmax(foot, axis=0)                              # first backing row up
     cols = np.where(foot.any(0) & (first <= PROP_AT_FOOT_MM * MM))[0]
     if len(cols) < TRACE_BANDS:
+        print("  backing_top: %d columns reach the foot (< %d) -- no line; "
+              "frame row used, cut() replaces it with the issue's foot"
+              % (len(cols), TRACE_BANDS), flush=True)
         return None
     tops = np.empty(len(cols))
     for k, c in enumerate(cols):
@@ -211,13 +215,63 @@ def backing_top(rgb):
         tops[k] = h - end                                        # first non-prop row
     try:
         line = trace(tops, cols.astype(float), CLEAN_PCT, MM)
-    except PageFailed:
+    except PageFailed as exc:
+        print("  backing_top: the trace failed (%s) -- frame row used, cut() "
+              "replaces it with the issue's foot" % exc, flush=True)
         return None
     up_mm = (h - 1 - float(np.polyval(line, w / 2.0))) / MM
     if up_mm > BACKING_BOT_MAX_MM:
         print("  backing_top: line sits %.1f mm above the frame foot (> %.1f) "
               "-- reading that as INK to the trim, not bed; frame row used"
               % (up_mm, BACKING_BOT_MAX_MM), flush=True)
+        return None
+    return line
+
+
+# A LEAF NARROWER THAN A4 IS NEITHER PAPER NOR FULL BLEED.  MEASURED on 8701:
+# p003/p004 are the bound-in reply card, about half the page wide, and the
+# rest of the frame is the black bed -- 43/44 % of the master, in ONE column
+# run touching the outer edge (p003 columns 2738-4937 of 4961, p004 0-2225).
+# The card fills about half of every row, under BODY_PAPER_FRAC, so `body`
+# read 0.00, the page was called full-bleed, `outer` was taken at the frame,
+# the bed went into the master, and `unknown` certified 2 %.  Unlike a dark
+# foot, this edge IS a step (card lum 200+ against bed 33), so it is traced:
+# per row, the run of backing from the outer frame edge inward.  A row counts
+# when that run is at least NARROW_BED_MIN_MM; the page counts when most rows
+# do AND what lies just inside the boundary is bright -- p005, the control,
+# is 21 % dark but in the artwork, not edge-contiguous, and is not touched.
+NARROW_BED_MIN_MM = 20.0     # a bed run from the outer edge at least this wide
+NARROW_ROWS_MIN = 0.6        # ...in at least this fraction of the rows
+NARROW_STEP_LUM = 150        # and the leaf just inside the boundary this bright
+
+
+def backing_outer(rgb, par):
+    """The outer edge of a leaf narrower than A4, as x(y), or None."""
+    h, w = rgb.shape[:2]
+    bk = backing_mask(rgb)
+    b = bk if par == "even" else bk[:, ::-1]          # column 0 = the outer edge
+    run = np.argmin(b, axis=1)
+    run[b.all(1)] = w
+    rows = np.where(run >= NARROW_BED_MIN_MM * MM)[0]
+    if len(rows) < NARROW_ROWS_MIN * h:
+        return None
+    x = run[rows].astype(float) if par == "even" else (w - 1 - run[rows]).astype(float)
+    try:
+        line = trace(x, rows.astype(float), CLEAN_PCT, MM)
+    except PageFailed:
+        return None
+    xm = int(np.polyval(line, h / 2.0))
+    # Clamped, and refused when empty: unclamped, an even page whose run
+    # reaches the far edge gave an EMPTY slice, .mean() was nan, `nan < 150`
+    # is False and an all-backing frame (a blank or failed scan) was accepted
+    # as a narrow leaf; on an odd page a negative start silently read the
+    # opposite side of the sheet.
+    x0, x1 = ((xm + int(MM), xm + int(3 * MM)) if par == "even"
+              else (xm - int(3 * MM), xm - int(MM)))
+    x0, x1 = max(x0, 0), min(x1, w)
+    if x1 <= x0:
+        return None
+    if rgb[int(h * .2):int(h * .8), x0:x1].mean() < NARROW_STEP_LUM:
         return None
     return line
 
@@ -263,10 +317,12 @@ def outer_edges(rgb, par):
         except PageFailed:
             pass
     bot = backing_top(rgb)
+    narrow = backing_outer(rgb, par)
     return {"top": frame["top"],
             "bot": np.array([0.0, h - 1.0]) if bot is None else bot,
-            "outer": frame["outer"],
-            "source": "fullbleed", "body": body, "replaced": []}
+            "outer": frame["outer"] if narrow is None else narrow,
+            "source": "fullbleed" if narrow is None else "narrow",
+            "body": body, "replaced": []}
 
 
 # --- the fold: the clip holes --------------------------------------------
@@ -702,7 +758,21 @@ def level_page(page):
         if not p.exists():
             raise PageFailed(f"r005 p{stem}: missing input {p}")
     thumb_rgb = Image.open(thumb).convert("RGB")
-    angle = measure_skew(np.array(thumb_rgb.convert("L"), float))
+    thumb_gray = np.array(thumb_rgb.convert("L"), float)
+    angle = measure_skew(thumb_gray)
+    # A flat skew profile may not move the page far (SKEW_PEAK_MIN, in
+    # r005_masters): on 8701 p051 it put a level sheet 3 deg off, and the
+    # residual pass, using the same instrument, confirmed it.  Refused, the page
+    # is left as scanned and NOT re-levelled, because re-levelling would ask the
+    # same blind instrument again.
+    peak = skew_peakiness(thumb_gray)
+    refused = peak < SKEW_PEAK_MIN and abs(angle) > SKEW_WEAK_MAX_DEG
+    if refused:
+        notes.append(f"SKEW refused: the profile has no peak (peak/median "
+                     f"{peak:.2f} < {SKEW_PEAK_MIN}) and it asked for "
+                     f"{angle:+.2f} deg (> {SKEW_WEAK_MAX_DEG}) -- levelled to 0. "
+                     f"LOOK AT the page")
+        angle = 0.0
 
     def levelled(a):
         f = Image.open(scan).convert("RGB")
@@ -715,6 +785,8 @@ def level_page(page):
 
     full, img = levelled(angle)
     residual = residual_of(img)
+    if refused:
+        return angle, residual, full, img, notes
     if abs(residual) > SKEW_RESIDUAL_MAX:
         first, angle = residual, angle + residual
         full, img = levelled(angle)
@@ -771,6 +843,12 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
     if edges["source"] == "fullbleed":
         notes.append(f"EDGES fullbleed: paper body {edges['body']:.2f} -- top/outer "
                      f"at the frame, bottom from the prop")
+    if edges["source"] == "narrow":
+        ox = float(np.polyval(edges["outer"], h / 2.0))
+        notes.append(f"EDGES narrow leaf: {(ox if par == 'even' else w - 1 - ox) / MM:.1f} mm "
+                     f"of bed from the outer frame edge -- a leaf printed NARROWER "
+                     f"than A4 (a bound-in card); the bed is fabricated white, so "
+                     f"`unknown` is large BY DESIGN. LOOK AT, not a failure")
     for key, depth, t in edges["replaced"]:
         notes.append(f"EDGES {key} from the {'prop' if key == 'bot' else 'frame'}: "
                      f"the paper trace ran {depth:.1f} mm in at {t:+.2f} deg -- ink to the trim")
@@ -1015,6 +1093,214 @@ def fit_window(geoms):
     return out
 
 
+# A FOOT THE PAGE COULD NOT MEASURE TAKES THE ISSUE'S, NEVER THE FRAME ROW.
+# MEASURED on 8701 (black bed), the bottom trim's depth above the frame foot,
+# read off the geometry sidecars: 173 paper-traced feet 5.14-7.98 mm, median
+# 7.45, sd 0.41; 16 of 19 full-bleed pages got a backing_top line inside that
+# population (6.52-7.85).  THREE took the frame row at 0.00 mm -- p051, p178,
+# p179 -- and kept 6-8 mm of bed in the master.  That cannot be cured with a
+# threshold: on a dark full-bleed page the trim is a GRADIENT, not a step
+# (p051 runs lum 32 -> 30 -> 28 -> 25 -> 18 over 2 mm, the sheet's edge-shadow
+# on the bed), and the bed (lum 33) sits between the ink (17-25) and the paper
+# (96).  So the depth is fitted issue-wide from the pages that can measure it,
+# as the window is from the pages that carry a logo, and applied where a page
+# cannot.  A foot shallower than FOOT_FRAME_MM is the frame row by construction.
+FOOT_FRAME_MM = 3.0          # a foot this close to the frame's is the frame row
+FOOT_OUTLIER_MM = 2.0        # the end gate: further than this from the median
+
+
+def foot_depth_mm(g):
+    w, h = g["sheet_px"]
+    return (h - 1 - float(np.polyval(g["edges"]["bot"], w / 2.0))) / MM
+
+
+def fit_foot(geoms):
+    """Replace every frame-row foot with the issue's median depth; NOTE it.
+
+    Returns (median_mm, replaced pages, outliers) -- the outliers are the
+    pages whose foot, measured or not, sits further than FOOT_OUTLIER_MM from
+    the issue's median, which is the check that would have named all three
+    8701 pages without an eye."""
+    depths = {g["page"]: foot_depth_mm(g) for g in geoms}
+    sound = [d for d in depths.values() if d >= FOOT_FRAME_MM]
+    if not sound:
+        raise SystemExit(f"{VARIANT} cut: no page measured its foot")
+    med = float(np.median(sound))
+    replaced = []
+    for g in geoms:
+        if depths[g["page"]] < FOOT_FRAME_MM:
+            w, h = g["sheet_px"]
+            g["edges"]["bot"] = [0.0, h - 1.0 - med * MM]
+            g.setdefault("notes", []).append(
+                f"FOOT from the issue: the page's own foot sat "
+                f"{depths[g['page']]:.2f} mm above the frame foot (the frame row, "
+                f"bed kept) -- replaced with the issue median {med:.2f} mm over "
+                f"{len(sound)} measured pages")
+            replaced.append(g["page"])
+            # Back into the sidecar, not only into this run's memory: the
+            # sidecar is what a check reads (the foot audit over all 192 found
+            # p179 that way), and left at 0.00 it re-flags a repaired page as
+            # the defect on every future audit.  Written with the note, so the
+            # sidecar, the stamp and the master say the same thing -- and a
+            # later cut() reads a sound foot and keeps the note.
+            (OUT_GEOM / f"{g['page']:03d}.json").write_text(json.dumps(g, indent=1))
+    outliers = sorted((p, round(d, 2)) for p, d in depths.items()
+                      if d >= FOOT_FRAME_MM and abs(d - med) > FOOT_OUTLIER_MM)
+    return med, replaced, outliers
+
+
+BED_RUN_FRAC = 0.9           # a column/row this much backing counts as bed
+BED_RUN_LOOK_MM = 2.0        # a bed run from an edge wider than this: LOOK AT
+
+
+# THE CLIP IS RIGID: FILL ALL SIX PUNCHES, NOT THE ONES THE FINDER LISTED.
+# MEASURED on 8701: 74 of 192 pages filled fewer than 6 punches.  18 had no
+# hole fold at all (source none/colour) and filled 0; 56 had a fold but the
+# finder had listed only 4 or 5 candidates (p077, p102, p105, p108: "4 filled of
+# 4"), so the punch it missed stayed in the master -- 27 of them survive the
+# PDF's 35 % threshold.  A clip punch is damage from our disbinding, like the
+# bed: it is never the plate and never the owner's question.
+# Detection's job is to LOCATE the clip.  Once located, the six positions are
+# the template's (HOLE_TEMPLATE_MM from HOLE_TEMPLATE_Y0_MM, issue-wide), and
+# each is filled from what is actually on the page there:
+#   1. a hole the fold already carries within HOLE_FILL_NEAR_MM -- kept as is;
+#   2. else a relaxed local search around the template position for a dark,
+#      punch-sized blob on a LIGHT surround (PUNCH_*);
+#   3. else nothing: no punch is visible there, and painting blind could cover
+#      ink (a full-bleed page, a screened box at the fold).
+# Where the page has no fold line, x comes from the issue's median hole-fold
+# distance from the inner frame edge and y from the issue's median template
+# shift, each widened by the search window -- the same clip on every sheet.
+PUNCH_WIN_X_MM = 3.0         # search half-width across the fold
+PUNCH_WIN_Y_MM = 2.5         # ...and along it, around the template row
+PUNCH_DIP = 30               # darker than the local surround by this (finder: 45)
+PUNCH_ABS_MAX = 150          # and absolutely this dark (finder: 120)
+PUNCH_MIN_MM = 0.3           # longest extent
+PUNCH_MAX_MM = 4.0           # longest extent (a torn teardrop runs to 2.84)
+PUNCH_RING_MM = 1.5          # the surround: this far beyond the blob's box...
+PUNCH_RING_DARK_MAX = 0.15   # ...may be at most this fraction dark, or it is ink
+PUNCH_ROW_TOL_MM = HOLE_TEMPLATE_TOL_MM   # a found blob must sit ON its template row
+PUNCH_FOLD_TOL_MM = 1.0      # ...and on the fold line, where the page has one
+PUNCH_FILL_MIN_MM = 2.0      # fill at least this diameter: r = max(d/2, 1.0) + 0.4
+# ACCEPT ON THE ROW, THEN SIZE TO COVER.  MEASURED in the 8701 dry run: on p192
+# the found blob was the punch and the disc was too small; on p179 the found
+# blob was a fragment 1.6 mm above the punch, and a bigger disc there would
+# only paint white beside a punch that still shows.  So a candidate is
+# accepted only within PUNCH_ROW_TOL_MM of its row (and PUNCH_FOLD_TOL_MM of
+# the fold, if known), and an accepted one is filled at no less than
+# PUNCH_FILL_MIN_MM.  A page with no fold line has no known row either, so its
+# row is fixed by agreement: at least two candidates on rows whose shifts
+# agree within the tolerance, or nothing is accepted.
+# A WHITE DISC IS ONLY AN IMPROVEMENT WHERE THE SURROUND IS PAPER.  The ring
+# test stays on art-to-the-fold pages: a punch that cannot be located with
+# confidence there is left, and the page is recorded, not smeared.
+
+
+def punch_priors(geoms):
+    """(median fold distance from the inner frame edge in mm, median template
+    shift in mm) over the pages whose fold came from the holes."""
+    dist, shift = [], []
+    for g in geoms:
+        f = g["fold"]
+        if f["source"] != "holes" or not f["poly"] or not f["holes"]:
+            continue
+        w, h = g["sheet_px"]
+        x = float(np.polyval(f["poly"], h / 2.0))
+        dist.append((w - 1 - x) / MM if g["parity"] == "even" else x / MM)
+        m, _, sh = template_score([c[1] for c in f["holes"]])
+        if sh is not None:
+            shift.append(sh)
+    return float(np.median(dist)), float(np.median(shift))
+
+
+def fill_punches(g, gray, priors):
+    """Add every visible clip punch to g["fold"]["holes"]; return (kept, found, none)."""
+    w, h = g["sheet_px"]
+    f = g["fold"]
+    dist_mm, shift_mm = priors
+    if f["poly"]:
+        fold_x = lambda y: float(np.polyval(f["poly"], y))
+        win_x = PUNCH_WIN_X_MM
+    else:
+        x = (w - 1 - dist_mm * MM) if g["parity"] == "even" else dist_mm * MM
+        fold_x = lambda y: x
+        win_x = PUNCH_WIN_X_MM + 2.0                    # the median, not this page's line
+    own = [c for c in f["holes"]]
+    if own:
+        _, _, sh = template_score([c[1] for c in own])
+        shift = sh if sh is not None else shift_mm
+        win_y = PUNCH_WIN_Y_MM
+    else:
+        shift = shift_mm
+        win_y = PUNCH_WIN_Y_MM + HOLE_TEMPLATE_Y0_TOL_MM
+    kept = found = none = 0
+    cands = {}                                   # row index -> [(px, py, d)]
+    for j, t in enumerate(HOLE_TEMPLATE_MM):
+        ty = (shift + t) * MM
+        if any(abs(c[1] - ty) <= HOLE_FILL_NEAR_MM * MM for c in own):
+            kept += 1
+            cands[j] = None
+            continue
+        tx = fold_x(ty)
+        x0, x1 = int(max(tx - win_x * MM, 0)), int(min(tx + win_x * MM, w))
+        y0, y1 = int(max(ty - win_y * MM, 0)), int(min(ty + win_y * MM, h))
+        cands[j] = []
+        if x1 - x0 < 10 or y1 - y0 < 10:
+            continue
+        win = gray[y0:y1, x0:x1].astype(np.float32)
+        local = ND.uniform_filter(win, int(HOLE_BG_MM * MM) | 1)
+        dark = (win < local - PUNCH_DIP) & (win < PUNCH_ABS_MAX)
+        lab, _ = ND.label(dark)
+        for i, sl in enumerate(ND.find_objects(lab), 1):
+            if sl is None:
+                continue
+            if sl[0].start == 0 or sl[1].start == 0 or sl[0].stop == win.shape[0] or sl[1].stop == win.shape[1]:
+                continue                                 # runs out of the window: ink
+            hh, ww = sl[0].stop - sl[0].start, sl[1].stop - sl[1].start
+            d = max(hh, ww) / MM
+            if d < PUNCH_MIN_MM or d > PUNCH_MAX_MM:
+                continue
+            r = int(PUNCH_RING_MM * MM)
+            ry0, ry1 = max(sl[0].start - r, 0), min(sl[0].stop + r, win.shape[0])
+            rx0, rx1 = max(sl[1].start - r, 0), min(sl[1].stop + r, win.shape[1])
+            ring = dark[ry0:ry1, rx0:rx1].copy()
+            ring[sl[0].start - ry0:sl[0].stop - ry0, sl[1].start - rx0:sl[1].stop - rx0] = False
+            if ring.mean() > PUNCH_RING_DARK_MAX:
+                continue                                 # sits in ink, not on paper
+            cy, cx = ND.center_of_mass(lab[sl] == i)
+            cands[j].append((float(x0 + sl[1].start + cx), float(y0 + sl[0].start + cy), float(d)))
+    # the row: this page's own shift where it has detected holes; otherwise
+    # the shift two or more candidates agree on
+    if not own:
+        offs = [(c[1] / MM - HOLE_TEMPLATE_MM[j]) for j, cs in cands.items() if cs for c in cs]
+        best = None
+        for o in offs:
+            n = len({j for j, cs in cands.items() if cs
+                     for c in cs if abs(c[1] / MM - HOLE_TEMPLATE_MM[j] - o) <= PUNCH_ROW_TOL_MM})
+            if n >= 2 and (best is None or n > best[0]):
+                best = (n, o)
+        shift = best[1] if best else None
+    for j, cs in cands.items():
+        if cs is None:
+            continue
+        ok = []
+        if shift is not None:
+            ty = (shift + HOLE_TEMPLATE_MM[j]) * MM
+            for px, py, d in cs:
+                if abs(py - ty) > PUNCH_ROW_TOL_MM * MM:
+                    continue
+                if f["poly"] and abs(px - fold_x(py)) > PUNCH_FOLD_TOL_MM * MM:
+                    continue
+                ok.append((abs(py - ty), px, py, d))
+        if ok:
+            _, px, py, d = min(ok)
+            f["holes"].append([px, py, max(d, PUNCH_FILL_MIN_MM)])
+            found += 1
+        else:
+            none += 1
+    return kept, found, none
+
+
 def cut_page(geom, fit, sheet600):
     """The master: sheet600 with the unknown painted white, cut to the window."""
     notes = list(geom["notes"])
@@ -1036,6 +1322,29 @@ def cut_page(geom, fit, sheet600):
         master[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = painted[sy0:sy1, sx0:sx1]
         unk[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = u[sy0:sy1, sx0:sx1]
     frac = float(unk.mean())
+    # WHAT THE PIXELS SAY, not what the trace thought.  `unknown` is built from
+    # the traced edges alone, so it can only report the trace's own view: on
+    # 8701 p003/p004 it certified 2 % for masters that were 44 % bed.  So the
+    # window is also read for BED that survived as "known": a run of columns
+    # from either side edge, or of rows from the foot, that is backing in more
+    # than BED_RUN_FRAC of its pixels (over all rows, not only the known ones,
+    # so it errs toward not firing).  Ink to the trim can do this too
+    # (a black full-bleed ad), which is why it is a LOOK AT and not a fill.
+    raw = np.zeros((MASTER_H_PX, MASTER_W_PX, 3), np.uint8)
+    if sy1 > sy0 and sx1 > sx0:
+        raw[sy0 - y0:sy1 - y0, sx0 - x0:sx1 - x0] = sheet600[sy0:sy1, sx0:sx1]
+    bed = backing_mask(raw) & ~unk
+    def edge_run(fr):
+        n = int(np.argmin(fr > BED_RUN_FRAC)) if not (fr > BED_RUN_FRAC).all() else len(fr)
+        return n / MM
+    col = bed.mean(0)
+    bed_mm = {"left": edge_run(col), "right": edge_run(col[::-1]),
+              "foot": edge_run(bed.mean(1)[::-1])}
+    if max(bed_mm.values()) > BED_RUN_LOOK_MM:
+        notes.append("BED in the window: " + ", ".join(
+            f"{k} {v:.1f} mm" for k, v in bed_mm.items() if v > BED_RUN_LOOK_MM)
+            + " of backing-coloured pixels the trace calls page -- bed, or ink "
+              "to the trim. LOOK AT")
     if source != "logo":
         notes.append("ANCHOR from the page edges (fold + bottom trim): the "
                      "wordmark was not found")
@@ -1046,13 +1355,29 @@ def cut():
     geoms = [json.loads(p.read_text()) for p in sorted(OUT_GEOM.glob("[0-9][0-9][0-9].json"))]
     if not geoms:
         raise SystemExit(f"{VARIANT} cut: no geometry in {OUT_GEOM} -- run measure first")
+    foot_med, foot_replaced, foot_out = fit_foot(geoms)
+    print(f"foot: issue median {foot_med:.2f} mm; frame-row feet replaced: "
+          f"{['%03d' % p for p in foot_replaced] or 'none'}; LOOK AT (> "
+          f"{FOOT_OUTLIER_MM} mm from the median): "
+          f"{[('%03d' % p, d) for p, d in foot_out] or 'none'}", flush=True)
     fit = fit_window(geoms)
+    priors = punch_priors(geoms)
+    print(f"punches: issue fold distance {priors[0]:.2f} mm, template shift "
+          f"{priors[1]:.2f} mm", flush=True)
     OUT_MASTER.mkdir(parents=True, exist_ok=True)
     report = {"fit": {k: list(v) for k, v in fit.items() if k != "stats"},
-              "stats": fit["stats"], "pages": {}}
+              "stats": fit["stats"], "pages": {},
+              "foot": {"median_mm": foot_med, "replaced": foot_replaced,
+                       "outliers": foot_out}}
     for g in geoms:
         stem = f"{g['page']:03d}"
         sheet = np.array(Image.open(OUT_SHEET600 / f"{stem}.png").convert("RGB"))
+        kept, found, none = fill_punches(g, sheet.mean(2), priors)
+        if found:
+            g.setdefault("notes", []).append(
+                f"PUNCHES: {kept} detected, {found} more found at the clip "
+                f"template's rows and filled, {none} not visible")
+            (OUT_GEOM / f"{stem}.json").write_text(json.dumps(g, indent=1))
         master, frac, notes = cut_page(g, fit, sheet)
         source, ax, ay = anchor_of(g)
         stamp = stamp_text(VARIANT, **{

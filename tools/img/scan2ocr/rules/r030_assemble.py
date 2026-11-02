@@ -33,9 +33,10 @@ import sys
 import r000_issue
 from r000_issue import ISSUE
 import r000_llm as llm
-from r020_classify import (PARA_INDENT_MIN_PX, ROLE_PREFIX,
-                           SOURCE_HTML, SOURCE_JOIN, ends_dangling,
-                           join_runons, join_text, page_paragraphs)
+from r020_classify import (FORTSETZUNG, PARA_INDENT_MIN_PX, ROLE_PREFIX,
+                           SOURCE_HTML, SOURCE_JOIN, XREF_EXTRA_MAX,
+                           ends_dangling, join_runons, join_text,
+                           page_paragraphs)
 
 # ---------------------------------------------------------------------------
 # CONSTANTS  (no CLI knobs, no env knobs -- see CLAUDE.md)
@@ -64,7 +65,10 @@ HYPHEN_CACHE = ISS.hyphen_cache
 # "auf" tolerates one OCR slip: 8612 p042 prints "Fortsetzung aug Seite 195",
 # which the exact spelling missed -- the continuation stranded, and the only
 # signal was one "has no article to rejoin" line in a 12-minute log.
-FORTSETZUNG = re.compile(r"Fortsetzung\s+(a\w{1,2}|von)\s+Seite\s+(\d+)", re.I)
+# FORTSETZUNG and XREF_EXTRA_MAX are IMPORTED, not declared here: step 020 has
+# to know the marker too, because it is what keeps a marker-only block in the
+# stream (see is_marker there).  Declared in both files, the two halves drift
+# -- which is exactly how 8701's three "von" markers were lost.
 
 # The issue's contents, the one place that names the major articles and the page
 # each starts on.  It is NOT a fixed page pair and must not be compiled in: 8609
@@ -224,11 +228,21 @@ Rules:
   the contents page prints them: "DIE 1541 IM NEUEN KLEID" -> "Die 1541 im
   neuen Kleid". Leave a headline that is already mixed case exactly as it is.
 - The table of contents below is THIS issue's own, transcribed from its printed
-  contents page. It lists the major articles and their starting pages. Use it to
-  fix titles and starting pages, and read it as the issue's own statement of
-  which names are sections and which are articles. Do NOT assume it is complete:
-  it omits short items. If it is empty, this issue's contents page did not
-  survive OCR -- go by the running heads and the headlines alone.
+  contents page. It lists the major articles and their starting pages. Use it
+  for the starting pages, and read it as the issue's own statement of which
+  names are sections and which are articles. Do NOT assume it is complete: it
+  omits short items. If it is empty, this issue's contents page did not survive
+  OCR -- go by the running heads and the headlines alone.
+- THE PRINTED HEADLINE BEATS THE CONTENTS PAGE, ALWAYS. If the candidate
+  paragraph is the headline, its text is the title, even when the contents page
+  words it differently -- the contents page is an index, written to fit a
+  column, and the banner is what the reader sees on the page. Take a title from
+  the contents page ONLY where the candidate has no headline at all, or to
+  repair a headline that is visibly OCR-damaged -- and then repair only the
+  damaged part, keeping the rest of the banner's own wording. On issue 1/87
+  this went wrong both times it could: "Dame - Strategie ist alles" was replaced
+  with the contents' "Super Dame-Spiel", and "Das Super-ROM fuer den MP$ 802"
+  with "MPS 802-Drucker grafikfaehig", when the only thing to repair was "MP$".
 - The title you return is what the READER sees, corrected for obvious OCR
   damage ("Comnuter" -> "Computer"). Do not invent, translate or expand it, and
   do not add the page number.
@@ -325,7 +339,17 @@ def continuation_links():
     second half of "Wie funktioniert ein Computer?" was stranded on p169 as an
     article of its own.  Whether a line is article text is a judgement; whether
     it is printed on the page is not, and only the second may decide where an
-    article resumes."""
+    article resumes.
+
+    THE "von" HALF IS NOT READ HERE, and for a while it was not read from all
+    blocks either: it has to arrive as a PARAGRAPH IN THE STREAM, because what
+    it marks is a position -- p099 of 8701 receives three different articles
+    and a page-level link cannot say where in the page each one resumes.  So
+    step 020 keeps a marker-only block whatever it labelled it (is_marker
+    there), and candidates() and split_articles() find it in the stream.  Until
+    that was done, every "von" in 8701 was labelled `other`, no continuation
+    segment was made, and three printed jumps were joined to nothing with no
+    warning at all."""
     out = {}
     for page in PAGES:
         path = os.path.join(OUT_DIR, f"{page:03d}.labels.json")
@@ -366,7 +390,7 @@ def candidates(stream):
         # loss must be 0" check certified exactly the silent drop it exists to
         # catch.  Keep the paragraph when there is substantial text around the
         # marker; strip the marker from it instead.
-        if m and len(p["text"]) - len(m.group(0)) > 20:
+        if m and len(p["text"]) - len(m.group(0)) > XREF_EXTRA_MAX:
             p["text"] = (p["text"][:m.start()] + p["text"][m.end():]).strip()
             m = None
         if m:
@@ -532,19 +556,26 @@ def merge_continuations(segments, hands_off=None):
     issue are symmetric, so a one-way match is evidence of a misread."""
     # An article hands off from whichever of its pages carries the marker, so
     # the link survives step 020 dropping that block from the corpus.
+    #
+    # Keyed on (the page it resumes on, the page it came from), not on the
+    # resuming page alone: one page can receive more than one jump.  MEASURED on
+    # 8701, p099 resumes both Master-Text (from p94) and Schleifen (from p27);
+    # keyed on 99 alone, whichever registered first took the slot, the other
+    # host failed the "resumes in host pages" test, and BOTH continuations were
+    # kept as articles of their own.
     hands_off = hands_off or {}
     resumes_on, out = {}, []
     for s in segments:
-        if s.get("hands_to"):
-            resumes_on[s["hands_to"]] = s
         for pg in s.get("pages", ()):
-            if pg in hands_off and hands_off[pg] not in resumes_on:
-                resumes_on[hands_off[pg]] = s
+            if s.get("hands_to"):
+                resumes_on[(s["hands_to"], pg)] = s
+            if pg in hands_off:
+                resumes_on.setdefault((hands_off[pg], pg), s)
     for s in segments:
         if s["kind"] == "article":
             out.append(s)
             continue
-        host = resumes_on.get(s["at"])
+        host = resumes_on.get((s["at"], s["resumes"]))
         if host is None or s["resumes"] not in host["pages"]:
             print(f'p{s["at"]}: continuation from p{s["resumes"]} has no article '
                   f'to rejoin, kept as its own', flush=True)
@@ -555,7 +586,8 @@ def merge_continuations(segments, hands_off=None):
         host["pages"] = sorted(set(host["pages"] + s["pages"]))
         # a continuation that hands on again keeps the chain pointing at the host
         if s.get("hands_to"):
-            resumes_on[s["hands_to"]] = host
+            for pg in s["pages"]:
+                resumes_on[(s["hands_to"], pg)] = host
     return out
 
 

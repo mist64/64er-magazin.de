@@ -465,7 +465,57 @@ dir=issues/<YYMM>
 $PY - "$dir" <<'PY'
 import os, re, subprocess, sys
 d = os.path.join(sys.argv[1], "prg")
-bad = nodisk = expected = 0
+bad = nodisk = expected = remonly = 0
+
+# A REM-ONLY DIFFERENCE IS "nothing at all" -- SO THE CHECK MAY NOT ASSERT ON
+# ONE.  The disposition table above has said since SH8604 that a REM-only
+# divergence needs no comment, no Futureteufelchen and no owner question; this
+# block had no branch for it, so a correct build exited non-zero.  MEASURED on
+# 8701: `tabel. for-next` (511 vs 508) and `testbild 64` (4218 vs 4206), both
+# Simons' BASIC `$64 xx` tokens sitting inside REM banners, which petcat
+# detokenises and re-tokenises differently -- and r120's own table says leave
+# them alone.  Another check keyed against the rule beside it (see HARVEST,
+# 8701).  The test is structural, not a byte count: same line numbers, same
+# code before the REM, difference only in the REM text.
+def _lines(prg):
+    """[(line_no, body)] from a .prg; body is everything after the number."""
+    b, out, i = prg[2:], [], 0            # [2:] drops the load address
+    while i + 4 <= len(b):
+        if b[i] | (b[i + 1] << 8) == 0:   # the end-of-program link
+            break
+        j = b.find(b"\x00", i + 4)
+        if j < 0:
+            break
+        out.append((b[i + 2] | (b[i + 3] << 8), b[i + 4:j]))
+        i = j + 1
+    return out
+
+def _rem_at(body):
+    """Index of the REM token ($8F) OUTSIDE quotes, or None.  Inside a string
+    $8F is a literal character, not a token -- the same ambiguity this whole
+    rule is about."""
+    q = False
+    for k, c in enumerate(body):
+        if c == 0x22:
+            q = not q
+        elif c == 0x8F and not q:
+            return k
+    return None
+
+def rem_only(got, want):
+    """True when the two programs differ ONLY in REM text."""
+    a, b = _lines(got), _lines(want)
+    if len(a) != len(b):
+        return False
+    for (na, ba), (nb, bb) in zip(a, b):
+        if na != nb:
+            return False
+        if ba == bb:
+            continue
+        ra, rb = _rem_at(ba), _rem_at(bb)
+        if ra is None or rb is None or ra != rb or ba[:ra] != bb[:rb]:
+            return False                  # the difference reaches the CODE
+    return True
 for f in sorted(os.listdir(d)):
     if not f.endswith(".txt"):
         continue
@@ -516,11 +566,17 @@ for f in sorted(os.listdir(d)):
         print(f"  expected mismatch (r300 patch: {patched.group(0).strip()}) "
               f"v{v:<6} {f}: {len(got)} vs {len(want)} bytes")
         expected += 1
+    elif rem_only(got, want):
+        # "nothing at all" per the disposition table -- reported, never asserted.
+        print(f"  ok  v{v:<6} {f}  (REM-only difference, "
+              f"{len(got)} vs {len(want)} bytes -- no disposition)")
+        remonly += 1
     else:
         print(f"  MISMATCH v{v:<6} {f}: {len(got)} vs {len(want)} bytes")
         bad += 1
 print(f"round-trip failures: {bad}   "
-      f"(print-only, no disk file: {nodisk}; expected r300 patches: {expected})")
+      f"(print-only, no disk file: {nodisk}; expected r300 patches: {expected}; "
+      f"REM-only, no disposition: {remonly})")
 assert not bad, f"{bad} listing(s) no longer re-tokenise to their disk .prg"
 
 PY

@@ -75,15 +75,19 @@ between the open and close tags stays verbatim.
 
 ```bash
 dir=issues/<YYMM>
+# rc IS DECLARED BEFORE THE FIRST CHECK, not after it.  It used to be set
+# between checks 1 and 2, so check 1 printed FAIL and could not raise the
+# status -- the block reported a clean exit on an issue that still had
+# <a href> in it.  A check that cannot fail the run is a comment.
+rc=0
 
 # 1. no <a href> wrappers survive
-grep -nE '<a href=' "$dir"/*.html && echo "  FAIL: <a href> left"
+grep -nE '<a href=' "$dir"/*.html && { echo "  FAIL: <a href> left"; rc=1; }
 
 # 2. rule 060 no longer emits +autolink.
 #    Match the FLAG LINE, not the file: r060 carries a comment explaining
 #    that +autolink is deliberately omitted, so a bare grep matches its own
 #    explanation and reports a regression that does not exist.
-rc=0
 grep -E "^\s*-f '" tools/img/scan2ocr/rules/r060_md_to_html.sh \
   | grep -E '\+autolink' && { echo "  FAIL: rule 060 still passes +autolink"; rc=1; }
 # A CLEAN RUN MUST EXIT 0.  As `grep ... && echo FAIL` the block's last command

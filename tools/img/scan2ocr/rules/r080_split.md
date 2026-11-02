@@ -345,6 +345,25 @@ page range spanning both (`8609,48—56` for Bar-Codes, `8609,46—54` for the
 piece carries `index_category`, and the two ids read like `foo-system` /
 `foo-listing`.
 
+**A SINGLE PAGE IN THE INDEX IS NOT EVIDENCE AGAINST A PAIR, AND IT NAMES THE
+LISTING.** The span above is how the 1986 index prints it; the 1987 index
+prints one page, and it is the LISTING's, not the intro's. 8701 has two
+instances, and in both the index row sits on the second piece:
+
+    8701,52,Listings zum Abtippen,Spiele,Dame -- Strategie ist alles
+    8701,55,Listings zum Abtippen,Drucker,Das Super-ROM für den MPS 802
+
+against banners printed on 49 + 52 and on 50 + 55—58. So one row for two
+banners confirms the pair whether it carries a span or a single page; what
+settles it is that there is ONE row, not where it points.
+
+**And the row's title is the printed headline.** On both of these, step 030
+took the title from the contents page instead (*Super Dame-Spiel*, *MPS
+802-Drucker grafikfähig*) and the index names the banner (*Dame — Strategie
+ist alles*, *Das Super-ROM für den MPS 802*). The printed headline wins over
+the contents, and from 1987 on the index is a second witness to it — check the
+pair against the index before settling the `<h1>`; it costs one grep.
+
 When the two banners carry **different** titles, use the
 `Jahresinhaltsverzeichnis` title for `<h1>` (e.g. *Vollgas für die Floppy
 1570/1571*, not the deep-dive's *Die 1570/71 gibt Gas*) and demote the other

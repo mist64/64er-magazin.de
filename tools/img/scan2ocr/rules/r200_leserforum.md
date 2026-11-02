@@ -90,9 +90,48 @@ which is NOT the rubric: requiring the three produced **three permanent FAILs
 on correct output**, which is the shape r000 warns gets "fixed" by undoing the
 transform.
 
-**No `<meta name="author">`** — a Q&A article has no overall author;
-per-question authorship lives inside each `<p class="author">`. That one is the
-shape's, and holds for all of them.
+**`<meta name="author">` DEPENDS ON WHETHER THE ANSWERS ARE SIGNED.** The rule
+used to say "no author meta, it holds for all of them", on the reasoning that
+per-question authorship lives inside each `<p class="author">`. That is true of
+the HTML and false of the generator: `generate.py:resolve_meta_authors` builds
+the author index from `<meta name="author">` and **from nothing else** — no
+code path reads `<p class="author">` at all. Removing the meta therefore does
+not move the authorship into the paragraphs; it deletes those people from the
+site's author index. MEASURED corpus-wide: 42 files use this shape, and 9 carry
+a meta, so the old wording also contradicted the corpus.
+
+The distinction the rule failed to draw:
+
+| the answers are | meta | corpus |
+|---|---|---|
+| **unsigned** — the magazine answers as a body (the monthly Leserforum) | **none** | 33 files, 8404/14 onward |
+| **signed by one columnist** (*Leser fragen — Willi Brechtl antwortet*) | that person | 8502/12, 8505/13 |
+| **signed per answer** (*Profis helfen Einsteigern*) | the answerers | 8610/23, 8611/29, 8612/26, 8701/24 |
+
+**ONE ENTRY PER SIGNED ANSWER, in body order, repeats included** — r180's
+per-byline expansion shape, which this shape is an instance of. `rf, rf, Torben
+Müller, rf, rf` for five answers signed by two people. The repetition is not
+decoration: it is what lets the meta be checked against the page, because an
+entry count that no longer matches the `<p class="author">` count is an
+answerer we dropped. The same reasoning as r180's, and the same shape, so do
+not invent a second one here.
+
+**The duplicates must never reach the site, and they no longer do.** They used
+to: `generate.py:resolve_meta_authors` returned the list verbatim, so the
+by-author pages appended the article once per entry (8610/23 was listed EIGHT
+times on Roland Fieger's page, his article count inflated by seven), the author
+index's counts came from those lists, and the schema.org JSON-LD emitted eight
+duplicate `Person` objects. Only `db.authors` (a set) and the byline linker
+(`setdefault`) were immune, which is why nobody saw it. MEASURED over the
+corpus: 58 articles, 252 duplicate entries, worst +56 listings. The function
+now returns the distinct names in first-appearance order, which fixes all 58 at
+once and leaves the HTML free to record what the page actually says.
+
+**And an editor code only becomes a name if it is in `known_authors.csv`.**
+`rf` and `sk` are not, so the index and the JSON-LD print the raw code as
+though it were a person's name. Add the code to `known_authors.csv` from this
+issue's own Impressum when you add it to a meta; a code that resolves to itself
+is a name we failed to look up, not a name.
 
 ## THE Q&A SHAPE IS NOT THE LESERFORUM'S ALONE
 
@@ -220,7 +259,10 @@ The sub-agent must:
    `64er.toc_category=Rubriken`, `64er.id=leserforum`. For any OTHER
    reader-question article, verify instead that `head1` equals the printed
    running head and that `toc_category` / `id` are what r100 and r140 set.
-   Either way: NO `<meta name="author">`.
+   Either way, `<meta name="author">` follows whether the ANSWERS are signed
+   (see the table above): none when the magazine answers as a body, otherwise
+   one entry per signed answer in body order, repeats included (r180's
+   per-byline expansion), with every code present in `known_authors.csv`.
 10. Apply word-level OCR fixes to headings and body:
     `U→ll` (`darsteUen` → `darstellen`), lost spaces
     (`aufjedenfalls` → `auf jedenfalls`), `0` ↔ `O` confusions
@@ -307,7 +349,26 @@ else
   echo "  note: not the Leserforum rubric -- head1 must equal the printed" \
        "running head; compare it with the page by eye"
 fi
-grep -lE '<meta name="author"' "$file" && echo "  FAIL: author meta present (must be removed)"
+# The author meta is NOT a failure in itself -- see the signed/unsigned table --
+# and a REPEATED name is not one either: the expansion shape is deliberate, and
+# generate.py dedupes before the site sees it.  What IS a failure: an entry
+# count that does not match the signed answers (an answerer we dropped), and a
+# code known_authors.csv cannot resolve (the index would print the raw code).
+$PY - "$file" <<'PYEOF'
+import csv, io, re, sys
+s = io.open(sys.argv[1], encoding="utf-8").read()
+m = re.search(r'<meta name="author" content="([^"]*)"', s)
+if m:
+    a = [x.strip() for x in m.group(1).split(",") if x.strip()]
+    n = s.count('<p class="author"')
+    if len(a) != n:
+        print(f"  FAIL: author meta has {len(a)} entries, body has {n} "
+              f"<p class=\"author\"> -- per-byline expansion is one per signed answer")
+    known = {r["code"].strip() for r in csv.DictReader(open("known_authors.csv", encoding="utf-8"))}
+    for x in a:
+        if re.fullmatch(r"[a-z]{2,3}", x) and x not in known:
+            print(f"  FAIL: editor code {x!r} is not in known_authors.csv")
+PYEOF
 
 # 4. balanced section / div counts
 $PY -c "$(cat <<'PY'

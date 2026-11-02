@@ -113,6 +113,44 @@ from r010_ocr_blocks import (ARTICLE_LABELS, HYPHEN_MARK,        # noqa: E402
 # The lesson is about method as much as about listings: a rule verified on the
 # handful of pages that motivated it is not verified.
 
+# THE MAGAZINE'S OWN CROSS-REFERENCE, AND WHY IT IS NOT A CLASSIFICATION.
+# "Fortsetzung auf Seite N" at the foot of a page whose article resumes later,
+# "Fortsetzung von Seite N" at the head of the page where it does.  Step 030
+# joins the two halves on these, and the blocks that carry them are apparatus:
+# a sweep may reasonably call one a footer, a header or `other`, and then it
+# leaves the stream and 030 never sees it.
+#
+# MEASURED on 8701: every "von" marker in the issue -- p078 id3, p099 id4 and
+# id16, p187 id2 -- was labelled `other`, so no continuation segment was made
+# for any of them and three printed jumps were silently not joined.  Schleifen's
+# tail landed inside "Noch mehr Tips zu Master-Text", Master-Text itself was
+# split into two articles, and "Literatur fuer Einsteiger" ended up inside
+# "Vorschau".  Nothing was printed: the "has no article to rejoin" line only
+# fires for a link that HAS a segment.  Earlier, 8612 p127's "auf" half went
+# the same way and stranded "Wie funktioniert ein Computer?" on p169.
+#
+# Whether a line is article text is a judgement; whether it is PRINTED on the
+# page is not, and only the second may decide where an article resumes.  So a
+# block that is nothing but a marker is kept whatever the label says.  The
+# 20-character allowance is the same one r030's candidates() uses to tell a
+# cross-reference from a paragraph that merely contains one: a marker with
+# substantial text around it is already inside a body block, and r030 strips
+# the marker out of it rather than treating the paragraph as apparatus.
+FORTSETZUNG = re.compile(r"Fortsetzung\s+(a\w{1,2}|von)\s+Seite\s+(\d+)", re.I)
+XREF_EXTRA_MAX = 20          # chars of other text that still leave it a marker
+
+
+def is_marker_text(t):
+    """True when this text is (almost) nothing but a Fortsetzung marker."""
+    m = FORTSETZUNG.search(t or "")
+    return bool(m) and len(t) - len(m.group(0)) <= XREF_EXTRA_MAX
+
+
+def is_marker(b):
+    """True when this block is (almost) nothing but a Fortsetzung marker."""
+    return is_marker_text(b.get("text") or "")
+
+
 VALID_LABELS = ARTICLE_LABELS | {
     "caption", "listing-standalone", "ad", "kleinanzeige", "toc",
     "header", "footer", "sliver", "noise", "other",
@@ -464,6 +502,17 @@ def join_runons(paras):
     paragraph being joined is not the first one on its page."""
     out = []
     for role, p, starts_block, indent in paras:
+        # A marker is never joined to its neighbour, in either direction.  It
+        # ends on a page number, not a full stop, so the unfinished-sentence
+        # tests below read it as dangling and weld the text it introduces onto
+        # it.  MEASURED on 8701 p187: "Fortsetzung von Seite 28" + "ne als
+        # Standardwerk ..." became one paragraph, r030 cut at the marker and
+        # dropped the whole paragraph as apparatus -- the continuation's first
+        # paragraph was lost, and r030's loss count, which counts a marker
+        # paragraph as accounted for, read 0.
+        if is_marker_text(p) or (out and is_marker_text(out[-1][1])):
+            out.append((role, p, starts_block, indent))
+            continue
         # A paragraph running over the foot of one column into the next is the
         # normal case, and its continuation is NOT indented.  So the first
         # paragraph of a block joins the previous one when it is flush, and
@@ -600,7 +649,8 @@ def process(page):
     art = os.path.join(OUT_DIR, stem + ".article.txt")
     open(art, "w", encoding="utf-8").write(text + ("\n" if text else ""))
 
-    kept = sum(1 for b in rec["blocks"] if b["label"] in ARTICLE_LABELS)
+    kept = sum(1 for b in rec["blocks"]
+               if b["label"] in ARTICLE_LABELS or is_marker(b))
     print(f"p{stem}: kind={rec['page_kind']:<8} kept {kept}/{len(rec['blocks'])} blocks, "
           f"{len(text)} chars", flush=True)
 
@@ -612,7 +662,8 @@ def page_paragraphs(rec, stem=""):
     Stage D reassembles articles out of these across page boundaries, which is
     why the build lives in its own function: defined twice, the per-page corpus
     and the per-article one would eventually disagree."""
-    keep = [b for b in rec["blocks"] if b["label"] in ARTICLE_LABELS]
+    keep = [b for b in rec["blocks"]
+            if b["label"] in ARTICLE_LABELS or is_marker(b)]
     # The LLM decides the reading order: column flow, sentences continuing across
     # a column break, a boxed panel that must stay whole rather than being woven
     # into the text beside it.  Geometry alone cannot see any of that.  The
@@ -634,6 +685,27 @@ def page_paragraphs(rec, stem=""):
         if bid in by_id and bid not in seen:
             seen.add(bid)
             ordered.append(by_id[bid])
+    # A marker kept only because it IS a marker (is_marker, above) was never
+    # in the model's order -- it ordered the blocks it kept.  Appended with the
+    # other missing blocks it would land at the foot of the page, and p099,
+    # which receives two articles, would be cut after everything on it.  The
+    # magazine prints "Fortsetzung von Seite N" directly above the text it
+    # introduces, in the same column: MEASURED on 8701, p078 id3, p099 id4 and
+    # id16, p187 id2 each sit 15-45 px above an ordered block that overlaps it
+    # in x.  So it goes in before that block.  A marker with nothing below it
+    # ("auf", at the foot -- p028 id30) has no such block and keeps the end of
+    # the page, which is where it belongs.  Recovered markers only: where an
+    # ordinary block the model forgot goes is not changed here.
+    for b in sorted((b for b in keep if b["id"] not in seen
+                     and b["label"] not in ARTICLE_LABELS and is_marker(b)),
+                    key=lambda b: b["bbox"][1]):
+        x0, _, x1, y1 = b["bbox"]
+        below = [(o["bbox"][1], n) for n, o in enumerate(ordered)
+                 if o["bbox"][1] >= y1 and o["bbox"][0] < x1 and o["bbox"][2] > x0]
+        if not below:
+            continue
+        seen.add(b["id"])
+        ordered.insert(min(below)[1], b)
     missing = [b for b in reading_order(keep) if b["id"] not in seen]
     if missing and ordered:
         print(f"p{stem}: {len(missing)} block(s) missing from LLM order, appended", flush=True)

@@ -64,16 +64,28 @@ def fix(m):
 # Match <…>: starts with letter (so '<10', '< CBM >', '<\*>' don't match).
 s = map_outside_fences(s, lambda l: re.sub(r'<(/?[a-zA-Z][^<>\n]*?)>', fix, l))
 
-# Pass 3: "</" FOLLOWED BY A NON-LETTER, which Pass 2's pattern cannot reach.
-# The rule has required this since the 8612 harvest; the script never did it,
-# and neither did the Verification regex, so the gap was invisible from both
-# ends.  HTML5 drops </> outright and treats </ + non-letter as a bogus comment
-# that eats text up to the next '>': 8612 line 2903, "durch `</>` dargestellt",
-# would have lost the </> and swallowed what followed.  Neither 030 handover on
-# hand (SH8603, SH8604) has the shape, so it ships unexercised on live text --
-# the planted case in the Verification is what stands in for one.
+# Pass 3: EVERY OPENER HTML5 TURNS INTO A BOGUS COMMENT, which Pass 2's pattern
+# cannot reach.  The tokenizer has exactly four "tag open" paths after `<`: a
+# letter (a tag), `/` + a letter (an end tag), and then `!`, `?` and `/` +
+# anything-else -- the last three all become a BOGUS COMMENT that eats text up
+# to the next '>' and renders as nothing.  Pass 2 covers the first two, so this
+# pass must cover all three of the others, not just one of them.
+#
+# The `</` + non-letter half has been required since the 8612 harvest; the
+# script never did it, and neither did the Verification regex, so the gap was
+# invisible from both ends.  8612 line 2903, "durch `</>` dargestellt", would
+# have lost the </> and swallowed what followed.
+#
+# `<!` was the same gap one character over, found on 8701: the issue prints
+# `<!>` five times (Master-Text, the "Ausrufungszeichen-Funktion"), every one
+# of them shipped unescaped, and the `!` disappeared.  The Verification could
+# not see it either, because it applied the same "a non-letter after `<` is
+# safe" test as the transform -- a check derived from the belief it was meant
+# to question.  `<?` has not been seen in the corpus; it is here because it is
+# the same tokenizer path and costs one character to close.
 s = map_outside_fences(s, lambda l: re.sub(
-    r'</(?![a-zA-Z])([^<>\n]*)>', lambda m: '&lt;/' + m.group(1) + '&gt;', l))
+    r'<(![^<>\n]*|\?[^<>\n]*|/(?![a-zA-Z])[^<>\n]*)>',
+    lambda m: '&lt;' + m.group(1) + '&gt;', l))
 
 open(fp, 'w', encoding='utf-8').write(s)
 # Report.  THE SUMMARY MUST BE AS FENCE-AWARE AS THE TRANSFORM.  Counting the
@@ -85,7 +97,9 @@ left_bad = 0
 for m in re.finditer(r'<(/?[a-zA-Z][^<>\n]*?)>', t):
     name = re.match(r'/?([a-zA-Z][a-zA-Z0-9]*)', m.group(1)).group(1)
     if name not in HTML_TAGS: left_bad += 1
-bogus = len(re.findall(r'</(?![a-zA-Z])[^<>\n]*>', t))
+# THE SUMMARY COUNTS WHAT PASS 3 ESCAPES -- all three bogus-comment openers.
+# Counting only `</` is how the `<!` gap stayed invisible for an issue.
+bogus = len(re.findall(r'<(?:![^<>\n]*|\?[^<>\n]*|/(?![a-zA-Z])[^<>\n]*)>', t))
 escaped = t.count('&lt;')
 print(f"{fp}: unescaped non-HTML <…> remaining = {left_bad};  bogus </ = {bogus};"
       f"  &lt; sequences = {escaped}   (outside fences)")

@@ -1029,19 +1029,41 @@ def load_author_codes():
     return _author_codes_cache
 
 def resolve_meta_authors(soup, known_authors):
-    """Return the list of canonical author names from an article's
-    <meta name="author"> tags, resolving known editor codes to full names.
+    """Return the DISTINCT canonical author names from an article's
+    <meta name="author"> tags, resolving known editor codes to full names,
+    in first-appearance order.
 
     Articles for unsigned rubrics (Leserforum, Impressum, Vorschau,
     Fehlerteufelchen, contest announcements, ...) have no author meta and
-    yield an empty list."""
+    yield an empty list.
+
+    THE META REPEATS A NAME ON PURPOSE AND THE SITE MUST NOT.  Step 180 of the
+    scan2ocr chain writes one entry per byline in the body, in body order,
+    repeats included -- `bs, bs, hm, ev, hm` for an Aktuelles roundup of five
+    items by four editors -- so that the meta can be checked against the page
+    it describes: a count that no longer matches the body's bylines is a byline
+    we dropped.  That is a fact about the PAGE.  What the SITE wants is the set
+    of people, and every consumer here wanted that all along:
+
+      - the by-author pages appended the article once per entry, so "Profis
+        helfen Einsteigern" was listed EIGHT times on Roland Fieger's page and
+        his article count was inflated by seven;
+      - the author index's per-author counts came from those same lists;
+      - the schema.org JSON-LD emitted eight duplicate Person objects;
+      - only db.authors (a set) and the byline linker (setdefault) were immune,
+        which is why this went unseen.
+
+    MEASURED over the corpus: 58 articles repeat a name, 252 duplicate entries
+    in all, worst Dieter Mayer at +56 listings.  Deduping HERE rather than in
+    the HTML keeps step 180's check working and fixes all 58 at once.
+    """
     authors = []
     for meta in soup.find_all('meta', {"name": "author"}):
         for author in meta.get("content", "").split(','):
             author = author.strip()
             if author and author != "XXX":
                 authors.append(known_authors.get(author, author))
-    return authors
+    return list(dict.fromkeys(authors))
 
 def prg_link(issue, download):
     label, url = download

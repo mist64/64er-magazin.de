@@ -644,6 +644,23 @@ residual still over it after that is NOTED and the page publishes anyway. The
 two-pass arrangement, and the rotation-sign trap it exists for, are the sheet
 rule's (*Traps*); nothing differs.
 
+**A REFUSED SKEW IS NOT A FAILED LEVELLING, AND ITS RESIDUAL IS EXEMPT.** A
+page whose skew score has no peak (`SKEW_PEAK_MIN`, r005_masters) and which
+asked to move further than `SKEW_WEAK_MAX_DEG` is NOTED `SKEW refused`, left at
+0 and **not re-levelled** — re-levelling would put the same question to the same
+blind instrument. Its recorded `residual` is then the refused measurement on
+the *unrotated* page, i.e. what the instrument asked for, not an error in the
+levelling: 8701 p051 carries `angle 0.00, residual -3.06`, and the page is
+level. **Such a page is exempt from the residual check; the NOTE is what flags
+it.** Do not zero the residual — it is the most interesting number on the page,
+and it is the only record of what was rejected.
+
+The reason the guard exists at all is that the residual CANNOT catch a bad
+measurement: it re-measures with the same instrument, so on p051 the coarse
+sweep said -3.06 and the levelled page reported -0.02, confirming itself. The
+eye caught it. See HARVEST (8701) — this is one of four checks in the chain
+found to be keyed on the belief they were meant to question.
+
 The grade is the sheet variant's too: the whole levelled 2400 dpi sheet goes
 through `cmyk_reconstruction`, its GCR is undone (`c = c_final + k`), the
 result is ICC-rendered once to AdobeRGB with no curve, and the 600 dpi sheet

@@ -235,12 +235,28 @@ def main():
             idx_cat = f"{entry['category']}|{entry['subcategory']}"
             idx_title = entry['title']
 
+            # A BLANK CATEGORY IS "UNKNOWN", AND `|` IS NOT A WAY TO SAY IT.
+            # From 1987 the index CSV carries rows whose category was never
+            # read -- the magazine did not classify the piece, or the printed
+            # line has not been transcribed -- and the rule above forbids
+            # filling one by inference.  This built `content="|"` from the two
+            # empty fields, which is indistinguishable downstream from a
+            # category that WAS read, and is the inference the rule forbids,
+            # made by a format string.  MEASURED on 8701: 5 of its 69 rows
+            # (p22 Reverse REM-Zeilen, p172 Druck-Daten, p176 Aufloesung
+            # Giga-CAD, two on p185), removed by hand after the fact.  Every
+            # 1987 issue would have repeated it.  The TITLE is still known and
+            # still written; only the category is withheld.
+            if not (entry['category'].strip() or entry['subcategory'].strip()):
+                idx_cat = None
+
             # get_title() returns the ESCAPED <title>; the CSV title is raw.
             # Comparing them directly meant every title containing &差 differed
             # from itself, and 4 rows on 8611 got a redundant index_title.
             if idx_title != H.unescape(article_title or ''):
                 insert += f'    <meta name="64er.index_title" content="{H.escape(idx_title)}">\n'
-            insert += f'    <meta name="64er.index_category" content="{H.escape(idx_cat)}">\n'
+            if idx_cat is not None:
+                insert += f'    <meta name="64er.index_category" content="{H.escape(idx_cat)}">\n'
 
         text = text[:m_id.start()] + insert + text[m_id.start():]
         open(fn, 'w').write(text)

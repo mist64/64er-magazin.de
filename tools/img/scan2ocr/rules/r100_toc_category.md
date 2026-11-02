@@ -315,7 +315,15 @@ PY
   d = sys.argv[1]
   # House advertising appears under Rubriken and is not an article. MEASURED
   # on 8610 and 8611; 8610's unclaimed-page sweep confirmed both as ads.
-  ADS = {'Programm-Service', 'Einkaufsführer'}
+  # MATCH THE NAME LOOSELY: the magazine does not spell its own house ads the
+  # same way twice.  8610/8611 print "Programm-Service", 8701 prints
+  # "Programmservice", and the exact-set test reported 8701 p159 -- the house
+  # ad itself -- as NO ARTICLE.  A check that fires on a correct issue gets
+  # ignored, so the comparison folds case, hyphens and spaces away rather than
+  # collecting one spelling per issue.
+  def norm(x):
+      return re.sub(r'[-\s]+', '', x).casefold()
+  ADS = {norm(x) for x in ('Programm-Service', 'Einkaufsführer')}
   ent = os.path.join(d, 'toc_entries.txt')
   if not os.path.exists(ent):
       sys.exit('no toc_entries.txt (pre-chain issue) -- skipped')
@@ -336,7 +344,7 @@ PY
               claimed.update(range(int(a), int(b or a) + 1))
   for line in io.open(ent, encoding='utf-8'):
       page, section, entry = (line.rstrip('\n').split('\t') + ['', ''])[:3]
-      if entry not in ADS and page.isdigit():
+      if norm(entry) not in ADS and page.isdigit():
           if int(page) not in claimed:
               print('NO ARTICLE for Rubriken entry %-22s p%s' % (entry, page))
   PYEOF

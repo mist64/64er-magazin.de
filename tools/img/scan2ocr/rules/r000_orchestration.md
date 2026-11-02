@@ -310,6 +310,33 @@ against ink's 9-10), was ruled **a printing plate problem and left in**
 (2026-10-17). So the mark you cannot attribute by measurement is not
 automatically a hand — it may be the press.
 
+**AND THERE IS A FOURTH, WHICH NEVER REACHES THE OWNER: OUR OWN DAMAGE.** The
+three verdicts above all ask *what does this belong to on the magazine's side* —
+the paper, a reader, the press. A mark we made ourselves belongs to none of
+them, and asking the owner to rule it wastes their attention on our mess. Fix
+it and record it; do not surface it.
+
+| it is ours when | example |
+|---|---|
+| the same mark lands on the same spot of the SCAN on several sheets | a hair or fibre in the optical path — one artefact, not N marks |
+| it is a trace of disbinding or scanning | 8701's clip punches: 74 of 192 pages filled fewer than six, so the teardrops survive at 35 % in the master |
+
+**THE FIRST IS A MEASUREMENT, NOT AN IMPRESSION, AND IT MUST BE MADE IN RAW
+SCAN COORDINATES.** Master coordinates cannot tell a scanner artefact from a
+coincidence, because every page is levelled and windowed independently. Undo
+the levelling rotation and the window offset from each page's geometry sidecar,
+then compare. A fixed thing in the optical path lands within a pixel or two;
+anything looser is on the sheets.
+
+MEASURED on 8701, and it came out the other way: five near-identical 1.35 x 2.4
+mm brown diagonal strokes in the head margin of p043, p045, p145, p149 and
+p151 looked like one artefact at master scale. In raw scan coordinates they sit
+at (1988, 238), (2098, 187), (2010, 250) and (1969, 266) — a spread of 5.5 x
+3.3 mm on a 5184 px frame, far too loose for the platen, and p145's is on a
+different part of the page altogether. **They are four separate marks on four
+sheets and each went to the owner on its own.** Likeness of shape is what made
+them look common; only the raw coordinates settled it.
+
 **SHOW IT, DO NOT DESCRIBE IT.** "Page, what the mark is, and where" is not
 enough and was measured not to be: given exactly that for all three, the owner
 checked all three pages and could not find any of them — they are 1.0 x 1.7 mm
@@ -417,8 +444,9 @@ For `binding: spread` the paper answer is **fixed** until the spread variant
 learns per-page classes: one measured profile under the legacy `colors` key,
 wrapper graded with the interior (decided 2026-09-27, 8610 and 8611). A spread
 descriptor carrying `paper` with `high_pages` is not honoured — every page is
-graded with the single profile, silently. So ask the owner only to CONFIRM that,
-not to choose.
+graded with the single profile, silently. **Record that in LOG.md; it is not a
+question** (2026-11-02 — see *WHAT THE OWNER IS ASKED FOR*, which is the list,
+and binding and paper are not on it).
 
 ## WHAT THE OWNER IS ASKED FOR: THREE DELIVERABLES, AND NOTHING ELSE
 
@@ -437,7 +465,7 @@ questions; they are work only the owner can do:
 |---|---|---|---|
 | 1 | the **cover source**, `<tmp>/title_source_150.png` | 005, or 005b on a `sheet` binding | makes `title.png` by hand |
 | 2 | the **crop worklist** + `<tmp>/sheets600/` | the HTML is complete but for figures | cuts the figures from the graded pages |
-| 3 | the **marks**, each with a crop at magnification | the mark census, before the PDF ships | rules each `dirt` / `a previous hand` / `the plate`, and repaints the master for the first two |
+| 3 | the **marks**, each with a crop at magnification — **ours already removed, not listed** | the mark census, before the PDF ships | rules each `dirt` / `a previous hand` / `the plate`, and repaints the master for the first two |
 
 **Hand each one over the moment it exists and keep going** — see *An OWNER
 DELIVERABLE is handed over the MOMENT it exists*. 1 and 2 arrive together once
@@ -589,11 +617,20 @@ on -- the instructions were sufficient and you stopped early -- or fixes these
 files and points you at the change. **The owner is interrupted at the two pauses
 and for nothing else.**
 
-## THE CHAIN'S FIRST ACTION — ask which binding, and which pages are which paper
+## THE CHAIN'S FIRST ACTION — DERIVE the binding, and which pages are which paper
 
 **Before step 005 grades anything — before a scan is opened, before an output
-directory is made — the operator is asked two questions about the physical
-copy.** They are the first thing that happens in an issue build.
+directory is made — two facts about the physical copy are settled.** They are
+the first thing that happens in an issue build.
+
+> **They are DERIVED, not asked** (2026-11-02). This section was written when
+> the operator answered both, and the wording survived the ruling that replaced
+> it. The binding is read off the centre spread and the paper from the leaf
+> partner — see *BINDING IS DERIVED FROM THE SCAN, NOT ASKED* and *PAPER IS
+> DERIVED TOO* above — and the owner is asked for three things only, neither of
+> them among them. Read the rest of this section for WHAT the two facts decide
+> and what goes in the descriptor; read "asked" in it as "settled, and recorded
+> in LOG.md".
 
 **`first_action()` lives ONLY in `r005_masters_sheet.py`.** The spread variant
 has none, and this is a trap, not a detail: with `binding` absent — which is
@@ -1835,10 +1872,20 @@ something; fix the detector, not the number.
 ## Cross-cutting rule: PREFLIGHT the free space, before step 005
 
 Step 005 is the only step that writes at the scan's full resolution, and the
-footprint depends on that resolution. For a **2400 dpi** page it is ~**2.25 GB**
-— `masters2400/NNN.png` plus `cmyk2400/NNN.tif` — so a 200-page monthly is
-**~450 GB**, arriving over four hours with no check of its own. Running out at
-hour three loses the sweep, not just the page.
+footprint depends on that resolution. For a **2400 dpi** page it is ~**0.9 GB**
+all-in — `masters2400/NNN.png` ~0.33 and `cmyk2400/NNN.tif` ~0.51, plus the
+600 dpi derivatives — so a 200-page monthly is **~180 GB**, arriving over four
+hours with no check of its own. Running out at hour three loses the sweep, not
+just the page.
+
+> **ERRATUM, 2026-11-02.** This said **2.25 GB** a page and **~450 GB** an
+> issue, which is 2.5x the truth, and it nearly stopped a build: 8701 read
+> 192 x 2.25 = 432 GB, concluded it fitted on neither volume, and was about to
+> stream the archive off or skip it. MEASURED on the finished working sets —
+> 8701 (192 pp, spread, 2400 dpi): **172 GB total**, masters2400 63 + cmyk2400
+> 97 + sheets600 6 + masters600 5 + debug600 1 + geometry 1, i.e. **0.90
+> GB/page**; 8612 (200 pp): 174 GB, 0.87 GB/page. A budget that over-books by
+> 2.5x does not fail safe — it buys a needless and lossy decision.
 
 For a **600 dpi** page it is roughly **1/16 of that**: there is no
 `masters2400/NNN.png` at all (at 600 dpi the full-resolution render IS
@@ -1865,7 +1912,7 @@ from PIL import Image
 import r000_issue
 Image.MAX_IMAGE_PIXELS = None
 iss = r000_issue.load(r000_issue.ISSUE)
-per = {2400: 2.25, 600: 2.25 / 16}          # GB per page, measured
+per = {2400: 0.9, 600: 0.06}                # GB per page, MEASURED on 8701/8612
 tot = {}
 for f in sorted(glob.glob(os.path.join(iss.scan_dir, "[0-9][0-9][0-9].png"))):
     with Image.open(f) as im:

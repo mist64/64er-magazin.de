@@ -32,14 +32,43 @@ an italic run, a link or a quotation. `<P>RESS <RETURN>` would open a
 paragraph tag and swallow the line. The whitelist is all lowercase precisely
 so that an uppercase key name can never match it.
 
-Patterns that already start with a non-letter (e.g. `< CBM >` with leading space, `<10`, `<\*>`) won't be matched and stay as-is — they're already browser-safe because HTML requires a letter immediately after `<` for a tag. **EXCEPT `</` followed by a non-letter** (`</>`, `</1>`): the HTML5 tokenizer drops `</>` entirely and treats `</`+non-letter as a bogus comment that eats text up to the next `>`. 8612 line 2903, "durch `</>` dargestellt", would have lost the `</>` and swallowed what followed. Escape those too — **Pass 3 in the script.**
+Patterns that already start with a non-letter (e.g. `< CBM >` with leading space, `<10`, `<\*>`) won't be matched and stay as-is — they're already browser-safe because HTML requires a letter immediately after `<` for a tag.
 
-This rule has said that since the 8612 harvest and the script did not do it:
-Pass 2's pattern requires a letter after the optional `/`, so `</>` never
-matched, and the Verification regex had the same requirement, so neither end
-could see the gap. Both now cover it. The shape is rare — 0 occurrences in
-SH8603's and SH8604's 030 handovers — so the planted case in the Verification
-is what exercises it.
+**"A NON-LETTER AFTER `<` IS SAFE" IS WRONG FOR THREE OF THEM.** The HTML5
+tokenizer has exactly four paths out of a `<`: a letter (a tag), `/` + a letter
+(an end tag), and then **`!`**, **`?`** and **`/` + anything else** — and those
+last three all open a *bogus comment*, which eats text up to the next `>` and
+renders as nothing at all. So the complete set to escape is:
+
+| after `<` | HTML5 does | in this corpus |
+|---|---|---|
+| a letter | a tag — whitelist decides | Pass 2 |
+| `/` + letter | an end tag — whitelist decides | Pass 2 |
+| `!` | bogus comment, text eaten | **8701: `<!>` ×5** |
+| `?` | bogus comment, text eaten | not yet seen |
+| `/` + non-letter | bogus comment, text eaten | 8612 line 2903 |
+| anything else | literal text, safe | left alone |
+
+All three bogus-comment openers are **Pass 3 in the script**, in one pattern.
+
+**Both halves of this were found the same way, an issue apart, and both were
+invisible from both ends.** The `</` + non-letter half: the rule had required
+it since the 8612 harvest and the script never did it, because Pass 2's pattern
+requires a letter after the optional `/` — and the Verification regex had the
+same requirement, so neither end could see the gap. 8612 line 2903, "durch
+`</>` dargestellt", would have lost the `</>` and swallowed what followed.
+
+The `<!` half, on 8701: the issue prints `<!>` five times (Master-Text, the
+"Ausrufungszeichen-Funktion"), every one shipped unescaped, and the `!`
+disappeared. **The Verification could not see that either, because it applied
+the same "a non-letter after `<` is safe" test as the transform.** A check
+derived from the belief it is meant to question can only ever confirm it; this
+is the fourth instance in the chain (see HARVEST, 8701). The count the script
+prints now covers all three openers for the same reason.
+
+The shape is rare in live text — 0 occurrences in SH8603's and SH8604's 030
+handovers, 5 in 8701 — so the planted case in the Verification is what
+exercises it.
 
 ## Usage
 
@@ -93,26 +122,29 @@ for m in re.finditer(r'(?<!\\)<(/?[a-zA-Z][^<>\n]*?)(?<!\\)>', s):
     if name not in WHITE: bad.append(m.group(0))
 print(f"unescaped non-HTML <...>: {len(bad)}")
 for b in bad[:5]: print(f"  e.g. {b}")
-# Pass 3's shape, which this block could not see either: both regexes required
-# a letter after the optional '/', so `</>` was unreachable from both ends.
-bogus = re.findall(r'</(?![a-zA-Z])[^<>\n]*>', s)
-print(f"bogus </ + non-letter: {len(bogus)}")
+# Pass 3's shapes, which this block could not see either: it applied the same
+# "a non-letter after '<' is safe" test as the transform, so `</>` (8612) and
+# then `<!>` (8701, five times) were unreachable from both ends.  ALL THREE
+# bogus-comment openers, or the check confirms the belief it is testing.
+bogus = re.findall(r'<(?:![^<>\n]*|\?[^<>\n]*|/(?![a-zA-Z])[^<>\n]*)>', s)
+print(f"bogus-comment openers (<!, <?, </ + non-letter): {len(bogus)}")
 for b in bogus[:5]: print(f"  e.g. {b}")
 PYEOF
 ```
 
-Expected: zero unescaped non-HTML tags, zero bogus `</`.
+Expected: zero unescaped non-HTML tags, zero bogus-comment openers.
 
 **And plant Pass 3's case, because live text almost never carries it** (0 in
 both SH8603 and SH8604). A check that no issue can exercise is not a check:
 
 ```bash
-printf 'Das Zeichen `</>` und `</1>` und ein echtes <br> dahinter.\n' > /tmp/t50.md
+printf 'Zeichen `</>`, `</1>`, die Taste <!> und ein echtes <br> dahinter.\n' > /tmp/t50.md
 tools/img/scan2ocr/rules/r050_escape_tags.sh /tmp/t50.md
 cat /tmp/t50.md
 ```
 
-Expected: `&lt;/&gt;` and `&lt;/1&gt;`, with `<br>` untouched.
+Expected: `&lt;/&gt;`, `&lt;/1&gt;` and `&lt;!&gt;`, with `<br>` untouched. Run
+it twice: the output must not change the second time.
 
 ## Notes / lessons
 

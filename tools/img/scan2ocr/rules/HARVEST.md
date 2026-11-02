@@ -1434,3 +1434,207 @@ lies under the sheet — is encoded separately in three files, two can be right
 and the third wrong for a year. Worth a sweep: the three variants should share
 one backing test, not three.
 
+
+## 8701, 2026-11-02: three checks that were keyed on the thing they questioned
+
+Four more defects came out of the same build, and three of them share a shape.
+
+**1. The foot: no threshold can read a gradient.** The backing fix above made
+the common case right, but on a dark full-bleed page the bed and the ink are
+not separated by an edge. MEASURED at 0.1 mm on the ungraded scans: p051 runs
+32 → 30 → 28 → 25 → 18 over two millimetres, p178 the same. That is the sheet's
+edge-shadow falling on the bed. `BED_LUM = 70` is worse than useless there,
+because the bed (lum 33) sits BETWEEN the ink (17–25) and the paper (96) — ink
+is darker than bed on 13 of the issue's 18 full-bleed pages, so a one-sided
+threshold is structurally incapable of it.
+
+The answer was not a better threshold but the chain's own existing pattern:
+173 pages traced their foot from paper at 5.14–7.98 mm above the frame foot
+(median 7.45, sd 0.41), so FIT the depth issue-wide and apply it where a page
+cannot measure its own — exactly as the window already fits (S, B) from the
+pages that have a logo.
+
+**2. `backing_top` failed silently in two of its three exits.** The gate
+printed; too-few-columns and a `trace` failure returned None without a word.
+p051 and p179 took the frame row with nothing in the notes, and only p051 was
+caught, by eye. A third page (p179) was found not by looking but by pulling the
+foot depth out of all 192 sidecars and noticing three zeros. **A fourth exit
+turned up afterwards**: on p179 `backing_top` returned a LINE, at about 0 mm —
+not None at all. Which is why the gate has to test the DEPTH, not the exit.
+
+**3. Three checks were keyed on the thing they were meant to question.**
+
+- r020's `kept n/N` log counted `label in ARTICLE_LABELS` while
+  `page_paragraphs` kept a wider set, so the line reported the old answer.
+- r030's unexplained-loss count treats any paragraph matching `FORTSETZUNG` as
+  accounted for. When `join_runons` welded a marker onto a real paragraph and
+  030 then dropped the whole thing as apparatus, the loss count read 0 —
+  certifying exactly the silent drop it exists to catch.
+- r005's `unknown` fraction is built from the TRACED EDGES, so it can only
+  report what the trace already believed. On 8701 p003/p004 — a bound-in reply
+  card, a leaf narrower than A4, misread as full-bleed because `body` collapses
+  to 0.00 when the card fills half of each row — it certified 2.2% and 1.8%
+  fabricated for masters that are 43% and 44% scanner bed, in one contiguous
+  column run touching the outer edge.
+
+**A check must be able to disagree with the step it checks.** Each of these
+three was derived from the same belief as the code it audited, so it could only
+ever confirm it. The skew residual is the fourth of the same kind: it
+re-measures with the same blind instrument, which is why p051 reported a
+residual of −0.02 and confirmed a 3-degree error on a level sheet.
+
+**4. The sweep's own rail is an unlabelled answer.** `measure_skew`'s coarse
+winner may land on the end of `SKEW_COARSE`, and nothing said so. p118 escaped
+only because the re-level pass walked out past the rail and tripped the
+"OUTSIDE the coarse sweep" note; p051 sat on the rail and was silent. The guard
+added is `skew_peakiness` — coarse peak over coarse median — paired with a
+distance: a flat profile may not move the page more than a degree. MEASURED
+over 8701's 192 thumbs: median 14.9, p5 4.8, every correctly-measured page 4.26
+or better, and the two worst in the issue are the two the eye rejected (p118 at
+1.77, p051 at 3.25). The pair refuses exactly 2 of 192. Both halves are needed:
+p109 scores 1.81 and p188 3.07, and both are right, because both land at zero.
+
+**Ruling 14 was read backwards — by control.** I told the build to "apply the
+6.6 deg deliberately, by eye" on p118. Ruling 14 says *"diagnostic only, no
+per-page override"*: detect it, NOTE it, LOOK AT it, do not act. The sibling
+pushed back, correctly. A page whose art was printed tilted on a level sheet is
+levelled to the SHEET — rotating the sheet to straighten the art would change
+the plate. Note for later: 8612 p183 was built with −6.60 applied, before
+ruling 14 existed, so the corpus is inconsistent on that one page. Not worth
+re-cutting 8612; recorded here so nobody "corrects" 8701 to match it.
+
+## 8701, 2026-11-02: four more, and the fourth check keyed on its own belief
+
+**5. `<!` is a bogus comment, and the check could not see it.** r050 escapes
+`<` + letter (Pass 2) and `</` + non-letter (Pass 3) and leaves everything else
+alone, on the reasoning that HTML needs a letter after `<` for a tag. The HTML5
+tokenizer actually has four paths out of a `<`: a letter, `/` + a letter, and
+then `!`, `?` and `/` + anything else — and those last three all open a BOGUS
+COMMENT that eats text to the next `>` and renders as nothing. 8701 prints
+`<!>` five times (Master-Text, the "Ausrufungszeichen-Funktion") and every one
+shipped with the `!` gone. **The Verification applied the same "a non-letter
+after `<` is safe" test as the transform**, so neither end could see it — the
+same shape as `</>` on 8612, one character over, and the fourth check in the
+chain found keyed on the belief it was meant to question. Pass 3 and the
+printed count now cover all three openers in one pattern, `<?` included,
+because it is the same tokenizer path and costs one character.
+
+**6. The contents page beat the printed banner.** r030's brief said the TOC is
+"used to **correct** titles", which was meant as *where the page gives nothing*
+and read as *instead of the banner*. On 8701 both of the issue's paired articles
+lost their headline to the contents column: `role=title` "Dame — Strategie ist
+alles" became "Super Dame-Spiel", and "Das Super-ROM für den MP$ 802" became
+"MPS 802-Drucker grafikfähig". Both banners were in the stream and both had
+OCR'd correctly apart from `MP$` — the one thing the TOC was entitled to touch.
+The prompt also carried the contradiction, telling the model both to "fix
+titles" from the TOC and that "if the candidate paragraph IS the headline, that
+headline is the title". Now ordered explicitly, in the md and in the prompt:
+**the printed banner, then the Jahresinhaltsverzeichnis, then the contents
+page.** Note that changing the prompt invalidates every cached boundary verdict.
+
+**7. The index is a second witness, and it does not always print a span.** 1987
+is the first year whose Jahresinhaltsverzeichnis we hold while building the
+issue, and it settled both of the above. r080 had recorded the paired-article
+tell as "a single row with a page range spanning both" (1986's form); 1987
+prints a single page, and it is the LISTING's, not the intro's. So one row for
+two banners confirms the pair whether or not it carries a span — what settles
+it is that there is one row. The row's title is also the banner, not the
+contents wording, which is what identified defect 6 as a defect.
+
+**8. A house ad is not spelled the same way twice.** r100's coverage check held
+`ADS = {'Programm-Service', 'Einkaufsführer'}` as an exact set; 8701 prints
+"Programmservice", so the house ad on p159 reported as NO ARTICLE — r000's "a
+check that cannot pass", and the kind that gets ignored. The comparison now
+folds case, hyphens and spaces rather than collecting one spelling per issue.
+
+**9. r120 check 4 asserted on what r120's own table says to ignore.** The
+disposition table has said since SH8604 that a REM-only round-trip difference
+gets "nothing at all" — no comment, no Futureteufelchen, no owner question.
+Check 4 had branches for an exact match, a disk tail past the program end and
+an r300 patch, and then asserted. So a correct build exited non-zero. MEASURED
+on 8701: `tabel. for-next` (511 vs 508 bytes) and `testbild 64` (4218 vs 4206),
+both Simons' BASIC `$64 xx` tokens inside REM banners. The branch added is
+structural rather than a byte count — same line numbers, same code before the
+REM, difference only in the REM text — and it rejects a one-byte change to code
+while accepting a one-byte change inside a REM. The fifth check in this build
+found keyed against the rule beside it.
+
+**10. The figure-series rule got applied as a pre-delivery test.** r160 says a
+numbered series is all typeset or all cropped, and that the rule "governs the
+worklist, not the delivery": before the delivery the whole series goes on the
+worklist and NOTHING is typeset; after it, what came back empty is typeset and
+the series ends up mixed. The SH8607 passage explaining why that mixed result
+is correct — a series heterogeneous in kind cannot be homogeneous in medium —
+reads, two paragraphs above the conclusion, like a standalone test. 8701
+resolved it both ways in one issue: p149's Bild 1a/1b went to the worklist with
+its siblings (right), p35's Bild 2 pin table was typeset on the spot (wrong).
+The passage is now marked explicitly as not a pre-delivery test, with both 8701
+cases in a table. **The owner discriminates** — on SH8607 they withheld exactly
+the five data tables out of 23 — so deciding the mixture for them is taking
+their half of the decision, and the cost of asking is one worklist row.
+
+**11. "No author meta" was wrong about the generator, and about the corpus.**
+r200 said a Q&A article never carries `<meta name="author">`, because
+"per-question authorship lives inside each `<p class="author">`". True of the
+HTML, false of the site: `generate.py:resolve_meta_authors` builds the author
+index from the meta and from **nothing else** — no code path reads
+`<p class="author">` at all — so removing the meta does not move the authorship
+into the paragraphs, it deletes those people from the index. The build followed
+the rule, stripped the metas from 8701/24 and /169, and noticed that rf, Torben
+Müller and sk would vanish. It restored them and asked. That is the question
+reaching control instead of the output.
+
+The corpus had been contradicting the rule for two years: of the 42 files using
+this shape, 9 carry a meta, three of them Leserforum files. The distinction the
+rule never drew is whether the ANSWERS ARE SIGNED — the magazine answering as a
+body (33 files, no meta), one named columnist, or a signature per answer.
+
+**And two defects underneath it, live on three published issues.** The meta's
+list goes verbatim into the article's schema.org JSON-LD, so 8610/23's
+`rf, rf, rf, rf, rf, rf, rf, rf` emits eight duplicate `Person` entries for one
+man; the author index is a set and cannot see it. And `rf` is not in
+`known_authors.csv`, so the index and the JSON-LD print the raw code as a
+person's name. 8611/29 and 8612/26 are the same. Put to the owner; not fixed
+here.
+
+**The lesson, and it is the build's third of this shape:** a rule that says
+what the HTML should CONTAIN is making a claim about what the generator READS.
+r200 asserted one and meant the other, and no check could catch it because the
+check was written from the same sentence (it failed on any author meta at all).
+The check now tests the two things that are actually wrong — a repeated name,
+and a code `known_authors.csv` cannot resolve.
+
+**12. Two kinds of damage that are OURS, and a fourth verdict.** The mark
+census on 8701 produced 95 candidates, 67 surviving, and two of them were not
+the copy's at all:
+
+- Five near-identical 1.35 x 2.4 mm brown diagonal strokes in the head margin
+  of p043, p045, p145, p149 and p151, at what looked like the same place on
+  five different sheets. **Control called it one hair in the optical path; the
+  measurement said otherwise.** In raw scan coordinates they sit at (1988,
+  238), (2098, 187), (2010, 250) and (1969, 266) — 5.5 x 3.3 mm of spread on a
+  5184 px frame, where a fixed hair lands within a pixel or two — and p145's is
+  elsewhere on its page entirely. Four separate marks; each went to the owner.
+  The guess was wrong and the test is what earned its place.
+- The clip punches. The build reported 18 pages whose fold came out `none` or
+  `colour`, so `fold.holes` was empty and nothing was filled. The stamps say it
+  is worse: **74 of 192 pages filled fewer than six**, 18 of them zero and 56
+  filling only four or five with a fold line present, because the hole finder
+  had detected only four or five candidates and `unknown_mask` fills the
+  DETECTED holes rather than the six that exist.
+
+Both are traces of our disbinding and scanning. r000's three verdicts — dirt, a
+previous hand, the plate — all ask what a mark belongs to on the MAGAZINE's
+side, so our own damage has no verdict and was heading for the owner's queue.
+It is now a fourth category that never reaches them: fix it, record it, do not
+surface it. The test for the repeated-mark case is in r000, and it has to be
+run in raw scan coordinates, because every page is levelled and windowed
+independently and master coordinates cannot tell a scanner hair from a
+coincidence.
+
+**The rule the punch defect yields: the clip is RIGID.** Once it is located on
+a page, all six hole positions follow from the issue-wide template
+(`HOLE_TEMPLATE_MM`, `HOLE_TEMPLATE_Y0_MM`, already in every stamp). Detection
+exists to LOCATE the clip, not to enumerate the holes — so filling only what
+was detected leaves known damage in the master for no reason. Same shape as the
+foot: a per-page measurement standing in for a fact that is known issue-wide.

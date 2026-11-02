@@ -219,6 +219,7 @@ dir=issues/<YYMM>
 # and printed FAIL on clean output. Test the OUTPUT, not the status.
 caps=$($PY - "$dir" <<'PYEOF'
 import glob, io, os, re, sys
+import html as H
 # THE CHECK IS THE TRIGGER. The rule above defines ALL CAPS as ">=80% of the
 # letters uppercase AND 3 uppercase in a row"; this implements that and nothing
 # else. Do not re-express it as a character class: any punctuation left out of
@@ -240,6 +241,11 @@ _cleared = 0
 for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
     for m in re.finditer(r'<h([12])>(.*?)</h\1>', io.open(f, encoding='utf-8').read(), re.S):
         t = re.sub(r'<[^>]+>', '', m.group(2))
+        # AN ENTITY IS NOT LOWERCASE TEXT.  `C 16 &amp; PLUS/4` is a caps
+        # heading, but the a, m and p of `&amp;` count as three lowercase
+        # letters and drag the ratio under 0.8, so this never saw it
+        # (8701).  Unescape first: the reader sees `&`, not `amp`.
+        t = H.unescape(t)
         letters = re.findall(r'[A-Za-zÄÖÜäöüßẞ]', t)
         if not letters:
             continue
@@ -272,12 +278,17 @@ if _n and _cleared != _n:
           f"{' -- MORE than adjudicated' if _cleared > _n else ''}")
 PYEOF
 )
-[ -n "$caps" ] && { printf '%s\n' "$caps"; echo "  FAIL: ALL CAPS heading survived"; }
+# rc, OR THE FAIL IS A COMMENT.  This printed "FAIL: ALL CAPS heading
+# survived" and the block still exited 0, so a caller reading the status
+# saw a clean run on an issue with display caps left in it (8701).
+rc=0
+[ -n "$caps" ] && { printf '%s\n' "$caps"; echo "  FAIL: ALL CAPS heading survived"; rc=1; }
 
 # 2. spot-check: every h1/h2 starts with a capital letter
 $PY -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
+bad = False
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
@@ -323,8 +334,12 @@ for f in sorted(os.listdir(d)):
         first = next((c for c in h if c.isalpha()), None)
         if first and not first.isupper():
             print(f"  lowercase first letter in {f}: {h!r}")
+            bad = True
+sys.exit(1 if bad else 0)
 PY
-)" "$dir"
+)" "$dir" || rc=1
+
+exit $rc
 ```
 
 ## Evidence-in-report requirement

@@ -162,6 +162,42 @@ named source, and the source is the issue, not the rule:
 The model call is briefed with those, and with nothing else. If a run in this
 issue looks like a department, the evidence for that is on this issue's pages.
 
+### THE PRINTED BANNER OUTRANKS THE CONTENTS PAGE
+
+"Used to **correct**" above meant *where the page gives nothing* — a title the
+OCR lost, or a start page the stream cannot place. It did not mean *instead of
+the banner*, and without saying so it read as licence to prefer the contents
+wording. **When the start candidate is a `role=title` paragraph, that
+paragraph's text IS the title.** The TOC may only supply a title where the
+start has none, or repair one that is visibly OCR-broken — and then only the
+broken part.
+
+MEASURED on 8701, where both of the issue's paired articles lost their
+headline this way:
+
+    #489 p49 role=title "Dame — Strategie ist alles"
+                        -> {'action': 'start', 'title': 'Super Dame-Spiel'}
+    #497 p50 role=title "Das Super-ROM für den MP$ 802"
+                        -> {'action': 'start', 'title': 'MPS 802-Drucker grafikfähig'}
+
+Both banners were in the stream and both had OCR'd correctly (one slip, `MP$`,
+which is the *only* thing the TOC was entitled to touch). The contents page
+lists those two under *Wettbewerbe* as "Listing des Monats / Super Dame-Spiel"
+and "Anwendung des Monats / MPS 802-Drucker grafikfähig", and the model took
+the column wording over the printed headline on both. Step 080 put them back
+by hand.
+
+The **Jahresinhaltsverzeichnis is the tie-breaker, and from 1987 we have it.**
+It names the banner, not the contents:
+
+    8701,52,Listings zum Abtippen,Spiele,Dame -- Strategie ist alles
+    8701,55,Listings zum Abtippen,Drucker,Das Super-ROM für den MPS 802
+
+So the order of authority for an `<h1>` is: **the printed banner, then the
+Jahresinhaltsverzeichnis, then the contents page** — and the contents page only
+where the two above are silent. See r080_split.md, which uses the same index
+row to confirm a paired article.
+
 ## Conventions this step must produce, because step 080 (split) reads them
 
 - `# Title [12-14, 17]` — the page range in the h1, comma-separated ranges. A

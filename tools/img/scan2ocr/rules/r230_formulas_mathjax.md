@@ -112,15 +112,20 @@ to find**, and exercise them against 8607 or a fault-planted copy.
 # `python3` this check failed at the import rather than checking anything.
 PY=${PYTHON:-.venv/bin/python}
 dir=issues/<YYMM>
+# THIS BLOCK USED TO EXIT 0 WHATEVER IT PRINTED.  All three checks only
+# printed, so a planted TODO FORMULA, a bare \frac and an unclosed \(
+# were each reported while the run still reported success -- r000's "a
+# check that cannot fail the run is a comment".  Every check now raises rc.
+rc=0
 
 # 1. no TODO FORMULA / FORMULAS markers survive
-grep -nE 'TODO FORMULA' "$dir"/*.html && echo "  FAIL: TODO FORMULA left"
+grep -nE 'TODO FORMULA' "$dir"/*.html && { echo "  FAIL: TODO FORMULA left"; rc=1; }
 
 # 2. any LaTeX outside MathJax delimiters is a bug — Unicode-only
 #    formulas should not contain LaTeX macros at all.
 #    (heuristic: any \frac / \sqrt / \cdot / \omega outside \( \) or
 #    \[ \] is suspicious)
-$PY - "$dir" <<'PYEOF'
+$PY - "$dir" <<'PYEOF' || rc=1
 import os, re, sys
 d = sys.argv[1]
 MACROS = (r'\frac', r'\sqrt', r'\cdot', r'\omega', r'\mathrm')
@@ -143,6 +148,7 @@ PYEOF
 "$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
+bad = False
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
     s = open(os.path.join(d, f)).read()
@@ -150,10 +156,15 @@ for f in sorted(os.listdir(d)):
     o_disp   = s.count(r'\[');  c_disp   = s.count(r'\]')
     if o_inline != c_inline:
         print(f"  inline math mismatch in {f}: \\(={o_inline} \\)={c_inline}")
+        bad = True
     if o_disp != c_disp:
         print(f"  display math mismatch in {f}: \\[={o_disp} \\]={c_disp}")
+        bad = True
+sys.exit(1 if bad else 0)
 PY
-)" "$dir"
+)" "$dir" || rc=1
+
+exit $rc
 ```
 
 ## Evidence-in-report requirement

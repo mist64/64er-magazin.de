@@ -102,6 +102,24 @@ Three further shapes this rule never named, all met on 8612:
 
 A `Bild N` referenced in the body that is NONE of the above *and* has no crop is a gap, not a no-op: log it to `LOG.md` (as with a referenced-but-missing table) rather than silently skipping.
 
+### A PAGE RANGE IS SET WITH A HYPHEN, WHATEVER THE PRINT SETS
+
+Decided on 8701's *Jahres-Inhaltsverzeichnis '86* (580 rows, 353 ranges), where
+the print sets an en dash. MEASURED corpus-wide in typeset cells: `N-N` with a
+hyphen **1499**, en dash 18, em dash 18 — and `64er.pages` carries 1276 ranges,
+all hyphens, because the format admits nothing else.
+
+So a range in a table and the same range in the metadata are the same datum,
+and the hyphen is what the corpus already writes. Reproducing the print's en dash in
+one table would make that table the odd one out and leave 1499 rows elsewhere
+wrong by the new standard. **Keep the hyphen; do not re-set an existing table.**
+
+This is typography, not transcription — the dash GLYPH carries no information
+the hyphen loses, unlike a dash INSIDE a title, which is the author's and stays
+as printed (8602/85's Titel column keeps its 59 en dashes). 8602/85, the
+nearest precedent, has no page ranges at all, which is why this had to be
+decided rather than looked up.
+
 ### A NUMBERED SERIES IS ALL TYPESET OR ALL CROPPED — decide for the series
 
 The decision above is per-caption, and that splits a series. SH8604's **Bild
@@ -151,6 +169,29 @@ crops. The build was right to do it, and right not to ask.
 **So apply the rule at worklist time and never after.** Before the delivery:
 put the whole series on the worklist, typeset none of it. After the delivery:
 place what came, typeset what did not, and do not reopen the question.
+
+**THE TWO BULLETS ABOVE ARE NOT A PRE-DELIVERY TEST.** They explain why the
+mixed RESULT on SH8607 was correct; they do not license deciding the mixture
+yourself before the owner has seen the worklist. A build that reads "a series
+heterogeneous in kind cannot be homogeneous in medium" and typesets the data
+table on the spot has taken the owner's half of the decision — and the owner
+discriminates, which is the whole point: on SH8607 they withheld exactly the
+five members that are data tables out of 23. The question "which members of
+this series are really data?" is theirs to answer, and the worklist is how it
+is asked.
+
+MEASURED on 8701, where one issue resolved it both ways. Both of these are one
+`Bild` series with a plain table among photographs and diagrams:
+
+| page | series | what the build did | right? |
+|---|---|---|---|
+| 149 | Bild 1a/1b + Bild 2–5 (byte-box diagrams) | whole series to the worklist | **yes** |
+| 35 | Bild 1, 3–5 (photos, diagrams) + Bild 2 (a 9×2 pin table) | typeset Bild 2, cropped the rest | **no** — the whole series goes to the worklist, and Bild 2 is typeset only if it comes back undelivered |
+
+If the owner withholds the pin table, it gets typeset then, and the series ends
+up mixed — the same outcome, reached the way the rule asks. The cost of asking
+is one row on a worklist; the cost of not asking is a decision the owner never
+made.
 
 **AND DO NOT GO LOOKING FOR A PRECEDENT THAT ISN'T THERE.** The build reported
 that *"the 1985 Memory Map printings were mixed the same way"*, and the

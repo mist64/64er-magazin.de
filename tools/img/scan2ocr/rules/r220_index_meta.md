@@ -550,6 +550,41 @@ The CSV cannot tell the two apart; `git log` for the file does.
 
 **Do not fill a blank by inference.** A category guessed from a neighbouring
 row looks exactly like one that was read, and nothing downstream can tell.
+`r220_index_meta_apply.py` used to do exactly that by accident: it built
+`index_category` as `f"{category}|{subcategory}"`, so two empty fields became
+`content="|"` — an inference made by a format string, indistinguishable
+downstream from a category that was read. MEASURED on 8701: 5 of its 69 rows.
+The script now withholds the category meta on a blank row and still writes the
+title, which IS known.
+
+### THE 1987 CSV CAME OFF A DISK, AND THE DISK HAD NO TYPOGRAPHY
+
+The 1985 and 1986 indexes were transcribed from print; 1987's was recovered
+from `8801B.D64`, so its titles carry whatever PETSCII could hold. Two
+artifacts, both fixed at source in the CSV rather than per issue at
+application — leave them in and every one of the twelve 1987 issues patches
+the same strings by hand:
+
+- **The dash.** The disk wrote ASCII `--` where the magazine printed an em
+  dash. MEASURED: 1986 has 399 `—` and no `--`; 1987 had 58 `--` and no `—`,
+  every one of them space-surrounded, so all 58 were dashes and none a hyphen
+  pair inside a word. Normalised to `—`.
+- **ASCII umlauts.** Some entries were typed with umlauts and some
+  transliterated, in the same file: `Apfelmännchen` beside `Brueche kuerzen`,
+  `Problembewältigung` beside `Aufloesung`. 26 words in 23 distinct forms were
+  corrected where German orthography decides it without a witness
+  (`Datenfernuebertragung`, `Computerkriminalitaet`, `DFUe`, `Briefkoepfe`,
+  `waechst`, …). **Do not blanket-replace `ue`/`oe`/`ae`** — `Neue`, `Steuern`,
+  `teuer`, `Abenteuer`, `Duell`, `Individuell` and `Sequentielle` are all real
+  words in these titles.
+
+Two are left for the owner because a witness is needed, both in 8705:
+`CNC-Fraessanlage` (Fräs- or Fräss-?) and `DidactaUeberblick` (also missing a
+space). Neither is in a 1987 issue built so far.
+
+1985 uses an EN dash (59 of them) where 1986 uses an em dash. That predates
+this work and is not touched here; it is recorded so the next reader does not
+"fix" one to match the other without deciding which is right.
 
 ### Verification: every printed theme must receive at least one row
 
