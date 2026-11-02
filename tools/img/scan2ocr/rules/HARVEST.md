@@ -1411,3 +1411,26 @@ Four lessons, in the order they cost time:
    this write-up went into r220 as 114 lines of narrative — which is this
    file's job, not that one's. The owner caught it: *"it's more of your log,
    no?"*
+
+## 8701, 2026-11-02: the first question the new brief produced was a good one
+
+The build was dispatched with four words — *follow the rules* — after r000 was
+given a section saying a question goes to control and a deliverable goes to the
+owner. The first thing it sent back was a question, with the measurement
+attached: 8701's foot is a near-black BED, not the yellow prop, so
+`prop_mask` is blind, `prop_top()` returns None, and every full-bleed page
+takes the frame's last row — the window 7 mm low with the bed inside the
+master. It stopped before the full sweep rather than producing 192 wrong pages.
+
+**The defect is a yellow test standing in for a backing test**, and both
+sibling files already knew better: the sheet variant builds its bed as
+`(lum < BED_LUM) | prop_mask(rgb)`, and r005_a4_window.py explains that the
+prop is "yellow on one side of the bed, red on the other — BOTH, which is why
+saturation and not a yellow test". The spread variant had never met a bed the
+prop did not cover, so it never learned.
+
+**One rule read three ways is three rules.** When the same physical fact — what
+lies under the sheet — is encoded separately in three files, two can be right
+and the third wrong for a year. Worth a sweep: the three variants should share
+one backing test, not three.
+

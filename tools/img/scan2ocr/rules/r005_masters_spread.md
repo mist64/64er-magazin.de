@@ -1528,3 +1528,41 @@ were filled under the inlier rule and 1173 under the punch rule.
 - A change to `MASTER_W_PX`/`MASTER_H_PX` changes every master's pixel size and
   every page-fraction downstream of it. Wipe `masters600/` and `cut` again —
   this is not a change that can be made for one page.
+
+## THE FOOT UNDER THE SHEET IS BACKING, NOT NECESSARILY THE YELLOW PROP
+
+A full-bleed page has no paper for the mask to trace, so its bottom comes from
+the top of whatever lies under the sheet. That was read with a **yellow** test
+(`prop_mask`: G−B > 50 and mean > 120), and 8701 is scanned on a **near-black
+bed with no prop at all** — foot median RGB `34 34 36`, G−B −1, against
+8610–8612's `248 215 112`, G−B 103.
+
+The yellow test sees nothing there, so every full-bleed page silently took the
+frame's last row: **the window ~7 mm low with the bed left inside the master**,
+on the covers, on ads with ink to the trim, and on every edge-anchored page
+without a wordmark.
+
+**Test for BACKING — `(lum < BED_LUM) | prop_mask(rgb)`.** The sheet variant
+has always done this, and r005_a4_window.py says why: *"a saturated prop
+(yellow on one side of the bed, red on the other — BOTH, which is why
+saturation and not a yellow test)"*. This variant had simply never met a bed
+the prop did not cover.
+
+MEASURED on the 150 dpi thumbs, columns found / depth of the run touching the
+foot:
+
+| | `prop_mask` | `backing_mask` |
+|---|---|---|
+| 8612 p050 (yellow prop) | 182 cols, 6.94 mm | 184 cols, 7.11 mm |
+| 8701 p050 (black bed) | **0 cols** | 186 cols, 7.45 mm |
+| 8701 p010 | **0 cols** | 187 cols, 6.10 mm |
+| 8701 p001 (cover) | **0 cols** | 184 cols, 6.77 mm |
+
+No change where the prop exists; the black bed goes from invisible to read.
+
+**AND BLACK INK TO THE BOTTOM TRIM LOOKS EXACTLY LIKE A BLACK BED.** That is
+the new risk the yellow test did not have, so the fitted line is gated: the
+bottom trim sits 6.4–9.4 mm above the frame's foot on 8610's 195 sound pages
+and 6.1–7.8 mm on 8701, and a line further up than `BACKING_BOT_MAX_MM` (12 mm)
+is read as ink, reported, and dropped in favour of the frame row.
+

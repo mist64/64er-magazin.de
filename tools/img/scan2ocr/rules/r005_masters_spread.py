@@ -157,22 +157,50 @@ EDGE_TOP_MAX_MM = 3.0        # traced top further below the frame's top than thi
 EDGE_BOT_MAX_MM = 12.0       # traced bottom further above the frame's foot than this: ink
 EDGE_OUTER_MAX_MM = 8.0      # traced outer edge further into the frame than this: ink
 EDGE_TILT_MAX = 1.0          # deg; a levelled page's trim is level
-PROP_FOOT_MM = 15.0          # the prop's top is looked for this far up from the foot
-PROP_AT_FOOT_MM = 2.0        # ...in columns whose prop starts within this of it
+PROP_FOOT_MM = 15.0          # the backing's top is looked for this far up
+PROP_AT_FOOT_MM = 2.0        # ...in columns whose backing starts within this of it
+# THE FOOT UNDER THE SHEET IS NOT ALWAYS THE YELLOW PROP.  MEASURED on the
+# derived 150 dpi thumbs, p050, foot median RGB and G-B:
+#     8610/8611  248 215 112   G-B 103      the yellow prop
+#     8612       249 216 113   G-B 103
+#     8701        34  34  36   G-B  -1      a near-black BED, no prop at all
+# `prop_mask` is a YELLOW test (G-B > 50 AND mean > 120), so on 8701 it sees
+# nothing, prop_top() returns None, and every full-bleed page takes the frame's
+# last row instead: the window sits ~7 mm low and the bed stays in the master.
+# The sheet variant already knows this -- r005_masters_sheet.py builds its bed
+# as `(lum < BED_LUM) | prop_mask(rgb)` -- and r005_a4_window.py says why in as
+# many words: "a saturated prop (yellow on one side of the bed, red on the
+# other -- BOTH, which is why saturation and not a yellow test)".
+# So test for BACKING, not for yellow.  This variant had simply never met a bed
+# the prop did not cover.
+BED_LUM = 70                 # 0-255 mean channel; as the sheet variant
+BACKING_BOT_MAX_MM = 12.0    # a backing line further up than this is INK, not bed
 
 
-def prop_top(rgb):
-    """The prop's top boundary as a line y(x), or None if too few columns see it.
+def backing_mask(rgb):
+    """True where the pixel is BACKING: the dark bed, or the saturated prop."""
+    return (rgb.mean(2, dtype=np.float32) < BED_LUM) | prop_mask(rgb)
 
-    Per column, the top of the prop RUN THAT TOUCHES THE FOOT -- not the first
-    prop-coloured row in the foot: MEASURED on p001, the cover's orange banner
-    sits inside the foot and pulled the first-row line 4.7 mm up on the left.
-    The run may start a few rows above the frame's last row, which is black
-    where the levelling rotation left a wedge.
+
+def backing_top(rgb):
+    """The backing's top boundary as a line y(x), or None if it cannot be read.
+
+    Per column, the top of the backing RUN THAT TOUCHES THE FOOT -- not the
+    first backing-coloured row in the foot: MEASURED on p001, the cover's
+    orange banner sits inside the foot and pulled the first-row line 4.7 mm up
+    on the left.  The run may start a few rows above the frame's last row,
+    which is black where the levelling rotation left a wedge.
+
+    BLACK INK TO THE BOTTOM TRIM LOOKS EXACTLY LIKE A BLACK BED, so the fitted
+    line is gated against the frame's measured slack before it is believed: on
+    8610's 195 sound pages the bottom trim sits 6.4-9.4 mm above the frame's
+    foot, and 8701's black band measures 6.1-7.8 mm.  A line further up than
+    BACKING_BOT_MAX_MM is a page whose ink runs off the foot, not the bed --
+    say so and fall back to the frame row, which is the documented behaviour.
     """
     h, w = rgb.shape[:2]
-    foot = prop_mask(rgb[h - int(PROP_FOOT_MM * MM):])[::-1]     # row 0 = the foot
-    first = np.argmax(foot, axis=0)                              # first prop row up
+    foot = backing_mask(rgb[h - int(PROP_FOOT_MM * MM):])[::-1]  # row 0 = the foot
+    first = np.argmax(foot, axis=0)                              # first backing row up
     cols = np.where(foot.any(0) & (first <= PROP_AT_FOOT_MM * MM))[0]
     if len(cols) < TRACE_BANDS:
         return None
@@ -182,9 +210,16 @@ def prop_top(rgb):
         end = first[c] + (int(np.argmin(run)) if not run.all() else len(run))
         tops[k] = h - end                                        # first non-prop row
     try:
-        return trace(tops, cols.astype(float), CLEAN_PCT, MM)
+        line = trace(tops, cols.astype(float), CLEAN_PCT, MM)
     except PageFailed:
         return None
+    up_mm = (h - 1 - float(np.polyval(line, w / 2.0))) / MM
+    if up_mm > BACKING_BOT_MAX_MM:
+        print("  backing_top: line sits %.1f mm above the frame foot (> %.1f) "
+              "-- reading that as INK to the trim, not bed; frame row used"
+              % (up_mm, BACKING_BOT_MAX_MM), flush=True)
+        return None
+    return line
 
 
 def outer_edges(rgb, par):
@@ -220,14 +255,14 @@ def outer_edges(rgb, par):
                 if depth > limit or abs(t) > EDGE_TILT_MAX:
                     e["replaced"].append([key, float(depth), float(t)])
                     if key == "bot":
-                        pt = prop_top(rgb)
+                        pt = backing_top(rgb)
                         e["bot"] = np.array([0.0, h - 1.0]) if pt is None else pt
                     else:
                         e[key] = frame[key]
             return e
         except PageFailed:
             pass
-    bot = prop_top(rgb)
+    bot = backing_top(rgb)
     return {"top": frame["top"],
             "bot": np.array([0.0, h - 1.0]) if bot is None else bot,
             "outer": frame["outer"],
