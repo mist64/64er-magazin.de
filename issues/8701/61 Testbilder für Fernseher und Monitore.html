@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Testbilder für Fernseher und Monitore</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dieter Laues, kn, sk">
+    <meta name="64er.issue" content="1/87">
+    <meta name="64er.pages" content="61-63">
+    <meta name="64er.head1" content="Anwendung">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Anwendung">
+    <meta name="64er.toc_title" content="Testbild zum Abtippen">
+    <meta name="64er.index_title" content="Testbilder für Fernseher und Monitore">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Monitore">
+    <meta name="64er.id" content="testbild">
+</head>
+
+<body>
+    <article>
+        <h1>Testbilder für Fernseher und Monitore</h1>
+        <p class="intro">Ein Testbildgenerator für Bildschirmgeräte kostet je nach Leistung einige hundert bis tausend Mark. Wir zeigen Ihnen hier eine reine Software-Lösung.</p>
+
+        <p>Dieses Programm ist eine gelungene Verbindung zwischen Heimcomputer und Videotechnik. Es bietet eine Alternative zu einem käuflichen Testbildgenerator, dessen Anschaffung sich beispielsweise für Video-Amateure nicht lohnen würde.</p>
+
+        <p>Ohne zusätzliche Hardware wird eine Reihe von Testbildern und Meßtönen erzeugt, mit denen Sie eine schnelle Qualitätsbeurteilung und Fehlersuche bei Fernsehern, Monitoren und Videorecordern durchführen können. Testbilder aus dem vorhandenen Repertoire finden Sie im Beitrag »Der Weg zum richtigen Monitor« in dieser Ausgabe.</p>
+
+        <p>Das Programm ist in Simons Basic geschrieben (Listing 1). Jedoch auch den Lesern, die Simons Basic nicht besitzen, wollen wir die wirklich guten Testbilder zugänglich machen. Deshalb sind in Tabelle 3 am Ende des Artikels die verwendeten Grafikbefehle von Simons Basic mit der Bedeutung ihrer Parameter, den entsprechenden Grafikbefehlen unserer im Grafik-Sonderheft 4/85 vorgestellten Basic-Erweiterung »Grafik 2000« gegenübergestellt.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Befehl</th>
+                    <th>Bedeutung</th>
+                    <th>Parameter</th>
+                    <th>Entsprechung Grafik 2000</th>
+                </tr>
+                <tr>
+                    <td>NRM<br>COLOUR r,h</td>
+                    <td>Grafik aus<br>Rahmen- und Hintergrundfarbe</td>
+                    <td>keine r: 0-15; p: 0-15</td>
+                    <td>MODE 0<br>COLOR p,h</td>
+                </tr>
+                <tr>
+                    <td>LINE x1,y1,x2,y2,zm</td>
+                    <td>Linie zeichnen</td>
+                    <td>x1/y1: Startpunkt<br>x2/y2: Endpunkt<br>zm: Zeichenmodus<br>Standard: 1</td>
+                    <td>SLINE x1,y1,x2,y2</td>
+                </tr>
+                <tr>
+                    <td>HIRES p,h</td>
+                    <td>Einschalten der hochaufl. Grafik</td>
+                    <td>p: Punktfarbe<br>h: Hintergrundfarbe</td>
+                    <td>CLEAR: MODE 1: COLOR p,h</td>
+                </tr>
+                <tr>
+                    <td>VOL L</td>
+                    <td>Lautstärke</td>
+                    <td>L: (0-15)</td>
+                    <td>POKE 54296,L</td>
+                </tr>
+                <tr>
+                    <td>REC x,y,b,h,1</td>
+                    <td>Rechteck zeichnen</td>
+                    <td>x-Koordinate li. oben<br>y-Koordinate li. oben<br>b: Breite des Rechtecks<br>h: Höhe des Rechtecks</td>
+                    <td>Existiert nicht<br>Ersetzen durch Zeichnen von vier Linien.</td>
+                </tr>
+                <tr>
+                    <td>LOW COL p,0,0,h</td>
+                    <td>Punktfarbe; für HiRes-Grafik nur 1. Parameter wichtig</td>
+                    <td>p: Farbe (0-15)</td>
+                    <td>LOW COL x1,y1,p,h<br>x1/y1: Koordinaten<br>p/h: Farbe wie oben</td>
+                </tr>
+                <tr>
+                    <td>ARC mx,my, sw,ew,a,rx,ry,zm</td>
+                    <td>Zeichnen eines Bogens einer Ellipse (Kreis)</td>
+                    <td>Grafik 2000: Ellipse bzw. Kreis<br>Mittelpunkt: x/y; Radius a/b<br>bei Kreis x=y;a=b</td>
+                    <td>SCIRCLE x,y,a,b</td>
+                </tr>
+                <tr>
+                    <td>PAINT x1,y1,1</td>
+                    <td>Ausfüllen einer beliebigen umschlossenen Fläche</td>
+                    <td>x/y: Koordinaten Startpunkt</td>
+                    <td>FILL x,y</td>
+                </tr>
+                <tr>
+                    <td>TEXT x1,y1, "A$",x,y,</td>
+                    <td>Schreiben von Text in HiRes-Grafik</td>
+                    <td>Grafik 2000:<br>r: Schreibrichtung; hier: r=1; b: Breite der Zeichen (1-25); hier: b=1 h: Höhe (wie b) v: Verschiebung (kursiv) hier: v=0, a: Abstand; a=8 x/y: Startkoordinaten des Strings links oben. A$: zu zeichnender String</td>
+                    <td>STEXT r,b,h,v,a "A$"</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Die Befehle von Simons Basic im Vergleich mit Grafik 2000</figcaption>
+        </figure>
+
+        <p>Zudem ist es mit »Grafik 2000« auch möglich, die Testbilder mit GSAVE und SSAVE zu speichern.</p>
+
+        <p>Dafür, daß man einen Testbildgenerator quasi zum Nulltarif erhält, muß ein Kompromiß eingegangen werden. Die Computerbilder werden nicht bis in die Ecken gezeichnet. Trotz dieses kleinen Mankos ergeben sich so viele Anwendungsmöglichkeiten, daß die Vorteile bei weitem überwiegen.</p>
+
+        <p>Kommen wir nun zum Programm selbst. Eine Übersicht der einzelnen Menüpunkte und deren Bedeutung zeigt Tabelle 1. Was Sie mit den einzelnen Testbildern prüfen können, finden Sie in Tabelle 2.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Menüpunkt</th>
+                    <th>Bezeichnung</th>
+                    <th>Bild</th>
+                    <th>Aufbau in Sek.</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Grundfarbe rot</td>
+                    <td>konstante Rotfläche</td>
+                    <td>sofort</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Grundfarbe grün</td>
+                    <td>konstante Grünfläche</td>
+                    <td>sofort</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Grundfarbe blau</td>
+                    <td>konstante Blaufläche</td>
+                    <td>sofort</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Gitter</td>
+                    <td>Raster mit quadratischen Feldern</td>
+                    <td>4 Sek.</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Farbbalken</td>
+                    <td>acht senkrechte Farben</td>
+                    <td>1 Sek.</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Multiburst</td>
+                    <td>senkrechte Strichraster</td>
+                    <td>zirka 20 Sek.</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>50-MHz-Sprung</td>
+                    <td>weißes Rechteck</td>
+                    <td>sofort</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>2T-Impuls</td>
+                    <td>senkrechte Linie in Bildmitte</td>
+                    <td>sofort</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>Farbtestbild</td>
+                    <td>dem TV-Testbild nachempfunden</td>
+                    <td>zirka 1 min.</td>
+                </tr>
+                <tr>
+                    <td>&lt;F1&gt;</td>
+                    <td>Pegelton</td>
+                    <td>1 kHz</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&lt;F3&gt;</td>
+                    <td>Zweitonerkennung</td>
+                    <td>274 Hz</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&lt;F5&gt;</td>
+                    <td>Stereokennung</td>
+                    <td>117 Hz</td>
+                    <td></td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die einzelnen Menüpunkte in einer Übersicht</figcaption>
+        </figure>
+
+        <figure>
+            <p><strong>Anwendung der Testbilder</strong></p>
+            <p><strong>Grundfarben:</strong> Prüfung von Farbdecodern, RGB-Endstufen und Farbreinheit der Bildröhren (Flecken auf Maske). Prüfung von Videoköpfen und -Bändern mit der Rotfläche. Hier lassen sich Unregelmäßigkeiten und Störungen gut erkennen.</p>
+            <p><strong>Gitter:</strong> Einstellung der Linearität und Konvergenz (Farbdeckung). Alle Felder müssen quadratisch sein, jede Linie weiß. Bunte Ränder sind Farbdeckungsfehler.</p>
+            <p><strong>Farbbalken:</strong> Allgemeine Prüfung der Farbeinstellung.</p>
+            <p><strong>Multiburst:</strong> Ermittlung der Auflösungsgrenzen von Monitoren und Videorecordern. Fokuseinstellung (Bildschärfe).</p>
+            <p><strong>50-MHz-Sprung:</strong> Prüfung von Klemmschaltungen mit Hilfe eines Oszilloskops</p>
+            <p><strong>2T-Impuls:</strong> Messungen von Laufzeiten und Reflexionen auf dem Übertragungsweg (Koaxialkabel). Störstellen und Fehlanpassungen erkennt man als Mehrfachbilder.</p>
+            <p><strong>Farbbildtest:</strong> Dieses Bild enthält Auszüge aus allen anderen Testmustern zur Qualitätsbeurteilung »auf einen Blick«. Laufendes Kontrollbild für Video-Anwendungen.</p>
+            <p><strong>Pegelton 1 kHz:</strong> Allgemeiner Meßton für alle Anwendungen.</p>
+            <p><strong>Zweitonerkennung, Stereoerkennung:</strong> Pilottöne zum Abgleichen und Prüfungen von TV-Stereodecodern.</p>
+            <figcaption>Tabelle 2. Die Prüfmöglichkeiten der einzelnen Testbilder</figcaption>
+        </figure>
+
+        <p>Um das Programm zu aktivieren, müssen Sie es mit LOAD "Testbild",8 laden und mit RUN starten. Innerhalb eines Testbildes können Sie mit den Tasten &lt;F1&gt;, &lt;F3&gt;, &lt;F5&gt; einen beliebigen Prüfton dazuschalten. Als Wellenform wurde dabei ein Dreieck gewählt, da es dem Sinus am ähnlichsten ist. Mit &lt;F7&gt; wird die Lautstärke erhöht, mit &lt;F8&gt; erniedrigt.</p>
+
+        <p>Durch die Betätigung einer beliebigen anderen Taste gelangen Sie wieder ins Hauptmenü.</p>
+
+        <p>Insgesamt ist dieses Programm für Videofreunde und Fernseh-Amateure ein Hilfsmittel, für das Sie sonst viel Geld bezahlen müßten.</p>
+
+        <address class="author">(Dieter Laues/kn/sk)</address>
+
+        <figure>
+            <pre data-filename="testbild 64" data-name="Testbild"></pre>
+            <figcaption>Listing »Testbild«. Bitte mit Simons Basic eingeben.</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

@@ -160,13 +160,14 @@ Seite 72
 
 ## Ausgabe 1/87
 
-Seite unbekannt (Footer durch Grafik verdeckt)
+Seite 69
 
 - **Precompiler für Textdateien** (Ausgabe 12/86, Seite 68ff)
-- **Tips und Tricks** (Sonderheft 11, Seite 144)
+- **Partnervermittlung** (Sonderheft 11, Seite 144)
 - **Computer-Sound in Stereo** (Ausgabe 11/86, Seite 160 und 161)
-- **3D-Grafik-Master** (Ausgabe 11/86, Seite 25)
-- **XREF 7.0** (Ausgabe 9/86, Seite 25)
+- **SYS-Zeile für Basic-Programme** (Ausgabe 11/86, Seite 25)
+- **3D-Grafik-Master** (Ausgabe 11/86, Seite 56)
+- **XREF 7.0** (Ausgabe 9/86, Seite 71)
 
 ## Ausgabe 2/87
 

@@ -1,0 +1,39 @@
+
+
+;lineare gl..prg ==0801==
+    1 rem loesen eines lineraren gleichungsystems mit hilfe des horner-schemas
+    2 :
+    3 rem germano caronni greubstelstr.10 ch-5430 wettingen tel.0041/56262574
+    4 :
+   10 poke53280,0:poke53281,0:print"{wht}{clr}"
+   20 input"anzahl unbekannte ";n:ifn<2orn>10thenprint"{up}{up}":goto20
+   30 dima(n,n),b(n)
+   40 fori=1ton:print"zeile";i;:forj=1ton:printtab(12);"spalte ";j;
+   50 inputa(i,j):nextj
+   60 printtab(12);"konstante ";
+   70 inputa(i,0):nexti
+   80 print
+   90 :
+  100 fori=1ton-1:fl=0:dk=i
+  102 ifa(i,i)<>0then105
+  103 dk=dk+1:ifdk>nthenprint"tut mir leid, ueberbestimmt !":end
+  104 forj=0ton:a=a(i,j):a(i,j)=a(dk,j):a(dk,j)=a:next:print"*-":goto102
+  105 a=a(i,i)*-1:fork=iton:a(i,k)=a(i,k)/a:nextk:a(i,0)=a(i,0)/a
+  110 forj=i+1ton
+  119 ifa(j,i)=0thenprint"*+":goto140
+  120 a=a(j,i):fork=iton:a(j,k)=a(j,k)/a:nextk:a(j,0)=a(j,0)/a
+  130 fork=iton:a(j,k)=a(j,k)+a(i,k):nextk:a(j,0)=a(j,0)+a(i,0)
+  140 nextj,i
+  145 :
+  150 fori=nto1step-1
+  155 ifa(i,i)=0thenprint"die gleichung hat keine eindeutige loesung{down}":end
+  160 a(i,0)=a(i,0)/a(i,i):a(i,i)=1:b(i)=a(i,0):printi,b(i):ifi=1then180
+  170 forj=1toi-1:a(j,0)=a(j,0)-a(j,i)*b(i):a(j,i)=0:nextj
+  180 nexti
+  190 print
+  199 :
+  500 fori=1ton:forj=1ton:printa(i,j);"{left}";:nextj:print"=";a(i,0):nexti
+  510 print"{down}"
+  520 input"name ";a$:ifa$=""thenend
+  530 open2,8,2,"horn"+str$(n)+"loesung,s,w":fori=1ton:print#2,b(i):next:close2
+

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Werner Braun, dm, Albrecht Ropers, dm, Martin Conrad, dm, Florian Müller, dm, Christian Scherzer, dm, M.Conrad, dm">
+    <meta name="64er.issue" content="1/87">
+    <meta name="64er.pages" content="74-75,78">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Tips & Tricks">
+    <meta name="64er.toc_title" content="Tips &amp; Tricks zum C 128: Speichern des 80-Zeichen-Bildschirms / VDC 8563 voll ausgereizt / Basic-Programm in BANK 0 verschieben / Grafik-Konverter / Kleine Befehlserweiterung">
+    <meta name="64er.index_title" content="Speichern des 80-Zeichen-Bildschirms">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.index_title" content="VDC 8563 voll ausgereizt">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.index_title" content="Basic-Programm in Bank 0 verschieben">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.index_title" content="Grafik-Konverter">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.index_title" content="Kleine Befehlserweiterung">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.id" content="tips_c128">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 128</h1>
+        <p class="intro">Wer schon immer seine 40-Zeichen-Grafiken auf dem 80-Zeichen-Bildschirm verarbeiten wollte, erhält eine Routine, die dies ermöglicht. Ergänzend dazu finden Sie eine Routine, mit der Sie den 80-Zeichen-Bildschirm laden und speichern können.</p>
+
+        <p>Möchte man in einer fertigen Grafik mit COLOR F,F<sub>x</sub> die Farben ändern (wobei F=0 der Hintergrund- und F=1,2,3 der drei Zeichenfarben im Multicolor-Modus entspricht; der Farbcode F<sub>x</sub> liegt zwischen 1 und 16), so funktioniert dies nur mit der Hintergrundfarbe. Abhilfe schafft für die Zeichenfarben 1 und 2 das POKEn des Farbcodes (F<sub>x</sub>-1 +16*(F<sub>x</sub>-1)) in die Speicherregister von $1C00 bis $1FE7.</p>
+
+        <p>Bleibt noch die dritte Zeichenfarbe, die über das Farb-RAM von $D800 bis $DFE8 gesteuert wird. Weil beim C 128 Grafik und Text gemischt werden kann, sind die Register doppelt belegt. Ein POKEn in diesen Bereich oder das Hineinschreiben des gewünschten Farbcodes durch ein kleines Maschinenprogramm hat nicht die gewünschte Wirkung, sondern verändert lediglich die Textfarbe. Dennoch gibt es eine Möglichkeit, auch die dritte Zeichenfarbe zu ändern, ohne die Grafik neu zu zeichnen oder zu speichern beziehungsweise (nach Löschen des Grafikbildschirms und Wahl der neuen Farbe mit COLOR 3,F<sub>x</sub>) zu laden: Das Betriebssystem des C 128 enthält eine Routine, die die gewünschte Änderung ausführt (offenbar wird diese Routine nur beim Löschen des Grafikbildschirms aktiviert). Sie liegt ab Adresse $6B17. Der Farbcode wird aus Speicherstelle 133 ($85) gelesen. Die gewünschte neue Farbe erhält man also mit folgender Anweisung:</p>
+
+        <pre><code>POKE 133,F<sub>x</sub>-1:BANK 15:SYS DEC("6B17")</code></pre>
+
+        <address class="author">(Werner Braun/dm)</address>
+
+        <h2>Speichern des 80-Zeichen-Bildschirms</h2>
+
+        <p>Dieses kleine Programm (Listing 1, bitte mit dem MSE im C 64-Modus eingeben) ermöglicht es, den 80-Zeichen-Bildschirm zu speichern oder zu laden. Hierbei wird natürlich auch Rücksicht auf den Grafikbildschirm genommen. Mittels folgender Befehle wird der Bildschirm gespeichert oder geladen, wobei der Dateiname folgendermaßen festgelegt ist:</p>
+
+        <ol>
+            <li>Textbildschirm : 80-.T</li>
+            <li>Grafikbildschirm: 80-.G</li>
+        </ol>
+
+        <p>Nun die Befehle:<br>
+            SYS 7028 — Speichern des Textbildschirms<br>
+            SYS 7052 — Speichern des Grafikbildschirms<br>
+            SYS 7016 — Laden des Textbildschirms<br>
+            SYS 7040 — Laden des Grafikbildschirms</p>
+
+        <p>Selbstverständlich bleibt die Möglichkeit offen, diese Namen mit RENAME zu ändern, man muß jedoch vor dem Laden den Namen wieder auf das vorgeschriebene Format bringen.</p>
+
+        <address class="author">(Albrecht Ropers/dm)</address>
+
+        <figure>
+            <pre data-filename="unisave 80.prg" data-name="Unisave 80" data-mse=mse1></pre>
+            <figcaption>Listing 1. »UNISAVE 80« (bitte mit dem MSE im C 64-Modus eingeben)</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="unisave 80.prg" data-name="Unisave 80"></div>
+
+        <h2>VDC 8563 voll ausgereizt</h2>
+
+        <p>Bisher diente der 80-Zeichen-Chip des C 128 wohl in erster Linie ausschließlich zur Textdarstellung auf Schwarzweiß-Monitoren. Bedingt durch die schlechtere Lesbarkeit auf Farbmonitoren wird dort wohl viel im 40-Zeichen-Modus gearbeitet. Dieser hat allerdings den Nachteil, daß er im FAST-Modus nicht verwendbar ist.</p>
+
+        <p>Warum benutzen wir dann nicht einfach den 40-Zeichen-Modus des VDC? Weil es darüber fast keine Informationen gibt!</p>
+
+        <p>Hier zunächst eine Bemerkung: Es gibt leider zwei unterschiedliche Versionen des VDC. Bei der einen steht in Register 25 normalerweise der Wert $40, in der anderen der Wert $47. Bei allen nun folgenden Angaben werden die Werte des erstgenannten Chips vor, die des zweitgenannten nach einem Schrägstrich angegeben (zum Beispiel Register 25: $40/$47).</p>
+
+        <p>Zunächst soll jedoch die Frage beantwortet werden, wie man eines der VDC-Register beschreibt.</p>
+
+        <p>Die Register lassen sich über die Speicherstelle $D600 und $D601 ansprechen. Dabei ist zunächst in $D600 die Registernummer zu POKEn und anschließend der Wert aus $D601 zu lesen oder in diese Speicherstelle zu schreiben. Um zum Beispiel den Wert von Register 25 zu erfahren, geben Sie folgende Befehle ein:</p>
+
+        <pre><code>POKE 54784,25:PRINT PEEK (54785)</code></pre>
+
+        <p>Auf Ihrem Bildschirm sollte dann eine der beiden folgenden Zahlen stehen: 64 / 71 (64 bei erstgenanntem Chip, sonst 71).</p>
+
+        <p>Die gewünschten Werte bringt man am leichtesten mit einer kleinen Schleife in die dazugehörigen Register:</p>
+
+        <pre><code>10 READ RG:IF RG&lt;0 THEN END:REM REGISTER VERSORGT
+20 READ WE$:POKE 54784,RG:POKE 54785,DEC(WE$):GOTO 10
+30 DATA R1,W1,...,Rn,Wn,-1</code></pre>
+
+        <p>Hierbei sind R1 bis Rn dezimal angegebene Registernummern und W1 bis Wn hexadezimal angegebene Werte, die in das zuvor angegebene Register geschrieben werden sollen.</p>
+
+        <p>Sie erhalten nun alle Werte, die Sie benötigen, um mit dem VDC mal etwas anders zu arbeiten. Die Wertangaben sind dabei alle hexadezimal und die Registerangaben dezimal.</p>
+
+        <ol>
+            <li>40 Zeichen in 25 Zeilen (Darstellung wie beim VIC-Chip, lediglich ohne Rahmen):
+                <table class="plain">
+                    <tr>
+                        <th>Register</th>
+                        <th>Wert</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>$28</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>$3D</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>$47</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>$28</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>$50/$56</td>
+                    </tr>
+                </table>
+                <p>Nach WINDOW 0,0,29,24 erfolgen alle Ausgaben wie bei Verwendung des VIC.</p>
+            </li>
+            <li>Wie 1., jedoch bis zu 50 Zeichen je Zeile:
+                <table class="plain">
+                    <tr>
+                        <th>Register</th>
+                        <th>Wert</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>$32</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>$1E</td>
+                    </tr>
+                </table>
+                <p>sonst wie bei 1.</p>
+                <p>Nach WINDOW 0,0,ZEICHENZAHL,24 stehen in 25 Zeilen die gewünschte Anzahl Zeichen zur Verfügung. Durch Veränderung des Wertes in Register 2 kann die Ausgabe weiter nach rechts oder links verschoben werden.</p>
+            </li>
+            <li>80 Zeichen je Zeile (Standardwerte):
+                <table class="plain">
+                    <tr>
+                        <th>Register</th>
+                        <th>Wert</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>$50</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>$66</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>$7E</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>$00</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>$40/$47</td>
+                    </tr>
+                </table>
+                <p>Hierfür ist kein WINDOW-Kommando erforderlich, da dies die voreingestellten Werte sind.</p>
+            </li>
+            <li>40 Zeichen je Zeile, bis zu 32 Zeilen:
+                <table class="plain">
+                    <tr>
+                        <th>Register</th>
+                        <th>Wert</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>$28</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>$3D</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>$47</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>$00</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>$50/$56</td>
+                    </tr>
+                </table>
+                <p>Nach WINDOW 0,0,79,INT(ZEILENZAHL/2)-1 erfolgen die Ausgaben wie folgt:</p>
+                <p>Jeweils zwei Bildschirmzeilen bilden eine logische Zeile. Dies bedeutet, daß durch CHR$(13) vor Spalte 40 immer eine Zeile übersprungen wird. Das Gleiche gilt bei der Verwendung der Cursor-Tasten. Um zum Beispiel von Zeile 2 nach Zeile 3 zu gelangen, muß der Cursor statt einmal nach unten, 40mal nach rechts bewegt werden. Dies ist zwar etwas umständlich, dafür können aber immerhin je nach Monitor bis zu sieben Zeilen mehr verwendet werden als sonst.</p>
+            </li>
+            <li>Hochauflösende Farbgrafik
+                <p>Die hochauflösende Farbgrafik mit einer Auflösung von 640x200 Bildpunkten kann, wie ein einfaches Rechenbeispiel zeigt, nicht farbig dargestellt werden. Der dafür benötigte Speicherplatz beträgt nämlich:</p>
+                <p>640 x 200 / 8 = 16000 Byte für die Bitmap<br>
+                    25 x 80 = 2000 Byte für den Farbspeicher<br>
+                    Zusammen 18000 Byte</p>
+                <p>Der VDC verfügt jedoch nur über einen Speicher von 16 KByte = 16384 Byte.</p>
+                <p>Wie verhält es sich aber, wenn wir auf einige Zeilen oder Spalten verzichten? Die Grafik ist nicht viel kleiner, wenn Sie statt 25 nur 22 Zeilen verwenden, das heißt, statt 640 x 200 nur 640 x 176 Punkte. Die Adresse des Attributspeichers muß dann entsprechend hinter die Bitmap gesetzt werden. Die Adresse eines Punktes errechnet sich übrigens leichter als beim VIC:</p>
+                <p>Adresse von Punkt X,Y : INT(X/8) +Y*80<br>
+                    Bitnummer : 2↑(7-(X AND 7))<br>
+                    Adresse im Farbspeicher: INT(X/8) +INT(Y/8)*80 + Basisadresse</p>
+                <p>Leider ist es ein Problem, Werte in den Speicher des VDC zu bekommen. Hier hilft jedoch einschlägige Literatur weiter. Wie man von Basic aus Werte in den VDC-Speicher bekommt, wird noch beschrieben. Nun zunächst zur Registerbelegung:</p>
+                <table class="plain">
+                    <tr>
+                        <th>Register</th>
+                        <th>Wert</th>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>$C0/$C7</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>$37</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>$16</td>
+                    </tr>
+                </table>
+                <p>Rest wie bei 80 Zeichen je Zeile</p>
+                <p>Die Basisadresse der Farbinformation ist jetzt $3700 = 14080. Die Farbinformation gibt für je 8x8 Punkte die Vordergrund- und die Hintergrundfarbe an (obere 4 Bit: Hintergrundfarbe, untere 4 Bit: Vordergrundfarbe).</p>
+                <p>Auch andere Werte für Zeilen und Spalten wären denkbar, zum Beispiel 72x25, 75x24, 79x23, 82x22 oder 86x21.</p>
+                <p>Hierbei ist die Zeichenzahl je Zeile in Register 1, die Anzahl der Zeilen in Register 6 und die Adresse des Farbspeichers in Register 20/21 einzutragen.</p>
+            </li>
+            <li>Zweifarbige Grafik im 40-Zeichen-Modus
+                <p>Dieser Modus ist sicher nicht so interessant. Jedoch kann hier die Grafik-Erweiterung aus Ausgabe 12/85 verwendet werden. Hierbei ist dann ein Quadrat auch ein Quadrat und nicht so stark in der X-Richtung verkürzt. Es sollte jedoch beachtet werden, daß die X-Koordinaten nicht über den Wert 320 hinausgehen. Hier die zugehörigen Werte:</p>
+                <table class="plain">
+                    <tr>
+                        <th>Register</th>
+                        <th>Wert</th>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>$90/$96</td>
+                    </tr>
+                </table>
+                <p>sonst wie bei 1.</p>
+                <p>Hierbei entsteht bei den Video-Chips des zweiten Typs am Rand leider ein nicht vermeidbares leichtes Flimmern.</p>
+            </li>
+            <li>Farbige Grafik im 40-Zeichen-Modus
+                <p>Dieser Modus ist natürlich hier besonders interessant, da hier volle 320x200 Punkte in mehreren Farben dargestellt werden können. Im Extremfall lassen sich sogar 400x256 Punkte farbig darstellen (32 Zeilen/50 Zeichen je Zeile). Hier die Werte:</p>
+                <table class="plain">
+                    <tr>
+                        <th>Register</th>
+                        <th>Wert</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Zeichenzahl je Zeile; $28=40, $32 = 50</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>$00</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>$D0/$D6</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Zeilenzahl; $19 = 25, $20 = 32</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>$3C</td>
+                    </tr>
+                </table>
+                <p>Der Farbspeicher beginnt bei dieser Kombination ab $3C00 und ist damit auch für die Darstellung von 400x256 Punkten geeignet.</p>
+            </li>
+        </ol>
+
+        <p>Zum Schluß sei noch eine Möglichkeit erwähnt, von Basic aus in den VDC-Speicher zu schreiben. (Beim C 128 des Autors hat es jedenfalls funktioniert.) Bei der hier beschriebenen Routine ist A die Adresse, an die der Wert W geschrieben werden soll:</p>
+
+        <pre><code>10 POKE 54784,31:POKE 54785,W
+20 POKE 54784,18:POKE 54785,A/256
+30 POKE 54784,19:POKE 54785,A AND 255
+40 POKE 54784,30:POKE 54785,1
+50 RETURN</code></pre>
+
+        <p>Diese Routine ist jedoch für schnelle Grafik ebenso ungeeignet wie die Grafik im C 64-Modus, wenn man sie dort von Basic aus programmieren will. Daher ein Aufruf an alle Assembler-Programmierer: Schicken Sie doch eine Grafik-Erweiterung, die diese Möglichkeiten ausnutzt!</p>
+
+        <p>Noch ein Wort zur Geschwindigkeit: Da alle Berechnungen und Ausgaben auch im FAST-Modus arbeiten, ist die Geschwindigkeit gar nicht so gering, wie häufig angenommen wird. Oft ist nicht die Zeit zum Setzen der Punkte entscheidend, sondern die Zeit, um irgendwelche Werte zu errechnen.</p>
+
+        <address class="author">(Martin Conrad/dm)</address>
+
+        <h2>Basic-Programm in BANK 0 verschieben</h2>
+
+        <p>Um ein im Speicher befindliches Basic-Programm innerhalb von BANK 0 an eine andere Stelle zu befördern, kann man sich einer Routine des Basic 7.0-Interpreters bedienen, die beim Einschalten der hochauflösenden Grafik zum Transport des Programms zur neuen Anfangsadresse 16385 ($4001) dient. Da es sich um eine Maschinenroutine handelt, geht das Verschieben selbst bei extrem langen Programmen in Sekundenschnelle vonstatten. Allerdings ist die Routine nur für den Transport von 7183 ($1C01) nach 16385 ($4001) ausgelegt, weshalb bei der Verwendung anderer Adressen Einschränkungen unvermeidlich sind:</p>
+
+        <p>— Das Low-Byte der neuen Startadresse muß »1« sein.</p>
+
+        <p>— Das Programm muß vor dem Kopieren bei 7182 ($1C01) liegen.</p>
+
+        <p>— Die neue Anfangsadresse muß größer sein als die alte (7183 = $1C01).</p>
+
+        <p>Wie man dann vorgeht, soll am Beispiel der Zieladresse 32769 ($8001) gezeigt werden:</p>
+
+        <ol>
+            <li>High-Byte bestimmen: PRINT (32769-1)/256<br>
+                    Ergebnis 128 (merken!)</li>
+            <li>Offset-High-Byte ermitteln: PRINT 128-28<br>
+                    Ergebnis 100 (merken!) 28 ist hierbei immer konstant.</li>
+            <li>Verschieberoutine aufrufen: SYS DEC("9F5C"),PEEK (4625) + 100<br>
+                    (100 ist das Ergebnis aus Schritt 2.)
+                <p>Wenn das Programm so lang ist, daß ab der Zieladresse nicht ausreichend Platz vorhanden ist, erfolgt die Meldung »OUT OF MEMORY«. Sie müssen also nicht mit einem Absturz oder sonstigem Fehlverhalten rechnen.</p>
+            </li>
+            <li>Neue Adresse einstellen: POKE 46,128<br>
+                    (128 ist das High-Byte aus Schritt 1.)</li>
+            <li>Programm löschen: NEW</li>
+            <li>Programm wiederherstellen, damit alle Basic-Zeiger richtig gesetzt werden (was nach Schritt 4. nicht der Fall ist): POKE 1+256*128,1:RENUMBER<br>
+                    (128 ist das High-Byte (Schritt 1.), 1 und 256 sind unabhängig von der Zieladresse)</li>
+        </ol>
+
+        <p>Dann kann das Programm gelistet, gespeichert, editiert oder gestartet werden. Mit GRAPHIC CLR wird jetzt allerdings nicht mehr der normale Basic-Start eingestellt, sondern einfach das Programm um 9 KByte nach unten verschoben, was nur bei einer Anfangsadresse von 16385 ($4001), also dem Zustand nach GRAPHIC1, das gewünschte Ergebnis ist.</p>
+
+        <address class="author">(Florian Müller/dm)</address>
+
+        <h2>Grafik-Konverter</h2>
+
+        <p>Mit der nächsten kleinen Routine (Listing 2) ist es möglich, Bilder, die auf dem 40-Zeichen-Bildschirm als hochauflösende Grafiken sichtbar sind, auf den 80-Zeichen-Bildschirm zu transferieren. Dabei ist folgendermaßen vorzugehen:</p>
+
+        <ol>
+            <li>Das HiRes-Bild auf dem 40-Zeichen-Schirm muß sichtbar sein (eventuell von Diskette laden und Grafik einschalten)</li>
+            <li>»Picturetrans 128« mit BLOAD laden</li>
+            <li>Die Verschiebung wird nach Umschaltung auf den 80-Zeichen-Grafikmodus (zum Beispiel mit POKE 54784,25: POKE 54785,135) durch SYS DEC("1700"),(39-Startspalte) aufgerufen.</li>
+        </ol>
+
+        <address class="author">(Christian Scherzer/dm)</address>
+
+        <figure>
+            <pre data-filename="picturetrans 128.prg" data-name="Picturetrans 128" data-mse=mse1></pre>
+            <figcaption>Listing 2. Ein Programm zum Übertragen von 40-Zeichen-Grafiken auf den 80-Zeichen-Schirm (bitte mit dem MSE im C 64-Modus eingeben)</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="picturetrans 128.prg" data-name="Picturetrans 128"></div>
+
+        <h2>Kleine Befehlserweiterung</h2>
+
+        <p>Programmierer erhalten einen neuen Befehl (»%«), der ein Label kennzeichnet (Listing 3). Außerdem werden die Befehle RESUME, GOTO, GOSUB, ON und RUN so erweitert, daß die Übergabe von Zeilennummern per Variable möglich wird.</p>
+
+        <p>Der Befehl »%« ermöglicht die Definition einer Labelvariablen beim Programmstart. Während des Programmablaufs wird der Befehl übersprungen. Das Kommando RUN wurde jedoch so geändert, daß alle Label in Form von Integervariablen erzeugt werden. Dies aber nur, wenn RUN ohne Zeilennummer oder Programmname angegeben wird.</p>
+
+        <p>Diese Erweiterung macht den C 128-Besitzer endlich frei vom Gebrauch von Zeilensprüngen. War dies ohnehin bisher schon weitgehend möglich, da so leistungsfähige Befehle wie DO..LOOP und IF..THEN..ELSE mit BEGIN und BEND zur Verfügung gestellt wurden, so wird dies hiermit komplettiert.</p>
+
+        <p>Bisher mußte man zumindest noch bei allen GOSUB-Sprüngen, COLLISION- und TRAP-Befehlen die Zeilennummer wissen, um die es geht.</p>
+
+        <p>Da beim Programmstart mit RUN jetzt alle Label in Form vom Integervariablen erzeugt werden (sofern sie hinter einem »%«-Zeichen am Zeilenbeginn stehen), braucht man nur noch zu wissen, welche Namen den Label gegeben wurden.</p>
+
+        <p>Da der Basic-Interpreter leider die Angewohnheit hat, nur im Programmodus in die Erweiterung zu springen, kann, um die Labelvariablen zu erzeugen, am Programmanfang folgende Sequenz stehen:</p>
+
+        <pre><code>10 % ANF%:IF ANF%=0 THEN:RUN</code></pre>
+
+        <p>Anschließend stehen dann alle verwendeten Labelvariablen zur Verfügung. Ein Beispiel für die sinnvolle Verwendung von Label:</p>
+
+        <pre><code>10 IF V1UP%=0 THEN:RUN
+... trap fehl% ...
+... gosub v1up$ ...
+nn % V1UP%:REM VERARBEITUNG 1
+... return
+mm % FEHL%:REM TRAP-ROUTINE
+... resume ...</code></pre>
+
+        <p>Sie sehen, daß so die Programme noch übersichtlicher gestaltet werden können. Nun zum Umgang mit dem Programm: Nach Eingabe des Befehls</p>
+
+        <pre><code>BOOT"ERW128"</code></pre>
+
+        <p>steht die Befehlserweiterung zur Verfügung. Sie belegt den Speicherbereich ab $1300. Wenn Sie das Programm absolut (,8,1) laden, erfolgt der Start durch SYS4864.</p>
+
+        <address class="author">(M.Conrad/dm)</address>
+
+        <figure>
+            <pre data-filename="erw128.prg" data-name="ERW128" data-mse=mse1></pre>
+            <figcaption>Listing 3. Befehlserweiterung zum Kennzeichnen von Label (bitte mit dem MSE im C 64-Modus eingeben)</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="erw128.prg" data-name="ERW128"></div>
+        <div style="display: none;">
+            <pre data-filename="test.erw128" data-name="Beispiel zu ERW128"></pre>
+        </div>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Grafik für Hypra-Basic</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heiko Müller, Horst Aurisch, og">
+    <meta name="64er.issue" content="1/87">
+    <meta name="64er.pages" content="83-86,99">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Eingabe-Hilfen">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik">
+    <meta name="64er.id" content="hypra-basic">
+</head>
+
+<body>
+    <article>
+        <h1>Grafik für Hypra-Basic</h1>
+        <p class="intro">Beherrschen Sie die Bitmap mit Hypra-Basic! Effektive Befehle vereinfachen die Programmierung der hochauflösenden Grafik auf ein Minimum.</p>
+
+        <p>Komfort muß sein, auch bei hochauflösender Grafik. Diesen bieten Ihnen die neuen Module zur Grafikprogrammierung. Ungewöhnlich groß ist Modul 52, das schon eher ein Grafikpaket darstellt. Das muß es aber auch sein, da sich bei der Programmierung der Grafik einige Routinen ständig wiederholen. Die einzelnen Programme wären sonst zu lang. Außerdem belegt das Grafikmodul 40 Byte im Spriteblock 11, ab $02c0.</p>
+
+        <address class="author">(Heiko Müller/Horst Aurisch/og)</address>
+
+        <aside>
+            <pre><code>Listing 1. Modulnummer: 50
+Anzahl der Befehle: 1
+1) HRDCPY 49152 bis 49511, 22
+Syntax: HRDCPY startspalte,endspalte,startzeile,endzei-
+le,linkerrand,pos
+Linkerrand bestimmt die Position, ab der der Drucker
+druckt.
+pos=0: Alle Zeilen werden ab »linkerrand«
+gedruckt.
+pos=1: Es wird zusätzlich zu »linkerrand« noch entspre-
+chend der Position der Startspalte eingerückt, so
+daß gleiche Teile des Bildschirmes auch bei unter-
+schiedlichem Hardcopy-Beginn untereinanderstehen.
+Dem Befehl HRDCPY muß ein OPEN 1,4 vorausgehen. Das
+File ist anschließend wieder geschlossen.
+
+Funktion: Beliebige Teile des normalen Textbildschirmes
+auf dem Drucker auszudrucken.
+
+Anwendung: HRDCPY gibt die Möglichkeit, jederzeit be-
+stimmte Teile einer Bildschirmmaske ausdrucken zu kön-
+nen.
+
+Beispiel: OPEN 1,4 : HRDCPY 0,0,39,24,20,0
+Der gesamte Bildschirm wird auf der Mitte des Papieres
+ausgedruckt.</code></pre>
+        </aside>
+        <figure>
+            <pre data-filename="50erw .ass.prg" data-name="HRDCPY" data-mse=mse1></pre>
+            <figcaption>Listing 1. Hardcopy eines beliebigen Bildschirmausschnittes</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="50erw .ass.prg" data-name="HRDCPY"></div>
+        <div class="binary_download" data-filename="50modul.prg" data-name="Modul 50"></div>
+        <aside>
+            <pre><code>Listing 2. Modulnummer: 51
+Anzahl der Befehle: 2
+1) VARSPRITE 49152 bis 49595,0
+Syntax: VARSPRITE A$, beginn, block
+A$ muß mindestens auf 20 dimensioniert sein.
+
+Funktion: Sprites in einer Textvariable zu definieren.
+Anwendung: Leichtes und übersichtliches Definieren
+eines Sprites, ohne einen Spriteeditor, sowie leichtes
+Verändern und Austauschen von Sprites.
+
+Beispiel: DIM A$(26)
+A$ (5) = "***************........."
+ .
+ .
+ .
+ A$ (26) = "***************........"
+ VARSPRITES A$,5,11
+ Ein 15*21 großes gefülltes  Rechteck wurde ab A$(5)
+definiert und dann in Block 11 ab 704 übertragen.
+ * oder jedes andere Zeichen bedeutet, ein Punkt wird
+gesetzt.
+ . bedeutet, ein Punkt wird nicht  gesetzt.
+
+2) MCVARSPRITE 49596 bis 49713,72
+Syntax: MCVARSPRITE A$, beginn, block
+
+Funktion: Multicolorsprites in einer  Textvariablen zu
+definieren.
+
+Anwendung: Leichtes und übersichtliches Definieren von
+Multicolorsprites, sowie leichte Veränderungsmöglich-
+keiten über Basic-Programme.
+
+Beispiel: DIM A$ (27)
+A$ (6) = "*****-----+++++....."
+ .
+ .
+ .
+A$(27) = "*****-----+++++....."
+MCVARSPRITE A$, 6, 11
+Ein Multicolorsprite, das vier senkrechte Streifen ent-
+hält, wird in A$(6) bis A$(27) definiert und in Block 11
+bei 704 abgelegt.
+.. bedeutet die Bitkombination 00
+** bedeutet die Bitkombination 11
+++ bedeutet die Bitkombination 01
+-- bedeutet die Bitkombination 10</code></pre>
+        </aside>
+        <figure>
+            <pre data-filename="51erw .ass.prg" data-name="VARSPRITE" data-mse=mse1></pre>
+            <figcaption>Listing 2. Sprites definieren im Programm leichtgemacht</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="51erw .ass.prg" data-name="VARSPRITE"></div>
+        <div class="binary_download" data-filename="51modul.prg" data-name="Modul 51"></div>
+        <aside>
+            <pre><code>Listing 3. Modulnummer: 52
+Anzahl der Befehle: 13
+1) VIDEO 49152 bis 49234,0
+Syntax: VIDEO r,v
+r gibt die Video-RAM-Seite im Adressierungsbereich des
+VICs an.
+ 0 = $0000            1 = $0400
+ 2 = $0800            3 = $0C00
+ 4 = $1000            5 = $1400
+ 6 = $1800            7 = $1C00
+ 8 = $2000            9 = $2400
+10 = $2800           11 = $2C00
+12 = $3000           13 = $3400
+14 = $3800           15 = $3C00
+v gibt den Adressierungsbereich des VICs an.
+0 = $0000 bis $3FFF
+1 = $4000 bis $7FFF
+2 = $8000 bis $8FFF
+3 = $C000 bis $FFFF
+Dieser Parameter muß nicht zwingend angegeben werden.
+
+Funktion: Video-RAM wird verschoben und Adressierungsbe-
+reich des VIC wird geändert.
+
+Anwendung: HiRes-Grafik kann in anderen Speicherbereichen
+dargestellt werden oder es kann zwischen mehreren Bild-
+schirmseiten hin- und hergeschaltet werden.
+
+Beispiel: VIDEO 1
+Der Bildschirm liegt bei $0400.
+VIDEO 15,1
+Der Bildschirm liegt jetzt bei $7C00
+
+2) GRPA 49235 bis 49251,0
+Syntax: GRPA x
+x gibt die Seite an (0 bis 5)
+
+Funktion: Leitet die Grafikbefehle auf eine andere Gra-
+fikseite um. Die voreingestellte Seite bleibt sichtbar.
+Anwendung: Page-Flipping, besonders bei bewegter Grafik.
+Beispiel: GRPA 1 leitet die Grafikbefehle auf $4000 um
+
+3) HIRES 49252 bis 49359,0
+Syntax: HIRES x
+x gibt die Grafikseite an. Wenn dieser Parameter fehlt,
+wird die Grafik bei $2000 eingeschaltet.
+x =  0 $2000
+     1 $4000
+     2 $6000
+     3 $8000
+     4 $A000
+     5 $E000
+
+Funktion: Schaltet den HiRes-Bildschirm ein und löscht
+ihn.
+Anwendung: Mehrere Grafiken befinden sich gleichzeitig im
+Speicher, so daß das Nachladen entfällt.
+
+4) VIEW 49360 bis 49362,0
+Funktion: Schaltet die Grafikseite ein, ohne sie zu lö-
+schen.
+Syntax: VIEW
+
+5) CLHI 49363 bis 49422,0
+Syntax: CLHI x
+löscht die Grafikseite x. Wenn der Parameter fehlt, wird
+die Seite 0 ($2000) gelöscht.
+
+Funktion: löscht eine Grafikseite.
+
+6) GROFF 49423 bis 49458,0
+Syntax: GROFF
+
+Funktion: schaltet die Grafik aus
+
+7) GRWIND 49459 bis 49515,0
+Syntax: GRWIND xmin,xmax,ymin,ymax
+xmin &lt; xmax und ymin &lt; ymax
+
+Funktion: Die Grafikseite gibt den von GRWIND eingestell-
+ten Bereich als Maßstab wieder.
+
+Anwendung: Das einfache Zeichnen von Funktionen ist somit
+leicht durchzuführen.
+
+Beispiel:  GRWIND -4,4 ,-2,2
+           FOR x=-4 TO 4 STEP 0.01
+           PLOT x,SIN(x)
+           NEXT
+
+8) COPY 49516 bis 49640,0
+Syntax: COPY s1,s2 Seite s1 wird nach s2 kopiert
+COPY s1,s2,"o" Seite s1 wird mit Seite s2 ODER-Verknüpft
+und das Ergebnis nach s2 kopiert. Statt dem "o" kann man
+auch ein "a" (UND-Verknüpfung) oder ein "e"
+(EXKLUSIV-OR-Verknüpfung) angeben
+
+Funktion: Kopiert eine Grafikseite in eine andere
+
+Anwendung: Überlagerung von mehreren Grafikseiten
+
+Beispiel: COPY 1,0,"o"
+Seite 1 ($4000) wird mit Seite 0 ODER-Verknüpft und nach
+Seite 0 ($2000) kopiert.
+
+9) MODUS 49641 bis 49675,0
+Syntax: MODUS m
+0 &lt;= m &lt;= 255
+Als 8-Bit-Kombination: Das letzte Bit bestimmt ob ein Bit
+gesetzt wird (Bit 7 = 0) oder gelöscht wird (Bit 7 = 1). Die
+anderen Bits haben folgende Aufgaben:
+Bit 0 = 0 GRWIND Befehl wird nicht wirksam
+      = 1 GRWIND Befehl wird wirksam
+Der GRWIND Befehl setzt dieses Bit
+Bit 1,2 = 00 Beim PLOT und LINE Befehl werden die Pixel ge-
+setzt
+01 Ein Pixel wird gelöscht
+10 Ein gesetztes Pixel wird gelöscht und umgekehrt
+11 wie 10
+Bit 3,4 = 00 Zeichensatz 1 ist aktiviert
+        = 01 Zeichensatz 1 RVS ON
+        = 10 Zeichensatz 2 ist aktiviert
+        = 11 Zeichensatz 2 RVS ON
+Bit 5 = 0 Fehlermeldungen ein
+1 Fehlermeldungen aus
+Bit 6 keine Funktion
+
+Funktion: Manipulation des PLOT,LINE und TEXT Befehls. Au-
+ßerdem läßt sich die ERROR-Meldung abschalten
+
+Beispiel: MODUS 2
+Jetzt werden Pixel nur noch gelöscht
+MODUS 1
+GRWIND Befehl wird aktiviert
+Pixel werden gelöscht (von MODUS 2 noch eingestellt)
+MODUS 2+128
+Jetzt werden die Pixel wieder gesetzt der GRWIND
+Befehl ist immer noch aktiviert
+MODUS 255
+Alle Bits werden gelöscht (von HiRes voreingestellt)
+
+Anmerkung: Die Fehlermeldung läßt sich nur im Programm ab-
+schalten. Man kann Funktionen wie f(x)=1/x ohne Probleme
+plotten, obwohl die Funktion bei x=0 nicht definiert ist.
+10) COLOR 49676 bis 49738,0
+
+Syntax: COLOR cu,hi,ra
+cu = Cursorfarbe, Pixelfarbe
+hi = Hintergrundfarbe
+ra = Rahmenfarbe
+hi und ra müssen nicht angegeben werden
+
+Funktion: Setzen von Cursor-, Rahmen- und Hintergrundfar-
+be. Die Pixelfarbe ist mit der Cursor-Farbe gleichzuset-
+zen.
+
+Beispiel: COLOR 1,0,0
+Pixel- und Cursorfarbe ist weiß, Hintergrund und Rahmen
+schwarz
+11) PLOT 49739 bis 49987,0
+Syntax: PLOT x,y
+Funktion: Setzen eines Punktes. Der Ursprung liegt links
+unten im Bildschirm bei (0/0).
+
+12) LINE 49988 bis 50490,0
+Syntax: LINE ax,ay,bx,by
+
+Funktion: Ziehen einer Linie
+
+Beispiel: LINE 0,0,319,199
+
+13) TEXT 50491 bis 50993,80
+Syntax: TEXT zeile,spalte,text
+Zeile (0-24)
+Spalte (0-39)
+
+Funktion: Ausgabe eines Textes in einer Grafik
+
+Beispiel: TEXT 5,12,"Hallo"
+
+Bemerkung: die Grafikerweiterung benutzt eine Tabelle bei
+$02c0 von 40 Bytes. Der Spriteblock 11 ist somit belegt!</code></pre>
+        </aside>
+        <figure>
+            <pre data-filename="52erw .ass.prg" data-name="Grafikerweiterung" data-mse=mse1></pre>
+            <figcaption>Listing 3. Grafikerweiterung</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="52erw .ass.prg" data-name="Grafikerweiterung"></div>
+        <div class="binary_download" data-filename="52modul.prg" data-name="Modul 52"></div>
+        <aside>
+            <pre><code>Listing 4. Modulnummer: 53
+Anzahl der Befehle: 1
+
+1) GRHRDCPY 49152 bis 49622,12
+Syntax: GRHRDCPY xstart, xlaenge, ystart, ylaenge
+
+Funktion: Ausdrucken eines frei wählbaren Grafikbereichs
+bei 8192 ($2000) mit einem MPS 801-kompatiblen Drucker.
+
+Beispiel: GRHRDCPY 0,319,0,199
+Ausdrucken des gesamten Grafikbildschirms.</code></pre>
+        </aside>
+        <figure>
+            <pre data-filename="53erw .ass.prg" data-name="GRHRDCPY" data-mse=mse1></pre>
+            <figcaption>Listing 4. Hardcopy eines beliebigen HiRes-Bereiches</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="53erw .ass.prg" data-name="GRHRDCPY"></div>
+        <div class="binary_download" data-filename="53modul.prg" data-name="Modul 53"></div>
+    </article>
+</body>
+
+</html>

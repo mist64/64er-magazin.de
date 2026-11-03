@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Die CP/M-Ecke (Teil 5)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Steffen Stempel, bj">
+    <meta name="64er.issue" content="1/87">
+    <meta name="64er.pages" content="90-91">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Tips & Tricks">
+    <meta name="64er.toc_title" content="Die CP/M Ecke: Alles über das MFM-Format">
+    <meta name="64er.index_title" content="Die CP/M-Ecke (Teil 5)">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|CP/M">
+    <meta name="64er.id" content="cpm">
+</head>
+
+<body>
+    <article>
+        <h1>Die CP/M-Ecke (Teil 5)</h1>
+        <p class="intro">Neues zum CP/M-Formatter: Formatieren Sie (fast) beliebige Fremdformate mit dem CP/M-Formatter durch die Informationen von MFM-Scan.</p>
+
+        <p>Das Programm »MFM-Scan« (64'er, Ausgabe 10/1986 auf Seite 90) liefert alle Parameter einer MFM-Diskette. Diese können dazu verwendet werden, das Programm »CP/M-Formatter« (oben genannte Ausgabe, Seite 91) um neue MFM-Formate zu erweitern.</p>
+
+        <p>Zunächst jedoch ein paar grundsätzliche Informationen zum physikalischen Aufbau einer MFM-Diskette.</p>
+
+        <h2>Was ist MFM?</h2>
+
+        <p>Der Begriff MFM-formatiert ist eigentlich nicht ganz korrekt, da MFM (Modified Frequence Modulation) sich nur auf die Art und Weise bezieht, in der die einzelnen Bits physikalisch auf der Diskette aufgezeichnet werden. Wie nun die Bits zu Sektoren und diese wiederum zu Spuren zusammengefaßt werden, ist nicht durch das MFM-Aufzeichnungsformat, sondern durch den IBM-34-Standard festgelegt. Eine Diskette wird in eine gewisse Anzahl von Spuren unterteilt. Die Spurenanzahl hängt vom verwendeten Laufwerk ab. Bei den Floppy-Laufwerken 1570 und 1571 beträgt sie 40, manche Laufwerke anderer Computer können sogar 80 Spuren (einseitig) verwalten. Bei Laufwerken mit zwei Schreib-/Leseköpfen (wie zum Beispiel der 1571) unterscheidet man noch zwischen der Vorder- und Rückseite, die jede für sich 40 Spuren aufnehmen kann. Man spricht in diesem Zusammenhang von »Double Sided«, im Gegensatz zu Laufwerken mit nur einem Schreib-/Lesekopf (zum Beispiel 1570), die auch als »Single Sided« bezeichnet werden.</p>
+
+        <p>Jede Spur wird in eine feste Anzahl von gleich großen Sektoren unterteilt, wobei jedem Sektor ein Sektor-Header vorausgeht. In diesem »Vorspann« sind die (logische) Sektor-Nummer und die Sektor-Größe des nachfolgenden Sektors, sowie die (logische) Spur- und die (physikalische) Seitennummer vermerkt.</p>
+
+        <h2>Logische und physikalische Nummern</h2>
+
+        <p>Der Unterschied zwischen einer logischen und einer physikalischen »Nummer« besteht darin, daß sich die physikalische »Nummer« an Hardware-Vorgaben orientiert, die logische jedoch nicht. Ein Beispiel: Die Spuren, wie sie die Hardware der 1570/1571 mit dem Schreib-/Lesekopf anfahren kann, sind von »0« (außen) bis »39« (innen) durchnummeriert. Die Nummerierung der Spuren in dem oben besprochenen Sektorheader kann jedoch zum Beispiel mit »1« beginnen und bis »40« gehen. Die Spur, die auf den Disketten ganz außen liegt, hätte also die physikalische Nummer »0« (Vorgabe durch die Hardware der 1570/1571) und die logische (sprich aufgezeichnete) Nummer »1«.</p>
+
+        <p>Ähnlich verhält es sich mit den Sektoren: Innerhalb einer Spur kann der Sektor mit der niedrigsten Nummer (der physikalische Sektor »0«) die logische Nummer »10« haben (zum Beispiel auf der Rückseite einer Kaypro IV-Diskette).</p>
+
+        <p>Ein anderes Kennzeichen einer IBM-34-Diskette ist der Sektorversatz (auch Sector-Skewfactor, Interleavingfactor oder Sector-Shift-Factor genannt). Der Sektorversatz berechnet sich aus der Reihenfolge, in der die einzelnen Sektoren innerhalb einer Spur aufeinanderfolgen. Untersucht man mit MFM-Scan zum Beispiel eine Kaypro IV-Diskette, so wird man auf der Vorderseite folgende Sektorfolge feststellen:<br>
+            00 05 01 06 02 07 03 08 04 09</p>
+
+        <p>Die Sektorenfolge kann natürlich auch mit einem anderen Sektor beginnen, da MFM-Scan immer den Sektor, den es zuerst findet, auch zuerst auswertet. Der Sektorversatz ist nun der Abstand zwischen zwei Sektoren, deren logische Nummern aufeinander folgen (letzter logischer Sektor ausgenommen!). Im Falle von Kaypro IV ist der Sektorversatz also eins. Bei »Osborne DD« (Sektorfolge: 01 02 03 04 05) wäre der Sektorversatz null.</p>
+
+        <h2>Was bringt der Sektorversatz?</h2>
+
+        <p>In den Commodore-Floppies 1570/1571 befindet sich ein eigener Mikroprozessor, der die Controller für das normale CBM-Format sowie für MFM bedient und die Daten dann über den seriellen Bus an den C 128 überträgt (deshalb spricht man auch von einem intelligenten Peripheriegerät). Andere Hersteller lassen die Floppycontroller direkt vom Hauptprozessor bedienen. Die dabei erreichten Datenübertragungsgeschwindigkeiten liegen im selben Bereich, die die neuesten Floppyspeeder mit der guten alten 1541 erreichen.</p>
+
+        <p>Wurde nun ein Sektor eingelesen, so muß dieser von CP/M erst noch verarbeitet (zum Beispiel umkopiert) werden. In dieser Zeit dreht sich die Diskette allerdings weiter. Würde man auf der Diskette auf Sektor eins gleich Sektor zwei folgen lassen, so müßte der Controller eine ganze Umdrehung warten, bis er den gewünschten Sektor einlesen kann. Liegt aber zwischen Sektor eins und zwei noch ein anderer, so kann der eingelesene Sektor verarbeitet werden, während sich der »Zwischensektor« unbeachtet unter dem Schreib-/Lese-Kopf des Laufwerks »vorbeidreht«. Anschließend kann der Diskcontroller Sektor zwei einlesen ohne eine Diskettenumdrehung warten zu müssen. Zum einwandfreien Arbeiten muß allerdings der Sektorversatz auf die Verarbeitungszeit eines Sektors abgestimmt sein! Dauert zum Beispiel das Umkopieren eines Sektors etwas länger, so müssen sich zwischen den beiden logisch aufeinanderfolgenden Sektoren mehrere »Zwischensektoren« befinden, das heißt der Sektorversatz wird größer.</p>
+
+        <p>Bei der 1570/1571 bringt der Sektorversatz leider keinen Geschwindigkeitsvorteil, weil wesentlich mehr Zeit zum Übertragen eines Sektors zum Computer vergeht, als durch den Sektorversatz zur Verfügung steht. Trotzdem muß man seine MFM-Disketten auf der 1570/1571 mit einem Sektorversatz formatieren, weil viele CP/M-Implementationen den Sektorversatz dazu benutzen, ein IBM-34-Diskettenformat zu erkennen (so auch das CP/M 3.0 des C 128)!</p>
+
+        <p>Soviel zur Bedeutung der Ausgabedaten von MFM-Scan.</p>
+
+        <p>Um nun den CP/M-Formatter zu erweitern, muß zunächst das Format in einer neuen DATA-Zeile ab 1171 definiert werden. Ein DATA-Eintrag ist wie folgt aufgebaut:</p>
+
+        <h3>Formatname:</h3>
+
+        <p>Name des Formats, erscheint in der Menüauswahl (muß in Anführungszeichen gesetzt werden)</p>
+
+        <h3>Seitenzahl:</h3>
+
+        <p>Anzahl der zu formatierenden Seiten (eine oder zwei)</p>
+
+        <h3>1. Spurnummer vorne:</h3>
+
+        <p>logische Nummer der physikalischen Spur »0« auf der Vorderseite.</p>
+
+        <h3>1. Spurnummer hinten:</h3>
+
+        <p>logische Nummer der physikalischen Spur »0« auf der Rückseite.</p>
+
+        <h3>Spuranzahl:</h3>
+
+        <p>Anzahl der zu formatierenden Spuren, grundsätzlich »40«</p>
+
+        <h3>1. Sektor-Nummer vorne:</h3>
+
+        <p>erste logische Sektor-Nummer auf der Vorderseite</p>
+
+        <h3>1. Sektor-Nummer hinten:</h3>
+
+        <p>erste logische Sektor-Nummer auf der Rückseite</p>
+
+        <h3>Sektoren-Anzahl:</h3>
+
+        <p>Anzahl der Sektoren (muß auf Vorder- und Rückseite gleich sein).</p>
+
+        <h3>Sektor-Größe:</h3>
+
+        <p>Kennung für Sektor-Größe: »0« bei 128, »1« bei 256, »2« bei 512 und »3« bei 1024 Byte je Sektor</p>
+
+        <h3>Skew-Factor:</h3>
+
+        <p>Der aus der Sektortabelle — wie oben beschrieben — berechnete Sektorversatz plus eins.</p>
+
+        <h2>Die Erweiterung des CP/M-Formatters</h2>
+
+        <p>Außerdem muß der Startinitialisierungswert der Variablen »FZ« in Zeile 80 für jeden neuen DATA-Eintrag um eins erhöht werden (FZ bedeutet Formatzahl). Die Werte für den Datenblockeintrag erhält man aus der Untersuchung einer Diskette, die im jeweiligen Format formatiert wurde. Wenn das Format der eingelegten Diskette nicht zu exotisch ist (zum Beispiel auf der ersten Seite die logischen Nummern 1 bis 40 und auf der Rückseite 80 bis 41 oder ähnliches), kann dieses Format nun durch die Floppy 1571 hergestellt werden. Dazu untersucht man mit MFM-Scan jeweils Spur »0« der Vorder- und der Rückseite. Außer der Seitenanzahl lassen sich alle Parameter direkt mit MFM-Scan ermitteln. Ist die Seitenzahl nicht bekannt, so kann man sich wie folgt behelfen: Disketten, die auf Vorder- und Rückseite unterschiedliche Sektoren-Anzahl und/oder Sektor-Größe haben, oder deren Rückseite un- oder GCR-formatiert ist, sind nur »einseitig«. Die Daten der Vorderseite sind in den Datenblock einzutragen (erste Spurnummer hinten und erste Sektor-Nummer hinten auf null, sowie Seitenanzahl auf eins setzen!).</p>
+
+        <p>Sofern Sie nicht ganz sicher sind, welches Format die eingelegte Diskette besitzt, können Sie als Formatname einen beliebigen Begriff einsetzten, der sie an diese Diskette erinnert. Einen Formattest können Sie aber auch vom CP/M 3.0-Betriebssystem durchführen lassen. Geben Sie lediglich »DIR« &lt;RETURN&gt; ein; falls ein bekanntes Format vorliegt, wird es links unten namentlich erwähnt.</p>
+
+        <p>Wer sicher gehen will, untersucht die Diskette unter CP/M 3.0: CP/M durch Reset mit eingelegter Systemdiskette »hochfahren«, die Rückseite der Systemdiskette beziehungsweise Ihre Arbeitsdiskette (mit dem Dienstprogramm SHOW) einlegen, und das BDOS durch &lt;CTRL+C&gt; zurücksetzen.</p>
+
+        <p>Nun geben Sie »SHOW E: [DRIVE]« ein (E: ist das virtuelle Laufwerk) und legen die zu untersuchende Diskette in das Laufwerk. Wenn Sie nun &lt;RETURN&gt; drücken, gibt SHOW die Diskettenparameter aus. Für die Bestimmung der Seitenanzahl ist die Angabe »Kilobyte Drive Capacity« (Gesamtkapazität der Diskette) von Bedeutung. Ist der angegebene Wert deutlich größer als 200, so handelt es sich um eine zweiseitige, ansonsten nur um eine einseitige Diskette.</p>
+
+        <p>Mit diesen Informationen sind Sie in der Lage, Fremdformate zu formatieren, wenn Sie lediglich eine solche Diskette analysiert haben. Der nächste Schritt besteht nun darin, unter CP/M 3.0 diese neuen Formate einzufügen und sie ins System zu integrieren. Auf diese Technik gehen wir in einer der nächsten Folgen der CP/M-Ecke ein.</p>
+
+        <address class="author">(Steffen Stempel/bj)</address>
+    </article>
+</body>
+
+</html>

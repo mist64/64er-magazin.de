@@ -1,0 +1,232 @@
+
+
+;pinboardmaker.prg ==0801==
+  100 poke55,8192and255
+  110 poke56,8192/256:clr
+  120 print"{clr}einen moment......."
+  130 fort=49156to49454:reada$
+  140 c1=asc(left$(a$,1))
+  150 c2=asc(right$(a$,1))
+  160 ifc2<59thenz=c2-48:goto180
+  170 z=c2-55
+  180 ifc1<59thenz=z+16*(c1-48):goto200
+  190 z=z+16*(c1-55)
+  200 poket,z
+  210 next
+  220 dimf$(16):f$(16)=" ":open4,4
+  230 dimf(16):dimy$(16)
+  240 y$(0)="schwarz    "
+  250 y$(1)="weiss      "
+  260 y$(2)="rot        "
+  270 y$(3)="tuerkies   "
+  280 y$(4)="violett    "
+  290 y$(5)="gruen      "
+  300 y$(6)="blau       "
+  310 y$(7)="gelb       "
+  320 y$(8)="orange     "
+  330 y$(9)="braun      "
+  340 y$(10)="rosa       "
+  350 y$(11)="dunkelbraun"
+  360 y$(12)="mittelgrau "
+  370 y$(13)="hellgruen  "
+  380 y$(14)="hellblau   "
+  390 y$(15)="hellgrau   "
+  400 y$(16)="hintergrund"
+  410 fort=0to79:pw$=pw$+" ":mm$=mm$+"-":next
+  420 fort=0to15:f$(t)=chr$(t+65):next
+  430 rem hauptmenue
+  440 print"{clr}    *** pinboardmaker ***"
+  450 print"{down}{down}{down}{down}{down}{down}{down}einstellungen (f1)"
+  460 print"{down}pic load (f3)"
+  470 print"{down}pic zeigen (f5)"
+  480 print"{down}druck (f7)"
+  490 geta$:ifa$=""then490
+  500 ifa$="{f1}"thengoto 550
+  510 ifa$="{f3}"thengoto 720
+  520 ifa$="{f5}"thengoto 1370
+  530 ifa$="{f7}"thengoto 1510
+  540 goto 490
+  550 rem einstellungen
+  560 print"{clr}        **** pinboardgroesse ****"
+  570 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}breite"
+  580 input"{down}40cm *";br
+  590 ifbr>10orbr=7orbr=9thenprint"nicht moeglich!!!!!":goto580
+  600 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}laenge"
+  610 input"84cm *";la
+  620 print"{down}{down}{down}{down}breite * laenge => ";br*40;"cm * ";la*84;"cm"
+  630 input"ok (j/n)";q$
+  640 ifq$="n"then560
+  650 input"farbeneinstellung ok (j/n)";q$
+  660 ifq$="j"thengoto440
+  670 print"{clr}         **** chr$ => farben ****"
+  680 fort=0to16:l$=f$(t):printy$(t),f$(t);:input"{left}{left}{left}{left}{left}=>";f$(t)
+  690 iflen(f$(t))<>1thenprint"illegal !!!!":f$(t)=l$:t=t-1
+  700 next
+  710 goto440
+  720 print"{clr} ***** pic load *****"
+  730 print"{down}koala painter   (1)"
+  740 print"{down}blazing paddles (2)"
+  750 print"{down}paint magic     (3)"
+  760 print"{down}$2000           (4)"
+  770 input"{down}ihre wahl ";w2
+  780 input"{down}progammname ";pn$
+  790 on w2 goto800,1000,1200,1360
+  800 pn$="{orng}pic ? "+pn$+"               "
+  810 gosub 1170
+  820 poke780,15
+  830 poke781,0
+  840 poke782,4
+  850 sys 65469
+  860 poke780,0
+  870 poke781,8
+  880 poke782,0
+  890 sys 65466
+  900 poke780,0
+  910 poke781,0
+  920 poke782,32
+  930 sys65493
+  940 if(peek(783)and1)<>0thenprint"diskettenfehler !!!":goto780
+  950 s=0
+  960 print"{clr}einen moment...."
+  970 fort=1024to0step-1:poke17408+t,peek(17192+t):next
+  980 fort=1024to0step-1:poke16384+t,peek(16192+t):next
+  990 goto440
+ 1000 pn$="pi."+pn$
+ 1010 gosub1170
+ 1020 s=0
+ 1030 poke780,len(pn$)
+ 1040 poke781,0
+ 1050 poke782,4
+ 1060 sys 65469
+ 1070 poke780,0
+ 1080 poke781,8
+ 1090 poke782,0
+ 1100 sys 65466
+ 1110 poke780,0
+ 1120 poke781,0
+ 1130 poke782,32
+ 1140 sys65493
+ 1150 if(peek(783)and1)<>0thenprint"diskettenfehler !!!":goto780
+ 1160 goto440
+ 1170 fort=0to(len(pn$)-1)
+ 1180 poke1024+t,asc(mid$(pn$,t+1,1))
+ 1190 nextt:return
+ 1200 gosub1170
+ 1210 s=2
+ 1220 poke780,len(pn$)
+ 1230 poke781,0
+ 1240 poke782,4
+ 1250 sys 65469
+ 1260 poke780,0
+ 1270 poke781,8
+ 1280 poke782,0
+ 1290 sys 65466
+ 1300 poke780,0
+ 1310 poke781,142
+ 1320 poke782,31
+ 1330 sys65493
+ 1340 if(peek(783)and1)<>0thenprint"diskettenfehler !!!":goto780
+ 1350 goto440
+ 1360 s=3:gosub1170:goto1030
+ 1370 poke53281,1
+ 1380 poke53265,59
+ 1390 poke53272,peek(53272)or8
+ 1400 ifs=0thenpoke53270,216
+ 1410 ifs=2thenpoke53270,216:print"{clr}":goto1440
+ 1420 ifs=3thenpoke53270,200:print"{clr}":goto1450
+ 1430 fort=17408to18427:poke55296+p,peek(t):p=p+1:next
+ 1440 fort=16384to17403:poke1024+y,peek(t):y=y+1:next
+ 1450 getq$:ifq$=""then1450
+ 1460 poke53281,240
+ 1470 poke53265,27
+ 1480 poke53270,200
+ 1490 poke53272,peek(53272)and247
+ 1500 goto440
+ 1510 ifbr=0orla=0then550
+ 1520 ifs=3thengoto1730
+ 1530 forl1=0tobr*2-1:print#4,mm$
+ 1540 fory=0to199
+ 1550 forl2=0to80/br-1
+ 1560 x=int(l1*80/br+l2)
+ 1570 poke49152,y
+ 1580 poke49153,x
+ 1590 sys49348:r=peek(49155):f(r)=f(r)+1
+ 1600 forl3=1tobr
+ 1610 p$=p$+f$(r)
+ 1620 next:next
+ 1630 iflen(p$)<80thenp$=p$+" ":goto1630
+ 1640 xa=la+1
+ 1650 xa=xa-1:ifxa=0thenp$="":goto1690
+ 1660 ifp$=pw$thenprint#4:goto1650
+ 1670 print#4,p$
+ 1680 goto1650
+ 1690 next
+ 1700 print#4,mm$:print#4:print#4:print#4:print#4:print#4
+ 1710 next
+ 1720 goto1960
+ 1730 ifbr/2<>int(br/2)thenprint"bitte neue breite eingeben !!!":goto 570
+ 1740 forl1=0tobr*2-1:print#4,mm$
+ 1750 fory=0to199
+ 1760 forl2=0to160/br-1
+ 1770 x=int(l1*160/br+l2)
+ 1780 poke49152,y
+ 1790 ifx>=256thenpoke49153,x-256:poke49154,1:goto1810
+ 1800 poke49153,x:poke49154,0
+ 1810 sys49326:r=peek(49155)
+ 1820 ifr<>16thenr=0
+ 1830 f(r)=f(r)+1
+ 1840 forl3=1tobr/2
+ 1850 p$=p$+f$(r)
+ 1860 next:next
+ 1870 iflen(p$)<80thenp$=p$+" ":goto1870
+ 1880 xa=la+1
+ 1890 xa=xa-1:ifxa=0thenp$="":goto1930
+ 1900 ifp$=pw$thenprint#4:goto1890
+ 1910 print#4,p$
+ 1920 goto1890
+ 1930 next
+ 1940 print#4,mm$:print#4:print#4:print#4:print#4:print#4
+ 1950 next
+ 1960 print#4,"sie benoetigen:"
+ 1970 ifs=3thenbr=br/2
+ 1980 fort=0to16:print#4,"chr=>";f$(t);"  ";f(t)*br*la*0.014;"gramm ";y$(t):next
+ 1990 clr:goto220
+ 2000 dataa9,00,85,fb,a9,20,85,fc
+ 2010 dataad,00,c0,29,f8,48,4a,4a
+ 2020 data4a,85,fe,4a,4a,18,65,fe
+ 2030 data85,fe,68,48,0a,0a,0a,85
+ 2040 datafd,0a,0a,18,65,fd,85,fd
+ 2050 dataa5,fe,69,00,85,fe,18,a5
+ 2060 datafb,65,fd,85,fb,a5,fc,65
+ 2070 datafe,85,fc,a9,00,85,fe,68
+ 2080 data85,fd,ad,00,c0,38,e5,fd
+ 2090 data85,fd,ad,01,c0,29,f8,18
+ 2100 data65,fd,85,fd,a5,fe,6d,02
+ 2110 datac0,85,fe,18,a5,fb,65,fd
+ 2120 data85,fb,a5,fc,65,fe,85,fc
+ 2130 dataad,01,c0,29,f8,85,fe,ad
+ 2140 data01,c0,38,e5,fe,aa,a9,80
+ 2150 datae0,00,f0,05,4a,ca,4c,7c
+ 2160 datac0,85,fe,b1,fb,25,fe,c9
+ 2170 data00,f0,02,38,60,18,60,38
+ 2180 dataa5,fc,e9,20,85,fc,a2,03
+ 2190 data18,66,fc,66,fb,ca,e0,00
+ 2200 datad0,f6,18,a5,fc,69,40,85
+ 2210 datafc,60,20,04,c0,90,0b,20
+ 2220 data93,c0,a0,00,b1,fb,8d,03
+ 2230 datac0,60,a9,10,8d,03,c0,60
+ 2240 dataad,01,c0,0a,8d,01,c0,90
+ 2250 data08,a9,01,8d,02,c0,4c,da
+ 2260 datac0,a9,00,8d,02,c0,20,04
+ 2270 datac0,b0,22,ad,01,c0,09,01
+ 2280 data8d,01,c0,20,04,c0,90,0f
+ 2290 data20,93,c0,a0,00,b1,fb,4a
+ 2300 data4a,4a,4a,8d,03,c0,60,a9
+ 2310 data10,8d,03,c0,60,ad,01,c0
+ 2320 data09,01,8d,01,c0,20,04,c0
+ 2330 datab0,0d,20,93,c0,a0,00,b1
+ 2340 datafb,29,0f,8d,03,c0,60,20
+ 2350 data93,c0,a5,fc,18,69,04,85
+ 2360 datafc,a0,00,b1,fb,29,0f,8d
+ 2370 data03,c0,60
+

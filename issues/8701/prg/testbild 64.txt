@@ -1,0 +1,156 @@
+
+
+;testbild 64.prg ==0801==
+;version=simons
+    1 rem *********************************
+    2 rem *       testbildgenerator       *
+    3 rem *********************************
+    4 rem *         dieter laues          *
+    5 rem *        vowinkelstr. 1         *
+    6 rem *       4030 ratingen 1         *
+    7 rem *********************************
+    8 rem
+    9 rem
+   20 l=8:s=54272:rem synthesizer
+   25 nrm:colour 0,3:rem grundzustand
+   30 print"{clr}"
+   35 print"1 - rot"
+   40 print"2 - gruen"
+   45 print"3 - blau":print
+   50 print"4 - gitter":print
+   55 print"5 - farbbalken":print
+   60 print"6 - multiburst":print
+   65 print"7 - 50hz-sprung":print
+   70 print"8 - 2t-impuls":print
+   75 print"9 - farbtestbild":print:print
+   80 print"----------------------------"
+   85 print"f1   pegelton       1000 hz"
+   90 print"f3   zweiton-kennung 274 hz"
+   95 print"f5   stereo-kennung  117 hz"
+  100 get a$:if a$="" then 100
+  105 a=val (a$):if a<1 or a>9 then 100
+  110 on a gosub 295,300,305,315,330,370,410,440,455
+  115 goto 25
+  120 rem *******************************
+  125 rem *        unterprogramme       *
+  130 rem *******************************
+  135 rem --- vertikale linien ---
+  140 for n=a to b step c
+  145 for m=0 to d
+  150 line n+m,0,n+m,185,1:next m:next n
+  155 text x,190,a$,1,0,8:return
+  160 for n=a to b step c:for m=0 to d
+  165 line n+m,112,n+m,127,1:nextm:nextn
+  170 return
+  175 rem --- raster ---
+  180 hires 1,0:rem grafik einschalten
+  185 for n=8 to 320 step 20
+  190 line n,0,n,199,1:next
+  195 for n=8 to 199 step 20
+  200 line 0,n,319,n,1:next
+  205 return
+  210 rem --- farbflaeche ---
+  215 print"{clr}":colour a,a
+  220 goto 230
+  225 rem --- tasten abfragen ---
+  230 get a$:if a$="" then 230
+  235 if asc(a$)>140 or asc(a$)<133 then return
+  240 if asc(a$)=133 then hi=66:lo=140:gosub 275
+  245 if asc(a$)=134 then hi=18:lo=60 :gosub 275
+  250 if asc(a$)=135 then hi=7 :lo=200:gosub 275
+  255 if asc(a$)=136 then l=l+1:if l>15 then l=15
+  260 if asc(a$)=140 then l=l-1:if l<0 then l=0
+  265 vol l:goto 230:rem lautstaerke
+  270 rem --- toene ---
+  275 poke s+7,lo:poke s+8,hi:poke s+13,240:rem frequenz,wellenform
+  280 if e=0 then e=1:pokes+11,17:return
+  285 if e=1 then e=0:poke s+11,0:return
+  290 rem ******* grundfarben **********
+  295 a=2:goto 215:rem rot
+  300 a=5:goto 215:rem gruen
+  305 a=6:goto 215:rem blau
+  310 rem ********** gitter ************
+  315 gosub 180:rem raster zeichnen
+  320 goto 230
+  325 rem ******** farbbalken **********
+  330 colour 15,0:rem rahmen, hintergrund
+  335 print"{clr}{rvon}{wht}     {yel}     {cyn}     {grn}     {pur}     {red}     {blu}     {blk}    "
+  340 for n=1 to 23
+  345 print"{rvon}{wht}     {yel}     {cyn}     {grn}     {pur}     {red}     {blu}     {blk}    "
+  350 next
+  355 print"{rvon}{wht}     {yel}     {cyn}     {grn}     {pur}     {red}     {blu}     {blk}    {up}"
+  360 goto 230
+  365 rem ******* multiburst **********
+  370 hires 1,0
+  375 a=0  :b=70 :c=16:d=7:x=5  :a$="0,5 mh{CTRL-B}z":gosub 140
+  380 a=76 :b=128:c=8 :d=3:x=80 :a$="1 mh{CTRL-B}z":gosub 140
+  385 a=132:b=192:c=6 :d=2:x=135:a$="1,3 mh{CTRL-B}z":gosub 140
+  390 a=198:b=256:c=4 :d=1:x=205:a$="2 mh{CTRL-B}z":gosub 140
+  395 a=258:b=318:c=2 :d=0:x=265:a$="4 mh{CTRL-B}z":gosub 140
+  400 goto 230
+  405 rem ******* 50hz-sprung **********
+  410 colour 0,0:print"{clr}{down}{down}{down}{down}"
+  415 for n=1 to 15
+  420 print"{rvon}{wht}                                       {rvof}{blk}"
+  425 next
+  430 goto 230
+  435 rem ******* 2t-impuls ***********
+  440 hires 1,0:line 160,0,160,199,1
+  445 goto 230
+  450 rem ****** testbild *************
+  455 hires 1,0:rem grafik einschalten
+  460 rem ----- aeusseres raster ------
+  465 for n=8 to 60 step 20
+  470 line n,0,n,199,1:next
+  475 for n=69 to 260 step 20
+  480 line n,0,n,24,1:line n,175,n,199,1:next
+  485 for n=270 to 320 step 20
+  490 line n,0,n,199,1:next
+  495 line 0,8,319,8,1
+  500 line 0,188,319,188,1
+  505 for n=28 to 168 step 20
+  510 line 0,n,63,n,1:line 255,n,319,n,1:next
+  515 rem ----- innerer rahmen --------
+  520 for n=63 to 251 step 24
+  525 rec n,24,24,40,1:next
+  530 for n=63 to 190 step 40
+  535 rec n,64,40,32,1:next
+  540 rec 224,64,31,48,1
+  545 rec 63,96,32,16,1
+  550 rec 96,96,127,16,1
+  555 rec 63,112,192,16,1
+  560 rec 63,128,192,15,1
+  565 rec 63,143,128,16,1
+  570 rec 63,160,128,15,1
+  575 rec 192,144,30,31,1
+  580 rec 224,144,31,31,1
+  585 line 158,128,158,142,1
+  590 line 160,142,170,128,1
+  595 rem     ----- kreis -----
+  600 arc 159,100,321,39,1,100,100,1
+  605 arc 159,100,75,105,1,100,100,1
+  610 arc 159,100,255,285,1,100,100,1
+  615 arc 159,100,141,219,1,100,100,1
+  620 rem farben einsetzen
+  625 low col 1,0,0:paint 65,25,1
+  630 low col 7,0,0:paint 90,25,1
+  635 low col 3,0,0:paint 113,25,1
+  640 low col 5,0,0:paint 137,25,1
+  645 low col 4,0,0:paint 161,25,1
+  650 low col 2,0,0:paint 185,25,1
+  655 low col 6,0,0:paint 209,25,1
+  660 low col 0,0,0:paint 233,25,1:paint 90,90,1
+  665 low col 11,0,0:paint 105,65,1
+  670 low col 12,0,0:paint145,65,1:paint 193,145,1:paint225,145,1
+  675 low col 15,0,0:paint 185,65,1
+  680 low col 2,0,0:paint 64,144,1
+  685 low col 6,0,0:paint 64,161,1
+  690 low col 1,0,0:paint 225,65,1:paint 66,97,1:paint 65,129,1:paint170,129,1
+  695 rem multiburst
+  700 a=86 :b=125:c=8:d=4:gosub 160
+  705 a=125:b=160:c=6:d=3:gosub 160
+  710 a=160:b=195:c=4:d=2:gosub 160
+  715 a=196:b=230:c=2:d=0:gosub 160
+  720 text 105,102,"{CTRL-B}64'er Testbild",1,1,8
+  725 goto 230
+

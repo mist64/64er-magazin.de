@@ -1,0 +1,57 @@
+
+
+;load-einfach.prg ==0801==
+  100 a=18:b=1
+  110 rem einlesen des blocks
+  120 open15,8,15:open2,8,2,"#"
+  130 fori=1to8:t$(i)="":nexti
+  140 ifa=0orb=0thenclose2:close15:end
+  150 gosub540
+  160 k=4
+  170 fori=1to8
+  180 print#15,"b-p 2";k-2
+  190 get#2,p$:p=asc(p$+chr$(0))
+  200 ifp<>130andp<>194then270
+  210 forj=1to16
+  220 print#15,"b-p 2";j+k
+  230 get#2,c$
+  240 t$(i)=t$(i)+c$
+  250 nextj
+  260 k=k+32
+  270 nexti
+  280 rem abfrage
+  290 k=17
+  300 fori=1to8
+  310 ift$(i)=""then420
+  320 print"{clr}{rvon}"t$(i)
+  330 print"{down}was soll angehaengt werden ?"
+  340 print" ,{rvon}8{rvof}:"
+  350 print" ,8,{rvon}1{rvof}"
+  360 print" {rvon}n{rvof}ichts"
+  370 gete$:ife$=""then370
+  380 ife$="8"thenaf$=",8:":af=8:goto480
+  390 ife$="1"thenaf$=",8,1":af=1:goto480
+  400 ife$="n"then420
+  410 goto370
+  420 k=k+32
+  430 nexti
+  440 ifw=1thengosub600
+  450 a=a1:b=b1:close2:close15
+  460 print"{clr}bitte warten !"
+  470 goto110
+  480 w=1
+  490 ifaf=8thenprint#15,"b-p 2";k
+  500 ifaf=1thenprint#15,"b-p 2";k-1
+  510 print#2,chr$(160);af$;
+  520 goto420
+  530 run
+  540 rem lesen
+  550 print#15,"u1 2 0";a;b
+  560 print#15,"b-p 2 0"
+  570 get#2,a$,b$
+  580 a1=asc(a$+chr$(0)):b1=asc(b$+chr$(0))
+  590 return
+  600 rem schreiben
+  610 print#15,"u2 2 0";a;b
+  620 return
+

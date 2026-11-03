@@ -1,0 +1,65 @@
+
+
+;apfelberge.prg ==4001==
+;version=3
+  100 rem *******************************
+  110 rem *                             *
+  120 rem * apfelberge   c16/116/plus 4 *
+  130 rem *                             *
+  140 rem *  (w)'86 by florian mueller  *
+  150 rem *                             *
+  160 rem *******************************
+  220 :
+  230 :
+  300 color 0,13:color 4,13:color 1,1
+  310 scnclr:graphic 1:graphic 0,1
+  320 :
+  400 xc=1:yc=0:t=20:s=60:xl=-.15:xr=.26:yo=.47:yu=.9:xm=105:ym=105:hg=7:f1=8:f2=11:f3=1
+  410 printtab(10)"hintergrund.....";hg
+  420 printtab(10)"farbe 1.........";f1
+  430 printtab(10)"farbe 2.........";f2
+  440 printtab(10)"farbe 3.........";f3
+  450 printtab(10)"x komplex.......";xc
+  460 printtab(10)"y komplex.......";yc
+  470 printtab(10)"rechentiefe.....";t
+  480 printtab(10)"maximale hoehe..";s
+  490 printtab(10)"x links.........";xl
+  500 printtab(10)"x rechts........";xr
+  510 printtab(10)"y oben..........";yo
+  520 printtab(10)"y unten.........";yu
+  530 printtab(10)"ausmass x.......";xm
+  540 printtab(10)"ausmass y.......";ym
+  550 print:print "fuer diese werte muss man nur immer die"
+  560 print "return-taste druecken."
+  570 print
+  580 :
+  590 :
+  600 input"hintergrund";hg
+  610 input"farbe 1    ";f1
+  620 input"farbe 2    ";f2
+  630 input"farbe 3    ";f3
+  640 input"x komplex";xc
+  650 input"y komplex";yc
+  660 input"max.tiefe";t
+  670 input"max.hoehe";s
+  680 input"x links";xl
+  690 input"x rechts";xr
+  700 input"y oben";yo
+  710 input"y unten";yu
+  720 do:input"ausmass x";xm:loop while xm=0
+  730 do:input"ausmass y";ym:loop while ym=0
+  740 print"alles richtig (j/n) ?"
+  750 do:getkey a$:loop until a$="j" or a$="n"
+  760 :
+  800 if a$="n" then run:else dx=(xr-xl)/xm:dy=(yu-yo)/ym
+  810 graphic 1,1:graphic 0
+  820 graphic 3,1:color 1,f1:color 4,hg:color 2,f2:color 3,f3:color 0,hg
+  830 forn=0toym:y1=yo+n*dy:form=0toxm:x=xl+m*dx:y=y1:k=0
+  840 do:x2=x*x:y2=y*y:y=2*x*y-yc:x=x2-y2-xc:k=k+1:loop while (k<t)and(x2+y2<s)
+  850 u=m+53-n/2:u1=u+1:v=n+80:v1=v-3*(k-1)
+  860 draw3,u,vtou,v1:draw2,u1,vtou1,v1:draw1,u,v1tou1,v1
+  870 next:next
+  880 :
+  900 do:get a$:loop until a$="_"
+  910 graphic 0
+

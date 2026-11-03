@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Einsteiger</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="tr, og, Herbert Kunz, Andreas Schindler, Tobias Habermehl, Patrick Luginbühl, Roland Metschulat, Germano Caronni">
+    <meta name="64er.issue" content="1/87">
+    <meta name="64er.pages" content="22-23">
+    <meta name="64er.head1" content="Einsteiger">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Einsteiger-Teil">
+    <meta name="64er.index_title" content="Hilfe zum Programmeschreiben">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Programmieren">
+    <meta name="64er.index_title" content="Kommata im INPUT-Befehl?">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Basic">
+    <meta name="64er.index_title" content="Leichteres Programme-Laden">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Programmieren">
+    <meta name="64er.index_title" content="Lösungsprogramm für lineare Gleichungssysteme">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Mathematik">
+    <meta name="64er.index_title" content="Reverse REM-Zeilen">
+    <meta name="64er.index_title" content="Superschnelle Directory-Routine">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Floppy &amp; Datasette">
+    <meta name="64er.id" content="tips_einsteiger">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Einsteiger</h1>
+        <p class="intro">Schreiben Sie oft eigene Basic-Programme? Wir zeigen Ihnen, wie Sie mit reversen REM-Zeilen Ihre Listings übersichtlicher gestalten können. Außerdem gibt es einen Trick, mit dem Sie beim INPUT-Befehl auch Kommata und Doppelpunkte eingeben können.</p>
+
+        <p>Haben Sie nicht auch schon davon geträumt, zwei Computer miteinander zu verbinden? Zum Datenaustausch wird man wohl eher die RS232-Schnittstelle verwenden. Wenn Sie aber zum Beispiel nur zwei Programme gleichzeitig starten möchten, gibt es einen kleinen Trick:</p>
+
+        <p>Verbinden Sie die beiden C 64 über den seriellen Bus mit dem normalen Kabel für das 1541-Laufwerk (Achtung: es dürfen zusätzlich keine Diskettenlaufwerke angeschlossen sein!). Dann geben Sie auf beiden Computern ein kleines Testprogramm ein:</p>
+
+        <pre><code>10 PRINT "ES KLAPPT!":GOTO 10</code></pre>
+
+        <p>Nun tippen Sie auf einem der beiden C 64 »WAIT 56576,128,255:RUN« ein und drücken die &lt;RETURN&gt;-Taste. Es passiert zunächst nichts.</p>
+
+        <p>Auf dem anderen Computer geben Sie nun »POKE 56578,191:POKE 56576,23:RUN« ein und drücken ebenfalls die &lt;RETURN&gt;-Taste. Lassen Sie sich überraschen!</p>
+
+        <address class="author">(tr/og)</address>
+
+        <h3>Hilfe zum Programmeschreiben</h3>
+
+        <p>Wer selbst Basic-Programme schreibt, wird es wohl schon bemerkt haben: Ein auf Anhieb voll funktionsfähiges Programm gibt es nicht. Aus diesem Grund ist die Fehlersuche ein wichtiger Teil der Programmentwicklung. Sehr nützlich hierzu ist der STOP-Befehl. Man kann ihn an jede beliebige Stelle im Programm setzen. Wird diese Zeile später erreicht, wird der Programmlauf unterbrochen und man kann dann zum Beispiel Variablen abfragen oder ähnliches.</p>
+
+        <p>Der STOP-Befehl hat allerdings einen großen Nachteil: Man muß ihn direkt in den Programmtext einfügen und später auch wieder löschen. Um diesen Umstand zu umgehen, wurde das vorliegende Programm »BREAK« (siehe Listing 1) geschrieben. Als erstes sollten Sie dieses Listing mit Hilfe des MSE (siehe Seite 70) abtippen.</p>
+
+        <p>Nun können Sie beliebige, sogenannte »Stop-Marken« setzen. Angenommen, Sie möchten, daß Ihr Basic-Programm beim Probelauf bei Zeile 100 stoppt. Dazu laden Sie »BREAK« mit LOAD"BREAK",8,1 und geben SYS 828,100 ein. Mit »SYS 828« initialisieren Sie die Stop-Routine und das »,100« bedeutet »Stoppe bei Zeile 100«. Nach dem Start Ihres Basic-Programms mit RUN wird beim Erreichen dieser Zeile die alte Stop-Marke wieder gelöscht und es erscheint »BREAK IN xxx« und »READY.«.</p>
+
+        <p>Wenn Sie eine Basic-Erweiterung besitzen (zum Beispiel Simons Basic oder Hypra-Basic), können Sie das »BREAK« Programm auf diese Erweiterung einstellen: Laden und starten Sie zuerst die Basic-Erweiterung. Dann laden Sie Listing 1 und geben SYS 899 ein.</p>
+
+        <address class="author">(Herbert Kunz/tr)</address>
+
+        <figure>
+            <pre data-filename="break mse.prg" data-name="BREAK" data-mse=mse1></pre>
+            <figcaption>Listing 1. »BREAK«, eine Hilfe beim Austesten von Programmen</figcaption>
+        </figure>
+        <div style="display: none;">
+            <pre data-filename="break" data-name="BREAK"></pre>
+        </div>
+
+        <h3>Reverse REM-Zeilen</h3>
+
+        <p>Das Programm »rem rev« (siehe Listing 2) markiert alle REM-Zeilen revers und hebt sie so deutlich aus dem normalen Programmtext hervor.</p>
+
+        <p>Tippen Sie das Listing mit Hilfe des Checksummers (siehe Seite 70) ab, und starten es mit RUN. Wenn Sie nun in einem Basic-Programm alle REM-Zeilen markieren wollen, geben Sie SYS 49152 ein. Bedingung: Die REM-Zeilen müssen nach dem REM-Befehl mindestens ein Leerzeichen enthalten.</p>
+
+        <address class="author">(Andreas Schindler/tr)</address>
+
+        <figure>
+            <pre data-filename="rem rev" data-name="rem rev"></pre>
+            <figcaption>Listing 2. »REM REV«, macht Ihre Programme übersichtlicher</figcaption>
+        </figure>
+
+        <h3>Kommata im INPUT-Befehl?</h3>
+
+        <p>Im Leserforum der 64'er, Ausgabe 10/86, wurde die Frage gestellt, warum innerhalb einer INPUT-Anweisung keine Kommata eingegeben werden dürfen. Es muß ergänzt werden, daß nicht nur Kommata, sondern auch Anführungszeichen und Doppelpunkte nicht verwendet werden dürfen. Ansonsten kommt es zu einer Fehlermeldung. Man kann das leicht ausprobieren:</p>
+
+        <pre><code>10 INPUT A$
+20 PRINT A$</code></pre>
+
+        <p>Versuchen Sie nach dem Start mit RUN einmal, eines der genannten Zeichen einzugeben.</p>
+
+        <p>Listing 3 bringt Abhilfe: Es ändert im Betriebssystem des C 64 alle Abfragen auf eines der kritischen Zeichen. Einfach abtippen, mit RUN starten und dann die beiden obenstehenden Basic-Zeilen noch einmal ausprobieren.</p>
+
+        <p>Wenn Sie &lt;RUN/STOP+RESTORE&gt; gedrückt haben, müssen Sie danach wieder POKE 1,54 eingeben.</p>
+
+        <address class="author">(Tobias Habermehl/tr)</address>
+
+        <figure>
+            <pre data-filename="input komma" data-name="INPUT KOMMA"></pre>
+            <figcaption>Listing 3. »INPUT KOMMA«, ändert den INPUT-Befehl des C 64</figcaption>
+        </figure>
+
+        <h3>Superschnelle Directory-Routine</h3>
+
+        <p>In der 64'er, Ausgabe 9/86, wurde eine Routine zum Einlesen des Disketten-Inhaltsverzeichnisses von Basic aus vorgestellt. Mit einem kleinen Trick läßt sich die Ausführungszeit der Routine verdoppeln.</p>
+
+        <p>Der Trick besteht darin, das Standardeingabegerät (normalerweise die Tastatur) auf das File zu setzen, über das die Daten vom Laufwerk eingelesen werden. Die Daten werden jetzt nicht mehr über »GET #«, sondern einfach über »GET« in den C 64 gebracht (zur Erinnerung: »GET« liest normalerweise Zeichen von der Tastatur).</p>
+
+        <p>Die neue Routine finden Sie in Listing 4. Sie wird über GOSUB 1000 aufgerufen und kann problemlos in eigene Programme eingebaut werden.</p>
+
+        <address class="author">(Patrick Luginbühl/tr)</address>
+
+        <figure>
+            <pre data-filename="dir fast" data-name="DIR-FAST"></pre>
+            <figcaption>Listing 4. »DIR-FAST«, eine schnelle Directory-Routine</figcaption>
+        </figure>
+
+        <h3>Leichteres Programme-Laden</h3>
+
+        <p>Mit Hilfe des Programms »,8,1« (siehe Listing 5) können Sie an Programmnamen auf Diskette den Zusatz »,8:« oder »,8,1« anhängen. Das bedeutet, daß Sie später das Inhaltsverzeichnis der Diskette laden, listen und dann nur noch »LOAD« vor das gewünschte Programm schreiben müssen. Wenn Sie dann die &lt;RETURN&gt;-Taste drücken, wird es geladen.</p>
+
+        <p>Das Programm lädt zuerst das Directory und zeigt dann hintereinander alle Programmnamen an. Drücken Sie jeweils &lt;8&gt;, wenn Sie »,8:« (Basic-Programme) anhängen möchten; &lt;1&gt;, für »,8,1« (Maschinensprache-Programme) und &lt;N&gt; für keinen Zusatz im Programmnamen.</p>
+
+        <address class="author">(Roland Metschulat/tr)</address>
+
+        <figure>
+            <pre data-filename="load-einfach" data-name="LOAD-EINFACH"></pre>
+            <figcaption>Listing 5. »LOAD-EINFACH«, erspart das »,8« beim Laden aus dem Directory.</figcaption>
+        </figure>
+
+        <h3>Lösungsprogramm für lineare Gleichungssysteme</h3>
+
+        <p>Ein Greuel für alle Schüler sind lineare Gleichungssysteme. Sie bedeuten viel Schreibarbeit, in die sich ebensoviele Fehler einschleichen können. Gut, wenn man einen C 64 hat, mit dem man die Ergebnisse überprüfen kann. Listing 6 löst ein Gleichungssystem mit beliebig vielen Unbekannten. Zur Lösung wird das recht trickreiche Horner-Schema verwendet. Ein Beispiel:</p>
+
+        <table class="plain">
+            <tr>
+                <td>2x</td>
+                <td>+</td>
+                <td>3y</td>
+                <td>+</td>
+                <td>4z</td>
+                <td>=</td>
+                <td>12</td>
+            </tr>
+            <tr>
+                <td>9x</td>
+                <td>+</td>
+                <td>2y</td>
+                <td>+</td>
+                <td>8z</td>
+                <td>=</td>
+                <td>34</td>
+            </tr>
+            <tr>
+                <td>5x</td>
+                <td>+</td>
+                <td>7y</td>
+                <td>+</td>
+                <td>3z</td>
+                <td>=</td>
+                <td>19</td>
+            </tr>
+        </table>
+
+        <p>Wenn man das Programm startet, und auf die Frage nach der Anzahl an Unbekannten eine 3 und dann nacheinander alle Werte (2, 3, 4, 12, etc.) eingibt, erscheint die Lösung:</p>
+
+        <table class="plain">
+            <tr>
+                <td>1x</td>
+                <td>+</td>
+                <td>0y</td>
+                <td>+</td>
+                <td>0z</td>
+                <td>=</td>
+                <td>2.3178808</td>
+            </tr>
+            <tr>
+                <td>0x</td>
+                <td>+</td>
+                <td>1y</td>
+                <td>+</td>
+                <td>0z</td>
+                <td>=</td>
+                <td>0.397350993</td>
+            </tr>
+            <tr>
+                <td>0x</td>
+                <td>+</td>
+                <td>0y</td>
+                <td>+</td>
+                <td>1z</td>
+                <td>=</td>
+                <td>1.54304636</td>
+            </tr>
+        </table>
+
+
+        <p>Falls eine lineare Abhängigkeit zwischen zwei Gleichungen besteht, oder keine eindeutige Lösung existiert, gibt das Programm eine entsprechende Meldung aus.</p>
+
+        <address class="author">(Germano Caronni/tr)</address>
+
+        <figure>
+            <pre data-filename="lineare gl." data-name="LINEARE GL."></pre>
+            <figcaption>Listing 6. »LINEARE GL.«, löst lineare Gleichungssysteme</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

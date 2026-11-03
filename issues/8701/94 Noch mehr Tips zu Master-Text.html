@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Noch mehr Tips zu Master-Text</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Martin Pahl, sk">
+    <meta name="64er.issue" content="1/87">
+    <meta name="64er.pages" content="94,99">
+    <meta name="64er.head1" content="Software-Hilfe">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips & Tricks">
+    <meta name="64er.toc_title" content="Tips zu Master-Text: Die Ausrufungszeichen-Funktion / Fragen zum Nachladen / Aufbau einer Rundschreibendatei / 80-Zeichenausgabe anhalten / Steuerzeichen mit MPS 801">
+    <meta name="64er.index_title" content="Noch mehr Tips zu Master-Text">
+    <meta name="64er.index_category" content="Software-Hilfen|Textverarbeitung">
+    <meta name="64er.id" content="master-text">
+</head>
+
+<body>
+    <article>
+        <h1>Noch mehr Tips zu Master-Text</h1>
+        <p class="intro">Aus den vielen Zuschriften, die uns zu Master-Text erreichen, entnehmen wir, daß das Programm sich großer Beliebtheit erfreut. Deshalb haben wir diesmal die am häufigsten gestellten Fragen zu den Themen Steuerzeichen, Rundschreiben und Nachladen von Diskette ausgewählt und beantwortet.</p>
+
+        <h3>1. Frage: Was hat es mit der Ausrufungszeichen-Funktion auf sich?</h3>
+
+        <p>Viele Anfragen unsere Leser beschäftigen sich damit. Hier ist die genaue Beschreibung:</p>
+
+        <p>Interessant ist diese Funktion hauptsächlich für Besitzer eines Epson-Druckers oder Kompatiblen. Mit Hilfe der Ausrufungszeichen-Funktion kann auf einfache Weise jede beliebige Schriftart eingestellt werden. Nach der &lt;!&gt;-Funktion folgt ein Byte, das im Text als Hexadezimal-Zahl stehen muß.</p>
+
+        <p>Beispiel: Sie besitzen einen Epson FX-80. Die Steuersequenz für die &lt;!&gt;-Zeichenfunktion lautet also ESC!. Damit teilen Sie dem Drucker mit, daß Sie einen bestimmten Druckmodus anwählen wollen. ESC entspricht hexadezimal $1b. Tragen Sie also für die &lt;!&gt;-Funktion als erstes 1b in die Tabelle ein. Das »!« entspricht hexadezimal $21. Verfahren Sie hier ebenso. Die Steuerzeichen-Sequenz lautet also: $1b21.</p>
+
+        <p>Nach der mit dem Ausrufungszeichen aufgerufenen ESC!-Funktion bietet Master-Text die Möglichkeit, zehn von Ihnen vordefinierte Schriftarten zu wählen. Die entsprechenden Codes, welche Sie dem Druckerhandbuch entnehmen können (FX-80: Seite 98f.), geben Sie in der Steuerzeichentabelle ein.</p>
+
+        <p>Im Text wird die &lt;!&gt;-Funktion ebenfalls durch »!« gekennzeichnet. Tippen Sie also &lt;F7&gt;, um das Steuerzeichen zu kennzeichnen (es erscheint ein reverses »S«). Dann drücken Sie die &lt;!&gt;-Taste. Dahinter schreiben Sie nun als Hexadezimal-Zahl die Nummer der in der Steurzeichentabelle von Ihnen definierten Steuersequenz.</p>
+
+        <p>Eine andere Anwendungsmöglichkeit wäre zum Beispiel auch das Hin- und Herschalten zwischen den zur Verfügung stehenden Zeichensätzen Ihres Druckers oder das Einstellen von Zeilenabständen. Mit ein bißchen Phantasie finden Sie vielleicht noch weitere Anwendungsmöglichkeiten.</p>
+
+        <h3>2. Frage: Warum funktioniert weder das Nachladen von Diskette noch die Rundschreiben-Funktion?</h3>
+
+        <p>Dies funktioniert nicht bei allen Druckern, da der serielle Bus von verschieden Druckern oder Interfaces unterschiedlich behandelt wird. Mit einem Görlitz- oder einem Wiesemann-Interface beispielsweise klappte der Ausdruck einwandfrei. Die weitverbreiteten Drucker MPS 801 und MPS 802 streikten jedoch. Abhilfe schafft die hier abgedruckte Änderung des Programmes »t2« (Listing 1). Sie ersetzt die in Ausgabe 10/86 beschriebenen und ist wieder mit dem in Ausgabe 6/86 modifizierten MSE einzugeben. Die Vorgehensweise ist ebenfalls in Frage 5, Ausgabe 10/86 beschrieben.</p>
+
+        <p>Auf der Programmservice-Diskette zu dieser Ausgabe befindet sich noch einmal das komplette Programm »t2« mit allen Änderungen.</p>
+
+        <h3>3. Frage: Wie muß eine Rundschreibendatei aufgebaut sein?</h3>
+
+        <p>Am besten ist es wohl, an dieser Stelle ein kleines Programm (Listing 2) abzudrucken. Das Programm kann zwar keine Adreßverwaltung ersetzen. Da es aber sehr einfach aufgebaut ist, kann man gut den Aufbau der Dateien erkennen. Wenn Sie das kleine Basic-Programm starten, werden Sie zunächst nach dem Dateinamen gefragt (Zeile 10). In Zeile 20 wird das von Master-Text gewünschte »r« an den Dateinamen angehängt. Nebenbei wird der Dateiname auch auf die vorgeschriebenen 16 Zeichen Länge gebracht. Zeile 30 eröffnet ganz einfach die sequentielle Datei. Jetzt werden Sie gefragt, aus wievielen Daten ein Satz bestehen soll. Angenommen Sie benötigen im Textprogramm Name, Straße, Wohnort und Anrede, so hätten Sie insgesamt 4 Daten, die jeweils zusammengehören. Sie müßten also eine »4« eingeben. In Zeile 1010 werden Sie nun nach den Daten gefragt. Geben Sie Ihre Daten der Reihe nach ein. Nach jedem Datum ist einmal &lt;RETURN&gt; zu drücken. In dem oben genannten Beispiel würden Sie jetzt also den Namen, die Straße, den Wohnort und die Anrede eingeben. Die Daten werden auf Diskette gespeichert. Wenn Sie die vorher von Ihnen festgesetzte Anzahl der Daten eingegeben haben, werden Sie gefragt, ob Sie noch einen Datensatz eingeben wollen (Zeile 1020). Drücken Sie die Taste &lt;J>, so können Sie jetzt zum Beispiel eine zweite Adresse eingeben (Zeile 1010). Drücken Sie eine andere Taste, so wird noch ein Zeichen mehr in die Datei geschrieben (print#3,1), da Master-Text dies als Endkennung benötigt. Danach wird die Datei geschlossen. Diese können Sie nun in Master-Text nutzen, indem Sie die Datenfelder im Text mit dem »A«-Befehl kennzeichnen. Zum Ausdruck wählen Sie »Rundschreiben«. Sie werden wieder aufgefordert, die Anzahl der Daten einzugeben. Hier tragen Sie dieselbe Zahl wie im Basic-Programm ein. Nun müssen Sie nur noch den Dateinamen eingeben.</p>
+
+        <p>Natürlich ist das kleine Basic-Programm zum Erstellen von Rundschreibendateien nur sehr begrenzt geeignet. Wenn Sie jedoch im Besitz einer Daten- oder Adreßverwaltung sind, können Sie in der Regel auch mit dieser Dateien erstellen. Sie müssen jedoch darauf achten, daß der Dateiname 16 Buchstaben lang sein muß (notfalls mit RENAME umbenennen) und daß die Datei mindestens ein Zeichen mehr enthalten muß, als nachher gedruckt werden soll. Dies können Sie nachträglich zum Beispiel so erreichen:</p>
+
+        <pre><code>OPEN3,8,3,"dateiname,S,A":PRINT#3:CLOSE3
+</code></pre>
+
+
+        <p>Sollten Sie eine eigene Routine entwickelt haben, die Dateien anderer Daten- oder Adreßverwaltungsprogramme für Master-Text umsetzt, so können Sie uns diese gerne unter dem Stichwort »Master-Text« zusenden.</p>
+
+        <h3>4. Frage: Wie läßt sich die 80-Zeichenausgabe anhalten?</h3>
+
+        <p>Die 80-Zeichenausgabe läßt sich mit der Leertaste anhalten. Da die Taste aber nur nach jeder Zeile einmal abgefragt wird, kann es sein, daß Sie diese schon mal etwas länger drücken müssen. Wenn der Rahmen seine Farbe verändert, hat der Computer den Tastendruck registriert. Das Anhalten der Ausgabe ist auch bei der Ausgabe auf dem Drucker möglich. Jedoch ist hier zu beachten, daß manche Drucker einen Pufferspeicher besitzen, dessen Inhalt auf jeden Fall noch zu Papier gebracht wird.</p>
+
+        <h3>5. Frage: Wie nutze ich Steuerzeichen auf dem MPS 801?</h3>
+
+        <p>Da die Drucker MPS 801 und MPS 802 keine verschiedenen Schriftarten beherrschen, erübrigt sich die Frage nach der Einstellung der Schriftarten von selbst. Die einzigen Möglichkeiten, die diese Drucker bieten, sind Breitschrift und Reversdruck. Softwaremäßig wurde in der Installation für den MPS 802 noch Unterstreichen eingebaut. Beim MPS 801 werden die Umlaute jedoch nicht revers gedruckt, da Master-Text die Umlaute nur in normaler Schrift enthält. Die Umlaute werden auf beiden Druckern auch nicht in Breitschrift gedruckt. Hier sind Sie als Leser gefordert, leistungsfähigere Druckroutinen zu schreiben und zur Veröffentlichung anzubieten, damit auch andere Leser davon profitieren. Dies gilt ebenso für von Ihnen entwickelte Treiber-Routinen für andere, seltenere Drucker.</p>
+
+        <address class="author">(Martin Pahl/sk)</address>
+
+        <figure>
+            <pre>Name : t2                 a000 bce4
+-----------------------------------
+ad60 : 02 38 60 18 60 20 cc ff   d4
+ad68 : a2 03 4c c6 ff 00 00 00   78
+===================================
+
+Name : t2                 a000 bce4
+-----------------------------------
+aea8 : 02 4c f9 ae 20 65 ad ea   de
+aeb0 : ea ae c8 02 ca 86 0c a0   b6
+
+Name : t2                 a000 bce4
+-----------------------------------
+b1d0 : b1 fb 99 00 c9 85 28 c8   e0
+b1d8 : c6 28 30 e5 b1 fb 99 00   dc
+b1e0 : c9 d0 f4 20 73 00 c9 d3   58
+
+Name : t2                 a000 bce4
+-----------------------------------
+b338 : a9 1c 4c 21 b4 c9 57 d0   bf
+Name : t2                 a000 bce4
+-----------------------------------
+b390 : c3 ff ea ea ea ea ea a9   70
+Name : t2                 a000 bce4
+-----------------------------------
+b470 : 5d c9 9c d0 04 68 4c 2c   00</pre>
+            <figcaption>Listing 1. Verbessern Sie diese Zeilen im Master-Text Programm »t2« mit dem geänderten MSE aus Ausgabe 6/86</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="t2.prg" data-name="t2 (komplettes Programm mit allen Änderungen)"></div>
+        <figure>
+            <pre data-filename="rundschr." data-name="Rundschreibdatei"></pre>
+            <figcaption>Listing 2. Mit diesem kleinen Programm können Sie eine einfache Datei für die Rundschreib-Funktion erstellen. Bitte mit dem Checksummer V3 eingeben.</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 16 und Plus/4</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="tr, M. Knippel, W. Brosche, F. Müller, B. Kardel">
+    <meta name="64er.issue" content="1/87">
+    <meta name="64er.pages" content="79-80,82">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 16, Plus/4">
+    <meta name="64er.toc_category" content="Tips & Tricks">
+    <meta name="64er.toc_title" content="Tips &amp; Tricks zum C 16 und Plus/4: Piepmatz / Drei kurze Grafik-Listings / »Apfelmännchen«, fantastische Grafiken / C 16-Absturz geklärt / SAVE &amp; REPLACE bei der 1551-Floppy">
+    <meta name="64er.index_title" content="Drei kurze Grafik-Listings">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 16 &amp; Plus/4">
+    <meta name="64er.index_title" content="Piepmatz">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 16 &amp; Plus/4">
+    <meta name="64er.index_title" content="Apfelmännchen — fantastische Grafiken">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 16 &amp; Plus/4">
+    <meta name="64er.index_title" content="C 16-Absturz geklärt">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 16 &amp; Plus/4">
+    <meta name="64er.index_title" content="SAVE&amp;REPLACE korrigiert">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 16 &amp; Plus/4">
+    <meta name="64er.id" content="tips_c16">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 16 und Plus/4</h1>
+        <p class="intro">Diesmal haben wir unter anderem zwei echte Leckerbissen für Sie: Die Umsetzung der berühmten »Fractal-Grafiken« für den C 16 und einen interessanten Artikel über einen Fehler im Betriebssystem einiger älterer Computer.</p>
+
+        <p>Nachdem in der Redaktion das Netzteil eines unserer C 16 zum x-ten Male beim Betrieb mit einer Speichererweiterung durchbrannte, waren wir mal wieder ziemlich sauer. Passiert das nur uns? Schwebt ein böser Fluch über unserer Redaktion?</p>
+
+        <p>Uns würde nun interessieren, welche Erfahrungen Sie mit Speichererweiterungen, Umschaltern auf Normalspeicher und allgemeinen Kompatibilitätsproblemen gemacht haben. Haben Sie ein anderes Netzteil? Benutzen Sie einen kleinen Schalter zum Abschalten der Erweiterung? Welche Tricks haben Sie sich zu diesem Themenkreis einfallen lassen? Schreiben Sie uns, Stichwort »C 16«.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>Piepmatz</h2>
+
+        <p>Das Programm »BEEPER« (siehe Listing 1) erzeugt bei jedem Tastendruck einen kurzen Piepston. Dies ist vor allem für »schnelle Tipper« und »Blindschreiber« interessant. Das Programm fügt sich in die Interrupt-Routine des C 16 oder Plus/4 ein. Zuerst wird überprüft, ob eine Taste gedrückt ist. Wenn ja, so wird Stimme 1 eingeschaltet. Ist keine Taste gedrückt, wird Stimme 1 ausgeschaltet.</p>
+
+        <p>Da die Tonhöhe und die Lautstärke des Tons vom Maschinenprogramm aus nicht mehr verändert werden, können sie einfach über die Basic-Befehle »VOL« und »SOUND1,« den entsprechenden Bedürfnissen angepaßt werden. Nach einem Reset kann »BEEPER« über SYS 1630 wieder aktiviert werden. Allerdings müssen dann Tonhöhe und Lautstärke »manuell« gesetzt werden.</p>
+
+        <p>Mit SYS 1643 wird BEEPER wieder ausgeschaltet. Für Interessierte wird im folgenden das Maschinenprogramm kurz erläutert:</p>
+
+        <pre><code>.065e   SEI                 ;BEEPER in Interrupt einbin-
+                            ;den:
+        LDA     #$78        ;Interrupt-Vektor wird
+        STA     $0314       ;auf eigene Routine bei $0678
+        LDA     #$06        ;gerichtet.
+        STA     $0315
+        CLI
+        RTS
+.066B   SEI                 ;BEEPER ausschalten:
+        LDA     #$0E        ;Interrupt-Vektor auf Normal-
+                            ;wert
+        STA     $0314       ;($CE0E) richten.
+        LDA     #$CE
+        STA     $0315
+        CLI
+        RTS
+.0678   LDA     $C6         ;Interrupt-Routine »BEEPER«:
+        CMP     #$40        ;Taste gedrückt?
+        BNE     $0689       ;Ja =&gt; Stimme 1 einschalten
+        LDA     $F11        ;Nein, also
+        AND     #$EF        ;Stimme 1 ausschalten
+        STA     $FF11       ;und
+        JMP     $CE0E       ;im normalen Interrupt weiter.
+.0689   LDA     $FF11       ;Stimme 1 einschalten
+        ORA     #$10        ;und
+        STA     $FF11
+        JMP     $CE0E       ;im normalen Interrupt weiter.</code></pre>
+
+
+        <address class="author">(M. Knippel/tr)</address>
+
+        <figure>
+            <pre data-filename="beeper" data-name="BEEPER"></pre>
+            <figcaption>Listing 1. »BEEPER«, Piepston bei jedem Tastendruck</figcaption>
+        </figure>
+
+        <h2>Drei kurze Grafik-Listings</h2>
+
+        <p>Sie erfreuen sich immer großer Beliebtheit: Kleine Programme, die meist erstaunliche Grafiken auf den Bildschirm zaubern. Hier sind drei:</p>
+
+        <pre><code>10 COLOR 0,1:COLOR 1,4
+20 GRAPHIC 1,1
+30 FOR L=1 TO 150 STEP2
+40 M=INT(50+50*SIN(L/10))
+50 CIRCLE 1,160,100,L,M
+60 NEXT L</code></pre>
+
+        <pre><code>10 GRAPHIC 1,1
+20 FOR L=1 TO 319
+30 M=INT(100+99*SIN(L/10))
+40 DRAW 1,160,100 TO L,M
+50 NEXT L</code></pre>
+
+        <pre><code>10 PRINT "{RVSON,SPACE,RVSOFF} ";
+20 COLOR 1,INT(RND(1)*2)+1
+30 GOTO 10</code></pre>
+
+        <p>Viel Spaß beim Experimentieren!</p>
+
+        <address class="author">(W. Brosche/tr)</address>
+
+        <h2>»Apfelmännchen« — fantastische Grafiken</h2>
+
+        <p>In der Ausgabe 11/85 des 64'er-Magazins wurde ein Programm für den C 64 vorgestellt, das sogenannte »Fractal-Grafiken«, auch »Apfelmännchen« genannt, erzeugt. Listing 2 zeigt ein ähnliches Programm für den C 16 beziehungsweise Plus/4. Im Gegensatz zum »Vorbild« stellt es allerdings die Grafiken dreidimensional dar. Die Ergebnisse können sich durchaus sehen lassen! Wenn Sie nähere Informationen zu den verwendeten Algorithmen und den mathematischen Grundlagen möchten, schlagen Sie bitte in der oben genannten Ausgabe der 64'er nach.</p>
+
+        <p>Nach dem Start des Programms mit RUN können Sie verschiedene Parameter eingeben (Farben, komplexe Parameter und Ausmaße). Wenn Sie einen Parameter nicht ändern möchten, drücken Sie einfach &lt;RETURN&gt;. Die voreingestellten Werte geben einen kleinen Eindruck von der Leistungsfähigkeit des Programms. Bei den komplexen Parametern können schon kleine Abweichungen an den Nachkommastellen erhebliche Veränderungen des Bildes hervorrufen. Die Farbwerte müssen denen des COLOR-Befehls (Zahlen von 1 bis 16) entsprechen.</p>
+
+        <p>Das Erstellen eines kompletten Bildes dauert leider wegen dem sehr hohen Rechenaufwand mehrere Stunden (vielleicht ist ein Leser ja so genial und schreibt das Programm in Maschinensprache um?). Ist das Bild fertig, gelangt man durch Drücken des Linkspfeils (&lt;SHIFT&gt;+&lt;=>) in den normalen Textmodus zurück.</p>
+
+        <p>Beim Eintippen können Sie alle REM-Zeilen und alle Zeilen, die nur einen Doppelpunkt enthalten, ersatzlos weglassen. Achtung: In den Zeilen 300 und 820 dürfen Sie im COLOR-Befehl keinen Zwischenraum zwischen »COL« und »OR« lassen. Dieser Zwischenraum wurde versehentlich von unserem Druckprogramm für die Listings erzeugt.</p>
+
+        <address class="author">(F. Müller/tr)</address>
+
+        <figure>
+            <pre data-filename="apfelberge" data-name="APFELBERGE"></pre>
+            <figcaption>Listing 2. »APFELBERGE«, fantastische Grafiken auf dem C 16 und Plus/4</figcaption>
+        </figure>
+
+        <h2>C 16-Absturz geklärt</h2>
+
+        <p>In der Ausgabe 7/86 wurde in dieser Rubrik ein Fehler des C 16 beschrieben, der zum Absturz vollkommen fehlerfreier Basic-Programme führen kann. Dieser Fehler tritt dann auf, wenn im Programm die Systemvariablen DS, DS$ oder die Basic-Kommandos HEADER oder SCRATCH verwendet werden. Auch stellte sich heraus, daß es zwei verschiedene C 16-Versionen gibt (bei den einen tritt der Fehler auf, bei den anderen nicht). Mir ist es nun endlich gelungen aufzuklären, wie es zu diesem Fehler kommt. Er tritt dann auf, wenn ein Programm die oben genannten Variablen und Befehle verwendet und soviel Speicherplatz benötigt, daß eine Garbage-Collection notwendig wird. Das erklärt auch, warum sich der Absturz durch die FRE(0)-Funktion provozieren läßt (dabei wird eine Garbage-Collection durchgeführt). Der Fehler liegt jedoch nicht in der Garbage-Collection-Routine selbst, sondern dort, wo die Variable DS$ angelegt wird.</p>
+
+        <p>Um den Fehler zu verstehen, muß man wissen, wie der C 16 Variablen verwaltet. Jede Variable, egal ob Fließkomma-, Integer- oder String-Variable wird im Speicher hinter dem Basic-Programm abgelegt. Dabei wird folgendes Format verwendet: Wenn eine Variable nur einen Buchstaben als Name hat, wird das zweite Byte auf $00 gesetzt. Um kenntlich zu machen, um welchen Variablentyp es sich handelt, wird das Bit 7 der beiden Namen-Bytes entsprechend behandelt (mit $80 ODER-verknüpft):</p>
+
+        <p>Bei einer Fließkommavariablen wird keines der beiden Bytes verändert, bei einer Integer-Variablen wird das erste und bei einer String-Variablen das zweite Byte gekennzeichnet.</p>
+
+        <p>Von hier an wollen wir uns nur noch mit den String-Variablen beschäftigen. Nach den zwei Namen-Byte folgt ein sogenannter »String-Deskriptor«, bestehend aus drei Byte. Das erste Byte enthält die Länge des Strings und die beiden folgenden die Adresse, ab der die Zeichenkette im Speicher zu finden ist. Die Zeichenketten selbst werden nämlich nicht direkt hinter dem Programm abgelegt, sondern am oberen Speicherende. Ab der Adresse, die im Deskriptor steht, werden die Zeichen abgelegt. Nach den Zeichen folgen noch zwei Byte, die wiederum auf den zugehörigen Deskriptor zeigen (auch als »R-Zeiger« bezeichnet). Hierzu ein Beispiel:</p>
+
+        <p>Wenn Sie Ihren C 16 gerade erst eingeschaltet haben, und im Direktmodus die Zeile A$= "TEST" eingeben, sieht es im Speicher folgendermaßen aus:</p>
+
+        <pre><code>1003  41 80 04 F0 3F  ; A....</code></pre>
+
+        <p>»41« und »80« bedeuten »A$«, die Länge des Strings wird mit »04« festgelegt und die zugehörige Zeichenkette (»TEST«) ist ab Adresse 3FF0 zu finden. Betrachten wir uns also den Bereich ab $3FF0:</p>
+
+        <pre><code>3FF0  54 45 53 54 05 10  ; TEST..</code></pre>
+
+        <p>Die ersten vier Bytes stellen die Zeichenkette im ASCII-Format dar und »05 10« ist der eben beschriebene R-Zeiger.</p>
+
+        <p>Wenn wir nun der Variablen A$ einen neuen Inhalt zuweisen, wird dieser an einer anderen Adresse im Speicher abgelegt und der Deskriptor entsprechend geändert. Dann muß noch die alte Zeichenkette als ungültig gekennzeichnet werden: Das Highbyte des R-Zeigers wird auf $FF gesetzt, während im Lowbyte die Länge der alten Zeichenkette eingetragen wird. Dies ist für die Garbage-Collection nötig. Zurück zu unserem Beispiel: Wenn wir die alte Zeichenkette unseres Strings A$ durch A$="HALLO" ungültig machen, sieht es im Speicher ab Adresse $3FF0 so aus:</p>
+
+        <pre><code>3FF0  54 45 53 54 04 FF  ; TEST..</code></pre>
+
+        <p>Wird nun eine Garbage-Collection ausgeführt (durch PRINT FRE(0) oder einfach weil der Speicher zu voll wird), so werden zuerst einmal die R-Zeiger aller Strings benötigt. Die Garbage-Collection-Routine »hangelt« sich dann anhand der R-Zeiger von oben nach unten durch den Speicher. Trifft die Routine auf einen als ungültig gekennzeichneten String, wird dessen Adresse gemerkt. Der nächste gültige String wird dann an diese Adresse kopiert und dessen Deskriptor entsprechend geändert. Auf diese Weise werden alle ungültigen Strings gelöscht und dadurch wieder Speicherplatz gewonnen.</p>
+
+        <h2>Problemkind DS$</h2>
+
+        <p>Kommen wir nun zu unserem »Problemkind« DS$: Es hat nämlich mehrere Besonderheiten. Der Deskriptor von DS$ wird nicht im Arbeitsspeicher des C 16 gespeichert, sondern in der Zeropage an den Adresse $79 bis $7B. Außerdem wird bei jedem (!) Aufruf von DS$ der Fehlerkanal des Laufwerks ausgelesen. Der C 16 geht also grundsätzlich davon aus, daß DS$ »gültig« ist. Daher wird dessen R-Zeiger vom Betriebssystem überhaupt nicht beachtet. Ob DS$ nun schon einmal angelegt wurde, wird anhand der Stringlänge im Deskriptor ermittelt: Ist sie Null, wurde DS$ noch nicht angelegt. Ansonsten hat er die einheitliche Länge von 40 Zeichen.</p>
+
+        <p>Kommen wir nun zur Aufklärung des Fehlers: Das Betriebssystem enthält eine Routine, die den Fehlerkanal des Laufwerks einliest, und, wenn noch nicht geschehen, DS$ als String von 40 Zeichen Länge neu anlegt. Diese Routine steht ab $CCCF im Speicher und beginnt so:</p>
+
+        <pre><code>CCCF    LDA $79         ;Länge von DS$
+CCD1    BNE $CCE4       ;verzweige, wenn DS$ schon an-
+ge                      legt ist
+CCD3    LDA #$28        ;dez.40 = neue Länge
+CCD5    STA $79         ;Deskriptor für DS$ (Länge)
+CCD7    JSR $A906       ;Platz für String reservieren
+CCDA    STX $7A         ;Lowbyte-Adresse von DS$ und
+CCDC    STY $7B         ;Highbyte-Adresse von DS$ spei-
+                        chern
+CCDE    LDY #$28        ;Parameter für den STA(...),Y-
+                        Befehl
+CCE0    LDA #$0D        ;falsch, müßte die Länge von
+                        DS$ sein
+CCE2    STA ($7A),Y     ;schreibt in Lowbyte des R-
+                        Zeigers
+CCE4    LDA $0277       ;Adresse der Floppy</code></pre>
+
+        <p>Im weiteren wird der Fehlerkanal des Laufwerks ausgelesen.</p>
+
+        <p>Besondere Beachtung verdient die Routine $A906, die Platz im Speicher reserviert. Im Akku wird ihr die benötigte Stringlänge übergeben, anschließend stehen in X- und Y-Register Low- und Highbyte der zugewiesenen Adresse. Diese Routine kennzeichnet den eben angelegten String als ungültig, was im folgenden auch nicht mehr geändert wird (die Fehlerkanalabfrage soll ja keinen unnötigen Speicherverbrauch mit sich führen). Und genau diese Tatsache bringt den C 16 im Falle einer Garbage-Collection dann aus der Fassung. Besonders fatal ist aber auch, daß zusätzlich noch die falsche String-Länge in den Deskriptor eingetragen wird. Trifft die Garbage-Collection nun auf den DS$-String, stellt sie anhand des R-Zeigers (zweites Byte gleich $FF) fest, daß es sich um einen ungültigen String handelt. Also nimmt sie das Lowbyte, das ja die aktuelle Länge des Strings enthalten sollte, und geht um diese Anzahl im Speicher abwärts. Die beiden dort gefundenen Bytes sollten ja nach Adam Riese den nächsten R-Zeiger darstellen. Da die Länge im Falle von DS$ nicht stimmt, werden irgendwelche ASCII-Zeichen als R-Zeiger angenommen. Diese wiederum führen den C 16 weit in die Untiefen seines Speichers und damit früher oder später zum unweigerlichen Absturz.</p>
+
+        <h2>Was tun?</h2>
+
+        <p>Wie kann man nun festellen, ob der eigene C 16 diesen Fehler enthält oder nicht? Ganz einfach: Wir testen, ob der String DS$ nach einem Aufruf auch als »echter, gültiger« String angelegt wird. Geben Sie NEW ein und dann PRINT FRE(0). Dann fragen Sie mit PRINT DS$ den Fehlerkanal ab und danach wieder mit PRINT FRE(0) den freien Speicherplatz. Wenn die Zahl um den Wert 42 kleiner geworden ist (40 Zeichen String-Länge und zwei Zeichen R-Zeiger), können Sie aufatmen: Sie besitzen eine korrigierte Version des C 16, die den String DS$ korrekt anlegt.</p>
+
+        <p>Was aber tun, wenn man nicht zu jenen Glücklichen gehört? Kein Problem, für diese Fälle hat der Autor ein kleines Programm entworfen, das DS$ nachträglich korrekt anlegt:</p>
+
+        <pre><code>60000 FOR I=DEC("065E") TO DEC("0676")
+60010 READ A$:POKE I,DEC(A$)
+60020 NEXT
+60030 SYS DEC("065E"):RETURN
+60040 DATA A9,28,85,79,20,06,A9,86,7A,84,7B,A0
+60050 DATA 28,A9,00,91,7A,C8,A9,79,91,7A,4C,E4,CC</code></pre>
+
+        <p>Das Programm ist als Unterroutine zum Aufruf mit GOSUB 60000 geschrieben. Sie sollte nach dem erstmaligen Benutzen von DS$ einmal aufgerufen werden.</p>
+
+        <address class="author">(B. Kardel/tr)</address>
+
+        <h2>SAVE &amp; REPLACE korrigiert</h2>
+
+        <p>Der größte Fehler beim 1541-Laufwerk ist die fehlerhafte SAVE &amp; REPLACE-Funktion. Zur Erinnerung: Wenn ein auf der Diskette bereits vorhandenes Programm überschrieben werden soll, bedient man sich (laut Handbuch) der »@:«-Funktion. Man speichert das Programm also mit SAVE" @:Name". Das alte Programm soll dann automatisch gelöscht und durch das neue ersetzt werden. Leider ist im Betriebssystem des 1541-Laufwerks in dieser Routine ein Fehler enthalten. Die »@:«-Funktion arbeitet nur einwandfrei, wenn die beiden Programme die gleiche Länge besitzen. Ansonsten können sogar andere auf der Diskette befindliche Programme zerstört werden. Da half nur, das Programm vorher von der Diskette zu löschen.</p>
+
+        <p>Beim neuen 1551-Laufwerk ist diese Funktion nun korrigiert. Selbst nach mehreren Tests mit sehr langen Programmen zeigt sich kein Fehlverhalten der Diskettenstation.</p>
+
+        <address class="author">(tr)</address>
+    </article>
+</body>
+
+</html>

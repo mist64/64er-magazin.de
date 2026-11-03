@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Profis helfen Einsteigern (Teil 4)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="rf, rf, Torben Müller, rf, rf">
+    <meta name="64er.issue" content="1/87">
+    <meta name="64er.pages" content="24">
+    <meta name="64er.head1" content="Einsteiger">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Einsteiger-Teil">
+    <meta name="64er.toc_title" content="Profis helfen Einsteigern">
+    <meta name="64er.index_title" content="Profis helfen Einsteigern (Teil 4)">
+    <meta name="64er.index_category" content="Kurse/Grundlagen|Betriebssysteme">
+    <meta name="64er.id" content="profis-helfen-einsteigern">
+</head>
+
+<body>
+    <article class="qa numbered" style="counter-reset: qa-question 22">
+        <h1>Profis helfen Einsteigern (Teil 4)</h1>
+        <p class="intro">Ob Sie sich für Betriebssystem-Umschaltungen oder für ein brandheißes Thema wie Kopierschutz interessieren, hier finden Sie die Antworten auf die meistgestellten Fragen zu diesen Themen und vieles andere.</p>
+
+        <section>
+            <div class="q">
+                <p>Ich habe gehört, daß man in den C 64 mehrere Betriebssysteme einbauen kann. Wie funktioniert das?</p>
+                <p class="author">(Harald Diemer)</p>
+            </div>
+            <div class="a">
+                <p>Mit einigen Tricks kann man den C 64 in der Tat mit mehreren Betriebssystemen ausstatten. Solche Zusatzsysteme werden mit Hilfe eines EPROM-Brenners in einen eigenen Baustein gespeichert. Wie das funktioniert, können Sie im Computerlexikon dieser Ausgabe nachlesen. Natürlich müssen diese neuen Bausteine noch mit dem C 64 verbunden werden. Sie können nicht einfach an beliebiger Stelle eingebaut werden. Auch ist es nicht möglich, mehrere Betriebssysteme gleichzeitig aktiviert zu haben. Man kann immer nur mit einem System arbeiten. Um all diese Probleme zu lösen, wurden spezielle Betriebssystemumschaltungen entwickelt. Diese werden größtenteils in den Computer eingebaut; einige Umschaltungen verwenden auch den Expansion-Port des C 64. Eine solche Umschaltung besteht aus einer Platine mit mehreren freien Steckplätzen für EPROMs, auf denen die Betriebssysteme gespeichert sind. Ein meist externer Schalter sorgt dann für absturzfreies Umschalten zwischen den Systemen. In eine solche Betriebssystemumschaltung können Sie dann neben dem normalen Betriebssystem zum Beispiel noch das 64'er-DOS aus Sonderheft 9 und andere erweiterte Betriebssysteme einbauen. Allerdings sollten Sie, falls Ihnen der Umgang mit dem Lötkolben nicht geläufig ist, solche Veränderungen von einem Fachmann vornehmen lassen, um Fehlfunktionen zu vermeiden.</p>
+                <address class="author">(rf)</address>
+            </div>
+        </section>
+
+        <section>
+            <div class="q">
+                <p>Kann man Programme, die für Diskette geschrieben sind, ohne weiteres für die Datasette umschreiben?</p>
+                <p class="author">(Lutz Schröder)</p>
+            </div>
+            <div class="a">
+                <p>Es gibt für Diskette geschriebene Programme, die sich ohne weiteres für den Datasettenbetrieb umschreiben lassen. Das ist bei Basic-Programmen der Fall, die während des Ablaufs nicht mehr auf die Diskette zugreifen. Ein solches Programm wird nach dem Abtippen nicht auf Geräteadresse acht, sondern auf eins (Datasette) gespeichert. Werden im Programm sequentielle Dateien verwendet, müssen zusätzlich alle OPEN-Befehle auf die Datasette umgelenkt werden. Dies funktioniert ebenfalls wieder durch das Ändern der Geräteadresse von acht nach eins (Beispiel: OPEN 5,8,1 in OPEN 5,1,1). Benutzt das Programm relative Dateien ist es nicht möglich, dieses mit Datasette zu betreiben. Auch Maschinenprogramme sind nur bedingt auf Datasette übertragbar, da oft spezielle Betriebssystemroutinen zum Diskettenzugriff Verwendung finden. Viele Maschinenprogramme verwenden außerdem einen Speicherbereich, der eigentlich für den Betrieb mit Datasette reserviert ist (Kassettenpuffer von Speicherstelle 631 bis 640 dezimal). Wollen Sie ein solches Programm auf Datasette speichern, wird es unweigerlich zerstört.</p>
+                <address class="author">(rf)</address>
+            </div>
+        </section>
+
+        <section>
+            <div class="q">
+                <p>Wie kann ich ein Basic-Programm weiterbearbeiten, wenn ich versehentlich den Reset-Taster gedrückt habe?</p>
+                <p class="author">(Christian Frank)</p>
+            </div>
+            <div class="a">
+                <p>Um ein Basic-Programm nach einem versehentlichen Reset wiederherstellen zu können, müssen Sie ein klein wenig in das Betriebssystem des C 64 eingreifen. Wenn Sie einen Reset auslösen, werden, wie übrigens auch beim NEW-Befehl, die ersten beiden Bytes des Programms im Speicher gelöscht. Das eigentliche Programm existiert weiterhin. Diese ersten beiden Zeichen haben mit dem eigentlichen Programm nichts zu tun. Sie zeigen dem Computer lediglich, wo im Speicher die nächste Basic-Zeile zu finden ist. Steht an diesen beiden Stellen Null, was nach einem Reset oder NEW-Befehl der Fall ist, nimmt der Computer an, es würde kein Programm im Speicher stehen. Um diese beiden Speicherstellen wiederherzustellen, geben Sie folgende Befehle ein:</p>
+                <pre><code>POKE 2050,1: SYS 42291: POKE 46,PEEK (35): POKE 45,PEEK (781)+2:CLR</code></pre>
+                <p>Sollte danach eine Fehlermeldung erscheinen, geben Sie noch folgende Zeile ein:</p>
+                <pre><code>POKE 46,PEEK (35)+1: POKE 45,PEEK (781)-254</code></pre>
+                <p>Danach können Sie mit dem Programm wie gewohnt weiterarbeiten.</p>
+                <address class="author">(Torben Müller)</address>
+            </div>
+        </section>
+
+        <section>
+            <div class="q">
+                <p>Gibt es eine Möglichkeit, den C 64 mit 80 Zeichen pro Zeile zu betreiben? Wie kann der C 64 eventuell dafür umgerüstet werden?</p>
+                <p class="author">(Horst Miers)</p>
+            </div>
+            <div class="a">
+                <p>Prinzipiell ist der C 64 nur für 40 Zeichen pro Zeile ausgelegt. Es gibt auf dem Markt einige Hersteller, die 80-Zeichen-Karten für den C 64 anbieten. Allerdings kostet eine solche Zusatzkarte bis zu 300 Mark und erfordert in der Regel speziell darauf angepaßte Programme. Im Verhältnis zum Kaufpreis des Computers also recht teuer. Man sollte sich in diesem Falle überlegen, ob nicht ein C 128 angeschafft werden soll, der von vorneherein mit 80 Zeichen arbeiten kann. Ein weiteres Problem bei der 80-Zeichen-Darstellung ist die oft zu niedrige Auflösung des Monitors. Es kann passieren, daß die Buchstaben beim Einsatz einer 80-Zeichen-Karte nur noch verschwommen am Bildschirm erscheinen. Es gibt noch eine andere Möglichkeit, die Zeichenanzahl pro Zeile beim C 64 zu erweitern. Eine Software-Lösung für 64 Zeichen finden Sie im Sonderheft 11 auf Seite 40. Zwar können auch damit nur 64 Zeichen dargestellt werden, doch sind diese auf den speziell für den C 64 verwendeten Monitoren noch gut zu lesen.</p>
+                <address class="author">(rf)</address>
+            </div>
+        </section>
+
+        <section>
+            <div class="q">
+                <p>Warum sind viele Spielprogramme für den C 64 mit aufwendigem Kopierschutz gesichert? Kann man diesen Kopierschutz überwinden?</p>
+                <p class="author">(Heiner Baltes)</p>
+            </div>
+            <div class="a">
+                <p>Die Spielehersteller schützen ihre Produkte, um einer zu schnellen Verbreitung der Spiele durch Raubkopien vorzubeugen. Es herrscht ein ewiger Wettlauf zwischen den Herstellern, die immer ausgeklügeltere Schutzmaßnahmen einbauen, und den Raubkopierern oder Kopierprogrammen, die diesen Schutz wieder entfernen oder umgehen. Anbieter professioneller Programme wie Textverarbeitungen oder Datenbanken erlauben mittlerweile in zunehmendem Maße die Erstellung einer Sicherheitskopie, oder verzichten ganz auf einen Kopierschutz um das Arbeiten mit den Programmen sicherer zu gestalten. Bei den Spielen ist dieser Trend noch nicht zu erkennen. Das Anfertigen von Kopien geschützter Programme kann (muß aber nicht) zu unangenehmen Folgen führen. Eine ausführliche Reportage zum derzeitigen Copyright-Gesetz finden Sie in der nächsten Ausgabe des 64'er Magazins.</p>
+                <address class="author">(rf)</address>
+            </div>
+        </section>
+    </article>
+</body>
+
+</html>

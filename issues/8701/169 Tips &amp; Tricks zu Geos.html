@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zu Geos</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="sk">
+    <meta name="64er.issue" content="1/87">
+    <meta name="64er.pages" content="169">
+    <meta name="64er.head1" content="Software-Hilfe">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Software-Hilfe">
+    <meta name="64er.index_category" content="Software-Hilfen|Geos">
+    <meta name="64er.id" content="geos">
+</head>
+
+<body>
+    <article class="qa">
+        <h1>Tips &amp; Tricks zu Geos</h1>
+        <p class="intro">Wieder haben uns viele Fragen zu Geos erreicht. Neben Erläuterungen zur notorisch falschgehenden Geos-Uhr finden Sie hier unter anderem Grundlagen zur Diskettenstruktur von Geos.</p>
+
+        <section>
+            <div class="q">
+                <p>1. Woher bekomme ich FONT-PACK-1 für Geos?</p>
+            </div>
+            <div class="a">
+                <p>FONT-PACK-1, eine Erweiterung für Geowrite, die neue Schriftarten enthält, wird bislang in Deutschland noch nicht angeboten. Eine Möglichkeit wäre die Bestellung direkt bei Berkeley Softworks in Kalifornien. Die Adresse können Sie dem Info am Ende des Beitrages entnehmen.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="q">
+                <p>2. Ich kann mir als Schüler leider nur eine Datasette leisten. Besteht die Möglichkeit auch mit der Datasette in den Genuß von Geos zu kommen?</p>
+            </div>
+            <div class="a">
+                <p>Geos ist eine Betriebssystemerweiterung. Diese enthält sehr viele komplexe Funktionen. Da diese jeweils auch Speicherplatz verbrauchen, ist es nicht möglich, das komplette Geos im Speicher zu halten. Darum muß Geos ständig auf die Diskettenstation zugreifen und die benötigten Programmteile nachladen. Zudem haben die Programmierer von Berkeley Softworks ein eigens für Geos geschaffenes Dateiformat entwickelt, nämlich die VLIR-Dateien (Variable Length Index Record). Diese haben eine sehr komplexe Struktur, die man am besten als eine Weiterentwicklung der relativen Dateien mit variabler Datensatzlänge bezeichnen kann. Diese kann die Datasette, ebenso wie die normalen relativen Dateien, nicht verwalten, da sie ein auf rein sequentielle Speicherung ausgelegtes Gerät ist.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="q">
+                <p>3. Ich habe den alten C 64. Lohnt es sich für mich überhaupt, Geos zu kaufen oder läuft es nur auf dem neuen C 64?</p>
+            </div>
+            <div class="a">
+                <p>Selbstverständlich ist es möglich, auf dem »alten« C 64 mit Geos zu arbeiten, da dieser sich vom Neuen, dem C 64C lediglich durch das »getunte« Design und eine verbesserte Störstrahl-Abschirmung unterscheidet.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="q">
+                <p>4. Im Geos-System ist eine Uhr, die sogenannte Alarm-Clock integriert. Leider mußte ich feststellen, daß diese Uhr stark nachgeht, und somit unbrauchbar ist. Woran liegt das?</p>
+            </div>
+            <div class="a">
+                <p>Im C 64 sind mehrere Uhren eingebaut. Es sind die Timer A und B im CIA 1 und dasselbe noch einmal im CIA 2 (CIA: Complex Interface Adapter). Die Timer in den CIAs des C 64 werden von der Netzfrequenz getaktet, die sehr konstant ist, und sich deshalb gut zur Zeitmessung eignet. Geos ist eine amerikanische Entwicklung. Die Netzfrequenz dort beträgt 60 Hz. In Deutschland sind es 50 Hz. Hier sind wir schon am Punkt. Die Uhren werden einfach zu langsam weitergezählt.</p>
+                <p>Wir sind deswegen an die Entwicklerfirma von Geos, Berkeley Softworks, herangetreten und haben auf dieses Problem aufmerksam gemacht. Lee Llevano, einer der Programmierer, sagte uns zu, daß dieser Fehler bei den nach Deutschland gelieferten Versionen beseitigt wird.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Es geht ans Eingemachte</h2>
+
+            <p>Sicher haben Sie sich schon gefragt, wie Geos beim Auflisten des Directories die Icons erzeugt, die zusammen mit dem Programmnamen angezeigt werden. Außerdem erkennt Geos, ob eine eingelegte Diskette unter Geos formatiert wurde. Wie funktioniert das?</p>
+
+            <p>Vielleicht wollen Sie auch ihre eigenen Directories mit solchen Bildern (Icons) versehen, wenn sie unter Geos betrieben werden. Hierzu müssen wir etwas in das Innere einer Geos-Diskette eintauchen. Verwenden Sie für Ihre Experimente aber unbedingt eine mit dem Geos-Backup-Programm erstellte Sicherheitskopie, da ein falscher Befehl mit dem Disk-Monitor oft reicht, um einen Nervenzusammenbruch beim Programmierer hervorzurufen.</p>
+
+            <p>Was wir hier als Werkzeug brauchen ist also ein Disk-Monitor, wie er zum Beispiel im Assembler-Sonderheft 8/85 als Erweiterung zum SMON veröffentlicht wurde. Zudem sollten Grundkenntnisse über den Aufbau der 1541-Diskettenstruktur vorhanden sein. Fundierte Informationen hierüber erhalten Sie im Sonderheft 9/86, Floppy und Dateiverwaltung, oder in dem Buch »Die Floppy 1541« von Karsten Schramm.</p>
+
+            <p>Laden und starten Sie also den Disk-Monitor und geben R 12 00 und &lt;RETURN&gt; ein. Diskmonitore verlangen hexadezimale Eingaben. Es wird also der Block 18/00 dezimal eingelesen, der wie alle anderen eine Länge von 256 Byte hat. Spur 18/Sektor 0 einer mit der Floppy 1541 formatierten Diskette, beinhaltet die BAM (Block Availability Map). Diese kennzeichnet Sektoren auf der Diskette als frei beziehungsweise als belegt. Zudem enthält dieser Block in den ersten beiden Bytes die Spur- und Sektornummer des ersten Directory-Blocks, und als drittes Byte $41 (ASCII-Code für A) die Kennung für das 1541-Format zur Unterscheidung von anderen Commodore-Laufwerken.</p>
+
+            <p>Die Bytes 144 bis 161 enthalten in ASCII-Code den Namen, den Sie der Diskette beim Formatieren gegeben haben. Sollte der Name kürzer als die zugelassenen 16 Zeichen sein, wird der Rest mit &lt;SHIFT-SPACE&gt; (entspricht $A0) aufgefüllt. In unserem Fall lesen Sie dort: »geos v1.2«. Danach folgen die Bytes 162 und 163, welche die Diskettenidentifikation oder ID enthalten. Byte 164 ist wieder $A0. Die Bytes 165/166 enthalten im ASCII-Code die Zeichen »2A«. Dies ist wieder das Formatkennzeichen. »A« steht wieder für 1541-Format, die »2» bezeichnet die DOS-Version mit der gearbeitet wird (CBM-DOS V2.6). In den Bytes 167 bis 170 treffen wir wiederum auf den Wert $A0. Laut Floppy-Handbuch sind die restlichen Bytes nicht mehr von Bedeutung und enthalten den Wert $00. Auf manchen Disketten steht dort höchstens noch die Meldung »BLOCKS FREE« in den Bytes 180 bis 191.</p>
+
+            <p>Doch halt! Was sehen wir hier am Bildschirm? Klar und deutlich steht in den Bytes 173 bis 188 »geos FORMAT v1.0« Hieran erkennt Geos also, ob die eingelegte Diskette mit dem normalen CBM-DOS oder mit Geos formatiert wurde!</p>
+
+            <p>Machen wir mit dem so erarbeiteten Wissen also ein kleines Experiment. Formatieren Sie eine Diskette mit:</p>
+
+            <pre><code>OPEN1,8,15,"N:TESTDISK,TD"</code></pre>
+
+            <p>Starten Sie nun Geos und schließen die Originaldiskette mit dem CLOSE-Befehl aus dem DISK-Menü. Dann legen Sie die neu formatierte Diskette ein und melden Sie dem System mit dem OPEN-Befehl an. Sofort erscheint die Meldung: »This is a NON-GEOS disk«. Geos führt also bei jeder neu eingelegten Diskette eine Abfrage des Formats durch. Jetzt werden wir Geos überlisten: Verlassen Sie Geos und laden den Disk-Monitor. Lesen Sie nun von Ihrer Backup Diskette den BAM-Block 12/00 (hex.) und schreiben ihn an die gleiche Stelle mit dem Kommando w 12 00 auf die eben formatierte »TESTDISK« zurück. Nun laden Sie Geos erneut und versuchen, diese Diskette nochmals anzumelden. Sie werden staunen!</p>
+
+            <p>In der nächsten Ausgabe werden wir weiter eintauchen in die Tiefen des Geos-Systems. Sollten Sie sich durch unsere Anregungen zu weiteren Versuchen angeregt sehen, können Sie uns Ihre Ergebnisse gerne mitteilen.</p>
+
+            <address class="author">(sk)</address>
+
+            <p class="source">Info: Berkeley Softworks, 2150 Shattuck Avenue Berkeley, CA 94704, USA</p>
+        </section>
+    </article>
+</body>
+
+</html>
