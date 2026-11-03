@@ -56,6 +56,23 @@ usw.
 * Sonderheft 6/86 (Grafik): zwischen 16. Mai und 14. Juni 2026 <!-- wegen 7/86 -->
 * Sonderheft 7/86 (Peeks & Pokes): "Ende" Juni 2026 <!-- 8607/S.40 -->
 
+Ab Sonderheft 8 erscheinen sie **monatlich zum Monatsende**, zwölf im Jahr.
+Das Heft selbst läßt ab Nummer 8 die Jahreszahl weg ("Sonderheft 9"), die
+Bestellseiten schreiben weiter "9/86". Die Ankündigung steht jeweils im
+Aktuelles-Teil der Ausgabe, die kurz davor am Kiosk liegt.
+
+* Sonderheft 8/86 (Plus/4 und C16): "Ende" Juli 2026 <!-- 8608: "ab Ende Juli im Zeitschriftenhandel" -->
+* Sonderheft 9/86 (Floppy & Dateiverwaltung): wohl "Ende" August 2026 <!-- 8609/S.11 kündigt ohne Datum an, 8610 bestellbar; Muster SH8/SH10 -->
+* Sonderheft 10/86 (C 128 II): "Ende" September 2026 <!-- 8610: "gibt's ab Ende September 1986 an jedem Kiosk" -->
+* Sonderheft 11/86 (Grafik, Musik, Anwendung): "Ende" Oktober 2026 <!-- 8611: "Ende Oktober im Zeitschriftenhandel" -->
+* Sonderheft 12/86 (Assembler, Programmiersprachen): wohl "Ende" November 2026 <!-- keine Ankündigung gefunden; zwischen SH11 und SH13 -->
+* Sonderheft 13/86 (Hardware): "Ende" Dezember 2026 <!-- 8701: "gibt es ab Ende Dezember an jedem Kiosk" -->
+* Sonderheft 14 (C16, C116, Plus/4): "Ende" Januar 2027 <!-- 8702 -->
+* Sonderheft 15 (Floppy & Datasette): "Ende" Februar 2027 <!-- 8703 -->
+* Sonderheft 16 (C64-Einsteiger): "Ende" März 2027 <!-- 8704 -->
+* Sonderheft 17 (Spiele): "Ende" April 2027 <!-- 8705 -->
+* Sonderheft 18 (Drucker): "**Mitte**" Mai 2027 <!-- 8706: "ab Mitte Mai", nicht Ende -->
+
 usw.
 
 Auf der modernen Homepage gibt es
