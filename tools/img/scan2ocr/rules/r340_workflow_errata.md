@@ -293,3 +293,39 @@ commits as often as it likes — that is what makes a mistake recoverable mid
   a peer's go-ahead are all insufficient.
 
 Until that moment the honest report is the count: *"N commits unpushed."*
+
+## CITE THE RULE, NOT THE COMMIT — a build's commits do not survive its push
+
+`WORKFLOW_ERRATA.md` is the one artefact of a build that outlives it, and it is
+pushed. The commits it is written against are not: a finished issue goes to the
+remote as **one squashed commit**, so every build-local hash in the file is
+unreachable in any clone the moment it is published.
+
+MEASURED on 8701, 2026-11-03: of the 17 hashes its two errata files cite, **15
+had never been pushed** — and six already carried an `(was <older hash>)` note,
+because they had been rewritten once mid-build before the squash rewrote them
+again. The file documented its own references going stale twice and nobody read
+it as a warning.
+
+It did no harm there, for one reason only: **every citation carries a
+description beside the hash** — "r005 bed-strip floor 2 mm -> 0.5", "r240
+adjudicated banner shape". That sentence is what a later reader actually uses,
+and it leads to the rule file, which is pushed and is the authority. The hash
+led nowhere even before the squash.
+
+So, when recording that a finding was harvested:
+
+- **name the rule and its section** — `r005_masters_spread.py`, `BED_LUM` /
+  "the foot is BACKING, not necessarily a prop". That is stable, pushed, and
+  the thing a reader needs anyway.
+- a hash may go **beside** it as a convenience, never instead of it, and never
+  as "the fix is the commit, not a sentence here" — after the squash that
+  sentence is the only record, and it says nothing.
+- do not push a `pre-squash-<ID>` tag to rescue such citations. It uploads a
+  whole build's local history to make pointers resolvable whose content is
+  already in the rules. The tag is a local safety net for the squash, nothing
+  more.
+
+The general form, and it is the third time this archive has paid for it after
+the r330 remap and the LOG.md precedents: **a reference that is cheap to write
+goes stale silently.** Write the thing that will still be true.
