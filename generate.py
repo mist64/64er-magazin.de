@@ -865,7 +865,14 @@ class ArticleDatabase:
                 continue
 
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
-            if os.path.isdir(issue_dir_path) and (re.match(r'^\d{4}$', issue_dir_name) or re.match(r'^SH\d{4}$', issue_dir_name)):
+            # SH IDs COME IN TWO WIDTHS, BECAUSE THE MAGAZINE CHANGED ITS MIND.
+            # Sonderhefte 1/85-8/85 and 1/86-8/86 carry a year, so they are
+            # SH8501-SH8508 and SH8601-SH8608. From number 9 the cover dropped
+            # the year and simply counted on -- "Sonderheft 9", ... up to 97 --
+            # so those are SH09, SH10, ... Matching only \d{4} did not error on
+            # SH09: the directory was silently never an issue, which is the
+            # worst of the three possible outcomes.
+            if os.path.isdir(issue_dir_path) and (re.match(r'^\d{4}$', issue_dir_name) or re.match(r'^SH\d{2}(\d{2})?$', issue_dir_name)):
 
                 try:
                     issue = Issue(issue_dir_path)

@@ -56,10 +56,8 @@ usw.
 * Sonderheft 6/86 (Grafik): zwischen 16. Mai und 14. Juni 2026 <!-- wegen 7/86 -->
 * Sonderheft 7/86 (Peeks & Pokes): "Ende" Juni 2026 <!-- 8607/S.40 -->
 
-Ab Sonderheft 8 erscheinen sie **monatlich zum Monatsende**, zwölf im Jahr.
-Das Heft selbst läßt ab Nummer 8 die Jahreszahl weg ("Sonderheft 9"), die
-Bestellseiten schreiben weiter "9/86". Die Ankündigung steht jeweils im
-Aktuelles-Teil der Ausgabe, die kurz davor am Kiosk liegt.
+Ab Sonderheft 8 monatlich, zwölf im Jahr; ab Nummer 8 ohne Jahreszahl im Titel
+("Sonderheft 9"), auf den Bestellseiten weiter "9/86".
 
 * Sonderheft 8/86 (Plus/4 und C16): "Ende" Juli 2026 <!-- 8608: "ab Ende Juli im Zeitschriftenhandel" -->
 * Sonderheft 9/86 (Floppy & Dateiverwaltung): wohl "Ende" August 2026 <!-- 8609/S.11 kündigt ohne Datum an, 8610 bestellbar; Muster SH8/SH10 -->
@@ -71,7 +69,18 @@ Aktuelles-Teil der Ausgabe, die kurz davor am Kiosk liegt.
 * Sonderheft 15 (Floppy & Datasette): "Ende" Februar 2027 <!-- 8703 -->
 * Sonderheft 16 (C64-Einsteiger): "Ende" März 2027 <!-- 8704 -->
 * Sonderheft 17 (Spiele): "Ende" April 2027 <!-- 8705 -->
-* Sonderheft 18 (Drucker): "**Mitte**" Mai 2027 <!-- 8706: "ab Mitte Mai", nicht Ende -->
+* Sonderheft 18 (Drucker): "Mitte" Mai 2027 <!-- 8706: "ab Mitte Mai" -->
+* Sonderheft 19 (Einsteiger): **unbekannt**, wohl Juni 2027 <!-- keine Ankündigung gefunden; zwischen SH18 und SH20 -->
+* Sonderheft 20 (Grafik): "Mitte" Juli 2027 <!-- 8708: "gibt es ab Mitte Juli im Zeitschriftenhandel" -->
+* Sonderheft 21 (Basic und Assembler): "Ende" August 2027 <!-- 8709: "Das Sonderheft 12 »Basic und Assembler« ist ab Ende August erhältlich" — die 12 ist ein OCR-Fehler für 21 -->
+* Sonderheft 22 (128'er): "Mitte" September 2027 <!-- 8710: "Das Sonderheft 22 ist ab Mitte September erhältlich" -->
+* Sonderheft 23 (Grafik, Anwendung): Oktober 2027, Tag unbekannt <!-- keine Ankündigung in 11/87; Monat sicher, weil SH22 Mitte Sept. 87 und SH26 der 28.1.88 ist und monatlich gezählt wird -->
+* Sonderheft 24 (Tipps, Tricks & Tools): November 2027, Tag unbekannt <!-- wie SH23 -->
+* Sonderheft 25 (Floppy-Laufwerke): Dezember 2027, Tag unbekannt <!-- wie SH23 -->
+* Sonderheft 26 (C 64 verständlich für alle): 28. Januar 2028 <!-- 8802: "wird ab 28. Januar erhältlich sein" -->
+* Sonderheft 29 (128'er): 28. April 2028 <!-- 8805: "ab dem 28.4.88" -->
+* Sonderheft 30 (Spiele): 27. Mai 2028 <!-- 8806: "ab dem 27.5.88" -->
+* Sonderheft 31 (DFÜ, Musik, MSR): 1. Juli 2028 <!-- 8807: "ab dem 01.07.88" -->
 
 usw.
 
