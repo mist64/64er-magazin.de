@@ -120,9 +120,9 @@ MATCH_MIN = 0.55
 # folio fragment is noise in the comparison, not evidence about the pipeline.
 MIN_TOKENS = 4
 
-TRUTH_PROMPT = """Transcribe the ARTICLE TEXT from the page image.
+TRUTH_PROMPT = f"""Transcribe the ARTICLE TEXT from the page image.
 
-This is a page of the German computer magazine "64'er", issue 9/September 1986.
+This is a page of the German computer magazine "64'er", {ISS.self_phrase}.
 
 INCLUDE, in the order a person reads them:
 - article headlines, standfirsts and subheads
@@ -133,7 +133,7 @@ EXCLUDE completely:
 - advertising of any kind, including the publisher's own subscription, club or
   order promotions, coupons and small classified ads
 - the running head at the top (section name, machine tag like "C 64")
-- the folio line at the foot (page number, "Ausgabe 9/September 1986")
+- {ISS.folio_hint}
 - figure and table captions ("Bild 3. ...", "Tabelle 1. ...")
 - standalone type-in listings: BASIC listings and hex dumps printed for the
   reader to key in, usually boxed and captioned "Listing 1. ..."

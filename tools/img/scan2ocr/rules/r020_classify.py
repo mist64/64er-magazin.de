@@ -170,8 +170,12 @@ COLOURS = {
     "sliver": (120, 120, 120), "noise": (200, 200, 200), "other": (90, 90, 90),
 }
 
-PROMPT = """You are labelling one page of the German home-computer magazine "64'er",
-issue 9/September 1986, so that its ARTICLE TEXT can be extracted into a corpus.
+# THE PROMPT NAMES THE ISSUE IT IS ACTUALLY READING.  Hardcoded as 8609's
+# "issue 9/September 1986" until 2026-11-03, so every page of every issue built
+# since 8609 was introduced to the model as September 1986 -- all 448 of 8701's
+# calls among them.  See Issue.label in r000_issue.py.
+PROMPT = f"""You are labelling one page of the German home-computer magazine "64'er",
+{ISS.self_phrase}, so that its ARTICLE TEXT can be extracted into a corpus.
 
 Two inputs describe the same page:
 1. The block digest below. Coordinates are fractions of the page (0,0 = top left).
@@ -222,7 +226,7 @@ Assign a final label to every block id. Valid labels:
                       corpus, which is how 8610 and SH8601 came to have their
                       Impressum rebuilt BY HAND and 8611 lost p187.
   header              running head at the top (section name, machine tag)
-  footer              folio line at the foot (page number, "Ausgabe 9/September 1986")
+  footer              {ISS.folio_hint}
   sliver              text belonging to the FACING page, caught at the extreme
                       left or right edge because the scan is not cropped
   noise               OCR garbage read out of a photo or a screened tint, AND
@@ -639,6 +643,17 @@ def process(page):
     rec["roles"] = verdict.get("roles")
     rec["reads"] = verdict.get("reads")
     rec["prompt_key"] = PROMPT_KEY
+    # WHAT PRODUCED THIS, IN THE ARTEFACT.  These labels are a model's
+    # judgement, and until 2026-11-03 nothing recorded WHICH model.  That is
+    # why `_call_cli` falling to the session's default went unnoticed across
+    # FIVE issues -- SH8605, SH8606, SH8607, SH8608 and 8701 were all labelled
+    # by Fable, against the Opus this chain specifies two lines above its MODEL
+    # constant, and it surfaced only when Fable ran out of tokens. The
+    # substitution was wrong AND invisible; only the second let it last.
+    # One line in the file it produced would have shown it the first time
+    # anyone opened one.
+    rec["model"] = llm.MODEL
+    rec["transport"] = llm.transport()
 
     json.dump(rec, open(os.path.join(OUT_DIR, stem + ".labels.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
@@ -758,11 +773,32 @@ def page_paragraphs(rec, stem=""):
 def safe(page):
     try:
         process(page)
+        return None
     except Exception as e:                      # one bad page must not stop 176
         print(f"p{page:03d}: FAILED {type(e).__name__}: {e}", flush=True)
+        return (page, f"{type(e).__name__}: {e}")
 
 
 if __name__ == "__main__":
     pages = [int(a) for a in sys.argv[1:]]
     with ThreadPoolExecutor(max_workers=LANES) as ex:
-        list(ex.map(safe, pages))
+        failed = [f for f in ex.map(safe, pages) if f]
+
+    # A STEP THAT FAILS 128 OF 192 PAGES MUST NOT EXIT 0.
+    # One bad page must not stop the other 191 -- that is why `safe` swallows
+    # the exception -- but swallowing it and then exiting 0 tells every caller
+    # the step succeeded.  MEASURED on 8701, 2026-11-03: the model's usage
+    # credits ran out mid-run, all 128 re-asked pages failed with "You're out
+    # of usage credits", and this exited 0 with 128 FAILED lines in its own
+    # output.  The issue was then left with new blocks and STALE LABELS, which
+    # is worse than not having run at all, and nothing downstream could tell.
+    # The same hollow pass r320 refuses, in the step that feeds it.
+    if failed:
+        print(f"\n{len(failed)} of {len(pages)} page(s) FAILED -- their labels "
+              f"are now STALE against their blocks. Do not run 030 or the "
+              f"coverage check until they are re-run.", file=sys.stderr)
+        for pg, why in failed[:10]:
+            print(f"  p{pg:03d}: {why}", file=sys.stderr)
+        if len(failed) > 10:
+            print(f"  ... and {len(failed) - 10} more", file=sys.stderr)
+        sys.exit(1)

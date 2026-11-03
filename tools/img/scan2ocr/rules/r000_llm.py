@@ -42,6 +42,36 @@ from PIL import Image
 MODEL = "claude-opus-5"
 MAX_TOKENS = 8000
 
+# NAME THE MODEL ON EVERY PATH, AND NEVER LET IT BE FABLE.
+# `_call_api` passed `model=MODEL`; `_call_cli` passed nothing, so the CLI used
+# whatever the invoking session's default was.  MEASURED on 8701, 2026-11-03:
+# step 020 failed on all 128 re-asked pages with "You're out of usage credits"
+# while the supervising session's own calls succeeded, for hours, because the
+# CLI path had silently fallen to Fable and Fable's tokens were exhausted.
+# Nothing in the error said which model it was, so it read as an account-wide
+# outage.  Owner: "make sure to exclude fable from all work. when calling
+# claude CLI, explicitly state the desired model, and it must exclude fable."
+#
+# An unnamed model is not a cheaper version of the right answer -- it is a
+# different judgement, from a tier this rule chose against on purpose (see the
+# note above MODEL), arriving with nothing to mark it as such.
+FORBIDDEN_MODELS = ("fable",)
+
+
+def _check_model(name):
+    low = (name or "").lower()
+    for bad in FORBIDDEN_MODELS:
+        if bad in low:
+            raise RuntimeError(
+                f"r000_llm: MODEL is {name!r}, which contains {bad!r}. "
+                f"This chain does not use it for any step -- the page "
+                f"classification and boundary calls are judgement calls the "
+                f"cheaper tiers get wrong. Set MODEL to an Opus or Sonnet id.")
+    return name
+
+
+_check_model(MODEL)
+
 # The SDK already retries 429 and 5xx with exponential backoff; this raises its
 # default of 2 because a sweep is 176 calls deep and a single give-up costs a
 # whole page.
@@ -182,7 +212,10 @@ def _call_cli(instructions, payload, image_path, cwd):
     # points at /Users/mist/DNB/<ISSUE>/tmp).  Without this the classify pass
     # fails on every page with "outside working dir, permission not granted"
     # and falls back to judging the digest with no picture at all.
-    argv = [CLAUDE, "-p", prompt, "--output-format", "text"]
+    # --model, ALWAYS.  Without it the CLI takes the invoking session's
+    # default; see FORBIDDEN_MODELS above for what that cost on 8701.
+    argv = [CLAUDE, "-p", prompt, "--model", _check_model(MODEL),
+            "--output-format", "text"]
     if image_path:
         argv[1:1] = ["--add-dir", str(os.path.dirname(os.path.abspath(image_path)))]
     for attempt in range(RETRIES):

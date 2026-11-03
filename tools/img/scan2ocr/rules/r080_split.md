@@ -385,6 +385,72 @@ banner to an `<h2>` at the seam, so the file keeps exactly one `<h1>`.
   fingerprint of a deliberate pair.
 
 
+### a/b FOLLOWS THE READING ORDER — PROMINENCE IS NOT ORDER
+
+When two articles start on one page they are lettered `NNNa` / `NNNb`, and the
+letter follows **the printed reading order: column by column, left to right.**
+A banner that starts at the top right is not first because it is bigger.
+
+MEASURED on 8701, where two of the three lettered pairs were reversed and both
+the same way — the big banner lettered `a`, the left-column piece `b`:
+
+| page | was | is | the print |
+|---|---|---|---|
+| 144 | Axt im Haus `144a`, Bücher `144b` | **Bücher `144a`**, Axt `144b-146` | the Bücher review, its cover and its byline are the LEFT column; *»Die Axt im«* banners across the top right |
+| 8 | Unter die Lupe `8a`, editorial `8b` | **editorial `8a`**, Unter die Lupe `8b-10` | the editorial is the LEFT column; *»UNTER DIE LUPE GE…«* starts top right |
+
+**AND THE LETTER IS NOT COSMETIC.** `generate.py` sorts articles on
+`(first_page_number(), pages_raw)`, and `pages_raw` carries the letter — so the
+letter decides the order within a page, that order becomes `sort_index`, and
+`sort_index` sets each article's staggered publish time across the month and
+its place in the issue sequence. On 8701 the editorial, which carries
+`category_index −1`, still sorted AFTER the article beside it, because the page
+key is compared first. A wrong letter publishes two articles in the wrong order.
+
+Nothing checks this: neither r080 nor r310 looks at letter order. It was found
+by the owner opening a page.
+
+**The principle is the same one as the section below.** The contents page
+indexes but does not define; prominence ranks but does not order. Both are the
+magazine telling you what it thought was IMPORTANT, and neither is evidence
+about SEQUENCE or about what a thing IS. The page decides, by position and by
+measurement.
+
+### THE CONTENTS PAGE INDEXES; IT DOES NOT DEFINE
+
+**A printed TOC entry does not make an article. Measure the heading.**
+
+MEASURED on 8701 p44: the yellow box *»99 Spiele für Ihre Meinung«* was split
+into its own file because the printed contents lists it under *Wettbewerbe*.
+Nobody measured it. Its heading is **124 px** against the host article's
+**524 px** banner, and **106 px** for that article's own section head on the
+same page — a section head to within the noise. The content agrees: same
+byline, and the host's closing sentence points straight at it (*"Wer anderer
+Meinung ist, sollte deswegen gleich den nächsten Artikel lesen"*). It is a box
+inside *Computerspiele des Jahres 1986*, and the owner said so on sight.
+
+**This is the third instance of one principle in a single build**, so it is
+written here, in r030 and in r000:
+
+| where | what the contents page was allowed to decide | what it cost |
+|---|---|---|
+| r030 | an article's `<h1>` | two headlines replaced by contents wording (Dame, Super-ROM) |
+| the site index | how an article is listed | the owner could not find *"Unter die Lupe genommen"* by its printed name and reported it missing |
+| r080 | whether a box is an article | p44 split out of its host |
+
+The contents page is evidence about what the magazine considered notable. It is
+never evidence about what the page IS. **The page decides, by measurement.**
+
+Keep the printed entry in `toc_entries.txt` either way — it is a transcription,
+and after a merge the site TOC and the printed contents simply differ, which is
+allowed and is the same arrangement an omitted article uses (`omitted-<page>`
+in `adjudicated.txt`, see r100).
+
+**AND A RULE THAT IS CORRECT BUT NEVER RUN LOOKS EXACTLY LIKE A RULE THAT IS
+ABSENT.** The size test below did not fail on p44 — it was skipped. The tell
+was in the issue's own LOG: step 080's entry does not mention p44 at all. When
+a split looks wrong, check first whether the measurement was made.
+
 ### Heading SIZE decides article vs. section — measure it, don't guess
 
 Within a rubric like *Aktuelles* the news items carry small headings while a

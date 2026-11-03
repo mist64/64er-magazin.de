@@ -1149,8 +1149,17 @@ def fit_foot(geoms):
     return med, replaced, outliers
 
 
-BED_RUN_FRAC = 0.9           # a column/row this much backing counts as bed
-BED_RUN_LOOK_MM = 2.0        # a bed run from an edge wider than this: LOOK AT
+# MEASURED on 8701's finished masters, which is the wrong time to find out.
+# Three carry a backing-coloured strip at an edge and NONE was reported:
+# p028 right 0.8 mm over 98 % of the rows, p147 left 1.9 mm over 49 %, p103
+# left 0.7 mm over 47 % -- the last of them the yellow prop, which came in
+# because p103's fold was never found (`fold none`) so the inner side was not
+# cut.  The check saw all three and dismissed them: the width floor was 2.0 mm
+# and the height fraction 0.9.  A prop strip does not have to be wide to be
+# wrong, and it does not have to run the full page: 0.7 mm of prop at 600 dpi
+# is 17 px of saturated yellow down half a published page.
+BED_RUN_FRAC = 0.4           # a column/row this much backing counts as bed
+BED_RUN_LOOK_MM = 0.5        # a bed run from an edge wider than this: LOOK AT
 
 
 # THE CLIP IS RIGID: FILL ALL SIX PUNCHES, NOT THE ONES THE FINDER LISTED.
@@ -1210,14 +1219,104 @@ def punch_priors(geoms):
         m, _, sh = template_score([c[1] for c in f["holes"]])
         if sh is not None:
             shift.append(sh)
-    return float(np.median(dist)), float(np.median(shift))
+    return float(np.median(dist)), float(np.median(shift)), float(np.percentile(dist, 5))
+
+
+# A FOLD THAT DID NOT COME FROM THE HOLES IS NOT A FOLD.  MEASURED on 8701:
+# the colour-boundary fallback put p092's fold 1.2 mm from the inner frame edge
+# and p178's 0.8 mm -- it found the FAR side of the neighbour's white margin --
+# and a page with no fold at all (p103, p111, p120, p147, p179) defaulted to
+# the frame edge.  On a page anchored on its edges the window IS placed on the
+# fold, so each of those masters was shifted about 10 mm into the neighbour's
+# margin and lost the same at its outer trim (owner: "p92 cut wrong",
+# "178/179 were cropped wrong. the black vs. white is the border").
+# The clip is rigid, so where the holes did not give the fold, it is placed:
+#   - on a FULL-BLEED page, where the ink stops (owner's ruling): per row, the
+#     first run of FOLD_INK_RUN_MM that is >= FOLD_INK_FRAC ink, counted from
+#     the inner frame edge; the neighbour's sparse type in its margin never
+#     makes such a run.  MEASURED: p178 at x 5000 (ink ends 4984 by eye),
+#     p179 at 237 (248), p147 8.4 mm in.
+#   - otherwise, and wherever the ink stop or a colour fold lands outside
+#     FOLD_BAND_MM of the issue's median hole-fold distance: AT that median.
+#     MEASURED hole folds p5-p95 8.2-12.5 mm, median 10.26.
+# A colour fold INSIDE the band is kept: p014/046/050 at 10.4-11.2 mm agree
+# with the holes.  The ink stop reads 0 where the bed or the neighbour's own
+# ink runs to the frame edge (p001, p029), which the band rejects.
+FOLD_BAND_MM = 3.0           # accepted within this of the issue median hole-fold distance
+FOLD_INK_BAND_MM = 25.0      # search this far in from the inner frame edge
+FOLD_INK_RUN_MM = 3.0        # a run this long...
+FOLD_INK_FRAC = 0.85         # ...this much ink is this page's art
+FOLD_INK_LUM = 170           # ink: darker than this
+FOLD_INK_CHROMA = 40         # ...or this saturated
+
+
+def ink_stop_mm(rgb, par):
+    """Median distance (mm) from the inner frame edge to where this page's ink starts, or None."""
+    h, w = rgb.shape[:2]
+    lum = rgb.mean(2)
+    chroma = rgb.max(2).astype(int) - rgb.min(2)
+    ink = (lum < FOLD_INK_LUM) | (chroma > FOLD_INK_CHROMA)
+    b, run = int(FOLD_INK_BAND_MM * MM), int(FOLD_INK_RUN_MM * MM)
+    strip = ink[:, w - b:][:, ::-1] if par == "even" else ink[:, :b]
+    xs = []
+    for y in range(int(h * .05), int(h * .95), 20):
+        c = np.convolve(strip[y].astype(float), np.ones(run) / run, mode="valid")
+        idx = np.flatnonzero(c >= FOLD_INK_FRAC)
+        if len(idx):
+            xs.append(idx[0])
+    if len(xs) < 20:
+        return None
+    xs = np.asarray(xs, float)
+    med = np.median(xs)
+    return float(np.median(xs[np.abs(xs - med) < 1.5 * MM])) / MM
+
+
+def fold_fallback(g, rgb, priors):
+    """Re-place a fold that did not come from the holes; return a NOTE or None."""
+    f = g["fold"]
+    if f["source"] in ("holes", "inkstop", "p5", "median"):
+        return None                                       # from the holes, or placed by a previous cut
+    w, h = g["sheet_px"]
+    dist_mm = priors[0]
+    cur = None
+    if f["poly"]:
+        x = float(np.polyval(f["poly"], h / 2.0))
+        cur = (w - 1 - x) / MM if g["parity"] == "even" else x / MM
+    src, new = None, None
+    if g["edges"]["source"] in ("fullbleed", "narrow"):
+        d = ink_stop_mm(rgb, g["parity"])
+        if d is not None and abs(d - dist_mm) <= FOLD_BAND_MM:
+            src, new = "inkstop", d
+    if new is None:
+        if cur is not None and abs(cur - dist_mm) <= FOLD_BAND_MM:
+            return None                                   # a colour fold that agrees
+        # WHERE THE LINE ONLY MASKS, GUESS ON THE REVERSIBLE SIDE.  On a page
+        # anchored on its wordmark the window is already right and the fold
+        # only decides the neighbour-side mask.  Too far IN paints this page's
+        # own inner margin white -- invisible and irreversible; too far OUT
+        # leaves a sliver of the neighbour's margin, which the strip and BED
+        # checks can see.  So a logo-anchored page takes the p5 of the hole
+        # folds; an edges-anchored page, where the line PLACES the window and
+        # the error is symmetric, takes the median (control, 2026-11-03).
+        if g.get("anchor"):
+            src, new = "p5", priors[2]
+        else:
+            src, new = "median", dist_mm
+    x = (w - 1 - new * MM) if g["parity"] == "even" else new * MM
+    f["poly"] = [0.0, float(x)]
+    f["tilt_deg"] = 0.0                                   # a placed line is vertical
+    old = f["source"]
+    f["source"] = src
+    return (f"FOLD re-placed ({old} -> {src}): {new:.2f} mm from the inner frame edge"
+            + ("" if cur is None else f", was {cur:.2f} mm")
+            + f" (issue median hole fold {dist_mm:.2f} mm, band +-{FOLD_BAND_MM})")
 
 
 def fill_punches(g, gray, priors):
     """Add every visible clip punch to g["fold"]["holes"]; return (kept, found, none)."""
     w, h = g["sheet_px"]
     f = g["fold"]
-    dist_mm, shift_mm = priors
+    dist_mm, shift_mm = priors[0], priors[1]
     if f["poly"]:
         fold_x = lambda y: float(np.polyval(f["poly"], y))
         win_x = PUNCH_WIN_X_MM
@@ -1301,16 +1400,168 @@ def fill_punches(g, gray, priors):
     return kept, found, none
 
 
-def cut_page(geom, fit, sheet600):
+# PIN THE WINDOW WHERE A WRONG EDGE COSTS CONTENT; LET THE SLACK FALL WHERE IT
+# ONLY FABRICATES WHITE (owner, 2026-11-03).  At the gutter both directions of
+# error cost content: short of the fold loses this page's own ink, past it
+# brings in the neighbour's (8701 p178 carried 10.4 mm of p179 with readable
+# type; p009/p010/p016 lost 1.3-2.7 mm of their inked gutter).  At the
+# fore-edge a window placed from the fold can only OVERHANG -- it is a fixed
+# 210 mm and no page is wider -- so its error there is white over blank paper.
+# The wordmark does not remove the print-to-trim offset; it only chooses where
+# the error lands, and it splits it across both edges including the costly one.
+# MEASURED: the wordmark-to-fold distance is BIMODAL, split at the centre
+# spread -- about 187.3 mm on pages of the front half, 183.5 mm on the back
+# half, sd ~1 mm within each -- in 8701, 8611 and 8612 alike (8611/8612 from
+# their cut-time sidecars under /Users/mist/DNB/861x/tmp/geometry, re-measured
+# on 16 pages with this code to 0.00 mm).  One (S, B) per parity sits between
+# the modes: on 8701, 92 of 115 pages with a certified fold were >= 0.5 mm off
+# it under the wordmark; placed on the fold, 0 lost type at either edge, 39
+# gained 0.5-4.2 mm of white beyond the scan frame at the fore-edge.
+# So x comes from the fold wherever the fold is CERTIFIED; y stays on the
+# wordmark (logo to bottom trim is unimodal, sd ~0.9 mm: head and foot are
+# trimmed on the folded stack, common to both pages of a sheet).  A fold that
+# is not certified keeps the wordmark's x, and the FOLD GATE says LOOK AT.
+# 8609-8612 were cut on the wordmark and are NOT re-cut (owner: a pass over old
+# issues is theirs to start).
+FOLD_CERT_TEMPLATE = 4       # clip-template rows matched, at least
+FOLD_CERT_MM = (6.0, 14.0)   # from the inner frame edge (hole folds measured 8.1-13.3)
+FOLD_GATE_MM = 0.5           # master gutter edge vs the certified fold
+
+
+def fold_mid_x(geom):
+    w, h = geom["sheet_px"]
+    return float(np.polyval(geom["fold"]["poly"], h / 2.0)) if geom["fold"]["poly"] else None
+
+
+def fold_certified(geom):
+    """The fold is from the clip's holes, matches the template, and sits where folds sit."""
+    f = geom["fold"]
+    x = fold_mid_x(geom)
+    if f["source"] != "holes" or x is None or (f.get("template") or 0) < FOLD_CERT_TEMPLATE:
+        return False
+    w, _ = geom["sheet_px"]
+    d = (w - 1 - x) / MM if geom["parity"] == "even" else x / MM
+    return FOLD_CERT_MM[0] <= d <= FOLD_CERT_MM[1]
+
+
+def fold_gate(geom, x0, logo_x0):
+    """(verdict, note): the master's gutter edge against the certified fold."""
+    x = fold_mid_x(geom)
+    if not fold_certified(geom):
+        return "LOOK AT", (f"FOLD GATE: LOOK AT -- the fold is not certified "
+                           f"({geom['fold']['source']}), so nothing checks the gutter edge")
+    gutter = x0 + MASTER_W_PX if geom["parity"] == "even" else x0
+    off = (gutter - x) / MM
+    extra = "" if logo_x0 is None else f"; the wordmark would have put it {(logo_x0 - x0) / MM:+.2f} mm"
+    if abs(off) <= FOLD_GATE_MM:
+        return "PASS", f"FOLD GATE: pass, gutter edge {off:+.2f} mm from the fold{extra}"
+    return "LOOK AT", (f"FOLD GATE: LOOK AT -- gutter edge {off:+.2f} mm from the "
+                       f"certified fold (> {FOLD_GATE_MM}){extra}")
+
+
+# THE GATE ABOVE MEASURES ITS OWN ARITHMETIC ON A CERTIFIED PAGE: x0 was set
+# from the fold, so "gutter vs fold" is zero by construction (control,
+# 2026-11-03).  It only says whether anything vouches for the gutter.  What
+# reads the ARTEFACT is the gutter white margin of the cut master -- master
+# edge to this page's first ink, the GUTTER_MARGIN_PCT percentile over rows --
+# against the median of its own half's certified pages.  A window past the
+# fold shows as too much white (8701 p110/p112 on the plain fit: 12.2 / 11.6 mm
+# against the back half's 8.7); a window short of it eats the margin.  Ink to
+# the gutter (art, a bleed) reads under GUTTER_ART_MM and is reported apart:
+# it cannot be told from a cut margin by the master alone.
+GUTTER_STRIP_MM = 30.0       # look this far in from the gutter edge
+GUTTER_INK_LUM = 140         # ink: darker than this (grey of the master)
+GUTTER_MARGIN_PCT = 5        # percentile over rows of the first-ink distance
+GUTTER_ART_MM = 3.0          # a margin under this is ink to the gutter
+GUTTER_MAD_K = 4.0           # LOOK AT beyond this many MADs of the certified pages
+
+
+def gutter_margin_mm(master, parity):
+    """Master edge to first ink at the gutter, mm (percentile over rows), or None."""
+    g = master[::2, ::2].mean(2)                              # 300 dpi grey
+    n = int(GUTTER_STRIP_MM * MM / 2)
+    y0, y1 = int(g.shape[0] * .06), int(g.shape[0] * .94)
+    strip = g[y0:y1, -n:][:, ::-1] if parity == "even" else g[y0:y1, :n]
+    # a speck at the edge is not a margin: 8701 p014's 1 px mark at the gutter
+    # read 0.17 mm against a 10.4 mm margin until opened away
+    ink = ND.binary_opening(strip < GUTTER_INK_LUM, np.ones((3, 3), bool))
+    has = ink.any(1)
+    if has.sum() < 50:
+        return None
+    return float(np.percentile(np.argmax(ink, 1)[has], GUTTER_MARGIN_PCT)) / (MM / 2)
+
+
+def gutter_verdicts(margins, certified, n_pages):
+    """{page: verdict}, and the per-half baseline: median and MAD over the
+    certified pages whose margin is not ink to the gutter."""
+    base = {}
+    for half in ("front", "back"):
+        v = [m for s, m in margins.items() if s in certified and m is not None
+             and m >= GUTTER_ART_MM and ((int(s) <= n_pages // 2) == (half == "front"))]
+        if v:
+            med = float(np.median(v))
+            base[half] = (med, float(np.median(np.abs(np.asarray(v) - med))) * 1.4826)
+    out = {}
+    for s, m in margins.items():
+        half = "front" if int(s) <= n_pages // 2 else "back"
+        if m is None:
+            out[s] = "no ink in the gutter strip"
+        elif m < GUTTER_ART_MM:
+            out[s] = "ink to the gutter"
+        elif half in base and abs(m - base[half][0]) > GUTTER_MAD_K * base[half][1]:
+            out[s] = f"LOOK AT: {m - base[half][0]:+.2f} mm off the {half} half's mode"
+        else:
+            out[s] = "ok"
+    return out, base
+
+
+def half_of(geom, n_pages):
+    return "front" if geom["page"] <= n_pages // 2 else "back"
+
+
+def half_offsets(geoms, fit):
+    """Median (wordmark-placed x0 - fold-placed x0) in px per (half, parity),
+    over the logo pages with a certified fold."""
+    acc = {}
+    for g in geoms:
+        if not g["anchor"] or not fold_certified(g):
+            continue
+        fx = fold_mid_x(g)
+        lx = g["anchor"]["x"] - fit[g["parity"]][0]
+        f0 = fx - MASTER_W_PX if g["parity"] == "even" else fx
+        acc.setdefault((half_of(g, len(geoms)), g["parity"]), []).append(lx - f0)
+    return {k: float(np.median(v)) for k, v in acc.items()}
+
+
+def cut_page(geom, fit, sheet600, halves=None, n_pages=None):
     """The master: sheet600 with the unknown painted white, cut to the window."""
     notes = list(geom["notes"])
     w, h = geom["sheet_px"]
     source, ax, ay = anchor_of(geom)
+    logo_x0 = None
     if source == "logo":
         S_, B_ = fit[geom["parity"]]
         x0, y0 = int(round(ax - S_)), int(round(ay - B_))
+        if fold_certified(geom):
+            logo_x0 = x0
+            fx = fold_mid_x(geom)
+            x0 = int(round(fx - MASTER_W_PX if geom["parity"] == "even" else fx))
+        elif halves:
+            # NO CERTIFIED FOLD: the wordmark, less its own half's offset.  The
+            # one (S, B) per parity sits between the two modes, so a back-half
+            # page placed on it alone is ~4 mm off (8701 p110/p112: gutter
+            # margin 12.2/11.6 mm against the half's 8.7).
+            k = (half_of(geom, n_pages), geom["parity"])
+            if k in halves:
+                x0 = int(round(x0 - halves[k]))
+                notes.append(f"WINDOW x: no certified fold -- the wordmark, corrected by "
+                             f"the {k[0]}-half {k[1]} median wordmark-to-fold offset "
+                             f"{halves[k] / MM:+.2f} mm")
     else:
         x0, y0 = int(round(ax)), int(round(ay))
+    verdict, gnote = fold_gate(geom, x0, logo_x0)
+    notes.append(gnote)
+    geom["_gate"] = (verdict, None if logo_x0 is None else (logo_x0 - x0) / MM)
     u = unknown_mask(geom)
     painted = sheet600[:h, :w].copy()
     painted[u] = 255
@@ -1361,24 +1612,33 @@ def cut():
           f"{FOOT_OUTLIER_MM} mm from the median): "
           f"{[('%03d' % p, d) for p, d in foot_out] or 'none'}", flush=True)
     fit = fit_window(geoms)
+    halves = half_offsets(geoms, fit)
+    print("wordmark-to-fold, median per half and parity (mm): " + ", ".join(
+        f"{k[0]} {k[1]} {v / MM:+.2f}" for k, v in sorted(halves.items())), flush=True)
     priors = punch_priors(geoms)
     print(f"punches: issue fold distance {priors[0]:.2f} mm, template shift "
           f"{priors[1]:.2f} mm", flush=True)
     OUT_MASTER.mkdir(parents=True, exist_ok=True)
     report = {"fit": {k: list(v) for k, v in fit.items() if k != "stats"},
+              "half_offsets_mm": {f"{a} {b}": v / MM for (a, b), v in halves.items()},
               "stats": fit["stats"], "pages": {},
               "foot": {"median_mm": foot_med, "replaced": foot_replaced,
                        "outliers": foot_out}}
+    look, margins = [], {}
     for g in geoms:
         stem = f"{g['page']:03d}"
         sheet = np.array(Image.open(OUT_SHEET600 / f"{stem}.png").convert("RGB"))
+        fnote = fold_fallback(g, sheet, priors)
+        if fnote:
+            g.setdefault("notes", []).append(fnote)
+            (OUT_GEOM / f"{stem}.json").write_text(json.dumps(g, indent=1))
         kept, found, none = fill_punches(g, sheet.mean(2), priors)
         if found:
             g.setdefault("notes", []).append(
                 f"PUNCHES: {kept} detected, {found} more found at the clip "
                 f"template's rows and filled, {none} not visible")
             (OUT_GEOM / f"{stem}.json").write_text(json.dumps(g, indent=1))
-        master, frac, notes = cut_page(g, fit, sheet)
+        master, frac, notes = cut_page(g, fit, sheet, halves, len(geoms))
         source, ax, ay = anchor_of(g)
         stamp = stamp_text(VARIANT, **{
             "page": f"{stem} of {ISSUE}", "phase": "cut",
@@ -1398,19 +1658,50 @@ def cut():
                        if source == "logo" else
                        f"edges: window top-left ({ax:.0f}, {ay:.0f}) from fold + bottom trim"),
             "window": f"S {fit[g['parity']][0]} B {fit[g['parity']][1]} ({g['parity']})"
+                      + ("" if source != "logo" or not fold_certified(g)
+                         else " -- x from the certified fold, y from S B")
                       + ("" if source == "logo" else " -- not used: edges anchor"),
             "unknown": f"{frac:.2%} of the window is fabricated white",
             "notes": "; ".join(notes) or "(none)",
         })
         save_master(master, OUT_MASTER / f"{stem}.png", stamp)
+        margins[stem] = gutter_margin_mm(master, g["parity"])
         (OUT_MASTER / f"{stem}.stamp.txt").write_text(stamp, encoding="utf-8")
+        verdict, logo_off = g.pop("_gate")
         report["pages"][stem] = {"anchor": source, "fold": g["fold"]["source"],
-                                 "unknown": frac}
+                                 "unknown": frac, "fold_gate": verdict,
+                                 "logo_minus_fold_x0_mm": logo_off}
+        if verdict != "PASS":
+            look.append(stem)
         print(f"p{stem}: anchor {source} | fold {g['fold']['source']} | "
               f"unknown {frac:.2%}" + "".join(f"\n      NOTE p{stem}: {n}" for n in notes),
               flush=True)
+    certified = {s for s, v in report["pages"].items() if v["fold_gate"] == "PASS"}
+    gv, base = gutter_verdicts(margins, certified, len(geoms))
+    for s, v in report["pages"].items():
+        v["gutter_margin_mm"], v["gutter"] = margins.get(s), gv.get(s)
+    report["gutter"] = {"baseline_mm": {k: {"median": a, "sd_mad": b} for k, (a, b) in base.items()},
+                        "k_mad": GUTTER_MAD_K,
+                        "look_at": [s for s, v in gv.items() if v.startswith("LOOK AT")],
+                        "ink_to_gutter": [s for s, v in gv.items() if v == "ink to the gutter"]}
+    offs = [v["logo_minus_fold_x0_mm"] for v in report["pages"].values()
+            if v["logo_minus_fold_x0_mm"] is not None]
+    report["fold_gate"] = {"look_at": look, "logo_minus_fold_x0_mm": {
+        "n": len(offs), "median": float(np.median(offs)) if offs else None,
+        "sd": float(np.std(offs)) if offs else None,
+        "off_ge_0.5mm": sum(abs(o) >= FOLD_GATE_MM for o in offs)}}
     (OUT_GEOM / "fit.json").write_text(json.dumps(report, indent=1))
     print("fit:", json.dumps(report["fit"]), json.dumps(report["stats"]), flush=True)
+    print(f"FOLD GATE: {len(look)} page(s) LOOK AT: {' '.join(look) or 'none'}; "
+          f"the wordmark would have been >= {FOLD_GATE_MM} mm off the fold on "
+          f"{report['fold_gate']['logo_minus_fold_x0_mm']['off_ge_0.5mm']} of {len(offs)} "
+          f"fold-placed pages", flush=True)
+    gl = report["gutter"]
+    print("GUTTER MARGIN (the master's pixels): baseline " + ", ".join(
+        f"{k} {v['median']:.2f} mm (sd {v['sd_mad']:.2f})" for k, v in gl["baseline_mm"].items())
+        + f"; {len(gl['look_at'])} page(s) beyond {GUTTER_MAD_K} sd LOOK AT: "
+        + (" ".join(f"{s} ({report['pages'][s]['gutter_margin_mm']:.2f})" for s in gl["look_at"]) or "none")
+        + f"; ink to the gutter: {' '.join(gl['ink_to_gutter']) or 'none'}", flush=True)
 
 
 if __name__ == "__main__":

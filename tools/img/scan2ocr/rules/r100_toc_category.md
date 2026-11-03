@@ -324,6 +324,23 @@ PY
   def norm(x):
       return re.sub(r'[-\s]+', '', x).casefold()
   ADS = {norm(x) for x in ('Programm-Service', 'Einkaufsführer')}
+  # A PIECE THE OWNER CHOSE NOT TO PUBLISH IS DECLARED, NOT FAILED.  The
+  # printed entry is real and must STAY in toc_entries.txt -- it is the only
+  # witness that the piece existed, which is this check's whole purpose -- so
+  # the omission is declared beside it instead, in issues/<ID>/adjudicated.txt:
+  #     omitted-95   4   Jahresinhaltsverzeichnis 1986 (pp 95-98): ...
+  # MEASURED on 8701: the key was invented without a reader, so it declared
+  # nothing and this check would have reported the entry for ever. A rule that
+  # says "record it here" and a check that does not look there is the same
+  # defect as a check that cannot pass.
+  omitted = set()
+  adj = os.path.join(d, 'adjudicated.txt')
+  if os.path.exists(adj):
+      for line in io.open(adj, encoding='utf-8'):
+          m = re.match(r'omitted-(\d+)\s+(\d+)', line)
+          if m:
+              start = int(m.group(1))
+              omitted.update(range(start, start + int(m.group(2))))
   ent = os.path.join(d, 'toc_entries.txt')
   if not os.path.exists(ent):
       sys.exit('no toc_entries.txt (pre-chain issue) -- skipped')
@@ -345,7 +362,9 @@ PY
   for line in io.open(ent, encoding='utf-8'):
       page, section, entry = (line.rstrip('\n').split('\t') + ['', ''])[:3]
       if norm(entry) not in ADS and page.isdigit():
-          if int(page) not in claimed:
+          if int(page) in omitted:
+              print('omitted ON PURPOSE  %-22s p%s  (adjudicated.txt)' % (entry, page))
+          elif int(page) not in claimed:
               print('NO ARTICLE for Rubriken entry %-22s p%s' % (entry, page))
   PYEOF
   ```

@@ -180,6 +180,15 @@ def find_file_for_entry(entry, by_page, all_files, cov=None):
     return best
 
 
+# THE MAGAZINE'S NAME HAS AN APOSTROPHE IN IT.  `html.escape` defaults to
+# quote=True, which turns every ' into &#x27; -- so this wrote
+# content="64&#x27;er Extra|Speicher" into the metas, and 13 published files
+# carry it. The attribute is DOUBLE-quoted, so an apostrophe needs no escaping
+# at all; only &, < and " do. Escape those and leave the apostrophe alone.
+def attr(x):
+    return H.escape(x, quote=False).replace('"', '&quot;')
+
+
 def get_title(text):
     """Extract <title> from HTML."""
     m = re.search(r'<title>(.*?)</title>', text)
@@ -224,6 +233,9 @@ def main():
     for fn in sorted(file_entries):
         text = open(fn).read()
         article_title = get_title(text)
+        # what the index would show WITHOUT an index_title (see below)
+        m_toc = re.search(r'<meta name="64er\.toc_title" content="([^"]*)"', text)
+        toc_title = m_toc.group(1) if m_toc else None
 
         m_id = re.search(r'(    <meta name="64er\.id")', text)
         if not m_id:
@@ -253,10 +265,24 @@ def main():
             # get_title() returns the ESCAPED <title>; the CSV title is raw.
             # Comparing them directly meant every title containing &差 differed
             # from itself, and 4 rows on 8611 got a redundant index_title.
-            if idx_title != H.unescape(article_title or ''):
-                insert += f'    <meta name="64er.index_title" content="{H.escape(idx_title)}">\n'
+            #
+            # AND COMPARE AGAINST WHAT THE INDEX WOULD ACTUALLY SHOW, NOT
+            # AGAINST THE TITLE.  generate.py:index_title() falls back
+            # index_title -> toc_title -> title, so a `toc_title` INTERCEPTS.
+            # Omitting index_title because it equals the <title> then displays
+            # the CONTENTS-page wording instead of the year index's, which is
+            # the opposite of what the owner ruled (2026-11-03: "index should
+            # come from the Jahresinhaltsverzeichnis, even if it disagrees").
+            # MEASURED on 8701 p8: the year index and the banner both say
+            # "Unter die Lupe genommen: Computer-Fachberatung"; toc_title says
+            # "Computer-Fachhandel: Ist der Kunde noch König?"; no index_title
+            # was written, and the owner could not find the article under its
+            # printed name and reported it MISSING.
+            shown = H.unescape(toc_title or article_title or '')
+            if idx_title != shown:
+                insert += f'    <meta name="64er.index_title" content="{attr(idx_title)}">\n'
             if idx_cat is not None:
-                insert += f'    <meta name="64er.index_category" content="{H.escape(idx_cat)}">\n'
+                insert += f'    <meta name="64er.index_category" content="{attr(idx_cat)}">\n'
 
         text = text[:m_id.start()] + insert + text[m_id.start():]
         open(fn, 'w').write(text)

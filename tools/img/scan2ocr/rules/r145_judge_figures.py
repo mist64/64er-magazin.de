@@ -18,15 +18,24 @@ import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
+import r000_issue
+from r000_issue import ISSUE
 import r000_llm as llm
 import r010_ocr_blocks as OB
+
+ISS = r000_issue.load(ISSUE)
 
 OUT = os.path.join(OB.OUT_DIR, "figures")
 LANES = 4
 CAPTION_RE = re.compile(r"^\s*(Bild|Tabelle|Abb\.?)\s*(\d+)", re.I)
 
+# NOT an f-string: this template is .format()ed per page and contains {page}
+# and {candidates}.  The issue name is substituted by replace() for exactly
+# that reason -- an f-string here consumed the format fields and raised
+# NameError on import.  (The hardcoded "issue 9/September 1986" it replaces had
+# been handed to the model on every page of every issue built since 8609.)
 PROMPT = """You are extracting the FIGURES from one page of the German home-computer
-magazine "64'er", issue 9/September 1986, so they can be cropped out as images.
+magazine "64'er", __ISSUE_PHRASE__, so they can be cropped out as images.
 
 A geometric pass has already measured candidate rectangles. It cannot tell a
 picture from typesetting -- half this magazine's figures ARE pictures of text
@@ -90,6 +99,8 @@ PAGE {page}. CANDIDATES:
 CAPTION LINES PRINTED ON THIS PAGE:
 {caps}
 """
+
+PROMPT = PROMPT.replace("__ISSUE_PHRASE__", ISS.self_phrase)
 
 
 def judge(page):

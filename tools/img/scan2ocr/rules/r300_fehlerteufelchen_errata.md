@@ -63,7 +63,30 @@ MEASURED on SH8604: its Vorwort (p3) calls the same first course *Sonderheft
 2/85* in one sentence and *Sonderheft 2/86* in the next. Obviously one of them
 is wrong; **nobody is helped by being told which**, and no aside is written.
 
-Derived from all 19 in the corpus, not from principle. Every one of them says
+**THE DEFAULT IS NO, AND IT IS STRONGER THAN THIS SECTION READS.** The four
+kinds below describe what the EXISTING asides are; they are not an invitation
+to find more. The standing rule is the owner's, 2026-10-08: *print errors are
+left as printed, and only a reprint missing its original's erratum earns an
+aside*. Everything else has to clear that, not merely fit a kind.
+
+MEASURED, 2026-11-02: the 8701 build put up six candidates, each with the page
+quoted, the fact established, the German aside drafted and "who is helped"
+answered — and **the owner took none of them.** Six would have been double the
+corpus record in any case (22 asides across 14 issues, maximum 3 in one). The
+six were a wrong address range, a typeset fusion that breaks a beginner's
+example, two absent line references, a wrong part number, an off-by-one in a
+command and a dropped hex digit: every one of them "the magazine got this
+wrong, and a reader could act on it", which is the *smallest* of the four kinds
+below (5 of 22) and the one the standing rule is pointed at.
+
+**So read the table the other way round.** Twelve of the 22 — "we corrected it"
+and "our files differ" — say something about what WE did or what OUR files
+hold. That is what the aside is mostly for. When the only content is *the
+magazine was wrong*, the answer is almost always to leave it, however
+actionable it looks and however well the (a)-(d) case is made. Do not spend a
+build drafting six of them.
+
+Derived from all of them in the corpus, not from principle. Every one says
 something **the archive knows and the page does not**, and falls into four
 kinds:
 

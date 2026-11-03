@@ -12,6 +12,62 @@ This is a **program step** that calls a model once per page. The orchestrator
 runs it; there is nothing to dispatch to a sub-agent, because the per-page
 judgement *is* the model call.
 
+## EVERY labels.json RECORDS THE MODEL THAT MADE IT
+
+`rec["model"]` and `rec["transport"]` are written on every page. These labels
+are a MODEL'S JUDGEMENT — which block is a caption, which is noise, what order
+a reader goes in — and a judgement from a different model is not a worse
+version of the same answer, it is a different answer that nothing downstream
+can distinguish.
+
+**MEASURED, 2026-11-03: five issues were labelled by the wrong model and nobody
+knew.** `r000_llm._call_api` passed `model=MODEL`; `_call_cli` passed nothing,
+so the CLI took the invoking session's default. SH8605, SH8606, SH8607, SH8608
+and 8701 — four of them published — were classified by Fable, against the Opus
+this chain chooses in a comment directly above its `MODEL` constant, *"the
+cheaper tiers get wrong often enough to matter"*.
+
+It surfaced only because Fable ran out of tokens, months later, and then it
+looked like an account-wide outage. **The substitution was wrong AND invisible,
+and only the second let it survive.** One line in the file it produced would
+have shown it the first time anyone opened one.
+
+So: whatever produces an artefact stamps itself into it. Check it when reading
+a label file from a build you did not run, and when an issue's labels disagree
+with what you see on the page.
+
+The CLI's own per-session transcripts under
+`~/.claude/projects/<cwd-slug>/` carry `"model"`, `usage` and `totalCostUSD`,
+and step 020 runs with `cwd=<tmp>/masters600`, so each issue's calls are filed
+in their own directory. That is how the five were identified after the fact,
+and it is also how to total an issue's token cost — 8701's 192 pages came to
+$86.53, $0.45 a page.
+
+### A stamp cannot describe the run that came before it — and do not re-ask for one
+
+On 8701 the stamp was added **during** the re-ask it was meant to document: 128
+pages ran on the commit before it, 64 on the commit after, so two thirds of a
+correct Opus build carries no `model` field. The temptation is to make the
+record whole. Both ways of doing that are wrong:
+
+- **Re-asking the 128 is not a provenance fix, it is a rebuild.** The calls are
+  not deterministic, so the new labels differ, and differing labels move block
+  boundaries and the reading order — steps 030 onward would re-run on two
+  thirds of the issue to obtain a string that is already known. Paying $58 to
+  make an artefact self-describing is defensible; paying it to *re-decide* the
+  issue's text is not.
+- **Hand-writing the field is worse than leaving it blank.** A provenance field
+  typed in by whoever believes they know is exactly the record this chain
+  learned not to trust. An absent stamp says *"look it up"*; a hand-written one
+  says *"stop looking"*, with no way to tell the two apart later.
+
+So the gap stays, and the EVIDENCE moves into the repo: lift the per-page
+model, cost and timestamp out of the CLI transcript into the issue's
+`reviewed/` ledger, and cite **that** file. `~/.claude/projects/` is a cache —
+it rotates, it is outside the repo, and it is not on the machine of whoever
+reads the ledger next. The stamp then fills itself in the next time 020
+re-asks a page, which is soon enough.
+
 ## Inputs
 
 `out/NNN.json` + `out/NNN.digest.txt` + `out/NNN_boxes.png` from step 010.
@@ -407,3 +463,36 @@ heads against the page, and was restored from the crop.
 **A `listing-standalone` block whose leading lines are prose — no line number,
 no hex address, sentence punctuation — is split.** At the very least r320 must
 list it as "prose inside a listing block" so a human looks.
+
+### The prompt must name the issue it is actually reading
+
+**MEASURED, 2026-11-03, by the 8701 build: every classification prompt in the
+chain said "issue 9/September 1986".** It was 8609's string, hardcoded, and it
+went to the model on all 448 of 8701's calls — Fable's and Opus's alike — and
+on every page of every issue built since 8609. Three prompts carried it
+(`r020_classify.py`, `r020_evaluate.py`, `r145_judge_figures.py`) and a comment
+in `r010_ocr_blocks.py` repeated it.
+
+The folio example is in the prompt so the model recognises the foot of the page,
+so the impact is probably small: the footer is identified by position and shape
+as much as by its words. **That is not the point.** It is a wrong fact handed to
+a judgement step on every page for five issues, and like the unnamed model
+above, nothing in any output would ever have shown it. The builder found it by
+reading a prompt, not by running a gate.
+
+It now comes from the descriptor — `Issue.label`, `Issue.self_phrase` and
+`Issue.folio_hint` in `r000_issue.py`, derived from the id, because for a
+monthly the issue number IS the month and a stored copy could only disagree
+with it. **A Sonderheft gets `label is None`** and a prompt that describes it
+truthfully instead of inventing a folio form nobody has looked at; fabricating
+one there would reintroduce this very defect a level down.
+
+Two traps if you touch these strings:
+
+- **`r145`'s prompt is NOT an f-string.** It is `.format()`ed per page with
+  `{page}`, `{cands}` and `{caps}`, so making it one consumed the fields and
+  raised `NameError` on import. It substitutes by `replace()` on a
+  `__ISSUE_PHRASE__` placeholder. The other two take no format fields and are
+  f-strings.
+- **Grep for the string before believing it is gone.** Four files held it and
+  only three were prompts.

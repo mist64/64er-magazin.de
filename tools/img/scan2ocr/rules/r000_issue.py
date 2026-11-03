@@ -532,6 +532,58 @@ class Issue:
         self.articles_json = os.path.join(self.ocr_dir, ARTICLES_NAME)
         self.hyphen_cache = os.path.join(self.ocr_dir, HYPHENS_NAME)
 
+    # HOW THIS ISSUE NAMES ITSELF, derived from the id and nothing else.
+    #
+    # MEASURED, 2026-11-03: every classification prompt in the chain told the
+    # model it was reading "issue 9/September 1986" -- 8609's string, hardcoded
+    # in r020_classify.py, r020_evaluate.py and r145_judge_figures.py, and
+    # carried forward into all 448 of 8701's calls and every issue built since
+    # 8609. The folio example in a prompt is there so the model recognises the
+    # foot of the page; naming the wrong month hands a judgement step a wrong
+    # fact on every page of every issue.
+    #
+    # It is derived rather than stored because it is not a measurement: for a
+    # monthly the issue number IS the month, so the id already says it, and a
+    # second copy in the descriptor could only disagree with the first.
+    MONTHS_DE = ("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
+                 "August", "September", "Oktober", "November", "Dezember")
+
+    @property
+    def label(self):
+        """'1/Januar 1987' for a monthly -- how the folio line names it.
+
+        None for a Sonderheft: its foot does not print this form, and the
+        prompts that use this must say nothing rather than invent one. An
+        INVENTED folio example is the defect this property exists to fix, so
+        guessing here would reintroduce it one level down.
+        """
+        if self.kind != "monthly":
+            return None
+        digits = "".join(c for c in self.id if c.isdigit())
+        if len(digits) != 4:
+            return None
+        yy, mm = int(digits[:2]), int(digits[2:])
+        if not 1 <= mm <= 12:
+            return None
+        return f"{mm}/{self.MONTHS_DE[mm - 1]} {1900 + yy}"
+
+    @property
+    def self_phrase(self):
+        """How a PROMPT should introduce this issue to the model.
+
+        A Sonderheft gets a true description instead of a fabricated issue
+        number, for the reason given on `label`.
+        """
+        return (f"issue {self.label}" if self.label
+                else "a Sonderheft (a themed special issue, not a monthly)")
+
+    @property
+    def folio_hint(self):
+        """The folio line as a prompt should describe it, label or no label."""
+        return (f'the folio line at the foot (page number, "Ausgabe'
+                f' {self.label}")' if self.label else
+                'the folio line at the foot (page number and issue line)')
+
     @property
     def page_range(self):
         """1..pages inclusive -- what every per-page sweep iterates.

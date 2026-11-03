@@ -291,7 +291,7 @@ MIN_BLOCK_AREA_FRAC = 0.00015
 # --- running header / footer -------------------------------------------------
 # The single strongest signal in the magazine: every editorial page carries a
 # section header at the top ("Anwendung des Monats", "Grafik", "Software", plus a
-# machine tag "C 64" / "C 16, Plus/4") and "Ausgabe 9/September 1986" plus the
+# machine tag "C 64" / "C 16, Plus/4") and the folio line ("Ausgabe <N>/<Monat> <Jahr>") plus the
 # folio at the foot.  Ads carry neither -- that is what identifies p45 as a
 # full-page ad with no other evidence available.
 HEADER_BAND = 0.075   # top fraction of the page

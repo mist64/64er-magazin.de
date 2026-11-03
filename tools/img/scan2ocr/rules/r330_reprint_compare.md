@@ -198,6 +198,51 @@ For each row of the `## Leads` table in `REPRINTS.md`:
 |---|---|
 | `CONFIRMED` | the same article, re-set. Same argument in the same order, same figures/listings, sentences recognisably shared. |
 | `PARTIAL` | part of it. A multi-part series merged into one reprint (`8506/16 + 8507/17` is one lead with two originals — one row and one diff **per original**), or only a section reprinted. |
+
+**THE NUMBERING OF RECORD IS ALWAYS THE WHOLE-ARTICLE ONE.** `--partial` is a
+READING aid, never a recording format: `verify` checks the table's count and
+every D number against the whole-article diff, so a `--partial`-numbered table
+cannot pass the gate. Diff without it to write the table; diff with it to read.
+(Found on 8701, where the rule said one thing and the gate enforced another —
+my error, introduced with the flag.)
+
+**AND `--partial` IS NEVER THE ONLY READ.**
+
+**A `PARTIAL` IS DIFFED WITH `--partial`.** The rule has always said to
+restrict the diff to the reprinted blocks, and until 8701 the tool had no way
+to: `8701/14 Leserforum` reprints eight quoted reader questions out of six
+earlier letters pages, and each of the six pairs diffed whole-article at **216
+differences**, almost all of them PRINT, with the blocks that matter word-diffed
+by hand afterwards. `--partial` reports only the blocks that PAIRED and prints
+the count of one-sided ones it suppressed — the un-reprinted remainder, which
+is the normal case and not a finding. On that pair: **216 → 13**, with 203
+suppressed and named. A whole-article `CONFIRMED` is unaffected and must be
+diffed WITHOUT it (8701/70 against 8610/76: 98/100 paired, 2 diffs, identical
+either way).
+
+**A MOVED BLOCK LOOKS EXACTLY LIKE AN UN-REPRINTED ONE.** `align` is a
+SequenceMatcher over block ORDER, so a paragraph that was re-set and moved
+pairs on neither side, and the first version of `--partial` suppressed it as
+remainder. MEASURED on 8701: 8607/13's »Technischer Defekt?« question IS
+reprinted and IS moved, and suppressing it hid five differences including the
+**STREHLOW / STEHLOW byline** and »in einer« against »in eine«. A
+`--partial`-only run would never have examined it.
+
+So before anything is suppressed, every one-sided block is checked against the
+one-sided blocks on the other side by TOKEN BAG, which has no notion of order
+(`find_moved`, floor 0.45). A good enough match is reported as `MOVED` and
+diffed like any pair. On that case: 13 → **54** differences, 20 blocks
+recovered as moved, 163 genuinely suppressed, and the byline is back. The
+count is printed, so a run that recovers nothing says so.
+
+**AND RE-RUN `verify` AFTER STEP 150, NOT ONLY AFTER 330.** The D numbers are
+positions in a diff of the article as it stands, so anything that changes the
+article renumbers them — and 150 places figures. MEASURED on 8701: 330 wrote
+its tables, 150 placed the Leserforum banner, and `verify` then reported
+`8611/16: table says D=175, the diff reports 174` and the same off-by-one on
+8612/16. Nothing was wrong with either table when it was written. Remap by
+CONTENT, never by a fixed offset — the tool says so itself when it catches
+this.
 | `NOT-A-REPRINT` | same *topic*, different *text*. `REPRINTS.md` names this trap itself: `Welche Floppy für den C128?` is "near 8601/44 in topic, different text". Record it and stop — nothing is diffed. |
 | `UNRESOLVED` | the original could not be identified: the page resolves to nothing (issue not imported), or to more than one article that the printed pages could not separate. Report every candidate for human review; nothing is diffed. |
 
@@ -623,6 +668,30 @@ nothing wrong to search for.
 For a correction that ADDS text, sweep differently: find the other printings
 of that article (`reprints.txt`, `REPRINTS.md`, or a title search) and check
 each for the **new** text. Absent means the same defect, present means clean.
+
+### AND A DISPOSITION CAN GO STALE IN MEANING WHILE STAYING VALID IN COUNT
+
+`verify` checks the table's counts against the diff's. It cannot check what a
+difference IS. **So a difference that changes CLASS under the same D number
+passes the gate until a human re-reads it.**
+
+MEASURED on 8701, `70 Checksummer V3 und MSE` against `8610/76`. D-001 was a
+**CROP**: the figure and its caption were missing on our side. Then r150's
+*a declined figure takes its label, not the prose* put the caption in as text —
+and D-001 became a **PRINT** difference, the printed »die« that 8610 has and
+1/87 does not. One difference before, one after. `verify` passed throughout. It
+only failed once the entry was rewritten, because the summary table then said
+CROP 1 / PRINT 0 against a diff saying the opposite.
+
+So the gate is sound and its silence is not evidence. The tell is not in the
+numbers at all: **anything that changes an article changes what its differences
+MEAN**, even when it changes none of them. Placing a figure, restoring a
+caption, merging a box, moving a `<br>` — each can turn a MARKUP into a PRINT
+or a CROP into nothing, with the count untouched.
+
+**So re-read the dispositions after any edit to a reprinted article, not only
+after a remap.** The sweep below is for renumbering; this is for meaning, and
+it is the same reading step done for a different reason.
 
 ### A REMAP LEAVES REFERENCES STALE, AND NO SCRIPT CAN CATCH IT
 

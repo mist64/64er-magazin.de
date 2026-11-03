@@ -82,6 +82,14 @@ Consequences, and the reason this variant exists:
   to the content — and not on the paper. 8609's masters were made this way,
   exact A4 with one rigid offset per parity, and the corpus was measured on
   them.
+- **Corrected 2026-11-03 (8701): the premise "print-to-trim varies, so align
+  the type" is half true, and the half that is false cost content.** The
+  wordmark-to-fold distance is not one value with jitter; it is **two**, split
+  at the centre spread, and the same in 8701, 8611 and 8612. Since 8701 the
+  window's **x comes from the certified fold** and only its **y** from the
+  wordmark — see *Where the window is pinned, and why* under `cut`. 8609–8612
+  were cut on the wordmark alone and are not re-cut (owner: a pass over old
+  issues is theirs to start).
 - Everything else the sheet variant does — skew, grade, stamps, the debug
   overlay, "publish and NOTE, never refuse" — transfers unchanged.
 
@@ -945,6 +953,32 @@ placed by the wordmark (or, with no wordmark either, on the inner frame
 edge), is what takes it out of the master. The source —
 `holes` / `colour` / `none` — is in the JSON, the stamp and the fit report.
 
+**A fold that did not come from the holes is not a fold** (`fold_fallback`, in
+`cut`, which sees the issue). MEASURED on 8701: the colour boundary put p092's
+fold 1.2 mm from the inner frame edge and p178's 0.8 mm — it found the far side
+of the neighbour's white margin — and the pages with no fold (p103, p111, p120,
+p147, p179) defaulted to the frame edge. On an edges-anchored page the window
+IS placed on the fold, so each of those masters slid about 10 mm into the
+neighbour (owner: *"p92 cut wrong"*, *"178/179 were cropped wrong. the black
+vs. white is the border"*). The clip is rigid, so `cut` re-places such a fold:
+
+- on a **full-bleed** page, where this page's ink starts (`ink_stop_mm`): per
+  row, the first run of `FOLD_INK_RUN_MM` = 3 mm that is ≥ 85 % ink, counted
+  from the inner frame edge. MEASURED p178 at x 5000 (ink ends 4984 by eye),
+  p179 at 237 (248);
+- otherwise, or where the ink stop or a colour fold lands more than
+  `FOLD_BAND_MM` = 3 mm from the issue's median hole-fold distance: an
+  edges-anchored page takes **that median** (8701: 10.26 mm; the error is
+  symmetric there); a logo-anchored page, where the line only masks, takes the
+  **p5** of the hole folds (8.24 mm) — too far in would paint this page's own
+  margin white, invisibly; too far out leaves a sliver the checks can see.
+- a colour fold inside the band is kept (p014/046/050 at 10.4–11.2 mm agree
+  with the holes).
+
+The re-placed line is vertical, its source is `inkstop` / `median` / `p5`, a
+NOTE gives old and new distance, and a later `cut` leaves it alone. None of
+these is a certified fold, so every such page is a FOLD GATE LOOK AT.
+
 ### The anchor — the 64'er wordmark
 
 The wordmark is the same glyph on every page, not mirrored between parities,
@@ -1100,6 +1134,108 @@ parity, a fit in name only — this program landed even S=592 B=6900, odd
 S=4452 B=6908. The full sweep, over 83 even and 62 odd logo'd pages, lands
 **even S=556 B=6904, odd S=4416 B=6904**: odd S is 8609's to the pixel, even
 S is 12 px (0.5 mm) smaller, B 12 / 4 px larger (*What it read*).
+
+### Where the window is pinned, and why — x on the fold, y on the wordmark
+
+**Pin the window where a wrong edge admits foreign matter or destroys content;
+let the slack fall where it only fabricates white.** (Owner, 2026-11-03, on
+8701: *the fold is the more important signal, because cutting wrong there
+either loses information or lets the other sheet show through.*)
+
+The asymmetry is the whole argument:
+
+- **at the gutter**, both directions of error cost CONTENT. Short of the fold
+  loses this page's own ink; past it brings in the neighbour's. 8701 p178
+  carried 10.4 mm of p179 with readable type; p009/p010/p016 lost 1.3–2.7 mm
+  of their own inked gutter under the wordmark fit.
+- **at the fore-edge**, a window placed from the fold can only OVERHANG: it is
+  a fixed 210 mm and no page is wider. Its error there is white over blank
+  paper, stated in the stamp's `unknown`.
+
+The wordmark does not remove the print-to-trim offset; it only chooses where
+the error lands, and it splits it across both edges, including the costly one.
+The same principle is why a foot the page could not measure takes the issue's
+median and never the frame row (*THE FOOT UNDER THE SHEET IS BACKING*): bed
+showing through at the foot is foreign matter, white above it is not.
+
+**MEASURED — the wordmark-to-fold distance is bimodal, split at the centre
+spread.** Raw distance, no fit involved, pages with a certified fold:
+
+| issue | front half even / odd | back half even / odd | split |
+|---|---|---|---|
+| 8701 | 187.5 / 187.8 mm | 183.1 / 183.2 mm | 96 \| 97 |
+| 8611 | 186.9 / 187.5 | 183.5 / 183.1 | 96 \| 97 |
+| 8612 | 187.2 / 187.4 | 183.6 / 183.9 | 100 \| 101 |
+
+The sd within each half is 0.7–1.3 mm; about two pages per issue sit on the
+wrong side of the split. 8611/8612 were read from their cut-time sidecars
+(`/Users/mist/DNB/861{1,2}/tmp/geometry/`, 192 and 200 pages plus
+`fit.json`), and 16 pages were re-measured with this code to 0.00 mm. One
+(S, B) per parity lands between the two modes **by construction**, so the
+pages the owner saw cut wrong (8701 p030 at −1.23 mm, p176 at +2.30) were
+simply the tails. On 8701, of 115 logo pages with a certified fold, **92 were
+≥ 0.5 mm off it** under the wordmark. Placed on the fold: **0** lost type or
+brought ink within 2 mm of the fore-edge (counted at ≥ 2 % of rows, both side
+edges of every page); 39 gained 0.5–4.2 mm of white beyond the scan frame at
+the fore-edge (median 2.2).
+
+**Vertically the wordmark stays.** Wordmark to bottom trim is one mode, sd
+0.90 / 0.95 mm, 0.4–0.6 mm between the halves: head and foot are trimmed on
+the folded stack, common to both pages of a sheet. The data does not show the
+wordmark beats the traced foot either; y is left where it was because nothing
+shows it wrong.
+
+**A certified fold** (`fold_certified`): from the holes, at least
+`FOLD_CERT_TEMPLATE` = 4 clip-template rows matched, and `FOLD_CERT_MM` =
+6–14 mm from the inner frame edge (hole folds measured 8.1–13.3; p076's 1.55 mm
+is the neighbour's column, not the fold). Where the fold is certified, a
+logo page's x0 is the fold at mid-height (−4961 on an even page); otherwise
+the wordmark's x0 stands **less the median wordmark-to-fold offset of its own
+half and parity** (`half_offsets`, over that issue's certified pages; the half is
+`page <= N/2`). Without that correction the one (S, B) per parity is ~4 mm off
+on every back-half page: MEASURED 8701 p110/p112 (Kleinanzeigen, no fold
+found) had gutter margins of 12.2 / 11.6 mm against the back half's 8.7 under
+the plain fit; corrected, 8.5 / 7.9. Front-half pages move by under 0.8 mm. An
+edges-anchored page is placed on its fold as before (*Pages without a
+wordmark*).
+
+### The fold gate — the gutter edge, tested on the RESULT
+
+Every master's gutter edge (x0, +4961 on an even page) is compared with the
+sheet's fold at mid-height. **PASS** only if the fold is certified and the edge
+is within `FOLD_GATE_MM` = 0.5 mm of it; otherwise **LOOK AT**, as a NOTE in
+the stamp and in `fit.json` → `fold_gate.look_at`. Each page also records
+`logo_minus_fold_x0_mm`, the distance the wordmark would have put it, and
+`fold_gate` summarises its median, sd and count ≥ 0.5 mm: **the quantity the
+chain depended on and never measured.** A per-issue step in it is the first
+sign of a print that is off-centre across the fold.
+
+**On a certified page this gate measures its own arithmetic** — `x0` was set
+from the fold two lines earlier, so "gutter vs fold" is zero by construction
+(8701: every certified page ±0.02 mm). It says only whether anything vouches for
+the gutter. **What reads the artefact is the gutter margin** (`gutter_margin_mm`):
+on the cut master's own pixels, master edge to this page's first ink, the p5
+over rows of a 30 mm strip at 300 dpi, after a 3×3 opening (a 1 px mark at
+8701 p014's gutter read 0.17 mm against a 10.4 mm margin until opened away).
+It owes nothing to `x0`. Each half's baseline is the median of its certified
+pages whose margin is at least `GUTTER_ART_MM` = 3 mm, and the spread its MAD;
+a page beyond `GUTTER_MAD_K` = 4 sd is LOOK AT, and a margin under 3 mm is
+reported apart as *ink to the gutter* (art or bleed, which the master alone
+cannot tell from a cut margin). `fit.json` → `gutter`. MEASURED on 8701: front
+10.92 mm (sd 1.00), back 8.89 (sd 0.94); the plain-fit p110/p112 read 12.2 /
+11.6 and would have been caught without reading a strip. After the re-cut the
+LOOK ATs are eight certified pages, every one design when looked at: the
+tear-out cards 003/004/189/190 (perforation margin), the ads 057/132 (wide white
+margin), 025 (the SEIKOSHA pattern stops short of the fold), 144 (the banner
+runs across the spread).
+
+Why this and not a look at the master: a **colour-difference** test at the
+side edges was validated against the nine pages found wrong on 8701 and
+failed. It is blind where the ground at the edge is white on both sides — p030,
+1.23 mm short of the fold, reads nothing on either edge; so does p092 — and the
+threshold that catches the nine flags about 90 good pages (full-bleed pages
+overhanging the frame, blank margins of the same 8–14 mm width as a slip, a real
+design gap on p025). The fold gate caught all nine.
 
 ### Pages without a wordmark — placed on their physical edges
 
@@ -1331,6 +1467,22 @@ print("LOOK AT (no logo):", [s for s, p in pages.items() if p["anchor"] != "logo
 print("LOOK AT (no fold):", [s for s, p in pages.items() if p["fold"] == "none"])
 print("LOOK AT (unknown > 4%):", [s for s, p in pages.items() if p["unknown"] > 0.04])
 PY
+
+# 5b. the fold gate: every LOOK AT is a gutter edge nothing vouches for
+$PY - <<'PY'
+import json, r005_masters_spread as R
+r = json.loads((R.OUT_GEOM / "fit.json").read_text())
+fg = r["fold_gate"]
+print("FOLD GATE LOOK AT:", fg["look_at"])
+print("wordmark vs fold x0:", fg["logo_minus_fold_x0_mm"])
+print("gutter margin:", r["gutter"]["baseline_mm"], "LOOK AT", r["gutter"]["look_at"])
+for s, p in r["pages"].items():
+    if p["fold_gate"] != "PASS":
+        print(" ", s, p["anchor"], p["fold"])
+PY
+# Every LOOK AT is looked at as the gutter strip of the master at 600 dpi.
+# A step between the halves in logo_minus_fold_x0_mm (median ~0 front,
+# ~+4 mm back on 8701/8611/8612) is the print, not a fault of this issue.
 
 # 6. no bed, no prop in a 6 mm band inside the traced edges (on sheets600)
 $PY - <<'PY'

@@ -341,6 +341,52 @@ def similarity(a, b):
     return difflib.SequenceMatcher(None, a.text, b.text, autojunk=False).ratio()
 
 
+# A MOVED BLOCK LOOKS EXACTLY LIKE AN UN-REPRINTED ONE, AND ONLY CONTENT CAN
+# TELL THEM APART.  `align` is a SequenceMatcher over block order, so a
+# paragraph that was re-set and moved pairs on neither side and `--partial`
+# would suppress it as remainder.  MEASURED on 8701: 8607/13's »Technischer
+# Defekt?« question is reprinted and moved, and suppressing it hid five
+# differences including the STREHLOW/STEHLOW byline and »in einer« against
+# »in eine«.  A --partial-only run would never have examined a question that
+# IS reprinted.  So before suppressing, every one-sided block is checked
+# against the one-sided blocks on the OTHER side by token bag, which has no
+# notion of order; a good enough match is MOVED and is diffed like any pair.
+MOVED_SIM = 0.45             # token-bag overlap; the pairing floor is 0.45 too
+
+
+def _bag(blk):
+    c = {}
+    for t in blk.tokens:
+        if len(t) >= 4 and t[0].isalpha():
+            k = t.lower()
+            c[k] = c.get(k, 0) + 1
+    return c
+
+
+def bag_similarity(x, y):
+    """Order-free overlap of two blocks, 0..1 over the smaller bag."""
+    bx, by = _bag(x), _bag(y)
+    if not bx or not by:
+        return 0.0
+    shared = sum(min(v, by.get(k, 0)) for k, v in bx.items())
+    return shared / (min(sum(bx.values()), sum(by.values())) or 1)
+
+
+def find_moved(only_a, only_b, floor=MOVED_SIM):
+    """[(a_block, b_block, sim)] -- one-sided blocks that are really MOVED."""
+    out, used = [], set()
+    cand = sorted(((bag_similarity(x, y), i, j)
+                   for i, x in enumerate(only_a) for j, y in enumerate(only_b)),
+                  reverse=True)
+    seen_a = set()
+    for sim, i, j in cand:
+        if sim < floor or i in seen_a or j in used:
+            continue
+        seen_a.add(i); used.add(j)
+        out.append((only_a[i], only_b[j], sim))
+    return out
+
+
 def align(a_blocks, b_blocks, min_sim):
     """Pair the two block lists.
 
@@ -392,7 +438,22 @@ def window(tokens, lo, hi, context):
     return pre, mid, post
 
 
-def diff_report(a_path, b_path, context=6, min_sim=0.45, out=sys.stdout):
+def diff_report(a_path, b_path, context=6, min_sim=0.45, out=sys.stdout,
+                partial=False):
+    """`partial` is for a PARTIAL reprint, where only some blocks are reprinted.
+
+    r330 says to restrict the diff to the reprinted blocks, and this tool had
+    no way to: 8701's Leserforum reprints eight quoted reader questions out of
+    six earlier letters pages, so each of the six pairs diffed whole-article at
+    about 200 differences, almost all of them PRINT, and the eight blocks that
+    matter were word-diffed BY HAND afterwards.  A report nobody can read is
+    the same failure as a check that does not run.
+
+    With `partial`, a block present on only ONE side is not reported: in a
+    partial reprint that is the un-reprinted remainder, which is the normal
+    case and not a finding.  The blocks that paired are diffed exactly as
+    before.  The suppressed count is printed, so nothing goes quiet.
+    """
     a_meta, a_blocks = extract(a_path)
     b_meta, b_blocks = extract(b_path)
     A, B = a_meta["label"], b_meta["label"]
@@ -410,19 +471,41 @@ def diff_report(a_path, b_path, context=6, min_sim=0.45, out=sys.stdout):
     print("=" * 78, file=out)
 
     n = 0
+    unpaired = 0
     pairing = align(a_blocks, b_blocks, min_sim)
     aligned = sum(1 for x, y in pairing if x is not None and y is not None)
+    moved = {}
+    if partial:
+        only_a = [x for x, y in pairing if y is None and x is not None]
+        only_b = [y for x, y in pairing if x is None and y is not None]
+        for mx, my, sim in find_moved(only_a, only_b):
+            moved[id(mx)] = (my, sim)
+            moved[id(my)] = (mx, sim)
     for x, y in pairing:
         if x is not None and y is not None and x.text == y.text:
             continue
         if x is None or y is None:
-            n += 1
-            side = B if x is None else A
-            blk = y if x is None else x
-            print(f"\nD-{n:03d}  BLOCK ONLY IN {side}  <{blk.role}>", file=out)
-            print(f"  {side:<{w}}: {blk.text}", file=out)
-            print(f"  {(A if x is None else B):<{w}}: (nothing aligned)", file=out)
-            continue
+            if partial:
+                blk = y if x is None else x
+                m = moved.get(id(blk))
+                if m is None:
+                    unpaired += 1
+                    continue
+                if x is None:            # report the pair once, from the A side
+                    continue
+                y, sim = m[0], m[1]
+                print(f"\n-- MOVED block, paired on content ({sim:.0%} of the "
+                      f"smaller bag): it IS reprinted, in another position",
+                      file=out)
+                # fall through and diff x against y like any other pair
+            else:
+                n += 1
+                side = B if x is None else A
+                blk2 = y if x is None else x
+                print(f"\nD-{n:03d}  BLOCK ONLY IN {side}  <{blk2.role}>", file=out)
+                print(f"  {side:<{w}}: {blk2.text}", file=out)
+                print(f"  {(A if x is None else B):<{w}}: (nothing aligned)", file=out)
+                continue
         sm = difflib.SequenceMatcher(None, x.tokens, y.tokens, autojunk=False)
         for tag, i1, i2, j1, j2 in sm.get_opcodes():
             if tag == "equal":
@@ -457,6 +540,13 @@ def diff_report(a_path, b_path, context=6, min_sim=0.45, out=sys.stdout):
     # printed page (see the rule .md, step 1), never this number.
     denom = max(len(a_blocks), len(b_blocks)) or 1
     print(f"\nALIGNED: {aligned}/{denom} blocks paired ({100 * aligned // denom}%)", file=out)
+    if partial:
+        print(f"PARTIAL: {unpaired} one-sided block(s) suppressed -- the "
+              f"un-reprinted remainder. Run without --partial to see them.",
+              file=out)
+        print(f"MOVED: {len(moved) // 2} block(s) paired on CONTENT after "
+              f"failing the order pairing -- reprinted, in another position, "
+              f"and diffed above.", file=out)
     print(f"DIFFS: {n}", file=out)
     return n
 
@@ -840,6 +930,10 @@ def main(argv=None):
     d.add_argument("a", help="this issue's article (the reprint)")
     d.add_argument("b", help="the published monthly's article")
     d.add_argument("--context", type=int, default=6, help="tokens of context each side (default 6)")
+    d.add_argument("--partial", action="store_true",
+                   help="a PARTIAL reprint: diff only the blocks that paired, "
+                        "and do not report one-sided blocks (the un-reprinted "
+                        "remainder). The count is still printed.")
     d.add_argument("--min-similarity", type=float, default=0.45,
                    help="below this, two blocks are not the same paragraph (default 0.45)")
 
@@ -901,7 +995,8 @@ def main(argv=None):
     for p in (args.a, args.b):
         if not os.path.isfile(p):
             raise SystemExit(f"r330: no such file: {p}")
-    diff_report(args.a, args.b, context=args.context, min_sim=args.min_similarity)
+    diff_report(args.a, args.b, context=args.context, min_sim=args.min_similarity,
+                partial=args.partial)
     return 0
 
 

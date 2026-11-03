@@ -181,8 +181,27 @@ dir=issues/<YYMM>
 # Editorial is detected by stable id (its filename is a headline, not
 # the word "Editorial"); the other rubrics by filename glob.
 editorial=$(grep -l '64er.id" content="editorial"' "$dir"/*.html 2>/dev/null)
+# A RUBRIC THAT PRINTS NO BANNER IS ADJUDICATED, NOT FAILED.  8701's Bücher
+# (p144) has no printed banner at all, and the check had only FAIL and
+# "N/A (no article)" -- so a correct issue failed forever, which is r000's
+# "a check that cannot pass".  Declare it like any other finding class, in
+# issues/<ID>/adjudicated.txt (the file r310 and r260 already read):
+#     banner-absent-144   1   Bücher p144 prints no banner; verified on the master
+# The key carries the START PAGE, so an adjudication cannot silently cover a
+# different article that loses its banner later.
+adj="$dir/adjudicated.txt"
+banner_adjudicated() {   # $1 = start page
+  [ -f "$adj" ] && grep -qE "^banner-absent-$1[[:space:]]" "$adj"
+}
+# NO BARE GLOB IN A CONDITION.  `ls "$dir/"*"$rub"*.html` is expanded by the
+# SHELL before ls runs, and under zsh -- this machine's shell -- a glob that
+# matches nothing is a fatal "no matches found" that takes the whole block
+# with it.  (r000: THE VERIFICATION BLOCKS ARE BASH; this one no longer needs
+# to be.)  Iterate the directory, which always matches, and filter by name.
 for rub in Bücher Fehlerteufelchen Fachredakteur; do
-  matches=$(ls "$dir/"*"$rub"*.html 2>/dev/null)
+  matches=$(for f in "$dir"/*.html; do
+              case "$(basename "$f")" in *"$rub"*) printf '%s\n' "$f";; esac
+            done)
   if [ -z "$matches" ]; then
     echo "  $rub: N/A (no article in this issue)"
     continue
@@ -197,6 +216,10 @@ for rub in Bücher Fehlerteufelchen Fachredakteur; do
     [ -n "$f" ] || continue
     page=$(basename "$f" | grep -oE '^[0-9]+')
     banner="$dir/$page-0.png"
+    if banner_adjudicated "$page"; then
+      echo "  $rub p$page: no printed banner (adjudicated)"
+      continue
+    fi
     [ -f "$banner" ] || echo "  FAIL: $f has no banner $banner"
     grep -q "src=\"$page-0\.png\"" "$f" || echo "  FAIL: $f doesn't reference banner"
   done
@@ -212,8 +235,21 @@ else
     # Anchored like the rubric loop above. Unanchored, with the dot
     # unescaped, this accepted a planted src="18-0.png" for page 8.
     grep -q "src=\"$page-0\.png\"" "$f" || echo "  FAIL: $f doesn't reference banner"
-    # and the editorial needs the same SHAPE check the rubrics get
-    grep -q "<figure" "$f" || echo "  NOTE: $f banner not wrapped in <figure>"
+    # THE EDITORIAL'S SHAPE IS THE OPPOSITE OF THE RUBRICS'.  This read "the
+    # editorial needs the same SHAPE check the rubrics get" and tested for a
+    # <figure> -- but the table at the top of this rule prescribes
+    # `<img class="inline">` with NO <figure> for the Editorial, so the NOTE
+    # fired on exactly the shape the rule asks for, on every correct issue.
+    # Test what is prescribed instead: the banner carries class="inline" and
+    # is not wrapped.
+    # NOT ORDER-DEPENDENT.  The corpus writes `<img src=.. alt=.. class=..>`,
+    # so a pattern that wants class first NOTEs every correct issue -- the
+    # same defect one layer down.  Test the TAG's line for both parts, and
+    # the lines above it for a wrapper.
+    grep "src=\"$page-0\.png\"" "$f" | grep -q 'class="inline"' \
+      || echo "  NOTE: $f editorial banner lacks class=\"inline\""
+    grep -B2 "src=\"$page-0\.png\"" "$f" | grep -q "<figure" \
+      && echo "  NOTE: $f editorial banner is wrapped in <figure> (it should not be)"
   done
 fi
 
@@ -221,8 +257,21 @@ fi
 "$PY" -c "$(cat <<'PY'
 import os, re, sys
 d = sys.argv[1]
+# AN ADJUDICATED BANNER IS ABSENT ON PURPOSE, SO ITS SHAPE IS NOT "OFF".
+# The loop above honours banner-absent-<page>; this one did not, so every
+# issue with a declared absence printed one WARN per declared banner, for
+# ever -- 8701 printed two (69 and 144) on a correct issue. Same key, same
+# file, read once here.
+adj = os.path.join(d, 'adjudicated.txt')
+absent = set()
+if os.path.exists(adj):
+    for line in open(adj, encoding='utf-8'):
+        m = re.match(r'banner-absent-(\d+)\s', line)
+        if m: absent.add(m.group(1))
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'): continue
+    page = re.match(r'(\d+)', f)
+    if page and page.group(1) in absent: continue
     p = os.path.join(d, f)
     s = open(p).read()
     if 'Bücher' in f:

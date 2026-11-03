@@ -289,3 +289,69 @@ werden"*). A plain `<p>` starting with a lowercase word is worse still: 172
 files, mostly glossary and listing entries. Neither is usable; the hyphen is
 the only precise signal.
 
+
+## A GATE WHOSE MATCHER CAN'T READ THE FIX IT ASKED FOR (8701, p33)
+
+The noise sweep's whole purpose is to ask *is this text anywhere in the HTML?*
+It asked it with 3-word shingles — and a shingle cannot read a table.
+
+8701 p33 printed three pin assignments inside yellow panels. Step 020 labelled
+them `noise`, nothing carried them, and this gate is what found them. They were
+then typeset, as `<table>`, because that is what the print shows. **The sweep
+re-ran and still called all three LOST.** Every word was in the file. The cell
+stream normalises to `1 luminanz 2 masse 3 audio out`, the block's shingle
+`luminanz masse audio` occurs nowhere in it, and the row numbers between the
+words are the reason. Five more blocks failed identically — p35, p48, p61,
+p162, p170 — all of them tables.
+
+So the gate written to catch the p33 loss could not see the p33 **fix**, and it
+reported the correct outcome as the defect. Short, number-interleaved text is
+the one population this sweep exists for, and a prose-order matcher is blind to
+all of it.
+
+**The sweep now reports three outcomes, not two:**
+
+| outcome | test | what it means |
+|---|---|---|
+| published | ≥ 50 % of its 3-word shingles are in the HTML | silent |
+| **vocabulary only** | ≥ 90 % of its 4+ letter words are on the page, in any order | **its own short list — eyeball every one** |
+| needs a disposition | neither | the ranked list, `real × (1 − found)` |
+
+**The middle row is the point, and it is a downgrade, not a dismissal.** A
+vocabulary match is much weaker evidence than a phrase match. TESTED while
+writing it: a paragraph that is genuinely gone, whose words happen to scatter
+through its own article in another order, scores 0.92. Folding that into
+"published" would have bought six table false positives at the price of a new
+way to lose a paragraph in silence — the exact failure this gate exists to
+prevent. A typeset table lands in that list and is correct; a reordered lost
+paragraph lands there and is not; the list is short enough that the difference
+is visible at a glance, and both counts are in the verdict line.
+
+**The general rule, and it is the second time this build has paid for it** (see
+r005's fold gate, which compared the window edge to the fold it was set from):
+**a gate must be able to represent the correct answer.** Before trusting one,
+construct the passing case by hand and check that the check actually passes it.
+A green gate that could not have gone red is not evidence.
+
+## THE AD MATTER IS NOT AN OMISSION — the Inserentenverzeichnis precedent
+
+The back-matter page carries the Impressum in one column and the
+**Inserentenverzeichnis** — the alphabetical list of advertisers, with page
+numbers — in the other. **No issue in the corpus transcribes it**, and that is
+a decision, not an oversight: it indexes the ads, which we do not publish, so
+every page number in it points at nothing.
+
+The noise sweep finds its text every time, because it is real German words that
+occur in no article. 8701 p187 raised `Bitte beachten Sie unsere
+Österreich-Beilage …`, a notice printed in that same column. **Disposition:
+omitted, no comment, no aside** — like the list it belongs to.
+
+Already settled on 8610 (p195), 8611 (**p187, the same page**) and 8612 (p195),
+each time in that issue's `LOG.md` and nowhere else, which is why 8701 asked
+again — and `LOG.md` is git-ignored, so those three rulings exist on one
+machine and in no clone. **If a sweep will raise the same block every time, the
+answer belongs here**, in the rule the next builder reads before running it.
+
+Not to be confused with 8610's `75 Österreich-Beilage.html` — an editorial
+article announcing the supplement, which is published. The notice beside the ad
+index is not that article.

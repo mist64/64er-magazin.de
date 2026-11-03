@@ -44,6 +44,24 @@ be expected to notice that an artefact it did not delete is missing.
 Owner, 2026-10-04: "we also collect. we apply the errata at the END" and "when
 applied, delete all errata md files".
 
+### BUT THE DELETION WAITS ON THE OWNER HAVING READ IT
+
+The harvest does not. MEASURED: `0392bbb2` harvested SH8606's and SH8608's
+files and deleted them the same day, and `65ac71b9` put them back —
+*"Harvested and deleted in 0392bbb2 **before the owner asked to see them**.
+The rule changes from that harvest stand; these files come back unchanged so
+they can be read first, and will be deleted again when the owner is done with
+them."* Both are still in the tree.
+
+So the sequence is: **harvest → write `reviewed/workflow-errata.md` → leave the
+working file → tell the owner it is there → delete it when they say so.** The
+record in `reviewed/` is what makes the deletion safe whenever it comes, and it
+names the commits so the harvest can be audited without the original. SH8607
+and 8701 are both in this shape.
+
+A harvester that deletes on the same day it harvests is optimising for a tidy
+tree over the one reader the file was written for.
+
 ### A HARVEST THAT CHANGES A CLAIM GREPS FOR THE OLD ONE
 
 Rules cross-reference each other, and a rule's claim is usually repeated in a

@@ -469,6 +469,104 @@ That mismatch is correct and must not be "fixed" by a later pass. Record the
 reason in `LOG.md`; do not put it in an HTML comment, which is reader-facing
 German and never a process note.
 
+### A LIST OF DECISIONS IS NOT A LIST OF OUTCOMES — REBUILD IT FROM THE ARTEFACT
+
+The LOG records what was decided at a moment. The HTML records what happened.
+**Where the two can diverge, the artefact governs, and the list is rebuilt from
+it rather than carried forward.**
+
+MEASURED on 8701. Step 150's LOG named six undelivered rows — *70-1, 12-x3,
+49-x, 50-3, 144-00, 156-0*. Rebuilt from the HTML at the end of the build:
+
+- **four of the six were wrong.** 12-x3, 49-x, 50-3 and 144-00 WERE delivered,
+  under the owner's own names — `10-5`, `49-0`, `55-3`, `28-4` — and all four
+  are placed.
+- **two were missing.** 69-0 (the Fehlerteufelchen devil) and 178-0 (the
+  Amerika skyline) are genuinely declined and were not on it.
+- Two of six were right.
+
+Nothing went wrong when that list was written: it was true of the delivery as
+first matched. It went stale the moment a file turned out to be the same figure
+under another name, and **nothing announces that.** A renamed delivery looks
+exactly like a missing one plus an extra one.
+
+So the true declined list is: every worklist row with no `<img src>` pointing
+at it in the final HTML. One query over the artefact, at the end, and it cannot
+be stale by construction. The same holds for any list of what we chose NOT to
+do — r330's dispositions (which also go stale in MEANING, see its own section),
+r220's orphan rows, the marks census's vanishers.
+
+**Write the decision down when you make it, and rebuild the list when you
+report it.** The first is the record; the second is the fact.
+
+### A RECURRING ARTICLE'S FIGURE IS NOT A DECISION — CHECK THE CORPUS FIRST
+
+**Before treating an undelivered row as declined, look for the same figure in
+the other printings.** A piece that recurs — Checksummer, MSE, the Memory Map,
+a Kurs, a Fehlerteufelchen — has been published many times. If every other
+printing carries the figure, its absence here is an **OMISSION from the
+delivery**, not a choice, and it is cut from the master and placed like the
+others. One grep over `issues/*/*.html` answers it, and it outranks any
+reasoning about what the figure or its caption is for.
+
+MEASURED on 8701 p72. `70-1` (Checksummer Bild 1) was not delivered, was
+recorded as declined, and the section below was written about what to do with
+its orphaned caption. **Eight other printings carry that caption in a
+`<figcaption>` with the image above it** — 8508/53, 8610/76, SH8503/6,
+SH8505/6, SH8506/16, SH8507/6, SH8603/76, SH8608/129 — and 8701 was the only
+one in the corpus with the figcaption and no image. The owner saw it on the
+page and said so: *"we have the very same in 10+ other magazines, why ask me?
+do it consistently!"*
+
+The deliveries are large and the owner is deliberate, but **deliberate is not
+the same as exhaustive**: a row can simply be missed, and an undelivered row
+reads identically either way. The corpus is what tells them apart.
+
+### A DECLINED FIGURE TAKES ITS LABEL, NOT THE ARTICLE'S PROSE
+
+An undelivered worklist row is an answer and the figure does not ship — but
+**what goes with it is the LABEL, not everything printed under the picture.**
+Where a caption carries something the reader needs independently of the image —
+instructions, data, a formula, a part number — it is article text that happens
+to be set as a caption, and it stays.
+
+MEASURED on 8701 p72. `70-1`, the framed PETSCII listing of the Checksummer,
+was not delivered and was correctly declined. Its printed caption is **105
+words of instructions**: *"Bild 1. In Zeile 10 müssen Sie nach den
+Anführungsstrichen die ⟨SHIFT+CLR/HOME⟩-Taste drücken…"* — how to type the
+listing in. Declining the crop took that with it, so the article kept its
+*"Als Beispiel können Sie sich Bild 1 betrachten"* and lost the part that tells
+the reader what to do.
+
+> **ERRATUM, same day.** This section first cited 8610's printing of the same
+> Bild as the precedent — *"8610 publishes the same caption AS TEXT"*. **It
+> does not.** 8610/76 carries `<img src="76-1.png">` with that caption attached
+> to it in the ordinary way; r330's D-001 was classed CROP precisely because
+> 8610 has the figure and 8701 does not. The claim was read out of a
+> disposition label and never checked against the file. The RULE below stands
+> on its own reasoning — a procedure is not a label — but 8610 is not evidence
+> for it, and a precedent nobody opened is not a precedent.
+
+**AND THE SURVIVING TEXT IS PROSE, NOT A CAPTION.** Placed as
+`<figure><figcaption>…</figcaption></figure>` with nothing inside, it renders
+as a caption under an empty space, and the owner read it as *"Bild 1 is missing
+the image"* — which is exactly what it looks like. The corpus's 68 image-less
+`<figure>`s are not this shape: each holds a list, a table or a paragraph that
+the caption describes. **A caption needs something to caption.** When a figure
+is declined and its caption carries matter the reader needs, that matter goes
+into the text flow as a paragraph, keeping its *"Bild 1."* opening so the
+article's own reference still lands.
+
+The test is not the caption's length or where it sits. It is: **if the picture
+had never existed, would a reader still need these words?** A label — *"Bild 3.
+VCR-Buchse (am Fernsehgerät)"* — answers no and goes with the figure. A
+procedure answers yes and stays, at its print position, in the shape the corpus
+uses for the same content elsewhere.
+
+The dangling *"siehe Bild 1"* is not a reason to drop the caption too. It is the
+ordinary consequence of a declined figure — 39 published articles name a Bild
+and carry no image — and losing the instructions as well does not mend it.
+
 **What this does NOT license.** It is about position only. A caption that is
 wrong in its WORDS is still r300/r325's business and is recorded, not
 rewritten. If you find yourself editing a character to make a pairing work,

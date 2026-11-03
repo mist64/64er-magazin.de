@@ -1638,3 +1638,303 @@ a page, all six hole positions follow from the issue-wide template
 exists to LOCATE the clip, not to enumerate the holes — so filling only what
 was detected leaves known damage in the master for no reason. Same shape as the
 foot: a per-page measurement standing in for a fact that is known issue-wide.
+
+**13. Both owner deliverables came back "nothing to do", and that is the
+finding.** 8701 put up 67 surviving marks and six Futureteufelchen, each
+worked up properly — montages at matched scale for the marks, and for the
+asides the page quoted verbatim, the fact established, the German drafted and
+"who is helped" answered. The owner ruled **every mark the plate** (*"none of
+the alledged owner marks in the file are actually owner marks"*) and **none of
+the asides**.
+
+Two standing rules already said so, and neither of us read them that way:
+*what we publish is the original printing plate* and *print errors are left as
+printed; only a reprint missing its original's erratum earns an aside* (owner,
+2026-10-08). The build's own confidence counted for nothing — it called p108's
+"23.1.87 Vatel." in a head margin *"plainly a reader's hand"* and it is the
+plate.
+
+**The shape of the mistake is the same in both.** We asked *"is this really an
+error, and can a reader act on it?"* and answered honestly six times over. The
+owner's question is *"is this ours to say?"* — and for a mark on paper or a
+slip in 1987's type, it almost never is. r300's four-kinds table made this
+worse by reading as a menu: twelve of the corpus's 22 asides are about what WE
+did or what OUR files hold, and only five are "the magazine was wrong" — the
+kind all six candidates were. r300 now states the default before the table.
+
+Cost: a census and a 382-line drafting exercise, both of which produced
+excellent records and no changes. The records are not wasted — marks.txt and
+the dropped-candidate list stop the next build re-asking — but the bar should
+have been set before the work, not after it.
+
+**14. The bed check I specified had a floor two to three times the defect.**
+8701's `FORCE_CONTONE` list sent me to the colour classifier's table, and p103
+sat in the same band as the five forced pages (0.00182 against 0.00149-0.00198)
+without being forced. Localising its chroma: 3089 px at x 0-24, a **0.7 mm
+strip of the yellow PROP** down the bottom half of the master, in because
+p103's fold was never found so the inner side was never cut. Not forcing it was
+right and for a better reason than the build knew — at the 35 % bilevel cutoff
+the strip is lum ~186 and drops to white, so bilevel REMOVES the artefact and
+contone would have preserved it.
+
+Sweeping all 192: three masters carry a backing-coloured edge run under 2 mm
+(p028 0.8 mm over 98 % of rows, p147 1.9 over 49 %, p103 0.7 over 47 %), and
+**none was reported.** The `BED in the window` check — the one added this build
+precisely because `unknown` could only report what the trace already believed —
+saw all three and dismissed them: `BED_RUN_LOOK_MM` was 2.0 and `BED_RUN_FRAC`
+0.9. Lowered to 0.5 mm and 0.4.
+
+**The lesson is about thresholds, not about this check.** Every number I set
+this build — the skew peakiness, the foot outlier, the punch row tolerance, this
+one — was chosen from the defects in front of me. Three of the four held. This
+one was set to the size of the bed strip at the FOOT, 7 mm, and the same
+defect at a side edge is ten times smaller. A threshold derived from one
+instance of a defect class is a guess about the others.
+
+**And a justification can be wrong while its conclusion is right.** The build
+forced five pages to contone "matching 153/156/158, which classify contone".
+The five measure 0.0015-0.0020; those three measure 0.018-0.099, ten to fifty
+times higher. The five are forced on the eye, which is a good reason and the
+one 8612 used — but the record cited a resemblance that does not exist, and a
+later reader would have trusted it.
+
+**15. The preflight budget was 2.5x the truth and nearly stopped the build.**
+r000 said a 2400 dpi page costs ~2.25 GB and a 200-page monthly ~450 GB. 8701
+did the arithmetic — 192 x 2.25 = 432 GB — concluded it fitted on neither
+volume, and was about to stream the archive off or skip it. MEASURED on the
+finished working sets: **8701 is 172 GB for 192 pages**, masters2400 63 +
+cmyk2400 97 + sheets600 6 + masters600 5 + debug600 1 + geometry 1, i.e. **0.90
+GB a page**; 8612 is 174 GB for 200, 0.87. The constant is now the measured one.
+
+A budget that OVER-books does not fail safe. It buys a needless and lossy
+decision — in this case throwing away the CMYK archive, which cannot be
+recovered without re-running 005 over the whole issue. The same is true of
+every other "safe" over-estimate in the chain: the cost is paid in work
+avoided that should have happened.
+
+## 8701, 2026-11-03: the day the owner found eight pages the gates had passed
+
+The issue had been signed off. The PDF was built, every gate was green, and
+the owner opened it and found **seven pages cut wrong** — 30, 92, 120, 147,
+176, 178, 179 — one message at a time, over an afternoon. Plus a lost article
+section, three lost tables, two articles in the wrong order, and a figure that
+should never have been declined.
+
+Not one of those was caught by anything we run.
+
+### 1. The window was placed by the wrong thing, and the metric could not see it
+
+Each master is placed by the printed 64'er wordmark, at one fitted offset per
+parity per issue. **MEASURED: the wordmark-to-fold distance is BIMODAL**, split
+at the centre spread — about 187.5 mm on a front-half page and 183.2 mm on a
+back-half one, because the printing sits ~2 mm off-centre on each sheet, so one
+page of every pair is 4 mm nearer the fold than its partner. One offset lands
+between the modes **by construction**, and 92 of 115 comparable pages were
+≥ 0.5 mm off. The owner saw the tails.
+
+8611 and 8612 measure the same. This was never an 8701 fault; every
+logo-anchored issue in the corpus carries it.
+
+**The owner settled it in one sentence, and it is better than the facsimile-
+versus-reading-edition framing control offered:** *"the fold is the more
+important signal, because cutting wrong there either loses information or lets
+the other sheet show through."* At the gutter both directions of error cost
+CONTENT; at the fore-edge a window placed from the fold can only overhang,
+because it is a fixed 210 mm and no page is wider. **Pin the window where a
+wrong edge admits foreign matter or destroys content; let the slack fall where
+it only fabricates white.** Zero regressions across both edges of all 192 pages
+followed from that, not by luck — the error had nowhere expensive to go.
+
+**And the fit's own quality number pointed at the wrong pages.** `unknown` — the
+fabricated-white fraction — put all nine bad pages at or BELOW the median, and
+its eight worst-scoring pages included none of them. It is one-sided (a window
+short of the fold costs nothing), it moves with a wrong mask, and it never
+measured the one quantity that varies: the per-page wordmark-to-trim offset,
+which the chain depended on and had never recorded.
+
+**That number was the end-gate control itself asked for.** When the full-bleed
+code path was rewritten, control demanded "the fabricated/alpha spread for the
+full 192 before 005b, not a sample". It came back 0.10–3.58 %, green, and could
+never have caught any of this. Asking for the number that is available rather
+than the number that would answer the question is its own failure mode.
+
+### 2. Seven checks that could not report their own failure
+
+This is the year's running theme and it produced seven more in one build:
+
+| check | what was wrong |
+|---|---|
+| r020's `kept` count | counted a different predicate than the code kept |
+| r030's unexplained-loss | counted anything matching the marker as accounted for |
+| r005's `unknown` | built from the traced edges, so it could only report the trace's own view |
+| r050's escape test | applied the same "a non-letter is safe" rule as the transform |
+| the skew residual | re-measured with the same blind instrument, and confirmed a 3° error |
+| r300's aside check | held a literal BACKSPACE where `\b` was meant — **it had never matched anything** |
+| the new fold gate | compared x0 to the fold, and x0 was SET from the fold |
+
+The last one is the sharpest: it appeared in the REMEDY, written the same day,
+by people who had spent a week removing the others. **A gate must test the
+ARTEFACT, not the intention.** What replaced it reads the cut master's own
+pixels — the gutter white margin against the issue's own measured baseline —
+and owes nothing to the placement arithmetic.
+
+And r020 exited **0** with 128 of 192 pages FAILED, leaving new blocks with
+stale labels: a state worse than not having run, which nothing downstream
+could detect.
+
+### 3. A check nobody reads is a check that did not run
+
+r320's noise sweep PRINTED one of p33's three lost pin tables, during this
+build, in plain text. It was not read. Three reasons, and the third is the one
+that matters:
+
+- no count in the verdict line, so it read as informational;
+- 138 lines of OCR debris with nothing ranking the one that mattered;
+- **it never asked the question the other half of the same script asks — is
+  this text anywhere in the HTML?** Without that test every line needed a
+  judgement the script could have made itself.
+
+The other two tables were never printed at all: the floor was 12 words and they
+are 4 and 10. **A pin table, a legend, a parts list are SHORT BY NATURE**, so
+that floor excluded exactly the population the failure lives in.
+
+### 4. The contents page indexes; it does not define
+
+Three instances in one build, each from letting the contents page decide
+something that is not its job:
+
+- step 030 took two `<h1>`s from the contents over the printed banner;
+- step 080 let a contents entry decide that a box was an article (p44);
+- the site index showed the contents wording, so the owner could not find an
+  article under its printed name **and reported it missing**.
+
+The owner then set the hierarchy: **the printed banner decides the `<h1>`, the
+Jahresinhaltsverzeichnis decides the index, the contents page decides neither.**
+The same shape governs the a/b letters — *prominence is not order*: both of
+8701's reversed pairs had been lettered by headline size instead of reading
+order, and the letter decides the order two articles publish in.
+
+### 5. A list of decisions is not a list of outcomes
+
+Step 150's record of declined crops was wrong on **four of six**, with two
+genuine declines missing. Nothing went wrong when it was written; it went stale
+when a file arrived under another name, and **a renamed delivery looks exactly
+like a missing one plus an extra one.** Rebuild such a list from the artefact
+at the end. The same applies to r330's dispositions, which go stale in MEANING
+as well as in number: placing one caption turned a CROP difference into a PRINT
+difference with the count untouched, and the gate passed throughout.
+
+### 6. An unnamed model is a silent substitution
+
+`r000_llm._call_api` passed `model=MODEL`. **`_call_cli` passed nothing**, so
+the CLI took the session's default — Fable — for every issue built through it:
+SH8605, SH8606, SH8607, SH8608 and 8701, four of them published. The rule had
+chosen Opus deliberately, in a comment directly above the constant, because
+"the cheaper tiers get wrong often enough to matter".
+
+It surfaced only because Fable ran out of tokens, and then it looked like an
+account-wide credit outage — which control reported to the owner as fact. **The
+owner diagnosed it from one sentence of the symptom.**
+
+Two lessons, and the second is the durable one:
+
+- an unnamed model is not a cheaper version of the right answer. It is a
+  different judgement, arriving with nothing to mark it as such. Had Fable had
+  tokens, 020 would have completed on the wrong model and every gate would have
+  passed.
+- **it lasted five issues because `labels.json` records no model.** The
+  substitution was wrong AND invisible, and only the second let it survive.
+  Whatever produces an artefact should stamp itself into it.
+
+### What to carry forward
+
+**The owner's eye found eight defects that every automated check passed.** That
+is the measurement of this build. Each fix above is worth having, but the
+pattern they share is worth more: a check written from the same belief as the
+thing it checks will agree with it, a check whose output nobody reads has not
+run, and a number produced is not a question answered.
+
+### 7. A gate must be able to represent the correct answer
+
+The noise sweep from §2 above is what found 8701 p33's three lost pin tables.
+They were then typeset, as `<table>`, because that is what the print shows.
+**The sweep re-ran and called all three LOST, with every word in the file.** A
+cell stream normalises to `1 luminanz 2 masse 3 audio out`, so the block's
+3-word shingle `luminanz masse audio` occurs nowhere in it — the row numbers
+sit between the words. Five more blocks, all tables: p35, p48, p61, p162, p170.
+
+The gate written to catch the loss could not see the fix, and reported the
+correct outcome as the defect. The builder put it exactly right: *"the check
+did not confirm its own fix; it confirmed that the fix is in a shape it cannot
+read."*
+
+**This is the same fault as r005's fold gate, twice in one build.** That gate
+compared the window's gutter edge to the fold — but the edge had been SET from
+the fold, so it agreed to within 0.02 mm on every certified page and could
+never have gone red. Here the matcher assumes prose order in the one population
+the sweep exists for: short, number-interleaved text. Both gates were green.
+Neither could have been anything else.
+
+So: **before trusting a gate, construct the passing case by hand and check that
+the check passes it.** A green gate that could not have gone red is not
+evidence, it is a sentence about itself.
+
+The fix also carries its own small lesson. The obvious repair — match a token
+SET instead of shingles — was tested against a hand-built adversarial case
+first: a paragraph that is genuinely gone, whose words happen to scatter
+through its own article in another order, scores 0.92. Folding that into
+"found" would have bought six table false positives at the price of a new way
+to lose a paragraph in silence. So the weak test downgrades a block into its
+own short eyeball list instead of silencing it. **A gate may downgrade
+evidence; it may not make the finding disappear.**
+
+### 8. A precedent recorded only in a log is re-litigated once per issue
+
+8701's sweep raised p187 `Bitte beachten Sie unsere Österreich-Beilage …`,
+printed in the Inserentenverzeichnis column. The ad index is deliberately
+transcribed nowhere in the corpus — its page numbers point at ads we do not
+publish — and this had been settled on 8610, 8611 (**p187, the same page**) and
+8612. Each time in that issue's `LOG.md`, and in no rule. So 8701 asked again,
+and would have asked again on 8702.
+
+And it is worse than "the next build does not look there". **`LOG.md` IS NOT
+IN THE REPOSITORY.** `.gitignore` ignores `issues/*/*` wholesale and names
+every exception; the log is not one, and the file's own comments name it twice
+as the archetype of what is excluded — *"not a work log like LOG.md"*, *"the
+same class as LOG.md: a record of how a run went, not issue content."* That is
+a deliberate decision and the right one. Its consequence is not: 11 logs exist
+on disk against 52 issue directories, on one machine, and a fresh clone has
+none of them. The 8610/8611/8612 precedent was never written down anywhere
+that would outlive the laptop it was typed on.
+
+Three things are carved out as the records that survive a build: `reviewed/`
+(the per-gate baselines), `WORKFLOW_ERRATA.md` (r340's report on the rules) and
+`REPRINTS.md`. **A durable decision goes in one of those or in a rule — and a
+corpus-wide disposition goes in the rule.** The test is not "did we write it
+down" but "will the next builder find it without knowing it exists."
+
+AUDITED, 2026-11-03, because this file class has swallowed a rule's own record
+twice before — `reviewed/` on SH8604 and `WORKFLOW_ERRATA.md` on 8612, both
+recorded in `.gitignore` itself. Every path the rules tell a build to write was
+tested against `git check-ignore`. Everything still ignored is an intermediate
+or a work log by design: `issues/<ID>/<ID>.md` (r030's assembled markdown —
+exists for 0 of 52 issues and nothing past r050 reads it) and
+`toc_category_mapping.tsv` (r100's hand-written input, consumed by its script).
+**No durable record is being silently swallowed today.** Re-run that check
+whenever a rule starts writing a new file into the issue directory.
+
+### 9. A provenance stamp cannot describe the run before it
+
+The §6 fix landed mid-re-ask: 128 of 8701's pages ran on the commit before the
+stamp, 64 on the commit after, so two thirds of a correct Opus build records no
+model. Both ways to make the record whole are wrong. **Re-asking is a rebuild,
+not a provenance fix** — the calls are not deterministic, so new labels move
+block boundaries and the reading order, and steps 030 onward would re-run over
+two thirds of the issue to obtain a string already known. **And a hand-written
+field is worse than a blank one:** blank says *look it up*, written says *stop
+looking*, and nothing later tells the two apart. The builder saw this unprompted
+and declined to hand-stamp.
+
+What moved instead was the evidence: out of the CLI transcript cache and into
+the issue's `reviewed/`. `~/.claude/projects/` rotates, sits outside the repo,
+and is not on the machine of whoever reads the ledger next.
