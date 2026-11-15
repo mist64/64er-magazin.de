@@ -163,6 +163,14 @@ Two further traps found with it, both now closed in the scripts:
   already does for its own cache. Verification: after a cover change, page 1's
   embedded image must DIFFER from the previous build's and match `title.png`.
 
+- **AND THE CACHE LIST IN STEP 3 OMITS `out-allbw.pdf`.** MEASURED on SH10,
+  2026-11-15: after p023's a4600 repair, `out-allbw.pdf` was stale for that
+  page at q90, q94, q96 AND q97 while every cache the list names had been
+  refreshed. A per-page repair invalidates **every** artefact derived from that
+  page, and the list is the only place a reader learns which those are — so an
+  artefact missing from it is an artefact nobody refreshes. Add it, and when a
+  new output appears, add it the same day.
+
 ## PIXEL SIZE DOES NOT PROVE A COVER WAS RETOUCHED
 
 `title.png` must be exactly **25 % of `<A4>/001.png`** — but a plain 150 dpi

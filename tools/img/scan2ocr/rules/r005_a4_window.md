@@ -450,6 +450,19 @@ PY
 #     inside FIELD_PAGE_MM, and the edge tint fell to +1.2/5 %, +0.8/1 %,
 #     +0.2/0 % on fore, top and bottom -- inside the class median.
 #
+#     AND THE OVERRIDE CHECK MUST READ EVERY STAMP LINE, NOT THE LAST ONE.
+#     MEASURED on SH10, 2026-11-15: p023 ended with THREE overrides -- the
+#     masters600 OVERRIDE field (the hand-traced box), the a4600 window
+#     recovery, and the gutter/fore-edge/foot edge repair -- and
+#     check_a4600_overrides.py tests only the LAST stamp line per page. So the
+#     first override silently fell out of coverage as the second and third were
+#     added: the check kept reporting green while describing less and less of
+#     the page. It was hand-checked instead, and the field was still there.
+#     A CHECK THAT NARROWS AS THE WORK GROWS is the worst kind on a page that
+#     needs repeated repair, because the pages with the most overrides are the
+#     ones it covers least. Read ALL stamp lines, and report the count of
+#     overrides found per page so a missing one shows as a number.
+#
 #     AND AN a4600 OVERRIDE HAS A DOWNSTREAM: EVERYTHING READ FROM a4600 IS
 #     STALE AFTER IT.  010 OCRs a4600 into blocks, and 020/030 are built on
 #     those blocks; the 150 dpi raster, the JBIG2 stream and the OCR text layer
