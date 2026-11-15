@@ -475,6 +475,41 @@ never acceptable.
   is enough.
 
 
+## A GLUED HEAD CANNOT BE READ FROM THE HTML — THE TEST IS ON THE PAGE
+
+A bold label joined to the end of the previous paragraph is **indistinguishable
+in the markup** from a run-in head that belongs there. The HTML offers no
+evidence either way, and an inference drawn from it will be wrong about half the
+time.
+
+**THE TEST, and it takes one look at the line:** does the body text continue
+**ON THE SAME LINE** as the bold label?
+
+| on the page | markup |
+|---|---|
+| the label stands on **its own line**, body indented beneath | a heading — `<h3>`, per the owner's rule that heading level follows print |
+| the body **continues on the label's line** | run-in — `<p><strong>Label:</strong> text …</p>` |
+
+**MEASURED on SH10, 2026-11-15, both branches on one issue.** Step 160's report
+called article 141's routine entries "prose run-in heads" — an inference from
+the glued HTML — and control built a caution on it, telling the builder not to
+let them become headings because 290 would then enforce the structure. The
+190 agent read pp. 141–148 and found **each entry is a bold line on its own
+with an indented body paragraph.** The corpus thread agrees without exception:
+`SH8608/87` carries 30 `<h3>` entries (`<h3>VIRES ($FF81)</h3>`,
+`<h3>IORES ($FF84)</h3>`), and `SH8601/125` sets the C 128 interpreter's
+entries the same way.
+
+So 141's **73** heads are `<h3>`, and the withdrawn caution had also flattened
+correct headings in three other articles, which were restored: 123's seven
+(six menu points plus `Programmbeschreibung:`), 126's seven `Speicherstelle(n)`
+heads, 148's seven subheads.
+
+**And the same look keeps the genuinely run-in labels as they are:** SH10's
+129 `Eingabehinweise:` and 132's `f` / `x,y` / `w` / `q$` definitions all
+continue on the label's line, so they stay `<p><strong>`. One test, both
+answers, and the page gives both in the same glance.
+
 ## Set-off boxes become `<aside>` — decided by BACKGROUND, not by content
 
 The magazine sets sidebars apart visually and the OCR keeps only the words, so
