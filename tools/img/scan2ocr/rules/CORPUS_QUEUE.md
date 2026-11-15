@@ -236,3 +236,36 @@ run one way. Decide the convention once, then apply it to this pair.
 
 **Not urgent, and not SH10's work:** the pair was diffed as an OCR cross-check
 with no credit claimed either way, per r330, *THE DIRECTION CAN BE REVERSED*.
+
+## 15. The traced top/bottom line can take a skew the page does not have
+
+SH10 p002 lost 869.9 mm² of print from a white wedge along the top of the page.
+It looks exactly like the bed drop that `BED_REACH_MM` now caps, and it is a
+different defect: measured per 500 px column the band is 0, 203, 174, 149, 123,
+97, 71, 46, 20, 0 px deep — **a straight line falling 25.8 px per 500, i.e.
+−2.95°**. A connected-component flood has a ragged boundary; a line fit is
+straight. This is `t.keep`'s own top line, from `trace(tops, …)` at
+`r005_masters_sheet.py:1977`, taken off an ink/bed edge on a page where print
+runs to the scan edge, with nothing above the print for the tracer to find.
+
+p002 currently carries a hand override (`regrade_002.py`, recorded in
+`a4600-overrides.txt` with both-ways figures). **That override exists only
+because this rule is not written yet.**
+
+THE SHAPE OF THE GUARD, not yet measured: a top or bottom line more than about
+1° off the page's own skew, where the opposite edge is near level, is not a
+page edge — on p002 the bottom line sits at −0.09°, so the two disagree by
+2.86°. Refuse the outlier and fall back to the scan edge, or to the opposite
+edge's angle.
+
+WHAT HAS TO BE MEASURED FIRST, corpus-wide: the distribution of (top angle −
+bottom angle) over every page of every issue with a working tree. The guard's
+threshold has to sit above the honest disagreement a real paste-up produces —
+r005 already records that **two printed straights that agree are a scan
+rotation, two groups that disagree are the paste-up** (SH10 001/002 and
+167/168), so some disagreement is real and must survive.
+
+**Deliberately NOT bundled with `BED_REACH_MM`.** Both change `t.keep`, and
+one 3 h re-derive that moves two things cannot say which one moved the result.
+Land this on its own, with its own before-and-after ink sweep. When it lands,
+p002's override should become redundant; its record says so.
