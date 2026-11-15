@@ -574,6 +574,35 @@ indistinguishable from a clean sweep, which is the whole of the lesson above.
 **Closing it would mean a NEW population, not more reading of this one** — do
 not open one on the strength of a hypothetical example.
 
+### AND ITS SIZE IS NOW MEASURED, NOT ASSERTED — THE PLANTED-STROKE TEST
+
+r000 has always asked for a planted-stroke test and no build had run one. SH10
+ran it, 2026-11-15, on COPIES of p121 (bilevel) and p024 (contone), eight
+strokes each, with the census itself untouched:
+
+| planted stroke | result |
+|---|---|
+| any stroke in a margin or white space, dark | caught by the `dark` net |
+| the same, pale | caught by `faint` / `pale` |
+| a RED stroke across a word | caught by `chroma`, on both paths |
+| **a NEUTRAL 3 mm stroke across a word, dark (lum 60)** | **caught by NO net, on either path** |
+| **the same, pale (lum 185)** | **caught by NO net, on either path** |
+| a pale (185) stroke in bilevel white space | **0 px in the PDF — it vanishes** |
+
+So the hole below is not merely "a mark that touches print may be missed": a
+**neutral** stroke across a word is invisible to every net we have, and the
+dark one would have put **353 black pixels** on that bilevel page. Colour is
+what saved SH09's p110 — it was RED, and `chroma` is the net that caught the
+planted red stroke too. A grey pencil would not have been found.
+
+**NOT COVERED by the test and therefore still unknown:** a stroke ~10 mm across
+a word, and mid tones between 60 and 185.
+
+**So a census reports its bound with its result.** SH10's `marks.txt` header
+carries exactly that sentence — no hands found, and here is the size and tone
+of hand this issue's bilevel pages could not have shown — and a census without
+it is a claim about an uncalibrated instrument.
+
 ### KNOWN DEFECT, OPEN — THE ISOLATION RULE DROPS EVERY MARK THAT TOUCHES PRINT
 
 **And this one is NOT bounded by the arithmetic above.** The section before this
