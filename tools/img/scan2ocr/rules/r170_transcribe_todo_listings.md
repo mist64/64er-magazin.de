@@ -39,6 +39,7 @@ numbers IS the program. So it does not stay as page text — it goes into
 | MSE hex | decode the hex to the binary with `tools/mse.py`, write `prg/<name>.prg` | `<pre data-filename="<name>.prg" data-name="<Name>" data-mse=mse1></pre>` |
 | A **monitor dump** (TEDMON, VC-20 monitor, C64 monitor) | assemble the bytes at their printed addresses, write `prg/<name>.prg` | `<pre>` carrying the dump **as printed** — not `data-mse`, which would render MSE's row format and addresses the magazine never set |
 | A dump in the **program's own format with a row sum** | same, and verify every row sum | as printed |
+| **A printed program the disk HAS, differing only in numbering, layout, line splits or truncation** | type the PRINT into the `<pre>`; ship the DISK file as a hidden download; add a German comment giving both numberings as FACTS and claiming no rule between them | as for Checksummer BASIC. MEASURED on SH10: `xlv 3.6` numbers 1–86 on disk against 10–860 in print, `datawandler v3.5` 1–115 against 10–1150, and four printed lines (135, 315, 355, 1115) correspond by nothing — so "renumbered by ten" is false and a comment that implied it would be checkable and wrong. No Futureteufelchen: the program is identical |
 | **A printed BASIC program the disk lacks** — the general row | `petcat` the transcription as above; there is nothing to compare against, so a second independent read replaces the round trip | as for Checksummer BASIC, minus `data-checksummer` where the print has no sums |
 
 Two shapes SH8608 had that the rows above do not name, both of which became
@@ -184,6 +185,36 @@ lines, one agent per page-range.** Carry the crop coordinates in the brief
 spend its budget rediscovering them. r000's image cap is the same constraint
 one level up: about four images survive a turn, and `[media removed: request
 limit]` arrives with no error.
+
+### THE LINE BREAKS COME FROM THE PAGE, AND A CHARACTER COUNT IS A MAXIMUM
+
+A 1986 listing is set to a column width, so it is tempting to treat that width
+as where the lines break. **It is a ceiling and not a rule.** MEASURED on
+SH10's `xlv` and `datawandler`: the print breaks EARLY, before `PRINT` and
+before `THEN`, so a wrap reconstructed from a character count lands in a
+different place from the page's.
+
+**Take every wrap from the page.** Nothing in this file ever said a number, so
+nobody could check the assumption that produced it — which is the defect: a
+belief that is not written down cannot be wrong in public.
+
+### THE VERIFICATION COULD NOT SEE A TRUNCATED CROP — COUNT THE PRINTED ROWS
+
+The Verification looked for empty bodies and leftover `TODO`s. **A crop cut
+short passes both**: the body is full, the markup is right, and the listing is
+simply missing its last rows. MEASURED on SH10: a crop region had dropped
+**~15 rows** before it was re-cut, and nothing in this block could see it.
+
+**So compare the number of typed rows against the number of ROWS PRINTED ON THE
+PAGE**, measured from cell occupancy rather than from the transcription — the
+page is the authority for how many rows exist, and the transcription is the
+thing under test. SH10 read **87/87 and 118/118** this way, with an independent
+GLM pass agreeing apart from artefacts that were each eyed, and an underline
+scan matching the disk's shifted characters exactly.
+
+A listing that is short by its last rows is the quietest possible defect in
+this chain: it renders, it tokenises, and it runs up to the point where it
+stops.
 
 Don't guess crop coordinates by trial-and-error. Step 010 already wrote the
 block index; grep it for the `Listing` caption line:
