@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Laden und Speichern ohne Kompromisse</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Michael Möller, nj">
+    <meta name="64er.issue" content="Sonderheft 9/86">
+    <meta name="64er.pages" content="109">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.id" content="load-save-plus">
+</head>
+
+<body>
+    <article>
+        <h1>Laden und Speichern ohne Kompromisse</h1>
+        <p class="intro">Das Programm »Load/Save Plus« zeigt, wie man mit wenigen Bytes das Betriebssystem des C 64 sinnvoll erweitert. Das Speichern beliebiger Bereiche und ein »verschobenes« Laden ist nun auch ohne Monitor möglich.</p>
+
+        <p>Zur Speicherung von Maschinenprogrammen, Bildschirmmasken oder hochauflösenden Grafiken und ähnlichem mußte bisher oft ein Maschinensprache-Monitor eingesetzt werden. Auch das Laden von Diskette in gewünschte andere Speicherbereiche war bisher nur auf Umwegen möglich. »Load/Save Plus« beseitigt dieses Manko des C 64 in nur 74 Bytes. Programme können nun von der Diskette in jeden gewünschten RAM-Bereich geladen und aus nahezu allen Bereichen auf Diskette oder Kassette gespeichert werden.</p>
+
+        <h2>Bedienungsanleitung</h2>
+
+        <p>Die Erweiterung kann entweder als Basic-Lader (Listing 1) oder direkt als Maschinenprogramm (Listing 2) mit dem MSE eingegeben und gespeichert werden. Der Basic-Lader speichert die Erweiterung nach RUN automatisch als Maschinenprogramm auf Diskette. Nach dem Laden mit »LOAD "LOAD/SAVE.OBJ",8,1« und der Aktivierung mit SYS 694 stehen folgende Befehle zur Verfügung:</p>
+
+        <p>— SAVE"NAME",ga<br>Normale SAVE-Routine</p>
+
+        <p>— SAVE"NAME",ga,1,START,ENDE<br>Bereich von START bis ENDE speichern</p>
+
+        <p>— LOAD"NAME",ga<br>Normales Basic-LOAD</p>
+
+        <p>— LOAD"NAME",ga,1<br>Absolutes Laden</p>
+
+        <p>— LOAD"NAME",8,1,START<br>Laden an angegebene Adresse (nur Disk)</p>
+
+        <p>(ga = 8/9 oder 10/11 für Diskette beziehungsweise ga = 1 für Kassette)</p>
+
+        <p>»START« und »ENDE« können direkt, das heißt mit Hilfe ganzer Zahlen, oder indirekt als Variablen angegeben werden. In der vorliegenden Form ist es jedoch nicht möglich, das RAM zwischen $A000 und $BFFF oder $E000 und $FFFF zu speichern.</p>
+
+        <p>Beim Aktivieren der Erweiterung mit SYS 694 werden die im RAM liegenden Vektoren für LOAD und SAVE ($0330/0331 und $0332/0333), die normalerweise auf $F4A5 beziehungsweise $F5ED zeigen, geändert. Die Vektoren zeigen nun auf die Erweiterung. Die Routinen prüfen zunächst, ob beim LOAD- oder SAVE-Befehl zusätzliche Parameter angegeben wurden. Wenn das nicht der Fall ist, wird die normale LOAD- beziehungsweise SAVE-Routine angesprungen. Wenn eine START- beziehungsweise ENDE-Adresse angegeben wurde, werden die Zeiger auf Beginn und Ende in der Zeropage entsprechend gesetzt und danach die LOAD- beziehungsweise SAVE-Routine ausgeführt. Zuletzt sei noch darauf hingewiesen, daß die Erweiterung nach &lt;RUN/STOP+RESTORE&gt; mit SYS 694 erneut aktiviert werden muß.</p>
+
+        <address class="author">(Michael Möller/nj)</address>
+        <figure>
+            <pre data-filename="load_save.bas" data-name="Load/Save Plus (Basic-Lader)" data-checksummer="3"></pre>
+            <figcaption>Listing 1. Dieser Basic-Lader speichert »Load/Save Plus« automatisch als Maschinenprogramm auf Diskette</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="load_save.obj.prg" data-name="Load/Save Plus" data-mse=mse1></pre>
+            <figcaption>Listing 2. Maschinenprogramm »Load/Save Plus«. Bitte verwenden Sie zur Eingabe den MSE</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="load_save.obj.prg" data-name="Load/Save Plus"></div>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Arbeiten mit dBase II</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="O.Trottno, bj">
+    <meta name="64er.issue" content="Sonderheft 9/86">
+    <meta name="64er.pages" content="79-84,86-90">
+    <meta name="64er.head1" content="dBase-II-Kurs">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Grundlagen">
+    <meta name="64er.id" content="dbase">
+</head>
+
+<body>
+    <article>
+        <h1>Arbeiten mit dBase II</h1>
+        <p class="intro">Das Datenbanksystem dBase II von Ashton-Tate hat sich nicht nur auf IBM-PCs und Kompatiblen einen Namen gemacht, es gehört auch zur professionellsten Software, die derzeit für den C 128 verfügbar ist. In diesem Beitrag geben wir allen, die noch nicht mit dBase II gearbeitet haben, einen kurzen Einstieg und den Anwendern kompakte Nachschlagetabellen zur täglichen Arbeit an die Hand.</p>
+
+        <figure>
+            <img src="79-1.png" alt="Bildschirmfoto: gelistete Videodatei mit Filmtiteln, Genres und Nummern">
+            <figcaption>Bild 1. Eine gelistete dBase II-Videodatei</figcaption>
+        </figure>
+
+        <p>Wir wollen uns zuerst schrittweise vom Starten des Programmes dBase II über die Erstellung einer Datei bis zur Dateneingabe vorarbeiten. Bei den »Vorarbeiten« werden einige Möglichkeiten, die uns das Betriebssystem CP/M zur Verfügung stellt, um schneller und effektiver mit dem Datenbanksystem umgehen zu können, zur Sprache gebracht. Diese »Möglichkeiten« sind zwar für den Programmablauf nicht erforderlich, bieten aber für manchen eine wichtige Anregung.</p>
+
+        <h3>Erstellen einer dBase II-Arbeitsdiskette</h3>
+
+        <p>Stellen Sie sich zuerst, wie im Handbuch ausführlich beschrieben, eine Arbeitskopie der dBase II-Disketten her. Sofern Sie dabei die Floppy 1571 verwenden, ergibt sich schon nach dem Formatieren im 1571-Modus (»C 128 double sided« im Programm »Format«) ein Geschwindigkeits- und Speicherplatzvorteil gegenüber der Originaldiskette. Dies liegt daran, daß Software für den C 128 üblicherweise im 1541-Modus aufgezeichnet wird, um die Möglichkeit zu bieten, sowohl mit der Floppy 1541 als auch den Folgemodellen 1570 und 1571 die Disketten zu verwenden. Da die Floppy 1571 die Disketten beidseitig verwendet und zudem ihr eigenes Format weit schneller einlesen kann, sollte man bei der Formatierung nur den »double-sided«-Modus verwenden. Sollten Sie sich dennoch für den 1541-Modus entscheiden, dürfen auf der vermeintlichen »Rückseite« der Diskette keine wichtigen Programme oder Datenbestände aufbewahrt werden, zumindest nicht ohne Schreibschutz auf dieser Seite. Das Programm »Format« formatiert nämlich auch gegen Ihren Willen im einseitigen Modus die zweite Seite mit. Soviel zum Formatieren. Da auf der dBase II-Arbeitsdiskette nach dem Kopieren die Programme »CPM+.SYS« und »CCP.COM« enthalten sein sollten (um nicht das Betriebssystem von einer anderen Diskette einlesen zu müssen), besteht zuerst die Möglichkeit, die Bildschirmfarben im 40- und 80-Zeichenmodus beliebig den eigenen Bedürfnissen und Wünschen anzupassen. Starten Sie hierfür das Programm »Keyfig«, wählen Sie die Option »Definitions on the CP/M boot disk« an und legen die dBase II-Arbeitsdiskette (auf der das System dann enthalten sein sollte) ein. Wählen Sie nun das Ändern der »logischen« Farben und danach die Art Ihres Bildschirmes (40- oder 80-Zeichen-Darstellung) an. Wenn Sie nun als logische Farbe »a« für Schwarz (=Hintergrund) drücken und anstelle deren beispielsweise »g« für Dunkelblau wünschen, müssen Sie nur noch bei »Select physical color to assign« »g« drücken, fertig. Mit der Schriftfarbe (»e«) können Sie dann auf gleiche Weise verfahren. &lt;RETURN&gt; beendet die Farbzuweisung. Nachdem Sie »done logical/physical colors« anwählten, erscheint die Frage, wohin die neuen Werte gespeichert werden sollen. Da wir die farblichen Änderungen dauerhaft nach jedem »Booten« des CP/M-Systems zur Verfügung haben möchten, speichern wir also auf der »CP/M boot disk«. Davon ausgehend, daß Sie zu diesem Zeitpunkt keine weiteren Änderungen beabsichtigen, können Sie nun die Schlußabfrage mit »N« beantworten, das System neu starten und Ihre Farbkombination begutachten.</p>
+
+        <p>Auf die gleiche Weise läßt sich mit dem Programm »Keyfig« auch die Tastatur (also nicht nur die Funktionstasten) mit anderen als den dort gewohnten Tasten belegen, lassen sich sogar Zeichenketten, Farbcodes und spezielle Funktionen programmieren! Dies hört sich vielleicht schwierig an, ist es jedoch nicht. Es nimmt allenfalls etwas Zeit in Anspruch, sich selbst klar darüber zu werden, wo man nun am günstigsten was unterbringt. Den Funktionstasten könnten Sie beispielsweise Strings wie »display structure« oder »display files like *.*« zuordnen. Geben Sie am Ende des Textes noch &lt;CTRL+M&gt; ein, so wird ein RETURN (CHR$(13) angehängt und der Befehl gleich ausgeführt.</p>
+
+        <p>Die letzte hier vorgestellte Möglichkeit, sich selbst den Umgang mit CP/M und dBase II zu erleichtern, besteht darin, eine Stapelverarbeitungsdatei einzurichten. In diese Datei können Sie dann Programmnamen eintragen, die ausgeführt werden sollen und können diesen Programmen sogar noch Parameter übergeben. Nennt man diese Datei dann noch »Profile.sub«, so wird deren Inhalt bearbeitet, bevor überhaupt die Bereitschaftsmeldung »A« erscheint. Befindet sich die Datei »Profile.sub« mit folgendem Inhalt auf der Diskette</p>
+
+        <pre><code>setup
+&lt;g
+&lt;u
+dbase</code></pre>
+
+        <p>so wird zuerst »Setup.com« geladen, der Wert »g« für »German« (deutsche Tastaturbelegung) und »u« für Druckerbetrieb über den User-Port übergeben (die Meldung »Program input ignored« können Sie in diesem Zusammenhang ignorieren) und schließlich »dBase II« ausgeführt. Die spitze Klammer nach links signalisiert, daß die folgenden Zeichen als Pseudo-Tastatureingaben zu verstehen sind. Es lassen sich auch mehrere Zeichen hintereinander auf diese Weise verwenden. Haben Sie unter dBase II schon ein Programm geschrieben, kann man dies gleich berücksichtigen, etwa »dbase video«. Ist dies alles installiert, müssen Sie lediglich noch die Arbeitsdiskette einlegen und den C 128 einschalten, alles weitere wird »selbständig« von »Profile.sub« veranlaßt. Sofern Sie keine eigene Anwendung in Form eines Programms unter dBase II unmittelbar starten möchten, dafür aber auf das Datum verzichten wollen, müssen Sie an unser obiges Beispiel nur noch eine einzelne spitze Klammer anfügen. Ohne folgende Zeichen wird dies als &lt;RETURN&gt; interpretiert, was bedeutet, daß die Eingabe des Datums übersprungen wird. Auch die Frage, wie die Datei »Profile.sub« zu erstellen ist, soll nicht unbeantwortet bleiben. Sie benötigen hierfür den Editor »Ed«, der hier mit »Ed profile.sub« aufgerufen wird. Im Commodore-Handbuch zu CP/M auf dem C 128 finden Sie unter den Kapiteln 7 - 55 bis 7 - 58 eine Aufstellung der Editorkommandos (die sehr gewöhnungsbedürftig sind). Hier sollen nur in Kürze die uns direkt betreffenden Anweisungen beschrieben werden. Nachdem sich der Editor mit dem »*« meldet, geben Sie »I« für Insert (Einfügen) ein; da (noch) kein Inhalt vorhanden ist, wird das Einfügen von Text am Anfang durchgeführt. Es erscheint »1:« auf dem Bildschirm, Sie sind also in der ersten Zeile. Nachdem Sie in einem »manuellen Durchgang« festgestellt haben, welche Programme mit welchen Parametern Sie für Ihre Zwecke benötigen und dies am besten gleich notiert haben, tragen Sie nun Zeile für Zeile Ihre Anweisungen ein. Mit Ausnahme der letzten Eingabezeile verwenden Sie immer &lt;RETURN&gt;, um die Zeile abzuschließen. In besagter letzter Zeile drücken Sie &lt;CTRL+Z&gt;, es erscheint dann wieder das Sternchen (»*«), und Sie können mit &lt;E&gt; und &lt;RETURN&gt; die neu erstellte Datei auf Ihre Arbeitsdiskette schreiben. Nach diesen (nicht dringend erforderlichen) Vorbereitungen, deren Prinzip zudem bei allen Anwendungen unter CP/M verwendet werden kann, steht Ihnen das dBase II-System mit allen Einstellungen Ihrer Wahl zur Verfügung, nachdem Sie lediglich die Diskette eingelegt und den C 128 eingeschaltet haben!</p>
+
+        <h3>dBase II-Kompaktkurs</h3>
+
+        <p>Da eine ausführliche Beschreibung aller Befehle und Funktionen von dBase II selbst den Rahmen dieses Sonderheftes sprengen würde, wurde ein Kompromiß zwischen Kurs und Nachschlagewerk gewählt. Im folgenden finden Sie ein alphabethisches Verzeichnis aller dBase II-Befehle mit Kurzbeschreibung (Tabelle 1), ein Verzeichnis aller Funktionen (Tabelle 2) und eine Übersicht über alle wichtigen Begriffe rund um dBase II (Tabelle 3). Weiterhin werden alle Cursortasten in den verschiedenen Modi aufgeführt (Tabelle 4), die dBase II-Befehle mit Beispielen erklärt (Tabelle 5), die Fehlermeldungen sowie deren Ursache/Beseitigung zusammengefaßt (Tabelle 6) und schließlich noch wichtige Systemdaten (Tabelle 7) und Literaturhinweise (Info) gegeben.</p>
+
+        <p>Sie erhalten jederzeit im Programm Hilfestellung zum dBase II-System, indem Sie »HELP« und den Namen des dBase II-Kommandos oder »HELP« und eines der Schlüsselwörter</p>
+
+        <table class="plain">
+            <tr>
+                <td>– ANWENDERPROGRAMME</td>
+                <td>-BEGRIFFE</td>
+            </tr>
+            <tr>
+                <td>– -HELP</td>
+                <td>-NEU</td>
+            </tr>
+            <tr>
+                <td>– KENNDATEN</td>
+                <td>-BEISPIELE</td>
+            </tr>
+            <tr>
+                <td>– FUNKTIONEN</td>
+                <td>-DBASE</td>
+            </tr>
+            <tr>
+                <td>– BILDSCHIRM</td>
+                <td>-MODI</td>
+            </tr>
+            <tr>
+                <td>– -FEHLER</td>
+                <td>-INSTALL</td>
+            </tr>
+        </table>
+
+        <p>eingeben. Das Schlüsselwort muß dabei vollständig eingegeben werden. Sofern das Schlüsselwort nicht gefunden werden kann (etwa aufgrund eines Eingabefehlers oder weil die HELP-Datei gelöscht wurde), erscheint die Systemmeldung »Keine HELP-Texte gefunden«. Umfaßt ein HELP-Text mehrere Bildschirmseiten, so wird am Ende jeder Seite »System wartet« ausgegeben. Sofern Sie auf der dBase II-Arbeitsdiskette die HELP-Datei entbehren können (kopieren Sie in diesem Fall »DBASEMSG.TXT« am besten auf eine ungenutzte Diskette und löschen die Datei mit »erase« auf der Arbeitsdiskette), gewinnen Sie wertvollen Speicherplatz (etwa 60 KByte), was besonders bei Verwendung nur eines Laufwerkes wichtig werden kann.</p>
+
+        <p>Die wichtigsten dBase II-Dateien befinden sich auf der ersten Diskette. Dies sind:</p>
+
+        <table class="plain">
+            <tr>
+                <td>DBASE.COM</td>
+                <td>–</td>
+                <td>Hauptprogramm</td>
+            </tr>
+            <tr>
+                <td>DBASEOVR.COM</td>
+                <td>–</td>
+                <td>Übersichten und System-Mitteilungen</td>
+            </tr>
+            <tr>
+                <td>DBASEMSG.TXT</td>
+                <td>–</td>
+                <td>HELP-Datei (nur erforderlich, wenn Sie »HELP« nutzen)</td>
+            </tr>
+            <tr>
+                <td>INSTALL.COM</td>
+                <td>–</td>
+                <td>Programm zur Anpassung an das Terminal (die Version für den C 128 ist bereits angepaßt).</td>
+            </tr>
+        </table>
+
+        <p>Wie schon erwähnt, ist das Programm »INSTALL.COM« sowie die Textdatei »DBASEMSG.TXT« entbehrlich; Sie sollten beide aber vorsichtshalber auf eine eigene Diskette kopieren, für den Fall, daß die Systemdisketten beschädigt werden.</p>
+
+        <address class="author">(O.Trottno/bj)</address>
+
+        <p class="source">Literatur:<br>Dr. Peter Albrecht, dBase II für den Commodore 128 PC, Markt&amp;Technik Verlag 1985, ISBN 3-89090-189-1, 280 Seiten, Preis: 49 Mark<br>Dr. Peter Albrecht, Das Datenbanksystem dBase II, Markt&amp;Technik Verlag 1985, ISBN 3-89090-143-3, 280 Seiten, Preis: 68 Mark<br>Wayne Ratliff, dBase II-Anwenderhandbuch, Ashton-Tate GmbH, Markt&amp;Technik Software-Verlag 1984, 437 Seiten, Preis: 49 Mark</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>?</td>
+                    <td>–</td>
+                    <td>zeigt einen Ausdruck, eine Variable oder ein Feld an</td>
+                </tr>
+                <tr>
+                    <td>??</td>
+                    <td>–</td>
+                    <td>zeigt eine Liste von Ausdrücken an, ohne vorher einen Zeilenvorschub auszuführen</td>
+                </tr>
+                <tr>
+                    <td>@</td>
+                    <td>–</td>
+                    <td>gibt formatierte Daten auf Bildschirm oder Drucker aus</td>
+                </tr>
+                <tr>
+                    <td>ACCEPT</td>
+                    <td>–</td>
+                    <td>Eingabe einer Zeichenkette in eine bestimmte temporäre Variable</td>
+                </tr>
+                <tr>
+                    <td>APPEND</td>
+                    <td>–</td>
+                    <td>fügt Informationen von einer anderen dBase II-Datenbank oder -Datei an die benutzte Datei an</td>
+                </tr>
+                <tr>
+                    <td>BROWSE</td>
+                    <td>–</td>
+                    <td>Bildschirm-Darstellung und -Bearbeitung der Datenbank</td>
+                </tr>
+                <tr>
+                    <td>CANCEL</td>
+                    <td>–</td>
+                    <td>beendet die Ausführung einer Programmdatei</td>
+                </tr>
+                <tr>
+                    <td>CHANGE</td>
+                    <td>–</td>
+                    <td>feldweise Bearbeitung von Datenbanken</td>
+                </tr>
+                <tr>
+                    <td>CLEAR</td>
+                    <td>–</td>
+                    <td>schließt alle eröffneten Datenbanken und löscht alle erzeugten temporären Variablen</td>
+                </tr>
+                <tr>
+                    <td>CONTINUE</td>
+                    <td>–</td>
+                    <td>setzt die Suchaktion nach einem LOCATE-Befehl fort</td>
+                </tr>
+                <tr>
+                    <td>COPY</td>
+                    <td>–</td>
+                    <td>kopiert Daten aus einer Datei in eine andere Datei</td>
+                </tr>
+                <tr>
+                    <td>COUNT</td>
+                    <td>–</td>
+                    <td>zählt die Datensätze in einer Datei, die eine angegebene Bedingung erfüllen</td>
+                </tr>
+                <tr>
+                    <td>CREATE</td>
+                    <td>–</td>
+                    <td>erzeugt eine neue Datenbank-Datei</td>
+                </tr>
+                <tr>
+                    <td>DELETE</td>
+                    <td>–</td>
+                    <td>löscht eine Datei oder markiert einen Satz zum Löschen</td>
+                </tr>
+                <tr>
+                    <td>DISPLAY</td>
+                    <td>–</td>
+                    <td>zeigt Dateien, Datensätze, Strukturen, temporäre Variable oder den Status an</td>
+                </tr>
+                <tr>
+                    <td>DO</td>
+                    <td>–</td>
+                    <td>führt Programmdateien oder strukturierte Schleifen aus</td>
+                </tr>
+                <tr>
+                    <td>EDIT</td>
+                    <td>–</td>
+                    <td>ruft die Bearbeitung von Daten in einer Datenbank auf</td>
+                </tr>
+                <tr>
+                    <td>EJECT</td>
+                    <td>–</td>
+                    <td>erzeugt Seitenvorschub auf dem Drucker</td>
+                </tr>
+                <tr>
+                    <td>ELSE</td>
+                    <td>–</td>
+                    <td>alternativer Weg bei der Befehlsausführung innerhalb IF</td>
+                </tr>
+                <tr>
+                    <td>ENDCASE</td>
+                    <td>–</td>
+                    <td>beendet einen CASE-Befehl</td>
+                </tr>
+                <tr>
+                    <td>ENDDO</td>
+                    <td>–</td>
+                    <td>beendet einen DO WHILE-Befehl</td>
+                </tr>
+                <tr>
+                    <td>ENDIF</td>
+                    <td>–</td>
+                    <td>beendet einen IF-Befehl</td>
+                </tr>
+                <tr>
+                    <td>ENDTEXT</td>
+                    <td>–</td>
+                    <td>beendet einen TEXT-Befehl</td>
+                </tr>
+                <tr>
+                    <td>ERASE</td>
+                    <td>–</td>
+                    <td>löscht den Bildschirm</td>
+                </tr>
+                <tr>
+                    <td>FIND</td>
+                    <td>–</td>
+                    <td>sucht einen Datensatz in einer indizierten Datei</td>
+                </tr>
+                <tr>
+                    <td>GO/GO TO</td>
+                    <td>–</td>
+                    <td>geht zu einer bestimmten Position in einer Datei</td>
+                </tr>
+                <tr>
+                    <td>HELP</td>
+                    <td>–</td>
+                    <td>gibt dem Benutzer Hilfestellung auf dem Bildschirm</td>
+                </tr>
+                <tr>
+                    <td>IF</td>
+                    <td>–</td>
+                    <td>erlaubt eine bedingte Befehlsausführung</td>
+                </tr>
+                <tr>
+                    <td>INDEX</td>
+                    <td>–</td>
+                    <td>erzeugt eine Index-Datei</td>
+                </tr>
+                <tr>
+                    <td>INPUT</td>
+                    <td>–</td>
+                    <td>erlaubt Eingabe von Ausdrücken in temporäre Variable</td>
+                </tr>
+                <tr>
+                    <td>INSERT</td>
+                    <td>–</td>
+                    <td>einfügen neuer Datensätze</td>
+                </tr>
+                <tr>
+                    <td>JOIN</td>
+                    <td>–</td>
+                    <td>erzeugt gemeinsame Ausgabe aus zwei Datenbank-Dateien</td>
+                </tr>
+                <tr>
+                    <td>LIST</td>
+                    <td>–</td>
+                    <td>listet Dateien, Datensätze, Strukturen, temporäre Variable und den Status</td>
+                </tr>
+                <tr>
+                    <td>LOCATE</td>
+                    <td>–</td>
+                    <td>findet einen Datensatz, der eine Bedingung erfüllt</td>
+                </tr>
+                <tr>
+                    <td>LOOP</td>
+                    <td>–</td>
+                    <td>springt zum Anfang eines DO WHILE-Befehls</td>
+                </tr>
+                <tr>
+                    <td>MODIFY</td>
+                    <td>–</td>
+                    <td>erzeugt und/oder bearbeitet eine Programm-Datei oder ändert die Struktur in einer Datenbank-Datei</td>
+                </tr>
+                <tr>
+                    <td>NOTE oder</td>
+                    <td>–</td>
+                    <td>Kommentar-Einleitung in einem Programm</td>
+                </tr>
+                <tr>
+                    <td>PACK</td>
+                    <td>–</td>
+                    <td>eliminiert Datensätze, die zum Löschen markiert sind</td>
+                </tr>
+                <tr>
+                    <td>QUIT</td>
+                    <td>–</td>
+                    <td>verläßt dBase II und geht zum Betriebssystem zurück</td>
+                </tr>
+                <tr>
+                    <td>READ</td>
+                    <td>–</td>
+                    <td>erlaubt Datei-Bearbeitung mit formatiertem Bildschirm, nimmt die Daten aus SAY- und GET-Anweisungen entgegen</td>
+                </tr>
+                <tr>
+                    <td>RECALL</td>
+                    <td>–</td>
+                    <td>löscht die Markierungen zum Löschen von Datensätzen</td>
+                </tr>
+                <tr>
+                    <td>REINDEX</td>
+                    <td>–</td>
+                    <td>aktualisiert die vorhandene Index-Datei</td>
+                </tr>
+                <tr>
+                    <td>RELEASE</td>
+                    <td>–</td>
+                    <td>eliminiert unerwünschte temporäre Variablen und macht Speicherbereiche frei</td>
+                </tr>
+                <tr>
+                    <td>REMARK</td>
+                    <td>–</td>
+                    <td>erlaubt die Anzeige beliebiger Zeichen</td>
+                </tr>
+                <tr>
+                    <td>RENAME</td>
+                    <td>–</td>
+                    <td>gibt einer Datei einen neuen Namen</td>
+                </tr>
+                <tr>
+                    <td>REPLACE</td>
+                    <td>–</td>
+                    <td>ändert Informationen in einem Datensatz oder in einer ganzen Datenbank-Datei Feld für Feld</td>
+                </tr>
+                <tr>
+                    <td>REPORT</td>
+                    <td>–</td>
+                    <td>erzeugt einen Bericht</td>
+                </tr>
+                <tr>
+                    <td>RESET</td>
+                    <td>–</td>
+                    <td>startet das Betriebssystem nach dem Einlegen einer neuen Diskette</td>
+                </tr>
+                <tr>
+                    <td>RESTORE</td>
+                    <td>–</td>
+                    <td>reaktiviert temporäre Variable aus einer Datei, gegebenenfalls in Ergänzung zu bereits vorhandenen Variablen</td>
+                </tr>
+                <tr>
+                    <td>RETURN</td>
+                    <td>–</td>
+                    <td>beendet den Lauf einer Programm-Datei</td>
+                </tr>
+                <tr>
+                    <td>SAVE</td>
+                    <td>–</td>
+                    <td>speichert die temporären Variablen auf der Diskette</td>
+                </tr>
+                <tr>
+                    <td>SELECT</td>
+                    <td>–</td>
+                    <td>schaltet zwischen primärer und sekundärer Datenbank um</td>
+                </tr>
+                <tr>
+                    <td>SET</td>
+                    <td>–</td>
+                    <td>setzt dBase II-Kontrollparameter</td>
+                </tr>
+                <tr>
+                    <td>SKIP</td>
+                    <td>–</td>
+                    <td>springt vorwärts und rückwärts in der Datenbank</td>
+                </tr>
+                <tr>
+                    <td>SORT</td>
+                    <td>–</td>
+                    <td>erzeugt eine Datei, die nach einem Schlüsselfeld sortiert ist</td>
+                </tr>
+                <tr>
+                    <td>STORE</td>
+                    <td>–</td>
+                    <td>erzeugt temporäre Variablen</td>
+                </tr>
+                <tr>
+                    <td>SUM</td>
+                    <td>–</td>
+                    <td>berechnet die Gesamtsummen der Felder in einer Datenbank</td>
+                </tr>
+                <tr>
+                    <td>TEXT</td>
+                    <td>–</td>
+                    <td>gibt Textblöcke von einer Programm-Datei aus</td>
+                </tr>
+                <tr>
+                    <td>TOTAL</td>
+                    <td>–</td>
+                    <td>erzeugt zusammengefaßte Kopien einer Datenbank, bestehend aus Daten bestimmter Felder oder Datensätze</td>
+                </tr>
+                <tr>
+                    <td>UPDATE</td>
+                    <td>–</td>
+                    <td>aktualisiert eine Datenbank im Stapelverarbeitungsbetrieb</td>
+                </tr>
+                <tr>
+                    <td>USE</td>
+                    <td>–</td>
+                    <td>eröffnet eine Datenbank für nachfolgende Bearbeitung, bis der nächste USE-Befehl erscheint</td>
+                </tr>
+                <tr>
+                    <td>WAIT</td>
+                    <td>–</td>
+                    <td>unterbricht die Programmausführung, bis eine Eingabe vom Benutzer erfolgt ist</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1: Alle dBase II-Befehle auf einen Blick</figcaption>
+        </figure>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>@</td>
+                    <td>–</td>
+                    <td>@(&lt;Zeichenkette1&gt;,&lt;Zeichenkette2&gt;): Die »AT«-Funktion ergibt eine ganze Zahl für die Position in Zeichenkette2, wo Zeichenkette1 beginnt.</td>
+                </tr>
+                <tr>
+                    <td>*</td>
+                    <td>–</td>
+                    <td>Löschmarkierung; führt zum Überlesen des Satzes bei COPY oder ähnlichen Operationen.</td>
+                </tr>
+                <tr>
+                    <td>#</td>
+                    <td>–</td>
+                    <td>Satznummer-Funktion: Sie zeigt einen ganzzahligen Wert an, der der laufenden Satznummer entspricht.</td>
+                </tr>
+                <tr>
+                    <td>!</td>
+                    <td>–</td>
+                    <td>!(&lt;Zeichenkette&gt;): Großbuchstaben-Funktion. Sie wandelt die Zeichen in Großbuchstaben um.</td>
+                </tr>
+                <tr>
+                    <td>$</td>
+                    <td>–</td>
+                    <td>$(&lt;Zeichenkette&gt;, &lt;Start&gt;,&lt;Länge&gt;): Die Unterketten-Funktion erzeugt eine Zeichenkette aus dem angegebenen Teil einer anderen Zeichenkette.</td>
+                </tr>
+                <tr>
+                    <td>CHR</td>
+                    <td>–</td>
+                    <td>CHR(&lt;numerischer Ausdruck&gt;) ergibt das ASCII-Zeichen entsprechend dem numerischen Ausdruck. Beispielsweise sendet ».? CHR(7)« das Escape-Signal an den Drucker</td>
+                </tr>
+                <tr>
+                    <td>DATE()</td>
+                    <td>–</td>
+                    <td>gibt das Systemdatum in der Form xx/xx/xx aus.</td>
+                </tr>
+                <tr>
+                    <td>EOF</td>
+                    <td>–</td>
+                    <td>Datei-Ende-Funktion: Sie ist wahr, wenn versucht worden ist, über den letzten Datensatz der Datei hinauszugehen.</td>
+                </tr>
+                <tr>
+                    <td>FILE</td>
+                    <td>–</td>
+                    <td>FILE(&lt;Datei&gt;): Die Existenz-Funktion ist wahr, falls &lt;Datei&gt; auf dem angegebenen Laufwerk vorhanden ist.</td>
+                </tr>
+                <tr>
+                    <td>INT</td>
+                    <td>–</td>
+                    <td>INT (&lt;numerischer Ausdruck&gt;): Die Ganzzahl-Funktion schneidet alle Stellen rechts vom Dezimalpunkt ab, um eine ganze Zahl zu bilden.</td>
+                </tr>
+                <tr>
+                    <td>LEN</td>
+                    <td>–</td>
+                    <td>LEN(&lt;Zeichenkette&gt;): Die Längen-Funktion zeigt die Anzahl der Zeichen in der Zeichenkette an, beispielsweise ».?? LEN('KLAUS')« ergibt 5</td>
+                </tr>
+                <tr>
+                    <td>RANK</td>
+                    <td>–</td>
+                    <td>RANK(&lt;Zeichenkette&gt;) gibt den numerischen ASCII-Code des ersten Zeichens in der Zeichenkette wieder.</td>
+                </tr>
+                <tr>
+                    <td>STR</td>
+                    <td>–</td>
+                    <td>STR (&lt;numerischer Ausdruck&gt;, &lt;Weite:,&lt;Dezimalstelle&gt;:). Die String-Funktion wandelt einen numerischen Ausdruck in eine Zeichenkette um.</td>
+                </tr>
+                <tr>
+                    <td>TEST</td>
+                    <td>–</td>
+                    <td>TEST(&lt;Ausdruck&gt;) bildet zusammen mit »?« und »IF« die Test-Funktion. Sie prüft, ob ein Ausdruck gültig und passend ist. Ein gültiger Ausdruck liefert einen Wert ungleich 0; ein ungültiger den Wert 0.</td>
+                </tr>
+                <tr>
+                    <td>TRIM</td>
+                    <td>–</td>
+                    <td>TRIM(&lt;Zeichenkette&gt;): Die Trim-Funktion entfernt nachlaufende Leerstellen der Zeichenkette.</td>
+                </tr>
+                <tr>
+                    <td>TYPE</td>
+                    <td>–</td>
+                    <td>TYPE(&lt;Ausdruck&gt;) erzeugt eine einstellige Zeichenkette, die »C«,»N«,»L« oder »U« enthält, je nachdem, ob der Ausdruck vom Typ Character (Zeichen), Numeric (numerisch), Logical (logisch) oder Undefined (unbestimmt) ist.</td>
+                </tr>
+                <tr>
+                    <td>VAL</td>
+                    <td>–</td>
+                    <td>VAL(&lt;Zeichenkette&gt;): Die Wert-Funktion wandelt eine aus Zahlen bestehende Zeichenkette in einen numerischen Wert um.</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Alle dBase II-Funktionen</figcaption>
+        </figure>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>&lt;Kommando&gt; oder &lt;Aussage&gt;</td>
+                    <td>–</td>
+                    <td>alle gültigen dBase II-Kommandos (Befehle) oder -Funktionen.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Zeichenkette&gt;</td>
+                    <td>–</td>
+                    <td>Sie müssen in den meisten Fällen mit einfachen (' '), doppelten Anführungszeichen (" ") oder Klammern ( : : ) begrenzt sein.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Zeichenkettenausdruck&gt;</td>
+                    <td>–</td>
+                    <td>Ausdruck, dessen Inhalt vom Zeichentyp her festgelegt ist.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Begrenzer&gt;</td>
+                    <td>–</td>
+                    <td>jedes nicht alphanumerische Zeichen, das benutzt wird, um Daten zu kennzeichnen, zum Beispiel der Apostroph (' '), die Anführungszeichen (" ") oder Klammern.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Ausdruck&gt;</td>
+                    <td>–</td>
+                    <td>ein Zeichen oder eine Zeichengruppe, deren Wert von dBase II bestimmt werden kann. &lt;Ausdruck&gt; ist abhängig vom Datentyp und wird mit »C«, »N«, oder »L« bezeichnet.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Ausdruckliste&gt;</td>
+                    <td>–</td>
+                    <td>eine Liste durch Komma getrennter Ausdrücke.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Feld&gt;</td>
+                    <td>–</td>
+                    <td>Name eines Datenfeldes innerhalb eines Datensatzes.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Feldliste&gt;</td>
+                    <td>–</td>
+                    <td>eine Liste mit Feldnamen, getrennt durch Kommatas.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Datei&gt;</td>
+                    <td>–</td>
+                    <td>Name der Datei, die Sie erzeugen oder bearbeiten wollen.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Indexdatei&gt;</td>
+                    <td>–</td>
+                    <td>Name der Indexdatei.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Schlüssel&gt;</td>
+                    <td>–</td>
+                    <td>Felder (auch kombiniert) zum Indizieren von Datenbankdateien</td>
+                </tr>
+                <tr>
+                    <td>&lt;tempVar&gt;</td>
+                    <td>–</td>
+                    <td>Der Name einer temporären Variablen.</td>
+                </tr>
+                <tr>
+                    <td>&lt;tempVarliste&gt;</td>
+                    <td>–</td>
+                    <td>Liste mit temporären Variablen, getrennt durch Kommatas.</td>
+                </tr>
+                <tr>
+                    <td>&lt;n&gt;</td>
+                    <td>–</td>
+                    <td>eine Zahl, die dBase II als Buchstaben betrachtet.</td>
+                </tr>
+                <tr>
+                    <td>&lt;num Ausdr&gt;</td>
+                    <td>–</td>
+                    <td>Ausdruck mit numerischem Inhalt.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Bereich&gt;</td>
+                    <td>–</td>
+                    <td>das Kommando legt einen Bereich in einer Datenbankdatei fest, der bei Ausführung eines Kommandos berücksichtigt wird. &lt;Bereich&gt; kann etwa sein: ALL(e) Sätze der Datei; NEXT &lt;n&gt; Sätze der Datei und RECORD &lt;n&gt;. Der Standardwert ist vom jeweiligen Befehl abhängig.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Muster&gt;</td>
+                    <td>–</td>
+                    <td>erlaubt eine Stapelverarbeitung von Dateien desselben Typs und/oder mit passenden Zeichen im Dateinamen, etwa bei Benutzung von »wild cards« und »?«. Es dient weiterhin zur Auswahl einer Gruppe von temporären Variablen.</td>
+                </tr>
+                <tr>
+                    <td>&lt;Variable&gt;</td>
+                    <td>–</td>
+                    <td>Name eines Datenfeldes oder einer &lt;tempVar&gt;.</td>
+                </tr>
+                <tr>
+                    <td>: :</td>
+                    <td>–</td>
+                    <td>schließt optional zu verwendende Angabe ein (statt eckiger Klammern).</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Begriffe rund um dBase II</figcaption>
+        </figure>
+
+        <aside>
+            <p>dBase II für den Commodore 128 PC. Im Lieferumfang des Programms sind enthalten:</p>
+            <p>— zwei Disketten mit der auf den C 128 angepaßten Version von dBase II, Druckerinstallationsprogramm, Help-Datei und Beispiele</p>
+            <p>— ein über 460 Seiten umfassendes Handbuch (Hardcover) mit Einführungsteil, Befehlsbeschreibung, Beispielen und Stichwortverzeichnis.</p>
+            <p class="source">Bezugsquelle: Markt&amp;Technik Verlag AG, Hans-Pinsel-Straße 2,<br>8013 Haar bei München. Preis: 199 Mark.</p>
+            <p class="source">dBase II ist ein eingetragenes Warenzeichen von Ashton-Tate, Culver City, USA<br>CP/M ist ein eingetragenes Warenzeichen der Digital Research Inc., USA</p>
+        </aside>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th colspan="2">Bildschirm-Modus</th>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+X&gt;</td>
+                    <td>bewegt Cursor abwärts zum nächsten Feld (wie &lt;CTRL+F&gt;)</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+E&gt;</td>
+                    <td>bewegt Cursor aufwärts zum vorherigen Feld (wie &lt;CTRL+A&gt;)</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+D&gt;</td>
+                    <td>bewegt Cursor ein Zeichen nach rechts (vor-wärts)</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+S&gt;</td>
+                    <td>bewegt Cursor ein Zeichen nach links (rück-wärts)</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+G&gt;</td>
+                    <td>löscht das Zeichen unter dem Cursor</td>
+                </tr>
+                <tr>
+                    <td>&lt;DEL&gt;</td>
+                    <td>löscht das Zeichen links vom Cursor</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+Y&gt;</td>
+                    <td>löscht das laufende Feld rechts vom Cursor</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+V&gt;</td>
+                    <td>schaltet um zwischen Überschreib- und INSERT-Modus</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+W&gt;</td>
+                    <td>speichert Änderungen und geht zurück zum "."-Prompt</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Editier-Modus</th>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+U&gt;</td>
+                    <td>schaltet die Markierung DELETE des Satzes ein beziehungsweise aus</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+C&gt;</td>
+                    <td>schreibt laufenden Satz auf Diskette, geht zum nächsten</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+R&gt;</td>
+                    <td>schreibt laufenden Satz auf Diskette, geht zum vorherigen</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+Q&gt;</td>
+                    <td>ignoriert Änderungen im Satz und geht zurück zum "."-Prompt</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+W&gt;</td>
+                    <td>speichert alle Änderungen und geht zurück zum "."-Prompt</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Browse-Modus</th>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+B&gt;</td>
+                    <td>verschiebt das Bildschirm-Fenster ein Feld nach rechts</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+Z&gt;</td>
+                    <td>verschiebt das Bildschirm-Fenster ein Feld nach links</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Modify-Modus</th>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+T&gt;</td>
+                    <td>löscht die laufende Zeile, zieht alle unteren Zeilen hoch</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+N&gt;</td>
+                    <td>Einfügen einer neuen Zeile an der Cursorposition</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+C&gt;</td>
+                    <td>schiebt Bildschirm eine halbe Seite abwärts</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+W&gt;</td>
+                    <td>speichert alle Änderungen und geht zurück zum "."-Prompt</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+Q&gt;</td>
+                    <td>ignoriert alle Änderungen und geht zurück</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Append+Modus</th>
+                </tr>
+                <tr>
+                    <td>&lt;enter&gt;</td>
+                    <td>beendet APPEND, wenn der Cursor in der ersten Position des ersten Feldes ist</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+W&gt;</td>
+                    <td>speichert den Datensatz und geht zum nächsten Satz</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+Q&gt;</td>
+                    <td>ignoriert den laufenden Satz, geht zurück zum "."-Prompt</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Sonstige wichtige Control-Tasten</th>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+P&gt;</td>
+                    <td>schaltet Ihren Drucker an und aus</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+R&gt;</td>
+                    <td>wiederholt das zuletzt ausgeführte Kommando</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+X&gt;</td>
+                    <td>löscht die Kommandozeile, ohne ein Kommando auszuführen</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+H&gt;</td>
+                    <td>Rücklauf</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+M&gt;</td>
+                    <td>erzeugt einen Wagenrücklauf</td>
+                </tr>
+                <tr>
+                    <td>&lt;CTRL+S&gt;</td>
+                    <td>startet/stoppt CPU-Operationen</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4. Alle Cursorbewegungen auf einen Blick</figcaption>
+        </figure>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>?</td>
+                    <td>–</td>
+                    <td>erarbeitet und zeigt den Wert eines Ausdrucks an. Kann beispielsweise in Programmdateien und im Befehlsmodus verwendet werden, um das Ergebnis eine Zeile tiefer anzuzeigen. Auf einige Besonderheiten (die vom ähnlichen Basic-Befehl PRINT abweichen) soll hier etwas näher eingegangen werden. Die Division, etwa ».?12/7« ergibt 1. Tauchen jedoch in Divident oder Divisor Nachkommastellen auf (also auch .000), so wird im Ergebnis die höchste Anzahl an Nachkommastellen beider Werte ermittelt und das Ergebnis auf gleiche Anzahl an Nachkommastellen berechnet und ausgegeben. Aus ».? 12.0/7.000« resultieren entsprechend 1.714, also drei Nachkommastellen.<br>Anders verhält es sich jedoch bei der Multiplikation. Hier wird die Anzahl der Nachkommastellen addiert, ».? 4.0*4.0*5.00« ergibt demnach 80.0000. Addition und Subtraktion verhalten sich wie die Division. Weiterhin lassen sich dadurch Speichervariable, die Inhalte von Feldern oder auch komplette Dateien lesen.</td>
+                </tr>
+                <tr>
+                    <td>??</td>
+                    <td>–</td>
+                    <td>wie ?, zeigt allerdings das Ergebnis in derselben Zeile an.</td>
+                </tr>
+                <tr>
+                    <td>@</td>
+                    <td>–</td>
+                    <td>Ausgabe (formatierter) Daten auf Bildschirm oder Drucker beginnend bei x,y-Koordinate (x=Zeile, y=Spalte).<br>Syntax:<br>@ &lt;Koordinaten&gt; SAY &lt;Ausdr&gt; USING '&lt;picture&gt;'<br>GET &lt;Variable&gt; PICTURE '&lt;picture&gt;'<br>Beispiele:<br>@3,23 SAY WERT 1.06 USING '$$$,$$$.99'<br>@14,23 SAY "TEL-NR EINGEBEN" GET TEL PICTURE '(###) ###-####<br>@LINE+2,45 SAY TOTAL USING '99999.99'</td>
+                </tr>
+                <tr>
+                    <td>ACCEPT</td>
+                    <td>–</td>
+                    <td>Eingabe einer Zeichenkette in eine bestimmte temporäre Variable, die dann vom Typ »C« ist. Als Meldung erscheint die Zeichenkette mit nachfolgendem Doppelpunkt. Die Eingabe wird in &lt;tempVar&gt; abgelegt.<br>Syntax:<br>ACCEPT "&lt;Zeichenkette&gt;" TO &lt;tempVar&gt;<br>Beispiele:<br>. ACCEPT "Wie ist Ihr Name?" TO NAME<br>Wie ist Ihr Name?: (Antwort wird in NAME gespeichert)<br>. ? NAME<br>(Antwort wird auf dem Bildschirm angezeigt)</td>
+                </tr>
+                <tr>
+                    <td>APPEND &lt;Datei&gt;</td>
+                    <td>–</td>
+                    <td>APPEND FROM &lt;Datei&gt; FOR &lt;Ausdr&gt; oder APPEND FROM &lt;Datei&gt;</td>
+                </tr>
+                <tr>
+                    <td>DELIMITED</td>
+                    <td>–</td>
+                    <td>fügt Datensätze von einer Datenbank-Datei oder einer Format-Datei an die gerade benutzte Datenbank-Datei an. Datensätze, die in der Ursprungsdatei zum Löschen markiert sind, werden nicht übernommen.<br>zum Beispiel APPEND FROM ADRESSLISTE FOR NAME='N'<br>APPEND FROM TEST.TXT DELIMITED</td>
+                </tr>
+                <tr>
+                    <td>APPEND BLANK</td>
+                    <td>–</td>
+                    <td>fügt einen leeren Datensatz an die Datei an.</td>
+                </tr>
+                <tr>
+                    <td>APPEND</td>
+                    <td>–</td>
+                    <td>fügt neue Datensätze an die benutzte Datenbank-Datei an. Sofern ein Index benutzt wird, wird die Index-Datei ebenfalls aktualisiert.</td>
+                </tr>
+                <tr>
+                    <td>BROWSE FIELDS &lt;Feldliste&gt;</td>
+                    <td>–</td>
+                    <td>Ausgabe der Felder auf Bildschirm (Voreinstellung: alle) und Bearbeitungsmöglichkeit dort mit freier Cursorpositionierung.</td>
+                </tr>
+                <tr>
+                    <td>CANCEL</td>
+                    <td>–</td>
+                    <td>beendet in einer Programmdatei die Dateibearbeitung und geht zurück zum ».«-Prompt.<br>Ausschnitt aus Programmdatei:<br>ACCEPT "Was soll diese Maschine machen?" TO NEXT<br>IF NEXT = 'Q'<br>CANCEL<br>ENDIF</td>
+                </tr>
+                <tr>
+                    <td>CHANGE</td>
+                    <td>–</td>
+                    <td>erlaubt eine feldweise Bearbeitung von Datenbanken. Drücken der &lt;ESC&gt;-Taste beendet CHANGE-Modus.<br>Syntax: CHANGE &lt;Bereich&gt; FIELD &lt;Liste&gt; FOR &lt;Ausdr&gt;<br>Beispiel:<br>CHANGE ALL FIELD PLZ FOR PLZ = '8000'<br>RECORD: 00001<br>PLZ: 8000<br>CHANGE?<br>Zu änderndes Zeichen eingeben und &lt;RETURN&gt; drücken. Neue Daten mit dem TO-Prompt einfügen oder &lt;RETURN&gt; drücken, um den nächsten gewünschten Datensatz zu erhalten.</td>
+                </tr>
+                <tr>
+                    <td>CLEAR</td>
+                    <td>–</td>
+                    <td>schließt alle eröffneten Datenbanken und löscht alle erzeugten temporären Variablen und Arbeitsbereiche.</td>
+                </tr>
+                <tr>
+                    <td>CLEAR GETS</td>
+                    <td>–</td>
+                    <td>weist dBase II an, alle noch aktiven GET-Angaben zu eliminieren, ohne den Bildschirm zu löschen.</td>
+                </tr>
+                <tr>
+                    <td>COPY</td>
+                    <td>–</td>
+                    <td>kopiert Daten aus der benutzten Datenbank oder deren Struktur in eine andere Datei. COPY erzeugt die neue Datei, falls sie noch nicht existiert, kann aber eine bereits vorhandene Datei mit gleichem Namen zerstören. Zum Löschen markierte Datensätze werden nicht kopiert.<br>Das Kommando hat drei Formen:<br>COPY TO &lt;Datei&gt; &lt;Bereich&gt; FIELD &lt;Liste&gt; FOR &lt;Ausdr&gt;<br>COPY TO &lt;Datei&gt; SDF DELIMITED WITH &lt;Begrenzer&gt; FOR &lt;Ausdr&gt;<br>COPY TO &lt;Datei&gt; STRUCTURE FIELD &lt;Liste&gt;</td>
+                </tr>
+                <tr>
+                    <td>COPY TO &lt;Datei&gt;</td>
+                    <td>–</td>
+                    <td>STRUCTURE EXTENDED – spezielle Form von COPY. Erzeugt Datenbank, deren Datensätze die Struktur der benutzten Datei beschreiben.</td>
+                </tr>
+                <tr>
+                    <td>COUNT</td>
+                    <td>–</td>
+                    <td>zählt die Anzahl der Datensätze in der benutzten Datei, die eine angegebene Bedingung erfüllen. Standardwert ist: COUNT alle Datensätze.<br>Syntax:<br>COUNT &lt;Bereich&gt; FOR &lt;Ausdr&gt; TO &lt;tempVar&gt;<br>Beispiel:<br>COUNT NEXT 25 FOR TEMPERATUR &gt; 'B'- TO LISTE</td>
+                </tr>
+                <tr>
+                    <td>CREATE &lt;Dateiname&gt;</td>
+                    <td>–</td>
+                    <td>erzeugt eine neue Datenbank. Der Benutzer wird nach der Dateistruktur gefragt.</td>
+                </tr>
+                <tr>
+                    <td>CREATE &lt;Neudatei&gt; FROM &lt;Altdatei&gt; EXTENDED</td>
+                    <td>–</td>
+                    <td>erzeugt eine Datenbank, deren Struktur bestimmt wird durch die Daten, die in den Datensätzen der alten Datei enthalten sind (siehe auch COPY STRUCTURE EXTENDED).</td>
+                </tr>
+                <tr>
+                    <td>DELETE FILE &lt;Datei&gt;</td>
+                    <td>–</td>
+                    <td>löscht eine bestimmte Datei.</td>
+                </tr>
+                <tr>
+                    <td>DELETE &lt;Bereich&gt; FOR &lt;Ausdr&gt;</td>
+                    <td>–</td>
+                    <td>markiert Sätze als gelöscht. Datensätze, die mit " " als gelöscht markiert sind, werden erst entfernt, wenn das PACK-Kommando gegeben wird. Datensätze können auch durch die Satznummer angegeben werden.<br>Beispiele:<br>DELETE ALL FOR FIRMA = 'ZMB'<br>DELETE RECORD 15</td>
+                </tr>
+                <tr>
+                    <td>DISPLAY FILES ON &lt;Laufwerk&gt; LIKE &lt;Muster&gt;:</td>
+                    <td>–</td>
+                    <td>zeigt Inhaltsverzeichnis des Diskettenlaufwerkes.<br>Zum Beispiel:<br>DISPLAY FILES ON B LIKE .MEM.</td>
+                </tr>
+                <tr>
+                    <td>DISPLAY &lt;Bereich&gt; &lt;Feldliste&gt; FOR &lt;Ausdrliste&gt; OFF</td>
+                    <td>–</td>
+                    <td>zeigt die Datensätze der benutzten Datei an.</td>
+                </tr>
+                <tr>
+                    <td>DISPLAY STRUCTURE</td>
+                    <td>–</td>
+                    <td>zeigt die Feldnamen, -typen, -längen und Dezimalstellen (Datenstruktur) der benutzten Datei an.</td>
+                </tr>
+                <tr>
+                    <td>DISPLAY MEMORY</td>
+                    <td>–</td>
+                    <td>zeigt Namen, Typen und Werte aller temporären Variablen an.</td>
+                </tr>
+                <tr>
+                    <td>DISPLAY STATUS</td>
+                    <td>–</td>
+                    <td>listet benutzte Datenbanken, Indizes, Systemangaben und laufende Systemparameter auf.</td>
+                </tr>
+                <tr>
+                    <td>DO &lt;Datei&gt;</td>
+                    <td>–</td>
+                    <td>öffnet und führt eine Programmdatei aus.</td>
+                </tr>
+                <tr>
+                    <td>DO WHILE &lt;Ausdr&gt;</td>
+                    <td>–</td>
+                    <td>führt in einer Programmdatei eine Gruppe von Anweisungen mehrfach aus (Schleife); wird so lange durchlaufen, wie DO WHILE &lt;Ausdr&gt; wahr ist.<br>Syntax:<br>DO WHILE &lt;Ausdr&gt;<br>Beispiel:<br>USE ADRESSLISTE<br>&lt;Befehle&gt;<code class="mono">DO WHILE .NOT. EOF<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;? VORNAME<br>&nbsp;&nbsp;? NAME<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;? STRASSE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;? ORT<br>&nbsp;&nbsp;? TELEFON<br>&nbsp;&nbsp;SKIP<br>ENDDO</code></td>
+                </tr>
+                <tr>
+                    <td>ENDDO</td>
+                    <td>–</td>
+                    <td>beendet den Anweisungsblock in einer DO WHILE-Anweisung.</td>
+                </tr>
+                <tr>
+                    <td>LOOP</td>
+                    <td>–</td>
+                    <td>veranlaßt die Programmdatei, zur weiteren Bearbeitung zurück zum DO WHILE-Kommando zu springen.<br>Beispiel:<code class="mono">USE ADRESSLISTE<br>DO WHILE .NOT. EOF<br>&nbsp;&nbsp;IF PLZ = '8000'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SKIP<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOOP<br>&nbsp;&nbsp;ENDIF<br>&nbsp;&nbsp;? NAME<br>&nbsp;&nbsp;? TELEFON<br>&nbsp;&nbsp;SKIP<br>ENDDO</code></td>
+                </tr>
+                <tr>
+                    <td>DO CASE</td>
+                    <td>–</td>
+                    <td>wird in Programmdateien benutzt, um die Ausführung fallweise zu steuern. Wahlweise kann die OTHERWISE-Klausel benutzt werden, die dann gilt, wenn kein CASE zutrifft. Der Befehl muß mit ENDCASE beendet werden.<br>Beispiel:<code class="mono">USE ADRESSLISTE<br>&nbsp;&nbsp;&nbsp;ACCEPT "WELCHE ALTERNATIVE WÜNSCHEN SIE?" TO Wahl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO CASE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CASE Wahl = '1'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO Aufkleber<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CASE Wahl = '2'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO Anfügen<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CASE Wahl = '3'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DO Editieren<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OTHERWISE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDCASE</code></td>
+                </tr>
+                <tr>
+                    <td>EDIT :&lt;Satznummer&gt;:</td>
+                    <td>–</td>
+                    <td>erlaubt die gezielte Bearbeitung von Daten durch die Angabe der Satznummer. Fragt nach der Satznummer, falls diese nicht mit dem Befehl angegeben wurde. Wenn die Bearbeitung eines Satzes abgeschlossen ist, wird mit &lt;CTRL+W&gt; wieder das Prompt zur Eingabe der Satznummer erreicht. Um den EDIT-Modus zu beenden, für Satznummer &lt;RETURN&gt; eingeben.</td>
+                </tr>
+                <tr>
+                    <td>EJECT</td>
+                    <td>–</td>
+                    <td>veranlaßt beim Drucker einen Seitenvorschub, falls PRINT auf »ON« oder FORMAT auf »PRINT« gesetzt ist. Bei Verwendung von »@ SAY«-Kommandos für formatierte Ausgaben setzt EJECT den Zeilen- und Spaltenzähler auf Null.</td>
+                </tr>
+                <tr>
+                    <td>ERASE</td>
+                    <td>–</td>
+                    <td>löscht die Bildschirmanzeige. Im Dialog erscheint der ».«-Prompt in der linken oberen Bildschirmecke.</td>
+                </tr>
+                <tr>
+                    <td>FIND &lt;Zeichenkette&gt;</td>
+                    <td>–</td>
+                    <td>sucht einen Datensatz in einer indizierten Datenbank nach dem Wert des Schlüssels &lt;Zeichenkette&gt;.</td>
+                </tr>
+                <tr>
+                    <td>GO oder GOTO</td>
+                    <td>–</td>
+                    <td>geht zu einer bestimmten Position (Datensatznummer) in einer Datenbank. Die Datensatznummer kann auch Inhalt einer temporären Variablen sein.<br>Syntax:<br>GO oder GOTO :RECORD &lt;n&gt;, &lt;n&gt;, TOP, BOTTOM oder &lt;tempVar&gt;</td>
+                </tr>
+                <tr>
+                    <td>HELP</td>
+                    <td>–</td>
+                    <td>gibt dem Anwender Hilfestellung<br>Syntax:<br>HELP &lt;Kommandoname&gt; &lt;RETURN&gt; (zum Beispiel HELP CREATE &lt;CR&gt;). Nach Ausgabe der Erläuterung kehrt dBase II zum ».«-Prompt zurück, so daß Sie ohne Unterbrechung weiterarbeiten können. In einigen Fällen beansprucht die Information mehrere Seiten auf dem Bildschirm; um weiterzublättern, drücken Sie eine beliebige Taste. Falls Sie die HELP-Datei verlassen wollen, bevor Sie alle Angaben gesehen haben, drücken Sie einfach &lt;ESC&gt;.</td>
+                </tr>
+                <tr>
+                    <td>IF</td>
+                    <td>–</td>
+                    <td>erlaubt in der Programmdatei die bedingte Ausführung von Befehlen. Die ELSE-Klausel ist optional.<code class="mono">Syntax: IF &lt;Ausdr&gt;<br>Beispiel:<br>IF STAAT = 'D'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Aussage&gt;<br>&nbsp;&nbsp;&nbsp;DO INLAND (CMD Datei)<br>ELSE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Aussage&gt;:<br><br>&nbsp;&nbsp;&nbsp;DO AUSLAND (CMD Datei)<br>ENDIF</code></td>
+                </tr>
+                <tr>
+                    <td>INDEX ON &lt;Ausdr&gt; TO &lt;Indexdatei&gt;</td>
+                    <td>–</td>
+                    <td>erzeugt eine Indexdatei für die Datenbank, wobei der Index festgelegt wird durch &lt;Ausdr&gt; oder &lt;Indexschlüssel&gt;.</td>
+                </tr>
+                <tr>
+                    <td>INPUT "&lt;Zeichenkette&gt;" TO &lt;tempVar&gt;</td>
+                    <td>–</td>
+                    <td>nimmt Eingaben des Benutzers (numerische und logische Informationen) entgegen und legt sie in temporären Variablen ab.<br>Beispiel:<br>INPUT 'Benutzernr. eingeben' TO X<br>Benutzernummer eingeben: 12 &lt;CR&gt; (Benutzernr., 12, wird in X gespeichert)</td>
+                </tr>
+                <tr>
+                    <td>INSERT BEFORE BLANK</td>
+                    <td>–</td>
+                    <td>fügt einen Datensatz in die Datei ein, unmittelbar nach oder – mit BEFORE – vor dem laufenden Datensatz. Zeigt dem Benutzer das Dateneingabeformat für die benutzte Datei an, außer, ein leerer (BLANK) Datensatz wird eingegeben.</td>
+                </tr>
+                <tr>
+                    <td>JOIN</td>
+                    <td>–</td>
+                    <td>erzeugt eine neue Datei durch Verbindung der Datensätze aus zwei bestehenden Dateien (primäre und sekundäre Datei). Datensätze werden angefügt, solange wie FOR &lt;Ausdr&gt; wahr ist. Befehl muß im primären Datenbankbereich ausgeführt werden. Standardwert für &lt;Feldliste&gt; ist ALL.<br>Syntax:<br>JOIN TO &lt;Datei&gt; FOR &lt;Ausdr&gt; FIELDS &lt;Feldliste&gt;<br>Beispiel:<br>. USE NAMES<br>. SELECT SECONDARY<br>. USE ADRESSLISTE<br>. SELECT PRIMARY<br>. JOIN TO NAMEJ FOR LAST &lt;&gt; S.LAST</td>
+                </tr>
+                <tr>
+                    <td>LIST FILES ON &lt;Laufwerk&gt; LIKE &lt;Muster&gt;</td>
+                    <td>–</td>
+                    <td>listet alle Dateien auf dem gewählten Laufwerk. Standardwert ist das gewählte Laufwerk.<br>Beispiel: LIST FILES ON C LIKE *.FRM</td>
+                </tr>
+                <tr>
+                    <td>LIST &lt;Bereich&gt; &lt;Feldliste&gt; FOR &lt;Ausdrliste&gt; OFF:</td>
+                    <td>–</td>
+                    <td>zeigt Datensätze der benutzten Datei an. Standardwert ist ALL (alle) Datensätze.<br>Beispiel:<br>LIST NEXT 25 NAME, TELEFON FOR KOSTEN &gt; 100<br>(zum Beispiel NAME und TELEFON für die nächsten 25, mit mehr als 100 Mark Telefonkosten.</td>
+                </tr>
+                <tr>
+                    <td>LIST STRUCTURE</td>
+                    <td>–</td>
+                    <td>zeigt Datenstruktur der benutzten Datei.</td>
+                </tr>
+                <tr>
+                    <td>LIST MEMORY</td>
+                    <td>–</td>
+                    <td>listet alle Namen und Werte der festgelegten temporären Variablen auf.</td>
+                </tr>
+                <tr>
+                    <td>LIST STATUS</td>
+                    <td>–</td>
+                    <td>listet geöffnete Dateien, benutzte Indizes, Systemdaten und gesetzte Parameter.</td>
+                </tr>
+                <tr>
+                    <td>LOCATE &lt;Bereich&gt; FOR &lt;Ausdr&gt;</td>
+                    <td>–</td>
+                    <td>findet ersten Datensatz, für den FOR &lt;Ausdr&gt; als wahr gilt. Verwenden Sie CONTINUE, um den nächsten Datensatz zu finden.<br>. LOCATE ALL FOR PLZ &gt;= '5000' .AND. PLZ &lt; '4000'<br>RECORD: 00123<br>. DISPLAY<br>. CONTINUE<br>RECORD: 00232</td>
+                </tr>
+                <tr>
+                    <td>MODIFY STRUCTURE</td>
+                    <td>–</td>
+                    <td>erlaubt, die Struktur der benutzten Datenbank zu verändern. Dieser Befehl zerstört alle Daten in der benutzten Datenbank. Um die Struktur zu verändern, ohne Daten zu verlieren, benutzen Sie COPY STRUCTURE, USE und APPEND wie unten beschrieben:<br>. USE NAMES<br>. COPY STRUCTURE TO TEMP<br>. USE TEMP<br>. MODIFY STRUCTURE – kein Datenverlust, da Datei leer<br>. APPEND FROM NAMES – bringt Daten in modifizierte Datei<br>. DELETE FILE NAMES<br>. USE – TEMP<br>. RENAME TEMP TO NAMES</td>
+                </tr>
+                <tr>
+                    <td>MODIFY COMMAND &lt;Datei&gt;</td>
+                    <td>–</td>
+                    <td>ruft den Texteditor in dBase II auf und zeigt oder erzeugt die gewünschte Datei. Primär zu nutzen zum Erzeugen und Bearbeiten von Programmdateien (.PRG), Textdateien (.TXT) und Formatdateien (.FMT); aber auch als Bildschirm-Wortprozessor einzusetzen.</td>
+                </tr>
+                <tr>
+                    <td>NOTE oder *</td>
+                    <td>–</td>
+                    <td>erlaubt das Einfügen von Kommentaren in eine Programmdatei. Kommentare, die nach NOTE oder »*« folgen, werden bei der Programmausführung übergangen.</td>
+                </tr>
+                <tr>
+                    <td>PACK</td>
+                    <td>–</td>
+                    <td>eliminiert Datensätze, die zum Löschen markiert sind. Falls eine Indexdatei vorhanden ist, wird sie automatisch aktualisiert.</td>
+                </tr>
+                <tr>
+                    <td>QUIT TO &lt;Programmdateiliste&gt;</td>
+                    <td>–</td>
+                    <td>beendet dBASE II und geht zum Betriebssystem zurück. Ruft optional Programmdateien auf.</td>
+                </tr>
+                <tr>
+                    <td>READ</td>
+                    <td>–</td>
+                    <td>ermöglicht Bildschirm-Modus für die Eingabe und das Editieren von Variablen. Die Bildschirm-Prompts und -Fenster werden durch SAY- und GET-Kommandos erzeugt.</td>
+                </tr>
+                <tr>
+                    <td>RECALL &lt;Bereich&gt; FOR &lt;Ausdr&gt;</td>
+                    <td>–</td>
+                    <td>reaktiviert zum Löschen markierte Datensätze. Standardwert für &lt;Bereich&gt; ist der laufende Datensatz.</td>
+                </tr>
+                <tr>
+                    <td>REINDEX</td>
+                    <td>–</td>
+                    <td>aktualisiert diejenigen Indexdateien, die nicht mit USE angeschlossen und daher nicht automatisch geändert wurden.<br>Beispiel:<br>. USE ADRESSLISTE INDEX INDEXA<br>. APPEND<br>(auszuführende Kommandos)<br>. SET INDEX TO INDEXB,INDEXC<br>. REINDEX</td>
+                </tr>
+                <tr>
+                    <td>RELEASE</td>
+                    <td>–</td>
+                    <td>eliminiert nicht mehr benötigte temporäre Variable und macht davon belegten Speicherplatz frei. Mit »?« werden einzelne (beliebige) Zeichen zugelassen, mit " " beliebige Zeichenreihen.<br>Syntax:<br>RELEASE &lt;tempVarliste&gt; oder ALL<br>RELEASE ALL LIKE &lt;Muster&gt;<br>RELEASE ALL EXCEPT &lt;Muster&gt;<br>Beispiele (mit N, N1, N2, N10, V7 als Variablen):<br>RELEASE ALL LIKE N? (N10 und V7 bleiben erhalten)<br>RELEASE ALL LIKE N?? (V7 bleibt erhalten)<br>RELEASE ALL EXCEPT ?1 (N1 und N10 bleiben erhalten)</td>
+                </tr>
+                <tr>
+                    <td>REMARK</td>
+                    <td>–</td>
+                    <td>zur Kommentierung; beliebige Zeichenreihen sind verwendbar. Er wird bei der Ausführung von Programmen überlesen. Beispiel:<br>. REMARK irgendein Hinweis</td>
+                </tr>
+                <tr>
+                    <td>RENAME &lt;Datei&gt; TO &lt;neuer Dateiname&gt;</td>
+                    <td>–</td>
+                    <td>ändert den Namen einer Datei im Verzeichnis des Betriebssystems. Wenn nicht anders vorgegeben, definiert dBase II den Dateityp als DBF.<br>Beispiel: . RENAME REVIEW.FRM TO REVIEW2.FRM</td>
+                </tr>
+                <tr>
+                    <td>REPLACE</td>
+                    <td>–</td>
+                    <td>ändert Daten in bestimmten Datenfeldern oder Dateien. Falls das geänderte Feld gleichzeitig Schlüsselfeld in der Indexdatei ist, erfolgt deren Änderung. Standardwert für &lt;Bereich&gt; ist der laufende Datensatz.<br>Syntax:<br>REPLACE &lt;Bereich&gt; &lt;Feld&gt; WITH &lt;Ausdr&gt; ,&lt;Feld2&gt; WITH &lt;Ausdr2&gt;: :FOR &lt;Ausdr&gt;:<br>Beispiel:<br>. USE MXPROJ<br>. REPLACE ALL COST WITH COST 6.1 FOR ITEM = 'ELEC'</td>
+                </tr>
+                <tr>
+                    <td>REPORT</td>
+                    <td>–</td>
+                    <td>erzeugt eine Formatdatei für einen Bericht (FRM), um bestimmte Informationen aus einer Datei in einem vom Benutzer festgelegten Format auszugeben. Das Ergebnis erscheint auf dem Bildschirm oder wird ausgedruckt.<br>Syntax:<br>REPORT FORM &lt;Formdatei&gt; &lt;Bereich&gt; TO PRINT<br>FOR &lt;Ausdr&gt; PLAIN</td>
+                </tr>
+                <tr>
+                    <td>RESET &lt;Laufwerk&gt;</td>
+                    <td>–</td>
+                    <td>nach einem Diskettenwechsel ist dieser Befehl auszuführen. Dadurch können während der Arbeit die dBase II Disketten ausgetauscht werden. Bevor jedoch der Befehl RESET erfolgt, sind unbedingt alle Dateien auf der zu wechselnden Diskette abzumelden.</td>
+                </tr>
+                <tr>
+                    <td>RESTORE FROM &lt;Datei&gt; ADDITIVE</td>
+                    <td>–</td>
+                    <td>sucht und aktiviert die Parameter für temporäre Variablen, die vorher mit SAVE gespeichert worden sind. Mit ADDITIVE wird erreicht, daß bereits vorhandene Variablen erhalten bleiben. Fehlt die Angabe, werden alle aktuellen Variablen gelöscht (siehe auch RELEASE).</td>
+                </tr>
+                <tr>
+                    <td>RETURN</td>
+                    <td>–</td>
+                    <td>wird in einer Programmdatei benutzt, um zum aufrufenden Programm oder zum dBase II-».«-Prompt zurückzukehren.</td>
+                </tr>
+                <tr>
+                    <td>SAVE TO &lt;Datei&gt; ALL LIKE &lt;Muster&gt; oder ALL EXCEPT &lt;Muster&gt;</td>
+                    <td>–</td>
+                    <td>speichert alle temporären Variablen oder nur diejenigen, die durch &lt;Muster&gt; definiert sind in der angegebenen Datei. »?« wird benutzt, um einzelne (beliebige) Zeichen zuzulassen; mit " " sind beliebige Zeichenreihen erlaubt.<br>Beispiele:<br>(mit N1, N2, N10, V1, V2, V10 als Variablen):<br>. SAVE TO NUMBER ALL LIKE N (Speichert N1, N2, N10)<br>. SAVE TO NUMBER ALL LIKE N? (Speichert N1, N2)<br>. SAVE TO NUMBER ALL EXCEPT ?1 (Speichert N2, V2)</td>
+                </tr>
+                <tr>
+                    <td>SELECT :PRIMARY / secondary:</td>
+                    <td>–</td>
+                    <td>schaltet zwischen primärer und sekundärer Datenbank um. Dadurch kann der Benutzer gleichzeitig mit zwei Dateien arbeiten, wobei der Satzzähler jeweils erhalten bleibt. Nach dem Start von dBase II ist zunächst die primäre Datenbank aktiviert.</td>
+                </tr>
+                <tr>
+                    <td>SET</td>
+                    <td>–</td>
+                    <td>setzt dBase Kontrollparameter.<br>Syntax:<br>SET &lt;Parameter&gt; ON oder OFF<br>SET &lt;Parameter&gt; TO &lt;Option&gt;<br>Alle SET-Kommandos sind unten in alphabetischer Reihenfolge aufgelistet: Beachten Sie, daß einige SETs vom ON/OFF-Typ sind, andere aber bestimmte Eingaben erfordern. Standardwerte für ON/OFF-Kommandos werden jeweils durch Großbuchstaben (ON oder OFF) angezeigt.<br>Beispiel:<br>SET BELL :ON/off: - Standardwert ist ON.</td>
+                </tr>
+                <tr>
+                    <td>SET ALTERNATE :OFF/on:</td>
+                    <td>–</td>
+                    <td>ON sendet alle Bildschirmausgaben (außer im Bildschirm-Modus) zu einer Diskettendatei (dem muß vorangehen: SET ALTERNATE TO &lt;Datei&gt;). OFF unterbricht die Ausgabe in die Datei.</td>
+                </tr>
+                <tr>
+                    <td>SET BELL :ON/off:</td>
+                    <td>–</td>
+                    <td>Mit ON ertönt ein akustisches Signal, wenn ein ungültiges Zeichen eingegeben oder die Feldgrenze überschritten wird. OFF schaltet das Signal aus.</td>
+                </tr>
+                <tr>
+                    <td>SET CARRY :OFF/on:</td>
+                    <td>–</td>
+                    <td>Mit ON werden Daten aus dem vorherigen Datensatz in den laufenden Satz geschrieben, wenn im Bildschirm-Modus APPEND benutzt wird. OFF läßt das Feld leer.</td>
+                </tr>
+                <tr>
+                    <td>SET COLON :ON/off:</td>
+                    <td>–</td>
+                    <td>ON zeigt im Bildschirm-Modus Doppelpunkte an, um Variablen einzugrenzen. OFF hebt diese Anzeige auf.</td>
+                </tr>
+                <tr>
+                    <td>SET CONFIRM :OFF/on:</td>
+                    <td>–</td>
+                    <td>ON verhindert im Bildschirm-Modus das automatische Springen zum nächsten Feld, wenn das laufende Feld gefüllt ist. OFF wartet auf die Eingabe von &lt;RETURN&gt;, bevor der Cursor zum nächsten Feld springt.</td>
+                </tr>
+                <tr>
+                    <td>SET CONSOLE :ON/off:</td>
+                    <td>–</td>
+                    <td>Mit ON erscheinen alle Eingaben auf dem Bildschirm. OFF schaltet die Bildschirm-Anzeige aus; das System ist anscheinend »tot«.</td>
+                </tr>
+                <tr>
+                    <td>&gt; SET DEBUG :OFF/on:</td>
+                    <td>–</td>
+                    <td>Mit ON erscheint die mit ECHO und STEP erzeugte Ausgabe auf dem Drucker. OFF läßt die Ausgabe auf dem Bildschirm erscheinen.</td>
+                </tr>
+                <tr>
+                    <td>SET ECHO :OFF/on:</td>
+                    <td>–</td>
+                    <td>ON ermöglicht die Verfolgung einer Programmausführung durch Anzeige aller Kommandos auf dem Bildschirm. OFF zeigt keinen Ausführungsbericht.</td>
+                </tr>
+                <tr>
+                    <td>SET EJECT :ON/off:</td>
+                    <td>–</td>
+                    <td>ON veranlaßt den REPORT-Befehl, einen Seitenvorschub auszuführen, bevor ein auszugebender Bericht zum Drucker geschickt wird. OFF verhindert den Seitenvorschub.</td>
+                </tr>
+                <tr>
+                    <td>SET ESCAPE :ON/off:</td>
+                    <td>–</td>
+                    <td>Mit ON kann der Benutzer die Ausführung der Programmdatei abbrechen, indem er die &lt;ESC&gt;-Taste drückt. OFF erlaubt keinen Abbruch mit der &lt;ESC&gt;-Taste.</td>
+                </tr>
+                <tr>
+                    <td>SET EXACT :OFF/on:</td>
+                    <td>–</td>
+                    <td>ON erfordert genaue Eingaben der Zeichenketten in jeder Einzelheit (bei FOR&lt;Ausdr&gt;, FIND-Kommandos etc.). OFF erlaubt die Eingabe voneinander abweichender Zeichenketten, zum Beispiel unterschiedlicher Länge: 'ABCDEF' = 'ABC'.</td>
+                </tr>
+                <tr>
+                    <td>SET INTENSITY :ON/off:</td>
+                    <td>–</td>
+                    <td>ON ermöglicht eine inverse Darstellung oder eine andere Helligkeit in der Bildschirmanzeige (falls die Hardware dies zuläßt). OFF schaltet diese Einrichtung ab.</td>
+                </tr>
+                <tr>
+                    <td>SET LINKAGE :OFF/on:</td>
+                    <td>–</td>
+                    <td>ON erlaubt Bewegungen des Satzzeigers in der primären und sekundären Datenbank mit Hilfe von Kommandos, die einen bestimmten &lt;Bereich&gt; definieren, zum Beispiel Bewegungen nur abwärts. OFF schaltet diese Einrichtung ab.</td>
+                </tr>
+                <tr>
+                    <td>SET PRINT :OFF/on:</td>
+                    <td>–</td>
+                    <td>ON sendet die Ausgabe zum Drucker. OFF stoppt die Druckerausgabe.</td>
+                </tr>
+                <tr>
+                    <td>SET RAW :OFF/on:</td>
+                    <td>–</td>
+                    <td>Mit ON werden bei DISPLAY- und LIST-Befehlen keine Leerstellen zwischen den Feldern eingefügt; OFF fügt Leerstellen zwischen den Feldern ein.</td>
+                </tr>
+                <tr>
+                    <td>SET SCREEN :ON/off:</td>
+                    <td>–</td>
+                    <td>ON erlaubt Bildschirmbearbeitung mit APPEND-, EDIT-, INSERT-, READ-, und CREATE-Kommandos.</td>
+                </tr>
+                <tr>
+                    <td>SET STEP :OFF/on:</td>
+                    <td>–</td>
+                    <td>ON unterstützt das Testen von Programmdateien, indem diese in Einzelschritten ausgeführt werden, das heißt nach jedem Befehl angehalten wird. OFF schaltet diese Testeinrichtung ab.</td>
+                </tr>
+                <tr>
+                    <td>SET TALK :ON/off:</td>
+                    <td>–</td>
+                    <td>ON zeigt Ergebnisse der Kommandoausführung auf dem Bildschirm an. OFF unterdrückt diese Anzeige.</td>
+                </tr>
+                <tr>
+                    <td>SET ALTERNATE TO &lt;Datei&gt;</td>
+                    <td>–</td>
+                    <td>erzeugt eine Diskettendatei mit der Erweitung .TXT zur Protokollierung der Bildschirmausgaben. SET ALTERNATE TO schließt die .TXT-Datei.</td>
+                </tr>
+                <tr>
+                    <td>SET COLOR TO &lt;n1,n2&gt;</td>
+                    <td>–</td>
+                    <td>auf den 8-Bit-Computern nicht verfügbar.</td>
+                </tr>
+                <tr>
+                    <td>SET DATE TO &lt;xx/xx/xx&gt;</td>
+                    <td>–</td>
+                    <td>auf den 8-Bit-Computern nicht verfügbar.</td>
+                </tr>
+                <tr>
+                    <td>SET DEFAULT TO &lt;Laufwerk&gt;</td>
+                    <td>–</td>
+                    <td>auf den 8-Bit-Computern nicht verfügbar.</td>
+                </tr>
+                <tr>
+                    <td>SET FORMAT TO &lt;SCREEN/PRINT)</td>
+                    <td>–</td>
+                    <td>Mit SCREEN erfolgt die Ausgabe der SAY-Kommandos auf dem Bildschirm, mit PRINT auf dem Drucker.</td>
+                </tr>
+                <tr>
+                    <td>SET FORMAT TO &lt;Formatdatei&gt;</td>
+                    <td>–</td>
+                    <td>öffnet eine .FMT-Datei, die dBase II benutzt, um den Bildschirm bei READ-, APPEND-, EDIT-, INSERT-, CREATE-, und SAY-Kommandos zu formatieren (Maske). SET FORMAT TO schließt die Formatdatei.</td>
+                </tr>
+                <tr>
+                    <td>SET HEADING TO &lt;Zeichenkette&gt;</td>
+                    <td>–</td>
+                    <td>speichert &lt;Zeichenkette&gt; intern und druckt sie als Kopfzeile im Bericht.</td>
+                </tr>
+                <tr>
+                    <td>SET MARGIN TO &lt;n&gt;</td>
+                    <td>–</td>
+                    <td>festlegen des linken Randes auf dem Drucker in Spalte &lt;n&gt;.</td>
+                </tr>
+                <tr>
+                    <td>SKIP - &lt;n&gt;</td>
+                    <td>–</td>
+                    <td>bewegt den Satzzähler auf- oder abwärts um n Datensätze innerhalb der Datei. Standardwert ist +1.</td>
+                </tr>
+                <tr>
+                    <td>SORT ON &lt;Feld&gt; TO &lt;Datei&gt; ASCENDING / DESCENDING</td>
+                    <td>–</td>
+                    <td>schreibt eine neue Kopie der Datei mit allen Datensätzen in einer bestimmten Reihenfolge. Benutzt den ASCII-Code für die Sortierung (Leerstellen, Zahlen, Großbuchstaben, Kleinbuchstaben und dann Symbole). Zum Löschen markierte Sätze werden übergangen. Standardwert für die Sortierfolge ist ASCENDING (aufsteigend).<br>Beispiel: . USE ADRESSLISTE<br>. SORT ON PLZ TO POSTLEITZAHL DESCENDING</td>
+                </tr>
+                <tr>
+                    <td>STORE &lt;Ausdr&gt; TO &lt;tempVar&gt;</td>
+                    <td>–</td>
+                    <td>speichert den Wert eines Ausdrucks in eine temporäre Variable.<br>Beispiel: . STORE 3 TO NUMMER<br>3<br>. STORE NUMMER + 9 TO NUMMER2<br>12<br>. STORE 'KLAUS' TO NAME<br>KLAUS<br>. ? NUMMER+NUMMER2, ' ', NAME<br>15 KLAUS</td>
+                </tr>
+                <tr>
+                    <td>SUM</td>
+                    <td>–</td>
+                    <td>berechnet und zeigt die Summen von numerischen Feldern der Datei an. Die Option &lt;Bereich&gt; bestimmt die Menge der Datensätze für die Summierung; FOR &lt;Ausdr&gt; gibt für die Summierung bestimmte Bedingungen an; TO &lt;tempVar&gt; speichert das Ergebnis in der angegebenen temporären Variablen. Standardwert für &lt;Bereich&gt; ist ALL (alle). Zum Löschen markierte Datensätze werden übergangen.<br>Syntax:<br>SUM &lt;Feld&gt; :,&lt;Feld2&gt;: :&lt;Bereich&gt;:<br>:TO &lt;tempVarliste&gt;: :FOR &lt;Ausdr&gt;:<br>Beispiele:<br>. USE EINKAUFSLISTE :Felder sind TEIL, ANZAHL, PREIS:<br>. SUM PREIS ANZAHL FOR TEIL = 'Nahrung'<br>. SUM ANZAHL FOR TEIL = 'Bier' TO GETRÄNK<br>. SUM ANZAHL, ANZAHLPREIS FOR TEIL = 'BIER' .AND. PREIS &gt;1.00</td>
+                </tr>
+                <tr>
+                    <td>TEXT</td>
+                    <td>–</td>
+                    <td>erzeugt programmierte Textausgaben. Der Text ist zwischen TEXT und ENDTEXT einzuschließen. Erspart die (umständlichere) Verwendung von »?« beziehungsweise SAY.</td>
+                </tr>
+                <tr>
+                    <td>TOTAL</td>
+                    <td>–</td>
+                    <td>erzeugt eine summarisch ausgewertete Form einer indizierten oder vorsortierten Datei. Der Schlüssel muß als Index vorhanden oder die Datenbankdatei danach sortiert sein. Es werden dann die angegebenen Felder der Sätze mit gleichem Schlüssel summiert und das Ergebnis in einer weiteren Datei abgelegt. Mit TOTAL kann man auch duplizierte Sätze entfernen.<br>Syntax:<br>TOTAL TO &lt;Datei&gt; ON &lt;Schlüssel&gt; :FIELDS &lt;Feldliste&gt;:</td>
+                </tr>
+                <tr>
+                    <td>UPDATE</td>
+                    <td>–</td>
+                    <td>aktualisiert vorsortierte oder indizierte Dateien im Batch durch Übernahme von Informationen von (FROM) einer angegebenen Datei (mit demselben Schlüssel vorsortiert). Die Schlüssel der benutzten Datei werden mit den Schlüsseln der angegebenen Datei auf Übereinstimmung geprüft. dBase II kann dann zusammengehörige Felder aus beiden Dateien miteinander verbinden (zum Beispiel Addieren). Es können auch ganze Felder in der benutzten Datei durch Inhalte der entsprechenden Felder der anderen Datei ersetzt werden.<br>Syntax:<br>UPDATE FROM &lt;Datei&gt; ON &lt;Schlüssel&gt; :ADD &lt;Feldliste&gt;:<br>:REPLACE &lt;Feldliste&gt; oder &lt;Feld&gt; WITH &lt;Feldliste&gt;:<br>:RANDOM:</td>
+                </tr>
+                <tr>
+                    <td>USE &lt;Datei&gt; INDEX &lt;Indexdateiliste&gt;</td>
+                    <td>–</td>
+                    <td>bestimmt die Datei für die nachfolgende Bearbeitung. USE schließt automatisch die mit einem vorherigen USE-Kommando geöffnete Datei. Optional kann ein Index vergeben werden, um die Datei zu ordnen. Weitere mit USE angeschlossene Indexdateien werden bei Änderungen automatisch aktualisiert.</td>
+                </tr>
+                <tr>
+                    <td>WAIT TO &lt;tempVar&gt;</td>
+                    <td>–</td>
+                    <td>wird in Programmdateien benutzt, um die dBase II-Ausführung solange zu unterbrechen, bis auf der Tastatur ein einzelnes Zeichen eingegeben wird. WAIT TO &lt;tempVar&gt; speichert automatisch die Tastatureingabe in eine temporäre Variable und kann dadurch den Ablauf des Programms steuern.</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 5. dBase II-Befehlsbeschreibung und Beispiele</figcaption>
+        </figure>
+
+        <figure>
+            <table class="plain">
+                <tr class="separator">
+                    <th>Meldung</th>
+                    <th></th>
+                    <th>Ursache/Beseitigung</th>
+                </tr>
+                <tr>
+                    <td>UNZULÄSSIGE DEZIMALSTELLEN IM FELD</td>
+                    <td>–</td>
+                    <td>Die Anzahl der Dezimalstellen bei der Feld-Definition ist neu einzugeben.</td>
+                </tr>
+                <tr>
+                    <td>UNZULÄSSIGER DATEINAME</td>
+                    <td>–</td>
+                    <td>Syntaxfehler im Dateinamen.</td>
+                </tr>
+                <tr>
+                    <td>UNZULÄSSIGER FELDNAME</td>
+                    <td>–</td>
+                    <td>Unzulässige Zeichen/Länge im Feldnamen; neu eingeben.</td>
+                </tr>
+                <tr>
+                    <td>UNZULÄSSIGER FELDTYP</td>
+                    <td>–</td>
+                    <td>Nur C (Character), N (numerisch) oder L (logisch) zugelassen.</td>
+                </tr>
+                <tr>
+                    <td>UNZULÄSSIGE FELDLÄNGE</td>
+                    <td>–</td>
+                    <td>Feldlänge minimal 1, maximal 255 Stellen. Bei Stringbefehlen darf die Stellenangabe den Wert 255 nicht übersteigen.</td>
+                </tr>
+                <tr>
+                    <td>EINFÜGEN (INSERT) NICHT MÖGLICH – DATENBANKDATEI IST LEER</td>
+                    <td>–</td>
+                    <td>INSERT durch APPEND ersetzen.</td>
+                </tr>
+                <tr>
+                    <td>DATEI KANN NICHT GEÖFFNET WERDEN</td>
+                    <td>–</td>
+                    <td>Prüfen, ob Datei vorhanden ist.</td>
+                </tr>
+                <tr>
+                    <td>BEFEHLSDATEI NICHT VORHANDEN</td>
+                    <td>–</td>
+                    <td>Dateiname/Laufwerksangabe prüfen.</td>
+                </tr>
+                <tr>
+                    <td>DATENELEMENT NICHT GEFUNDEN</td>
+                    <td>–</td>
+                    <td>Prüfen, ob Feldbezeichnung korrekt beziehungsweise das Feld in der Struktur vorhanden ist. Beim REPLACE-Befehl diesen neu eingeben.</td>
+                </tr>
+                <tr>
+                    <td>DATENBANKDATEI WURDE OHNE INDEXDATEI AKTIVIERT</td>
+                    <td>–</td>
+                    <td>FIND ist nur auf indizierten Datenbankdateien möglich. Die Index-Datei mit USE anschließen.</td>
+                </tr>
+                <tr>
+                    <td>DISKETTENVERZEICHNIS IST VOLL</td>
+                    <td>–</td>
+                    <td>Nicht benötigte Dateien löschen.</td>
+                </tr>
+                <tr>
+                    <td>DISKETTE IST VOLL</td>
+                    <td>–</td>
+                    <td>Nicht benötigte Dateien löschen.</td>
+                </tr>
+                <tr>
+                    <td>DATEIENDE UNERWARTET ERREICHT</td>
+                    <td>–</td>
+                    <td>Datenbankdatei weist Fehler auf, gegebenenfalls kopieren beziehungsweise reindizieren.</td>
+                </tr>
+                <tr>
+                    <td>DIE »FIELD«-ANGABE FEHLT</td>
+                    <td>–</td>
+                    <td>CHANGE-Kommando neu eingeben.</td>
+                </tr>
+                <tr>
+                    <td>DATEI BEREITS VORHANDEN</td>
+                    <td>–</td>
+                    <td>Nicht benötigte Datei gleichen Namens löschen oder anderen Namen verwenden.</td>
+                </tr>
+                <tr>
+                    <td>DATEI NICHT VORHANDEN</td>
+                    <td>–</td>
+                    <td>Prüfen, ob Datei vorhanden ist, etwa mit DISPLAY FILES LIKE *.*</td>
+                </tr>
+                <tr>
+                    <td>DATEI IST BEREITS ERÖFFNET</td>
+                    <td>–</td>
+                    <td>Mit USE oder CLEAR aktive Datei(en) abmelden.</td>
+                </tr>
+                <tr>
+                    <td>FORMATDATEI KANN NICHT GEÖFFNET WERDEN</td>
+                    <td>–</td>
+                    <td>».FMT«-Datei prüfen, etwa durch Auflisten.</td>
+                </tr>
+                <tr>
+                    <td>ES WURDE NOCH KEINE FORMATDATEI AUSGEWÄHLT</td>
+                    <td>–</td>
+                    <td>Formatdatei aktivieren.</td>
+                </tr>
+                <tr>
+                    <td>UNGÜLTIGER DATENTYP</td>
+                    <td>–</td>
+                    <td>SORT kann nicht auf logischen Feldern sortieren.</td>
+                </tr>
+                <tr>
+                    <td>UNGÜLTIGER WERT BEI »GOTO«</td>
+                    <td>–</td>
+                    <td>Satznummer muß im belegten Bereich der Datenbank und im Bereich zwischen 1 und 65535 liegen.</td>
+                </tr>
+                <tr>
+                    <td>UNGÜLTIGER VARIABLENNAME</td>
+                    <td>–</td>
+                    <td>Nur alphanumerische Zeichen und Doppelpunkte sind als Namen für Felder und Variable zugelassen.</td>
+                </tr>
+                <tr>
+                    <td>INDEXDATEI PASST NICHT ZUR DATENBANK</td>
+                    <td>–</td>
+                    <td>Nur zur Datenbankdatei gehörende Indexdateien verwenden.</td>
+                </tr>
+                <tr>
+                    <td>INDEXDATEI KANN NICHT GEÖFFNET WERDEN</td>
+                    <td>–</td>
+                    <td>Dateiname prüfen oder Datenbank neu indizieren.</td>
+                </tr>
+                <tr>
+                    <td>MIT JOIN WURDE VERSUCHT, MEHR ALS 65534 SÄTZE ZU ERZEUGEN</td>
+                    <td>–</td>
+                    <td>Die »FOR«-Bedingung begrenzen.</td>
+                </tr>
+                <tr>
+                    <td>SCHLÜSSEL HABEN ABWEICHENDE LÄNGE</td>
+                    <td>–</td>
+                    <td>UPDATE verlangt übereinstimmende Schlüssel.</td>
+                </tr>
+                <tr>
+                    <td>MAKRO IST KEINE ZEICHENFOLGE</td>
+                    <td>–</td>
+                    <td>Makroexpansion verlangt Variablen mit Zeichenreihe als Wert.</td>
+                </tr>
+                <tr>
+                    <td>MAXIMAL 5 FELDER FÜR SUMMENBILDUNG MÖGLICH</td>
+                    <td>–</td>
+                    <td>SUM nur mit maximal 5 Feldern.</td>
+                </tr>
+                <tr>
+                    <td>MAXIMALE SCHACHTELUNGSGRENZE ÜBERSCHRITTEN</td>
+                    <td>–</td>
+                    <td>Programmdateien überarbeiten und zusammenfassen.</td>
+                </tr>
+                <tr>
+                    <td>ES FEHLT DER NUMERISCHE AUSDRUCK ZUM SUMMIEREN</td>
+                    <td>–</td>
+                    <td>SUM erfordert Angabe des/der zu summierenden Feldes(r).</td>
+                </tr>
+                <tr>
+                    <td>DIE »FOR«-ANGABE FEHLT</td>
+                    <td>–</td>
+                    <td>JOIN erneut mit »FOR«-Angabe eingeben.</td>
+                </tr>
+                <tr>
+                    <td>DIE »FROM«-ANGABE FEHLT</td>
+                    <td>–</td>
+                    <td>UPDATE erneut mit »FROM«-Angabe eingeben.</td>
+                </tr>
+                <tr>
+                    <td>WERT NICHT GEFUNDEN</td>
+                    <td>–</td>
+                    <td>Nicht unbedingt ein Fehler: Der Schlüsselwert ist nicht vorhanden (# = 0).</td>
+                </tr>
+                <tr>
+                    <td>AUSDRUCK IST NICHT NUMERISCH</td>
+                    <td>–</td>
+                    <td>SUM erfordert einen numerischen Ausdruck für die Summierung.</td>
+                </tr>
+                <tr>
+                    <td>DATEI NICHT VORHANDEN</td>
+                    <td>–</td>
+                    <td>Name prüfen, ggf. vorhandene Dateien auflisten lassen.</td>
+                </tr>
+                <tr>
+                    <td>DIE »ON«-ANGABE FEHLT</td>
+                    <td>–</td>
+                    <td>UPDATE oder INDEX mit »ON«-Angabe neu formulieren.</td>
+                </tr>
+                <tr>
+                    <td>SPEICHER FÜR TEMPORÄRE VARIABLEN IST VOLL</td>
+                    <td>–</td>
+                    <td>Nicht benötigte temporäre Variablen löschen.</td>
+                </tr>
+                <tr>
+                    <td>SATZLÄNGE ÜBERSCHREITET MAXIMALWERT VON 1000 BYTE</td>
+                    <td>–</td>
+                    <td>Feldlängen kürzen, so daß Satzlänge &lt;= 1000 Byte.</td>
+                </tr>
+                <tr>
+                    <td>SATZ NICHT IN INDEXDATEI ENTHALTEN</td>
+                    <td>–</td>
+                    <td>Index-Datei nicht aktuell; Datenbankdatei reindizieren.</td>
+                </tr>
+                <tr>
+                    <td>SATZ AUSSERHALB DES IN DATENBANKDATEI BELEGTEN BEREICHES</td>
+                    <td>–</td>
+                    <td>Datei überprüfen (gegebenenfalls COPY) beziehungsweise reindizieren.</td>
+                </tr>
+                <tr>
+                    <td>INTERNER FEHLER BEIM SORTIEREN</td>
+                    <td>–</td>
+                    <td>Bitte Händler unterrichten</td>
+                </tr>
+                <tr>
+                    <td>UNTERSCHIEDLICHE DATENTYPEN BEI QUELLE UND ZIEL</td>
+                    <td>–</td>
+                    <td>Datentypen müssen übereinstimmen.</td>
+                </tr>
+                <tr>
+                    <td>SYNTAXFEHLER</td>
+                    <td>–</td>
+                    <td>unbekanntes Kommando, neu formulieren.</td>
+                </tr>
+                <tr>
+                    <td>SYNTAXFEHLER BEI DER FORMAT-DEFINITION</td>
+                    <td>–</td>
+                    <td>ein @SAY GET PICTURE wurde fehlerhaft formuliert.</td>
+                </tr>
+                <tr>
+                    <td>DIE »TO«-ANGABE FEHLT</td>
+                    <td>–</td>
+                    <td>Kommando mit »TO«-Angabe neu eingeben.</td>
+                </tr>
+                <tr>
+                    <td>ZU VIELE ZEICHEN (BEFEHLSZEILE ZU LANG)</td>
+                    <td>–</td>
+                    <td>Feldlänge oder maximale Länge der Befehlszeile wurden überschritten.</td>
+                </tr>
+                <tr>
+                    <td>ZU VIELE DATEIEN ERÖFFNET</td>
+                    <td>–</td>
+                    <td>Nur bis zu 16 Dateien (aller Typen) können gleichzeitig aktiviert werden.</td>
+                </tr>
+                <tr>
+                    <td>ZU VIELE TEMPORÄRE VARIABLE</td>
+                    <td>–</td>
+                    <td>Höchstens 64 temporäre Variable sind möglich; nicht benötigte Variablen löschen.</td>
+                </tr>
+                <tr>
+                    <td>ZU VIELE »RETURNS« BENUTZT</td>
+                    <td>–</td>
+                    <td>Struktur der Programmdateien überprüfen (insbesondere Schachtelung, Schleifen).</td>
+                </tr>
+                <tr>
+                    <td>DIE »WITH«-ANGABE FEHLT</td>
+                    <td>–</td>
+                    <td>REPLACE mit »WITH«-Angabe neu eingeben.</td>
+                </tr>
+                <tr>
+                    <td>DATEI-NUMMER NICHT ZUGEORDNET</td>
+                    <td>–</td>
+                    <td>Prüfen, ob DBASEMSG.TXT vorhanden ist</td>
+                </tr>
+                <tr>
+                    <td>UNBEKANNTER BEFEHL</td>
+                    <td>–</td>
+                    <td>Formulierung prüfen.</td>
+                </tr>
+                <tr>
+                    <td>VARIABLE NICHT VORHANDEN</td>
+                    <td>–</td>
+                    <td>Temporäre Variable erzeugen beziehungsweise Name korrigieren.</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 6. Die dBase II-Fehlermeldungen</figcaption>
+        </figure>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>Anzahl Felder/Datensatz</td>
+                    <td>32</td>
+                </tr>
+                <tr>
+                    <td>Anzahl Zeichen/Datensatz</td>
+                    <td>1000</td>
+                </tr>
+                <tr>
+                    <td>Anzahl Datensätze/Datei</td>
+                    <td>65535</td>
+                </tr>
+                <tr>
+                    <td>Anzahl Zeichen/Zeichenkette</td>
+                    <td>254</td>
+                </tr>
+                <tr>
+                    <td>Rechengenauigkeit</td>
+                    <td>10 Stellen</td>
+                </tr>
+                <tr>
+                    <td>größter Wert etwa</td>
+                    <td>1.8 x 10<sup>63</sup></td>
+                </tr>
+                <tr>
+                    <td>kleinster Wert etwa</td>
+                    <td>1.0 x 10<sup>-63</sup></td>
+                </tr>
+                <tr>
+                    <td>Anzahl temporäre Variable</td>
+                    <td>64</td>
+                </tr>
+                <tr>
+                    <td>Anzahl Zeichen/Kommandozeile</td>
+                    <td>254</td>
+                </tr>
+                <tr>
+                    <td>Anzahl &lt;Ausdr&gt; in SUM-Kommando</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>Anzahl Zeichen im REPORT-Kopf</td>
+                    <td>254</td>
+                </tr>
+                <tr>
+                    <td>Anzahl Felder im REPORT</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <td>Anzahl Zeichen im Indexschlüssel</td>
+                    <td>99</td>
+                </tr>
+                <tr>
+                    <td>Länge einer Programmdatei</td>
+                    <td>unbegrenzt</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 7. dBase II-Kenndaten und -Grenzwerte</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

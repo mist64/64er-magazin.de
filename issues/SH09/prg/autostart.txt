@@ -1,0 +1,66 @@
+;autostart.prg ==1c01==
+;version=70
+ 1000 color0,16:color4,16:color5,12
+ 1010 ta$="          ":ta$=ta$+ta$:ta$=ta$+ta$
+ 1020 gn=8                               :rem" Ger{CBM-F}tenummer
+ 1030 gosub1440
+ 1040 restore1530
+ 1050 printchr$(14)chr$(7)chr$(8)
+ 1060 print"{down}{down}  Dieses Programm generiert einen Boot-
+ 1070 print"  Sector auf Track {rvon}1{rvof} Sector {rvon}0{rvof} , der den
+ 1080 print"  C= 128 beim Einschalten veranla{CBM-V}t ein
+ 1090 print"  bestimmtes BASIC - Programm  zu laden":print"  und zu starten.{down}{down}{down}
+ 1100 a$="(C)opyright  by":gosub1470:a$="Dirk Paessler":gosub1470
+ 1110 a$="L{CBM-F}rchenweg  8":gosub1470
+ 1120 a$="8520 Erlangen":gosub1470:print:print:print:print
+ 1130 gosub1500
+ 1140 gosub1440
+ 1150 open15,gn,15,"i"                   :rem" Befehlskanal er{CBM-C}fnen und Disk-Init
+ 1160 open 1,gn, 6,"#"                   :rem" Direktkanal er{CBM-C}ffnen
+ 1170 print#15,"b-a:0 1 0":ifds<>65then1240:rem" ist der Block noch frei ???
+ 1180 a$="Block 1:0 ist belegt":gosub1470
+ 1190 print"{CTRL-G}{down} <f> ... Block freigeben
+ 1200 print"{down} <n> ... nocheinmal versuchen
+ 1210 print"{down} <a> ... Vorgang abbrechen{down}{down}
+ 1220 gosub1500:ifa$="a"then1400:else:ifa$="n"then1170
+ 1230 ifa$<>"f"thenprint"{CTRL-G}{up}";:goto1220
+ 1240 print#15,"b-f:0 1 0"               :rem" Block wieder freigeben
+ 1250 print"{down}{down}{CTRL-G}{rvon}Bootnachricht :{down}":inputa1$
+ 1260 print"{down}{down}{CTRL-G}{rvon}Programmname :{down}":inputpr$
+ 1270 print#15,"b-p 6 0":print#1,"cbm"chr$(0)chr$(0)chr$(0)chr$(0);
+ 1280 print#1,a1$;chr$(0);pr$;chr$(0);
+ 1290 reada$:dowhilea$<>"ende":print#1,chr$(dec(a$));:reada$:loop
+ 1300 print#15,"u2 6 0 1 0"
+ 1310 ifds=0then1330
+ 1320 print"{CTRL-G}{rvon}Schreibfehler{rvof} : "ds$:gosub1500:goto1400
+ 1330 print#15,"b-a:0 1 0"               :rem" Block belegen
+ 1340 close1:open1,8,6,pr$+",p,r":ifds=0then1360
+ 1350 print"{CTRL-G}{rvon}Diskfehler{rvof} : "ds$:gosub1500:goto1400
+ 1360 get#1,a$,b$:a=asc(a$+chr$(0))+asc(b$+chr$(0))*256
+ 1370 ifa=dec("1c01")then1390
+ 1380 print"Startadresse des Programms nicht richtig":print:print:gosub1500
+ 1390 print"{CTRL-G}":print:print:a$="Auftrag vollendet":gosub1470:print:print:print:gosub1500
+ 1400 rem"PRG Ende
+ 1410 close1:close15:goto1030
+ 1420 end
+ 1430 :
+ 1440 rem"Kopfzeile
+ 1450 print"{home}{home}{clr}{rvon}"ta$"{home}";:a$="Autostart 128":gosub1470:print:print:return
+ 1460 :
+ 1470 rem"Zeile auf 40 Zeichen zentrieren
+ 1480 a$=left$(ta$,(40-len(a$))/2)+a$:printa$
+ 1490 return
+ 1500 rem" zum Tastendruck auffordern
+ 1510 a$="Bitte eine Taste dr{CBM-X}cken":gosub1470:getkeya$:return
+ 1520 :
+ 1530 :
+ 1540 rem"Maschinenprogramm speichert RUN <cr> in der Tastaturpuffer
+ 1550 data a2,04    : rem"ldx #$04       Anzahl der Zeichen
+ 1560 data bd,2d,10 : rem"lda $102d,x_{CBM-S}  aus Funktionstastentabelle lesen
+ 1570 data 9d,49,03 : rem"sta $0349,x {SHIFT--}  und in Tastaturpuffer speichern
+ 1580 data ca       : rem"dex         {SHIFT--}
+ 1590 data d0,f7    : rem"bne {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}  Schleife zu ende
+ 1600 data a9,04    : rem"lda #$04       Anzahl der Zeichen
+ 1610 data 85,d0    : rem"sta $d0        in Zahl der Zeichen im Puffer
+ 1620 data 60       : rem"rts            und ende
+ 1630 data ende

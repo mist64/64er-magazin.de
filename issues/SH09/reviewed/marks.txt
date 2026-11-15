@@ -1,0 +1,552 @@
+# SH09 marks census, on the A4 pages (<tmp>/a4600, the PDF's input; a sheet issue).
+# Verdicts (r000, WHAT WE PUBLISH IS THE ORIGINAL PRINTING PLATE): dirt, hand -> the owner repaints; plate -> it stays.
+# A later build that detects one of these must READ THIS, not ask again. Nothing was retouched in the chain.
+# verdict `?` = with the owner; `below the cutoff -- not surfaced` = does not survive the delivered PDF's path.
+#
+# SIZES: bbox of the connected component on a4600 at lum < 153/255 after a 2x2 opening (lum = Rec.709 luma of the 8-bit sRGB page).
+# px are 600 dpi; mm = px x 25.4 / 600. Exceptions say so on their own line. The bbox is the join key.
+#
+# LEFT PANELS come from the raw scan, /Volumes/S/png/SH09/NNN.png at its own dpi; every pair is checked in <tmp>/marks/PAIRS.txt.
+# GATE, measured on the images extracted from the delivered PDF, not on a4600:
+#   bilevel (35 % JBIG2): inside its bbox the JBIG2 holds a run >= 6 px and >= 12 black px in total.
+#   contone (150 dpi JPEG): darkest footprint pixel >= 40 grey levels off the surround median, mark larger than one 150 dpi pixel (long side > 4 px and bbox > 16 px).
+#   Regions (p004, p009, p166) are surfaced by inspection, the gate does not apply to a scattered area. The operational numbers are 8701's.
+#
+# COUNTS: 112 surfaced: 111 `dirt — left as scanned (owner 2026-11-14)`, 1 `hand` (p111 +707+3256, the pen note, removed in the raw by the owner 2026-11-14). Ours: 2 `ours — not repaired (owner 2026-11-14)` (p130, p132), 13 `ours — below the gate, not repaired`. 389 below the cutoff with a bbox, 2 as bands (p003, p162). 502 = the 112 + p130 + the 389.
+# OWNER 2026-11-14: every surfaced mark is dirt and stays; no page image is changed for dirt. Only p111 +707+3256 is a real mark. Torn-edge residue p130/p132 is not repaired; repair_edges.py stays unapplied.
+# POPULATION. 553 components put through the gate:
+#   margin class: every component isolated by >= 3 mm at the cutoff, >= 12 px, <= 12.7 mm long side.
+#   looked at by eye off contact sheets: chromatic class (70 comps >= 12 black px and mean chroma >= page median + 8, of 1132), isolated small survivors
+#   (274 bilevel, 97 contone), OCR-read specks (30 prose words the PDF layer starts with U+201A), and a look at all 168 pages at ~63 dpi.
+#   55 survivors were print on inspection (digits, disk icons, dashes, ad shapes, cartoon lines) and 1 on p001 are not in the PDF (page 1 is title.png): not listed.
+# ADDED AFTER THE FIRST CUT (p008, p010, p028, p110): the chromatic class above required black px, so a pale coloured mark never reached a contact sheet. Read afterwards: all 488 chroma>=30 comps on bilevel pages, as 40 tiles after merging at 6 mm (2 bands left out), and the 48 largest of the 2240 pale comps. p110 is a hand and went up. p008, p010, p028 are no hands and are not in the PDF: below the cutoff, withdrawn from the owner. Crop in <tmp>/marks/supplement2/.
+# RECALL against the 112 surfaced marks, by bbox overlap, miss count, all/bilevel(40)/hands(4): dark 20/14/2, cluster 104/37/4, pale 108/40/4, chroma 88/37/3, lum<153 comps 9/7/1, chromatic gate 92/20/3. In none: 2 (p012 +818+1254, p168 +4666+5028, contone, found by the faint sweep). Biased: 111 of the 112 came through the lum<153 populations, so low pale recall says little. The one pale mark, p110, is missed by pale and held only by chroma. A pale non-chromatic stroke has no such second net: unmeasured.
+# NOT LISTED ONE BY ONE, ALL BELOW THE GATE: chromatic comps under 12 black px (1062); pale comps with no pixel under 153 on bilevel pages (2240); comps under 12 px.
+# RECORDED AS ONE LINE: p003 browned left edge (chroma ~35, lum ~233).
+# SURFACING (r000): what the MASTER carries decides; the gate describes. A hand goes up however little survives (p111). Dirt that drops stays recorded. Re-walked all below-cutoff lines at raw resolution for the largest and at contact-sheet scale for the rest: one was a hand-like note (p111); p034 and p143 are brown-red fibres, not a hand. Added p047 from step 160.
+# A FAINT SWEEP lum<200 away from print, strokes >= 3 mm: 497 clusters on the bilevel pages, read by eye: only p111. The 344 clusters on the contone pages 002-168 (312 + p002's 32), ordered by share of open paper and fill, all read at contact-sheet scale, about 120 dpi, none set aside: no mark added. Reading at that scale resolves a stroke, not a speck. p168's whole-cover mottle is an observation about the stock, in grade-observations.txt, not a mark.
+# LIMIT: a mark touching print, or within about 0.85 mm of it, is not detected at any size, unless it is coloured. p110, a 3 mm stroke, was dropped this way and held by the chroma population alone.
+# TORN-EDGE RESIDUE: the criterion is a black JBIG2 component, neutral in the raw (median chroma <25), within 1.5 mm of the bed, 0 of them outside the traced box. It cannot tell our residue from a neutral dirt speck that close. p130 and p132 were read in the raw; p154 and p158 too, and the other 11 of these 13 were classed by measurement only. Table: <tmp>/marks_work/edge_residue.txt.
+#
+# SCANNER ARTEFACT TEST, raw scan coordinates, the transform checked by correlating every surfaced mark against the delivered PDF (<tmp>/marks/PAIRS.txt): window, sheet box, the level rotation, and on 163-166 the rotation in level_cards.py; 2400 dpi pages at /4:
+#   498 marks with a bbox, 0 pair(s) on different pages within 5 px. None: nothing here is a fixed thing in the optical path.
+#
+# page bbox(a4600)        px        size(mm)      path     where                          what                                                       verdict
+p004 +11+0       228x6964   9.65 x 294.81  contone  5 mm across, 147 mm down     blue mottled speckle down the left margin (extent at lum<220, chroma>=20; no 2x2 core at 153 over most of it); region  dirt — left as scanned (owner 2026-11-14)
+p004 +58+148     5x8      0.21 x 0.34  contone  3 mm across, 6 mm down       speck, lum min 127, contone isolated; 121 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p004 +4940+332     5x4      0.21 x 0.17  contone  209 mm across, 14 mm down    speck, lum min 51, contone margin; 90 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p004 +1873+349     5x6      0.21 x 0.25  contone  79 mm across, 15 mm down     speck, lum min 70, contone isolated; 144 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p004 +147+3155    7x7      0.30 x 0.30  contone  6 mm across, 134 mm down     speck, lum min 99, contone isolated; 166 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p006 +154+2521    7x9      0.30 x 0.38  contone  7 mm across, 107 mm down     speck, lum min 91, contone isolated; 123 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p006 +2600+6273    3x8      0.13 x 0.34  contone  110 mm across, 266 mm down   speck, lum min 84, margin; 72 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p007 +3445+671     6x4      0.25 x 0.17  contone  146 mm across, 28 mm down    speck, lum min 94, margin; 59 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p007 +3143+846     7x3      0.30 x 0.13  contone  133 mm across, 36 mm down    speck, lum min 95, margin; 66 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p007 +4159+1704    5x4      0.21 x 0.17  contone  176 mm across, 72 mm down    speck, lum min 68, margin; 64 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p007 +4566+3836    5x5      0.21 x 0.21  contone  193 mm across, 162 mm down   speck, lum min 104, margin; 102 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p008 +3554+4398    22x10     0.93 x 0.42  bilevel  151 mm across, 186 mm down   brownish blot, lum min 47, margin/isolated; 47 black px, run 13 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p008 +68+1471    217x255    9.19 x 10.79  bilevel  3 mm across, 62 mm down    a scatter of fine blue-green specks down the left margin beside the text, chromatic, chroma>=22; 0 black px in the JBIG2  below the cutoff -- not surfaced
+p009 +4770+0       168x6060   7.11 x 256.54  contone  205 mm across, 128 mm down   blue mottled speckle down the fore-edge margin (extent at lum<200, chroma>=30); region  dirt — left as scanned (owner 2026-11-14)
+p009 +4273+544     11x6      0.47 x 0.25  contone  181 mm across, 23 mm down    speck, lum min 97, contone isolated; 68 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p009 +4898+1953    6x5      0.25 x 0.21  contone  207 mm across, 83 mm down    speck, lum min 78, contone isolated; 141 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p010 +2174+4403    8x11     0.34 x 0.47  bilevel  92 mm across, 187 mm down    speck, lum min 51, margin/isolated; 19 black px, run 7 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p010 +1044+5134    18x41     0.76 x 1.74  bilevel  44 mm across, 217 mm down   three blue-green flecks in a column below the rule, chromatic, chroma>=22; 0 black px in the JBIG2  below the cutoff -- not surfaced
+p011 +3140+469     5x4      0.21 x 0.17  contone  133 mm across, 20 mm down    speck, lum min 99, margin; 95 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p011 +4413+1812    5x6      0.21 x 0.25  contone  187 mm across, 77 mm down    speck, lum min 76, margin; 94 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p011 +2519+2202    5x4      0.21 x 0.17  contone  107 mm across, 93 mm down    speck, lum min 109, contone margin; 82 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p011 +4753+4570    9x12     0.38 x 0.51  contone  201 mm across, 194 mm down   speck, lum min 95, contone isolated; 150 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p011 +109+6730    6x7      0.25 x 0.30  contone  5 mm across, 285 mm down     speck, lum min 32, contone isolated; 177 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p012 +818+1254    8x6      0.34 x 0.25  contone  35 mm across, 53 mm down     speck, lum min 88, contone isolated; 102 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p012 +4862+1644    4x6      0.17 x 0.25  contone  206 mm across, 70 mm down    speck, lum min 106, contone margin; 112 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p012 +575+3509    3x7      0.13 x 0.30  contone  24 mm across, 149 mm down    speck, lum min 87, margin; 41 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p012 +338+4770    5x9      0.21 x 0.38  contone  14 mm across, 202 mm down    speck, lum min 44, margin; 142 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p012 +797+5081    4x5      0.17 x 0.21  contone  34 mm across, 215 mm down    speck, lum min 62, margin; 69 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p012 +4881+6192    4x5      0.17 x 0.21  contone  207 mm across, 262 mm down   speck, lum min 81, contone margin; 107 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p012 +3679+6996    5x5      0.21 x 0.21  contone  156 mm across, 296 mm down   speck, lum min 59, contone margin; 103 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p013 +4892+1413    3x11     0.13 x 0.47  contone  207 mm across, 60 mm down    speck, lum min 89, contone isolated; 98 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p013 +4542+4398    10x11     0.42 x 0.47  contone  192 mm across, 186 mm down   speck, lum min 79, contone isolated; 196 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p013 +132+5114    4x5      0.17 x 0.21  contone  6 mm across, 217 mm down     speck, lum min 120, contone margin; 93 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p016 +3942+1467    5x7      0.21 x 0.30  contone  167 mm across, 62 mm down    speck, lum min 78, margin; 88 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p016 +1334+2800    5x6      0.21 x 0.25  contone  57 mm across, 119 mm down    speck, lum min 118, contone isolated; 118 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p016 +3943+3565    6x8      0.25 x 0.34  contone  167 mm across, 151 mm down   speck, lum min 61, contone isolated; 138 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p016 +252+6077    6x10     0.25 x 0.42  contone  11 mm across, 257 mm down    speck, lum min 90, contone isolated; 149 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p017 +4928+6761    13x254    0.55 x 10.75  bilevel  209 mm across, 292 mm down   magenta and black line along the fore edge at the foot, beside the code 64S986; 1760 black px, run 194 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p018 +3487+491     6x9      0.25 x 0.38  contone  148 mm across, 21 mm down    speck, lum min 102, contone isolated; 117 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p018 +2526+608     5x9      0.21 x 0.38  contone  107 mm across, 26 mm down    speck, lum min 99, margin; 61 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p020 +123+1118    3x7      0.13 x 0.30  contone  5 mm across, 47 mm down      speck, lum min 86, contone margin; 82 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p020 +2480+1872    19x26     0.80 x 1.10  contone  105 mm across, 80 mm down    blot, lum min 52, contone isolated; 201 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p020 +1198+2117    10x9      0.42 x 0.38  contone  51 mm across, 90 mm down     speck, lum min 85, margin; 95 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p021 +4539+1903    3x6      0.13 x 0.25  contone  192 mm across, 81 mm down    speck, lum min 99, contone margin; 112 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p021 +3356+3808    9x6      0.38 x 0.25  contone  142 mm across, 161 mm down   speck, lum min 104, contone isolated; 139 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p021 +3630+6003    5x7      0.21 x 0.30  contone  154 mm across, 254 mm down   speck, lum min 90, contone isolated; 137 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p022 +3096+569     7x7      0.30 x 0.30  contone  131 mm across, 24 mm down    speck, lum min 77, contone isolated; 105 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p022 +4750+1641    5x4      0.21 x 0.17  contone  201 mm across, 70 mm down    speck, lum min 65, contone margin; 133 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p022 +3845+2214    5x8      0.21 x 0.34  contone  163 mm across, 94 mm down    speck, lum min 89, margin; 131 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p022 +4833+6770    4x5      0.17 x 0.21  contone  205 mm across, 287 mm down   speck, lum min 124, contone margin; 80 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p022 +4228+6957    8x12     0.34 x 0.51  contone  179 mm across, 295 mm down   speck, lum min 81, contone isolated; 170 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p022 +197+6999    5x10     0.21 x 0.42  contone  8 mm across, 297 mm down     speck, lum min 123, contone isolated; 90 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p023 +2434+659     10x15     0.42 x 0.64  bilevel  103 mm across, 28 mm down    speck, lum min 38, margin/isolated; 48 black px, run 8 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p024 +3362+1678    7x8      0.30 x 0.34  contone  142 mm across, 71 mm down    speck, lum min 87, contone isolated; 158 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p024 +4848+3273    4x6      0.17 x 0.25  contone  205 mm across, 139 mm down   speck, lum min 92, contone margin; 86 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p024 +1531+5506    7x8      0.30 x 0.34  contone  65 mm across, 233 mm down    speck, lum min 66, contone isolated; 189 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p025 +3637+499     7x6      0.30 x 0.25  contone  154 mm across, 21 mm down    speck, lum min 84, contone isolated; 141 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p025 +930+506     5x6      0.21 x 0.25  contone  39 mm across, 22 mm down     speck, lum min 81, contone isolated; 105 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p025 +4749+679     4x5      0.17 x 0.21  contone  201 mm across, 29 mm down    speck, lum min 114, contone margin; 123 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p025 +4738+6151    6x5      0.25 x 0.21  contone  201 mm across, 260 mm down   speck, lum min 97, contone isolated; 113 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p027 +1995+957     7x10     0.30 x 0.42  bilevel  85 mm across, 41 mm down     speck, lum min 34, margin/isolated; 27 black px, run 8 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p028 +2973+1796    16x17     0.68 x 0.72  bilevel  126 mm across, 76 mm down   a small blue-green spot touching the top of the E of `Eint`, chromatic, chroma>=22; 0 black px in the JBIG2  below the cutoff -- not surfaced
+p030 +2665+956     5x6      0.21 x 0.25  contone  113 mm across, 41 mm down    speck, lum min 82, contone isolated; 157 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p030 +2160+5965    4x13     0.17 x 0.55  contone  92 mm across, 253 mm down    stroke, lum min 80, contone isolated; 108 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p030 +3153+6587    5x7      0.21 x 0.30  contone  134 mm across, 279 mm down   speck, lum min 62, contone margin; 169 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p030 +3480+6911    5x7      0.21 x 0.30  contone  147 mm across, 293 mm down   speck, lum min 98, contone isolated; 142 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p031 +1252+521     5x7      0.21 x 0.30  contone  53 mm across, 22 mm down     speck, lum min 99, contone isolated; 134 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p031 +3106+1859    5x4      0.21 x 0.17  contone  132 mm across, 79 mm down    speck, lum min 124, contone margin; 77 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p031 +4797+3853    7x6      0.30 x 0.25  contone  203 mm across, 163 mm down   speck, lum min 68, contone isolated; 189 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p031 +1538+5044    9x5      0.38 x 0.21  contone  65 mm across, 214 mm down    speck, lum min 108, contone margin; 111 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p036 +4714+6952    18x20     0.76 x 0.85  bilevel  200 mm across, 295 mm down   brownish blot, lum min 67, margin/isolated; 122 black px, run 15 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p037 +4514+4805    8x4      0.34 x 0.17  bilevel  191 mm across, 203 mm down   brownish speck, lum min 55, margin/isolated; 12 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p046 +2239+2125    5x7      0.21 x 0.30  bilevel  95 mm across, 90 mm down     brownish speck, lum min 56, chromatic; 15 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p047 +3908+1216    26x19     1.10 x 0.80  bilevel  166 mm across, 52 mm down    the "=" in "Kanalnummer = $FF", row $00AE-$00B4 of Tabelle 11, carries a spike on its upper bar and reads as not-equal, with a separate dark-red fibre just below (reported by step 160); bbox is the "=" at lum<153, the spike not separable from the glyph at that cutoff; 199 black px, run 24 in the JBIG2 for the whole "="  dirt — left as scanned (owner 2026-11-14)
+p050 +4799+4916    6x13     0.25 x 0.55  bilevel  203 mm across, 208 mm down   brownish speck, lum min 59, chromatic; 29 black px, run 10 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p052 +398+6813    11x6      0.47 x 0.25  bilevel  17 mm across, 289 mm down    brownish speck, lum min 67, margin/isolated; 14 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p054 +2014+3005    14x10     0.59 x 0.42  bilevel  86 mm across, 127 mm down    speck, lum min 49, margin/isolated; 47 black px, run 8 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p057 +1725+468     12x13     0.51 x 0.55  bilevel  73 mm across, 20 mm down     speck, lum min 40, margin/isolated; 89 black px, run 12 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p059 +3985+535     6x9      0.25 x 0.38  bilevel  169 mm across, 23 mm down    brownish speck, lum min 54, chromatic; 20 black px, run 7 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p066 +399+45      8x5      0.34 x 0.21  bilevel  17 mm across, 2 mm down      brownish speck, lum min 60, margin/isolated; 18 black px, run 7 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p069 +2309+632     28x24     1.19 x 1.02  bilevel  98 mm across, 27 mm down     blot, lum min 61, margin/isolated; 76 black px, run 9 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p075 +3868+292     10x10     0.42 x 0.42  bilevel  164 mm across, 13 mm down    brownish speck, lum min 55, chromatic; 37 black px, run 7 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p088 +922+6506    18x28     0.76 x 1.19  bilevel  39 mm across, 276 mm down    blot, lum min 58, near print; 48 black px, run 14 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p090 +3550+872     7x12     0.30 x 0.51  bilevel  150 mm across, 37 mm down    brownish speck, lum min 64, chromatic; 16 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p091 +4179+2937    5x9      0.21 x 0.38  bilevel  177 mm across, 125 mm down   brownish speck, lum min 63, margin/isolated; 12 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p099 +2775+1446    8x7      0.34 x 0.30  bilevel  118 mm across, 61 mm down    brownish speck, lum min 65, margin/isolated; 24 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p100 +900+189     11x9      0.47 x 0.38  bilevel  38 mm across, 8 mm down      brownish speck, lum min 54, chromatic; 24 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p101 +4339+411     8x7      0.34 x 0.30  bilevel  184 mm across, 18 mm down    brownish speck, lum min 41, margin/isolated; 24 black px, run 7 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p109 +4329+4130    9x15     0.38 x 0.64  bilevel  183 mm across, 175 mm down   speck, lum min 53, margin/isolated; 53 black px, run 13 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p110 +4590+2308    71x49     3.01 x 2.07  bilevel  194 mm across, 98 mm down   a thin red pencil stroke running down right from the e of `ausge-`, pale, chroma up to 91, lum about 205; 0 black px in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p111 +707+3256    622x89     26.33 x 3.77  bilevel  43 mm across, 140 mm down    a pen note, reading uncertain, candidates "M Blöcke" / "11 Blöcke", in the head of the listing frame above the caption. On the master 26.33 x 3.77 mm at lum<153 (5060 px); in the PDF 49 black px, longest run 3, which reads as dust. SURFACED ON WHAT THE MASTER CARRIES (r000); the gate describes it  hand — the only real mark (owner 2026-11-14); removed by the owner's retouch of the raw scan, published page re-derived, see reviewed/p111-provenance.txt
+p115 +1674+2479    4x13     0.17 x 0.55  bilevel  71 mm across, 105 mm down    brownish stroke, lum min 62, margin/isolated; 18 black px, run 11 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p116 +4955+2307    4x10     0.17 x 0.42  bilevel  210 mm across, 98 mm down    speck, lum min 40, margin/isolated; 13 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p130 +4903+6727    9x16     0.38 x 0.68  bilevel  208 mm across, 285 mm down   brownish speck, lum min 0, chromatic; 31 black px, run 10 in the JBIG2; NOTE the raw shows the torn edge and the scanner bed at this spot, no mark on paper: residue of the fill, a line of such specks; OURS by r000 if so ruled, 005 is frozen for this issue  ours — not repaired (owner 2026-11-14: "problem is minimal, all fine."): torn edge fibres beside the bed through the threshold, no mark on the paper; not surfaced; see a4600-overrides.txt
+p132 +4893+241     42x3401   1.78 x 143.98  bilevel  fore edge, 1.1-2.84 mm from the trim   line of specks in two runs, 16 comps at y 241-443 and 9 at y 3526-3641, 44 black px, largest 7, longest run 4 in the JBIG2, below the gate; read in the raw: the torn edge and the scanner bed at these spots, no mark on paper  ours — not repaired (owner 2026-11-14: "problem is minimal, all fine."): torn edge fibres beside the bed through the threshold, no mark on the paper; not surfaced; see a4600-overrides.txt
+p131 +2634+722     7x7      0.30 x 0.30  bilevel  112 mm across, 31 mm down    speck, lum min 30, margin/isolated; 25 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p131 +2995+5344    8x7      0.34 x 0.30  bilevel  127 mm across, 226 mm down   brownish speck, lum min 66, margin/isolated; 15 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p132 +3362+4572    11x13     0.47 x 0.55  bilevel  143 mm across, 194 mm down   speck, lum min 59, margin/isolated; 42 black px, run 9 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p135 +4450+3216    7x6      0.30 x 0.25  bilevel  189 mm across, 136 mm down   speck, lum min 67, margin/isolated; 13 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p141 +4038+418     9x4      0.38 x 0.17  bilevel  171 mm across, 18 mm down    brownish speck, lum min 37, chromatic; 17 black px, run 7 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p150 +1927+6971    6x7      0.25 x 0.30  bilevel  82 mm across, 295 mm down    speck, lum min 41, margin/isolated; 22 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p151 +4855+1523    18x11     0.76 x 0.47  bilevel  206 mm across, 65 mm down    brownish speck, lum min 41, margin/isolated; 86 black px, run 13 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p153 +1745+1049    12x9      0.51 x 0.38  bilevel  74 mm across, 45 mm down     brownish speck, lum min 60, chromatic; 37 black px, run 8 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p156 +398+39      9x9      0.38 x 0.38  bilevel  17 mm across, 2 mm down      speck, lum min 66, margin/isolated; 15 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p158 +1889+631     8x6      0.34 x 0.25  bilevel  80 mm across, 27 mm down     brownish speck, lum min 72, chromatic; 17 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p159 +2977+6759    5x8      0.21 x 0.34  bilevel  126 mm across, 286 mm down   speck, lum min 56, margin/isolated; 16 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p159 +2783+6980    7x8      0.30 x 0.34  bilevel  118 mm across, 296 mm down   speck, lum min 51, margin/isolated; 26 black px, run 6 in the JBIG2  dirt — left as scanned (owner 2026-11-14)
+p166 +1546+4290    1229x130    52.03 x 5.50  contone  91 mm across, 184 mm down    writing in blue in the first row of the order form, "L6 86 S9 CD" and "DM 29,90*" as it reads; region  dirt — left as scanned (owner 2026-11-14)
+p166 +3383+4886    8x6      0.34 x 0.25  contone  143 mm across, 207 mm down   speck, lum min 132, contone isolated; 114 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p167 +64+4       17x7      0.72 x 0.30  contone  3 mm across, 0 mm down       speck, lum min 79, contone margin; 136 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p168 +2+38      16x7      0.68 x 0.30  contone  0 mm across, 2 mm down       speck, lum min 36, contone isolated; 172 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p168 +601+484     7x4      0.30 x 0.17  contone  26 mm across, 21 mm down     speck, lum min 96, contone isolated; 107 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p168 +3699+1257    5x9      0.21 x 0.38  contone  157 mm across, 53 mm down    speck, lum min 44, contone isolated; 114 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p168 +1409+1890    10x7      0.42 x 0.30  contone  60 mm across, 80 mm down     speck, lum min 63, contone margin; 157 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p168 +96+2044    4x5      0.17 x 0.21  contone  4 mm across, 87 mm down      speck, lum min 117, contone margin; 91 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p168 +1092+2138    7x7      0.30 x 0.30  contone  46 mm across, 91 mm down     speck, lum min 100, contone isolated; 110 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p168 +4666+5028    5x6      0.21 x 0.25  contone  198 mm across, 213 mm down   speck, lum min 95, contone isolated; 158 grey levels off its surround at 150 dpi  dirt — left as scanned (owner 2026-11-14)
+p005 +4932+7012    1x2      0.04 x 0.08  bilevel  side B, 0.08-0.08 mm from the trim   torn-edge residue, classed by measurement: 1 comp(s), 2 black px, run 2 in the JBIG2, at most 0.12 mm from the bed  ours — below the gate, not repaired
+p055 +4929+5736    1x1      0.04 x 0.04  bilevel  side R, 1.31-1.31 mm from the trim   torn-edge residue, classed by measurement: 1 comp(s), 1 black px, run 1 in the JBIG2, at most 0.97 mm from the bed  ours — below the gate, not repaired
+p062 +882+6969    1x2      0.04 x 0.08  bilevel  side B, 1.9-1.9 mm from the trim   torn-edge residue, classed by measurement: 1 comp(s), 2 black px, run 2 in the JBIG2, at most 1.33 mm from the bed; same spot as the below-cutoff line +881+6969  ours — below the gate, not repaired
+p066 +4923+4712    1x1      0.04 x 0.04  bilevel  side R, 1.57-1.57 mm from the trim   torn-edge residue, classed by measurement: 1 comp(s), 1 black px, run 1 in the JBIG2, at most 0.04 mm from the bed  ours — below the gate, not repaired
+p068 +4909+2574    1x1      0.04 x 0.04  bilevel  side R, 2.16-2.16 mm from the trim   torn-edge residue, classed by measurement: 1 comp(s), 1 black px, run 1 in the JBIG2, at most 1.13 mm from the bed  ours — below the gate, not repaired
+p090 +4927+5844    1x1      0.04 x 0.04  bilevel  side R, 1.4-1.4 mm from the trim   torn-edge residue, classed by measurement: 1 comp(s), 1 black px, run 1 in the JBIG2, at most 0.24 mm from the bed; same spot as the below-cutoff line +4926+5841  ours — below the gate, not repaired
+p109 +46+546     2x2      0.08 x 0.08  bilevel  side L, 1.95-1.95 mm from the trim   torn-edge residue, classed by measurement: 1 comp(s), 3 black px, run 2 in the JBIG2, at most 1.33 mm from the bed  ours — below the gate, not repaired
+p126 +4943+385     1x1      0.04 x 0.04  bilevel  side R, 0.72-0.72 mm from the trim   torn-edge residue, classed by measurement: 1 comp(s), 1 black px, run 1 in the JBIG2, at most 0.24 mm from the bed  ours — below the gate, not repaired
+p131 +43+257     19x128    0.80 x 5.42  bilevel  side L, 1.82-2.54 mm from the trim   torn-edge residue, classed by measurement: 5 comp(s), 7 black px, run 2 in the JBIG2, at most 0.96 mm from the bed  ours — below the gate, not repaired
+p146 +61+6613    1x1      0.04 x 0.04  bilevel  side L, 2.58-2.58 mm from the trim   torn-edge residue, classed by measurement: 1 comp(s), 1 black px, run 1 in the JBIG2, at most 0.04 mm from the bed  ours — below the gate, not repaired
+p154 +4954+2287    2x62     0.08 x 2.62  bilevel  side R, 0.21-0.25 mm from the trim   torn-edge residue, classed by measurement: 4 comp(s), 4 black px, run 1 in the JBIG2, at most 0.04 mm from the bed  ours — below the gate, not repaired
+p158 +4944+2285    3x66     0.13 x 2.79  bilevel  side R, 0.59-0.68 mm from the trim   torn-edge residue, classed by measurement: 7 comp(s), 7 black px, run 1 in the JBIG2, at most 0.04 mm from the bed  ours — below the gate, not repaired
+p160 +4936+2314    3x53     0.13 x 2.24  bilevel  side R, 0.93-1.02 mm from the trim   torn-edge residue, classed by measurement: 4 comp(s), 4 black px, run 1 in the JBIG2, at most 0.04 mm from the bed  ours — below the gate, not repaired
+p003 left edge, 14-60 px wide   --        --            bilevel  whole height                   browned paper edge, chroma ~35, lum ~233, paper not a hand (r000 re-walk); no black px in the JBIG2  below the cutoff -- not surfaced
+p162 fore edge band             --        --            bilevel  whole height                   browned paper band at the fore edge, paper not a hand; no black px in the JBIG2  below the cutoff -- not surfaced
+p003 +3723+646     5x13     0.21 x 0.55  bilevel  158 mm across, 28 mm down    brownish speck, lum min 72, margin; 5 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p003 +158+737     4x7      0.17 x 0.30  bilevel  7 mm across, 31 mm down      speck, lum min 81, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p003 +3772+907     7x5      0.30 x 0.21  bilevel  160 mm across, 39 mm down    brownish speck, lum min 69, margin; 8 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p003 +1769+908     11x14     0.47 x 0.59  bilevel  75 mm across, 39 mm down     brownish speck, lum min 72, chromatic; 14 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p003 +3572+1937    6x4      0.25 x 0.17  bilevel  151 mm across, 82 mm down    speck, lum min 71, margin; 5 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p003 +798+1938    6x6      0.25 x 0.25  bilevel  34 mm across, 82 mm down     brownish speck, lum min 73, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p003 +4288+2169    4x4      0.17 x 0.17  bilevel  182 mm across, 92 mm down    brownish speck, lum min 89, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p003 +66+5984    4x8      0.17 x 0.34  bilevel  3 mm across, 253 mm down     brownish speck, lum min 116, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p004 +3905+66      4x4      0.17 x 0.17  contone  165 mm across, 3 mm down     speck, lum min 110, contone margin; 80 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p004 +665+1832    4x4      0.17 x 0.17  contone  28 mm across, 78 mm down     speck, lum min 89, contone margin; 113 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p005 +114+374     3x5      0.13 x 0.21  bilevel  5 mm across, 16 mm down      brownish speck, lum min 102, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p005 +3994+617     4x8      0.17 x 0.34  bilevel  169 mm across, 26 mm down    brownish speck, lum min 99, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p005 +2124+883     5x4      0.21 x 0.17  bilevel  90 mm across, 37 mm down     brownish speck, lum min 79, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p005 +4056+6825    5x6      0.21 x 0.25  bilevel  172 mm across, 289 mm down   brownish speck, lum min 80, margin; 4 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p005 +3733+6986    7x7      0.30 x 0.30  bilevel  158 mm across, 296 mm down   brownish speck, lum min 126, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p006 +4932+6448    4x4      0.17 x 0.17  contone  209 mm across, 273 mm down   speck, lum min 83, contone margin; 86 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p007 +2286+1193    4x4      0.17 x 0.17  contone  97 mm across, 51 mm down     speck, lum min 80, contone margin; 111 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p008 +2489+4818    5x5      0.21 x 0.21  bilevel  105 mm across, 204 mm down   speck, lum min 81, near text, OCR read it as a mark; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p009 +2984+1998    4x4      0.17 x 0.17  contone  126 mm across, 85 mm down    speck, lum min 99, contone margin; 98 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p010 +4763+574     5x4      0.21 x 0.17  bilevel  202 mm across, 24 mm down    speck, lum min 57, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p010 +4760+1866    12x9      0.51 x 0.38  bilevel  202 mm across, 79 mm down    brownish speck, lum min 62, margin; 9 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p010 +2518+2299    9x8      0.38 x 0.34  bilevel  107 mm across, 97 mm down    speck, lum min 63, chromatic; 20 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p010 +770+6846    8x4      0.34 x 0.17  bilevel  33 mm across, 290 mm down    brownish speck, lum min 94, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p011 +2918+913     5x3      0.21 x 0.13  contone  124 mm across, 39 mm down    speck, lum min 82, margin; 40 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p012 +1885+6522    3x5      0.13 x 0.21  contone  80 mm across, 276 mm down    speck, lum min 108, margin; 63 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p014 +4802+3045    7x5      0.30 x 0.21  bilevel  203 mm across, 129 mm down   brownish speck, lum min 102, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p014 +4885+3864    4x5      0.17 x 0.21  bilevel  207 mm across, 164 mm down   brownish speck, lum min 110, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p014 +4705+6134    4x5      0.17 x 0.21  bilevel  199 mm across, 260 mm down   speck, lum min 76, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p015 +3705+38      4x4      0.17 x 0.17  bilevel  157 mm across, 2 mm down     speck, lum min 73, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p015 +2143+1628    6x4      0.25 x 0.17  bilevel  91 mm across, 69 mm down     speck, lum min 57, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p017 +1290+177     5x8      0.21 x 0.34  bilevel  55 mm across, 8 mm down      brownish speck, lum min 33, chromatic; 14 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p018 +2756+580     4x4      0.17 x 0.17  contone  117 mm across, 25 mm down    speck, lum min 83, margin; 50 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p018 +4641+2264    4x4      0.17 x 0.17  contone  197 mm across, 96 mm down    speck, lum min 101, contone margin; 103 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p018 +4034+6824    4x4      0.17 x 0.17  contone  171 mm across, 289 mm down   speck, lum min 89, contone margin; 117 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p020 +1627+467     3x5      0.13 x 0.21  contone  69 mm across, 20 mm down     speck, lum min 67, margin; 85 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p020 +4802+5053    2x6      0.08 x 0.25  contone  203 mm across, 214 mm down   speck, lum min 81, contone margin; 88 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p021 +690+159     5x3      0.21 x 0.13  contone  29 mm across, 7 mm down      speck, lum min 110, contone margin; 76 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p021 +4705+4815    4x4      0.17 x 0.17  contone  199 mm across, 204 mm down   speck, lum min 89, contone margin; 68 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p022 +3733+665     4x4      0.17 x 0.17  contone  158 mm across, 28 mm down    speck, lum min 117, contone margin; 92 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p023 +2130+116     6x2      0.25 x 0.08  bilevel  90 mm across, 5 mm down      brownish speck, lum min 120, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p023 +211+3210    3x5      0.13 x 0.21  bilevel  9 mm across, 136 mm down     speck, lum min 38, margin; 4 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p025 +2348+4804    3x5      0.13 x 0.21  contone  99 mm across, 203 mm down    speck, lum min 146, contone margin; 79 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p026 +2108+67      7x9      0.30 x 0.38  bilevel  89 mm across, 3 mm down      brownish speck, lum min 53, margin; 7 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p026 +4745+2049    4x6      0.17 x 0.25  bilevel  201 mm across, 87 mm down    brownish speck, lum min 66, margin; 9 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p026 +496+6925    6x7      0.25 x 0.30  bilevel  21 mm across, 293 mm down    speck, lum min 79, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p027 +209+1943    4x4      0.17 x 0.17  bilevel  9 mm across, 82 mm down      speck, lum min 90, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p027 +150+6016    17x4      0.72 x 0.17  bilevel  7 mm across, 255 mm down     stroke, lum min 71, margin; 10 black px, run 6 in the JBIG2  below the cutoff -- not surfaced
+p028 +4897+5596    5x7      0.21 x 0.30  bilevel  207 mm across, 237 mm down   brownish speck, lum min 82, margin; 4 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p028 +838+6892    5x9      0.21 x 0.38  bilevel  36 mm across, 292 mm down    speck, lum min 84, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p029 +4792+1535    4x7      0.17 x 0.30  bilevel  203 mm across, 65 mm down    brownish speck, lum min 72, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p029 +2358+3430    11x5      0.47 x 0.21  bilevel  100 mm across, 145 mm down   brownish speck, lum min 72, chromatic; 15 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p029 +1949+3530    4x5      0.17 x 0.21  bilevel  83 mm across, 150 mm down    brownish speck, lum min 104, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p029 +2428+4451    3x5      0.13 x 0.21  bilevel  103 mm across, 189 mm down   brownish speck, lum min 117, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p029 +168+4748    9x17     0.38 x 0.72  bilevel  7 mm across, 201 mm down     brownish speck, lum min 79, margin; 7 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p029 +2767+5083    5x9      0.21 x 0.38  bilevel  117 mm across, 215 mm down   brownish speck, lum min 72, margin; 10 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p032 +3929+1091    6x4      0.25 x 0.17  bilevel  166 mm across, 46 mm down    speck, lum min 76, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p032 +3725+3743    10x6      0.42 x 0.25  bilevel  158 mm across, 159 mm down   brownish speck, lum min 88, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p034 +2680+2291    5x8      0.21 x 0.34  bilevel  114 mm across, 97 mm down    speck, lum min 92, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p034 +2558+3422    8x7      0.34 x 0.30  bilevel  108 mm across, 145 mm down   speck, lum min 69, near text, OCR read it as a mark; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p034 +2406+3899    7x5      0.30 x 0.21  bilevel  102 mm across, 165 mm down   brownish speck, lum min 93, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p034 +810+5686    16x26     0.68 x 1.10  bilevel  35 mm across, 241 mm down    hairline stroke before "U-Boot" (measured at lum<190: no 2x2 core at 153); 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p035 +3007+997     3x5      0.13 x 0.21  bilevel  127 mm across, 42 mm down    brownish speck, lum min 102, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p035 +1068+6769    4x5      0.17 x 0.21  bilevel  45 mm across, 287 mm down    speck, lum min 72, margin; 6 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p036 +2368+3       4x4      0.17 x 0.17  bilevel  100 mm across, 0 mm down     brownish speck, lum min 122, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p036 +73+5440    3x5      0.13 x 0.21  bilevel  3 mm across, 230 mm down     brownish speck, lum min 93, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p036 +4803+6736    5x5      0.21 x 0.21  bilevel  203 mm across, 285 mm down   brownish speck, lum min 135, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p037 +4902+320     10x12     0.42 x 0.51  bilevel  208 mm across, 14 mm down    brownish speck, lum min 75, chromatic; 12 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p037 +140+5518    9x9      0.38 x 0.38  bilevel  6 mm across, 234 mm down     brownish speck, lum min 115, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p038 +4900+1991    5x10     0.21 x 0.42  bilevel  208 mm across, 84 mm down    speck, lum min 69, margin; 10 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p038 +4852+5387    2x6      0.08 x 0.25  bilevel  205 mm across, 228 mm down   brownish speck, lum min 129, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p038 +1222+6900    9x6      0.38 x 0.25  bilevel  52 mm across, 292 mm down    brownish speck, lum min 81, margin; 8 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p039 +4559+1643    5x6      0.21 x 0.25  bilevel  193 mm across, 70 mm down    brownish speck, lum min 118, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p040 +4200+66      6x7      0.25 x 0.30  bilevel  178 mm across, 3 mm down     brownish speck, lum min 76, margin; 10 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p040 +4499+4256    4x5      0.17 x 0.21  bilevel  191 mm across, 180 mm down   speck, lum min 102, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p041 +2226+981     5x9      0.21 x 0.38  bilevel  94 mm across, 42 mm down     speck, lum min 56, margin; 6 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p041 +4641+3351    5x4      0.21 x 0.17  bilevel  197 mm across, 142 mm down   speck, lum min 81, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p041 +251+4434    4x4      0.17 x 0.17  bilevel  11 mm across, 188 mm down    brownish speck, lum min 109, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p041 +152+6519    6x8      0.25 x 0.34  bilevel  7 mm across, 276 mm down     speck, lum min 69, margin; 12 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p042 +4113+1768    4x4      0.17 x 0.17  bilevel  174 mm across, 75 mm down    speck, lum min 82, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p042 +4752+5627    4x4      0.17 x 0.17  bilevel  201 mm across, 238 mm down   brownish speck, lum min 95, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p042 +571+6853    11x9      0.47 x 0.38  bilevel  24 mm across, 290 mm down    brownish speck, lum min 80, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p043 +4861+2963    6x5      0.25 x 0.21  bilevel  206 mm across, 126 mm down   brownish speck, lum min 76, margin; 9 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p043 +220+3325    3x6      0.13 x 0.25  bilevel  9 mm across, 141 mm down     brownish speck, lum min 104, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p043 +1268+4141    5x3      0.21 x 0.13  bilevel  54 mm across, 175 mm down    brownish speck, lum min 74, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p044 +1116+1442    4x4      0.17 x 0.17  bilevel  47 mm across, 61 mm down     speck, lum min 67, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p044 +4370+5029    5x5      0.21 x 0.21  bilevel  185 mm across, 213 mm down   speck, lum min 48, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p045 +4915+2807    4x9      0.17 x 0.38  bilevel  208 mm across, 119 mm down   speck, lum min 79, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p045 +4886+3837    4x3      0.17 x 0.13  bilevel  207 mm across, 162 mm down   speck, lum min 53, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p045 +4897+6038    5x6      0.21 x 0.25  bilevel  207 mm across, 256 mm down   speck, lum min 34, margin; 16 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p045 +4466+6936    7x8      0.30 x 0.34  bilevel  189 mm across, 294 mm down   brownish speck, lum min 61, chromatic; 25 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p046 +798+6913    5x4      0.21 x 0.17  bilevel  34 mm across, 293 mm down    speck, lum min 63, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p047 +69+5261    5x3      0.21 x 0.13  bilevel  3 mm across, 223 mm down     brownish speck, lum min 92, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p047 +4867+6147    4x4      0.17 x 0.17  bilevel  206 mm across, 260 mm down   brownish speck, lum min 63, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p047 +4057+6505    4x4      0.17 x 0.17  bilevel  172 mm across, 275 mm down   brownish speck, lum min 68, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p048 +4833+947     3x5      0.13 x 0.21  bilevel  205 mm across, 40 mm down    speck, lum min 118, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p048 +4814+1239    3x6      0.13 x 0.25  bilevel  204 mm across, 53 mm down    brownish speck, lum min 89, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p048 +4936+2348    4x4      0.17 x 0.17  bilevel  209 mm across, 99 mm down    brownish speck, lum min 72, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p050 +2479+5044    6x3      0.25 x 0.13  bilevel  105 mm across, 214 mm down   brownish speck, lum min 82, near text, OCR read it as a mark; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p051 +2208+4401    3x6      0.13 x 0.25  bilevel  94 mm across, 186 mm down    brownish speck, lum min 76, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p051 +3820+5465    4x6      0.17 x 0.25  bilevel  162 mm across, 231 mm down   brownish speck, lum min 97, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p052 +2016+1379    4x6      0.17 x 0.25  bilevel  85 mm across, 59 mm down     brownish speck, lum min 81, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p052 +4033+6957    3x7      0.13 x 0.30  bilevel  171 mm across, 295 mm down   speck, lum min 100, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p053 +1898+41      7x6      0.30 x 0.25  bilevel  80 mm across, 2 mm down      brownish speck, lum min 84, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p054 +2911+632     4x5      0.17 x 0.21  bilevel  123 mm across, 27 mm down    speck, lum min 96, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p054 +4861+2639    4x5      0.17 x 0.21  bilevel  206 mm across, 112 mm down   brownish speck, lum min 87, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p055 +209+4924    5x7      0.21 x 0.30  bilevel  9 mm across, 209 mm down     speck, lum min 113, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p055 +222+6381    3x7      0.13 x 0.30  bilevel  9 mm across, 270 mm down     speck, lum min 62, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p056 +1311+1317    5x5      0.21 x 0.21  bilevel  56 mm across, 56 mm down     speck, lum min 54, margin; 11 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p056 +58+1684    4x4      0.17 x 0.17  bilevel  3 mm across, 71 mm down      brownish speck, lum min 96, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p056 +239+3050    3x6      0.13 x 0.25  bilevel  10 mm across, 129 mm down    brownish speck, lum min 40, near text, OCR read it as a mark; 8 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p057 +2268+708     8x6      0.34 x 0.25  bilevel  96 mm across, 30 mm down     brownish speck, lum min 69, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p057 +4495+911     7x6      0.30 x 0.25  bilevel  190 mm across, 39 mm down    brownish speck, lum min 57, chromatic; 15 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p058 +3759+61      4x5      0.17 x 0.21  bilevel  159 mm across, 3 mm down     speck, lum min 83, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p058 +3574+997     4x5      0.17 x 0.21  bilevel  151 mm across, 42 mm down    brownish speck, lum min 97, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p058 +37+2392    3x6      0.13 x 0.25  bilevel  2 mm across, 101 mm down     brownish speck, lum min 86, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p058 +4454+4762    6x6      0.25 x 0.25  bilevel  189 mm across, 202 mm down   speck, lum min 77, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p058 +3097+5462    5x4      0.21 x 0.17  bilevel  131 mm across, 231 mm down   speck, lum min 69, near text, OCR read it as a mark; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p058 +4522+5726    4x4      0.17 x 0.17  bilevel  192 mm across, 242 mm down   brownish speck, lum min 118, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p059 +4805+5980    3x6      0.13 x 0.25  bilevel  203 mm across, 253 mm down   brownish speck, lum min 68, margin; 6 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p060 +4624+59      5x7      0.21 x 0.30  bilevel  196 mm across, 3 mm down     brownish speck, lum min 93, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p060 +3824+4094    3x5      0.13 x 0.21  bilevel  162 mm across, 173 mm down   speck, lum min 27, margin; 4 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p061 +103+5698    5x6      0.21 x 0.25  bilevel  4 mm across, 241 mm down     speck, lum min 46, margin; 12 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p062 +4878+4818    4x6      0.17 x 0.25  bilevel  207 mm across, 204 mm down   speck, lum min 91, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p062 +881+6969    5x4      0.21 x 0.17  bilevel  37 mm across, 295 mm down    speck, lum min 76, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p063 +4837+4717    4x7      0.17 x 0.30  bilevel  205 mm across, 200 mm down   brownish speck, lum min 67, margin; 7 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p064 +4107+72      4x4      0.17 x 0.17  bilevel  174 mm across, 3 mm down     brownish speck, lum min 89, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p064 +4541+890     3x8      0.13 x 0.34  bilevel  192 mm across, 38 mm down    brownish speck, lum min 101, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p064 +236+2740    4x5      0.17 x 0.21  bilevel  10 mm across, 116 mm down    speck, lum min 87, near text, OCR read it as a mark; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p064 +13+2983    7x3      0.30 x 0.13  bilevel  1 mm across, 126 mm down     brownish speck, lum min 69, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p064 +50+5711    4x4      0.17 x 0.17  bilevel  2 mm across, 242 mm down     speck, lum min 76, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p065 +211+1043    5x6      0.21 x 0.25  bilevel  9 mm across, 44 mm down      speck, lum min 80, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p065 +61+4529    5x10     0.21 x 0.42  bilevel  3 mm across, 192 mm down     brownish speck, lum min 69, margin; 11 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p065 +104+6518    5x3      0.21 x 0.13  bilevel  5 mm across, 276 mm down     speck, lum min 122, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p066 +984+483     6x5      0.25 x 0.21  bilevel  42 mm across, 21 mm down     brownish speck, lum min 70, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p066 +165+2077    3x7      0.13 x 0.30  bilevel  7 mm across, 88 mm down      brownish speck, lum min 132, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p066 +2372+2629    5x6      0.21 x 0.25  bilevel  101 mm across, 111 mm down   brownish speck, lum min 85, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p066 +2167+3375    2x6      0.08 x 0.25  bilevel  92 mm across, 143 mm down    brownish speck, lum min 75, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p066 +4496+5015    5x5      0.21 x 0.21  bilevel  190 mm across, 212 mm down   brownish speck, lum min 43, margin; 12 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p066 +0+5477    11x11     0.47 x 0.47  bilevel  0 mm across, 232 mm down     brownish speck, lum min 104, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p068 +1000+1892    4x6      0.17 x 0.25  bilevel  42 mm across, 80 mm down     speck, lum min 46, margin; 7 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p068 +2233+6370    3x5      0.13 x 0.21  bilevel  95 mm across, 270 mm down    brownish speck, lum min 110, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p069 +4849+1439    3x6      0.13 x 0.25  bilevel  205 mm across, 61 mm down    brownish speck, lum min 88, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p070 +4913+565     2x7      0.08 x 0.30  bilevel  208 mm across, 24 mm down    brownish speck, lum min 138, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p070 +421+4676    5x4      0.21 x 0.17  bilevel  18 mm across, 198 mm down    brownish speck, lum min 64, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p071 +2086+19      15x9      0.64 x 0.38  bilevel  89 mm across, 1 mm down      brownish speck, lum min 83, margin; 3 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p071 +3604+476     4x5      0.17 x 0.21  bilevel  153 mm across, 20 mm down    speck, lum min 86, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p071 +4922+6417    4x4      0.17 x 0.17  bilevel  208 mm across, 272 mm down   speck, lum min 98, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p073 +4533+2421    6x4      0.25 x 0.17  bilevel  192 mm across, 103 mm down   brownish speck, lum min 83, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p073 +4949+3926    4x8      0.17 x 0.34  bilevel  210 mm across, 166 mm down   brownish speck, lum min 98, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p074 +95+2059    3x7      0.13 x 0.30  bilevel  4 mm across, 87 mm down      brownish speck, lum min 111, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p074 +4830+3186    5x4      0.21 x 0.17  bilevel  205 mm across, 135 mm down   brownish speck, lum min 81, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p075 +56+2858    4x5      0.17 x 0.21  bilevel  2 mm across, 121 mm down     speck, lum min 87, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p075 +380+3746    4x5      0.17 x 0.21  bilevel  16 mm across, 159 mm down    speck, lum min 88, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p075 +2393+5733    8x12     0.34 x 0.51  bilevel  101 mm across, 243 mm down   brownish speck, lum min 72, margin; 9 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p075 +4213+6862    2x6      0.08 x 0.25  bilevel  178 mm across, 291 mm down   brownish speck, lum min 135, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p075 +4100+6869    4x4      0.17 x 0.17  bilevel  174 mm across, 291 mm down   brownish speck, lum min 79, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p076 +4739+6772    5x9      0.21 x 0.38  bilevel  201 mm across, 287 mm down   brownish speck, lum min 62, margin; 10 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p077 +4740+994     6x5      0.25 x 0.21  bilevel  201 mm across, 42 mm down    speck, lum min 53, margin; 14 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p077 +99+3063    4x4      0.17 x 0.17  bilevel  4 mm across, 130 mm down     speck, lum min 107, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p078 +282+3304    13x11     0.55 x 0.47  bilevel  12 mm across, 140 mm down    brownish speck, lum min 68, chromatic; 16 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p078 +4943+6878    5x4      0.21 x 0.17  bilevel  209 mm across, 291 mm down   brownish speck, lum min 87, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p079 +4446+117     6x4      0.25 x 0.17  bilevel  188 mm across, 5 mm down     brownish speck, lum min 95, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p079 +323+3707    2x3      0.08 x 0.13  bilevel  14 mm across, 157 mm down    brownish speck, lum min 72, near text, OCR read it as a mark; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p079 +3586+6871    5x7      0.21 x 0.30  bilevel  152 mm across, 291 mm down   speck, lum min 97, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p080 +833+103     8x9      0.34 x 0.38  bilevel  35 mm across, 5 mm down      brownish speck, lum min 104, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p080 +1051+129     4x5      0.17 x 0.21  bilevel  45 mm across, 6 mm down      brownish speck, lum min 89, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p080 +2968+1246    3x5      0.13 x 0.21  bilevel  126 mm across, 53 mm down    brownish speck, lum min 68, margin; 5 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p080 +4794+2093    12x7      0.51 x 0.30  bilevel  203 mm across, 89 mm down    brownish speck, lum min 107, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p081 +4767+3115    6x4      0.25 x 0.17  bilevel  202 mm across, 132 mm down   brownish speck, lum min 77, margin; 5 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p081 +2893+6224    4x4      0.17 x 0.17  bilevel  123 mm across, 264 mm down   speck, lum min 79, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p081 +4760+6774    6x5      0.25 x 0.21  bilevel  202 mm across, 287 mm down   brownish speck, lum min 102, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p082 +2326+2051    6x7      0.25 x 0.30  bilevel  99 mm across, 87 mm down     brownish speck, lum min 65, chromatic; 16 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p082 +55+4029    4x9      0.17 x 0.38  bilevel  2 mm across, 171 mm down     speck, lum min 97, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p082 +476+4082    4x5      0.17 x 0.21  bilevel  20 mm across, 173 mm down    brownish speck, lum min 86, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p082 +4025+6796    3x6      0.13 x 0.25  bilevel  170 mm across, 288 mm down   brownish speck, lum min 121, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p082 +692+6820    4x7      0.17 x 0.30  bilevel  29 mm across, 289 mm down    speck, lum min 85, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p082 +3748+6937    5x3      0.21 x 0.13  bilevel  159 mm across, 294 mm down   speck, lum min 124, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p082 +4134+6957    3x6      0.13 x 0.25  bilevel  175 mm across, 295 mm down   brownish speck, lum min 89, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p082 +2920+6993    6x5      0.25 x 0.21  bilevel  124 mm across, 296 mm down   brownish speck, lum min 78, margin; 7 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p083 +699+4344    2x6      0.08 x 0.25  bilevel  30 mm across, 184 mm down    brownish speck, lum min 93, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p084 +4579+915     8x8      0.34 x 0.34  bilevel  194 mm across, 39 mm down    speck, lum min 67, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p084 +2554+2093    5x4      0.21 x 0.17  bilevel  108 mm across, 89 mm down    brownish speck, lum min 97, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p084 +4925+6876    7x7      0.30 x 0.30  bilevel  209 mm across, 291 mm down   brownish speck, lum min 80, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p085 +3520+2707    3x4      0.13 x 0.17  bilevel  149 mm across, 115 mm down   speck, lum min 82, near text, OCR read it as a mark; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p085 +2207+2937    4x4      0.17 x 0.17  bilevel  94 mm across, 124 mm down    speck, lum min 106, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p085 +2100+3512    4x5      0.17 x 0.21  bilevel  89 mm across, 149 mm down    brownish speck, lum min 112, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p085 +4106+4604    5x19     0.21 x 0.80  bilevel  174 mm across, 195 mm down   brownish stroke, lum min 92, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p085 +627+5660    4x4      0.17 x 0.17  bilevel  27 mm across, 240 mm down    brownish speck, lum min 96, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p086 +2233+30      7x7      0.30 x 0.30  bilevel  95 mm across, 1 mm down      brownish speck, lum min 84, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p086 +551+4187    5x5      0.21 x 0.21  bilevel  23 mm across, 177 mm down    brownish speck, lum min 78, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p086 +360+5454    11x4      0.47 x 0.17  bilevel  15 mm across, 231 mm down    brownish speck, lum min 89, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p086 +3072+5662    3x6      0.13 x 0.25  bilevel  130 mm across, 240 mm down   brownish speck, lum min 88, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p088 +4821+34      3x5      0.13 x 0.21  bilevel  204 mm across, 2 mm down     brownish speck, lum min 70, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p088 +4416+104     6x4      0.25 x 0.17  bilevel  187 mm across, 4 mm down     speck, lum min 67, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p088 +773+5675    6x7      0.25 x 0.30  bilevel  33 mm across, 240 mm down    speck, lum min 56, margin; 16 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p088 +2567+6262    4x7      0.17 x 0.30  bilevel  109 mm across, 265 mm down   brownish speck, lum min 105, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p088 +655+6938    6x6      0.25 x 0.25  bilevel  28 mm across, 294 mm down    brownish speck, lum min 54, chromatic; 16 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p088 +3385+6981    3x4      0.13 x 0.17  bilevel  143 mm across, 296 mm down   brownish speck, lum min 96, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p089 +742+3572    5x6      0.21 x 0.25  bilevel  32 mm across, 151 mm down    brownish speck, lum min 80, margin; 7 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p090 +4741+659     4x3      0.17 x 0.13  bilevel  201 mm across, 28 mm down    brownish speck, lum min 68, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p090 +1143+5652    3x8      0.13 x 0.34  bilevel  48 mm across, 239 mm down    brownish speck, lum min 85, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p090 +4926+5841    4x8      0.17 x 0.34  bilevel  209 mm across, 247 mm down   brownish speck, lum min 89, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p091 +109+2850    4x11     0.17 x 0.47  bilevel  5 mm across, 121 mm down     brownish speck, lum min 87, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p091 +1704+3498    5x8      0.21 x 0.34  bilevel  72 mm across, 148 mm down    speck, lum min 72, margin; 7 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p092 +20+5111    8x9      0.34 x 0.38  bilevel  1 mm across, 217 mm down     brownish speck, lum min 82, margin; 5 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p092 +4453+5865    5x6      0.21 x 0.25  bilevel  189 mm across, 248 mm down   brownish speck, lum min 66, chromatic; 13 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p093 +3592+6966    5x4      0.21 x 0.17  bilevel  152 mm across, 295 mm down   brownish speck, lum min 103, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p094 +3351+737     8x13     0.34 x 0.55  bilevel  142 mm across, 31 mm down    brownish speck, lum min 82, margin; 5 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p094 +2473+2503    3x3      0.13 x 0.13  bilevel  105 mm across, 106 mm down   brownish speck, lum min 113, near text, OCR read it as a mark; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p094 +3596+6256    3x2      0.13 x 0.08  bilevel  152 mm across, 265 mm down   speck, lum min 89, near text, OCR read it as a mark; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p094 +4828+6761    4x4      0.17 x 0.17  bilevel  204 mm across, 286 mm down   brownish speck, lum min 104, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p095 +123+3083    6x5      0.25 x 0.21  bilevel  5 mm across, 131 mm down     speck, lum min 85, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p095 +4773+3270    4x6      0.17 x 0.25  bilevel  202 mm across, 139 mm down   brownish speck, lum min 89, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p096 +2705+479     6x6      0.25 x 0.25  bilevel  115 mm across, 20 mm down    speck, lum min 42, margin; 16 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p096 +4649+1136    7x13     0.30 x 0.55  bilevel  197 mm across, 48 mm down    brownish speck, lum min 61, chromatic; 15 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p096 +3627+4510    3x7      0.13 x 0.30  bilevel  154 mm across, 191 mm down   brownish speck, lum min 71, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p096 +1323+4568    3x5      0.13 x 0.21  bilevel  56 mm across, 193 mm down    brownish speck, lum min 107, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p096 +4831+6973    5x5      0.21 x 0.21  bilevel  205 mm across, 295 mm down   brownish speck, lum min 123, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p096 +3877+6988    10x7      0.42 x 0.30  bilevel  164 mm across, 296 mm down   brownish speck, lum min 80, margin; 12 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p097 +1912+1184    9x8      0.38 x 0.34  bilevel  81 mm across, 50 mm down     brownish speck, lum min 100, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p099 +3060+3189    5x6      0.21 x 0.25  bilevel  130 mm across, 135 mm down   speck, lum min 80, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p099 +253+6795    9x7      0.38 x 0.30  bilevel  11 mm across, 288 mm down    brownish speck, lum min 109, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p099 +3883+6859    4x4      0.17 x 0.17  bilevel  164 mm across, 290 mm down   brownish speck, lum min 106, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p100 +1141+42      8x8      0.34 x 0.34  bilevel  48 mm across, 2 mm down      speck, lum min 78, margin; 5 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p100 +23+1394    5x4      0.21 x 0.17  bilevel  1 mm across, 59 mm down      brownish speck, lum min 96, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p100 +2838+3754    4x6      0.17 x 0.25  bilevel  120 mm across, 159 mm down   brownish speck, lum min 106, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p100 +258+6995    6x5      0.25 x 0.21  bilevel  11 mm across, 296 mm down    speck, lum min 71, margin; 7 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p101 +57+4758    5x7      0.21 x 0.30  bilevel  3 mm across, 202 mm down     speck, lum min 80, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p102 +519+916     10x10     0.42 x 0.42  bilevel  22 mm across, 39 mm down     brownish speck, lum min 88, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p102 +952+4137    7x5      0.30 x 0.21  bilevel  40 mm across, 175 mm down    brownish speck, lum min 94, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p103 +1367+471     4x5      0.17 x 0.21  bilevel  58 mm across, 20 mm down     brownish speck, lum min 103, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p104 +4927+2516    6x12     0.25 x 0.51  bilevel  209 mm across, 107 mm down   brownish speck, lum min 83, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p104 +4398+4617    8x8      0.34 x 0.34  bilevel  186 mm across, 196 mm down   brownish speck, lum min 108, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p104 +145+6484    4x8      0.17 x 0.34  bilevel  6 mm across, 275 mm down     brownish speck, lum min 118, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p105 +220+0       10x9      0.42 x 0.38  bilevel  10 mm across, 0 mm down      speck, lum min 90, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p105 +4559+2352    7x16     0.30 x 0.68  bilevel  193 mm across, 100 mm down   brownish speck, lum min 94, near text, OCR read it as a mark; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p105 +240+5348    4x8      0.17 x 0.34  bilevel  10 mm across, 227 mm down    speck, lum min 100, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p106 +4439+1301    6x7      0.25 x 0.30  bilevel  188 mm across, 55 mm down    speck, lum min 75, margin; 8 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p107 +1869+923     5x8      0.21 x 0.34  bilevel  79 mm across, 39 mm down     brownish speck, lum min 79, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p107 +921+1560    6x3      0.25 x 0.13  bilevel  39 mm across, 66 mm down     brownish speck, lum min 86, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p107 +4944+1986    6x12     0.25 x 0.51  bilevel  209 mm across, 84 mm down    brownish speck, lum min 111, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p107 +4321+6378    4x4      0.17 x 0.17  bilevel  183 mm across, 270 mm down   brownish speck, lum min 82, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p108 +38+2206    8x5      0.34 x 0.21  bilevel  2 mm across, 93 mm down      brownish speck, lum min 106, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p108 +114+2562    4x6      0.17 x 0.25  bilevel  5 mm across, 109 mm down     brownish speck, lum min 82, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p108 +60+4778    4x5      0.17 x 0.21  bilevel  3 mm across, 202 mm down     speck, lum min 63, margin; 6 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p109 +4786+502     9x16     0.38 x 0.68  bilevel  203 mm across, 22 mm down    brownish speck, lum min 61, chromatic; 18 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p109 +1136+976     5x6      0.21 x 0.25  bilevel  48 mm across, 41 mm down     brownish speck, lum min 81, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p109 +1313+1005    7x12     0.30 x 0.51  bilevel  56 mm across, 43 mm down     speck, lum min 80, margin; 5 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p109 +201+1616    5x4      0.21 x 0.17  bilevel  9 mm across, 68 mm down      speck, lum min 86, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p109 +2015+4359    6x5      0.25 x 0.21  bilevel  85 mm across, 185 mm down    brownish speck, lum min 93, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p111 +4008+86      4x4      0.17 x 0.17  bilevel  170 mm across, 4 mm down     speck, lum min 60, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p111 +4526+5977    7x5      0.30 x 0.21  bilevel  192 mm across, 253 mm down   speck, lum min 89, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p112 +158+3354    4x3      0.17 x 0.13  bilevel  7 mm across, 142 mm down     brownish speck, lum min 120, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p113 +94+130     4x7      0.17 x 0.30  bilevel  4 mm across, 6 mm down       brownish speck, lum min 78, margin; 4 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p113 +4467+1149    3x6      0.13 x 0.25  bilevel  189 mm across, 49 mm down    brownish speck, lum min 98, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p113 +2206+4936    5x6      0.21 x 0.25  bilevel  93 mm across, 209 mm down    brownish speck, lum min 114, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p113 +4914+5652    4x10     0.17 x 0.42  bilevel  208 mm across, 239 mm down   brownish speck, lum min 107, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p114 +122+1214    5x6      0.21 x 0.25  bilevel  5 mm across, 52 mm down      brownish speck, lum min 97, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p115 +139+3653    4x6      0.17 x 0.25  bilevel  6 mm across, 155 mm down     speck, lum min 112, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p115 +4899+5358    4x4      0.17 x 0.17  bilevel  207 mm across, 227 mm down   brownish speck, lum min 94, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p115 +1446+6845    2x6      0.08 x 0.25  bilevel  61 mm across, 290 mm down    brownish speck, lum min 137, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p116 +4537+6589    5x4      0.21 x 0.17  bilevel  192 mm across, 279 mm down   brownish speck, lum min 70, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p117 +79+6373    3x5      0.13 x 0.21  bilevel  3 mm across, 270 mm down     brownish speck, lum min 89, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p118 +4813+1242    8x6      0.34 x 0.25  bilevel  204 mm across, 53 mm down    brownish speck, lum min 91, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p118 +3313+5926    5x10     0.21 x 0.42  bilevel  140 mm across, 251 mm down   brownish speck, lum min 84, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p119 +4071+33      5x4      0.21 x 0.17  bilevel  172 mm across, 1 mm down     brownish speck, lum min 129, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p119 +1711+1023    4x4      0.17 x 0.17  bilevel  73 mm across, 43 mm down     brownish speck, lum min 112, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p119 +4305+1679    10x5      0.42 x 0.21  bilevel  182 mm across, 71 mm down    brownish speck, lum min 89, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p120 +4699+2748    6x5      0.25 x 0.21  bilevel  199 mm across, 116 mm down   brownish speck, lum min 53, margin; 12 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p122 +129+745     5x5      0.21 x 0.21  bilevel  6 mm across, 32 mm down      brownish speck, lum min 99, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p122 +4461+4543    4x5      0.17 x 0.21  bilevel  189 mm across, 192 mm down   speck, lum min 137, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p122 +1227+4644    5x4      0.21 x 0.17  bilevel  52 mm across, 197 mm down    brownish speck, lum min 108, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p122 +991+6802    4x4      0.17 x 0.17  bilevel  42 mm across, 288 mm down    speck, lum min 82, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p123 +3532+2688    3x8      0.13 x 0.34  bilevel  150 mm across, 114 mm down   brownish speck, lum min 76, margin; 4 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p123 +1808+3539    3x5      0.13 x 0.21  bilevel  77 mm across, 150 mm down    speck, lum min 95, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p123 +4392+3946    3x5      0.13 x 0.21  bilevel  186 mm across, 167 mm down   brownish speck, lum min 80, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p123 +185+4968    8x10     0.34 x 0.42  bilevel  8 mm across, 211 mm down     brownish speck, lum min 99, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p123 +225+5173    3x6      0.13 x 0.25  bilevel  10 mm across, 219 mm down    brownish speck, lum min 86, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p124 +4873+2732    4x12     0.17 x 0.51  bilevel  206 mm across, 116 mm down   brownish stroke, lum min 86, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p124 +4915+5439    4x4      0.17 x 0.17  bilevel  208 mm across, 230 mm down   brownish speck, lum min 97, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p125 +1899+6145    6x7      0.25 x 0.30  bilevel  81 mm across, 260 mm down    brownish speck, lum min 95, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p126 +1473+681     5x4      0.21 x 0.17  bilevel  62 mm across, 29 mm down     brownish speck, lum min 116, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p126 +3071+850     6x6      0.25 x 0.25  bilevel  130 mm across, 36 mm down    brownish speck, lum min 102, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p126 +134+2531    5x4      0.21 x 0.17  bilevel  6 mm across, 107 mm down     speck, lum min 115, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p126 +4458+2893    7x5      0.30 x 0.21  bilevel  189 mm across, 123 mm down   brownish speck, lum min 117, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p126 +3595+4758    9x6      0.38 x 0.25  bilevel  152 mm across, 202 mm down   brownish speck, lum min 84, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p126 +3583+5171    4x15     0.17 x 0.64  bilevel  152 mm across, 219 mm down   brownish stroke, lum min 86, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p126 +2977+6218    6x6      0.25 x 0.25  bilevel  126 mm across, 263 mm down   brownish speck, lum min 101, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p126 +4250+6331    4x6      0.17 x 0.25  bilevel  180 mm across, 268 mm down   brownish speck, lum min 82, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p126 +2330+6452    3x5      0.13 x 0.21  bilevel  99 mm across, 273 mm down    speck, lum min 79, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p127 +115+2806    7x8      0.30 x 0.34  bilevel  5 mm across, 119 mm down     speck, lum min 76, margin; 13 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p128 +1763+1109    6x8      0.25 x 0.34  bilevel  75 mm across, 47 mm down     brownish speck, lum min 62, margin; 10 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p128 +4095+4264    4x7      0.17 x 0.30  bilevel  173 mm across, 181 mm down   speck, lum min 56, margin; 14 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p128 +4918+4566    3x7      0.13 x 0.30  bilevel  208 mm across, 193 mm down   brownish speck, lum min 105, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p128 +3914+4996    6x4      0.25 x 0.17  bilevel  166 mm across, 212 mm down   speck, lum min 79, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p128 +2721+5593    10x13     0.42 x 0.55  bilevel  115 mm across, 237 mm down   brownish speck, lum min 93, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p129 +4285+1256    3x4      0.13 x 0.17  bilevel  181 mm across, 53 mm down    brownish speck, lum min 122, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p129 +2393+2146    6x6      0.25 x 0.25  bilevel  101 mm across, 91 mm down    brownish speck, lum min 70, margin; 13 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p129 +477+2185    4x5      0.17 x 0.21  bilevel  20 mm across, 93 mm down     brownish speck, lum min 57, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p129 +545+5271    3x5      0.13 x 0.21  bilevel  23 mm across, 223 mm down    brownish speck, lum min 118, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p130 +3092+2807    3x10     0.13 x 0.42  bilevel  131 mm across, 119 mm down   brownish speck, lum min 81, margin; 5 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p130 +1605+3005    7x18     0.30 x 0.76  bilevel  68 mm across, 128 mm down    brownish speck, lum min 84, margin; 4 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p130 +4443+4563    5x7      0.21 x 0.30  bilevel  188 mm across, 193 mm down   speck, lum min 98, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p130 +1211+4869    7x9      0.30 x 0.38  bilevel  51 mm across, 206 mm down    brownish speck, lum min 113, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p130 +2569+5567    4x8      0.17 x 0.34  bilevel  109 mm across, 236 mm down   brownish speck, lum min 95, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p130 +4722+6349    4x4      0.17 x 0.17  bilevel  200 mm across, 269 mm down   brownish speck, lum min 83, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p131 +4316+1019    4x4      0.17 x 0.17  bilevel  183 mm across, 43 mm down    brownish speck, lum min 113, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p131 +69+1063    2x6      0.08 x 0.25  bilevel  3 mm across, 45 mm down      brownish speck, lum min 78, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p131 +3122+1114    4x6      0.17 x 0.25  bilevel  132 mm across, 47 mm down    brownish speck, lum min 84, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p131 +2612+2378    4x5      0.17 x 0.21  bilevel  111 mm across, 101 mm down   brownish speck, lum min 83, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p131 +2931+2538    5x7      0.21 x 0.30  bilevel  124 mm across, 108 mm down   brownish speck, lum min 108, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p131 +2466+2755    4x5      0.17 x 0.21  bilevel  104 mm across, 117 mm down   speck, lum min 43, margin; 9 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p132 +4717+489     9x7      0.38 x 0.30  bilevel  200 mm across, 21 mm down    speck, lum min 57, margin; 17 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p132 +4142+1779    11x5      0.47 x 0.21  bilevel  176 mm across, 75 mm down    brownish speck, lum min 73, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p132 +4511+2747    6x4      0.25 x 0.17  bilevel  191 mm across, 116 mm down   speck, lum min 64, margin; 5 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p132 +3753+4021    4x4      0.17 x 0.17  bilevel  159 mm across, 170 mm down   brownish speck, lum min 102, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p132 +3001+4708    5x6      0.21 x 0.25  bilevel  127 mm across, 199 mm down   speck, lum min 53, margin; 9 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p133 +4935+1128    6x5      0.25 x 0.21  bilevel  209 mm across, 48 mm down    brownish speck, lum min 88, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p133 +2706+2913    4x4      0.17 x 0.17  bilevel  115 mm across, 123 mm down   brownish speck, lum min 122, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p133 +2616+4339    6x5      0.25 x 0.21  bilevel  111 mm across, 184 mm down   speck, lum min 59, margin; 13 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p133 +4298+5432    4x5      0.17 x 0.21  bilevel  182 mm across, 230 mm down   speck, lum min 72, margin; 9 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p133 +3971+5703    4x4      0.17 x 0.17  bilevel  168 mm across, 242 mm down   speck, lum min 66, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p134 +4814+242     5x7      0.21 x 0.30  bilevel  204 mm across, 10 mm down    brownish speck, lum min 104, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p134 +3751+696     6x4      0.25 x 0.17  bilevel  159 mm across, 30 mm down    brownish speck, lum min 98, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p134 +2863+1631    7x5      0.30 x 0.21  bilevel  121 mm across, 69 mm down    brownish speck, lum min 72, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p134 +2860+2257    3x5      0.13 x 0.21  bilevel  121 mm across, 96 mm down    speck, lum min 57, margin; 6 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p134 +3198+4565    6x7      0.25 x 0.30  bilevel  136 mm across, 193 mm down   speck, lum min 63, margin; 17 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p134 +3322+6313    5x4      0.21 x 0.17  bilevel  141 mm across, 267 mm down   speck, lum min 66, margin; 9 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p134 +4244+6500    5x4      0.21 x 0.17  bilevel  180 mm across, 275 mm down   speck, lum min 72, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p134 +3479+6812    5x4      0.21 x 0.17  bilevel  147 mm across, 288 mm down   speck, lum min 87, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p135 +3670+2693    3x5      0.13 x 0.21  bilevel  155 mm across, 114 mm down   speck, lum min 80, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p136 +542+715     6x7      0.25 x 0.30  bilevel  23 mm across, 30 mm down     brownish speck, lum min 88, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p136 +2312+1445    11x8      0.47 x 0.34  bilevel  98 mm across, 61 mm down     brownish speck, lum min 68, chromatic; 12 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p136 +4832+4824    3x4      0.13 x 0.17  bilevel  205 mm across, 204 mm down   speck, lum min 82, margin; 3 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p136 +4850+4960    5x5      0.21 x 0.21  bilevel  205 mm across, 210 mm down   brownish speck, lum min 119, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p136 +79+5120    6x5      0.25 x 0.21  bilevel  3 mm across, 217 mm down     brownish speck, lum min 91, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p136 +949+6831    7x6      0.30 x 0.25  bilevel  40 mm across, 289 mm down    brownish speck, lum min 106, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p137 +4029+4783    6x7      0.25 x 0.30  bilevel  171 mm across, 203 mm down   brownish speck, lum min 62, chromatic; 12 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p138 +4824+2660    4x6      0.17 x 0.25  bilevel  204 mm across, 113 mm down   brownish speck, lum min 112, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p139 +4097+958     6x10     0.25 x 0.42  bilevel  174 mm across, 41 mm down    brownish speck, lum min 87, margin; 1 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p139 +3074+1639    3x5      0.13 x 0.21  bilevel  130 mm across, 69 mm down    brownish speck, lum min 53, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p139 +4911+5155    5x5      0.21 x 0.21  bilevel  208 mm across, 218 mm down   brownish speck, lum min 67, margin; 8 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p139 +4856+6685    6x3      0.25 x 0.13  bilevel  206 mm across, 283 mm down   brownish speck, lum min 91, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p140 +2791+4204    3x4      0.13 x 0.17  bilevel  118 mm across, 178 mm down   brownish speck, lum min 75, margin; 4 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p141 +4868+1310    2x8      0.08 x 0.34  bilevel  206 mm across, 56 mm down    brownish speck, lum min 97, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p142 +3976+980     6x5      0.25 x 0.21  bilevel  168 mm across, 42 mm down    brownish speck, lum min 81, margin; 5 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p143 +184+3060    5x3      0.21 x 0.13  bilevel  8 mm across, 130 mm down     speck, lum min 75, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p143 +3180+6932    22x20     0.93 x 0.85  bilevel  135 mm across, 294 mm down   blot, lum min 62, chromatic; 28 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p144 +4698+64      4x4      0.17 x 0.17  bilevel  199 mm across, 3 mm down     speck, lum min 47, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p144 +1248+7002    5x6      0.21 x 0.25  bilevel  53 mm across, 297 mm down    brownish speck, lum min 108, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p145 +1065+5189    9x9      0.38 x 0.38  bilevel  45 mm across, 220 mm down    brownish speck, lum min 77, chromatic; 14 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p146 +156+4492    13x5      0.55 x 0.21  bilevel  7 mm across, 190 mm down     brownish speck, lum min 49, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p148 +4951+4991    7x4      0.30 x 0.17  bilevel  210 mm across, 211 mm down   brownish speck, lum min 128, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p148 +3969+6944    5x4      0.21 x 0.17  bilevel  168 mm across, 294 mm down   speck, lum min 45, margin; 7 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p150 +4730+4360    6x7      0.25 x 0.30  bilevel  200 mm across, 185 mm down   brownish speck, lum min 65, margin; 14 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p151 +260+3286    6x3      0.25 x 0.13  bilevel  11 mm across, 139 mm down    brownish speck, lum min 130, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p151 +115+6262    3x6      0.13 x 0.25  bilevel  5 mm across, 265 mm down     speck, lum min 81, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p151 +872+6956    4x4      0.17 x 0.17  bilevel  37 mm across, 295 mm down    speck, lum min 78, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p152 +4812+5504    4x4      0.17 x 0.17  bilevel  204 mm across, 233 mm down   brownish speck, lum min 106, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p153 +888+88      5x7      0.21 x 0.30  bilevel  38 mm across, 4 mm down      speck, lum min 68, margin; 11 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p154 +41+3609    7x6      0.30 x 0.25  bilevel  2 mm across, 153 mm down     brownish speck, lum min 101, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p155 +231+4638    4x8      0.17 x 0.34  bilevel  10 mm across, 197 mm down    brownish speck, lum min 123, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p155 +4878+5818    4x7      0.17 x 0.30  bilevel  207 mm across, 246 mm down   brownish speck, lum min 52, margin; 9 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p157 +70+2391    5x7      0.21 x 0.30  bilevel  3 mm across, 101 mm down     brownish speck, lum min 83, margin; 3 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p157 +3586+3533    4x6      0.17 x 0.25  bilevel  152 mm across, 150 mm down   brownish speck, lum min 69, margin; 6 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p157 +3535+6622    7x7      0.30 x 0.30  bilevel  150 mm across, 280 mm down   brownish speck, lum min 69, chromatic; 15 black px, run 5 in the JBIG2  below the cutoff -- not surfaced
+p158 +4713+136     5x6      0.21 x 0.25  bilevel  200 mm across, 6 mm down     brownish speck, lum min 98, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p158 +3537+5096    5x6      0.21 x 0.25  bilevel  150 mm across, 216 mm down   brownish speck, lum min 94, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p158 +3547+5177    11x17     0.47 x 0.72  bilevel  150 mm across, 220 mm down   brownish speck, lum min 75, chromatic; 22 black px, run 3 in the JBIG2  below the cutoff -- not surfaced
+p158 +681+6811    9x7      0.38 x 0.30  bilevel  29 mm across, 288 mm down    brownish speck, lum min 96, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p159 +253+2441    7x3      0.30 x 0.13  bilevel  11 mm across, 103 mm down    speck, lum min 87, margin; 2 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p159 +72+6172    3x6      0.13 x 0.25  bilevel  3 mm across, 261 mm down     brownish speck, lum min 90, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p159 +197+6182    4x8      0.17 x 0.34  bilevel  8 mm across, 262 mm down     brownish speck, lum min 83, margin; 2 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p160 +1326+1089    5x5      0.21 x 0.21  bilevel  56 mm across, 46 mm down     speck, lum min 61, margin; 3 black px, run 1 in the JBIG2  below the cutoff -- not surfaced
+p160 +4799+5345    4x6      0.17 x 0.25  bilevel  203 mm across, 226 mm down   brownish speck, lum min 95, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p160 +3855+6840    6x5      0.25 x 0.21  bilevel  163 mm across, 290 mm down   brownish speck, lum min 111, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p161 +3930+1475    5x4      0.21 x 0.17  bilevel  166 mm across, 63 mm down    speck, lum min 56, margin; 11 black px, run 4 in the JBIG2  below the cutoff -- not surfaced
+p161 +4292+5537    7x4      0.30 x 0.17  bilevel  182 mm across, 234 mm down   brownish speck, lum min 74, margin; 5 black px, run 2 in the JBIG2  below the cutoff -- not surfaced
+p161 +3947+6884    5x3      0.21 x 0.13  bilevel  167 mm across, 291 mm down   brownish speck, lum min 108, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p162 +167+3385    5x3      0.21 x 0.13  bilevel  7 mm across, 143 mm down     brownish speck, lum min 114, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p162 +2815+5307    5x5      0.21 x 0.21  bilevel  119 mm across, 225 mm down   brownish speck, lum min 93, margin; 0 black px, run 0 in the JBIG2  below the cutoff -- not surfaced
+p163 +2405+4117    3x5      0.13 x 0.21  contone  102 mm across, 174 mm down   speck, lum min 109, margin; 100 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p164 +391+1338    6x5      0.25 x 0.21  contone  17 mm across, 57 mm down     speck, lum min 136, margin; 28 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p164 +35+1436    11x10     0.47 x 0.42  contone  2 mm across, 61 mm down      speck, lum min 134, contone isolated; 25 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p168 +4253+681     3x5      0.13 x 0.21  contone  180 mm across, 29 mm down    speck, lum min 69, contone margin; 90 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced
+p168 +1199+1681    4x4      0.17 x 0.17  contone  51 mm across, 71 mm down     speck, lum min 96, contone margin; 76 grey levels off its surround at 150 dpi  below the cutoff -- not surfaced

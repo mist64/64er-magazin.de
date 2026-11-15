@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Verwalten wie die Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Said Baloui, tr">
+    <meta name="64er.issue" content="Sonderheft 9/86">
+    <meta name="64er.pages" content="64-78">
+    <meta name="64er.head1" content="Dateiverwaltung">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Grundlagen">
+    <meta name="64er.id" content="dateiverwaltung-ms">
+</head>
+
+<body>
+    <article>
+        <h1>Verwalten wie die Profis</h1>
+        <p class="intro">Das Verwalten großer Datenmengen mit dem Computer ist zweifellos eine reizvolle Sache. Bei der Programmierung in Basic hat man jedoch schnell die Grenzen der Verarbeitungsgeschwindigkeit erreicht. Wir zeigen Ihnen alles, was Sie beim Schreiben von Dateiverwaltungen in Maschinensprache wissen müssen.</p>
+
+        <p>Es gibt leider eine große Anzahl von Assemblerprogrammierern, die die tollsten Routinen schreiben, wie zum Beispiel Sortierroutinen oder Basic-Erweiterungen, die jedoch nicht wissen, wie von Maschinensprache aus auf Drucker oder Diskettenlaufwerk zugegriffen werden kann.</p>
+
+        <p>Zugegebenermaßen ist das »Datei-Handling« keine einfache Angelegenheit und selbst in einer höheren Programmiersprache wie Basic aufgrund der vielfältigen Möglichkeiten recht aufwendig (Datei auf Diskette oder Datasette zum Schreiben oder Lesen öffnen; relative oder sequentielle Datei öffnen und so weiter).</p>
+
+        <p>Wenn Sie jedoch bereits in Basic mit Dateien gearbeitet haben, wird Ihnen das Verständnis dieses Artikels keine besondere Mühe bereiten, da die erforderlichen Prozeduren (Datei öffnen, Daten schreiben/lesen, Datei schließen) analog den entsprechenden Basic-Befehlen arbeiten.</p>
+
+        <p>Das Besondere beim Datei-Handling auf Maschinenspracheebene ist, die Betriebssystemroutinen zu kennen, die zur Verwaltung logischer Dateien vorhanden sind. Das Ziel dieses Artikels ist es, Sie mit diesen Routinen vertraut zu machen. Da sich der Artikel an C 64-Besitzer wendet, die zum großen Teil über ein Diskettenlaufwerk verfügen, behandele ich die Datasette nur am Rande und bespreche auch die Behandlung relativer Dateien und die sogenannten »Direktzugriffs-Befehle«.</p>
+
+        <p>Zuvor will ich Ihnen jedoch noch erläutern, wieso es sehr vorteilhaft ist, die Dateiverwaltung in Maschinensprache zu beherrschen, selbst wenn Sie nicht vorhaben sollten, komplette Anwenderprogramme in Maschinensprache zu schreiben.</p>
+
+        <p>Die meisten größeren Programme für den C 64 werden Sie wahrscheinlich in Basic schreiben, da es außerordentlich aufwendig – und fehlerbehaftet – ist, ein größeres Programm vollständig in Maschinensprache zu erstellen. Am häufigsten wird Maschinensprache für kleinere Unterprogramme verwendet, um zeitkritische Basic-Programmteile zu ersetzen. Paradebeispiel für dieses Einsatzgebiet sind Sortierroutinen, die – in Basic programmiert – bei großen Datenmengen oftmals recht einschläfernd sein können.</p>
+
+        <p>Ein weiteres Einsatzgebiet sind Assemblerroutinen, die Mängel des eingebauten Basic beheben sollen, zum Beispiel eigene INPUT-Routinen, da der Basic-Befehl INPUT äußerst unzulänglich arbeitet (während der Eingabe kann der Bildschirm gelöscht werden; der Cursor kann aus dem Eingabefeld herausbewegt werden; es können maximal nur 80 Zeichen eingegeben werden und so weiter).</p>
+
+        <p>Viele nützliche Assemblerroutinen zum Einsatz in Basic-Programmen können jedoch nur dann erstellt werden, wenn Sie die Datenein- und -ausgabe auf der Maschinenspracheebene beherrschen. Vorstellbar wäre zum Beispiel ein sogenannter Drucker-Spooler, ein Assemblerprogramm, das in den Systeminterrupt eingebunden ist und das bei jedem Interrupt ein Zeichen eines Programmlistings oder Textes an den Drucker schickt. Während der Text durch diese »im Hintergrund laufende« Interruptroutine ausgedruckt wird, können Sie ungehindert mit Ihrem C 64 arbeiten, zum Beispiel ein Basic-Programm ablaufen lassen oder editieren.</p>
+
+        <p>Ein weiteres Beispiel ist eine INPUT #-Routine, die einen String von Kassette oder Diskette einliest, und die unter anderem in diesem Artikel vorgestellt werden wird. Wozu, werden Sie sich fragen, da doch das C 64-Basic den Befehl INPUT # bereits besitzt? Nun, jeder der sich bereits intensiver mit Dateiverwaltung beschäftigt hat, weiß, daß INPUT # den Programmierern des Basic-Interpreters gewiß keinen Ruhm einbrachte. Dieser Befehl arbeitet ebenso mangelhaft wie der Befehl INPUT: Soll ein String eingelesen werden, der länger ist als 80 Zeichen, erscheint die Fehlermeldung »STRING TOO LONG ERROR«. Einzulesende Strings dürfen weder ein Komma noch ein Semikolon enthalten, da beide Zeichen ebenso wie ein &lt;RETURN&gt; (CHR$(13)) als String-Endemarke aufgefaßt werden.</p>
+
+        <p>Im folgenden Artikel werde ich die wichtigsten Betriebssystemroutinen zur Datenein- beziehungsweise Datenausgabe vorstellen. Bei der Beschreibung dieser Routinen werden die Funktionen erläutert, wird erklärt, was bei Verwendung der jeweiligen Routine beachtet werden muß (Startadresse, Übergabeparameter), und welche Parameter – die vor allem zur Erkennung eventuell aufgetretener Fehler dienen – nach dem Aufruf der Routinen zurückübergeben werden.</p>
+
+        <p>Dieser Artikel setzt übrigens voraus, daß Sie sowohl über Maschinensprachekenntnisse als auch über Kenntnisse im Umgang mit sequentiellen und relativen Dateien verfügen. Wenn Sie bisher noch nichts vom »Positionieren«, von »Records« und »Kanälen« gehört haben, müssen Sie jedoch nicht gleich resignieren: In diesem Sonderheft finden Sie ab Seite 25 einen Artikel, der sich ausführlich mit den (Basic-) Grundlagen der verschiedenen Datei- und Zugriffsformen beschäftigt.</p>
+
+        <p>Zur Eingabe der Programmbeispiele: Die meisten der vorgestellten Routinen bestehen aus nur drei oder vier Maschinensprachebefehlen. Routinen, die etwas umfangreicher sind, wurden als Disassembler-Listings in den Text eingefügt und können mit jedem Monitor von Ihnen eingegeben werden.</p>
+
+        <p>Eine Ausnahme stellen die Programme »INPUT #-Routine« und »Verwaltung relativer Dateien« dar. Diese beiden Programme sind zu umfangreich, um als Disassembler-Listings noch problemlos verstanden zu werden. Sie wurden im Text als Assembler-Sourcecode (Hypra-Ass-Format) abgedruckt, da die Verwendung von Labeln in größeren Routinen doch einiges zur besseren Verständlichkeit beiträgt.</p>
+
+        <p>Die drei interessantesten Demoprogramme »INPUT #«, »Verwaltung relativer Dateien« und »ID ändern« sind zusätzlich als MSE-Listings vorhanden.</p>
+
+        <h2>Öffnen einer Datei</h2>
+
+        <p>Sie alle kennen den Basic-Befehl »OPEN«, mit dem eine Datei für Lese- oder Schreibzugriffe geöffnet werden kann. Erst nach dem Öffnen einer Datei kann die eigentliche Datenein- oder -ausgabe mit PRINT # oder INPUT # erfolgen. Die Programmierung auf der Maschinenspracheebene verläuft analog. Zuerst muß eine Datei geöffnet werden, wobei die gleichen Dateiparameter angegeben werden wie im OPEN-Befehl, dessen genaue Syntax bekanntlich lautet:</p>
+
+        <pre><code>OPEN (LF), (GA), (SA), "DATEINAME, TYP, MODUS"</code></pre>
+
+        <table class="plain">
+            <tr>
+                <td>LF</td>
+                <td>=</td>
+                <td>Logische Filenummer</td>
+            </tr>
+            <tr>
+                <td>GA</td>
+                <td>=</td>
+                <td>Geräteadresse</td>
+            </tr>
+            <tr>
+                <td>SA</td>
+                <td>=</td>
+                <td>Sekundäradresse</td>
+            </tr>
+        </table>
+
+        <p>Dieser für die Dateibehandlung grundlegende Basic-Befehl kann leider nur mit großem Aufwand in die entsprechenden Maschinenbefehle umgesetzt werden. Sollten Sie annehmen, daß hierzu der Aufruf einer einzigen Betriebssystemroutine ausreicht, muß ich Sie leider enttäuschen. Im Betriebssystem existiert zwar eine Routine mit dem Namen »OPEN«. Bevor jedoch diese Routine aufgerufen werden kann, müssen zwei Vorbereitungsroutinen aufgerufen werden, mit denen die benötigten Dateiparameter übergeben werden.</p>
+
+        <p>Der zuerst aufzurufenden Routine SETPAR ($FFBA) werden die Parameter »logische Filenummer«, »Geräteadresse« und »Sekundäradresse« übergeben. Anschließend wird die Routine SETNAM ($FFBD) aufgerufen, die für die Übergabe des Dateinamens zuständig ist (inklusive der Zusätze »Typ« und »Modus«). Erst nach dieser Vorbereitung kann die OPEN-Routine ($FFC0) aufgerufen werden.</p>
+
+        <h2>SETPAR ($FFBA): Fileparameter setzen</h2>
+
+        <p>Der erste Schritt zum Öffnen einer Datei – gleich ob zum Lesen oder Schreiben von Daten – ist die Übergabe der Parameter »log. Filenummer«, »Geräteadresse« und »Sekundäradresse« mit der Routine SETPAR.</p>
+
+        <p>Als log. Filenummer kann eine beliebige Zahl zwischen 1 und 255 angegeben werden.</p>
+
+        <p>Die Geräteadresse liegt üblicherweise zwischen Null und Acht (0=Tastatur; 1=Datasette; 3=Bildschirm; 4=Drucker; 8=Floppystation). In den folgenden Programmbeispielen werde ich immer (!) die Geräteadresse Acht verwenden, da die Floppystation wohl das am häufigsten in Verbindung mit dem C 64 verwendete Peripheriegerät ist.</p>
+
+        <p>Die Bedeutung der Sekundäradresse ist je nach verwendetem Peripheriegerät völlig unterschiedlich. Soll eine Diskettendatei geöffnet werden, kann eine beliebige Sekundäradresse zwischen 0 und 15 angegeben werden. Die Sekundäradresse 15 hat eine besondere Bedeutung, auf die ich noch genauer eingehen werde. Sie öffnet den sogenannten »Befehls-« oder auch »Fehlerkanal«.</p>
+
+        <p>Bei Druckern bestimmt die angegebene Sekundäradresse häufig den Druckmodus, ob zum Beispiel im Groß/Grafik- oder im Klein-/Großmodus gedruckt werden soll. Mit welcher Sekundäradresse welcher Druckmodus angesprochen wird, ist von Drucker zu Drucker unterschiedlich und muß daher im zugehörigen Druckerhandbuch nachgelesen werden.</p>
+
+        <p>Beim Öffnen einer Datasettendatei kann eine Sekundäradresse zwischen Null und Zwei angegeben werden. Null bedeutet, daß anschließend Daten vom Band gelesen werden sollen, eine Eins geben Sie an, wenn Schreibzugriffe erfolgen sollen. Die Angabe einer Zwei bedeutet ebenfalls, daß anschließend Schreibzugriffe erfolgen, zusätzlich wird jedoch eine sogenannte »EOT«-Markierung (= end of tape) auf das Band geschrieben, eine Markierung, die angibt, daß sich die Datei am Bandende befindet und keine weitere Datei folgt. Sinn und Zweck dieser Markierung blieb mir persönlich jedoch bislang etwas schleierhaft, da ich sie in meinen Programmen noch nie benötigt habe.</p>
+
+        <p>Sie wissen nun, welche Parameter der Routine SETPAR übergeben werden müssen, nicht jedoch wie. Alle drei Parameter werden mit Hilfe der Prozessorregister übergeben:</p>
+
+        <table class="plain">
+            <tr>
+                <td>Akku</td>
+                <td>=</td>
+                <td>logische Filenummer (1-255)</td>
+            </tr>
+            <tr>
+                <td>X-Register</td>
+                <td>=</td>
+                <td>Geräteadresse (0, 1, 3, 4 oder 8)</td>
+            </tr>
+            <tr>
+                <td>Y-Register</td>
+                <td>=</td>
+                <td>Sekundäradresse (Datasette: 0-2; Floppy: 0-15)</td>
+            </tr>
+        </table>
+
+        <p>Wenn wir zum Beispiel Daten in eine Diskettendatei schreiben wollen, übergeben wir der Routine SETPAR folgende Parameter:</p>
+
+        <pre><code>LDA #$01   ;LOG.FILENUMMER 1
+TAY        ;SEKUNDÄRADRESSE 1
+LDX #$08   ;GERÄTEADRESSE 8 = FLOPPYSTATION
+JSR $FFBA  ;SETPAR AUFRUFEN</code></pre>
+
+        <h2>SETNAM ($FFBD): Dateinamen (+Zusätze) übergeben</h2>
+
+        <p>Der Dateiname darf aus maximal 16 Zeichen bestehen. Unter »Zusatz« sind die Angaben »Typ« und »Modus« zu verstehen. Beide Angaben werden nur bei Diskettendateien benötigt, um zum Beispiel mit dem Befehl OPEN 2,8,2,"TEST,S,W" die sequentielle Datei »TEST« zum Schreiben zu öffnen.</p>
+
+        <p>Typ = S (Sequentielle Datei), R (Relative Datei), P (Programmdatei) oder U (Userdatei).</p>
+
+        <p>Modus = R (Read=Daten lesen), W (Write=Daten schreiben) oder A (Append=Daten an bestehende Datei anhängen)</p>
+
+        <p>Die Angabe des Dateityps wird bei Datasettendateien nicht benötigt, da die Datasette nur eine einzige Form der Datendatei kennt, den sequentiellen Typ.</p>
+
+        <p>Die Angabe der Zugriffsart, des »Modus«, ist bei Verwendung der Datasette ebenfalls überflüssig, da diese Angabe bereits beim Aufruf von SETPAR erfolgte (Sekundäradresse 0 bis 2).</p>
+
+        <p>Bei Verwendung der Datasette muß übrigens nicht unbedingt ein Dateiname angegeben werden. Die angelegte Datei erhält dann keinen Namen.</p>
+
+        <p>Die Parameter für SETNAM werden teilweise ebenfalls mit Hilfe der Prozessorregister übergeben. Zusätzlich muß jedoch in einem beliebigen Speicherbereich (im Programm selbst, in der Zeropage, oder an einem beliebigen anderen Ort) der Dateiname (plus Zusatz) in ASCII-Form abgelegt sein. In den folgenden Beispielen werde ich den Kassettenpuffer verwenden ($033C-$03FB), da dieser bei Verwendung der Floppystation nicht benötigt wird. Wenn Sie meine Demoprogramme für die Datasette umschreiben wollen, müssen Sie sich einen anderen Speicherbereich zur Datenablage suchen.</p>
+
+        <p>Wenn der Dateiname abgelegt wurde, wird der Akku mit der Länge des Namens geladen, und im X- beziehungsweise Y-Register wird ein Zeiger auf die Adresse übergeben, an der sich der Name befindet (X-Register = Low-Byte der Adresse; Y-Register = High-Byte):</p>
+
+        <pre><code>LDA #$04  ;LÄNGE DES NAMENS: 4 ZEICHEN (Beispiel)
+LDX #$3C  ;LOW-BYTE DER ADRESSE $033C
+LDY #$03  ;HIGH-BYTE DER ADRESSE $033C
+JSR $FFBD ;SETNAM AUFRUFEN</code></pre>
+
+        <p>Diese Routine ist nur dann lauffähig, wenn zuvor ein Dateiname mit einer Länge von vier Zeichen in ASCII-Form ab $033C abgelegt wurde.</p>
+
+        <h2>OPEN ($FFC0): Datei öffnen</h2>
+
+        <p>Nach diesen Vorbereitungen kann endlich die OPEN-Routine des Betriebssystems aufgerufen werden. Der Aufruf mit JSR $FFC0 genügt, da keine weiteren Parameter übergeben werden müssen. Die logische Datei wird nun geöffnet. Dabei ist es jedoch möglich, daß ein Fehler auftritt, zum Beispiel wenn auf Band geschrieben werden soll und die Datasette noch im Schrank liegt. In diesem Fall tritt ein »DEVICE NOT PRESENT ERROR« auf.</p>
+
+        <p>Wenn Sie wirklich professionell programmieren wollen, dürfen Sie eventuell auftretende Fehler selbstverständlich nicht einfach ignorieren, sondern benötigen eine »Fehlerbehandlungsroutine«, zu der Ihr Programm in einem solchen Fall verzweigt (zum Beispiel, um den Benutzer aufzufordern, endlich die Diskettenstation einzuschalten oder eine Diskette einzulegen).</p>
+
+        <p>Ob beim Öffnen einer Datei ein Fehler autrat, erkennen Sie am Carry-Flag. Bei fehlerfreiem Öffnen der Datei ist es nach der Rückkehr aus der OPEN-Routine gelöscht. Trat ein Fehler auf, ist das Carry-Flag gesetzt und im Akku wird die Nummer des Fehlers übergeben. Bei gesetztem Carry-Flag sollte Ihr Programm daher zu einer Fehlerbehandlungsroutine verzweigen:</p>
+
+        <pre><code>JSR $FFC0 ;OPEN AUFRUFEN
+BCS $???? ;WENN FEHLER, DANN VERZWEIGEN</code></pre>
+
+        <p>Die Fehlernummern im Akku haben folgende Bedeutung:</p>
+
+        <table class="plain">
+            <tr>
+                <td>0</td>
+                <td>=</td>
+                <td>&lt;STOP&gt;-Taste gedrückt (»Break Error«)</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>=</td>
+                <td>too many files</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>=</td>
+                <td>file open</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>=</td>
+                <td>file not open</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>=</td>
+                <td>file not found</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>=</td>
+                <td>device not present</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>=</td>
+                <td>not input file</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>=</td>
+                <td>not output file</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>=</td>
+                <td>missing filename</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>=</td>
+                <td>illegal device number</td>
+            </tr>
+        </table>
+
+        <p>Die Fehler Drei, Sechs und Sieben sind beim Öffnen einer Datei bedeutungslos. Sie können nur nach Lese- oder Schreibversuchen in die Datei auftreten. Ein Fehler wie zum Beispiel »MISSING FILENAME« ist dagegen gerätespezifisch. Bei Verwendung der Datasette müssen Sie nicht unbedingt einen Dateinamen angeben, daher kann auch dieser Fehler nicht auftreten.</p>
+
+        <h2>CHKIN ($FFC6) und CKOUT ($FFC9): Ein-/Ausgaben umleiten</h2>
+
+        <p>Ich muß gestehen, daß ich ein wenig vereinfachte mit der Behauptung, daß das Maschinensprache-Äquivalent zum Basic-Befehl OPEN die Routinen SETPAR, SETNAM und der anschließende Aufruf der OPEN-Routine sei. Leider müssen wir noch zwei weitere Routinen besprechen, bevor wir zur eigentlichen Datenein- beziehungsweise -ausgabe kommen, die Routinen CHKIN und CKOUT.</p>
+
+        <p>Wie Sie wissen, ist die Tastatur beim C 64 das Standardeingabegerät und der Bildschirm das Standardausgabegerät. Um nach dem Öffnen einer Datei in diese Daten zu schreiben oder Daten daraus zu lesen, muß die Ein- beziehungsweise Ausgabe auf die geöffnete logische Datei umgelenkt werden, da ansonsten die Standardgeräte angesprochen werden.</p>
+
+        <p>Das Umlenken der Eingabe von der Tastatur auf die mit der OPEN-Routine geöffnete Datei erfolgt mit der Routine CHKIN, der im X-Register die beim Aufruf von SETFLS verwendete logische Filenummer übergeben wird, zum Beispiel die Eins:</p>
+
+        <pre><code>LDX #$01  ;LOG.FILENUMMER
+JSR $FFC6 ;AUFRUF VON CHKIN</code></pre>
+
+        <p>Um in eine geöffnete Datei Daten zu schreiben, muß die Ausgabe vom Standardgerät Bildschirm zuvor auf die geöffnete logische Datei umgeleitet werden. Der zuständigen Routine CKOUT wird ebenfalls im X-Register die verwendete logische Filenummer übergeben:</p>
+
+        <pre><code>LDX #$01  ;LOG.FILENUMMER
+JSR $FFC9 ;AUFRUF VON CKOUT</code></pre>
+
+        <p>Beide Routinen zeigen auftretende Fehler ebenso wie die OPEN-Routine durch ein gesetztes Carry-Flag an. Trat ein Fehler auf, wird die Fehlernummer ebenfalls im Akku übergeben.</p>
+
+        <h2>Demoprogramm 1: Datei in Maschinensprache öffnen</h2>
+
+        <p>Wir sind nun endlich soweit, das theoretisch erworbene Wissen in ein Programm umsetzen zu können. Mit den erläuterten Routinen können wir ein Demonstrationsprogramm schreiben, das in Maschinensprache eine logische Datei zum Schreiben von Daten auf Diskette öffnet. Als Dateinamen verwenden wir »TEST,S,W« (das heißt der eigentliche Dateiname ist »TEST«, der Namenszusatz »,S,W«, da wir eine sequentielle Datei zum Schreiben öffnen wollen), als logische Filenummer eine Eins.</p>
+
+        <p>Zum Schreiben der Daten verwenden wir ein kleines Basic-Programm, das zusätzlich die Aufgabe übernehmen soll, den Dateinamen in ASCII-Form in den Kassettenpuffer zu POKEn, bevor es unsere Dateiöffnungsroutine aufruft und anschließend Daten in die – durch die Maschinenroutine geöffnete – Datei schreibt:</p>
+
+        <figure>
+            <pre data-filename="c64.open.bas" data-name="Demoprogramm 1 (Basic)"></pre>
+        </figure>
+        <div class="binary_download" data-filename="c64.open.ass.prg" data-name="Demoprogramm 1 (Maschinensprache)"></div>
+
+        <p>Die Maschinenroutine beginnt ab $C000, ebenso wie alle weiteren Demoprogramme.</p>
+
+        <pre><code>. C000  LDA #$01    ;LOG.FILENUMMER 1
+. C002  LDX #$08    ;GERÄTEADRESSE 8 = FLOPPY
+. C004  LDY #$02    ;SEKUNDÄRADRESSE 2
+. C006  JSR $FFBA   ;SETPAR AUFRUFEN
+
+. C009  LDA #$08    ;LÄNGE DES NAMENS+ZUSATZ: 8 ZEICHEN
+. C00B  LDX #$3C    ;LOW-BYTE DER ADRESSE $033C
+. C00D  LDY #$03    ;HIGH-BYTE DER ADRESSE $033C
+. C00F  JSR $FFBD   ;SETNAM AUFRUFEN
+
+. C012  JSR $FFC0   ;OPEN AUFRUFEN
+
+. C015  LDX #$01    ;LOG.FILENUMMER
+. C017  JSR $FFC9   ;AUFRUF VON CKOUT
+. C01A  RTS         ;ZURUECK NACH BASIC</code></pre>
+
+        <p>Das Maschinenprogramm besteht im Grunde nur aus einer Zusammenfassung der bereits beschriebenen Teile, das heißt aus dem Aufruf von SETPAR, SETNAM, OPEN und CKOUT. Beachten Sie bitte, daß eventuell auftretende Fehler ignoriert werden (Carry-Flag nach OPEN und CKOUT abfragen).</p>
+
+        <p>Geben Sie dieses Programm bitte mit einem Monitor ein (lassen Sie die Kommentare jedoch weg und versuchen Sie nicht, die einzelnen Programmteile wie abgebildet durch Leerzeilen optisch zu unterteilen!), geben Sie anschließend das Basic-Programm ein und starten Sie es mit RUN.</p>
+
+        <p>Zum Programmablauf: In den Zeilen 110-140 werden mit einer Schleife die ASCII-Codes der einzelnen Zeichen des Dateinamens »TEST« und des Zusatzes »,S,W« in den Kassettenpuffer gePOKEt. Anschließend wird unsere Maschinenroutine aufgerufen, die eine Diskettendatei unter der log. Filenummer Eins öffnet (Zeile 150). Unter Angabe dieser Filenummer schreibt das Basic-Programm nun zwei Strings in die Datei, bevor sie wieder geschlossen wird (Zeilen 160 bis 180).</p>
+
+        <p>Anschließend wird die sequentielle Datei »TEST« zum Lesen geöffnet (Zusatz »,S,R«). Die beiden Strings werden eingelesen, auf dem Bildschirm ausgegeben und die Datei geschlossen.</p>
+
+        <p>Wie Sie sehen, ist es zweifellos bequemer, einen Basic-Befehl zum Öffnen einer Datei zu verwenden, als ein Maschinenprogramm, das an mehrere Routinen die verschiedensten Parameter übergeben muß, um die gleiche Funktion zu erfüllen. Die im Laufe dieses Kapitels vorgestellte INPUT #-Routine entschädigt Sie jedoch für diesen Aufwand. In Basic könnte diese Routine nur mit einem kleinen Unterprogramm unter Verwendung von GET # erstellt werden und wäre weitaus langsamer als die entsprechende Maschinenroutine. (Versuchen Sie einmal, 20 Strings mit einer Länge von jeweils 100 Zeichen mit GET # nach und nach einzulesen. Sie werden staunen, wie langsam Ihre Datasette plötzlich wird.)</p>
+
+        <h2>BSOUT ($FFD2): Datenausgabe auf logische Datei</h2>
+
+        <p>Wir können nun zwar in Maschinensprache beliebige Dateien öffnen, bisher jedoch weder Daten ausgeben noch einlesen. Sie alle wissen sicherlich, daß mit der Routine BSOUT Daten auf dem Bildschirm ausgegeben werden können. BSOUT gibt ein im Akku übergebenes Zeichen (ASCII-Code!) auf dem Bildschirm aus, und zwar an der aktuellen Cursorposition.</p>
+
+        <p>BSOUT ist jedoch keineswegs eine speziell zur Ausgabe auf dem Bildschirm gedachte Routine, sondern erfüllt die weitaus allgemeinere Funktion, Daten in eine beliebige logische Datei zu schreiben. Diese Datei ist normalerweise der Bildschirm, wir können mit BSOUT jedoch auch Zeichen in eine Datasetten-, Disketten- oder Druckerdatei schreiben.</p>
+
+        <p>Die benötigten Vorbereitungsroutinen kennen wir bereits. Zuerst wird eine logische Datei geöffnet, anschließend die Datenausgabe mit CKOUT auf diese Datei umgeleitet. Wenn nun BSOUT aufgerufen wird, werden die im Akku übergebenen Zeichen dank der Umleitung der Ausgabe nicht auf dem Bildschirm ausgegeben, sondern in die angegebene Datei geschrieben.</p>
+
+        <pre><code>...          ;DISKETTENDATEI ZUM
+...          ;SCHREIBEN OEFFNEN
+JSR $FFC9    ;AUSGABE AUF DIE DATEI LEGEN
+LDA #$41     ;ASCII-CODE VON 'A'
+JSR $FFD2    ;'A' IN DIE DATEI SCHREIBEN
+...
+...
+...</code></pre>
+
+        <h2>BASIN ($FFCF): Dateneingabe von logischer Datei</h2>
+
+        <p>BASIN erfüllt die entgegengesetzte Funktion, das Einlesen von Daten aus einer beliebigen logischen Datei. Wenn die Zeichen nicht vom Standardgerät Tastatur gelesen werden sollen, muß ebenfalls eine logische Datei zum Lesen geöffnet und die Eingabe mit CHKIN auf diese Datei umgelenkt werden. Nun kann mit BASIN Zeichen für Zeichen aus dieser Datei gelesen werden. Die eingelesenen Zeichen werden im Akku übergeben.</p>
+
+        <pre><code>...          ;DISKETTENDATEI ZUM
+...          ;LESEN OEFFNEN
+JSR $FFC6    ;EINGABE AUF DIE DATEI LEGEN
+JSR $FFCF    ;EIN ZEICHEN AUS DER DATEI LESEN
+STA $xxx1    ;ZEICHEN SPEICHERN
+JSR $FFCF    ;NAECHSTES ZEICHEN LESEN
+STA $xxx2    ;EBENFALLS SPEICHERN
+...
+...</code></pre>
+
+        <h2>CLRCH ($FFCC): Standardein-/-ausgabegeräte setzen</h2>
+
+        <p>Nach beendeter Ein- beziehungsweise Ausgabe von Daten sollte die Routine CLRCH aufgerufen werden, die die Eingabe wieder auf das Standardgerät Tastatur und die Ausgabe auf den Bildschirm umleitet. Es werden keinerlei Vorbereitungsroutinen oder Übergabeparameter benötigt. CLRCH muß auch aufgerufen werden, wenn Ein-/Ausgabeoperationen noch nicht beendet wurden, sich im folgenden jedoch auf andere logische Dateien beziehen sollen, das heißt bevor die Ein- beziehungsweise Ausgabe mit CKOUT oder CHKIN auf eine andere Datei umgelenkt wird. Ohne die vorhergehende »Säuberung« der Übertragungskanäle durch CLRCH kann es passieren, daß mehrere Geräte gleichzeitig auf den seriellen Bus zugreifen wollen, was verständlicherweise zu erheblichen Problemen führt.</p>
+
+        <pre><code>...          ;LOGISCHE DATEI OEFFNEN
+...          ;EIN- ODER AUSGABE UMLENKEN
+...          ;DATEN LESEN ODER SCHREIBEN
+JSR $FFCC    ;STANDARDEIN-/AUSGABEGERAETE SETZEN
+...          ;(TASTATUR/BILDSCHIRM)
+...
+...</code></pre>
+
+        <h2>CLOSE ($FFC3): Logische Datei schließen</h2>
+
+        <p>CLRCH leitet weitere Ein- oder Ausgaben zwar wieder auf die Tastatur beziehungsweise den Bildschirm um, die zuvor geöffnete logische Datei wird jedoch nicht automatisch geschlossen! Zum Abschluß jeder Schreib- oder Leseroutine sollte daher die Routine CLOSE aufgerufen werden, die die angegebene logische Datei schließt, wobei die Filenummer im Akku übergeben werden muß.</p>
+
+        <pre><code>...            ;DATEI MIT LOG.FILENUMMER 1 OEFFNEN
+...            ;EIN-/AUSGABE UMLEITEN
+...            ;DATEN LESEN ODER SCHREIBEN
+JSR $FFCC      ;EIN-/AUSGABE AUF STANDARDGERAETE
+LDA #$01       ;LOG.FILENUMMER
+JSR $FFC3      ;LOG.DATEI SCHLIESSEN
+...
+...
+...</code></pre>
+
+        <h2>READST ($FFB7): Status abfragen</h2>
+
+        <p>Ein Problem müssen wir noch lösen, bevor wir ausschließlich in Maschinensprache Dateiverwaltung betreiben können, und zwar die Abfrage des Dateiendes. Das Einlesen einer Datei muß beendet werden, wenn das Dateiende erreicht wurde. In Basic können wir hierzu die Statusvariable ST abfragen, die den Wert 64 annimmt, wenn das Dateiende erreicht wurde.</p>
+
+        <p>In Maschinensprache verwenden wir die Routine READST, die die gleiche Funktion erfüllt (der Basic-Interpreter verwendet diese Routine selbst, um der Variablen ST den jeweiligen Status mitzuteilen).</p>
+
+        <p>Nach dem Aufruf von READST wird der aktuelle Status im Akku übergeben. Bei Erreichen des Dateiendes wird Bit 6 gesetzt (da dieses Bit den dezimalen Wert 64 besitzt, wird die Analogie zur Basic-Variablen ST deutlich).</p>
+
+        <pre><code>...
+...
+...
+LABEL JSR $FFCF  ;DATEN LESEN
+      JSR $FFB7  ;READST AUFRUFEN
+      AND #$40   ;ALLE BITS AUSSER BIT 6 AUSMASKIEREN
+      BEQ LABEL  ;WEITERLESEN, WENN NICHT DATEIENDE
+...
+...
+...</code></pre>
+
+        <h2>Demoprogramm 2: Daten in Maschinensprache schreiben und lesen</h2>
+
+        <p>Die Zeiten, in denen wir uns zum Schreiben und Lesen von Daten mit Basic behelfen mußten, sind nun endgültig vorbei. In diesem zweiten Programmbeispiel werden wir die Strings »DIES IST« und »EIN TEST« in Maschinensprache auf Band schreiben und wieder lesen.</p>
+
+        <p>Aus Bequemlichkeit wird zusätzlich ein kleines Basic-Programm verwendet, das den Dateinamen »TEST« und den Zusatz »,S,W« nach $033C-$0343 (dezimal 828-835) und die zu schreibenden Strings ab $034C (dezimal 828+16) in den Kassettenpuffer POKEt (Zeilen 110 bis 130), und das die Routine zum Schreiben der Strings aufruft (Zeile 160). Vor dem Aufruf der Leseroutine POKEt das Basic-Programm den gleichen Dateinamen »TEST«, jedoch mit dem geänderten Zusatz »,S,R« nach $033C, da die Datei nun zum Lesen geöffnet werden soll.</p>
+
+        <figure>
+            <pre data-filename="c64.read_wr.bas" data-name="Demoprogramm 2 (Basic)"></pre>
+        </figure>
+        <div class="binary_download" data-filename="c64.read_wr.ass.prg" data-name="Demoprogramm 2 (Maschinensprache)"></div>
+
+        <p>Beachten Sie bitte, daß bei der zeichenweisen Ausgabe mit BSOUT im Gegensatz zur Basic-Ausgabe mit PRINT # nicht automatisch nach jedem String das Zeichen CHR$(13) (Carriage Return oder auch Zeilenvorschub) auf Kassette geschrieben wird. Die Basic-Routine fügt dieses Zeichen daher an das Ende beider Zeichenketten an (Zeile 120). Als letztes Zeichen wird ein CHR$(0) als Endemarke angehängt, an dem unsere Maschinenroutine das Ende des auszugebenden Strings erkennen soll.</p>
+
+        <p>Teil 1: Daten schreiben</p>
+
+        <pre><code>. C000  LDA #$01      ;LOG.FILENUMMER
+. C002  LDX #$08      ;GERAETEADRESSE
+. C004  LDY #$02      ;SEKUNDAERADRESSE
+. C006  JSR $FFBA     ;SETPAR AUFRUFEN
+
+. C009  LDA #$08      ;LAENGE DES DATEINAMENS+ZUSATZ
+. C00B  LDX #$3C      ;LOW-BYTE ADRESSE DATEINAME
+. C00D  LDY #$03      ;HIGH-BYTE ADRESSE DATEINAME
+. C00F  JSR $FFBD     ;SETNAM AUFRUFEN
+
+. C012  JSR $FFC0     ;OPEN AUFRUFEN
+. C015  LDX #$01      ;LOG.FILENUMMER
+. C017  JSR $FFC9     ;CKOUT AUFRUFEN
+
+. C01A  LDX #$00      ;ZEIGER INITIALISIEREN
+. C01C  LDA $034C,X   ;ERSTES ZEICHEN HOLEN
+. C01F  BEQ $C027     ;FERTIG, WENN ENDEMARKE
+. C021  JSR $FFD2     ;ZEICHEN IN DATEI SCHREIBEN
+. C024  INX           ;ZEIGER AUF NAECHSTES ZEICHEN
+. C025  BNE $C01C     ;ZUM SCHLEIFENANFANG (UNBEDINGTER SPRUNG)
+
+. C027  JSR $FFCC     ;STANDARDGERAETE SETZEN
+. C02A  LDA #$01      ;LOG.FILENUMMER
+. C02C  JSR $FFC3     ;LOG.DATEI SCHLIESSEN
+. C02F  RTS           ;RUECKKEHR NACH BASIC</code></pre>
+
+        <p>Teil 2: Daten lesen/ausgeben</p>
+
+        <pre><code>. C030  LDA #$01      ;LOG.FILENUMMER
+. C032  LDX #$08      ;GERAETEADRESSE
+. C034  LDY #$02      ;SEKUNDAERADRESSE
+. C036  JSR $FFBA     ;SETPAR AUFRUFEN
+
+. C039  LDA #$08      ;LAENGE DES DATEINAMENS
+. C03B  LDX #$3C      ;LOW-BYTE ADRESSE DATEINAME
+. C03D  LDY #$03      ;HIGH-BYTE ADRESSE DATEINAME
+. C03F  JSR $FFBD     ;SETNAM AUFRUFEN
+
+. C042  JSR $FFC0     ;OPEN AUFRUFEN
+. C045  LDX #$01      ;LOG.FILENUMMER
+. C047  JSR $FFC6     ;CHKIN AUFRUFEN
+
+. C04A  JSR $FFCF     ;BASIN AUFRUFEN
+. C04D  JSR $FFD2     ;ZEICHEN AUF BILDSCHIRM AUSGEBEN
+. C050  JSR $FFB7     ;READST AUFRUFEN
+. C053  AND #$40      ;ALLE AUSSER BIT 6 AUSMASKIEREN
+. C055  BEQ $C04A     ;WEITER, WENN NICHT DATEIENDE
+
+. C057  JSR $FFCC     ;STANDARDGERAETE SETZEN
+. C05A  LDA #$01      ;LOG.FILENUMMER
+. C05C  JSR $FFC3     ;LOG.DATEI SCHLIESSEN
+. C05F  RTS           ;RUECKKEHR NACH BASIC</code></pre>
+
+        <p>Dieses Programm dürfte gut verständlich sein, da es unter Verzicht auf Programmiertricks in aller Ausführlichkeit geschrieben wurde. Mit dem Öffnen und Schließen der Dateien im ersten und zweiten Programmteil sollten Sie nun vertraut sein.</p>
+
+        <p>Wichtig an diesem Programm ist, daß im ersten Teil Zeichen für Zeichen in die Datei geschrieben wird, bis das nächste Zeichen eine Null ist, jene Endemarke, die das Basic-Programm am Ende des Strings in den Speicher POKEte.</p>
+
+        <p>Beim Lesen der Zeichen könnte selbstverständlich ebenfalls eine solche Endemarke benutzt werden, um das Dateiende festzustellen. Statt dessen wird die erläuterte Routine READST verwendet. Zeichen für Zeichen wird aus der Datei gelesen und auf dem Bildschirm ausgegeben, wobei nach jedem Lesevorgang READST aufgerufen und das sechste Bit des im Akku übergebenen Statusbytes überprüft wird (AND #$40). Ist dieses Bit gesetzt, wurde das Dateiende erreicht und das Programm kehrt ins Basic zurück (zuvor werden noch CLRCH und CLOSE aufgerufen).</p>
+
+        <p>Bevor Sie dieses Programm starten: Sollten Sie das Demoprogramm 1 ausprobiert haben, so löschen Sie bitte die dadurch auf der Diskette erzeugte Datei »TEST«.</p>
+
+        <p>Verwenden Sie keinesfalls den Zusatz »@:« im Dateinamen, um bereits existierende Dateien zu überschreiben, da er unter Umständen Ihre Diskette zerstören kann.</p>
+
+        <h2>Die Interpreterroutinen CHKKOM, GETBYT, STRPOS und STRRES</h2>
+
+        <p>Zu Beginn dieses Artikels erwähnte ich den Basic-Befehl INPUT #, der als »Fehlleistung« des Basic-Interpreters angesehen werden kann. Im folgenden wird eine Routine entwickelt, die diesen Befehl durch eine Maschinenroutine ersetzt und die 255 beliebige Zeichen einlesen kann (also auch Komma, Doppelpunkt etc.).</p>
+
+        <p>Vorher muß ich jedoch kurz auf verschiedene Routinen des Basic-Interpreters eingehen, die für diese Routine unbedingt benötigt werden. Da der Aufruf möglichst weitgehend dem normalen INPUT #-Befehl entsprechen soll (INPUT # (log. Filenummer), (Übergabestring)), muß das Programm in der Lage sein, die Filenummer aus dem Basic-Text zu lesen und auf den angegebenen String zuzugreifen, in dem die eingelesenen Daten an das aufrufende Basic-Programm übergeben werden sollen.</p>
+
+        <p>Die Routine wird ebenfalls im Bereich $C000 liegen und wie folgt aufgerufen:</p>
+
+        <p>SYS 49152,(LOG.FILENUMMER),(ÜBERGABESTRING)<br>zum Beispiel:<br>SYS 49152,1,a$ oder SYS 49152,2,X$(7)</p>
+
+        <p>Da die einzelnen Parameter durch Kommata getrennt sind, benötigen wir zuerst eine Routine, die in der Lage ist, Kommas aus dem Basic-Programm einzulesen. Diese Routine wird CHKKOM ($AEFD) genannt. Der Basic-Interpreter führt ständig einen Zeiger auf die momentan bearbeitete Textstelle mit sich. Nach dem SYS-Aufruf weist dieser Zeiger auf das erste Zeichen hinter der angegebenen Adresse, das heißt auf das Komma.</p>
+
+        <p>Der Aufruf von CHKKOM liest dieses Zeichen ein, setzt den Textpointer auf das nächste Zeichen im Basic-Programm und überprüft, ob tatsächlich ein Komma gelesen wurde. Wenn ja, endet CHKKOM mit einem RTS-Befehl, ansonsten wird ein »SYNTAX ERROR IN ...« ausgegeben.</p>
+
+        <p>Wenn mit CHKKOM das erste Trennzeichen eingelesen wurde, muß anschließend die angegebene Filenummer von unserem Programm gelesen werden. Die Routine GETBYT ($B79E) liest einen beliebigen Ein-Byte-Wert aus dem Basic-Text und übergibt ihn im X-Register. Der Wert muß übrigens nicht direkt als Zahl angegeben werden, da GETBYT auch Variablen verarbeitet, so daß zum Beispiel folgender Aufruf möglich ist:</p>
+
+        <p>LF=1:SYS 49152,LF,A$</p>
+
+        <p>Bevor wir an die eigentliche Programmerstellung gehen können, muß ein weiteres Problem gelöst werden: Wo speichern wir die eingelesenen Zeichen ab? Am komfortabelsten ist die Benutzung unserer Routine, wenn sie die eingelesenen Zeichen als String anlegt, auf den das aufrufende Basic-Programm direkt zugreifen kann. Der Name des Übergabestrings sollte ebenso wie beim INPUT #-Befehl beim Aufruf angegeben werden können.</p>
+
+        <p>Ein Standardproblem bei der Verbindung von Basic und Maschinenroutinen ist der Zugriff auf Basic-Strings von Maschinensprache aus, das Lesen oder gar Anlegen von Strings. Beides ermöglicht uns die Routine STRPOS ($B08B). Diese Routine liest den beim Aufruf angegebenen Stringnamen aus dem Basic-Text und übergibt in $47/$48 einen Pointer auf die sogenannten »Stringdescriptoren«.</p>
+
+        <p>Wie Sie vielleicht wissen, werden Strings vom Ende des verfügbaren Speichers aus abwärts angelegt und befinden sich im Gegensatz zu numerischen Variablen nicht direkt in der sogenannten »Variablentabelle«, die im Speicher immer unmittelbar dem Basic-Programm folgt. In der Variablentabelle befinden sich jedoch alle Daten, die zum Zugriff auf den eigentlichen String notwendig sind, der Stringname, die Stringlänge und die Adresse, an der sich der String selbst befindet (Name: 2 Byte; Länge: 1 Byte; Adresse: 2 Byte in der Form Low/High).</p>
+
+        <p>STRPOS übergibt einen Zeiger auf diese Descriptoren des angegebenen Strings (und zwar nicht auf das erste Descriptorenbyte (das erste Namensbyte), sondern auf das Längenbyte) und legt ihn an, wenn er bisher noch nicht existiert. Wenn der Aufruf zum Beispiel lautet: SYS 49152,A$(7) und unsere Routine zuerst CHKKOM und anschließend STRPOS aufruft, erhalten wir in $47/$48 einen Pointer, der auf den Längendescriptor des Strings A$(7) zeigt.</p>
+
+        <p>Die letzte benötigte Routine heißt STRRES ($B4F4). Diese Routine reserviert Speicherplatz für den anzulegenden String. Ein Beispiel: Wir wollen einen String mit einer Länge von 10 Zeichen anlegen. Zuerst muß der Akku mit der Stringlänge geladen werden, anschließend wird STRRES aufgerufen:</p>
+
+        <pre><code>LDA #$0A  ;STRINGLAENGE: 10 ZEICHEN
+JSR $B4F4 ;AUFRUF VON STRRES</code></pre>
+
+        <p>In $33/$34 befindet sich ein Pointer auf den Anfang des sogenannten »Stringstacks«, das heißt auf das erste Zeichen des zuletzt angelegten Strings. Nach dem Aufruf von STRRES mit der Stringlänge zehn im Akku wird dieser Pointer um den Wert zehn erniedrigt. Der dazukommende String kann nun vor (!) dem zuletzt angelegten gespeichert werden. (Denken Sie bitte daran, daß die Strings vom Speicherende ausgehend abwärts (!) angelegt werden.) Bevor STRRES den Pointer auf den Anfang der Strings um die übergebene Stringlänge vermindert, wird jedoch überprüft, ob überhaupt ausreichend Platz vorhanden ist, oder ob der nach unten wachsende Stringstack mit dem Basic-Programm kollidieren und dieses überschreiben würde. Wenn nicht ausreichend Platz vorhanden ist, wird eine Garbage Collection durchgeführt, das heißt nicht mehr benötigter »Stringmüll« wird beseitigt. Ist auch anschließend noch nicht ausreichend Platz für den anzulegenden String vorhanden, gibt STRRES die Fehlermeldung »OUT OF MEMORY ERROR« aus.</p>
+
+        <h2>Endlich: Die INPUT #-Routine</h2>
+
+        <p>Nach diesem »Vorgeplänkel« können wir uns endlich an die eigentliche Programmierung wagen. Im Gegensatz zu den bisher verwendeten Monitorlistings werde ich die Entwicklung der INPUT #-Routine anhand von Assemblerlistings (Hypra-Ass-Format) demonstrieren, da diese Routine doch etwas komplexer als die bisherigen Programmbeispiele ist und Assemblerlistings einfacher zu durchschauen sind.</p>
+
+        <pre><code>;*************************
+;*    INPUT#FUER C64     *
+;* (W) SAID BALOUI, 1986 *
+;*************************
+.BA $C000               ;PROGRAMMSTART
+;
+.EQ LENGTH   = $F7      ;STRINGLAENGE
+.EQ POINTR   = $F8      ;HILFSPOINTER
+.EQ DESCR    = $FA      ;STRINGDESCRIPTOREN
+.EQ DESPOI   = $47      ;POINTER AUF DESCRIPTOREN
+.EQ CHKKOM   = $AEFD    ;KOMMA EINLESEN
+.EQ GETBYT   = $B79E    ;BYTEWERT LESEN
+.EQ CHKIN    = $FFC6    ;INPUT AUF LOGISCHE DATEI
+.EQ CLRCH    = $FFCC    ;STANDARDGERAETE SETZEN
+.EQ BASIN    = $FFCF    ;ZEICHEN AUS LOG.DATEI LESEN
+.EQ STREND   = $33      ;POINTER AUF STRINGSTACK
+.EQ STRPOS   = $B08B    ;STRINGVARIABLE LESEN
+.EQ STRRES   = $B4F4    ;STRINGPLATZ RESERVIEREN
+;
+;</code></pre>
+
+        <pre><code>*** PLATZ RESERVIEREN ***
+           LDA #255     ;255 BYTE
+           JSR STRRES   ;RESERVIEREN</code></pre>
+
+        <p>Diese beiden Befehle reservieren Platz für den einzulesenden String in der Maximallänge von 255 Zeichen. Dank der Verwendung von STRRES wird sich das Programm keinesfalls »aufhängen«, sondern, sollte das Basic-Programm, in dem Sie die INPUT #-Routine verwenden, zu umfangreich und daher nicht ausreichend Platz vorhanden sein, sich mit einem »OUT OF MEMORY ERROR« verabschieden.</p>
+
+        <pre><code>*** STRING EINLESEN ***
+           JSR CHKKOM     ;LOG.FILENUMMER
+           JSR GETBYT     ;...EINLESEN (X-REGISTER)
+           JSR CHKIN      ;EINGABE AUF LOG.DATEI
+           LDY #0
+INPUT      JSR BASIN
+           CMP #13        ;LESEN BIS »RETURN«
+           BEQ LIESEND    ;UND AB STREND/STREND+1
+           STA (STREND),Y ;IM STRINGSTACK ABLEGEN
+           INY
+           BNE INPUT      ;UNBEDINGTER SPRUNG (!)
+LIESEND    STY LENGTH     ;STRINGLAENGE MERKEN
+           JSR CLRCH      ;STANDARDGERAETE SETZEN</code></pre>
+
+        <p>Der Programmteil zum Einlesen des Strings liest zuerst das als Trennzeichen verwendete Komma und die angegebene Filenummer aus dem Basic-Text ein. GETBYT übergibt wie erwähnt die Filenummer im X-Register, in dem sich die Filenummer auch beim Aufruf von CHKIN befinden muß, so daß diese Routine ohne weitere Vorbereitung aufgerufen und die Eingabe auf die geöffnete Datei umgelenkt werden kann.</p>
+
+        <p>Das Y-Register wird nun mit Null initialisiert, Zeichen für Zeichen aus der Datei eingelesen und ab dem neuen Anfang des Stringstacks gespeichert, bis das Zeichen für &lt;RETURN&gt; gelesen wird, das das Stringende kennzeichnet. Die im Y-Register enthaltene Stringlänge wird in LENGTH zur späteren Verwendung gemerkt und durch Aufruf von CLRCH wieder die Standardgeräte (Tastatur, Bildschirm) gesetzt.</p>
+
+        <pre><code>*** POINTER AUF STRINGANFANG ***
+           LDA STREND+1    ;POINTER(+1)=
+           STA POINTR+1    ;ECHTER STRINGANFANG,
+           LDA #255        ;D.H. MOMENTANER
+           SEC             ;ANFANG (STREND)
+           SBC LENGTH      ;+ DIE DIFFERENZ
+           CLC             ;ZWISCHEN DER
+           ADC STREND      ;RESERVIERTEN LAENGE
+           STA POINTR      ;255 ZEICHEN UND
+           BCC NOINC       ;DER TATSAECHLICHEN
+           INC POINTR+1    ;LAENGE DES STRINGS</code></pre>
+
+        <p>Die eingelesenen Zeichen wurden ab der Adresse gespeichert, auf die STREND weist. STREND weist durch die Stringreservierung 255 Zeichen vor den Beginn des nächsten Strings im Stringstack. Um die unglaubliche Platzverschwendung zu vermeiden, wenn zwar 255 Zeichen reserviert wurden, der eingelesene String tatsächlich jedoch zum Beispiel nur eine Länge von 20 oder 30 Zeichen besitzt, wird nach beendetem Einlesen der String nach oben verschoben, um den Leerraum zwischen dem eingelesenen und dem nächsten String im Stringstack wiederzugewinnen. Dazu wird zuerst anhand der tatsächlichen Stringlänge LENGTH und der daraus resultierenden Differenz zum reservierten Speicherplatz ein Pointer POINTR errechnet, der auf die korrekte Adresse weist, an die der String verschoben werden muß.</p>
+
+        <pre><code>;*** STRING VERSCHIEBEN ***
+NOINC      LDY LENGTH      ;STRING VON:
+           DEY             ;STREND BIS STREND+LENGTH
+COPY       LDA (STREND),Y  ;NACH:
+           STA (POINTR),Y  ;POINTR BIS POINTR+LENGTH
+           DEY             ;KOPIEREN
+           CPY #255
+           BNE COPY</code></pre>
+
+        <p>Das zeichenweise Kopieren des Strings dürfte problemlos zu verstehen sein. Der String befindet sich an der korrekten Adresse und unsere Routine wäre beendet. Doch leider kann das Basic-Programm noch nicht auf den angelegten String zugreifen, bevor nicht mehrere Pointer korrigiert werden.</p>
+
+        <pre><code>;*** DESCRIPT/STREND BEHANDELN ***
+           JSR CHKKOM
+           JSR STRPOS</code></pre>
+
+        <p>Mit CHKKOM wird das der Filenummer folgende Komma gelesen und STRPOS übergibt in DESPOI ($47/$48) einen Pointer auf den beim Aufruf angegebenen String. Die Descriptoren dieses Strings werden in einer Schleife nach DESCR (Länge), DESCR+1 (Adresse Low) und DESCR+2 (Adresse high) kopiert.</p>
+
+        <pre><code>;*** DESCRIPTOREN/STREND BEHANDELN ***
+           LDY #0          ;DESCRIPTOREN AKTUALISIEREN
+           LDA LENGTH      ;(LAENGENDESCRIPTOR MIT DER
+           STA (DESPOI),Y  ;STRINGLAENGE UND ADRESSEN-
+           INY             ;DESCRIPTOREN MIT DER STRING-
+           LDA POINTR      ;ADRESSE VERSEHEN
+           STA (DESPOI),Y  ;AUSSERDEM STREND/STREND+1
+           STA STREND      ;ENTSPRECHEND DER GEAENDERTEN
+           INY             ;STRINGADRESSE KORRIGIEREN
+           LDA POINTR+1
+           STA (DESPOI),Y
+           STA STREND+1
+           RTS             ;ZURUECK NACH BASIC
+.EN                        ;PROGRAMMENDE</code></pre>
+
+        <p>Der Längendescriptor des Strings wird nun mit der Länge LENGTH versehen und die beiden Adressendescriptoren (Low/High) mit der geänderten Startadresse POINTR/POINTR+1. Da der von den reservierten 255 Zeichen unbenutzte Bereich durch das Verschieben des Strings wieder freigegeben wurde, muß natürlich auch STREND/STREND+1 entsprechend der endgültigen Stringadresse korrigiert werden.</p>
+
+        <p>Alle Pointer und Descriptoren sind nun völlig korrekt gesetzt und das Basic-Programm kann auf den angelegten String zugreifen, wie das folgende Demoprogramm zeigt:</p>
+
+        <pre><code>100 REM *** STRING ERZEUGEN ***
+110 X$="123456789,"
+120 FOR I=1 TO 25:Y$=Y$+X$:NEXT
+130 Y$=Y$+"12345"
+140 :
+150 REM *** STRING SCHREIBEN ***
+160 OPEN 1,8,2"TEST,S,W"
+170 PRINT#1,Y$
+180 CLOSE 1
+190 :
+200 REM *** STRING LESEN ***
+210 OPEN 1,8,2,"TEST,S,R"
+220 SYS 49152,1,A$
+230 CLOSE 1
+240 PRINT A$</code></pre>
+        <div class="binary_download" data-filename="c64.input#.bas.prg" data-name="INPUT #-Demoprogramm"></div>
+
+        <p>Nach dem Starten mit RUN schreibt dieses Demoprogramm einen String in der Maximallänge von 255 Zeichen inklusive dem mit INPUT # keinesfalls einlesbaren Zeichen »,« auf Diskette und liest ihn mit der vorgestellten Routine in der vollen Länge mit Kommatas wieder ein, was für den INPUT #-Befehl völlig unmöglich wäre. Das Basic-Programm kann auf den eingelesenen String wie auf jeden anderen String auch zugreifen, zum Beispiel mit »PRINT A$«.</p>
+
+        <p>Verwenden Sie zur Eingabe der INPUT #-Routine bitte das abgebildete MSE-Listing (Listing 1).</p>
+
+        <figure>
+            <pre data-filename="c64.input#.prg" data-name="INPUT #-Routine" data-mse=mse1></pre>
+            <figcaption>Listing 1. Ein INPUT #-Befehl in Maschinensprache</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="c64.input#.prg" data-name="INPUT #-Routine"></div>
+
+        <h2>Umgehung der Routinen SETPAR und SETNAM</h2>
+
+        <p>Alle grundlegenden Routinen zur Arbeit mit logischen Dateien sind Ihnen nun bekannt. Bevor ich mich im folgenden verschiedenen speziellen Anwendungen zuwende (Fehlerkanal abfragen, relative Dateien etc.) will ich der Vollständigkeit wegen noch erläutern, wie eine logische Datei geöffnet werden kann, ohne (!) zuvor SETPAR und SETNAM aufzurufen.</p>
+
+        <p>Wenn die Register mit den jeweiligen Parametern geladen und SETPAR aufgerufen wird, kopiert diese Routine anschließend die übergebenen Werte in die Zeropageadressen $B8 (log. Filenummer), $BA (Geräteadresse) und $B9 (Sekundäradresse). Diese Parameter können Sie auch direkt in die angegebenen Speicherstellen schreiben.</p>
+
+        <p>Ebenso können Sie SETNAM umgehen, wenn Sie die Länge des Filenamens in $B7 und die Adresse in $BB/$BC ablegen. Nach diesen Vorbereitungen kann wie gewohnt die OPEN-Routine aufgerufen werden.</p>
+
+        <p>Mit diesen Kenntnissen kann das Demoprogramm 1 problemlos umgeschrieben werden:</p>
+
+        <pre><code>. C000  LDA #$01       ;LOG.FILENUMMER
+. C002  STA $B8        ;NACH $B8
+. C004  LDA #$08       ;GERAETEADRESSE
+. C006  STA $BA        ;NACH $BA
+. C008  LDA #$02       ;SEKUNDAERADRESSE
+. C00A  STA $B9        ;NACH $B9
+
+. C00C  LDA #$08       ;LAENGE DES FILENAMENS
+. C00E  STA $B7        ;NACH $B7
+. C010  LDA #$3C       ;ADRESSE DES FILENAMENS:
+. C012  LDX #$03       ;LOW-BYTE UND HIGH-BYTE
+. C014  STA $BB        ;NACH $BB
+. C016  STX $BC        ;BZW. $BC
+
+. C018  JSR $FFC0      ;OPEN AUFRUFEN
+. C01B  LDX #$01       ;LOG.FILENUMMER
+. C01D  JSR $FFC9      ;CKOUT AUFRUFEN
+. C020  RTS            ;ZURUECK NACH BASIC</code></pre>
+
+        <p>Wenn Sie die Routinen SETPAR und SETNAM aus irgendwelchen Gründen nicht verwenden wollen, besitzen Sie nun eine alternative Möglichkeit. Sollten Sie jedoch annehmen, Ihre Routinen auf diese Weise beschleunigen zu können, muß ich Sie leider enttäuschen. Sie ersparen sich zwar mehrere Unterprogrammaufrufe, der Zeitgewinn ist jedoch im Vergleich zur äußerst aufwendigen OPEN-Routine vernachlässigbar gering.</p>
+
+        <p>Die Umgehung der »offiziellen« Routinen SETPAR/SETNAM hat zudem einen Nachteil, den Sie spätestens dann entdecken werden, wenn Sie in die Verlegenheit kommen sollten, Ihre Routinen auf einen anderen Commodore-Computer umschreiben zu müssen. Die Parameterübergabe an die Betriebssystemroutinen ist auf allen Commodore-Computern identisch. Dank der sogenannten »Kernel-Sprungtabelle« sind sogar die Einsprungadressen identisch.</p>
+
+        <p>Dieser Kompatibilitäts-Vorteil ist jedoch nur vorhanden, wenn Sie in Ihren Programmen die Betriebssystemroutinen wie vorgesehen benutzen und nicht wie gezeigt umgehen, indem Sie Werte direkt in die Zeropage schreiben. Die Zeropageadressen sind zum großen Teil von Rechner zu Rechner völlig unterschiedlich (Ausnahme: C 16, C 116 und Plus/4 mit identischer Zeropage-Belegung).</p>
+
+        <p>Sie kennen nun alle grundlegenden Betriebssystemroutinen zur Arbeit mit logischen Dateien. Im folgenden stelle ich Standardanwendungen wie die Abfrage des Fehlerkanals vor und gehe auf den Umgang mit Direktzugriffsdateien ein.</p>
+
+        <p>In den zugehörigen Programmbeispielen werden zwei Programmiertechniken verwendet, die Einsteiger in die Maschinenprogrammierung eventuell vor Probleme stellen und die ich daher kurz erläutere.</p>
+
+        <ol>
+            <li>Sprung + RTS: Prinzipiell kann jede (!) Befehlsfolge JSR/RTS durch ein JMP ersetzt werden.</li>
+            <li>Unbedingter bedingter Sprung: Ebenfalls nicht jedem Einsteiger bekannt – jedoch eine »gängige« Methode – ist es, einen »JMP«-Befehl durch einen bedingten Sprung zu ersetzen, wenn der Zustand zumindest eines Flags mit Sicherheit bekannt ist. Zum Beispiel kann in der Befehlsfolge
+                <pre><code>LOOP1 ...
+LOOP2 ...
+      ...
+      DEX
+      BNE LOOP2
+      JMP  LOOP1</code></pre>
+                der Befehl »JMP LOOP1« durch den um ein Byte kürzeren Befehl »BEQ LOOP1« ersetzt werden, da das Zero-Flag an dieser Stelle des Programms immer (!) gesetzt ist.
+            </li>
+        </ol>
+
+        <h2>Fehlerkanal abfragen</h2>
+
+        <p>Bei der Arbeit mit einem Diskettenlaufwerk ist es unumgänglich, nach verschiedenen Aktionen den Fehlerkanal abzufragen. In Basic ist diese Abfrage ein Kinderspiel und das zugehörige Programm kennen wohl die meisten von Ihnen:</p>
+
+        <pre><code>100 OPEN 1,8,15:REM FEHLERKANAL OEFFNEN
+110 INPUT#1,A$,B$,C$,D$:REM MELDUNG EINLESEN
+120 PRINT A$;B$;C$;D$:REM MELDUNG AUSGEBEN
+130 CLOSE 1:REM FEHLERKANAL SCHLIESSEN</code></pre>
+
+        <p>Mit den bisher behandelten Routinen müßte es möglich sein, diese Basic-Befehle durch ein Maschinenprogramm zu ersetzen. Zuerst wird eine logische Datei mit der Sekundäradresse 15 geöffnet und die Eingabe auf diese Datei umgeleitet. Anschließend kann die Fehlermeldung Zeichen für Zeichen mit BASIN eingelesen werden.</p>
+
+        <p>Das folgende kleine Programm liest den Fehlerkanal, wenn es mit SYS 49152 aufgerufen wird und gibt die jeweilige Fehlermeldung auf dem Bildschirm aus. Um das Programm zu verstehen, müssen Sie jedoch wissen, daß die Fehlermeldung durch ein &lt;RETURN&gt;, also den Code $0D, abgeschlossen wird.</p>
+
+        <pre><code>. C000  LDA #$01       ;LOG.FILENUMMER
+. C002  LDX #$08       ;GERAETEADRESSE
+. C004  LDY #$0F       ;SEKUNDAERADRESSE 15 (=FEHLERKANAL)
+. C006  JSR $FFBA      ;SETPAR AUFRUFEN
+. C009  JSR $FFC0      ;OPEN AUFRUFEN
+. C00C  LDX #$01       ;LOG.FILENUMMER
+. C00E  JSR $FFC6      ;EINGABE AUF LOG.DATEI
+. C011  JSR $FFCF      ;ZEICHEN LESEN (BASIN)
+. C014  JSR $FFD2      ;ZEICHEN AUSGEBEN (BSOUT)
+. C017  CMP #$0D       ;'RETURN'?
+. C019  BNE $C011      ;NEIN =&gt; WEITERLESEN
+
+. C01B  JSR $FFCC      ;STANDARDGERAETE SETZEN
+. C01E  LDA #$01       ;LOG.FILENUMMER
+. C020  JMP $FFC3      ;LOG.DATEI SCHLIESSEN U. NACH BASIC</code></pre>
+
+        <p>Diese Routine ist recht einfach. Vor dem Aufruf von OPEN werden wie üblich mit SETPAR die Dateiparameter gesetzt. Der Aufruf von SETNAM entfällt, da wir nicht auf eine physikalisch auf der Diskette vorhandene Datei zugreifen wollen (beachten Sie den Unterschied zwischen einer logischen Datei, die eher als »Kanal« bezeichnet werden kann und einer physikalisch vorhandenen Datei), ein Dateiname daher nicht benötigt wird.</p>
+
+        <p>Nach dem Öffnen der Datei und dem Umlenken der Eingabe mit CHKIN wird Zeichen für Zeichen der Fehlermeldung eingelesen und auf dem Bildschirm ausgegeben.</p>
+
+        <p>Wenn das Zeichen $0D (&lt;RETURN&gt;) gelesen wird, wurde die komplette Fehlermeldung eingelesen. Die Standardgeräte Bildschirm und Tastatur werden wieder gesetzt und die logische Datei geschlossen, bevor der Rücksprung nach Basic erfolgt.</p>
+
+        <p>Mit einem kleinen Basic-Programm läßt sich die Routine erproben:</p>
+
+        <pre><code>100 OPEN 1,8,2,"GIBT ES NICHT,S,R"
+110 CLOSE 1
+120 SYS 49152:REM AUFRUF DER MASCHINENROUTINE</code></pre>
+        <div class="binary_download" data-filename="c64.fehlerk.bas.prg" data-name="Fehlerkanal-Demoprogramm"></div>
+
+        <p>Wenn Sie dieses Programm (Sie finden es auch als MSE-Listing 2) starten und das File »GIBT ES NICHT« auch tatsächlich nicht auf der eingelegten Diskette vorhanden ist, erhalten Sie auf dem Bildschirm die Fehlermeldung »62, FILE NOT FOUND,00,00«.</p>
+
+        <figure>
+            <pre data-filename="c64.fehlerk.ass.prg" data-name="Fehlerkanalabfrage" data-mse=mse1></pre>
+            <figcaption>Listing 2. Die Fehlerkanalabfrage in Maschinensprache</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="c64.fehlerk.ass.prg" data-name="Fehlerkanalabfrage"></div>
+
+        <p>Beim praktischen Einsatz der Routine innerhalb eines größeren Maschinenprogramms sollten Sie die Fehlermeldung nicht direkt auf dem Bildschirm ausgeben, sondern in einen Pufferspeicher schreiben. Wenn die Meldung komplett eingelesen wurde, kann die Fehlernummer überprüft werden (die beiden ersten Bytes). Ist sie Null, trat kein Fehler auf, ansonsten kann die gesamte Meldung ausgegeben und – je nach Fehlernummer – entsprechend reagiert werden.</p>
+
+        <h2>Prüfen, ob Gerät vorhanden (LISTEN und UNLISTEN)</h2>
+
+        <p>Die Routine zur Abfrage des Fehlerkanals nützt leider nichts, wenn es darum geht, zu erkennen, ob ein bestimmtes Peripheriegerät überhaupt vorhanden ist (das heißt sowohl angeschlossen als auch eingeschaltet).</p>
+
+        <p>Das Problem kann gelöst werden, wenn wir uns etwas tiefer in die »Eingeweide« des Betriebssystems wagen, an die Routinen zur Behandlung des seriellen Busses, die von den »übergeordneten« Routinen zur Behandlung logischer Dateien natürlich ebenfalls verwendet werden.</p>
+
+        <p>Die Routine LISTEN ($FFB1) sendet an ein angegebenes Gerät einen sogenannten »LISTEN«-Befehl und teilt diesem damit mit, daß es sich zum Empfang von Daten bereithalten soll. Die Geräteadresse wird LISTEN im Akku übergeben.</p>
+
+        <p>Die UNLISTEN-Routine ($FFAE) bewirkt das Gegenteil. Sie beendet jede Datenübertragung und macht den seriellen Bus damit für folgende Datenübertragungen wieder frei.</p>
+
+        <p>Um abzufragen, ob ein bestimmtes Gerät vorhanden ist, müssen wir folgendermaßen vorgehen:</p>
+
+        <ol>
+            <li>Statusvariable (in $90) löschen</li>
+            <li value="1">Akku mit Geräteadresse laden</li>
+            <li>LISTEN aufrufen</li>
+            <li>UNLISTEN aufrufen</li>
+            <li>Status prüfen</li>
+        </ol>
+
+        <p>Anstelle der Routine READST verwende ich zur Abwechslung einmal direkt die Statusvariable in $90. READST macht nichts anderes, als den Inhalt dieser Speicherstelle zu lesen und im Akku an das aufrufende Programm zu übergeben. Sie können daher den aktuellen Status auch jederzeit direkt durch Zugriff auf $90 überprüfen.</p>
+
+        <p>Teil 1: Prüfen, ob Gerät vorhanden ist</p>
+
+        <pre><code>. C000  LDA #$00        ;STATUSVARIABLE $90
+. C002  STA $90         ;MIT $00 INITIALISIEREN
+. C004  LDA #$08        ;GERAETEADRESSE DER FLOPPY
+. C006  JSR $FFB1       ;LISTEN SENDEN
+. C009  JSR $FFAE       ;UNLISTEN SENDEN
+. C00C  LDA $90         ;STATUSVARIABLE LESEN
+. C00E  BEQ $C026       ;GERAET VORHANDEN? JA=&gt;</code></pre>
+
+        <p>Teil 2: Gerät ist nicht vorhanden: Fehlerbehandlung</p>
+
+        <pre><code>. C010  LDX #$00        ;ZAEHLER INITIALISIEREN
+. C012  LDA $A1D0,X     ;AUF 'DEVICE NOT PRESENT' ZUGREIFEN
+. C015  PHA             ;AKKU RETTEN
+. C016  AND #$7F        ;BIT 7 AUSBLENDEN
+. C018  JSR $FFD2       ;'DEVICE NOT PRESENT' AUSGEBEN
+. C01B  INX             ;ZAEHLER INKREMENTIEREN
+. C01C  PLA             ;AKKU HOLEN
+. C01D  BPL $C012       ;BIT 7 GESETZT? JA=&gt;
+. C01F  JSR $FFE4       ;GET AUFRUFEN (ANALOG BASIC-GET)
+. C022  BEQ $C01F       ;TASTE GEDRUECKT? NEIN=&gt;
+. C024  BNE $C000       ;IMMER SPRINGEN !
+. C026  RTS             ;ZURUECK NACH BASIC</code></pre>
+
+        <p>Nach dem Aufruf mit SYS 49152 prüft Teil 1 dieser Routine (siehe auch Listing 3) wie beschrieben, ob das jeweilige Gerät – in diesem Fall die Floppystation – vorhanden ist. Wenn ja, erfolgt der Rücksprung nach Basic.</p>
+
+        <figure>
+            <pre data-filename="device-pres.ass.prg" data-name="Floppystation prüfen" data-mse=mse1></pre>
+            <figcaption>Listing 3. Prüft, ob die Floppystation eingeschaltet ist</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="device-pres.ass.prg" data-name="Floppystation prüfen"></div>
+
+        <p>Teil 2 der Routine ist ein etwas primitives Beispiel einer Fehlerbehandlungsroutine. Wenn die Floppystation nicht angeschlossen oder nicht eingeschaltet ist, wird die Meldung »DEVICE NOT PRESENT« auf dem Bildschirm ausgegeben. Diese Fehlermeldung befindet sich im ROM ab Adresse $A1D0. Das letzte Zeichen jeder ROM-Fehlermeldung wird durch ein gesetztes siebtes Bit gekennzeichnet, daher die merkwürdige »Pull-« und »Pusherei« in der Routine und das Ausblenden des siebten Bits vor der Zeichenausgabe mit BSOUT.</p>
+
+        <p>Wenn die Meldung ausgegeben wurde, wird die Routine GET ($FFE4) aufgerufen, die ein Zeichen von der Tastatur einliest und im Akku übergibt. Wenn keine Taste gedrückt wurde, übergibt GET eine Null und das Zero-Flag ist gesetzt. Bei gesetztem Zero-Flag wird wieder nach GET gesprungen, daher haben wir eine Eingabewarteschleife analog dem Basic-Befehl:</p>
+
+        <pre><code>100 GET A$:IF A$="" THEN 100:REM AUF TASTE WARTEN</code></pre>
+
+        <p>Wenn eine beliebige Taste gedrückt wurde, wird zum Programmanfang verzweigt und erneut geprüft, ob die Floppystation vorhanden ist. Sinn dieser Fehlerbehandlung ist es, nach Ausgabe der Meldung »DEVICE NOT PRESENT« dem Benutzer Gelegenheit zur Korrektur des Fehlers zu geben, bevor die Überprüfung nach Betätigung einer beliebigen Taste wiederholt wird.</p>
+
+        <p>Diese Fehlerbehandlung hat selbstverständlich nur Beispielcharakter und ist ein wenig unschön, da sich das Programm in einer Endlosschleife befindet, wenn es der Benutzer nicht schafft, den Fehler zu beheben.</p>
+
+        <p>Entscheidend ist der erste Programmteil, den Sie jederzeit in Ihren Programmen verwenden können. Wenn das Programm ein wenig flexibler gestaltet und der Akku vor dem Aufruf von LISTEN nicht immer mit dem Wert $08 geladen wird, kann das Vorhandensein jedes beliebigen Geräts mit dieser Routine überprüft werden.</p>
+
+        <p>Diese Routine eignet sich hervorragend zum Einbau in Basic-Programme mit professionellem Anspruch, die nicht »abstürzen« dürfen, wenn der Benutzer vergaß, Laufwerk oder Drucker einzuschalten.</p>
+
+        <h2>Relative Dateien</h2>
+
+        <p>Die Verwaltung relativer Dateien ist weit schwieriger als der Umgang mit sequentiellen Dateien und bereits in Basic nicht gerade einfach zu programmieren. Wenn Sie jedoch professionell mit Dateien arbeiten wollen, führt kein Weg an relativen Dateien vorbei, da diese Dateiart im Gegensatz zu den sequentiellen Dateien den unmittelbaren Zugriff auf bestimmte Datensätze gestattet.</p>
+
+        <p>Im folgenden gehe ich davon aus, daß Ihnen der Umgang mit relativen Dateien in Basic vertraut ist (wenn nicht: In diesem Sonderheft finden Sie einen Artikel, der ausführlich auf sequentielle und relative Dateien eingeht).</p>
+
+        <p>Um den Umgang mit relativen Dateien zu demonstrieren, werde ich ein kleines Basic-Programm verwenden, das eine relative Datei mit 50 Records à 50 Byte anlegt, Datensätze in diese Datei schreibt und wieder daraus liest. Anschließend werden die einzelnen Teile dieses Basic-Programms durch Maschinenroutinen ersetzt.</p>
+
+        <h3>Basic-Demo: Relative Dateien</h3>
+
+        <pre><code>100 REM *** REL-DATEI ANLEGEN ***
+110 OPEN 15,8,15:REM BEFEHLSKANAL OEFFNEN
+120 R=50:GOSUB 330:GOSUB 410:PRINT#1,CHR$(255):GOSUB 370:R=1
+130 :
+140 REM *** DATENSAETZE SCHREIBEN ***
+150 INPUT"DATEN (ENDE='E')";D$
+160 IF D$="E" THEN 220
+170 GOSUB 330:GOSUB 410:PRINT#1,D$:GOSUB 370
+180 R=R+1
+190 GOTO 150
+200 :
+210 REM *** DATENSAETZE LESEN ***
+220 AD=R-1
+230 GOSUB 330
+240 :
+250 FOR I=1 TO AD
+260 : R=I:GOSUB 410:INPUT#1,D$:PRINT D$
+270 NEXT
+280 :
+290 GOSUB 370:CLOSE 15
+300 END
+310 :
+320 REM * REL-DATEI OEFFNEN *
+330 OPEN 1,8,2,"REL-DATEI,L,"+CHR$(50)
+340 RETURN
+350 :
+360 REM * REL-DATEI SCHLIESSEN *
+370 CLOSE 1
+380 RETURN
+390 :
+400 REM * POSITIONIEREN *
+410 HB=INT(R/256):LB=R-HB*256
+420 PRINT#15,"P"+CHR$(2)+CHR$(LB)+CHR$(HB)+CHR$(1)
+430 RETURN</code></pre>
+
+        <h3>Deklarationsteil</h3>
+
+        <p>Den ersten Teil des Source-Codes bildet die Deklaration der bereits bekannten Betriebssystemroutinen:</p>
+
+        <pre><code>;***********************
+;* REL-DATEI VERWALTEN *
+;*    S.BALOUI/1986    *
+;***********************
+;
+.BA $C000             ;STARTADRESSE
+;
+;* VERWENDETE BETRIEBSSYSTEMROUTINEN *
+.EQ BSOUT   = $FFD2   ;ZEICHEN AUSGEBEN
+.EQ BASIN   = $FFCF   ;ZEICHEN LESEN
+.EQ OPEN    = $FFC0   ;LOG.DATEI OEFFNEN
+.EQ CLOSE   = $FFC3   ;LOG.DATEI SCHLIESSEN
+.EQ CKOUT   = $FFC9   ;AUSGABE AUF LOG.DATEI LEGEN
+.EQ CHKIN   = $FFC6   ;EINGABE AUF LOG.DATEI LEGEN
+.EQ CLRCH   = $FFCC   ;KANAELE 'SAEUBERN'
+.EQ SETFLS  = $FFBA   ;FILEPARAMETER SETZEN
+.EQ SETNAM  = $FFBD   ;FILENAME SETZEN</code></pre>
+
+        <h3>Unterprogramme</h3>
+
+        <p>Das Programm selbst läßt sich am einfachsten verstehen, wenn Sie sich zuerst die verwendeten Unterprogramme anschauen:</p>
+
+        <pre><code>;* REL-DATEI OEFFNEN *
+RELAUF  LDA #$01       ;LOG.FILENUMMER
+        LDX #$08       ;GERAETEADRESSE
+        LDY #$02       ;SEKUNDAERADRESSE
+        JSR SETPAR     ;FILEPAR.SETZEN
+
+        LDA #$0D       ;FILENAME: 13 ZEICHEN
+        LDX #&lt;NAME     ;ADRESSE NAME LOW
+        LDY #&gt;NAME     ;ADRESSE NAME HIGH
+        JSR SETNAM     ;FILENAME SETZEN
+
+        JMP OPEN       ;LOG.DATEI OEFFNEN
+
+;* REL-DATEI SCHLIESSEN *
+RELZU   LDA #$01       ;LOG.FILENUMMER
+        JMP CLOSE      ;LOG.DATEI SCHLIESSEN
+
+;* POSITIONIEREN *
+POSIT   LDX #$0F       ;LOG.FILENUMMER
+        JSR CKOUT      ;AUSGABE AUF LOG.DATEI LEGEN
+        LDX #$00       ;X-REG.INITIALISIEREN
+POSIT1  LDA STRING,X   ;POSITIONIERBEFEHL
+        JSR BSOUT      ;ZEICHENWEISE SENDEN
+        INX
+        CPX #$05       ;FERTIG?
+        BNE POSIT1     ;NEIN =&gt;
+        INC STRING+2   ;=&gt;WEIST AUF NAECHSTEN RECORD
+        JMP CLRCH      ;KANAELE 'SAEUBERN'+ RTS!
+
+NAME    .TX "REL-DATEI,L,"
+        .BY $32
+STRING  .BY "P",$02,$32,$00,$01
+DATEN   .EN             DATENPUFFER AM PROG.ENDE</code></pre>
+
+        <p>Dieses Programm finden Sie auch in Listing 4. Das Öffnen der relativen Datei unterscheidet sich nicht im geringsten vom Öffnen einer sequentiellen Datei. Zuerst werden SETPAR die Fileparameter übergeben, danach wird SETNAM die Länge des Filenamens und ein Zeiger auf die Adresse des Namens übergeben, anschließend wird die OPEN-Routine aufgerufen.</p>
+
+        <figure>
+            <pre data-filename="c64.rel-datei.as.prg" data-name="Verwaltung relativer Dateien" data-mse=mse1></pre>
+            <figcaption>Listing 4. Ein Beispiel für die Arbeit mit relativen Dateien in Maschinensprache</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="c64.rel-datei.as.prg" data-name="Verwaltung relativer Dateien"></div>
+
+        <p>Das Schließen der Datei wird ebenfalls wie gewohnt vorgenommen, indem der Routine CLOSE die logische Filenummer im Akku übergeben wird.</p>
+
+        <p>Interessanter ist die Positionierroutine. Zu Beginn des Hauptprogramms wird der Befehlskanal unter Angabe der logischen Filenummer geöffnet. Vor dem Positionieren auf einen bestimmten Record muß die Ausgabe auf diese logische Datei umgelenkt werden. Anschließend wird der Befehlsstring an die Floppystation gesendet und mit CLRCH die Standardgeräte gesetzt.</p>
+
+        <h2>Anlegen der relativen Datei</h2>
+
+        <p>Das eigentliche Hauptprogramm muß zuerst die relative Datei anlegen:</p>
+
+        <pre><code>;* BEFEHLSKANAL OEFFNEN *
+         LDA #$0F      ;LOG.FILENUMMER
+         TAY           ;SEKUNDAERADRESSE
+         LDX #$08      ;GERAETEADRESSE
+         JSR SETPAR    ;FILEPAR.SETZEN
+         JSR OPEN      ;BEFEHLSKANAL OEFFNEN
+;
+;* RECORD NR.50 FREIGEBEN *
+         JSR RELAUF    ;REL-DATEI OEFFNEN
+         JSR POSIT     ;AUF RECORD 'STRING+2' POSITIONIEREN
+         LDX #$01      ;AUSGABE AUF
+         JSR CKOUT     ;REL-DATEI LEGEN
+         LDA #$FF      ;FREIGABEKENNZEICHEN $FF
+         JSR BSOUT     ;IN RECORD SCHREIBEN
+         JSR RELZU     ;REL-DATEI SCHLIESSEN=&gt;ANLEGEN</code></pre>
+
+        <p>Der Befehlskanal wird unter Angabe der logischen Filenummer 15 geöffnet, das Unterprogramm RELAUF zum Öffnen der relativen Datei aufgerufen und anschließend das Unterprogramm POSIT zum Positionieren auf Record Nummer 50.</p>
+
+        <p>Beachten Sie bitte, daß das Low-Byte der Recordnummer im Befehlsstring den Wert $32 enthält, exakt die gewünschte Recordnummer, in die nun das Freigabekennzeichen $FF geschrieben werden soll. Zuvor wird die Ausgabe auf die logische Datei mit der Filenummer $01 gelegt (die Datei »REL-DATEI«). Wenn der Wert $FF ausgegeben wurde, wird die relative Datei mit der Routine RELZU wieder geschlossen. Die Datei wird nun von der Floppystation selbständig angelegt werden.</p>
+
+        <h2>Datensätze in eine relative Datei schreiben</h2>
+
+        <p>Bevor der erste Datensatz in die Datei geschrieben werden kann, muß dafür gesorgt werden, daß POSIT auf den gewünschten Record 1 positioniert. Die Recordnummer ist das dritte Byte des Befehlsstrings (STRING+2). Dieses Byte erhält den Wert Eins.</p>
+
+        <pre><code>;* DATENSAETZE SCHREIBEN *
+         LDA #$01      ;RECORDNUMMER MIT 1
+         STA STRING+2  ;INITIALISIEREN</code></pre>
+
+        <p>Der erste Aufruf von POSIT führt daher zum Positionieren auf den ersten Record der relativen Datei. Da die Routine POSIT das Low-Byte der Recordnummer nach erfolgter Positionierung inkrementiert, führt der zweite Aufruf von POSIT dazu, daß auf Record 2 positioniert wird, der dritte Datensatz wird demnach in Record 3 geschrieben werden und so weiter.</p>
+
+        <p>Der erste Datensatz kann nun vom Benutzer eingegeben werden. Zum Einlesen verwendet das Programm die Betriebssystemroutine BASIN. Ebenso wie beim Basic-Befehl INPUT blinkt der Cursor und der Benutzer kann seine Eingabe beliebig editieren, bevor er sie mit &lt;RETURN&gt; abschließt.</p>
+
+        <pre><code>WRITE1  LDX #$00       ;BENUTZEREINGABEN
+WRITE2  JSR BASIN      ;HOLEN UND
+        STA DATEN,X    ;IM PUFFER 'DATEN,X'
+        INX            ;SPEICHERN
+        CMP #$0D       ;EINGABEENDE?
+        BNE WRITE2     ;NEIN =&gt;
+        CPX #$02       ;EINGABELAENGE 1 (+RETURN)?
+        BEQ READ1      ;JA (=ENDE EINGABE) =&gt;</code></pre>
+
+        <p>Die eingelesenen Zeichen werden von der Routine in dem Puffer DATEN,X gespeichert, der sich am Programmende befindet. Die Routine liest Zeichen für Zeichen mit BASIN ein und speichert die Zeichen in diesem Puffer, bis der Code $0D (Carriage Return) gelesen wird.</p>
+
+        <p>Der nun folgende Programmteil wird übersprungen, wenn das X-Register nach dem Einlesen den Wert Zwei besitzt, das heißt, wenn außer Carriage Return nur ein weiteres Zeichen eingelesen wurde. Der Sinn dieser Überprüfung:</p>
+
+        <p>Nachdem ein vom Benutzer eingegebener String in der relativen Datei gespeichert wurde, soll der Benutzer ebenso wie in dem Basic-Demoprogramm beliebige weitere Datensätze eingeben können. Das Basic-Programm erkannte an der Eingabe »E«, daß die Eingabe beendet und die Sätze wieder aus der Datei eingelesen werden sollten. Diese »Abbruchbedingung« wurde von mir im Maschinenprogramm leicht abgewandelt. Das Eingabeende wird an der Stringlänge eins erkannt. Wenn Sie keine weiteren Datensätze mehr eingeben wollen, können Sie daher ein beliebiges Zeichen – unter anderem auch »E« (wie im Basic-Programm) eingeben, um die Datensatzeingabe zu beenden.</p>
+
+        <pre><code>        JSR RELAUF     ;REL-DATEI OEFFNEN
+        JSR POSIT      ;AUF 'STRING+2'POSITIONIEREN
+        LDX #$01       ;AUSGABE AUF
+        JSR CKOUT      ;REL-DATEI LEGEN
+
+        LDX #$00       ;X INITIALISIEREN
+WRITE3  LDA DATEN,X    ;DATEN ZEICHENWEISE AUS
+        JSR BSOUT      ;PUFFER HOLEN UND AUF
+        INX            ;REL-DATEI AUSGEBEN
+        CMP #$0D       ;DATENSATZENDE?
+        BNE WRITE3     ;NEIN =&gt;
+        JSR RELZU      ;REL-DATEI SCHLIESSEN
+        JMP WRITE1     ;=&gt; ANFANG EINGABE/SCHREIBSCHLEIFE</code></pre>
+
+        <p>Die relative Datei wird nun geöffnet, mit POSIT auf Record 1 positioniert (erinnern Sie sich: Vor der Eingabe des ersten Satzes wird STRING+2, das Low-Byte der Recordnummer, mit Eins initialisiert), und die Ausgabe wird auf die relative Datei gelegt.</p>
+
+        <p>Die Daten werden aus dem Puffer geholt und mit BASIN auf die Datei ausgegeben, wobei das Stringende an dem Code $0D (Carriage Return) erkannt wird. Die Datei wird geschlossen und der Beginn der »Schreibroutine« angesprungen, die Datensatzeingabe des Benutzers. Wie bereits erwähnt, wird diese Schleife wiederholt, bis ein String in der Länge Eins (plus Carriage Return) eingegeben wurde.</p>
+
+        <p>Wenn Sie sich wundern sollten, daß die Datei wegen jedem einzelnen Datensatz geöffnet und geschlossen wird: Es ist möglich, die relative Datei einmalig vor Beginn der Routine zum Schreiben von Sätzen zu öffnen und erst dann zu schließen, wenn der letzte Datensatz eingetragen wurde. Diese Vorgehensweise beinhaltet jedoch ein Sicherheitsrisiko. Das Betriebssystem sammelt Daten, die in eine logische Datei geschrieben werden, in einem Puffer. Der Inhalt dieses Puffers wird erst dann tatsächlich in den jeweiligen Record übertragen, wenn der Puffer entweder voll ist oder aber wenn die Datei – wie im Beispiel nach jedem Satz – geschlossen wird. Ich empfehle Ihnen, bei Schreibzugriffen auf eine relative Datei diese nach jedem Satz zu schließen. Dadurch wird gewährleistet, daß zum Beispiel bei einem Stromausfall niemals mehrere im Puffer enthaltene Datensätze verlorengehen können, sondern nur der gerade bearbeitete Satz.</p>
+
+        <h2>Datensätze aus einer relativen Datei lesen</h2>
+
+        <p>Bevor die Daten nun wieder eingelesen werden können, muß zuerst auf den ersten Record der Datei positioniert werden (Das X-Register enthält nach Verlassen der Leseroutine den Wert Zwei):</p>
+
+        <pre><code>;* DATENSAETZE LESEN *
+READ1   DEX            ;X WAR 2, NUN 1 !
+        STX STRING+2   ;RECORDNUMMER MIT 1 INITIALISIEREN</code></pre>
+
+        <p>Die relative Datei wird geöffnet, auf Record 1 positioniert und die Eingabe auf die Datei gelegt:</p>
+
+        <pre><code>        JSR RELAUF     ;REL-DATEI OEFFNEN
+READ2   JSR POSIT      ;AUF 'STRING+2'POSITIONIEREN
+        LDX #$01       ;EINGABE AUF
+        JSR CHKIN      ;REL-DATEI LEGEN</code></pre>
+
+        <p>Die Datensätze können nun mit BASIN zeichenweise eingelesen und mit BSOUT auf dem Bildschirm ausgegeben werden, wobei der Code $0D das Ende eines Datensatzes markiert. Wurde ein Datensatz komplett eingelesen, erfolgt ein Sprung nach READ2. Anschließend wird auf den nächsten Record positioniert und dieser eingelesen:</p>
+
+        <pre><code>READ3   JSR BASIN      ;EINGABE VON REL-DATEI
+        CMP #$FF       ;$FF(=ERSTER UNBELEGTER RECORD)?
+        BEQ READ4      ;JA (=DATEIENDE) =&gt;
+        JSR BSOUT      ;ZEICHEN AUF SCREEN AUSGEBEN
+        CMP #$0D       ;CARR.RETURN (=SATZENDE)?
+        BNE READ3      ;NEIN =&gt;
+        BEQ READ2      ;IMMER SPRINGEN !</code></pre>
+
+        <p>$FF wird eingelesen, wenn auf den ersten nicht belegten Record positioniert wurde, das heißt, wenn alle belegten Records bereits gelesen und ausgegeben wurden (Erinnern Sie sich: Mit $FF werden alle Records beim Anlegen der Datei automatisch von der Floppystation als nicht belegt gekennzeichnet). In diesem Fall werden mit CLRCH die Standardgeräte gesetzt und die geöffneten Dateien mit CLOSE geschlossen, bevor die Rückkehr nach Basic erfolgt:</p>
+
+        <pre><code>READ4   JSR CLRCH      ;KANAELE 'SAEUBERN', STANDARDGERAETE
+        JSR RELZU      ;REL-DATEI SCHLIESSEN
+        LDA #$0F       ;BEFEHLSKANAL SCHLIESSEN
+        JMP CLOSE      ;UND NACH BASIC (RTS !)</code></pre>
+
+        <p>Dieses Demoprogramm ist in mehrfacher Hinsicht sehr einfach gestaltet, da sowohl beim Schreiben als auch beim Lesen der Reihe nach auf unmittelbar folgende Records positioniert wird (Record 1, Record 2, Record 3 etc.). Die Positionierung wird sehr einfach, denn bei jedem Aufruf von POSIT kann der Zähler für die Recordnummer einfach inkrementiert werden. In der Praxis kommt dieser Idealfall leider nur selten vor.</p>
+
+        <p>Zum zweiten wird im Beispiel nur das Low-Byte der Recordnummer verwendet (STRING+2), während das High-Byte (STRING+3) immer den Wert Null enthält. Bei Dateien mit mehr als 255 Records müssen Sie selbstverständlich auch das High-Byte entsprechend setzen.</p>
+
+        <p>In der Praxis werden Sie auf eine relative Datei meist über eine im Speicher gehaltene Indexdatei zugreifen, die die Recordnummer und beispielsweise den Namen des zugehörigen Datensatzes enthält. Der Benutzer sucht Herrn »Müller«, Ihr Programm durchsucht die Indexdatei nach »Müller« und findet zum Beispiel die zugehörige Recordnummer $20/$03 (Low-Byte/High-Byte). Auf diesen Record könnten Sie folgendermaßen positionieren:</p>
+
+        <pre><code>...              ;DURCHSUCHEN DER INDEXDATEI
+...              ;NACH AUFFINDEN VON 'MUELLER'
+...              ;WEIST DER ZEIGER POINTR(+1) AUF
+LDA (POINTR),Y   ;DIE ZUGEHOERIGE RECORDNUMMER
+STA STRING+2     ;LOW-UND HIGH-BYTE DER
+INY              ;RECORDNUMMER WERDEN NACH
+LDA (POINTR),Y   ;STRING+2 UND STRING+2 UEBERTRAGEN
+STA STRING+3     ;ANSCHLIESSEND WIRD DIE
+JSR POSIT        ;POSITIONIERROUTINE AUFGERUFEN
+...
+...</code></pre>
+
+        <p>Auf diese Weise dürfte die Positionierung in einer vollständigen Dateiverwaltung ablaufen. Zweck des Demoprogramms ist nicht die Praxisnähe, sondern allein die Darstellung der relevanten Prinzipien.</p>
+
+        <p>Verwenden Sie zur Eingabe des Programms das MSE-Listing 4. Zum Testen rufen Sie das Programm mit SYS 49152 auf. Geben Sie mehrere Datensätze ein. Beenden Sie die Eingabe durch die Eingabe eines Satzes, der aus einem einzigen Zeichen besteht (»E« oder »X« etc.). Die Sätze werden nun der Reihe nach aus der relativen Datei eingelesen.</p>
+
+        <p>Achten Sie bei der Behandlung relativer Dateien generell auf folgende Punkte:</p>
+
+        <ol>
+            <li>Beim Schreiben in eine relative Datei sind sowohl die Datei selbst als auch der Befehlskanal geöffnet, und Daten müssen abwechselnd über den Datei- und den Befehlskanal gesendet werden. Die Ausgabe muß daher ständig mit CKOUT umgelenkt werden. Vergessen Sie in solchen Fällen bitte keinesfalls, vor dem Aufruf von CKOUT die Übertragungskanäle durch den Aufruf von CLRCH zu »säubern«.</li>
+            <li>Wenn Sie an einer Routine arbeiten und allmählich verzweifeln, weil die Aus- beziehungsweise Eingaben sich prinzipiell auf die falsche Datei beziehen, liegt die Ursache – zumindest bei meinen eigenen Programmen – meist in einem noch gültigen, vom Programmierer jedoch inzwischen vergessenen früheren Aufruf von CKOUT oder CHKIN.</li>
+            <li>Wenn Datensätze wie im Demoprogramm in unmittelbar aufeinanderfolgende Records geschrieben werden, müssen Sie nur beim ersten Datensatz auf den Anfangsrecord positionieren. Die Floppystation positioniert beim Schreiben von Daten in Record n selbständig auf den jeweils nächsten Record +1. Im Demoprogramm hätte daher beim Schreiben der Datensätze auf das Inkrementieren der Recordnummer verzichtet werden können.</li>
+        </ol>
+
+        <p>Beachten Sie bitte, daß diese »automatische Inkrementierung« nur beim Schreiben, nicht jedoch beim Lesen aus einer relativen Datei vorgenommen wird!</p>
+
+        <h2>Die Direktzugriffsbefehle B-P, U1 und U2</h2>
+
+        <p>Relative Dateien sind zwar recht nützlich, jedoch nicht unbedingt die schnellste Art und Weise zur Verwaltung einer Direktzugriffsdatei. Die Ursache liegt in der nötigen zweimaligen – und sehr gemächlichen – Kopfpositionierung der Floppystation. Zuerst wird auf die sogenannten »Side-Sektoren« positioniert, die eine Tabelle aller Records mit ihrer jeweiligen Position (Spur und Sektor) enthalten. Erst anschließend wird auf den gewünschten Record zugegriffen.</p>
+
+        <p>Erheblich schneller ist die Verwaltung von Direktzugriffsdateien mit den »Direktzugriffsbefehlen«, da hier durch Angabe von Spur und Sektor sofort auf einen Datensatz zugegriffen wird.</p>
+
+        <p>Nur mit diesen Befehlen ist es möglich, auf die Directory zuzugreifen, um den Diskettennamen oder die ID zu verändern, gelöschte Files wiederherzustellen und andere Manipulationen vorzunehmen.</p>
+
+        <p>Aus Platzgründen muß ich im folgenden wieder davon ausgehen, daß Ihnen diese Befehle bereits in Basic vertraut sind und werde mich auf knappe Erläuterungen beschränken. Die Verbindung zwischen Basic und Maschinensprache stelle ich anhand eines kleinen Demoprogramms her, das die Änderung der Disketten-ID erlaubt.</p>
+
+        <h3>ID ändern (Basic)</h3>
+
+        <pre><code>100 OPEN 15,8,15:REM BEFEHLSKANAL OEFFNEN
+110 OPEN 2,8,2,"#":REM DATENKANAL OEFFNEN
+120 PRINT#15,"U1:"2;0;18;0:REM SPUR 18, SEKTOR 0 IN PUFFER
+130 PRINT#15,"B-P:"2;162:REM PUFFER-POINTER AUF BYTE NR.162
+140 PRINT "ALTE ID: ";
+150 GET#2,A$:PRINT A$:GET#2,A$:PRINT A$:REM ID LESEN/AUSGEBEN
+160 :
+170 INPUT"NEUE ID";ID$:REM BENUTZEREINGABE DER NEUEN ID
+180 PRINT#15,"B-P:"2;162:REM PUFFER-POINTER WIEDER AUF BYTE 162
+190 PRINT#2,LEFT$(ID$,2);:REM ID-BYTES UEBERSCHREIBEN
+200 PRINT#15,"U2:"2;0;18;0:REM PUFFERINHALT ZURUECKSCHREIBEN
+210 PRINT#15,"I":REM FLOPPY INITIALISIEREN
+220 CLOSE 2:CLOSE 15:REM KANAELE SCHLIESSEN</code></pre>
+
+        <p>Beim Öffnen des Datenkanals wird als Dateiname »#« angegeben. Der Grund: Durch dieses Zeichen reserviert die Floppystation intern einen freien Pufferspeicher für die Datenübertragung. Sie könnte durch »#0«, »#1«, »#2« oder »#3« auch gezwungen werden, einen bestimmten Puffer zu reservieren, was jedoch nicht empfehlenswert ist.</p>
+
+        <p>Die ID befindet sich in Sektor 0 von Spur 18. Dieser Block wird mit »U1« von der Diskette gelesen und befindet sich zunächst im reservierten Puffer der Floppystation. Der Pufferpointer wird mit »B-P« auf das erste Byte der ID gesetzt (Byte 162), das erste und zweite Byte der ID werden mit GET # aus dem Puffer gelesen und auf dem Bildschirm ausgegeben.</p>
+
+        <p>Der Benutzer kann nun eine neue ID eingeben, die dem String ID$ zugewiesen wird. Der Pufferpointer wird wieder auf das erste Byte der ID gesetzt (beim Einlesen aus dem Puffer wurde er verändert). Die beiden ersten Zeichen der neu eingegebenen ID werden über den Datenkanal gesendet und die alte ID damit überschrieben. Die Änderung wird erst wirksam, wenn der Inhalt des Puffers mit »U2« auf die Diskette zurückgeschrieben wird.</p>
+
+        <p>Im Floppy-RAM befindet sich die unveränderte Directory. Wenn Sie sich die Directory anschauen, sehen Sie daher unverändert die alte ID. Zum Abschluß wird deshalb der Initialisierungsbefehl »I« an die Floppystation gesendet, der das Neueinlesen der Directory von der eingelegten Diskette bewirkt. Erst jetzt »weiß« die Floppystation die geänderte ID.</p>
+
+        <p>Übrigens: Dieses Programm verwendet für die ID nur zwei Zeichen, ebenso wie es im Floppy-Handbuch beschrieben ist. Tatsächlich kann die ID bis zu fünf Zeichen lang sein (probieren Sie's aus und ändern Sie das Basic-Programm in Zeile 190 entsprechend).</p>
+
+        <h2>ID ändern (Maschinensprache)</h2>
+
+        <p>In Maschinensprache ist diese Aktion leider ungleich aufwendiger und verlangt nach einem recht langen Programm (zumindest bei mir, vielleicht können Sie es besser). Da ein Disassemblerlisting dieses Programms zu unübersichtlich wäre, wird die Darstellung als Assembler-Sourcecode verwendet. Listing 5 zeigt den fertigen Objectcode.</p>
+
+        <figure>
+            <pre data-filename="c64.id-change.prg" data-name="ID ändern" data-mse=mse1></pre>
+            <figcaption>Listing 5. Ändern der Disketten-ID</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="c64.id-change.prg" data-name="ID ändern"></div>
+
+        <pre><code>;*******************
+;* DISK-ID AENDERN *
+;*  S.BALOUI/1986  *
+;*******************
+;
+.BA $C000            ;PROGRAMMSTART
+;
+;* BETRIEBSSYSTEMROUTINEN/ZEROPAGEADRESSEN *
+.EQPOINTR    = $F0   ;POINTER F.INDIR.INDIZ. ADRESSIERG.
+.EQ SETPAR   = $FFBA ;FILEPAR.SETZEN
+.EQ SETNAM   = $FFBD ;FILENAME SETZEN
+.EQ OPEN     = $FFC0 ;LOG.DATEI OEFFNEN
+.EQ CLALL    = $FFE7 ;SCHLIESST ALLE (!) DATEIEN
+.EQ CLRCH    = $FFCC ;KANAELE 'SAUEBERN'/STANDARDDEVICES
+.EQ CHKIN    = $FFC6 ;EINGABE AUF LOG.DATEI LEGEN
+.EQ CKOUT    = $FFC9 ;AUSGABE AUF LOG.DATEI LEGEN
+.EQ BSOUT    = $FFD2 ;ZEICHEN AUSGEBEN
+.EQ BASIN    = $FFCF ;ZEICHEN EINLESEN
+;
+    JSR CLALL        ;OFFENE DATEIEN SCHLIESSEN</code></pre>
+
+        <p>Die verwendeten Betriebssystemroutinen dürften Ihnen nun bekannt sein. Neu hinzu kommt in diesem Deklarationsteil die Routine CLALL, die ebenso wie CLRCH die Kanäle bereinigt und alle (!) offenen Dateien schließt. CLALL sollte zur Vermeidung eines »FILE OPEN ERROR« am Beginn jedes Programms aufgerufen werden.</p>
+
+        <pre><code>;* BEFEHLS- UND DATENKANAL OEFFNEN *
+        LDA #$0F       ;BEFEHLSKANAL OEFFNEN
+        TAY            ;(LF=15, SA=15, GA=8)
+        LDX #$08       ;KEIN NAME ERFORDERLICH
+        JSR SETPAR
+        JSR OPEN
+;
+        LDA #$02       ;DATENKANAL OEFFNEN
+        TAY            ;(LF=2, SA=2, GA=8)
+        LDX #$08       ;
+        JSR SETPAR     ;ALS DATEINAME WIRD
+        LDA #$01       ;'#'VERWENDET (AM
+        LDX #&lt;NAME     ;PROGRAMMENDE ABGELEGT)
+        LDY #&gt;NAME
+        JSR SETNAM
+        JSR OPEN</code></pre>
+
+        <p>Das Öffnen von Befehls- und Datenkanal verläuft äquivalent zur Behandlung relativer Dateien. Der Filename wurde ebenso wie verschiedene andere Strings am Programmende abgelegt.</p>
+
+        <pre><code>;* AKTUELLE ID LESEN UND AUSGEBEN *
+   LDA #&lt;ALT      ;DEM UNTERPROG. 'STROUT' WIRD EIN
+   LDY #&gt; ALT     ;POINTER AUF 'ID ALT:' UEBERGEBEN
+   JSR STROUT     ;AUSGABE VON 'ID ALT:'AUF SCREEN
+   LDA #&lt;LIES     ;POINTER AUF DEN BLOCK-READ-STRING
+   LDY #&gt;LIES     ;("U1:2,0,18,0") UND STRING-AUSGABE
+   JSR BEFEHL     ;AUF BEFEHLSKANAL
+   LDA #&lt;BP       ;POINTER AUF PUFFER-POINTER-BEFEHL
+   LDY #&gt;BP       ;("B-P:2,162") UND AUSGABE AUF
+   JSR BEFEHL     ;BEFEHLSKANAL</code></pre>
+
+        <p>Am Programmende befinden sich die Unterprogramme STROUT und BEFEHL. STROUT gibt einen String aus, auf den in Akku und Y-Register ein Pointer übergeben wird. Vor dem Einlesen der ID wird mit STROUT der String »ID ALT :« auf dem Bildschirm ausgegeben.</p>
+
+        <p>Zum Einlesen der ID muß zuerst der »U1«-Befehl und anschließend der »B-P«-Befehl über den Befehlskanal gesendet werden. Das Unterprogramm BEFEHL leitet die Ausgabe auf die logische Datei $0F, den Befehlskanal, um, gibt den String aus, auf den mit Akku und Y-Register ein Pointer übergeben wurde, und ruft zuletzt CLRCH auf, um die Kanäle zu »bereinigen« und die Standardein-/ausgabegeräte zu setzen.</p>
+
+        <pre><code>        LDX #$02       ;EINGABE AUF
+        JSR CHKIN      ;DATENKANAL LEGEN
+        JSR BASIN      ;DIE BEIDEN ZEICHEN DER
+        JSR BSOUT      ;ID AUS DEM PUFFER
+        JSR BASIN      ;EINLESEN UND AUF
+        JSR BSOUT      ;DEM BILDSCHIRM AUSGEBEN
+        LDA #$0D       ;ZUM ABSCHLUSS ZEILEN-VORSCHUB
+        JSR BSOUT      ;AUF SCREEN AUSGEBEN</code></pre>
+
+        <p>Nachdem die Eingabe auf den Datenkanal umgeleitet wurde, wird die ID eingelesen und auf dem Bildschirm ausgegeben. Daß zum Abschluß ein Zeilenvorschub auf dem Bildschirm ausgegeben wird, hat nur den Zweck, die folgende Ausgabe von »NEUE ID ?« in der nächsten Bildschirmzeile beginnen zu lassen.</p>
+
+        <pre><code>;* NEUE ID EINLESEN UND DIRECTORY AENDERN *
+         LDA #&lt;BP       ;"B-P"-BEFEHLSSTRING
+         LDY #&gt;BP       ;AUF BEFEHLSKANAL
+         JSR BEFEHL     ;AUSGEBEN
+         LDA #&lt;NEU      ;STRING 'NEUE ID ?'
+         LDY #&gt;NEU      ;AUF SCREEN AUSGEBEN
+         JSR STROUT</code></pre>
+
+        <p>Bevor auf die Eingabe der neuen ID durch den Benutzer gewartet wird, wird der Pufferpointer wieder auf das Byte 162 gesetzt, indem der entsprechende Befehlsstring ausgegeben wird. Anschließend wird die Aufforderung »NEUE ID ?« auf dem Bildschirm ausgegeben.</p>
+
+        <pre><code>        LDX #$02       ;AUSGABE AUF
+        JSR CKOUT      ;DATENKANAL SETZEN
+        JSR BASIN      ;2 ZEICHEN VON DER
+        JSR BSOUT      ;TASTATUR EINLESEN
+        JSR BASIN      ;UND AUF BEFEHLSKANAL
+        CMP #$0D       ;AUSGEBEN
+        BNE IDWRIT1    ;ALS 2.ZEICHEN 160
+        LDA #160       ;(INVERSES SPACE) SENDEN,
+IDWRIT1 JSR BSOUT      ;WENN NUR 1 ZEICHEN EINGEG.</code></pre>
+
+        <p>Die Ausgabe wird nun auf den Datenkanal umgeleitet und zwei Zeichen – die neue ID –, die von der Tastatur eingelesen werden, auf den Datenkanal ausgegeben. Wenn der Benutzer nur ein Zeichen als ID eingab und danach die Eingabe mit &lt;RETURN&gt; beendete, liest BASIN als zweites Zeichen den Code $0D (=Carriage Return).</p>
+
+        <p>In diesem Fall wird ein inverses Leerzeichen (Code 160) als zweites Zeichen der ID verwendet und auf den Datenkanal ausgegeben. Warum ausgerechnet ein inverses Space benutzt wird, erkennen Sie sofort, wenn Sie sich ein beliebiges Directory anschauen: Die »Kopfleiste« des Directory ist mit inversen Spaces aufgefüllt.</p>
+
+        <pre><code>        LDA #&lt;WRITE    ;'U2'-BEFEHLSSTRING UEBER
+        LDY #&gt;WRITE    ;BEFEHLSKANAL AUSGEBEN UND
+        JSR BEFEHL     ;DAMIT PUFFERINHALT ZURUECK-
+        LDX #$0F       ;SCHREIBEN
+        JSR CKOUT      ;INITIALISIERUNGSBEFEHL
+        LDA #"I"       ;AN FLOPPY SENDEN, UM DIRECTORY
+        JSR BSOUT      ;ZU AKTUALISIEREN
+;
+        JMP CLALL      ;DATEIEN SCHLIESSEN + BASIC!</code></pre>
+
+        <p>Die geänderte ID befindet sich zwar nun im Puffer, in dem Sektor 0 von Spur 18 eingelesen wurde. Der neue Pufferinhalt muß jedoch mit dem »U2«-Befehl auf die Diskette zurückgeschrieben werden, um die Änderung wirksam werden zu lassen.</p>
+
+        <p>Da sich im Floppy-RAM jedoch immer noch das alte Directory befindet, wird der Initialisierungsbefehl »I« gesendet. Bei der Initialisierung liest die Floppystation das (geänderte!) Directory ein. Wenn Sie nun das Directory laden, wird die geänderte ID ausgegeben.</p>
+
+        <p>Den Abschluß der Routine bildet das Bereinigen der Kanäle und Schließen aller offenen Dateien durch die Betriebssystemroutine CLALL.</p>
+
+        <p>Zum Verständnis dieses Programms fehlt noch die Darstellung der verwendeten Unterprogramme und Strings:</p>
+
+        <pre><code>;* VERWENDETE STRINGS *
+NAME     .BY "#"           ;SCHEINARGUMENT
+BP       .TX "B-P:2,162"   ;PUFFER-POINTER SETZEN
+         .BY $00
+LIES     .TX "U1:2,0,18,0" ;BLOCK LESEN
+         .BY $00
+WRITE    .TX "U2:2,0,18,0" ;BLOCK SCHREIBEN
+         .BY $00
+ALT      .TX "ALTE ID :"
+         .BY $00
+NEU      .TX "NEUE ID ?"
+         .BY $00
+;
+.EN                        ;PROGRAMMENDE</code></pre>
+
+        <p>Alle mit STROUT beziehungsweise BEFEHL auszugebenden Strings schließen mit dem Byte $00 als »Endemarke« ab. Die in den Befehlen »B-P«, »U1« und »U2« anzugebenden Parameter müssen (!) bei Verwendung eines Assemblers als String abgelegt (bei Hypra-Ass mit dem Befehl ».TX«) und mit Kommata voneinander getrennt werden.</p>
+
+        <pre><code>;* STRINGAUSGABE *
+STROUT  STA POINTR     ;IN AKKU UND Y UEBERGEBEN
+        STY POINTR+1   ;ZEIGER NACH POINTR(+1)
+        LDY #$00       ;Y INITIALISIEREN
+STR1    LDA (POINTR),Y ;STRINGZEICHEN HOLEN
+        BEQ STR2       ;ENDEMARKE $00 ERREICHT? JA=&gt;
+        JSR BSOUT      ;SONST AUSGEBEN
+        INY            ;ZEIGER AUF NEAECHSTES ZEICHEN
+        BNE STR1       ;IMMER SPRUNG !
+STR2    RTS            ;ENDE DER STRINGAUSGABE
+;
+;* BEFEHLSAUSGABE *
+BEFEHL  PHA            ;HIGH-BYTE DES STRINGZEIGERS RETTEN
+        LDX #$0F       ;AUSGABE AUF BEFEHLSKANAL LEGEN
+        JSR CKOUT      ;('CKOUT' AENDERT AKKUINHALT!)
+        PLA            ;HIGH-BYTE DES STRINGZEIGERS HOLEN
+        JSR STROUT     ;STRINGAUSGABE AUFRUFEN
+        JMP CLRCH      ;STANDARDDEVICES + RTS !</code></pre>
+
+        <p>Die Routine STROUT, die einen beliebigen String auf dem aktuellen Ausgabegerät ausgibt, sollte Ihnen keine Verständnisschwierigkeiten bereiten. Um die Routine BEFEHL zu verstehen, müssen Sie wissen, daß CKOUT den Inhalt des Akkus verändert, in unserem Fall das High-Byte des Zeigers auf den auszugebenden String. Bevor die Ausgabe auf den Befehlskanal gelegt wird, wird daher der Akkuinhalt auf den Stapel gerettet und nach Rückkehr von CKOUT wieder geholt.</p>
+
+        <p>Durch das Umleiten der Ausgabe gibt STROUT den betreffenden String auf dem Befehlskanal aus. Mit CLRCH werden zum Abschluß wieder die Standardgeräte für die Ein-/Ausgabe gesetzt.</p>
+
+        <p>Nach der Eingabe des MSE-Listing 5 kann die Routine mit SYS 49152 aufgerufen werden. Sie können nun beliebige Disketten-ID's jederzeit ohne Neuformatierung und entsprechenden Datenverlust ändern.</p>
+
+        <p>Beachten Sie die folgenden Punkte, wenn Sie Programme erstellen, die Direktzugriffsbefehle verwenden:</p>
+
+        <ol>
+            <li>Die Direktzugriffsbefehle werden immer (!) als String über den Befehlskanal (Sekundäradresse 15) an die Floppystation gesendet. Auch die zugehörigen Parameter (log. Filenummer, Laufwerk (0), Spur, Sektor, Byte) müssen als String übergeben und durch Kommata voneinander getrennt werden.</li>
+            <li>Wenn Sie einzelne Bytes eines Sektors verändern wollen (zum Beispiel die für den Diskettennamen verwendeten Bytes), müssen (!) Sie diesen Block unbedingt zuvor einlesen, da alle anderen Daten des Blocks unverändert auf die Diskette zurückgeschrieben werden sollen. Wenn Sie Directory-Manipulationen vornehmen, ohne diese Bedingung zu beachten, können Sie problemlos das Directory ruinieren und dadurch jeden weiteren Zugriff auf die Diskette – fast – unmöglich machen.</li>
+            <li>Denken Sie bitte daran, daß es beim Schreiben von Daten nicht genügt, den Pufferpointer auf die gewünschte Position zu setzen und die Daten über den Datenkanal an die Floppy zu senden. Ohne Abschluß der Schreibzugriffe mit dem Befehl »U2« befinden sich die Daten zwar im Floppy-Puffer, der Pufferinhalt wurde jedoch noch nicht auf die Diskette selbst geschrieben.</li>
+        </ol>
+
+        <p>Dieses Problem kennen Sie bestimmt von der Arbeit mit sequentiellen Dateien in Basic, wo Sie ebenfalls Daten verlieren, wenn die Datei nach Schreibzugriffen nicht ordnungsgemäß geschlossen wird.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th class="shaded">NAME</th>
+                    <th class="shaded">FUNKTION</th>
+                    <th class="shaded">PARAMETER HIN</th>
+                    <th class="shaded">PARAMETER ZURUECK</th>
+                    <th class="shaded">ADRESSE</th>
+                </tr>
+                <tr>
+                    <td>SETFLS</td>
+                    <td>FILEPARAMETER SETZEN</td>
+                    <td>AKKU=LF; X=GA; Y=SA</td>
+                    <td></td>
+                    <td>$FFBA</td>
+                </tr>
+                <tr>
+                    <td class="shaded">SETNAM</td>
+                    <td class="shaded">DATEINAME ÜBERGEBEN</td>
+                    <td class="shaded">AKKU=LÄNGE; X/Y=POINT. AUF NAME</td>
+                    <td class="shaded"></td>
+                    <td class="shaded">$FFBD</td>
+                </tr>
+                <tr>
+                    <td>OPEN</td>
+                    <td>LOG. DATEI ÖFFNEN</td>
+                    <td>VORBEREITUNG: SETFLS, SETNAM</td>
+                    <td>FEHLER: SEC, FEHLER NR.IM AKKU</td>
+                    <td>$FFC0</td>
+                </tr>
+                <tr>
+                    <td class="shaded">CLOSE</td>
+                    <td class="shaded">LOG. DATEI SCHLIESSEN</td>
+                    <td class="shaded">AKKU=LOG. FILENUMMER</td>
+                    <td class="shaded">FEHLER: SEC, FEHLERNR. IM AKKU</td>
+                    <td class="shaded">$FFC3</td>
+                </tr>
+                <tr>
+                    <td>CLALL</td>
+                    <td>SCHLIESST ALLE FILES</td>
+                    <td></td>
+                    <td></td>
+                    <td>$FFE7</td>
+                </tr>
+                <tr>
+                    <td class="shaded">CHKIN</td>
+                    <td class="shaded">EINGABE VON LOG. DATEI</td>
+                    <td class="shaded">X=LOG. FILENUMMER</td>
+                    <td class="shaded">FEHLER: SEC, FEHLERNR. IM AKKU</td>
+                    <td class="shaded">$FFC6</td>
+                </tr>
+                <tr>
+                    <td>CKOUT</td>
+                    <td>AUSGABE AUF LOG. DATEI</td>
+                    <td>X=LOG. FILENUMMER</td>
+                    <td>FEHLER: SEC, FEHLERNR. IM AKKU</td>
+                    <td>$FFC9</td>
+                </tr>
+                <tr>
+                    <td class="shaded">READST</td>
+                    <td class="shaded">I/O-STATUS ABFRAGEN</td>
+                    <td class="shaded"></td>
+                    <td class="shaded">STATUS IM AKKU (BIT 6=DATEIENDE)</td>
+                    <td class="shaded">$FFB7</td>
+                </tr>
+                <tr>
+                    <td>BASIN</td>
+                    <td>ZEICHEN EINLESEN</td>
+                    <td></td>
+                    <td>ZEICHEN IM AKKU</td>
+                    <td>$FFCF</td>
+                </tr>
+                <tr>
+                    <td class="shaded">BSOUT</td>
+                    <td class="shaded">ZEICHEN AUSGEBEN</td>
+                    <td class="shaded">ZEICHEN IM AKKU</td>
+                    <td class="shaded"></td>
+                    <td class="shaded">$FFD2</td>
+                </tr>
+                <tr>
+                    <td>LISTEN</td>
+                    <td>'LISTEN' SENDEN</td>
+                    <td>AKKU=GERÄTEADRESSE</td>
+                    <td></td>
+                    <td>$FFB1</td>
+                </tr>
+                <tr>
+                    <td class="shaded">UNLISTEN</td>
+                    <td class="shaded">'UNLISTEN' SENDEN</td>
+                    <td class="shaded"></td>
+                    <td class="shaded"></td>
+                    <td class="shaded">$FFAE</td>
+                </tr>
+                <tr>
+                    <td>CHKKOM</td>
+                    <td>KOMMA LESEN</td>
+                    <td></td>
+                    <td></td>
+                    <td>$AEFD</td>
+                </tr>
+                <tr>
+                    <td class="shaded">GETBYT</td>
+                    <td class="shaded">EIN-BYTE-WERT LESEN</td>
+                    <td class="shaded"></td>
+                    <td class="shaded">X=ÜBERGEBENES BYTE</td>
+                    <td class="shaded">$B79E</td>
+                </tr>
+                <tr>
+                    <td>STRPOS</td>
+                    <td>VARIABLENADRESSE HOLEN</td>
+                    <td></td>
+                    <td>$47/$48=POINT. AUF LÄNGENDESCR.</td>
+                    <td>$B08B</td>
+                </tr>
+                <tr>
+                    <td class="shaded">STRRES</td>
+                    <td class="shaded">STRINGPLATZ RESERVIEREN</td>
+                    <td class="shaded">AKKU=STRINGLÄNGE</td>
+                    <td class="shaded"></td>
+                    <td class="shaded">$B4F4</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle. Übersicht über alle im Artikel erwähnten Betriebssystem- und Interpreterroutinen</figcaption>
+        </figure>
+
+        <p>Mein Wissen über die Dateiverwaltung in Maschinensprache ist nun erschöpft, und ich kann Ihnen nur viel Erfolg bei der Programmierung wünschen. Wie Sie sehen, gibt es keinerlei prinzipiellen Unterschiede zur Dateiverwaltung in Basic. Auch Direktzugriffsdateien können problemlos verwaltet werden, wenn man weiß, wie Befehlsstrings an die Floppystation übermittelt werden können.</p>
+
+        <p>Den Schluß dieses Artikels bildet eine Tabelle, in der alle verwendeten Betriebssystemroutinen aufgelistet sind. Wenn Sie einzelne der vorgestellten Demoprogramme weiterverwenden wollen, halten Sie sich bitte zur Eingabe an die MSE-Listings.</p>
+
+        <p>Auch sei an dieser Stelle auf unser Sonderheft 8/85 mit dem Thema »Assembler« verwiesen, in dem Sie auch den Assembler »Hypra-Ass« finden.</p>
+
+        <address class="author">(Said Baloui/tr)</address>
+    </article>
+</body>
+
+</html>

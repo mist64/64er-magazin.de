@@ -1,0 +1,38 @@
+# SH09 p111: the published page comes from a RAW SCAN THE OWNER RETOUCHED BY HAND
+
+What. /Volumes/S/png/SH09/111.png is NOT the scan as the archive delivered it. On 2026-11-14 at 20:10 the owner
+retouched it in place in Affinity Photo 2 to remove a pen note. The note is a previous hand, not the plate: a pencil
+note in the head of the listing frame above the caption, candidates "M Blöcke" / "11 Blöcke", 26.33 x 3.77 mm at
+43 mm across / 140 mm down. It is a4600 +707+3256 622x89 in reviewed/marks.txt, which the owner ruled the only real
+mark of the census. Removing it follows "we publish the plate, not this copy".
+
+No pre-edit raw survives. /Volumes/S is excluded from Time Machine and has no snapshots. The pre-edit pixels
+exist only in derivatives built 2026-11-05/06 from the unedited file. They are kept until SH09 closes:
+  <tmp>/recovery/111.preedit/   masters600, sheets600, debug600, cmyk2400, a4600 (png + stamps), a4win cache,
+                                .ocrcache (111_150.png, 111.pdf, jbig2-t35/111.jb2), the PDF before the rebuild
+                                (sha1 bce2a34047ee) and the 2026-11-06 build output
+  <tmp>/marks/p111_707_3256.png the census crop: left panel from the raw before the edit, right from the old PDF
+All are 600 dpi, the same resolution as the raw, and none is the raw itself: masters600, sheets600 and a4600 are
+levelled and graded.
+
+The edit is local (measured 2026-11-14, before anything was re-derived):
+- File. Same size 5040x7203, 8-bit RGB, 3 channels, 23622 px/m as 110.png and 112.png. The one file-level change
+  is an embedded ICC profile, sRGB IEC61966-2.1; the neighbours carry only a cHRM white point. r005 reads the
+  pixel values through PIL and does not read the profile.
+- Pixels. r005_masters_sheet re-run on the edited raw into scratch gives a stamp identical to the 2026-11-06 one
+  (skew -0.42, sheet-box 46 2 4980 7044, trace, grade, field). Its master differs from the 2026-11-06 master in
+  24829 of 39186717 pixels, max 192 levels, all in ONE cluster at master x 648..1321, y 3219..3357, about 28.5 x
+  5.9 mm. That is a4600 x 687..1360, y 3216..3354, the pen note's box with its margin. Every other pixel is
+  byte-identical, in masters600 and sheets600 alike.
+- By eye, once, the master crop before/after: the pencil note is gone. The hex line above it and the frame rule
+  below are untouched, and a dust speck above the note is there before and after.
+
+Re-derived 2026-11-14 (owner via control: "update 111"): r005_masters_sheet.py 111 and r005_a4_window.py 111,
+page 111 only. Both are byte-identical to the scratch run. Window and offsets are unchanged and the a4600 stamp is
+identical; a4600/111.png differs only in that cluster. .ocrcache/111_150.png was made by the builder's recipe,
+and jbig2-t35/111.jb2 was removed so the builder re-made it: the cache keys on existence, and a rebuild would
+otherwise have reused the old JBIG2 with the note. .ocrcache/111.pdf, the text layer, is KEPT: it holds no word
+from the note, only the print around it.
+
+For a later reader: /Volumes/S/png/SH09/111.png is not a pristine archive scan. Anything re-derived from it carries
+the owner's retouch, which is what is published. To see the page as scanned, use <tmp>/recovery/111.preedit/.

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Diskmonitor C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Michael Bauer, dm">
+    <meta name="64er.issue" content="Sonderheft 9/86">
+    <meta name="64er.pages" content="105">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.id" content="diskmon">
+</head>
+
+<body>
+    <article>
+        <h1>Diskmonitor C 128</h1>
+        <p class="intro">Der Monitor des C 128 ist schon eine praktische Angelegenheit. Leider fehlte bisher der Diskmonitor. Hier ist er nun.</p>
+
+        <p>Eines der wichtigsten Werkzeuge im Umgang mit Disketten ist der Diskmonitor, der es gestattet, jede Spur und jeden Sektor anzusehen, zu verändern und wieder auf Diskette zurückzuschreiben. Der im C 128 eingebaute Monitor hat schon einige für diese Zwecke benötigte Befehle:</p>
+
+        <ol>
+            <li>Das Senden von Befehlen an die Diskettenstation</li>
+            <li>Laden des Disketten-Inhaltsverzeichnisses</li>
+            <li>Einen Lineassembler</li>
+            <li>Einen Disassembler und</li>
+            <li>Das Anzeigen von Speicherbereichen.</li>
+        </ol>
+
+
+        <p>Das Wichtigste aber, Befehle zum Einlesen und Zurückschreiben einzelner Blöcke, ist leider nicht vorhanden.</p>
+
+        <p>Die Aufgabenstellung ist also, diese beiden Befehle in den vorhandenen Monitor mit einzubinden.</p>
+
+        <p>Da Commodore seit Jahren bei ihren Betriebssystemen mit Sprunglisten und Vektoren arbeitet, bestand die berechtigte Hoffnung, daß beim Monitor ebenfalls ein Vektor vorhanden ist. Nachdem der Autor schon eine ganze Weile im ROM auf der Suche nach den Vektoren mit Erfolg gestöbert hatte, erschien dann bei Markt&amp;Technik eine wahre Fundgrube – das Buch »C 128-ROM-Listing: Operating System« von Schineis, Braun und Demgensky, das die Sache wesentlich erleichterte. Das Buch ist allen zu empfehlen, da es für alle Sprungbefehle Label angibt, die am Ende der gut kommentierten Listings alphabetisch sortiert mit ihren Adressen aufgeführt sind.</p>
+
+        <p>Da existiert nun solch ein Vektor mit dem Namen IMONCD ($032E), der auf die Monitorroutine »Kommando in Tabelle suchen und dann ausführen« zeigt, also der ideale Ansatzpunkt ist, um eigene Routinen einzubinden.</p>
+
+        <p>Als Befehlszeichen wurde der Pfeil nach oben »↑« mit einem zusätzlichen Buchstaben als Befehlszeichen gewählt.</p>
+
+        <p>»↑«: Zeige eingelesenen Block an (der Block steht im Bereich $1300 bis $13FF in BANK 0).</p>
+
+        <p>»↑R« (Spur Sektor Gerät Laufwerk): Lies einen Block von Diskette und zeige ihn an.</p>
+
+        <p>»↑W« (Spur Sektor Gerät Laufwerk): Schreibe den Block auf Diskette.</p>
+
+        <p>»↑N«: Lies nächsten Block von Diskette und zeige ihn an.</p>
+
+        <p>»↑G« (Gerät Laufwerk): Spezifiziere neue Geräteadresse (eingestellt ist Gerät 8).</p>
+
+        <p>»↑D« (Laufwerk): Spezifiziere neue Laufwerksnummer (Eingestellt ist Laufwerk 0 – dieser Befehl wird für Doppellaufwerke benötigt).</p>
+
+        <p>»↑L«: Lese den vorherigen Block wieder von Diskette ein.</p>
+
+        <p>»↑+«: Lese den physikalisch nächsten Block von der Diskette.</p>
+
+        <p>»↑-«: Lese den physikalisch vorhergegangenen Block von der Diskette.</p>
+
+        <p>»↑P« (DEV): Leitet die Ausgabe vom Bildschirm auf Gerät DEV (vorzugsweise auf den Drucker) um.</p>
+
+        <p>»↑B«: Ausgabe wieder auf Bildschirm.</p>
+
+        <p>Nach jedem Zugriff auf die Floppy wird der Fehlerkanal ausgelesen und in der Zeile, die dem Befehl folgt, ausgegeben.</p>
+
+        <h2>Eingabehinweise</h2>
+
+        <p>Bitte geben Sie das Programm (Listing) mit dem MSE im C 64-Modus ein und speichern es. Das Programm wird in Zukunft mit dem Befehl</p>
+
+        <pre><code>SYS DEC("1400")</code></pre>
+
+        <p>initialisiert. Wird dann bei Bedarf der Monitor mit dem Befehl MONITOR aufgerufen, stehen auch die DISKMON-Befehle zur Verfügung.</p>
+
+        <address class="author">(Michael Bauer/dm)</address>
+        <figure>
+            <pre data-filename="diskmon.exe.prg" data-name="Diskmon" data-mse=mse1></pre>
+            <figcaption>Listing »Diskmon«. Es erweitert den Monitor im C 128 zum Diskmonitor. Bitte mit dem MSE im C 64-Modus eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="diskmon.exe.prg" data-name="Diskmon"></div>
+        <div style="display: none;">
+            <pre data-filename="boot diskmon" data-name="Boot Diskmon"></pre>
+        </div>
+        <div class="binary_download" data-filename="diskmon.asm.prg" data-name="Diskmon (Top-Ass-Quelltext)"></div>
+    </article>
+</body>
+
+</html>

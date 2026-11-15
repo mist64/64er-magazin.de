@@ -1,0 +1,204 @@
+
+
+;anleitung cent..prg ==0801==
+    0 print"{clr}",chr$(14)
+   10 print"CENT-SMON-Kernel
+   20 print
+   30 print"- Das Super-Betriebssystem jetzt mit
+   40 print"  Centronics-Schnittstelle
+   50 print
+   60 print" CENT-SMON-Kernel entspricht in allen
+   70 print"Funktionen dem bereits vorgestellten
+   80 print"EX-SMON-Kernel. Die Bedienung und auch
+   90 print"der Einbau entsprechen den dortigen
+  100 print"Angaben. Nicht mehr vorhanden sind die
+  110 print"RS-232-Routinen, deren Platz fuer die
+  120 print"Centronics-Schnittstelle gebraucht
+  130 print"wurde.
+  150 print" Das erklaerte Ziel war, eine Schnitt-
+  160 print"stelle im Kernel unterzubringen, die
+  170 print"es ermoeglicht, einen Drucker mit Pa-
+  180 print"rallel-Schnittstelle so am User-Port
+  190 print"zu betreiben, dass man (abgesehen von
+  200 print"den meist besseren Qualitaeten des
+  210 print"Druckers) kaum mehr merkt, dass es
+  220 print"sich nicht um einen Commodore-kompa-
+  230 print"tiblen Drucker handelt.
+  240 print"                                {rvon}Taste
+  250 geta$:ifa$=""then250
+  260 print"{clr}
+  270 print" So wird nur ein einfaches Verbindungs-
+  280 print"kabel (kein Interface!) benoetigt, und
+  290 print"viele Steuerprobleme, die mit Inter-
+  300 print"faces entstehen, entfallen.
+  310 print
+  320 print" Leider war es im vorhandenen Speicher-
+  330 print"raum nicht moeglich, saemtliche Funk-
+  340 print"tionen, also auch die Zahlenformatie-
+  350 print"rung etc. eines Commodore-Druckers un-
+  360 print"terzubringen. Alle oft gebrauchten
+  370 print"Druckerfunktionen werden jedoch orgi-
+  380 print"nalgetreu an den Parallel-Drucker wei-
+  390 print"tergegeben. Selbst Hardcopy-Routinen,
+  400 print"die einen MPS801/803 erwarten, laufen
+  410 print"einwandfrei mit dem CENT-SMON-Kernel.
+  420 print
+  430 print" Folgende Druckerfunktionen werden
+  440 print"angepasst:
+  450 print
+  460 print"- Der Drucker wird ueber Geraeteadres-
+  470 print"  se #4 angesprochen.
+  480 print"                                {rvon}Taste
+  490 geta$:ifa$=""then490
+  500 print"{clr}";
+  510 print"- Es wird automatisch Extra-Line-Feed
+  520 print"  ausgegeben, die Auto-LF-Funktion
+  530 print"  des Druckers muss also ausgeschaltet
+  540 print"  bleiben (Orginalzustand!).
+  550 print"- Der Drucker wird beim ersten Anspre-
+  560 print"  chen automatisch auf den deutschen
+  570 print"  Zeichensatz mit Umlauten umgeschaltet.
+  580 print"{up}- Normalerweise wird Gross/Grafik bzw.
+  590 print"  Gross-Kleinschreibung so gedruckt,
+  600 print"  wie der Bildschirm sie anzeigt.
+  610 print"  Wenn kein Original-Zeichensatz auf
+  620 print"  dem Bildschirm ist, wird Gross/Klein-
+  630 print"  schreibung benutzt (Siehe auch Um-
+  640 print"  schaltung per Sekundaeradresse).
+  650 print"- Alle Grafikzeichen des C 64 werden
+  660 print"  gedruckt. Listings sehen also aus wie
+  670 print"  auf dem Bildschirm.
+  680 print
+  690 print" Folgende Steuerzeichen und -Funktionen
+  700 print"werden verarbeitet:
+  710 print
+  720 print"- {rvon}Sekundaeradresse 10{rvof} Drucker-Reset
+  730 print:print"                                {rvon}Taste
+  740 geta$:ifa$=""then740
+  750 print"{clr}";
+  760 print"- {rvon}Sekundaeradresse 6{rvof} Zeilen-Abstand
+  770 print"  einstellen (in /144'-Schritten, wie
+  780 print"  bei Commodore-Druckern)
+  790 print"- {rvon}CHR$(1) und CHR$(14){rvof} schalten auf
+  800 print"  erweiterte Zeichen
+  810 print"- {rvon}CHR$(129) und CHR$(15){rvof} schalten er-
+  820 print"  weiterte Zeichen aus
+  830 print"- {rvon}CHR$(8){rvof} schaltet auf 7-Punkt-Grafik-
+  840 print"  Modus. Der Zeilenabstand wird dabei
+  850 print"  angepasst (21/216')
+  860 print"- {rvon}CHR$(15){rvof} schaltet Grafik aus
+  870 print"- {rvon}CHR$(17){rvof} schaltet unbedingt auf
+  880 print"  Gross/Kleinschreibung
+  890 print"- {rvon}CHR$(145){rvof} schaltet unbedingt auf
+  900 print"  Gross/Grafik-Modus
+  910 print"- {rvon}CHR$(141){rvof} bewirkt Wagenruecklauf
+  920 print"  ohne Zeilenvorschub
+  930 print"- {rvon}CHR$(34){rvof} schaltet auf Quote-Modus
+  940 print"  (weitere Steuerzeichen werden als Gra-
+  950 print"{up}  fikzeichen gedruckt)
+  960 print"- {rvon}CHR$(18){rvof} schaltet auf Reverse
+  970 print"- {rvon}CHR$(146){rvof} schaltet Reverse aus
+  980 print
+  990 print"                                 {rvon}Taste
+ 1000 geta$:ifa$=""then1000
+ 1010 print"{clr}";
+ 1020 print" Andere Steuerzeichen werden als Grafik-
+ 1030 print"{up}zeichen gedruckt.
+ 1040 print
+ 1050 print" Mit der Speicherstelle {rvon}150{rvof} koennen
+ 1060 print"noch weitere Funktionen gesteuert
+ 1070 print"werden:
+ 1080 print
+ 1090 print"{rvon}POKE 150,128{rvof} bewirkt, dass Sekundaer-
+ 1100 print"adresse 7 als Umschaltzeichen fuer
+ 1110 print"Gross/Kleinschreibung interpretiert
+ 1120 print"wird. Ohne Sekundaeradresse oder mit
+ 1130 print"SA=0 wird Gross/Grafik gedruckt. Bei
+ 1140 print"anderen SA wird gemaess Bildschirm
+ 1150 print"gedruckt.
+ 1160 print"{rvon}POKE 150,64{rvof} alle Zeichen werden direkt
+ 1170 print"ohne irgendwelche Wandlung an den
+ 1180 print"Drucker ausgegeben. In diesem Modus
+ 1190 print"entfaellt auch das sonst uebliche Extra-
+ 1200 print"{up}Line-Feed.
+ 1210 print"{rvon}POKE{$a0}150,1{rvof} der Drucker wird nicht auf
+ 1220 print"deutschen Zeichensatz umgeschaltet.
+ 1230 print
+ 1240 print"Durch Addition koennen die Werte auch
+ 1250 print"gemischt werden!
+ 1260 print"                                 {rvon}Taste";
+ 1270 geta$:ifa$=""then1270
+ 1280 print"{clr}{rvof}";
+ 1290 print" Die Ausgabe-Routinen fuer den Parallel-
+ 1300 print"{up}Drucker sind so in die IEC-Bus-Routi-
+ 1310 print"nen eingebunden, dass auch praktisch
+ 1320 print"alle Maschinenprogramme keine Notiz
+ 1330 print"davon nehmen, wenn kein serieller
+ 1340 print"Drucker angeschlossen ist. Beim Betrieb
+ 1350 print"eines seriellen Druckers mit diesem
+ 1360 print"System ist allerdings zu beachten, dass
+ 1370 print"es ca. 2 Sekunden dauert, bis der
+ 1380 print"Drucker beim ersten Oeffnen reagiert,
+ 1390 print"da zuerst das Vorhandensein eines
+ 1400 print"Parallel-Druckers abgefragt wird.
+ 1420 print" Unter Einsatz aller Speicherreserven
+ 1430 print"(Die Meldung SEARCHING FOR beim Laden
+ 1440 print"fiel zum Opfer) gelang es, noch ein
+ 1450 print"weiteres Feature einzubauen:
+ 1460 print"{down} Bei Druck auf <CTRL+F3> erscheint auf
+ 1470 print"dem Bildschirm {rvon}:LIST{rvof} und der blin-
+ 1480 print"kende Cursor. Dieser Befehl ersetzt das
+ 1490 print"leidige {rvon}OPEN1,4:CMD1:LIST{rvof}. Nach dem
+ 1500 print"Listen wird das Druckerfile wieder ein-
+ 1510 print"wandfrei geschlossen, sodass auch das
+ 1520 print"{rvon}PRINT#1:CLOSE1{rvof} entfaellt.
+ 1530 print"                                 {rvon}Taste{rvof}";
+ 1540 geta$:ifa$=""then1540
+ 1550 print"{clr}
+ 1560 print" Fuer alle, die sich das Verbindungs-
+ 1570 print"kabel User-Port - Centronics nicht kau-
+ 1580 print"fen wollen, die Anschlussbelegung:
+ 1590 print
+ 1600 print"User-Port   Centronics
+ 1610 print
+ 1620 print"    A           16
+ 1630 print"    B           11
+ 1640 print"    C            2
+ 1650 print"    D            3
+ 1660 print"    E            4
+ 1670 print"    F            5
+ 1680 print"    H            6
+ 1690 print"    I            7
+ 1700 print"    K            8
+ 1710 print"    L            9
+ 1720 print"    M            1
+ 1730 print"    N          wie A
+ 1740 print
+ 1750 print" Besitzer eines nicht ESC/p-kompatiblen
+ 1760 print"Druckers (z.B. Melchers CP 80 II) mues-
+ 1770 print"sen vor dem Brennen folgende Aenderungen
+ 1780 print"{up}am Programm vornehmen:
+ 1790 print"                                 {rvon}Taste{rvof}";
+ 1800 geta$:ifa$=""then1800
+ 1810 print"{clr}"
+ 1820 print" Speicherstelle        neuer Wert
+ 1830 print"(ab EPROM-Start)
+ 1840 print"----------------       ----------
+ 1850 print"     $30A9                 $4B
+ 1860 print"     $30AD                 $EA
+ 1870 print"     $30AE                 $EA
+ 1880 print"     $30AF                 $EA
+ 1890 print"     $30B0                 $EA
+ 1900 print"{$a0}    $30B1                 $EA
+ 1910 print
+ 1920 print" Dadurch werden Grafik-Zeichen im
+ 1930 print"Single-Density-Modus ausgegeben
+ 1940 print"(statt CRT).
+ 1950 print" Fuer den erwaehnten Melchers-Drucker
+ 1960 print"muss ausserdem der Wert fuer das Grafik-
+ 1970 print"{up}Line-Feed geaendert werden:
+ 1980 print
+ 1990 print"     $2F71                 $13
+ 2000 print"{down}                                 {rvon}Taste
+ 2010 geta$:ifa$=""then2010
+

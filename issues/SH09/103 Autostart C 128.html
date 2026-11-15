@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Autostart C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dirk Paessler, dm">
+    <meta name="64er.issue" content="Sonderheft 9/86">
+    <meta name="64er.pages" content="103-104">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.id" content="autostart">
+</head>
+
+<body>
+    <article>
+        <h1>Autostart C 128</h1>
+        <p class="intro">Dieses Programm veranlaßt den C 128 beim Einschalten oder einem Reset dazu, ein Basic-Programm zu laden und zu starten.</p>
+
+        <p>Das Pinzip des Autostarts beruht auf dem Vorhandensein eines Boot-Sektors, der vom C 128 bei jedem Kaltstart (Reset oder Einschalten) auf der Diskette gesucht wird. Dabei handelt es sich um den Sektor 0 auf Spur 1, den das Programm manipuliert.</p>
+
+        <p>Nach dem Start des Generatorprogramms (Listing) erscheint ein Titelbild, auf dem eine kurze Erklärung ausgegeben wird.</p>
+
+        <p>Drückt man nun eine Taste, so wird auf die Diskette zugegriffen, um festzustellen, ob der Boot-Sektor bereits belegt ist. Dies geschieht mit Hilfe des Block-Allocate-Befehls des DOS, der normalerweise einen Block als belegt kennzeichnet. Wird dieser Befehl auf einen schon belegten Block angewendet, so meldet das DOS einen NO BLOCK-Fehler. Ist dies der Fall, so stellt das Programm drei Möglichkeiten zur Auswahl:</p>
+
+        <ol>
+            <li><strong>Block freigeben</strong><br>Dies sollte man nur wählen, wenn man sich ganz sicher ist, daß dieser Block nicht belegt ist. Andernfalls kann ein auf der Diskette befindliches Programm zerstört werden.</li>
+            <li><strong>Erneuter Versuch</strong><br>Bei Lesefehlern können hiermit weitere Leseversuche ausgeführt werden.</li>
+            <li><strong>Abbrechen</strong></li>
+        </ol>
+
+
+        <p>Es kann nun eine Nachricht eingegeben werden, die der Computer beim Laden ausgibt. Diese kann in Anführungszeichen stehen und damit auch Steuerzeichen enthalten.</p>
+
+        <p>Anschließend werden Sie aufgefordert, den Namen des zu ladenden Programms einzugeben.</p>
+
+        <p>Ist dies geschehen, schreibt der Computer den Block in den Puffer #6 und veranlaßt anschließend die Floppy-Station, diesen auf Diskette zu speichern.</p>
+
+        <p>Der Boot-Sektor besitzt die folgende Aufteilung:</p>
+
+        <table class="plain">
+            <tr>
+                <th>Byte-Nummer:</th>
+                <th>Inhalt:</th>
+                <th>Bemerkung:</th>
+            </tr>
+            <tr>
+                <td>0,1,2</td>
+                <td>CBM</td>
+                <td>daran erkennt das Betriebssystem den Boot-Sektor</td>
+            </tr>
+            <tr>
+                <td>3,4</td>
+                <td>0,0</td>
+                <td>Speicheradresse der Folgeboot-Sektoren. Diese beiden Werte werden vom Programm nicht genutzt, da nur ein Sektor gebildet wird. Hier wäre auch denkbar, mehrere Boot-Sektoren zu laden.</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>0</td>
+                <td>Konfigurationsindex, der beim Laden von folgenden Boot-Sektoren in die MMU gespeichert werden soll.</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>0</td>
+                <td>Hier steht die Anzahl der Boot-Sektoren, die noch zu laden sind.</td>
+            </tr>
+            <tr>
+                <td>7 bis (0)</td>
+                <td>Text</td>
+                <td>Die nun folgende Byte-Folge wird über die PRIMM-Routine ausgegeben (Abschluß des Textes mit CHR$(0)).</td>
+            </tr>
+            <tr>
+                <td>PRG-Name</td>
+                <td></td>
+                <td>Es schließt sich der Programmname an, der ebenfalls von einem Null-Byte abgeschlossen wird.</td>
+            </tr>
+            <tr>
+                <td>Maschinen-PRG</td>
+                <td></td>
+                <td>Nach der Testausgabe und dem Laden wird die folgende Maschinenroutine angesprungen.</td>
+            </tr>
+        </table>
+
+        <p>Nach Schreiben des Boot-Sektors wird das zu ladende Programm auf seine Anfangsadresse hin untersucht. Ist diese nicht unter $1C01 (normaler Basic-Start), so erfolgt die Ausgabe einer Meldung (dies ist zum Beispiel oft bei Compilaten des »BASIC 128« der Fall). In so einem Fall ist es nötig, das zu bootende Programm nach Abschluß von »Autostart 128« mit DLOAD zu laden, mit SCRATCH zu löschen und über DSAVE wieder unter dem gleichen Namen auf Diskette zu speichern.</p>
+
+        <p>Der Grund ist darin zu suchen, daß das Betriebssystem das zu ladende File absolut lädt. Man könnte also auch Maschinenspracheroutinen oder Interfaces bei jedem Reset neu von Diskette in den User-Bereich laden.</p>
+
+        <p>Ist dieser Test beendet, so schließt das Programm alle Files und startet sich neu.</p>
+
+        <p>Nachdem ein Boot-Sektor auf Diskette geschrieben wurde, sollte kein COLLECT beziehungsweise VALIDATE mehr durchgeführt werden, da der Boot-Sektor wieder als nicht belegt gekennzeichnet und überschrieben werden würde. Sollte dies doch unumgänglich sein, so muß nach COLLECT »Autostart 128« neu angewendet oder der folgende Befehl eingegeben werden:</p>
+
+        <pre><code>OPEN 1,8,15,"B-A:0 1 0":CLOSE 1</code></pre>
+
+        <address class="author">(Dirk Paessler/dm)</address>
+        <figure>
+            <pre data-filename="autostart" data-name="Autostart 128"></pre>
+            <figcaption>Listing »Autostart 128«. Bitte im 128er-Modus eingeben.</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

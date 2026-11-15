@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>79 more Blocks free!</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Germano Carroni, bs">
+    <meta name="64er.issue" content="Sonderheft 9/86">
+    <meta name="64er.pages" content="120-124,126,128-135">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.id" content="track40">
+</head>
+
+<body>
+    <article>
+        <h1>79 more Blocks free!</h1>
+        <p class="intro">Wer seine Disketten bis aufs letzte Byte mit Daten füllen möchte, wird sich über das nächste Programm freuen. Mit ihm lassen sich die bisher ungenutzten Tracks 36 bis 40 zur Datenspeicherung nutzen.</p>
+
+        <p>Laut Murphys Gesetzen ist eine Diskette genau in dem Augenblick voll, in dem man ein paar wenige Daten darauf speichern möchte. So muß man dann oft seine Programme wegen einiger weniger Blocks auf zwei Diskettenseiten verteilen.</p>
+
+        <p>Doch dem kann man abhelfen. In die Floppy 1541 ist ein 40-Track-Laufwerk eingebaut, das DOS nutzt aber nur 35 Tracks aus. Mit Hilfe einiger Manipulationen im Floppybetriebssystem ist es möglich, auch auf den Spuren 36 bis 40 Daten unterzubringen.</p>
+
+        <p>In Listing 1 finden Sie eine Basic-Erweiterung, mit der sich recht einfach Daten auf diesen Spuren ablegen und wieder lesen lassen. Die Routinen sind sehr flexibel gehalten, damit erfahrene Programmierer sie für den Eigenbedarf umändern können. Deswegen finden Sie in Listing 2 auch einen vollständig dokumentierten Source-Code der Basic-Erweiterung.</p>
+
+        <p>Es soll nicht verschwiegen werden, daß diese Erweiterung einige Nachteile hat: Sie ist nicht sehr einfach zu bedienen, und der Benutzer muß auf einige Punkte genau achtgeben, da es sonst zu extremen Fehlfunktionen des Floppy-Laufwerks kommen kann! Außerdem gibt es kein Directory und keine BAM für die Spuren 36 bis 40. Sie müssen sich selber merken, wo Sie welche Daten gespeichert haben. Es empfiehlt sich also, nur einige wichtige Daten dort unterzubringen.</p>
+
+        <p>Das Schreiben der Daten ist aufgrund eines geänderten Formats recht langsam. Eben wegen diesem geänderten Format sind die Spuren 36 bis 40 auch nicht mit normalen Kopierprogrammen kopierbar – da muß man schon mit schweren Geschützen wie Turbonibbler und ähnlichen auffahren. Wie das Diskettenformat genau aussieht, zeigt Bild 1.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>5 * $FF</td>
+                    <td>$0E</td>
+                    <td>$XX</td>
+                    <td>$XX</td>
+                    <td>$00</td>
+                    <td>9 * $XX</td>
+                </tr>
+                <tr>
+                    <td>(Sync)</td>
+                    <td>Headerkennzeichen</td>
+                    <td>Track</td>
+                    <td>Sektor</td>
+                    <td>Leer</td>
+                    <td>Lücke</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>5 * $FF</td>
+                    <td>$0B</td>
+                    <td>255*$XX</td>
+                    <td>$XX</td>
+                    <td>$XX</td>
+                    <td>7 * $XX</td>
+                </tr>
+                <tr>
+                    <td>(Sync)</td>
+                    <td>Blockkennzeichen</td>
+                    <td>255 Datenbyte</td>
+                    <td>interne Prüfsumme</td>
+                    <td>normale Prüfsumme</td>
+                    <td>Lücke</td>
+                </tr>
+            </table>
+            <figcaption>Bild 1. Das neue Format auf den Spuren 36 bis 40</figcaption>
+        </figure>
+
+        <h2>Fünf neue Befehle</h2>
+
+        <p>Die Basic-Erweiterung wird mit »LOAD"name",8,1« geladen und mit »SYS 50000« gestartet. Danach stehen Ihnen folgende fünf neuen Befehle zur Verfügung (Die eckigen Klammern gehören zum Befehl und müssen mit eingegeben werden.):</p>
+
+        <p><strong>[NEW]</strong> – formatiert auf einer Diskette die Spuren 36-40. Dies muß gemacht werden, bevor irgendwelche Daten geschrieben werden. Daten, die sich auf den Spuren 1 bis 35 befinden, werden nicht geändert. Sie können also Disketten auch nachträglich mit den neuen Spuren ausstatten.</p>
+
+        <p>Ab sofort stehen Ihnen 79 Blöcke, numeriert von 0 bis 78, zur Verfügung. Auf den Spuren 36 bis 39 befinden sich jeweils 16 Blöcke, auf Spur 40 nur 15. Diese Blöcke können nur über ihre Blocknummer und nicht über Track/Sektor-Angaben angesprochen werden!</p>
+
+        <p><strong>[SAVE anfang, ende, blockstart]</strong> – Mit diesem Befehl können Sie einen Speicherbereich auf die neuen Spuren schreiben. Anfang und Ende bezeichnen dabei die Start- und Endadresse des zu schreibenden Breichs. Mit Blockstart geben Sie den Block an, bei dem die Aufzeichnung beginnen soll. Nach dem Speichervorgang können Sie mit PEEK(139) erfragen, bis zu welchem Block geschrieben wurde.</p>
+
+        <p><strong>[LOAD anfang, blockstart]</strong> – Das Gegenstück zu SAVE. Mit diesem Befehl wird ein Speicherbereich ab dem Block der Nummer Blockstart an die Adresse anfang geladen.</p>
+
+        <p><strong>[GET stringvariable, block]</strong> – Mit diesem Befehl lassen sich die 255 Byte eines Blocks in eine beliebige Stringvariable lesen.</p>
+
+        <p><strong>[PRINT stringvariable, block]</strong> – Dieser Befehl schreibt die Daten aus einem String in den angegebenen Block. Die Länge des Strings muß genau 255 Zeichen betragen, ansonsten kann »Müll« im Block auf der Diskette stehen!</p>
+
+        <p>Folgende Fehlermeldungen werden von den neuen Befehlen ausgegeben:</p>
+
+        <p>Division by Zero – Sie haben eine kleinere End- als Anfangsadresse angegeben.</p>
+
+        <p>Illegal Quantity – Es sollte auf einen Block mit einer Nummer größer 78 zurückgegriffen werden.</p>
+
+        <p>Overflow – Sie wollten mehr als 79 Blöcke in einem Stück speichern.</p>
+
+        <p>String too long – Der String, den Sie in einen Block schreiben wollten, hat nicht exakt 255 Zeichen (meistens ist der String dann also zu kurz, aber dieses Paradoxon soll nicht weiter stören).</p>
+
+        <p>Wenn nötig, läßt sich die Basic-Erweiterung mit »SYS 50011« wieder ausschalten. Mit »POKE 49799,x« kann man die Adresse der anzusprechenden Floppy auf andere Werte ändern, der Standardwert ist 8.</p>
+
+        <p>Wenn auf eine nicht mit [NEW] formatierte Disk zugegriffen werden soll, stürzt das Programm unweigerlich ab! Dies geschieht ebenso, wenn keine Diskette im Laufwerk liegt oder gar kein Diskettenlaufwerk angeschlossen ist!</p>
+
+        <h2>Anwendungsbeispiele</h2>
+
+        <p>Damit Sie sich im Umgang mit den neuen Basic-Befehlen üben können, folgen nun einige Anwendungsbeispiele. Als erstes sollten Sie eine Diskette mit [NEW] formatieren.</p>
+
+        <p>Auf der Diskette befinden sich noch keine Daten, also können wir ab Block 0 mit dem Schreiben von Daten beginnen. Mit [SAVE 1024, 2023, 0] speichern wir als erstes einmal den Bildschirmspeicher. Mit »?PEEK(139)« erfahren wir, daß der letzte beschriebene Block die Nummer 3 ist. Um also einen weiteren Bildschirm zu speichern, müssen wir [SAVE 1024, 2023, 4] eingeben, da ab dem 4. Block freie Blöcke vorhanden sind. Um den ersten Bildschirm wieder zu laden, geben Sie [LOAD 1024, 0] ein.</p>
+
+        <p>Komplizierter wird es da schon, wenn Sie ein Basic-Programm speichern wollen. Hier sind leider eine Reihe von POKEs notwendig, um alle Vektoren wieder geradezubiegen.</p>
+
+        <p>Das Speichern wird mit folgender Befehlsfolge ausgelöst:</p>
+
+        <pre><code>[SAVE 2049, PEEK(45)+256*PEEK(46), block]</code></pre>
+
+        <p>Um das Programm später wieder zu laden, genügt ein [LOAD 2049, block]. Allerdings müssen jetzt einige Vektoren geradegebogen werden. Dazu geben Sie direkt nach dem Laden folgende zwei Zeilen ein:</p>
+
+        <pre><code>POKE 46,159 : CLR : L=(PEEK(139)-block) *254+PEEK(141)
+POKE 45, (L+2049) AND 255 : POKE 46, (L+2049)/256 : CLR</code></pre>
+
+        <p>Dieser Aufwand ist zwar nicht unerheblich, erleichterte aber die Programmierung der Basic-Erweiterung ungemein. Normalerweise wird man ja auch keine Basic-Programme auf den Spuren 36 bis 40 ablegen.</p>
+
+        <p>Unser Listing 3 zeigt Ihnen ein kleines Beispiel zur Anwendung der [PRINT]- und [GET]-Befehle.</p>
+
+        <h2>Laden ohne Erweiterung</h2>
+
+        <p>Manchmal ist es notwendig, daß die Daten auf den neuen Spuren von einem Programm gelesen werden müssen, die Basic-Erweiterung aber nicht aktiv sein darf. Für diesen Fall gibt es im Listing 4 die Laderoutine auch lose und relokatibel. Die Anwendung ist etwas kompliziert, dadurch kann die Laderoutine aber sehr einfach in eigene Programme eingebaut werden. Dies sollten Sie aber nur versuchen, wenn Sie schon Erfahrung mit Maschinensprache haben.</p>
+
+        <p>Zur Erklärung: Nachdem Sie die Laderoutine mit »LOAD "name",8,1« geladen haben, können Sie sie mit einem Monitor in beliebige Speicherbereiche legen. Um die Adressen anzupassen, müssen Sie die Startadresse der Laderoutine im LO/HI-Format in 254, 254 schreiben. Der Anfangsblock muß in Speicherzelle 139 geschrieben werden, die Ladeadresse im LO/HI-Format in die Zellen 251 und 252.</p>
+
+        <p>Danach wird die Laderoutine mit »SYS startadresse+510« aufgerufen. Soll ein zweites Mal geladen werden, genügt die Angabe von neuer Ladeadresse und Anfangsblock und der Aufruf mit »SYS startadresse«.</p>
+
+        <p>Nach dem Ladevorgang kann in der Speicherzelle 2 geprüft werden, ob alles geklappt hat. Dann steht dort eine 0. Trat während des Ladens ein Fehler auf, ist dort eine 14 anzufinden.</p>
+
+        <address class="author">(Germano Carroni/bs)</address>
+        <figure>
+            <pre data-filename="track40.prg" data-name="Track40" data-mse=mse1></pre>
+            <figcaption>Listing 1. Die Basic-Erweiterung »TRACK40«. Bitte mit dem MSE eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="track40.prg" data-name="Track40"></div>
+        <figure>
+            <pre data-filename="track40.source" data-name="Track40-Source"></pre>
+            <figcaption>Listing 2. Der Source-Code zu »TRACK40«. Bitte nicht eingeben, dient nur zur Dokumentation.</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="track40.demo" data-name="Track40-Demo"></pre>
+            <figcaption>Listing 3. Ein kleines Beispielprogramm zur Anwendung der neuen Befehle</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="track40.laden.prg" data-name="Track40-Laderoutine" data-mse=mse1></pre>
+            <figcaption>Listing 4. Zum Einbau in eigene Programme hier die Laderoutine. Bitte beachten Sie die Eingabehinweise.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="track40.laden.prg" data-name="Track40-Laderoutine"></div>
+    </article>
+</body>
+
+</html>

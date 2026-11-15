@@ -1,0 +1,37 @@
+# SH09 30-0.png: the lead photo of article 30 is the OWNER'S JOIN of two scans, and part of it was never scanned
+
+What. 30-0.png, the lead picture of »In die Geheimnisse der Floppy eingetaucht« (opened 1541 with its board
+raised, a floppy disk and an arrow), is printed across the page turn: its left part on p30 and its right part on
+p31. The worklist asked for two cuts, 30-0a from sheets600/030 and 30-0b from sheets600/031. On 2026-11-14 the
+owner delivered ONE file instead, 30-0.png, 5851x6204, 600 dpi sRGB. He joined the two halves across the fold
+himself and cut the photo out onto white. Control ruled on 2026-11-14 that it ships as one figure under the base
+name 30-0.
+
+Measured on the delivered raw (kept unaltered in <tmp>/delivery-2026-11-14/png/30-0.png, and under
+issues/SH09/png/c/30-0.png, git-ignored):
+- Left half: a pixel copy of sheets600/030.png (template match 1.000 at three places), the crop frame placed at
+  sheet offset -2198,-502. That is, crop(x,y) = sheet030(x+2198, y+502).
+- Right half: a pixel copy of sheets600/031.png (match 1.000 at three places), at offset +2799,-485. That is,
+  crop(x,y) = sheet031(x-2799, y+485). This is the p031 sheet AFTER its paper-yellowing regrade
+  (reviewed/regrade_031.py, 20:36); the crop was cut at 21:56.
+- So the halves are aligned on content, not abutted. The p31 half sits 17 px lower than a plain abutment would
+  put it, and the two sheets' fold edges overlap by 43 px (p30's right edge at crop x 2842, p31's left edge at
+  crop x 2799).
+- A BAND ABOUT 10 MM WIDE ACROSS THE FOLD, crop x ~2650..2890 (about 240 px), MATCHES NEITHER SCAN. Column by
+  column, the share of non-white pixels that equal sheet030 falls from 1.0 at x 2625 to 0 by x 2775; the share
+  equal to sheet031 rises from 0.06 at x 2800 to 0.99 at x 2870 and 1.0 from x 2895. These pixels are the owner's
+  retouch, made by hand. They exist in no scan and in no derivative of one.
+- Cut-out: everything around the photo is pure white; 57.6 % of all pixels are exactly 255,255,255. The p30 column
+  text that wraps on a slant beside the photo is not in the file.
+- By eye, once, across the seam at three heights (board corner, drive interior, drive front with the arrow and the
+  disk edge): no step, no doubling, no misregistration.
+
+What ships. 30-0.png in issues/SH09/ is the c/ bucket's conversion of that raw (convert-scans.sh, -resize 25 %,
+1463x1551, 150 dpi). The retouched band is in it, at about x 662..722.
+
+The unjoined halves, for a later reader who wants the page as scanned:
+- sheets600/030.png, crop x 2198..5040, y 502..6706 (the left part of the photo and the text beside it);
+- sheets600/031.png, crop x 0..3052, y 485..6689.
+sheets600 lives in <tmp> and is swept with it. It is re-derived from the raw scans /Volumes/S/png/SH09/030.png and
+031.png by r005_masters_sheet. For p031 this also needs reviewed/regrade_031.py: without it the regrade is lost and
+the half comes back with the yellowed edge.

@@ -1,0 +1,509 @@
+
+
+;dita.bas.prg ==0801==
+   10 rem ********************************
+   20 rem *                              *
+   30 rem *   s.linke  &  j.pleschka     *
+   40 rem *                              *
+   50 rem ********************************
+   60 rem
+   70 rem
+   80 rem dita kors: 1 20.5.86
+   90 az = 100 * 3 :rem fuer etiketten
+  100 dim et$(300)
+  110 af = 32 :rem anzahl files auf tasche
+  120 dim sa$(32),sb$(32) :rem files seite a / seite b
+  130 for i=1toaz:et$(i)="*":next
+  140 ae = 1 :rem anzahl etiketten
+  150 et$(0) = "   (c) s.linke & j.pleschka   "
+  160 et$(1) = " tel.:07533 / 2087     "
+  170 et$(2) = " tel.:07533 / 3128     "
+  180 poke53280,0:poke53281,0:poke646,1
+  190 printchr$(142) :rem gross/grafik
+  200 poke788,52  :rem stoptaste sperren
+  210 printchr$(8) :rem shift/commodore sperren
+  220 rem --------------------
+  230 rem char-code fuer etikett auf vdu
+  240 lo = 207:ro = 208
+  250 lu = 204:ru = 186
+  260 lb = 180:rb = 170
+  270 ob = 183:ub = 175
+  280 si =  18:so = 146
+  290 rem --------------------
+  300 lg = 30
+  310 na$ = "disk.etiketten"
+  320 le$ = "    "
+  330 f1 = 153 :rem hellgruen
+  340 f2 =  28 :rem rot
+  350 f3 = 158 :rem gelb
+  360 dim c1(4),c2(4)     :rem farben
+  370 dim m$(24)
+  380 rem --------------------
+  390 rem menue-zeilen
+  400 m$(1)  = "erfassen "
+  410 m$(2)  = "druck    "
+  420 m$(3)  = "etiketten"
+  430 m$(4)  = "korrektur"
+  440 rem --------------------
+  450 m$(5)  = "seite a  "
+  460 m$(6)  = "seite b  "
+  470 m$(7)  = "druck    "
+  480 m$(8)  = "fertig   "
+  490 rem --------------------
+  500 m$(9)  = "tasche   "
+  510 m$(10) = "etiketten"
+  520 m$(11) = "fertig   "
+  530 m$(12) = "         "
+  540 rem --------------------
+  550 m$(13) = "sichern  "
+  560 m$(14) = "laden    "
+  570 m$(15) = "fertig   "
+  580 m$(16) = "         "
+  590 rem --------------------
+  600 m$(17) = "kennung  "
+  610 m$(18) = "fertig   "
+  620 m$(19) = "         "
+  630 m$(20) = "         "
+  640 rem --------------------
+  650 m$(21) = "vorlegen "
+  660 m$(22) = "druck    "
+  670 m$(23) = "fertig   "
+  680 m$(24) = "         "
+  690 rem --------------------
+  700 rem diverse  strings fuer druck
+  710 hd$ = "{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+  720 ri$ = "{rght}{rght}{rght}{rght}{rght}"
+  730 ke$ = " kennung (maximal 30 zeichen) "
+  740 z1$ = ke$
+  750 t1$ = "                "
+  760 t2$ = "                              "
+  770 d1$ = "*  "
+  780 d2$ = "  *"
+  790 d3$ = "************************************"
+  800 d4$ = "+......+"
+  810 d6$ = "........................................................"
+  820 dm$ = "                                                        "
+  830 dx$ = "--------------------------------------------------------"
+  840 d7$ = "      "
+  850 d8$ = "                         "
+  860 dim pe(10)
+  870 pe$(0) = " "
+  880 pe$(1) = ".      .          "
+  890 pe$(2) = "          .      ."
+  900 pe$(3) = ".      ."
+  910 pe$(4) = "       ."
+  920 pe$(5) = ".       "
+  930 dl$ = "                              "
+  940 goto 1580 :rem ins hauptprogramm
+  950 rem ------------------------------
+  960 rem drucker anmelden
+  970 open 3,4
+  980 return
+  990 rem ------------------------------
+ 1000 rem zeichen z der laenge lg ausgeben
+ 1010 fori=1tolg:printchr$(z);:next
+ 1020 return
+ 1030 rem ------------------------------
+ 1040 rem rahmen ausgeben
+ 1050 printchr$(147); :rem clr/home
+ 1060 print"{down}{down}{down}{down}";
+ 1070 z=ob:printle$;chr$(lo);:gosub 1010:printchr$(ro)
+ 1080 z=32:printle$;chr$(lb);:gosub 1010:printchr$(rb)
+ 1090 z=ub:printle$;chr$(lu);:gosub 1010:printchr$(ru)
+ 1100 z=32
+ 1110 for j=1to4
+ 1120 printle$;chr$(lb);:gosub 1010:printchr$(rb)
+ 1130 next
+ 1140 z=ub:printle$;chr$(lu);:gosub 1010:printchr$(ru)
+ 1150 return
+ 1160 rem ------------------------------
+ 1170 rem menuezeilen ausgeben
+ 1180 printchr$(19);
+ 1190 printchr$(si);chr$(c1(1));m$(1);chr$(so);chr$(32);
+ 1200 printchr$(si);chr$(c1(2));m$(2);chr$(so);chr$(32);
+ 1210 printchr$(si);chr$(c1(3));m$(3);chr$(so);chr$(32);
+ 1220 printchr$(si);chr$(c1(4));m$(4);chr$(so);chr$(32)
+ 1230 p = m0*4
+ 1240 rem ------------------------------
+ 1250 print hd$;
+ 1260 printchr$(si);chr$(c2(1));m$(p+1);chr$(so);chr$(32);
+ 1270 printchr$(si);chr$(c2(2));m$(p+2);chr$(so);chr$(32);
+ 1280 printchr$(si);chr$(c2(3));m$(p+3);chr$(so);chr$(32);
+ 1290 printchr$(si);chr$(c2(4));m$(p+4);chr$(so);chr$(32);
+ 1300 if z1$ = "*"thenz1$=      dl$
+ 1310 print left$(hd$,6);ri$;chr$(f3);chr$(si);z1$;chr$(so);
+ 1320 print left$(hd$,9);ri$;
+ 1330 if z2$ = "*"thenz2$=left$(dl$,23)
+ 1340 if z3$ = "*"thenz3$=left$(dl$,23)
+ 1350 printchr$(si);chr$(f3);"a:";chr$(so);chr$(f1);"  ";z2$
+ 1360 print"{down}";ri$;
+ 1370 printchr$(si);chr$(f3);"b:";chr$(so);chr$(f1);"  ";z3$
+ 1380 return
+ 1390 rem ------------------------------
+ 1400 rem highlight loeschen
+ 1410 for i=1to4:c1(i)=f2:c2(i)=f2:next
+ 1420 gosub1180
+ 1430 return
+ 1440 rem ------------------------------
+ 1450 rem auf zeichen von tastatur warten
+ 1460 poke 198,0
+ 1470 getx$:ifx$="" then 1470
+ 1480 z=asc(x$)
+ 1490 return
+ 1500 rem ------------------------------
+ 1510 rem abbruch nach diskerror
+ 1520 close2:close15
+ 1530 for i=1to5000:next
+ 1540 print left$(hd$,3);t2$;
+ 1550 goto1610
+ 1560 rem ------------------------------
+ 1570 rem menuesteuerung
+ 1580 fa=664:fb=664
+ 1590 z2$="*":z3$="*"
+ 1600 printchr$(f1);:gosub 1050
+ 1610 m = 1:mm=1:m0=1:m1 = 0 :rem norm menuesteuerung
+ 1620 for i=1to4:c1(i)=f2:c2(i)=f2:next
+ 1630 c1(m0) = f3
+ 1640 c2(m1) = f3
+ 1650 gosub 1180 :rem menuezeilen ausgeben
+ 1660 gosub 1460 :rem zeichen von tastatur
+ 1670 rem wenn f8 dann stop und shift/commodore zulassen und schluss
+ 1680 if z=140  then poke788,49:printchr$(9):end
+ 1690 if z=13  then 1800
+ 1700 if z=19  then 1610
+ 1710 if z<>32 then 1660
+ 1720 mm=mm+1
+ 1730 if m  > 2 then m  = 1
+ 1740 if mm > 4 then mm = 1
+ 1750 if m=1 then m0=mm:goto1620
+ 1760 m1=mm
+ 1770 if m$((m0*4)+m1) = "         " then  m1=1:mm=1
+ 1780 goto  1620
+ 1790 rem ------------------------------
+ 1800 gosub 1410 :rem highlight loeschen
+ 1810 if m = 1 then m=2:m1=1:mm=1:goto1750
+ 1820 if (m0=1) then 2400 :rem erfassen
+ 1830 if (m0=2) then 3760 :rem druck
+ 1840 if (m0=3) then 4580 :rem etiketten
+ 1850 if (m0=4) then 1880 :rem korrektur
+ 1860 rem ------------------------------
+ 1870 rem **** korrektur *****
+ 1880 if m1=2then 1610 :rem fertig
+ 1890 k$ = "":zz=0
+ 1900 print left$(hd$,6);">";
+ 1910 gosub 1460 :rem zeichen von tastatur
+ 1920 if z=13 then print left$(hd$,6);" ";:mm=mm+1:goto1730
+ 1930 if z=19 then zz=0:k$="":goto 1990 :rem clr
+ 1940 if z<>20 then gosub 2190:goto 1980
+ 1950 if zz<=1 then zz=0:k$="":goto 1990
+ 1960 zz=zz-1:k$=left$(k$,zz) :goto 1990
+ 1970 if zz=30 then 2010
+ 1980 k$ = k$+x$:zz=zz+1
+ 1990 ke$=left$(k$+t2$,30)
+ 2000 et$((ae*3)   ) = ke$
+ 2010 z1$ = ke$
+ 2020 gosub 1310
+ 2030 goto  1910
+ 2040 rem ------------------------------
+ 2050 rem initialisierung disk
+ 2060 open15,8,15,"i0"
+ 2070 rem fehlerabfrage disk
+ 2080 input#15,a$,b$,c$,d$
+ 2090 if a$="00" then return
+ 2100 printleft$(hd$,3);t2$;
+ 2110 print left$(hd$,3);a$;",";b$;",";c$;",";d$
+ 2120 return
+ 2130 rem ------------------------------
+ 2140 rem zeichen von disk kolen
+ 2150 rem auf druckbarkeit pruefen
+ 2160 rem *****************************
+ 2170 get#2,x$:if x$="" then x$=chr$(0)
+ 2180 z=asc(x$)
+ 2190 if z =160 then x$=".":return
+ 2200 if z < 32 or z > 127 then x$="?" :rem unzul.zeichen
+ 2210 return
+ 2220 rem ------------------------------
+ 2230 rem startadresse ermitteln
+ 2240 aa$ = "      "
+ 2250 if ft <> 2 then return :rem nicht prg-file
+ 2260 if sp=0 and se=0 then return
+ 2270 open 3,8,3,"#"
+ 2280 print#15,"b-r";3;0;sp;se
+ 2290 gosub 2080 :rem diskerror  abfragen
+ 2300 if a$<>"00" then 2370
+ 2310 print#15,"b-p";3;2
+ 2320 get#3,x$:ifx$=""thenx$=chr$(0)
+ 2330 al=asc(x$)
+ 2340 get#3,x$:ifx$=""thenx$=chr$(0)
+ 2350 ah=asc(x$)*256
+ 2360 aa=al+ah:aa$=right$("      "+str$(aa),6)
+ 2370 close3:return
+ 2380 rem ------------------------------
+ 2390 rem erfassen
+ 2400 if m1=4 then ae=ae+1:sa=0:sb=0:goto1580 :rem fertig
+ 2410 if m1=3 then m=2:m0=2:m1=1:mm=1:goto 1620
+ 2420 gosub2060
+ 2430 if a$ <> "00" then 1520
+ 2440 open2,8,2,"#"  :rem datenkanal
+ 2450 print#15,"b-r";2;0;18;0
+ 2460 print#15,"b-p";2;144
+ 2470 dn$=""
+ 2480 fori=1to16:gosub 2170:dn$=dn$+x$:next
+ 2490 get#2,x$:get#2,x$
+ 2500 id$ =""
+ 2510 gosub 2170:id$=id$+x$
+ 2520 gosub 2170:id$=id$+x$
+ 2530 xx$=dn$+" id= "+id$
+ 2540 et$((ae*3)+m1) = xx$
+ 2550 et$(ae*3) = z1$
+ 2560 z2$=et$((ae*3)+1):z3$=et$((ae*3)+2):gosub 1310
+ 2570 print left$(hd$,14);
+ 2580 fori=1to8
+ 2590 printt2$;
+ 2600 printleft$(t2$,6)
+ 2610 next
+ 2620 print left$(hd$,13)
+ 2630 printchr$(si);
+ 2640 if m1=1then print "a:";
+ 2650 if m1=2then print "b:";
+ 2660 printchr$(so);"  ";
+ 2670 t=18:s=1
+ 2680 y2=0 :rem zaehler der files
+ 2690 y3=14:rem fuer fileuebernahme
+ 2700 y4=0 :rem fuer anfrage
+ 2710 if m1=1 then sa=0:fori=0toaf:sa$(i)= "*":next
+ 2720 if m1=2 then sb=0:fori=0toaf:sb$(i)= "*":next
+ 2730 printleft$(hd$,22);chr$(si);"return";chr$(so);" = uebernehmen ";
+ 2740 print chr$(si);"space";chr$(so);" = ignorieren"
+ 2750 rem ------------------------------
+ 2760 rem freie bloecke ermitteln
+ 2770 bf = 0
+ 2780 for i=4to140step4
+ 2790 if i=72 then 2830 :rem spur 18
+ 2800 print#15,"b-p";2;i
+ 2810 get#2,x$:ifx$=""then x$=chr$(0)
+ 2820 bf = asc(x$)+bf
+ 2830 next
+ 2840 if m1=1 then fa=bf
+ 2850 if m1=2 then fb=bf
+ 2860 rem ------------------------------
+ 2870 print#15,"u1";2;0;t;s
+ 2880 gosub2080:rem diskfehler abfragen
+ 2890 if a$ <> "00" then 1520
+ 2900 print#15,"b-p";2;0
+ 2910 get#2,x$:ifx$=""thenx$=chr$(0)
+ 2920 t=asc(x$)
+ 2930 get#2,x$:ifx$=""thenx$=chr$(0)
+ 2940 s=asc(x$)
+ 2950 rem schleife fuer 8 files anfang
+ 2960 for x=0to7
+ 2970 if y2>af-1 then 3500 :rem zuviele files
+ 2980 print#15,"b-p";2;x*32+2
+ 2990 get#2,x$:ifx$=""thenx$=chr$(0):rem filetyp
+ 3000 ty = asc(x$)
+ 3010 get#2,x$:ifx$=""thenx$=chr$(0):rem spur
+ 3020 sp = asc(x$)
+ 3030 get#2,x$:ifx$=""thenx$=chr$(0):rem sektor
+ 3040 se = asc(x$)
+ 3050 print#15,"b-p";2;x*32+30
+ 3060 get#2,x$:ifx$=""thenx$=chr$(0):rem filetyp
+ 3070 nb = asc(x$)
+ 3080 get#2,x$:ifx$=""thenx$=chr$(0):rem filetyp
+ 3090 hb = asc(x$)*256
+ 3100 bl=hb+nb
+ 3110 ft = ty  and 15     :rem filetyp
+ 3120 if ft = 0 then 3500 :rem del-file nicht ausgeben
+ 3130 print#15,"b-p";2;x*32+5
+ 3140 ff$=""
+ 3150 for ii=1to16
+ 3160 gosub 2170 :rem filename holen
+ 3170 ff$=ff$+x$
+ 3180 next ii
+ 3190 ff$=ff$+" "
+ 3200 if ft=1 then ft$="seq"
+ 3210 if ft=2 then ft$="prg"
+ 3220 if ft=3 then ft$="usr"
+ 3230 if ft=4 then ft$="rel"
+ 3240 if ft>4 then ft$="???"
+ 3250 k$  = ">"
+ 3260 if ty and  64 then 3300
+ 3270 k$  = " "
+ 3280 if ty and 128 then 3300
+ 3290 k$  = "*"
+ 3300 ft$= k$+ft$
+ 3310 bl$=right$("   "+str$(bl),3)
+ 3320 bl$=bl$+"  "
+ 3330 gosub 2240 :rem startadresse ermitteln
+ 3340 xx$=bl$+ff$+ft$+aa$
+ 3350 if y4 then 3440
+ 3360 printleft$(hd$,y3);left$(ri$,4);
+ 3370 printchr$(si);xx$;chr$(so);
+ 3380 gosub 1460 :rem zeichen von tastatur
+ 3390 if z=136 then y4=1:goto 3410
+ 3400 if z<>32 and z<>13 then 3380
+ 3410 printleft$(hd$,y3);left$(ri$,4);
+ 3420 print t2$;"  "
+ 3430 if z=32 then 3500 :rem ignorieren
+ 3440 printleft$(hd$,y3);left$(ri$,4);
+ 3450 print xx$
+ 3460 if m1=1 then sa$(sa)=xx$:sa=sa+1
+ 3470 if m1=2 then sb$(sb)=xx$:sb=sb+1
+ 3480 y2=y2+1:y3=y3+1
+ 3490 if y3 >= 22then y3=14
+ 3500 nextx
+ 3510 rem schleife fuer 8 files (ende)
+ 3520 if y2>af-1 then t=0:rem das sind genug
+ 3530 if t<>0 then goto 2870
+ 3540 close2
+ 3550 close15
+ 3560 mm=mm+1:goto1740
+ 3570 rem ------------------------------
+ 3580 rem leerzeile ausgeben
+ 3590 print#3,pe$(pa);d1$;dl$;d2$;pe$(pe)
+ 3600 return
+ 3610 rem ------------------------------
+ 3620 rem etikett ausgeben
+ 3630 print#3,pe$(pa);d3$;pe$(pe)
+ 3640 if z1$ = "*" then gosub 3590:goto 3660
+ 3650 print#3,pe$(pa);d1$;z1$;d2$;pe$(pe)
+ 3660 print#3,pe$(pa);d3$;pe$(pe)
+ 3670 print#3,pe$(pa);d1$;dl$;d2$;pe$(pe)
+ 3680 if z2$ = "*" then gosub 3590:goto 3700
+ 3690 print#3,pe$(pa);d1$;" a: ";z2$;"   ";d2$;pe$(pe)
+ 3700 if z3$ = "*" then gosub 3590:goto 3720
+ 3710 print#3,pe$(pa);d1$;" b: ";z3$;"   ";d2$;pe$(pe)
+ 3720 print#3,pe$(pa);d1$;dl$;d2$;pe$(pe)
+ 3730 print#3,pe$(pa);d3$;pe$(pe)
+ 3740 return
+ 3750 rem ------------------------------
+ 3760 if m1 = 3 then sa=0:sb=0:ae=ae+1:goto 1580 :rem fertig
+ 3770 rem druck
+ 3780 if m1 = 1 then 4320 :rem taschen
+ 3790 rem etiketten vorlegen/drucken
+ 3800 pp = 0:rem anfang etiketten
+ 3810 gosub 970 :rem drucker anmelden
+ 3820 p=20 :rem steuerung menue
+ 3830 m1=1
+ 3840 for i=1to4:c2(i)=f2:next
+ 3850 c2(m1) = f3
+ 3860 gosub 1250 :rem menuezeile ausgeben
+ 3870 gosub 1460 :rem zeichen von tastatur
+ 3880 if z=13 then 3930
+ 3890 if z<>32 then 3870
+ 3900 m1=m1+1
+ 3910 if m1>3 then m1=1
+ 3920 goto 3840
+ 3930 if m1=3 then close3:goto1580
+ 3940 if m1=2 then pa=0:pe=0:gosub3630:print#3:m1=1:goto 3840
+ 3950 pp = pp+1
+ 3960 z1$ = et$((pp*3)-3)
+ 3970 z2$ = et$((pp*3)-2)
+ 3980 z3$ = et$((pp*3)-1)
+ 3990 gosub 1310
+ 4000 m1=m1+1
+ 4010 goto 3840
+ 4020 rem ------------------------------
+ 4030 rem leerzeile tasche
+ 4040 print#3,pe$(pa);dm$;pe$(pe)
+ 4050 zz=zz+1
+ 4060 return
+ 4070 rem ------------------------------
+ 4080 rem trenner tasche vorn/hinten
+ 4090 gosub 4040:gosub 4040
+ 4100 print#3,d4$;dx$;d4$
+ 4110 pa=4:pe=5
+ 4120 gosub 4040:gosub 4040
+ 4130 return
+ 4140 rem ------------------------------
+ 4150 rem zeile fuer tasche seite a
+ 4160 if zz = 10  then gosub 4090
+ 4170 if sa$(i) = "*" then sa$(i) = d8$
+ 4180 if ww=0 then ww=1:xx$=mid$(sa$(i),6,19)+right$(sa$(i),6):return
+ 4190 xx$=xx$+"  "+mid$(sa$(i),6,19)+right$(sa$(i),6)
+ 4200 print#3,pe$(pa);"  ";xx$;"  ";pe$(pe)
+ 4210 zz=zz+1:ww=0
+ 4220 return
+ 4230 rem ------------------------------
+ 4240 rem zeile fuer tasche seite b
+ 4250 if zz = 10  then gosub 4090
+ 4260 if sb$(i) = "*" then sb$(i) = d8$
+ 4270 if ww=0 then ww=1:xx$=mid$(sb$(i),6,19)+right$(sb$(i),6):return
+ 4280 xx$=xx$+"  "+mid$(sb$(i),6,19)+right$(sb$(i),6)
+ 4290 goto4200
+ 4300 rem ------------------------------
+ 4310 rem tasche drucken
+ 4320 gosub 970 :rem drucker anmelden
+ 4330 pa=3:pe=3
+ 4340 print#3,d4$;d6$;d4$
+ 4350 gosub 4040
+ 4360 pa=1:pe=2 :rem fuer etikett
+ 4370 gosub 3630
+ 4380 pa=3:pe=3
+ 4390 gosub 4040
+ 4400 zz =  0
+ 4410 ifsa=0 then fori=0toaf:sa$(i)="*":next
+ 4420 ifsb=0 then fori=0toaf:sb$(i)="*":next
+ 4430 xx$=right$("    "+str$(fa),3)
+ 4440 print#3,pe$(pa);" a=  ";xx$;" bloecke frei    ";d8$;d7$;pe$(pe)
+ 4450 ww=0
+ 4460 for i=0toaf-1:gosub4160:next
+ 4470 xx$=right$("    "+str$(fb),3)
+ 4480 gosub 4040
+ 4490 print#3,pe$(pa);" b=  ";xx$;" bloecke frei    ";d8$;d7$;pe$(pe)
+ 4500 ww=0
+ 4510 for i=0toaf-1:gosub4250:next
+ 4520 gosub 4040:gosub 4040
+ 4530 print#3,pe$(pa);d6$;pe$(pe)
+ 4540 fori=1to18:print#3:next :rem neue seite
+ 4550 close3:mm=mm+2:goto1730
+ 4560 rem ------------------------------
+ 4570 rem etiketten laden
+ 4580 if m1=3 then 1610 :rem fertig
+ 4590 gosub 2060 :rem disk initialisieren
+ 4600 if a$ <> "00" then 1520 :rem disk-error
+ 4610 if m1=1 then 4840 :rem sichern
+ 4620 open2,8,2,na$+",s,r"
+ 4630 gosub 2080
+ 4640 if a$ <> "00" then 1520 :rem file nicht da
+ 4650 ae=0
+ 4660 gosub 4780
+ 4670 et$(ae*3) = xx$
+ 4680 gosub 4780
+ 4690 et$((ae*3)+1) = xx$
+ 4700 gosub 4780
+ 4710 et$((ae*3)+2) = xx$
+ 4720 if st = 64 then 4750
+ 4730 if et$(ae*3) = "*" then 4750
+ 4740 ae=ae+1:goto 4660
+ 4750 close2:close15
+ 4760 mm=3:goto 1740
+ 4770 rem ------------------------------
+ 4780 xx$=""
+ 4790 get#2,x$
+ 4800 if asc(x$) = 13 then return
+ 4810 xx$=xx$+x$:goto 4790
+ 4820 rem ------------------------------
+ 4830 rem etiketten sichern
+ 4840 open2,8,2,na$+",s,w"
+ 4850 gosub 2080
+ 4860 if a$  = "00" then 4900 :rem ok
+ 4870 close2
+ 4880 print#15,"s:"+na$       :rem file-loeschen
+ 4890 goto 4840
+ 4900 for i=0toae+1
+ 4910 xx$=et$(3*i)
+ 4920 gosub 5020
+ 4930 xx$=et$((3*i)+1)
+ 4940 gosub 5020
+ 4950 xx$=et$((3*i)+2)
+ 4960 gosub 5020
+ 4970 next
+ 4980 close2:close15
+ 4990 print"{home}{down}{down}";t2$;
+ 5000 mm=3:goto 1740
+ 5010 rem ------------------------------
+ 5020 for j=1tolen(xx$):x$=mid$(xx$,j,1):print#2,x$;:next
+ 5030 print#2,chr$(13);
+ 5040 return
+ 5050 rem ------------------------------
+

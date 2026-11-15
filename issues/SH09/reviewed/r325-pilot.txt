@@ -1,0 +1,31 @@
+# r325 pilot reader: 25 Grundlagen der Dateiverwaltung.html (p25-29). Crops in $TMPDIR_ISSUE/scratch_325/pilot/
+REJECT p026 pre 1.4/1.Beispiel lines 10-70: page matches HTML char for char; line 30 wraps after "CLOSE 2 :" and HTML joins "CLOSE 2 :CLOSE 1" per wrap-join convention, kept | c01_p026_ex1
+REJECT p026 pre 2.Beispiel: matches HTML; tesseract's "PRINT: A$" is a dust speck after PRINT, not a colon | c02_p026_ex2
+REJECT p027 pre 3.Beispiel: matches HTML char for char | c03_p027_ex3
+REJECT p027 pre 4.Beispiel: lines 10 (up to "LISTING-TEST,U,"), 20 CMD1:LIST, unnumbered CLOSE 1 match HTML; line tail cut by crop edge, see c04b | c04_p027_ex4
+REJECT p027 pre 4.Beispiel line 10 tail: page prints ',U,W"' as HTML | c04b_p027_ex4_tail
+REJECT p027 pre 5.Beispiel: lines 10-40 match HTML (up-arrow 2↑6 as printed, "OPEN 4,4" on line 10) | c05_p027_ex5
+PRINT-ERROR p027 5.Beispiel line 30 "IF B AND 2↑6 <> 0 THEN 20": C 64 BASIC binds <> tighter than AND, so this is B AND -1 = B; with ST=0 after a normal byte the loop ends after one character, and even as (B AND 64)<>0 the test is inverted against the text ("wenn dieses nicht gesetzt ist, das nächste Zeichen"); reader typing it gets one byte printed. Reasoned, not run; left as printed | c05_p027_ex5
+REJECT p027 pre 2.1 OPEN 2,8,2, "NAME,L,"+CHR$(40): matches HTML | c06_p027_open_rel
+REJECT p027 pre 2.1 init example lines 10-50: matches HTML; line 30 wraps after "CHR$(300/" and HTML joins "300/256" without space, correct | c07_p027_rel_init
+REJECT p027 pre P-command syntax: matches HTML; wraps after "CHR$(Lo)+", joined without space, correct | c08_p027_syntax
+REJECT p027 table P-command rows »P«/Sekundäradresse:/Lo:/Hi:: all cells match HTML; "Datensatz-|nummer" line hyphen correctly joined to Datensatznummer | c09_p027_table1
+REJECT p028 table P-command row Stelle: (continued from p027): matches HTML | c10_p028_table1_stelle
+REJECT p028 pre 2.2/1.Beispiel lines 10-50: matches HTML; line 40 wraps after "LANGER", HTML keeps one space at the join ("LANGER TEXT! ") - kept, since the string is then exactly 40 characters as the text says ("ganze 41 Zeichen" with Return); one space before closing quote as typed (pitch not measured, kept) | c11_p028_ex1
+REJECT p028 pre 2.2/2.Beispiel lines 10-130 incl. "99 :": all 10 lines match HTML char for char | c12_p028_ex2
+REJECT p028 pre 3.1 command list (6 lines U1/U2/B-P/B-A/B-F/OPEN): matches HTML; tesseract's "U1 30XY"/"B-AX Y" are its own spacing loss, page has single spaces | c13_p028_cmds
+REJECT p029 table Spur/Sektoren: all 8 data cells and "Spurnummer:" match HTML; header right edge cut by crop, see c14b | c14_p029_table2
+PRINT-ERROR p029 table last row "31-25" (should be 31-35, the 1541's last track); reader impact small, the row's 17 sectors and the 664-block count elsewhere make the intent clear; reasoned; left as printed | c14_p029_table2
+REJECT p029 table header "Anzahl Sektoren:": matches HTML | c14b_p029_table2_head
+REJECT p029 pre 3.2 write example lines 10-70: matches HTML char for char; line 40 wraps after "A;B," inside the REM, HTML joins "A;B, wenn" with a space (REM prose, gap hidden by the wrap, kept); line 50 wraps after "A,B$," joined "A,B$,C,D" correct; a small pen-like tick above the N of the second OPEN in line 10 is not text | c15_p029_write
+PRINT-ERROR p029 3.2 write example line 10 "OPEN 1,8,15 "I":OPEN 2,8,3,"#"": comma missing after 15 (the read example prints "OPEN 1,8,15,"I""); typed as printed it gives ?SYNTAX ERROR. Reasoned, not run; left as printed | c15_p029_write
+REJECT p029 pre 3.2 read example lines 10-30: match HTML; line 30 wraps after "C,D:" joined "C,D:CLOSE1" correct; "A<>0THENPRINT" printed run-together as in HTML, the 0/O glyph before THEN cannot decide at this face, kept as 0 | c16_p029_read_a
+REJECT p029 pre 3.2 read example lines 40-70 (top of right column): match HTML | c17_p029_read_b
+PRINT-ERROR p029 3.2 read example line 50 "PRINT#1, T$:PRINT T$": a read needs INPUT#2,T$ (data channel); as printed it sends an empty T$ to the command channel and the text "HALLO DU DA!" is never read. Reader impact: the example does not do what its heading says. Reasoned, not run; left as printed | c17_p029_read_b
+REJECT p026 prose "Wenn man dies nicht machen, sondern": page prints "machen" (grammar slip in print), HTML matches; left as printed | c19_p026_machen
+REJECT p028 prose "daß kein »PRINT« vorkommt": page prints »PRINT« with no semicolon, HTML matches | c20_p028_print
+REJECT p027 prose "Von Ihnen gibt es nur": page prints capital "Ihnen" (print slip for "ihnen"), HTML matches; left as printed | c21_p027_ihnen
+REJECT p028 heading "3. Random-Access-Dateien": page prints "Access" (tesseract's "Acess" is its own), HTML matches | c18_p028_heading3
+NOTE no repeated-character run longer than 3 in any of the 13 hand-typed pre blocks (counted on the HTML); nothing to count in the crops. Spacing within lines read as single spaces throughout; pitch not measured, transcription kept.
+NOT-SEEN none
+COVERAGE: pre blocks read 13/13, tables 2/2, prose spot-checks 4; crops read 23 / crops actually seen 23

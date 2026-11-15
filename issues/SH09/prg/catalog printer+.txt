@@ -1,0 +1,110 @@
+
+
+;catalog printer+.prg ==0801==
+    5 goto 20
+   10 a$="catalog printer+":open1,8,15,"s:"+a$:close1:save a$,8:end
+   11 'capri + file printer aus 64'er sonder2/86 s.111 / 29.5.86 / kd
+   12 'capri by herbert kaufhold, auf den stoecken 17a, 4040 neuss 22
+   13 'file printer by klaus grabietz, am weinberg 14, 3108 winsen
+   14 ' 64 -ersion
+   15 :
+   20 poke 53280,0:poke 53281,11:print "{clr}{cyn}"chr$(14)
+   30 close4:open4,4,0:close4
+   40 if st and-64 then print,"{rvon}Drucker einschalten{up}":goto 30
+   50 :
+   60 s=704:dj=86:rem dj=jahr
+   70 c$=chr$(13):e$=chr$(27):o$=chr$(0):gosub 930:poke s+3,dj:poke 198,0
+   90 :
+  100 print"{clr}{down}{down}"," Directory Printer
+  110 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}   Naechste Diskette - {rvon}'F7'{rvof} oder {rvon}RETURN
+  120 if w=64 then print"{down}   Druck wiederholen - {rvon}'F5'"
+  130 print,"{down}validieren - {rvon}'F3'"
+  140 print,"{down}      Ende - {rvon}'F1'"
+  150 wait 198,1:get a$:as=asc(a$):poke 198,0:if as=135 and w<>64 then as=0
+  160 if as=136 and w=64 then gosub 300:goto 100
+  170 if as=13 then as=136
+  180 on as+132*(as>132) gosub 3000,1020,600,200:goto 100
+  190 :
+  200 dj=peek(s+3):dj$=mid$(str$(dj),2)
+  210 gosub 800:if d3$<>dj$ then d$="{rvon}ttmm"+dj$
+  220 print"{lgrn}{home}{down}{down}{down}{down}{down}{down}Tagesdatum  :"d$c$"{up}"spc(11);
+  230 inputd$:if right$(d$,2)<>dj$then220
+  240 if d$=da$ then300
+  250 poke s,val(mid$(d$,1,2)):poke s+1,val(mid$(d$,3,2))
+  260 poke s+2,val(mid$(d$,5,2)):gosub 800:rem datum
+  270 :
+  290 rem=== block's free / dir-name
+  300 w=0:n=0:cc$="":print"{clr}{lgrn}";:gosub 1000:if de=21 then gosub 2100:goto 510
+  310 open2,8,2,"#":get#2,a$:p=asc(a$+o$)+3
+  320 print#15,"m-r"chr$(250)chr$(2):get#15,bl$
+  330 print#15,"m-r"chr$(252)chr$(2):get#15,bh$:bf=asc(bl$+o$)+256*asc(bh$+o$)
+  340 sp=18:se=0:gosub870:bf$=right$("   "+str$(bf),4)
+  350 print#15,"m-r"chr$(144)chr$(7)chr$(23)
+  360 a$="":cc$="":input#15,a$:cc$=left$(a$,16):id$=mid$(a$,19,2)
+  365 :
+  370 sp=18:se=1:print"{clr}"," "dd$c$," {rvon}"cc$"{rvof} {rvon}"id$
+  380 :
+  390 rem=== dir lesen
+  400 gosub870:if ed=10 then500
+  410 for di=0 to 7:pz=di*32:print#15,"b-p 2";pz+2:gosub 2000:rem err
+  420 : if de then ed=10:di=10
+  430 : get#2,a$:a=asc(a$+o$):b=a-(a and128):if a=0 then490:rem geloescht
+  435 : if b>64 then b=b-60
+  440 : print#15,"m-r"chr$(pz+5)chr$(p)chr$(16):input#15,f$:if len(f$)=16 then470
+  450 : print#15,"m-r"chr$(pz+5)chr$(p)chr$(16)
+  460 : f$="":fori=1 to 16:get#15,a$:f$=f$+a$:next
+  470 : print#15,"b-p 2";pz+30:get#2,bl$:get#2,bh$:bl=asc(bh$+o$)*256+asc(bl$+o$)
+  480 : n=n+1:f$(n)=right$("  "+str$(bl),4)+" "+f$+" "+b$(b):print"      "f$(n)
+  490 next:if ed=0 then400
+  500 printc$"      "bf$" bloecke frei.
+  510 close15:close2
+  520 :
+  590 rem=== print
+  600 if cc$="" then return
+  610 f=128:open f,4,1:print#f:cmd f:print e$"O";
+  620 print e$"P"e$chr$(15)e$"s"o$e$"a"chr$(5)e$"-1name : "cc$"  ID: "id$"  ";
+  630 print#f,bf$" bloecke frei.         Stand vom: "dd$" "e$"-0":print#f
+  640 if w then670
+  650 b=n/3:b%=b:if n=0 then710
+  660 if b<>b% then for x=1 to 3:f$(n+x)="":next:n=n+3
+  670 b%=n/3:for x=1 to b%
+  680 : print#f,f$(x)" "f$(x+b%)" "f$(x+2*b%)
+  690 next
+  700 :
+  710 w=64:close f:print"{clr}{cyn}"chr$(14):return
+  720 :
+  790 rem=== subroutine
+  800 d1$=right$("0"+mid$(str$(peek(s)),2),2)
+  810 d2$=right$("0"+mid$(str$(peek(s+1)),2),2)
+  820 d3$=right$("0"+mid$(str$(peek(s+2)),2),2):dd$=d1$+"."+d2$+"."+d3$
+  830 d$=d1$+d2$+d3$:da$=d$:return
+  840 :
+  850 rem"{rvon}{rvon} block read
+  860 ed=10:goto 900
+  870 print#15,"u1 2 0";sp;se:gosub 2000:if de then print"zeile {rvon}870":goto 860
+  880 ed=0:get#2,sp$:get#2,se$:sp=asc(sp$+o$):se=asc(se$+o$)
+  890 if sp=0 or sp>35 or se>20 then ed=1
+  900 return
+  910 :
+  920 rem"{rvon}{rvon} initialisieren
+  930 j=0:i=0:di=0:pz=0:se=0:a=0:b=0:bl=0:bf=0:w=0
+  940 b$(0)="    ":b$(1)="seq ":b$(2)="prg ":b$(3)="usr ":b$(4)="rel "
+  950 b$(5)="seq<":b$(6)="prg<":b$(7)="usr<":b$(8)="rel<"
+  960 dim f$(152)
+  970 return
+  980 :
+  990 rem"{rvon}{rvon} disk-anw.
+ 1000 open15,8,15,"i0":gosub 2000:return
+ 1010 :
+ 1020 open15,8,15,"v0":gosub 2000:return
+ 1030 :
+ 1990 rem"{rvon}{rvon} disk-err
+ 2000 input#15,de,de$,s1,s2
+ 2010 if de then print"{down}{rvon}"de;de$,s1;s2
+ 2020 return
+ 2030 :
+ 2100 print,"{down}{rvon}disk error #"de;c$"{down}weiter mit:   {down}{rvon}TASTE
+ 2110 poke198,0:wait198,1:return
+ 2990 rem=== ende
+ 3000 print"{clr}":close15:end
+

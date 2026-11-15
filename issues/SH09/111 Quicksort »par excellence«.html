@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Quicksort »par excellence«</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="U. Weingärtner, ks">
+    <meta name="64er.issue" content="Sonderheft 9/86">
+    <meta name="64er.pages" content="111-112">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips und Tricks">
+    <meta name="64er.id" content="quicksort">
+</head>
+
+<body>
+    <article>
+        <h1>Quicksort »par excellence«</h1>
+        <p class="intro">Einen neuen Quicksort-Algorithmus möchten wir Ihnen im folgenden vorstellen. Es handelt sich dabei um ein sehr schnelles und äußerst komfortables Werkzeug für Ihre Datenverwaltung</p>
+
+        <p>Nachdem wir im Laufe unseres 64'er-Magazins schon eine ganze Menge an Sortierprogrammen vorgestellt haben, wollen wir Sie in unserem Sonderheft mit dem wohl besten dieser Algorithmen verwöhnen.</p>
+
+        <p>Dieser Algorithmus ist äußerst schnell. Er sortiert 1000 Elemente in nur drei Sekunden und dürfte damit bei weitem allen Anwendungen genügen. Durch einen Basic-Lader, den Sie in Listing 1 abgedruckt finden, können Sie das Quicksort-Programm ganz einfach in eigene Programme einbinden. Es belegt die Zeilennummern von 10 000 bis 10 082 und wird mit</p>
+
+        <pre><code>GOSUB 10000</code></pre>
+
+        <p>gestartet. Nach einer kurzen Wartezeit von etwa acht Sekunden steht das Quicksort als Maschinenprogramm ab $C000 bis $C209 zur Verfügung und kann vom Basic-Programm aus angesprungen werden.</p>
+
+        <p>Die Startadresse von Quicksort ist normalerweise 49164 ($C00C), wobei ein Feld folgendermaßen sortiert werden kann:</p>
+
+        <p>Zum Beispiel das Feld A mit der Dimensionierung 100:</p>
+
+        <pre><code>SYS (49164), A(1), A(100)</code></pre>
+
+        <p>Wie Sie aus dieser Syntax erkennen können, kann sowohl der Name als auch die Dimensionierung beliebig sein. In unseren früher vorgestellten Algorithmen mußte das zu sortierende Feld jeweils das erste dimensionierte Feld in einem Programm sein. Bei dem neuen Quicksort-Programm spielt das keine Rolle mehr. Sie können jedes Feld sortieren. Dabei ist es egal, ob es sich um ein String-, Integer- oder Real-Variablenfeld handelt.</p>
+
+        <p>Auch die Grenzen der Sortierung können Sie angeben. Dabei bleibt der Rest des Feldes unberührt. Tippen Sie zum Beispiel</p>
+
+        <pre><code>SYS (49164), A(20), A(30)</code></pre>
+
+        <p>so werden nur die Elemente A(20) bis einschließlich A(30) sortiert.</p>
+
+        <p>Um den »Hardware-Stack« nicht zu belasten, werden hinter dem Programm 134 Byte für einen »Software-Stack« verwendet. Für die Assembler-Programmierer unter Ihnen zeigt Bild 1 noch einmal die Dokumentation der einzelnen Routinen im Quicksort-Programm.</p>
+
+        <address class="author">(U. Weingärtner/ks)</address>
+        <figure>
+            <pre>SYNTAX: SYS 49164, (linkes Grenzelement),
+                   (rechtes Grenzelement)
+$C000   Dimensionierte Variablen holen
+        C000    Variablenadresse holen
+        C003    Mit Anfangsadresse DIM's vergleichen
+        C009    kleiner?
+$C00C   Einsprung (Parameterauswertung)
+        C000    Anfangsadresse holen</pre>
+            <figcaption>Bild 1. Adressenbelegung bei Quicksort</figcaption>
+        </figure>
+
+        <figure>
+            <pre>        C016    Name merken
+        C01C    Endadresse holen
+        C023    Variablennamen vergleichen
+        C02D    Endadresse größer Anfangsadresse?
+        C033    gleich?
+        C035    größer?
+        C03B    Adresse merken
+        C03F    Variablenlänge holen (INT=2/TEXT=3/REAL=5)
+        C051    Stack initialisieren
+$C056   QUICKSORT: $FB/FC linkes Element (LI)
+                   $FD/FE rechtes Element (RE)
+                   $57 Variablenlänge
+        C056    58/59 = Endadresse - Anfangsadresse
+        C063    58/59 = INT (58/59 durch 57)
+        C07D    X-Reg/Y-Reg = 58/59 mal 57
+        C092    58/59 = X-Reg/Y-Reg + Anfangsadresse
+        C09C    Mittleres Element der Liste (P) nach $62 bis $66
+        C0A6    58/59 (X) = LI: 5A/5B (Y) = RE
+        C0AF    Vergleiche X mit Y
+        C0B9    größer gleich?
+        C0BB    drehe Elemente um P
+        C0C1    Vergleiche LI mit Y
+        C0CB    größer gleich?
+        C0CD    RE u. X auf Stack
+        C0E9    sortiere Teilliste links (LI bis Y)
+        C0EC    RE u. X zurück
+        C100    Vergleiche X mit RE
+        C10A    größer gleich?
+        C114    sortiere Teilliste rechts (X bis RE)
+$C117   Accu auf programmierten Stack
+$C126   Accu vom programmierten Stack
+$C130   drehe Elemente um P:
+                Alle Elemente kleiner P nach links
+                Alle Elemente größer P nach rechts
+        C130    Y merken
+        C136    Y = Zeiger (P)
+        C13E    Vergleiche Wert (X) mit Wert (Y)
+        C141    größer gleich?
+        C143    X = X+1
+        C149    Y zurück
+        C14F    X merken
+        C155    X = Zeiger (P)
+        C15D    Vergleiche Wert (X) mit Wert (Y)
+        C160    größer gleich
+        C162    Y = Y-1
+        C168    X zurück
+        C16E    Vergleiche Y mit X
+        C178    kleiner?
+        C17A    gleich?
+        C17C    tausche Wert (X) mit Wert (Y)
+        C18C    X = X+1
+$C18F   Y = Y-1
+$C19B   X = X+1
+$C1A7   Vergleiche numerische Werte
+$C1B5   Vergleiche REAL-Werte
+$C1CE   Vergleiche INT-Werte
+$C1DA   Vergleiche Texte
+$C1FE   Vergleiche Wert (X) mit Wert (Y)</pre>
+            <figcaption>Bild 1. Dokumentation des Quicksort-Programms von Listing 1</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="quicksort b 1" data-name="Quicksort (Basic-Lader)" data-checksummer="3"></pre>
+            <figcaption>Listing 1. Basic-Lader für Quicksort. Bitte verwenden Sie zur Eingabe den »Checksummer«.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="quicksort m 1.prg" data-name="Quicksort"></div>
+    </article>
+</body>
+
+</html>

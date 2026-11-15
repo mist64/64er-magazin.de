@@ -1,0 +1,853 @@
+
+
+;track40.source.prg ==0801==
+  100 ;   basic-erweiterung zur nuetzung der spuren 36-40 auf der diskette
+  110 ;                                       :
+  120 ;          germano caronni
+  130 ;          greubstelstr.10
+  140 ;         ch-5430 wettingen
+  150 ;         tel.0041/56262574
+  160 ;                                       :
+  900 ;
+49152 ".ba  49152 ;zuerst drei floppy-routinen dann hauptprogramm
+49152 " lda  7168 ;start 50000 einsprungpunkt vom interpret 50022
+49155 " and  #159 ;formatieren (36-40)  --- dc-timer fuer spur 36 und hoeher
+49157 " sta  7168 ;einrichten
+49160 " ldy    #4
+49162 " sty    49
+49164 " ldy    #0
+49166 " sty    48 ;zeiger  auf 1024
+49168 " sty    52
+49170 " lda   #14
+49172 " sta    82 ;header-kennzeichen
+49174 " lda  2046
+49177 " sta    83 ;spur
+49179 " sty    84 ;sektor
+49181 " lda    #0
+49183 " sta    85 ;leer
+49185 " tya
+49186 " pha       ;sektor retten
+49187 " jsr 63184 ;diese fuenf bytes in gcr-code wandeln und ab $400 ablegen
+49190 " pla       ;(das gibt die einzelnen header fuer die sektoren einer spur)
+49191 " tay       ;sektor wieder holen
+49192 " iny
+49193 " cpy  2045 ;schauen ob letzter sektor
+49196 " bne 49170 ;wenn nicht dann den naechsten umwandeln
+49198 " lda    52 ;die adresse des letzten bytes des letzten sektors +1 holen
+49200 " sta  2047 ;und retten
+49203 " lda   #13
+49205 " sta    71 ;datenblockkennzeichen
+49207 " ldy    #0
+49209 " tya
+49210 " sta   768,y
+49213 " iny
+49214 " bne 49210 ;datenblock ab 768 mit lauter nullen fuellen
+49216 " sta    48
+49218 " sta    52
+49220 " lda    #3
+49222 " sta    49 ;die zeiger auf $300 richten (768)
+49224 " jsr 62953 ;pruefsumme berechnen
+49227 " sta    58 ;und speichern
+49229 " jsr 63375 ;datenblock in gcr-kode wandeln
+49232 " jsr 65038 ;dc auf schreiben und die spur loeschen
+49235 " ldx    #0
+49237 " ldy    #5
+49239 " lda  #255
+49241 " bvc 49241
+49243 " clv
+49244 " sta  7169 ;5*255 als header-sync(hronistationsmarkierung) auf diskette
+49247 " dey
+49248 " bne 49241
+49250 " ldy    #5
+49252 " lda  1024,x
+49255 " inx
+49256 " bvc 49256
+49258 " clv
+49259 " sta  7169 ;dann die 5 header-bytes
+49262 " dey
+49263 " bne 49252
+49265 " ldy    #9
+49267 " lda   #85
+49269 " bvc 49269
+49271 " clv
+49272 " sta  7169 ;9 leerbytes als luecke abspeichern
+49275 " dey
+49276 " bne 49269
+49278 " ldy    #5
+49280 " lda  #255
+49282 " bvc 49282
+49284 " clv
+49285 " sta  7169   ;datenblock-sync
+49288 " dey
+49289 " bne 49282
+49291 " ldy  #187
+49293 " lda   256,y ;den ersten teil des umgewandelten blockes auf diskette
+49296 " bvc 49296
+49298 " clv
+49299 " sta  7169
+49302 " iny
+49303 " bne 49293
+49305 " lda   768,y ;und dann den zweiten teil
+49308 " bvc 49308
+49310 " clv
+49311 " sta  7169
+49314 " iny
+49315 " bne 49305
+49317 " ldy    #7
+49319 " lda   #85
+49321 " bvc 49321
+49323 " clv
+49324 " sta  7169   ;wieder 7 bytes luecke
+49327 " dey
+49328 " bne 49321
+49330 " cpx  2047   ;schauen ob alle sektoren eingerichtet
+49333 " bne 49237   ;wenn nicht dann den naechsten
+49335 " jsr 65024   ;dc auf lesen schalten
+49338 " lda    #7
+49340 " sta    71   ;datenblock-kennzeichen wieder richten
+49342 " jmp 64926   ;zurueck zur normalen floppy irq-routine
+49345 " lda   #16   ;eisprungspunkt mit m-e
+49347 " sta  2045   ;pro spur 16 sektoren einrichten
+49350 " ldx   #36
+49352 " stx  2046   ;spur 36
+49355 " stx    10   ;dem irq-prg bekannt geben
+49357 " lda  #224
+49359 " sta     2   ;irq-prg starten
+49361 " lda     2
+49363 " bmi 49361   ;warten auf fertig
+49365 " inx
+49366 " cpx   #40   ;schauen ob schon bei spur 40
+49368 " bcc 49352   ;wenn nicht naechste spur
+49370 " dec  2045   ;pro spur 15 sektoren
+49373 " cpx   #41
+49375 " bne 49352   ;und die spur 40 noch formatieren
+49377 " rts         ;ende
+49378 " lda  7168   ;einen block ab $400 speichern (spur+sektor in 2046,2047)
+49381 " and  #159   ;dc-timer richten
+49383 " sta  7168
+49386 " lda    #0
+49388 " tay
+49389 " clc
+49390 " adc  1024,y ;erste (interne) pruefsumme berechnen
+49393 " iny
+49394 " cpy  #255
+49396 " bne 49389
+49398 " sta  1279   ;und als letztes datenblock-byte speichern
+49401 " lda   #13
+49403 " sta    71   ;datenblock kennzeichen richten
+49405 " lda    #4
+49407 " sta    49
+49409 " lda    #0
+49411 " sta    48   ;zeiger auf $400
+49413 " sta    52
+49415 " jsr 62953   ;pruefsumme berechnen
+49418 " sta    58   ;speichern
+49420 " jsr 63375   ;datenblock umwandeln in gcr-kode
+49423 " lda   #14   ;header aufbauen
+49425 " sta    82   ;header-kennzeichen
+49427 " lda  2046
+49430 " sta    83   ;spur
+49432 " lda  2047
+49435 " sta    84   ;sektor
+49437 " lda    #0
+49439 " sta    85   ;leer
+49441 " sta    48
+49443 " sta    52
+49445 " lda    #3   ;zeiger auf $300
+49447 " sta    49
+49449 " jsr 63184   ;header in gcr umwandeln (ab 768 im speicher)
+49452 " jsr  1520   ;warten auf sync
+49455 " bvc 49455
+49457 " clv
+49458 " lda  7169
+49461 " cmp   768,y ;richtigen header suchen
+49464 " bne 49452   ;wenn nicht dann naechsten
+49466 " iny
+49467 " cpy    #5
+49469 " bne 49455
+49471 " lda    #7
+49473 " sta    71   ;datenblock-kennzeichen wieder richten (verzoegerung)
+49475 " ldx    #6
+49477 " bvc 49477   ;6 bytes ueberlesen
+49479 " clv
+49480 " dex
+49481 " bne 49477
+49483 " lda  #255
+49485 " sta  7171
+49488 " lda  7180
+49491 " and   #31
+49493 " ora  #192
+49495 " sta  7180   ;dc auf schreiben umschalten
+49498 " lda  #255
+49500 " ldx    #5
+49502 " sta  7169   ;5 bytes daten-sync schreiben
+49505 " clv
+49506 " bvc 49506
+49508 " clv
+49509 " dex
+49510 " bne 49506
+49512 " ldy  #187
+49514 " lda   256,y ;ersten teil des blockes
+49517 " bvc 49517
+49519 " clv
+49520 " sta  7169
+49523 " iny
+49524 " bne 49514
+49526 " lda  1024,y ;und dann den zweiten teil schreiben
+49529 " bvc 49529
+49531 " clv
+49532 " sta  7169
+49535 " iny
+49536 " bne 49526
+49538 " bvc 49538   ;warten das das letzte byte fertig geschrieben ist
+49540 " jsr 65024   ;dc auf lesen
+49543 " jsr  1520   ;warten auf sync
+49546 " bvc 49546
+49548 " clv
+49549 " lda  7169
+49552 " cmp   768,y ;den richtigen header suchen
+49555 " bne 49543
+49557 " iny
+49558 " cpy    #5
+49560 " bne 49546
+49562 " bne 49452
+49564 " jsr  1520
+49567 " ldy  #187
+49569 " lda   256,y ;und den soeben geschrieben block kontrollieren
+49572 " bvc 49572
+49574 " clv
+49575 " eor  7169
+49578 " bne 49562   ;wenn fehler dann alles von vorne
+49580 " iny
+49581 " bne 49569
+49583 " lda  1024,y ;zweiten teil kontrollieren
+49586 " bvc 49586
+49588 " clv
+49589 " eor  7169
+49592 " bne 49562
+49594 " iny
+49595 " bne 49583
+49597 " jmp 64926   ;zurueck zur floppy irq-routine
+49600 " lda  2046
+49603 " sta    10   ;spur festlegen
+49605 " lda  #224   ;irq-prg. starten
+49607 " sta     2
+49609 " lda     2
+49611 " bmi 49609   ;warten auf fertig
+49613 " .by 234 234 ;luecke
+49615 " .by 234 234
+49617 " rts         ;ende
+49618 " bit  7168   ;warten auf sync
+49621 " bmi 49618   ;wenn noch keine dann nochmal
+49623 " lda  7169
+49626 " clv         ;dc-port freimachen
+49627 " ldy    #0
+49629 " rts
+49630 " lda  7168   ;einen block lesen und in $300 speichern tr+se 2046,2047
+49633 " and  #159   ;dc-timer richten
+49635 " sta  7168
+49638 " lda   #14
+49640 " sta    82   ;header einrichten
+49642 " lda  2046
+49645 " sta    83   ;spur
+49647 " lda  2047
+49650 " sta    84   ;sektor
+49652 " lda    #0
+49654 " sta    85   ;leer
+49656 " sta    52
+49658 " sta    48
+49660 " lda    #3   ;zeiger auf $300
+49662 " sta    49
+49664 " jsr 63184   ;header umwandeln
+49667 " bit  7168   ;warten auf sync
+49670 " bmi 49667
+49672 " lda  7169
+49675 " clv
+49676 " ldy    #0
+49678 " bvc 49678
+49680 " clv
+49681 " lda  7169
+49684 " cmp   768,y ;den richtigen header suchen
+49687 " bne 49667
+49689 " iny
+49690 " cpy    #5
+49692 " bne 49678
+49694 " ldy    #0
+49696 " bit  7168   ;warten auf sync
+49699 " bmi 49696
+49701 " lda  7169
+49704 " clv
+49705 " bvc 49705
+49707 " clv
+49708 " lda  7169
+49711 " sta   768,y ;ersten teil des blockes
+49714 " iny
+49715 " bne 49705
+49717 " ldy  #186
+49719 " bvc 49719
+49721 " clv
+49722 " lda  7169
+49725 " sta   256,y ;und dann den zweiten teil lesen und speichern
+49728 " iny
+49729 " bne 49719
+49731 " jsr 63712   ;in hex-bytes umwandeln
+49734 " lda    56
+49736 " cmp   #13   ;schauen ob datenblock-kennzeichen stimmt
+49738 " bne 49638   ;wenn nicht alles von vorne
+49740 " lda    #0
+49742 " sta    48
+49744 " lda    #3
+49746 " sta    49   ;zeiger wieder auf $300
+49748 " jsr 62953   ;pruefsumme berechnen
+49751 " cmp    58   ;kontrolle
+49753 " bne 49638   ;wenn falsch nochmals
+49755 " lda    #0
+49757 " tay
+49758 " clc
+49759 " adc   768,y ;interne pruefsumme berechnen
+49762 " iny
+49763 " cpy  #255
+49765 " bne 49758
+49767 " cmp  1023   ;und kontrolle
+49770 " bne 49753
+49772 " jmp 64926   ;zurueck zum irq
+49775 " lda  2046
+49778 " sta    10
+49780 " lda  #224
+49782 " sta     2
+49784 " lda     2
+49786 " bmi 49784
+49788 " rts         ;ende
+49789 ".by  'i' '#2' 'b-p 2 0' 8  ;daten (die >8< ist die drivenummer)
+49800 " lda  #226   ;routine zum senden einer der drei floppy-prg.(formatieren)
+49802 ".by   44     ;bit ...
+49803 " lda  #252   ;einsprung (schreiben)
+49805 ".by   44     ;bit ...
+49806 " lda  #159   ;einsprung (lesen)
+49808 " pha         ;retten
+49809 " jsr 65511   ;clall alle kanaele schliessen
+49812 " lda    #1   ;log. file nr.
+49814 " ldx 49799   ;geraete-adresse (8)
+49817 " ldy   #15   ;sekundaeradr.
+49819 " jsr 65466   ;setlfs
+49822 " lda    #1   ;laenge
+49824 " ldx  #125   ;adresse
+49826 " ldy  #194
+49828 " jsr 65469   ;setnam
+49831 " jsr 65472   ;open (das ganze entspricht open1,8,15,"i"
+49834 " bcc 49839   ;wenn kein fehler
+49836 " jmp 57593   ;fehlerauswertung
+49839 " lda    #2
+49841 " ldx 49799
+49844 " tay
+49845 " jsr 65466   ;setlfs
+49848 " lda    #2
+49850 " ldx  #126
+49852 " ldy  #194
+49854 " jsr 65469   ;setnam
+49857 " jsr 65472   ;open (open2,8,2,"#2")
+49860 " bcs 49836   ;fehler?
+49862 " jsr 65484   ;clrchn (alle ausgabe- eingabekanaele ruecksetzen)
+49865 " ldx    #2
+49867 " jsr 65478   ;chkin (kanal 2 auf eingabe richten)
+49870 " jsr 65487   ;chrin (ein byte vom seriellen bus holen-puffernummer)
+49873 " jsr 65484   ;chrchn
+49876 " ldx    #1
+49878 " jsr 65481   ;chkout (kanal 1 als ausgabe definieren)
+49881 " bcs 49836   ;fehler?
+49883 " ldy    #0
+49885 " lda 49792,y ;'b-p 2 0'
+49888 " jsr 65490   ;chrout  (ein byte ausgeben)
+49891 " iny
+49892 " cpy    #7   ;schauen ob alles
+49894 " bne 49885
+49896 " jsr 65484   ;clrchn
+49899 " ldx    #2
+49901 " jsr 65481   ;chkout
+49904 " bcs 49836
+49906 " pla         ;die am anfang gerette laenge des prg. wieder holen
+49907 " sta   143   ;und abspeichern
+49909 " ldy    #0
+49911 " lda   143   ;schauen welches
+49913 " cmp  #226
+49915 " bne 49923
+49917 " lda 49152,y ;formatieren
+49920 " jmp 49940
+49923 " cmp  #252
+49925 " bne 49933
+49927 " lda 49378,y ;schreiben
+49930 " jmp 49940
+49933 " cmp  #159
+49935 " bne 49836
+49937 " lda 49630,y ;lesen
+49940 " jsr 65490   ;gesendet werden muss (chrout)
+49943 " bcs 49836   ;fehler?
+49945 " iny
+49946 " cpy   143   ;schauen ob das ganze prg. gesendet wurde
+49948 " bne 49911   ;wenn nicht naechstes byte
+49950 " jsr 65484   ;clrchn
+49953 " lda    #2
+49955 " jmp 65475   ;close (kanal 2 wird geschlossen)
+49958 ".by 'm-e' 0 5
+49963 ".by 'm-w' 254 7 2 36 0
+49971 ".by '#0' '#1'
+49975 " sta 49961   ;einspungpunkt abspeichern und m-e senden
+49978 " jsr 65484   ;clrchn
+49981 " ldx    #1
+49983 " jsr 65481   ;chkout
+49986 " ldy    #0
+49988 " lda 49958,y ;'m-e' x 5
+49991 " jsr 65490   ;chrout
+49994 " iny
+49995 " cpy    #5
+49997 " bne 49988
+49999 " rts
+50000 " lda  #102   ;**startadresse**
+50002 " sta   776
+50005 " lda  #195
+50007 " sta   777   ;basic-befehl abarbeitungs-schlaufe auf die eigene routine
+50010 " rts         ;biegen
+50011 " lda  #228   ;**endadresse**
+50013 " ldy  #167
+50015 " sta   776
+50018 " sty   777   ;interpreter-zeiger wieder richten,um diese erweiterung
+50021 " rts         ;auszuschalten
+50022 " jsr   115   ;**einspungpunkt** vom interpreter her (ein prg.byte holen)
+50025 " cmp   #91   ;schauen ob es das '['-zeichen ist
+50027 " beq 50032   ;wenn ja dann weiter
+50029 " jmp 50644   ;wenn nicht dann zur original-routine
+50032 " jsr   115   ;naechstes basic-byte holen
+50035 " cmp  #162   ;schauen ob es der 'new'-code ist
+50037 " bne 50084   ;wenn nicht dann weiter-kontrollieren
+50039 " jsr   115   ;naechstes zeichen
+50042 " cmp   #93   ;und schauen ob ']'
+50044 " beq 50049
+50046 " jmp 44808   ;wenn nein syntax-error
+50049 " jsr 49800   ;formatier-prg. senden
+50052 " lda  #193
+50054 " jsr 49975   ;und starten
+50057 " jsr 65484   ;clrchn (warten das die routine fertig ist)
+50060 " ldx    #1
+50062 " jsr 65481   ;chkout
+50065 " lda   #73   ;und ein 'i' senden (initialisierung der floppy)
+50067 " jsr 65490   ;chrout
+50070 " jsr 65484   ;clrchn
+50073 " lda    #1
+50075 " jsr 65475   ;close
+50078 " jsr   115   ;naechstes byte holen
+50081 " jmp 42926   ;und zurueck zur originalroutine
+50084 " cmp  #148   ;schauen ob es der 'save'-code ist
+50086 " beq 50091
+50088 " jmp 50455   ;wenn nicht weiterkontrollieren
+50091 " jsr   115   ;naechstes zeichen nach dem 'save' holen
+50094 " jsr 44426   ;die variable (zahl) auswerten
+50097 " jsr 47095   ;in zweibyte-form wandeln
+50100 " sty   251   ;und abspeichern
+50102 " sta   252
+50104 " jsr 44797   ;pruefen auf komma
+50107 " jsr 44426
+50110 " jsr 47095   ;zweibyte-zahl holen
+50113 " sty   253
+50115 " sta   254   ;und als endadresse speichern
+50117 " jsr 44797   ;pruefen auf komma
+50120 " lda   253
+50122 " sec
+50123 " sbc   251
+50125 " sta   139    ;endadresse-anfangsadresse in (139)
+50127 " lda   254
+50129 " sbc   252
+50131 " sta   140    ;abspeichern
+50133 " bcs 50140
+50135 " ldx   #20    ;wenn endadresse < anfangsadresse dann division by zero
+50137 " jmp 42042    ;error-ausgabe
+50140 " ldx    #0
+50142 " lda   139
+50144 " sec
+50145 " sbc  #254
+50147 " sta   139
+50149 " lda   140
+50151 " sbc    #0
+50153 " sta   140    ;differenz durch 254 dividieren (blocklaenge)
+50155 " bcc 50160    ;wenn fertig
+50157 " inx
+50158 " bne 50142    ;weiter dividieren
+50160 " cpx   #79    ;schauen ob das file laenger als 78 bloecke wird
+50162 " bcc 50169
+50164 " ldx   #15    ;wenn ja dann overflow error
+50166 " jmp 42042
+50169 " txa
+50170 " pha          ;blockanzahl retten
+50171 " jsr 47006    ;den anfangsblock vom basic ins x-register holen
+50174 " txa
+50175 " pha          ;und retten
+50176 " jsr   121    ;ein basic-zeichen holen
+50179 " cmp   #93    ;und schauen ob ']'
+50181 " beq 50186
+50183 " jmp 44808    ;wenn nein dann syntax error
+50186 " jsr   115    ;naechstes zeichen holen (vorbereitung fuer den rueck-
+50189 " pla          ;-sprung zum interpreter) anfangsblock wieder holen
+50190 " sta   139    ;und abspeichern
+50192 " pla          ;file-laenge holen
+50193 " clc
+50194 " adc   139    ;anfang dazuaddieren
+50196 " cmp   #79    ;und schauen ob der letzte block > 78 ist
+50198 " bcc 50205
+50200 " ldx   #14    ;wenn ja dann illegal quantity error
+50202 " jmp 42042    ;ausgeben
+50205 " jsr 49803    ;das floppy-programm zum schreiben senden
+50208 " lda    #2
+50210 " ldx 49799
+50213 " tay
+50214 " jsr 65466    ;setlfs
+50217 " lda    #2
+50219 " ldx   #53
+50221 " ldy  #195
+50223 " jsr 65469    ;setnam
+50226 " jsr 65472    ;open (open2,8,2,"#1")
+50229 " bcc 50305    ;wenn kein fehler dann weiter
+50231 " jmp 57593    ;fehler
+50234 " jsr 65484    ;clrchn   unterroutine zum senden von 'b-p 2 0'
+50237 " ldx    #1
+50239 " jsr 65481    ;chkout
+50242 " ldy    #0
+50244 " lda 49792,y  ;'b-p 2 0'
+50247 " jsr 65490    ;senden
+50250 " bcs 50231
+50252 " iny
+50253 " cpy    #7
+50255 " bne 50244
+50257 " jmp 65484    ;clrchn
+50260 " lda   139    ;routine zum senden von spur und sektor('m-w' 254 7 2 x y)
+50262 " lsr          ;block laden
+50263 " lsr          ;und durch 16 teilen
+50264 " lsr
+50265 " lsr
+50266 " clc
+50267 " adc   #36
+50269 " sta 49969    ;+36=aktuelle spur
+50272 " lda   139
+50274 " and   #15
+50276 " sta 49970    ;block and 15 = aktueller sektor
+50279 " jsr 65484    ;clrchn
+50282 " ldx    #1
+50284 " jsr 65481    ;chkout
+50287 " ldy    #0
+50289 " lda 49963,y  ;'m-w' 254 7 2 x y
+50292 " jsr 65490    ;senden
+50295 " bcs 50231
+50297 " iny
+50298 " cpy    #8
+50300 " bne 50289
+50302 " jmp 65484    ;clrchn und ende unterroutine
+50305 " jsr 65484    ;clrchn
+50308 " ldx    #2
+50310 " jsr 65478    ;chkin
+50313 " jsr 65487    ;chrin
+50316 " jsr 65463    ;status
+50319 " beq 50324
+50321 " jmp 42082    ;wenn <>0 dann 'error'
+50324 " jsr 50260    ;aktuellen track und sektor senden
+50327 " jsr 50234    ;'b-p 2 0' senden
+50330 " ldx    #2
+50332 " jsr 65481    ;chrout
+50335 " lda   253
+50337 " sec
+50338 " sbc   251
+50340 " sta   140
+50342 " lda   254
+50344 " sbc   252    ;schauen ob das der letzte bolck des files ist
+50346 " bne 50354    ;wenn nein
+50348 " ldy   140
+50350 " cpy  #254
+50352 " bcc 50399    ;wenn ja
+50354 " lda  #255  ;wenn etwas anderes als 255 gesendet wird so ist das das
+50356 " jsr 65490    ;kennzeichen das der betreffende block der letzte ist.
+50359 " ldy    #0
+50361 " lda  (251),y
+50363 " jsr 65490    ;chrout 254 datenbytes uebertragen
+50366 " bcs 50295
+50368 " iny
+50369 " cpy  #254
+50371 " bne 50361
+50373 " jsr 65484    ;clrchn
+50376 " lda  #222
+50378 " jsr 49975    ;floppy-routine starten
+50381 " nop
+50382 " nop
+50383 " inc   139    ;zeiger auf naechsten block
+50385 " lda   251
+50387 " clc
+50388 " adc  #254
+50390 " sta   251    ;anfangsadresse erhoehen
+50392 " bcc 50396
+50394 " inc   252
+50396 " jmp 50324    ;naechsten block senden
+50399 " iny          ;adresse des letzten gultigen bytes senden
+50400 " tya
+50401 " jsr 65490    ;chrout
+50404 " sty   141    ;adresse retten
+50406 " ldy    #0
+50408 " lda  (251),y
+50410 " jsr 65490    ;chrout gueltigen teil des blockes senden
+50413 " iny
+50414 " cpy   141
+50416 " bne 50408
+50418 " jsr 65484    ;clrchn
+50421 " lda  #222
+50423 " jsr 49975    ;floppy-routine starten
+50426 " jsr 65484    ;clrchn
+50429 " lda    #2
+50431 " jsr 65475    ;close2
+50434 " ldx    #1
+50436 " jsr 65481
+50439 " lda   #73
+50441 " jsr 65490    ;print#1,"i"
+50444 " jsr 65484
+50447 " lda    #1
+50449 " jsr 65475    ;close1
+50452 " jmp 42926    ;retour zur interpreter-schleife
+50455 " cmp  #147    ;schauen ob es der 'load'-code ist
+50457 " beq 50462
+50459 " jmp 50650    ;naechster befehl
+50462 " jsr   115
+50465 " jsr 44426
+50468 " jsr 47095
+50471 " sty   251
+50473 " sta   252    ;anfangsadrese holen
+50475 " jsr 44797
+50478 " jsr 47006    ;anfangsblock holen
+50481 " cpx   #79    ;wenn blocknr. >78
+50483 " bcc 50490
+50485 " ldx   #14    ;dann illegal quantity error ausgeben
+50487 " jmp 42042
+50490 " stx   139    ;anfangsblock retten
+50492 " jsr   121
+50495 " jsr 50703    ;kontrolle auf ']'
+50498 " nop
+50499 " jsr   115
+50502 " jsr 49806    ;floppy-prg. zum lesen senden
+50505 " lda    #2
+50507 " ldx 49799
+50510 " tay
+50511 " jsr 65466    ;setlfs
+50514 " lda    #2
+50516 " ldx   #51
+50518 " ldy  #195
+50520 " jsr 65469    ;setnam
+50523 " jsr 65472    ;open (open2,8,2,"#0")
+50526 " bcc 50531
+50528 " jmp 57593    ;fehler
+50531 " jsr 65484    ;clrchn
+50534 " ldx    #2
+50536 " jsr 65478    ;chkin
+50539 " jsr 65487    ;chrin
+50542 " jsr 65463    ;status
+50545 " beq 50550
+50547 " jmp 42082    ;wenn st <> 0 dann 'error'
+50550 " jsr 50260    ;spur und sektor senden
+50553 " lda  #145
+50555 " jsr 49975    ;block lesen (floppy-routine starten
+50558 " jsr 50234    ;'b-p 2 0' senden
+50561 " ldx    #2
+50563 " jsr 65478    ;chkin
+50566 " jsr 65487    ;chrin
+50569 " sta   141    ;1. byte als anzahl gueltiger bytes +1 retten
+50571 " ldy    #0
+50573 " jsr 65487
+50576 " bcs 50528    ;fehler?
+50578 " sta  (251),y ;alle bytes holen und speichern
+50580 " iny
+50581 " cpy   141    ;schauen ob alle gueltigen bytes
+50583 " bne 50573    ;wenn nein naechstes
+50585 " jsr 65484    ;clrchn
+50588 " lda   141
+50590 " cmp   #255   ;schauen ob alle bytes gueltig waren
+50592 " bne  50618   ;wenn nein dann war es der letzte block
+50594 " lda    251   ;wenn ja
+50596 " clc
+50597 " adc   #254
+50599 " sta    251   ;adresse =adresse+254
+50601 " bcc  50605
+50603 " inc    252
+50605 " inc    139   ;block-zeiger um eins erhoehen
+50607 " lda    139
+50609 " cmp    #79   ;wenn block-zeiger zu hoch (>78)
+50611 " bcc  50550   ;wenn nicht naechsten block holen
+50613 " ldx    #14   ;dann illegal quantity error
+50615 " jmp  42042   ;ausgeben
+50618 " lda     #2
+50620 " jsr  65475   ;close2
+50623 " ldx     #1
+50625 " jsr  65481   ;chkout
+50628 " lda    #73
+50630 " jsr  65490   ;print#1,"i"
+50633 " jsr  65484   ;clrchn
+50636 " lda     #1
+50638 " jsr  65475   ;close1
+50641 " jmp  42926   ;zurueck zur interpreter-schlaufe
+50644 " jsr   121
+50647 " jmp 42983    ;einsprung fuer befehl-abarbeiten
+50650 " cmp  #161    ;schauen ob get
+50652 " beq 50657
+50654 " jmp 50839    ;wenn nicht weiter
+50657 " jsr   115
+50660 " jsr 45195    ;stringzeiger-adresse holen
+50663 " sta    73
+50665 " sty    74    ;und speichern
+50667 " lda  #255    ;laenge
+50669 " jsr 46197    ;platz im string-bereich reservieren
+50672 " ldy    #2
+50674 " lda    97,y  ;neue adresse
+50677 " sta   (73),y ;beim stringzeiger richten
+50679 " pha          ;und retten
+50680 " dey
+50681 " bpl 50674
+50683 " jsr 44797    ;pruefen auf komma
+50686 " jsr 47006    ;block-nr. holen
+50689 " cpx   #79
+50691 " bcc 50698
+50693 " ldx   #14    ;wenn zu gross dann illegal quantity
+50695 " jmp 42042    ;ausgeben
+50698 " stx   139    ;block speichern
+50700 " jmp 50711
+50703 " cmp   #93    ;einschub von einer vorherigen routine
+50705 " beq 50710    ;(pruefen auf ']')
+50707 " jmp 44808    ;syntax-error
+50710 " rts
+50711 " jsr   121
+50714 " jsr 50703    ;pruefen auf ']'
+50717 " jsr   115    ;zaehler auf naechsten befehl richten
+50720 " jsr 49806    ;floppy-routine 'lesen' senden
+50723 " pla          ;zeiger und laenge des neuen strings holen
+50724 " sta   141
+50726 " pla
+50727 " sta   251
+50729 " pla
+50730 " sta   252    ;und speichern
+50732 " lda    #2
+50734 " ldx 49799
+50737 " tay
+50738 " jsr 65466    ;setlfs
+50741 " lda    #2
+50743 " ldx   #51
+50745 " ldy  #195
+50747 " jsr 65469    ;setnam
+50750 " jsr 65472    ;open 2,8,2,"#0"
+50753 " bcc 50758
+50755 " jmp 57593    ;fehler
+50758 " jsr 65484    ;clrchn
+50761 " ldx    #2
+50763 " jsr 65478    ;chkin
+50766 " jsr 65487    ;chrin
+50769 " jsr 65463    ;status
+50772 " beq 50777    ;kontrollieren
+50774 " jmp 42082    ;'error' ausgeben
+50777 " jsr 50260    ;spur + sektor senden
+50780 " lda  #145
+50782 " jsr 49975    ;routine starten
+50785 " jsr 50234    ;b-p 2 0
+50788 " ldx    #2
+50790 " jsr 65478    ;chkin
+50793 " nop
+50794 " nop
+50795 " nop
+50796 " ldy    #0
+50798 " jsr 65487    ;255 bytes holen
+50801 " bcs 50755    ;fehler ?
+50803 " sta  (251),y ;und als string speichern
+50805 " iny
+50806 " cpy   141
+50808 " bne 50798
+50810 " jsr 65484    ;clrchn
+50813 " lda    #2
+50815 " jsr 65475    ;close2
+50818 " ldx    #1
+50820 " jsr 65481    ;chkout
+50823 " lda   #73
+50825 " jsr 65490    ;print#1,"i"
+50828 " jsr 65484    ;clrchn
+50831 " lda    #1
+50833 " jsr 65475    ;close1
+50836 " jmp 42926    ;zum interpreter
+50839 " cmp  #153    ;schauen ob print-code
+50841 " beq 50846
+50843 " jmp 44808    ;wenn nein syntax-error
+50846 " jsr   115
+50849 " jsr 45195    ;adresse des string-zeigers holen
+50852 " pha
+50853 " tya
+50854 " pha          ;und retten
+50855 " jsr 44797    ;komma
+50858 " jsr 47006    ;blocknr. holen
+50861 " cpx   #79
+50863 " bcc 50870    ;pruefen
+50865 " ldx   #14
+50867 " jmp 42042    ;illeg. quantity
+50870 " stx   139    ;und speichern
+50872 " jsr   121
+50875 " jsr 50703    ;pruefen auf ']'
+50878 " jsr   115
+50881 " pla
+50882 " sta    98
+50884 " pla
+50885 " jsr 51008    ;laenge pruefen
+50888 " iny
+50889 " lda   (97),y
+50891 " sta   251
+50893 " iny
+50894 " lda   (97),y ;adresse des eigentlichen strings vom string-zeiger her
+50896 " sta   252    ;holen und speichern
+50898 " jsr 49803    ;'schreiben' senden
+50901 " lda    #2
+50903 " ldx 49799
+50906 " tay
+50907 " jsr 65466
+50910 " lda    #2
+50912 " ldx   #53
+50914 " ldy  #195
+50916 " jsr 65469
+50919 " jsr 65472    ;open2,8,2,"#1"
+50922 " bcc 50927
+50924 " jmp 57593    ;fehler
+50927 " jsr 65484
+50930 " ldx    #2
+50932 " jsr 65478
+50935 " jsr 65487
+50938 " jsr 65463
+50941 " beq 50946
+50943 " jmp 42082
+50946 " jsr 50260    ;spur + sektor senden
+50949 " jsr 50234    ;b-p 2 0 senden
+50952 " ldx    #2
+50954 " jsr 65481    ;chkout
+50957 " ldy    #0
+50959 " lda  (251),y ;255 daten aus dem string lesen
+50961 " jsr 65490    ;und senden
+50964 " bcs 50924
+50966 " iny
+50967 " cpy  #255
+50969 " bne 50959
+50971 " jsr 65484    ;clrchn
+50974 " lda  #222
+50976 " jsr 49975    ;floppy-routine starten
+50979 " jsr 65484
+50982 " lda    #2
+50984 " jsr 65475    ;close2
+50987 " ldx    #1
+50989 " jsr 65481
+50992 " lda   #73
+50994 " jsr 65490    ;print#1,"i"
+50997 " jsr 65484
+51000 " lda    #1
+51002 " jsr 65475    ;close1
+51005 " jmp 42926    ;zum interpret
+51008 " sta    97    ;einschub (laenge bestimmen)
+51010 " ldy    #0
+51012 " lda   (97),y   ;laenge holen
+51014 " cmp  #255
+51016 " beq 51023
+51018 " ldx   #23      ;wenn falsch dann string too long ausgeben
+51020 " jmp 42042
+51023 " rts
+51024 ".en
+

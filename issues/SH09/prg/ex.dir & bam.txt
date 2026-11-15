@@ -1,0 +1,151 @@
+
+
+;ex.dir & bam.prg ==0801==
+    0 rem *********************************
+    1 rem ***                           ***
+    2 rem ***      ext. dir & bam       ***
+    3 rem ***                           ***
+    4 rem ***          (c)  1986        ***
+    5 rem ***           by w. friedrich ***
+    6 rem ***           c-64 + 1541     ***
+    7 rem ***                           ***
+    8 rem *********************************
+   10 dim s$(255):i=0:m=0:nu$=chr$(0):c$=chr$(13)
+   20 print chr$(147)chr$(159)chr$(14):poke53281,0:poke53280,0
+   30 ft$(0)="DEL":ft$(1)="SEQ":ft$(2)="PRG":ft$(3)="USR":ft$(4)="REL"
+   40 ll$="                                           "
+  100 print"{down}{down}      Erweiterts Directory & BAM"
+  110 print"      {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+  120 print"{down}{down}{down}      {rvon}D{rvof}rucker oder {rvon}B{rvof}ildschirm?"
+  130 get a$:if a$=""then130
+  140 if a$="d"then ga=4:goto165
+  150 if a$<>"b"then130
+  160 ga=3
+  165 open1,ga,7
+  170 print"{up}"ll$
+  180 print"  {rvon} 1 {rvof}  Erweitertes Directory":print
+  190 print"  {rvon} 2 {rvof}  BAM{down}"
+  200 get a$:if a$="1"or a$="2"then210
+  201 goto200
+  210 on val(a$)gosub3002,2009
+  215 get a$:if a$=""then215
+  220 print chr$(147)chr$(158)
+  230 print"{down}{down}{down}{down}{down}Nochmal(j/n)
+  240 get a$:if a$=""then240
+  250 if a$<>"j"then print chr$(159):end
+  260 run
+  500 rem unterprogramme
+  501 rem **************
+  505 rem diskname und id auslesen
+  506 rem ************************
+  510 mn=0
+  520 mn=mn+1:if asc(s$(143+mn))<>160then dn$=dn$+s$(143+mn):goto520
+  530 fori=0to4:id$=id$+s$(162+i):next
+  540 return
+  600 rem formatieren
+  601 rem ***********
+  610 f$=str$(int(f))
+  612 if f=0then 620
+  615 if f<1then print#1," ";
+  620 for ii=1to5+sp-len(f$):print#1," ";:next
+  630 return
+  700 rem startaddr prog
+  701 rem **************
+  710 open15,8,15,"i0":gosub910
+  720 open2,8,2,"#":gosub910
+  730 print#15,"u1:2,";0;ft;fs
+  740 print#15,"b-p:2,0"
+  760 get#2,a$,a$,l$:if l$=""then l$=nu$
+  770 get#2,h$:if h$=""then h$=nu$
+  780 sd=256*asc(h$)+asc(l$):close2:close15
+  790 return
+  900 rem fehlerkanal
+  901 rem ***********
+  910 input#15,y1,y$,y2,y3:if y1=0then return
+  920 print y1;chr$(18)y$ chr$(146),y2,y3:close1:close2:close15:return
+ 1000 rem einen sektor lesen
+ 1001 rem ******************
+ 1010 open15,8,15,"i0":gosub910
+ 1020 open2,8,2,"#":gosub910
+ 1030 print#15,"u1:2,""0";t;s
+ 1040 print#15,"b-p:2,0"
+ 1050 print#15,"m-r"chr$(0)chr$(5)
+ 1060 get#2,s$(0):if s$(0)=""then s$(0)=nu$
+ 1070 nt=asc(s$(0))
+ 1080 get#2,s$(1):if s$(1)=""then s$(1)=nu$
+ 1090 ns=asc(s$(1))
+ 1110 for i=2to255:get#2,s$(i):if s$(i)=""then s$(i)=nu$
+ 1120 next
+ 1130 close2:close15
+ 1999 return
+ 2000 rem bam anzeigen
+ 2001 rem ************
+ 2009 print chr$(147)
+ 2010 t=18:s=0:gosub1010
+ 2012 gosub510
+ 2016 print#1,"       "chr$(18)chr$(34)dn$chr$(34)"  "id$chr$(146)
+ 2018 print#1,"  B"c$"  l"c$"  o"c$"  c"c$"  k 012345678901234567890 Sektor"c$
+ 2020 for i=1to35
+ 2030 bf=asc(s$(i*4))
+ 2040 for j=1to3
+ 2050 q$=str$(asc(s$(i*4+j)))
+ 2060 gosub2505
+ 2070 b$=b$+bi$
+ 2080 next
+ 2085 if tz<9then print#1," ";
+ 2090 tz=tz+1:print#1,tz;
+ 2100 if tz<18then print#1,left$(b$,21)"   ";:goto2135
+ 2110 if tz<25then print#1,left$(b$,19)"     ";:goto2135
+ 2120 if tz<31then print#1,left$(b$,18)"      ";:goto2135
+ 2130 print#1,left$(b$,17)"       ";
+ 2135 if bf<10then print#1," ";
+ 2140 print#1,bf" Blocks free"
+ 2150 if tz<>18then gf=gf+bf
+ 2160 b$="":next
+ 2170 print#1,c$"           "gf" Blocks free"
+ 2180 return
+ 2500 rem dez->dual
+ 2501 rem *********
+ 2505 if q$=" 255"then bi$="........":return
+ 2507 if q$=" 0"then bi$="********":return
+ 2510 d=val(q$):bi$="":z=0
+ 2520 z=z+1:d=d/2:if d<>int(d)then bi$=bi$+".":goto2540
+ 2530 bi$=bi$+"*"
+ 2540 if d<>.5then d=int(d):goto2520
+ 2580 d=len(bi$):if d=8then return
+ 2590 for k=8-d to1step-1
+ 2600 bi$=bi$+"*"
+ 2610 next
+ 2620 return
+ 3000 rem ext. dir
+ 3001 rem ********
+ 3002 print"{down}DEL-Files mit anzeigen?";
+ 3003 get a$:if a$=""then3003
+ 3004 if a$="j"then dm=1:goto3007
+ 3005 print:dm=0
+ 3007 print chr$(147)
+ 3010 t=18:s=0:gosub1010
+ 3020 gosub510
+ 3030 print#1,chr$(18)chr$(34)dn$chr$(34)"  "id$;chr$(146)
+ 3040 if nt<>18or ns>21or ns=0 then print#1,664-gl" blocks free":return
+ 3050 t=nt:s=ns:gosub1010
+ 3060 for i=0to7
+ 3070 m=i*32+2:mn=0:nf$=""
+ 3080 ft=asc(s$(m+1)):fs=asc(s$(m+2)):tf=asc(s$(m))and15:sd=0
+ 3085 if dm=0and ft=0then3200
+ 3090 mn=mn+1:te=asc(s$(m+2+mn)):if te<>160and te>10then nf$=nf$+s$(m+2+mn):goto3090
+ 3095 if nf$=""then 3200
+ 3100 l=asc(s$(m+29))*256+asc(s$(m+28)):lg=lg+l
+ 3120 if tf<>0then gosub710
+ 3130 f=l:sp=0:gosub610
+ 3150 print#1,l"   "chr$(34)nf$;chr$(34);left$(ll$,18-len(nf$));
+ 3160 print#1,ft$(tf);"  ";
+ 3165 if ft<10then print#1," ";
+ 3170 print#1," ";ft;
+ 3175 if fs<10then print#1," ";
+ 3180 print#1," ";fs;"   "left$(ll$,6-len(str$(sd)));sd;
+ 3185 f=l/4:sp=2:gosub610:print#1,l/4
+ 3190 if tf<>0then gl=gl+l
+ 3200 next
+ 3210 goto3040
+

@@ -1,0 +1,48 @@
+;schreibschutz setzen loeschen.prg ==0801==
+;Quelle: 64'er Sonderheft 9/86, Seite 38
+  100 rem schreibschutz setzen / loeschen
+  101 rem durch aenderung des format-
+  102 rem kennzeichens in der bam !!!
+  103 rem funktionsweise setzen :
+  104 rem formatkennzeichen wird auf
+  105 rem beliebigen wert ausser 'a'
+  106 rem gesetzt. ab sofort koennen
+  107 rem keine schreibvorgaenge ausser
+  108 rem formatieren durchgefuehrt
+  109 rem werden. also vorsicht !
+  110 rem funktionsweise freigeben :
+  111 rem die floppy speichert das
+  112 rem formatkennzeichen der eingel.
+  113 rem diskette in der speicherstelle
+  114 rem $0101 zwischen. wird dies
+  115 rem vor dem schreibvorgang auf
+  116 rem 'a' zurueckgesetzt, laesst
+  117 rem sich die floppy 'ueberlisten'
+  118 rem das 'a' wird nun in die bam
+  119 rem geschrieben
+  120 :
+  130 print"wollen sie die eingel. diskette"
+  140 input"schuetzen oder freigeben";aa$
+  150 if aa$="s"then 200
+  160 if aa$="f"then 300
+  170 print:run
+  180 :
+  190 :
+  200 open 15,8,15,"i":open8,8,8,"#"
+  210 print#15,"u1 8 0 18 0"
+  220 print#15,"b-p 8 2"
+  230 print#8,"x";
+  240 print#15,"u2 8 0 18 0"
+  250 print#15,"i"
+  260 close8:close15:print:run
+  270 :
+  280 :
+  290 :
+  300 open 15,8,15,"i":open8,8,8,"#"
+  310 print#15,"u1 8 0 18 0"
+  320 print#15,"b-p 8 2"
+  330 print#15,"m-w"chr$(1)chr$(1)chr$(1)chr$(65)
+  340 print#8,"a";
+  350 print#15,"u2 8 0 18 0"
+  360 print#15,"i"
+  370 close8:close15:print:run

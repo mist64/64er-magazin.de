@@ -1,0 +1,56 @@
+# SH09 PDF: what the shipped file is, what the build makes natively, and what must be re-applied after a rebuild.
+# Shipped: issues/SH09/64er_Sonderheft_1986-09.pdf, sha1 72f11f5e1ee1..., rebuilt 2026-11-15 (owner via control: "pdf id perfect, squash and push").
+# History of the file: 1e97d870e8ff (build 2026-11-06) -> b9921191e839 (items 1, 2) -> bce2a34047ee (page 31 stream swapped) -> a8cfb5d6b027 (full rebuild + items 1, 2 re-applied) -> 72f11f5e1ee1 (item 5, full rebuild + items 1, 2 re-applied).
+
+BUILD: QMIN=97 QMAX=97 bash <tmp>/marks_work/build.sh, which runs make_issue_pdf_mixed.sh on <tmp>/a4600 and its .ocrcache into <tmp>/64er_Sonderheft_1986-09.pdf.
+       Then: .venv/bin/python issues/SH09/reviewed/pdf_postfix.py <tmp>/64er_Sonderheft_1986-09.pdf issues/SH09/64er_Sonderheft_1986-09.pdf <previous shipped pdf>
+       That applies items 1 and 2 and lists the pages whose image streams changed against the previous file; every one of them must be explained.
+CACHE: make_issue_pdf_mixed.sh keeps a page's JBIG2 while jbig2-t35/NNN.jb2 EXISTS. It does not compare dates. A bilevel page whose a4600 changed needs its .jb2 and .dim removed, and its NNN_150.png remade (magick a4600/NNN.png -resize 25% +repage -strip), before the build, or the old page ships.
+       The contone JPEGs are re-made when NNN_150.png is newer. The text layer .ocrcache/NNN.pdf is never re-made by the build.
+
+1. PAGE ORDER — STILL RE-APPLIED after every build (pdf_postfix.py).
+   Owner: "the four blue order/payment sheets come after the last page, after the cover. seems like the png/ order was wrong. i'll fix it later. but do fix it in the pdf."
+   The build follows png/ numbering, where the blue Bestell-/Zahlkarte leaves are scan 163-166 and the covers 167-168. Shipped order: ...162, 167, 168, 163, 164, 165, 166, so PDF 163-164 are the covers and 165-168 the blue leaves.
+   Pages are moved, not re-encoded. masters600, a4600, sheets600, the OCR, the marks census and the crop worklist keep the scan's numbering.
+   Drop this item once the owner has fixed png/ and the build has the order natively; applying it then would put the leaves back in front of the covers.
+2. TITLE — STILL RE-APPLIED after every build (pdf_postfix.py, exiftool).
+   Owner: "the title in the metadata is wrong, it's should be Sonderheft 9, not 9/86."
+   build.sh passes "Sonderheft 09/86", so every build writes the wrong title. /Title and XMP dc:title must read "64'er Sonderheft 9". Author, Creator, Producer and dates are the build's.
+   Drop this item once build.sh passes the right title.
+3. PAGE 31 COLOUR — NOW NATIVE to the build. Owner: "31 has yellowing on the sides", then "do it" (2026-11-14).
+   r005's trace read the gutter-bleed photo as bed, and the paper-yellowing field was NOT APPLIED. reviewed/regrade_031.py applies field_low on a hand-traced box; its header lists the steps after it.
+   Swapped into the file as one image stream on 2026-11-14 (bce2a34047ee). Since the rebuild it is in a4600 and .ocrcache, and the build makes it: page 31's stream is byte-identical to the swapped one (sha1 e4d50081645e).
+   Proof on the rebuilt page, % of paper tinted at 0-3/3-6/6-10 mm: fore 2/0/0, top 0/0/1 (was 99/74/31 and 100/100/95). Inside the class range. Numbers in reviewed/colour-030-031.txt.
+   STILL A HAZARD: a re-run of r005_masters_sheet or r005_a4_window over p031 reverts it, because its trace still fails. After any such re-run, re-run regrade_031.py and its header's steps before the build.
+4. PAGE 111, THE PEN NOTE — NATIVE to the build. Owner retouched the raw /Volumes/S/png/SH09/111.png on 2026-11-14 and said "update 111".
+   p111 was re-derived from it (r005_masters_sheet 111, r005_a4_window 111), its JBIG2 and 150 dpi raster re-made, its text layer kept. In the PDF exactly the note's 49 black JBIG2 pixels went (x 710..1189, y 3267..3326); nothing else on the page changed.
+   Provenance, and where the pre-edit pixels are: reviewed/p111-provenance.txt. The raw is no longer the archive's scan.
+
+5. PAGES 30 AND 167, THE BED DROP — NATIVE to the build. Owner, on the rebuilt file: "pdf id perfect" (2026-11-15, via control).
+   r005's bed drop (level_and_trace, last block) dropped every frame-touching dark component whose share outside the line-traced page exceeds 0.5,
+   wholesale. On p030 the dark 1541 chassis of the lead photo joins the bed at the page turn and was painted white: 1716.5 mm2 inside the page, one
+   component reaching 48.7 mm deep. On p167 (back cover) the olive ground under the sleeve at the foot: 186.2 mm2, reaching 23.7 mm. No stamp said so.
+   reviewed/rebed_030_167.py re-derived both masters with the drop bounded (bounded_drop, DEPTH_MAX_MM = 10: a component whose part inside the page
+   reaches more than 10 mm from the line box's edge is not dropped; legitimate removals in SH09 reach at most 4.45 mm). The rule carries the same
+   limit since r005 commit 09308113. Then RECUT_OVERRIDE=1 r005_a4_window.py 30 167 (window unchanged), 030_150.png and 167_150.png remade, the build
+   and pdf_postfix.py as under BUILD. This is not a stream swap: a4600 and .ocrcache hold the repair, and the build makes it.
+   The grade is pinned: the field anchors are measured on r005's own keep, and sheets600/030 and 167 are PIXEL-IDENTICAL to the pre-repair copies
+   (asserted by the script). The owner's crops (30-0 was cut from sheets600) and the final HTMLs are untouched.
+   Image streams against a8cfb5d6b027 (pdf_postfix.py's comparison): PDF pages 30 and 163 only. 163 is scan 167 after item 1. Both are this repair.
+   Measured on the PDF's page 30 image (150 dpi), the 64526 pixels that changed by more than 40 levels (x 936..1224, y 685..1165): mean luminance 243.2
+   in a8cfb5d6b027, 55.1 in 72f11f5e1ee1, 55.5 in a4600/030 resized to the same raster. On the drive region of the build log: 154.3, against the
+   sheet's 154.1.
+   p168 is NOT repaired and needs no repair. Its drop is the prop branch (a yellow shape at the bleed read as the prop): 15.5 mm2, reaching 3.6 mm, at
+   sheets600 x 5160..5250, y 411..1235. The a4 window is x 2..4962 in that frame (a4_windows.json: x0 2, w 4961; the Bund trimmed by parity), so the bite
+   lies at least 197 px (8.3 mm) outside the published page. It never reached a published pixel.
+   Pre-repair files: <tmp>/recovery/predrop/ (masters600, sheets600, a4600, a4win, ocrcache, debug600, masters2400, cmyk2400, the shipped PDF a8cfb5d6b027,
+   the previous build output). Kept until the push has landed.
+
+Checked on 72f11f5e1ee1 (2026-11-15):
+- 168 pages, in the order of item 1: the image streams are the build output's (<tmp>/64er_Sonderheft_1986-09.pdf) as ...162, 167, 168, 163-166.
+- Against a8cfb5d6b027, image streams differ on pages 30 and 163 only (item 5); page 31 is identical (sha1 e4d50081645e, item 3), page 111 is identical (item 4).
+- qpdf --check clean; /Title and XMP dc:title "64'er Sonderheft 9".
+- pdftotext of the whole file identical to a8cfb5d6b027.
+- p031 and p111 as items 3 and 4 state them: their streams are a8cfb5d6b027's, on which those proofs were made.
+Pre-rebuild files: <tmp>/recovery/predrop/ (item 5). <tmp>/recovery/111.preedit/: the shipped PDF bce2a34047ee, the 2026-11-06 build output, an earlier text
+of this file. <tmp>/recovery/031.prefield/: b9921191e839. Kept until SH09 closes.
