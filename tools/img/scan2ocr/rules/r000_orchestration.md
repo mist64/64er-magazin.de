@@ -1504,9 +1504,16 @@ When the completion notification arrives:
    notices: a missing baseline reads as an empty one, which is exactly what a
    first run looks like. Check the path, and check the mtime.
 3. Run the rule's `## Verification` block in the main session.
-   **MEASURED, SH10, 2026-11-15: five steps re-checked (040, 050, 060, 070,
-   080) and all five came back IDENTICAL to the sub-agent's numbers — not one
-   disagreement.** So keep doing it, but know what it is: a CONFIRMATION, and
+   **MEASURED, SH10, 2026-11-15: of nine steps re-checked, EIGHT came back
+   identical to the sub-agent's numbers (040, 050, 060, 070, 080, 090, 100,
+   140) and ONE disagreed — and the disagreement was the agent reporting a
+   DEFECT THAT WAS NOT THERE.** Set A of 190 reported article 28's Bild 15 and
+   Bild 23 as "figures EMPTY, figcaption only, tables missing"; the re-check
+   found both holding their step-160 tables, 11 and 15 `<tr>`. Nothing was
+   lost, and a repair of something unbroken was averted.
+   **So the re-check earns its place by catching what an agent INVENTS, not by
+   finding what it missed.** That is a different value from the one it looks
+   like, and it is cheap either way on a text step. So keep doing it, but know what it is: a CONFIRMATION, and
    not where the catches come from. On the same five steps every finding of
    consequence came out of the SUB-AGENTS' OWN REPORTS — r040's pair-parity
    defect and the line it shipped on, 060's stray block, all five of 070's

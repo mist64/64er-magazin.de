@@ -547,6 +547,32 @@ Shape rules:
   *Kuriositätenecke* box above it. If an aside contains a second
   `<address class="author">`, suspect a merged neighbour.
 
+## BODY-FACE EXAMPLE LINES ARE NEITHER LISTING NOR PROSE
+
+Article 28 of SH10 carries **hundreds of example and monitor lines set in the
+BODY FACE** — commands, addresses, byte sequences the reader is told to enter —
+which are not listings (no monospace, no line numbers) and not prose (they do
+not run on). This rule had no shape for them, so they had no home.
+
+**The shape: join them with `<br>` into the lead-in paragraph that introduces
+them, and use `<pre>` ONLY where the page sets monospace.** The print's own
+typesetting is the test, exactly as it is for everything else here: body face
+stays in the paragraph flow, monospace becomes a block.
+
+## AN UNDERLINE IN THE PRINT IS CONTENT, AND `<u>` IS ALREADY THE CONVENTION
+
+Where the magazine underlines the bytes or values **the reader is meant to
+type**, that underline carries the instruction and must survive. No rule in
+this chain had ever mentioned it, yet the corpus has been doing it since
+SH8601: MEASURED 2026-11-15, **328 `<u>` elements across 8 issues** — SH8601,
+8606, 8608, 8610, 8701, SH8603, SH8606 and now SH10 — carrying values
+(`<u>199,40</u>`, `<u>850</u>`) and single bytes (`<u>N</u>`, `<u>C</u>`).
+
+SH10's article 28 has **118 of them**, placed by address arithmetic against the
+`oder >ADDR` lines and then read on the crops. Do both: derive the position,
+then confirm it on the page — an underline put on the wrong byte tells the
+reader to type the wrong thing.
+
 ## Never split the last paragraph from its `<p class="source">`
 
 An image or table must not be emitted between an article's final paragraph and
