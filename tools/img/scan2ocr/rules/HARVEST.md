@@ -3177,3 +3177,120 @@ SH10, SH8603 and 8608 — all four branches. r240's union was run on SH09 (finds
 r110 was edited in this build and its crash was still there. A per-file tally
 said 24 of 24; a per-entry tally said 19 open, and the twentieth was hiding
 inside a file the tally called done.
+
+## SH10, 2026-11-15: the owner read the served site, and three of the four things he found were ours
+
+The HTML went up on a local server for him at 22:0x. He accepted it within the
+hour ("html is fine otherwise. only pdf pending"), but not before finding, by
+eye, defects that four automated sweeps had passed. Each one is harvested here
+with the rule it reached.
+
+### THE INVENTED SENTENCE, AND WHERE IT ACTUALLY ENTERED → r160
+
+`101 Druckeranpassung`, Bild 2, carried a spanning row reading *"Masse (GND):
+Userport 1 und A an Centronics 16, 33 und 19-30; Userport 12 mit N verbunden"*.
+**It is nowhere on the page.** The plate draws a cable — pin, rule, signal
+name, rule, pin — with a bracket tying Centronics 16 and 33 to the range 19-30
+and `12— N` hanging below the ruled rows joined to nothing. Set as a
+three-column table, the bracket became the cell `16 – 33 – 19-30` and the
+dangling pin became a row of empty cells; the gloss was then written to carry
+the meaning the table could no longer hold.
+
+**The builder traced the origin and it was not the typesetting step.** Its own
+worklist line already specified "an explicit GND-tie row", so r160b executed
+the plan faithfully and never had the chance to catch it. **The invention
+enters at WORKLIST time**, where the writer is away from the plate and a
+sentence *about* a figure can be mistaken for a sentence *in* it. Sweep the
+worklist, not only the markup.
+
+The repair was ruled a crop by control and **the builder refused it, rightly**:
+the owner had already ruled TYPESET ALL TEN on that worklist, so a crop we cut
+ourselves reverses him. It was reset as the drawing instead, box-drawing
+characters in `<pre><code>`, bracket kept as drawn. Precedent was verified
+rather than assumed — exactly three published articles use box-drawing
+(8701/170, SH8603/60, SH8607/6).
+
+**The signature to sweep for is a prose sentence in a spanning cell.** It
+caught 1 of 169 across SH10; the other 168 are real printed structure.
+
+### AND CORRECTING THE PLATE IS THE SAME ERROR WITH THE SIGN FLIPPED → r160
+
+The same figure's third row reads `DO`, a letter O, in a column that then runs
+`D1`–`D7`. Measured, not eyeballed: on that line the `0` of pin `10` is a
+narrow oval and the `O` after the `D` a wide full circle. The published markup
+read `D0`. **Print errors are left as printed**, and no Futureteufelchen — this
+is not a reprint missing its original's erratum.
+
+**Control then got the attribution wrong**, telling the owner the repair had
+introduced it and that "the markup it replaced had it right" — without opening
+the pre-fix markup. The builder opened it: `r101_before.html:63` already read
+`D0`. The correction entered at the original table fill, in the same pass that
+wrote the invented row. **A claim about which step introduced a defect is a
+measurement, not an inference**, and the file was two commands away.
+
+### A FIGURE'S TEXT IS DEFINED BY WHAT IT DOES → r160
+
+p101's "Verdrahtungsschema…" note was emitted as a body `<p>` after
+`</figure>`, so the page read diagram, caption, orphan sentence, next heading.
+It belongs inside the figure. **But the rule as first written contradicted two
+standing rulings** (LOG 252, LOG 275) that put article 13's prose boxes in an
+`<aside>`, and the builder caught the contradiction. The test is what the
+sentence does: p101's names the connectors the diagram shows and cannot be read
+away from it; a box that reads on its own is an aside wherever the rule is
+printed. **A rule written from one page needs its scope written at the same
+time.**
+
+### THE BED IS BEHIND THE PAGE → r005, and this one was the owner's alone
+
+*"why does the bed correction bleed so far into the page, EVER? the bed is
+behind the page, and the page has straight edges. we can detect the bed on the
+other side of the edge only."*
+
+`t.keep` was already geometric and correct. The block after it deleted **whole
+bed-coloured components** that touched the scan frame whenever more than half
+of one lay outside the traced page — at any depth inside it. **No depth cap
+existed anywhere in the file.** On p031 the M&T ad's tint panel (L 61, B−R 6.5)
+connects through the fore edge to the bed outside, which outweighs it, and
+1359.5 mm² died 30.7 mm into the page, destroying the reversed text on it.
+
+The guard that existed was a **vote on the blob's size**, added after p006's
+board photo was a third erased by an unconstrained flood. So the reach into the
+page was already known and was bounded by the wrong quantity: a vote turns on
+how much bed happens to lie beyond the edge, which says nothing about whether
+the pixels inside are print. `BED_REACH_MM = 5.0`, measured against the
+deepest genuine bed in the issue (3.4 mm) and the shallowest finding (7.5 mm).
+
+**The first run of its test was a false PASS** — the toy sheet had too little
+bed outside the edge for anything to be doomed, so the cap was never reached.
+**A test that cannot reach the branch it is testing reports PASS.**
+
+**And two defects shared one symptom.** Control folded p002 into the same fix;
+the builder disproved it by measuring the white band per column — 0, 203, 174,
+149, 123, 97, 71, 46, 20, 0 px, a straight line falling 25.8 px per 500
+(−2.95°). That is the fitted top line itself, not a flood, and no cap touches
+it. **A component boundary is ragged; a line fit is straight.** p002 keeps a
+recorded override and the trace guard is held back as a separate change, so
+that one 3 h re-derive tests one thing.
+
+### THE RAWS CAN BE REORDERED, AND THE RENAME IS THE WHOLE FIX → r000
+
+The four blue reply cards were scanned mid-wrapper as 163-166. The owner ruled
+them to the end and assigned the rename to control. Five requirements, all
+cheap: copy off `/Volumes/S` first **and not into the scratchpad** (the builder
+caught that — it is wiped between sessions); look at the pages rather than
+trust the operator's note; two phases through temp names, because the mapping
+overlaps itself both ways; **verify the rename by inode and the copy by
+sha256** (control first verified by byte count and the builder refused it — the
+full sha256 of twelve files took 23 seconds); and rewrite `000MISSING.txt` in
+the same breath.
+
+### WHAT THE OWNER FOUND THAT NO SWEEP DID
+
+Four things, and the pattern is worth naming: **every one was visible on a
+rendered page and invisible to a check written against our own output.** The
+invented row passed because it was well-formed HTML. The flattened diagram
+passed because a table is a legal figure. The lost tint panel passed because
+the ink sweep ran only after he asked for it. The skewed title and the
+mis-classed colour pages, earlier the same night, passed the same way. **A
+sweep over our artefacts cannot see what is missing from them.** The plate is
+the only check that can, and the owner is currently the fastest reader of it.
