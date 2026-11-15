@@ -575,6 +575,14 @@ supervisor relaying a list as readily as the agent building it — a candidate
 whose only support is "this looks like OCR damage" has no page behind it and is
 `UNRESOLVED` until a blind reading of the ORIGINAL'S OWN SCAN settles it.
 
+**AND AN ORIGINAL CAN SPAN TWO PAGES, IN WHICH CASE BOTH ARE THE ORIGINAL.**
+MEASURED on SH10's 108, whose source runs over SH8608/129 AND /130: the Bild 1
+and Bild 2 captions sit on the facing Checksummer page because that is where
+the house set them. **Diff against the UNION of the pages and say so in the
+record.** Picking one would drop whatever the house put on the other, and the
+captions are the usual casualty — they are the part most often set across the
+fold.
+
 **WHICH ORIGINAL TO CREDIT WHEN A HOUSE TEXT RAN MANY TIMES.** The
 Checksummer and MSE articles are reprinted every few issues — 8603/55,
 SH8602/6, SH8507/6, SH8603/76 are all the same text — and step 7's credit
@@ -586,6 +594,23 @@ choice is visible.
 And note for the dispatch brief: **step 7's credit line is part of this rule**,
 not an extra. A brief that says "apply only the OURS fixes" has silently
 dropped it; SH8603 is the precedent for including it.
+
+**AND THE DIRECTION CAN BE REVERSED, BECAUSE WE PUBLISH IN OUR OWN ORDER.**
+The chain assumes the already-published issue is the ORIGINAL, which is true
+only because we publish chronologically — and a Sonderheft can predate a
+monthly we shipped first. MEASURED on SH10: article 27 matches 8612/21 at
+0.82-0.95 over three blocks, and SH10 is the EARLIER print (it reached the
+kiosk "Ende September 1986"; 8612/40 cites "Sonderheft 10/86" itself). So
+**8612 reprints SH10**, and our corpus has it the other way round only as an
+artefact of publication order.
+
+**What to do with a reversed pair:** diff it as an OCR CROSS-CHECK and claim
+nothing. No credit line, no THEIRS correction against the older issue unless
+the diff shows that issue misread ITS OWN page. Two independent transcriptions
+of one text is a gift — every difference is an OCR error in one of them, and
+the PRINT of whichever page settles each. And note the bookkeeping for later
+rather than doing it now: the earlier-published issue carries no reprint note
+pointing at the issue being built.
 
 Never reason from the other transcription ("8506 says `Rasterbildschirm`, so
 ours is wrong"). That is the same shape as the `internsiv` regression: a related

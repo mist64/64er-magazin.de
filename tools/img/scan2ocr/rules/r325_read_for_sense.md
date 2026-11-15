@@ -551,6 +551,17 @@ So this step runs in **waves**:
    what it did not see. That list is the next wave's input, not a failure.
 4. The orchestrator commits each wave's yield before starting the next, and
    reconciles `crops read / crops seen` per reader. Any gap means the cap bit.
+   **THESE COMMITS ARE LOCAL AND DO NOT BREACH THE ONE-COMMIT RULE.** SH10's
+   builder read them as a conflict with the owner's standing order — one
+   squashed commit per issue, permission asked every time — and held the
+   yields as uncommitted files instead. There is no conflict: the squash is
+   built from `origin/main` in a throwaway worktree, so local commits never
+   reach him. SH09 had **103 of them and pushed as ONE**. The order governs
+   the PUSH; committing as you go is what protects the work, and 80,851 words
+   across 8 readers is many hours to hold in an uncommitted directory.
+   **COMMIT BY PATHSPEC, `issues/<ID>` only** — control commits rule files
+   into the same working tree continuously, and a bare `git commit` sweeps
+   them into the wave (r000, *Commit & staging discipline*).
 
 **The yield goes to `issues/<ID>/reviewed/r325-<reader>.txt` and is committed
 as each article finishes.** Not to `LOG.md`: git does not track it, and SH09
