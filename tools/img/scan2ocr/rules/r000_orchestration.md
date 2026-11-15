@@ -2091,7 +2091,9 @@ the operator believes is complete, which spurious files were parked and why
 to `scan/<ID>/_dupes/`), and that is knowledge the scan itself does not carry.
 
 **But it is prose, and the per-page `pHYs` read is the measurement.**
-MEASURED on SH10, 2026-11-15: the note says "001,002,167,168 from 2 uncut A3
+MEASURED on SH10, 2026-11-15 (quoting the note as it then stood — the six
+tail pages were renumbered later that day, see the next rule): the note says
+"001,002,167,168 from 2 uncut A3
 wrapper sheets, 2400 dpi" plus "19 pages single pages, 2400 dpi (colour section
 + the 4 cards)" — 23 in all. `pHYs` reports **25**: 001-004, 008, 010, 011,
 013, 014, 016, 019, 020, 022-024, 027, 028, 031, 034, 163-168. The note is off
@@ -2109,6 +2111,73 @@ disk — do not re-derive them". They were not verified; they were read. The
 builder derived them anyway, per the `pHYs` instruction above, and that is how
 the two-page difference surfaced. **Nothing is "already verified" unless the
 brief says which command produced the number.**
+
+### THE OWNER CAN REORDER THE RAWS, AND THE RENAME IS THE WHOLE FIX
+
+The scan order is the order the sheets went through the scanner, and it is not
+always the order the issue reads in. Loose inserts are the usual case: SH10's
+four blue reply cards were scanned in the middle of the wrapper, so they came
+off as 163-166 with two real wrapper pages, a PC-Magazin ad and the Anco back
+cover, sitting behind them at 167-168.
+
+**When the owner rules on the order, fix it in the raws, once.** Not at PDF
+assembly time, not with a reorder table some later step consults — those put a
+second source of truth beside the scans, and every step that reads the raws
+directly keeps the old order. The raws are the only input, so the raws are
+where the order lives.
+
+OWNER, 2026-11-15, on SH10: *"the 4 blue smaller pages should go to the very
+end. fix in original pngs once, tell sibling then"*, and when asked who should
+run it, *"you do it"*. Control ran it. **The division still holds** — this is a
+rename on the input volume, not a build step; the propagation into
+`<tmp>/` was handed to the builder.
+
+**Five things the rename needs, all of them cheap:**
+
+1. **Copy off `/Volumes/S` first — and NOT into the scratchpad.** That
+   volume has no snapshots and is excluded from Time Machine. A rename
+   cannot lose a pixel, but the script that does it can, and p111's
+   pre-edit raw is already gone from there. 4.4 GB and ninety seconds.
+   Control put SH10's copy in its scratchpad, which is wiped between
+   sessions; **the builder caught it and asked for it to be moved**, and it
+   now lives at `<tmp>/recovery/raw-reorder/`, with a README, because it has
+   to outlive today — it is not safe to delete until the rebuilt PDF is
+   accepted. Name the copies with the **old** numbers and say so in the
+   README, or a later restore puts them back in the new order.
+2. **Look at the pages.** The operator's note said which were cards and
+   which were cover; a montage of the six thumbs confirmed it before
+   anything moved. The note is a hint — the rule above this one says so,
+   and SH10's note was already wrong about the 2400 dpi count.
+3. **Two phases through temp names.** SH10's mapping — 163→165, 164→166,
+   165→167, 166→168, 167→163, 168→164 — overlaps itself in both
+   directions, so any single sequence of `mv` clobbers. Move all six to
+   `T<n>.png`, assert no target survived, then move them down. `mv -n` on
+   every move, and a pre-flight that refuses if a temp name already exists.
+4. **Verify the rename by INODE, and the copy by SHA256.** Two different
+   checks, and both are needed. The *rename* must land the same inode on the
+   new name: record `stat -f %i` for every file before, check every one
+   after — sizes can coincide, an inode cannot, and the check is instant.
+   The *recovery copy* is what you may one day restore from, so before
+   anything is deleted it is verified by content hash against the renamed
+   original, old number against new. Byte count is not that check; control
+   first verified SH10's copy by size alone and **the builder refused it**.
+   The full sha256 of all twelve files took 23 seconds. Do the `thumb/`
+   directory in the same breath, with the same mapping.
+5. **Rewrite `000MISSING.txt` immediately.** It describes the scan order and
+   is wrong the moment the order changes. Keep the old numbering in it as an
+   explicit old→new table, so the scan order is still recoverable.
+
+**AND THE DERIVED TREE DOES NOT FOLLOW BY ITSELF.** After SH10's rename,
+eleven directories under `<tmp>/` plus `a4600/.ocrcache/pageclass.tsv` still
+held the old order. Most derived files are a pure per-page function of the raw,
+so permuting them is exactly equivalent to re-deriving and costs nothing, where
+re-deriving six 2400 dpi pages costs 30-50 minutes at 20 GB peaks. **But permute
+only where the page number is not baked into the file's content** — debug
+overlays, per-page logs and anything keyed by page, `pageclass.tsv` above all,
+must be rewritten or re-derived instead of shuffled. And a class that an
+earlier, weaker gate assigned is not carried across a reorder: SH10's four
+cards are a flat blue halftone, exactly what the three-column colour gate
+cannot see, so all six were re-gated rather than moved.
 
 ### A `thumb/` you FIND beside the scans is NOT an input — re-derive it
 

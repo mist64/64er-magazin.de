@@ -102,6 +102,62 @@ Three further shapes this rule never named, all met on 8612:
 
 A `Bild N` referenced in the body that is NONE of the above *and* has no crop is a gap, not a no-op: log it to `LOG.md` (as with a referenced-but-missing table) rather than silently skipping.
 
+### ROWS DO NOT MAKE A GRID — A DRAWN JOIN MAKES A SCHEMATIC
+
+The branch above sends a "schematic" to rule 150 and a "rectangular grid of
+cells" to `<table>`, and the hard cases look like both. **The test is not
+whether the content sits in rows. It is whether the drawing carries meaning the
+cells cannot.** A rule running from a name to a number, a bracket joining two
+rows to a third, a line that stops short, an item hanging below the ruled rows
+with no line at all — each of those is a statement, and a `<td>` has nowhere to
+put it.
+
+MEASURED, SH10 p101, Bild 2 "PIN-Belegung fuer ein Userport/Centronics-Kabel",
+found by the OWNER reading the served site. The plate draws a cable: Userport
+pin, a rule, the signal name, a rule, the Centronics pin — and at the right a
+bracket tying Centronics 16 and 33 to the range 19-30, with `12— N` hanging
+below the ruled rows, joined to nothing. It was typeset as a three-column
+table. The bracket became the cell `16 – 33 – 19-30`, which states a flat list
+where the plate draws a join, and `12— N` became a row with two empty cells.
+
+**AND THE FLATTENING IS WHAT INVITED THE FABRICATION.** Having lost the
+bracket, the step added a spanning row reading *"Masse (GND): Userport 1 und A
+an Centronics 16, 33 und 19-30; Userport 12 mit N verbunden"* — a sentence
+that appears NOWHERE on the page. It is correct electronics. It is a gloss the
+step wrote to carry the meaning its own table could no longer hold, set in a
+spanning row so it reads as magazine text. **We publish the plate, not our own
+knowledge**, and a true sentence we wrote is still a sentence we wrote. The
+repair is to delete it, never to improve it.
+
+So: **when a figure needs a drawn line to be read, crop it.** A grid is cells
+whose position is the only thing the ruling says. Everything else is rule 150's.
+
+**THE SIGNATURE TO SWEEP FOR** is a prose sentence set as a spanning cell. It
+is nearly always ours, because printed tables span a cell to carry a section
+label or a shared description, not an explanation of the table. On SH10 the
+sweep found 169 spanning cells across four articles and exactly one was
+invented: the other 168 are short cell content (`20 Formel C`, 4;
+`71 Wunderwelt`, 13) or the genuine BDOS function descriptions in
+`93 Tips & Tricks zu CP/M`, 151 of them. One hit in 169 is worth the grep.
+
+### AND THE FIGURE'S OWN TEXT STAYS INSIDE THE FIGURE
+
+A ruled box often holds, under the diagram and above the caption rule, a line
+or two explaining the parts — connector types, cable lengths, part numbers.
+**That text is inside the box, so it goes inside `<figure>`, before the
+`<figcaption>`.** SH10 p101 emitted it as a body `<p>` after `</figure>`, so
+the page read: diagram, caption, then an orphan sentence, then the next
+heading. The caption is the last thing in the box on the page and must be the
+last thing in the element.
+
+**AND A FIGURE SITS WHERE IT PRINTS, NOT WHERE IT IS FIRST NAMED.** The same
+figure was placed directly after the paragraph ending "...koennen Sie Bild 2
+entnehmen.". In the plate that paragraph is followed by the `Anpassung` head
+and its first paragraph, and only then the box. A body reference is a pointer,
+not a position: read the column down and place the figure where the column puts
+it. (The exception is a figure printed across the foot of the page, clear of
+the columns — SH10 p101's Bild 1 — which goes at its reference, as usual.)
+
 ### A NUMERIC RANGE IN A KEY CELL IS SET WITH A HYPHEN, WHATEVER THE PRINT SETS
 
 (This section was headed *A PAGE RANGE*, and its reasoning is drawn from the
