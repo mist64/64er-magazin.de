@@ -48,6 +48,43 @@ Both were escaped by hand from the orchestrator. Until the script implements
 the test, **read the per-line `**` output yourself** — the script's `pairs=0`
 is not evidence.
 
+### AND THE PAIR-PARITY COUNT COULD NOT COUNT PAIRS (fixed 2026-11-15, SH10)
+
+The parity test that decides `keep2` — whether a length-2 run survives as a
+bold delimiter — was
+
+```python
+pairs = len(re.findall(r'(?<!\)\*{2}(?!\*)', line))     # WRONG
+```
+
+`(?<!\)` excludes a preceding **backslash** and not a preceding **star**, so
+the pattern also matched **the last two stars of a `***` run**. MEASURED on
+SH10 l.1381, `F) *** Speicherende ** *`: one match inside the `***` plus one
+for the lone `**` is **two**, which is even, so `keep2` came out True and the
+lone `**` shipped as a live bold delimiter. Same arithmetic for a `****` and a
+lone `**` on one line.
+
+It is `(?<![\\*])` now — runs of **exactly** two. The rule's own per-line
+readout in Verification already spelled the lookbehind that way, which is why
+that readout was the only thing that saw it.
+
+**Verified on five lines, old against new** (`keep2` old/new):
+
+| line | old | new | |
+|---|---|---|---|
+| `F) *** Speicherende ** *` | True | **False** | the defect: now escaped |
+| `**** und ** hier` | True | **False** | same shape, now escaped |
+| `**Echt fett** und **noch eins**` | True | True | real pairs, untouched |
+| `**Fett**` | True | True | untouched |
+| `ein ** literal allein` | False | False | untouched |
+
+So the change moves only the defective cases and leaves every legitimate one
+identical. End-to-end on a planted file the three defect lines come out fully
+escaped, the real bold is unchanged, and a second run changes nothing.
+
+Found by the SH10 builder, who hand-fixed the line and reported the script
+defect rather than only the symptom.
+
 That covers:
 - `*` (one) → `\*` (BASIC multiply, wildcard, literal star)
 - `***` → `\*\*\*` (three literal asterisks)

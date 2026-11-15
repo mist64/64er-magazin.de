@@ -101,13 +101,55 @@ MEASURED on 8611: **43 of 192**, almost all of them article pages — only 53
 of the pages that carry article text had usable truth at all. And the harm
 was not the files, it was the number:
 
-| | recall | precision | order | headings |
-|---|---|---|---|---|
-| as printed, all 192 | **0.733** | 0.767 | 0.999 | 0.744 |
-| the 149 with real truth | **0.930** | 0.973 | 0.999 | 0.908 |
+| issue | denominator | recall | precision | order | headings |
+|---|---|---|---|---|---|
+| 8611 | all 192, refusals scored as truth | **0.733** | 0.767 | 0.999 | 0.744 |
+| 8611 | the 149 refusal-free, **mixed** | **0.930** | 0.973 | 0.999 | 0.908 |
+| SH10 | all 168, refusal-free, **mixed** | **0.892** | 0.962 | 0.995 | 0.799 |
+| SH10 | the 129 **with article text** | **0.860** | 0.951 | 0.994 | 0.738 |
 
 A reader budgeting from 0.733 goes looking for a regression that was never
-there. `is_refusal()` now catches it in three places: `build_truth` will not
+there.
+
+**AND THE DENOMINATOR IS NOT THE ONLY THING THE TABLE HIDES: A PAGE WITH NO
+ARTICLE TEXT SCORES 1.00 AND LIFTS THE MEAN.** `score()` reads
+
+```python
+recall = len(pairs) / len(truth) if truth else (1.0 if not ours else 0.0)
+```
+
+so every ad, form, cover leaf and standalone listing whose truth is
+`NO_ARTICLE_TEXT` contributes a perfect 1.00 to a **mixed** row. SH10 has 39
+such pages: 0.892 mixed against 0.860 on the 129 that carry article text.
+
+**SO ONLY ROWS OF THE SAME KIND COMPARE.** MEASURED, 2026-11-15, in one
+exchange that got this wrong in both directions inside ten minutes: control
+asserted that non-article pages DRAG the mean down and that SH10's 168 was not
+comparable to 8611's 149 (both false — they lift it, and both rows are
+refusal-free mixed rows, so those two DO compare); the builder then compared
+SH10's article-only 0.860 against 8611's mixed 0.930 and read a shortfall that
+is partly the same artefact (also false). The honest reading of the rows above
+is SH10 about **4 points below 8611 on recall and 11 on headings, like for
+like**, and 8611 has no article-only row because its truth files are gone.
+
+**AND A GAP AT 020 IS NOT A LOSS FROM THE ISSUE.** SH10's missing recall is
+concentrated in printed TABLES dimmed as noise — p098 (a full-page CP/M BDOS
+function table), p021, p097, p147 — which are **step 160 Pass 3's work**. Text
+that arrives as a table is not text that was lost. The gate that settles it is
+**r320**, the omission check, and those pages are named in its brief so it has
+to account for each one instead of reporting a total.
+
+**AND COUNT THE HEADINGS, DO NOT READ THEIR SCORE.** SH10's headings figure of
+0.738 says nothing actionable; the count does. 365 `#` lines in the truth, 197
+of them not headings in ours, across 59 pages — and **98 of those 197 are two
+reference-list shapes**: 73 Kochrezepte Kernel-routine entries (p141–148) and
+25 Impressum labels, where the vision truth chose a heading per entry. Those
+are a 160/290 question about table-shaped reference lists, not a classifier
+defect. What was left after removing them was a thin tail of 1–7 a page, and
+two real misses worth 290's attention: SH10 p123, whose own article title
+(`»Zeichensetzereien« auf dem C 128`) is not a heading on its page though 030
+titled the article with it, and p007's Q&A question heads. **Concentrated and
+spread mean different fixes, and the mean cannot tell them apart.** `is_refusal()` now catches it in three places: `build_truth` will not
 write one, `score()` will not score one already on disk, and the summary
 prints how many pages it could not score before it prints any figure.
 

@@ -103,7 +103,14 @@ def esc_line(line):
     # an unpaired ** shipped as a bold delimiter.  SH8602's Protext article
     # renders space padding as asterisks, giving one literal ** per line, and
     # every fence-aware check read 0 because a pair count cannot see it.
-    pairs = len(re.findall(r'(?<!\\)\*{2}(?!\*)', line))
+    # RUNS OF EXACTLY TWO.  `(?<!\\)` excludes a backslash and NOT a star, so
+    # this also matched the LAST TWO STARS of a `***` run: SH10 l.1381
+    # `F) *** Speicherende ** *` counted 1 (inside the ***) + 1 (the lone **)
+    # = even, so the lone ** was kept as a bold delimiter and shipped
+    # unescaped.  Only the rule's per-line `**` readout saw it, which already
+    # spells the lookbehind `(?<![\\*])`.  Same arithmetic for `****` + a lone
+    # `**` on one line.  MEASURED on SH10, 2026-11-15; found by the builder.
+    pairs = len(re.findall(r'(?<![\\*])\*{2}(?!\*)', line))
     keep2 = (pairs % 2 == 0)
 
     def esc(m):
