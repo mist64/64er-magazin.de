@@ -450,6 +450,21 @@ PY
 #     inside FIELD_PAGE_MM, and the edge tint fell to +1.2/5 %, +0.8/1 %,
 #     +0.2/0 % on fore, top and bottom -- inside the class median.
 #
+#     AND AN a4600 OVERRIDE HAS A DOWNSTREAM: EVERYTHING READ FROM a4600 IS
+#     STALE AFTER IT.  010 OCRs a4600 into blocks, and 020/030 are built on
+#     those blocks; the 150 dpi raster, the JBIG2 stream and the OCR text layer
+#     all come from the same page.  So an override has a PLACE in the chain, not
+#     just a procedure: do it BEFORE 010, or re-make every artefact derived
+#     from that page afterwards and say in LOG.md which ones.
+#
+#     SH10 got this right by sequence and said so: 164, 166 and 168 were
+#     levelled by override, and step 010 ran at 15:11 AFTER all three, so no
+#     page needed a re-run. That sentence in a report is the evidence; the
+#     alternative is an issue whose OCR describes a page that no longer exists.
+#     SH09's own near-miss is the same shape by another route: the JBIG2 cache
+#     tested EXISTENCE and would have re-shipped p111's old stream after the
+#     owner's retouch (r006, and make_issue_pdf_mixed.sh's freshness check).
+#
 #     AND THE OVERRIDE MUST STAMP WHAT IT DID, in both directions.  The stamp
 #     may not claim pixels the field did not touch (r005_masters_sheet, check
 #     7b) -- and it may not stay silent about pixels the field DID touch, or

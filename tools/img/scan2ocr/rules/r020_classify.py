@@ -70,7 +70,26 @@ RETRY_WAIT = 45   # seconds
 CLAUDE_TIMEOUT = 300
 # Each page is an independent call.  4 lanes keeps the box responsive; the
 # font_experiments agent shares this machine and swap-thrashes if crowded.
-LANES = 4
+#
+# `LANES` IN THE ENVIRONMENT OVERRIDES IT, the same way r000_issue.lanes() now
+# does.  SH10, 2026-11-15: the owner capped this build's fan-out and there was
+# no way to say so to this step -- 4 was a constant and the env was not read --
+# so the builder had to drive the step one page at a time through
+# `xargs -P 3 -n 1`, each process then running a pool of ONE. That worked and
+# cost nothing, but the lane count then lives in a shell line nobody will find
+# again. `LANES=3 r020_classify.py` is the same instruction, in the step.
+#
+# NOTE WHAT THIS NUMBER IS NOT BOUND BY: r000 says lanes() is "NOT for a step
+# whose lanes are model calls -- those are bound by rate limits and by the
+# credential race in r000_llm, not by this machine". 020 is one API call per
+# page; MEASURED on SH10 at 3 lanes it held ~1.6 GB (547 MB of python plus
+# 1.03 GB across the three `claude` CLI processes), against the 19-21 GB a
+# single 2400 dpi page took in 005. So a RAM cap is almost never the reason to
+# lower this; rate limits and credits are.
+try:                                  # unset, empty or malformed -> the default
+    LANES = max(1, int(os.environ["LANES"]))
+except (KeyError, ValueError):
+    LANES = 4
 
 # Which labels make it into the corpus, and the reading order, come from stage A.
 # Stage A writes a provisional article.txt with the same rules before the LLM has
