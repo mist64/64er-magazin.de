@@ -355,7 +355,10 @@ The sub-agent must:
    inline declarations) — replace with an unwrapped `<pre>` block if
    the printed text is short and uncaptioned, or with a
    `<figure>`-wrapped one if it has a Listing N caption.
-4. Beautify touched files (`npx --yes js-beautify --type html
+4. Beautify touched files — **skippable with a LOG.md line when `npx` cannot
+   download the package, as it was refused on SH10 (2026-11-15); the
+   formatting is cosmetic and the HTML is valid without it** —
+   (`npx --yes js-beautify --type html
    --indent-size 4 --wrap-line-length 0 --replace`). **Verify
    beautify did not collapse `<pre>` content** — it shouldn't, but
    double-check.

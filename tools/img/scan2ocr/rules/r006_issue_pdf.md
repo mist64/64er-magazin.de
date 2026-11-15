@@ -568,6 +568,49 @@ ship with their photographs crushed, consistent with SH8602 and with the rest
 of the archive. So a crushed halftone is a known, accepted cost — report it,
 do not silently fix it.
 
+### THE COLOUR GATE CANNOT SEE A NEUTRAL SCREEN, AND JBIG2 DELETES IT
+
+A page goes bilevel on its COLOUR fraction. **A grey halftone screen is
+neutral by definition**, so it scores zero colour, passes the gate, and then
+disappears: MEASURED on SH10 p020, 2026-11-15 — `a4600` carries an even
+mid-grey dot screen behind the whole Floppyfunktionen/DOS-Befehle box, and the
+trial PDF's JBIG2 image of the same 1200×1000 region at 35 % is a **WHITE
+ground with faint specks**, type intact. The box's ground, which r160 treats
+as meaning and which is why the owner scanned that page at 2400 dpi, does not
+reach the reader. Pair kept at `<tmp>/trial/p020/look_pair.png`.
+
+**And the owner's own scanning decision is the better authority on tone than
+our colour fraction.** With p020 in `FORCE_CONTONE`, SH10's contone set is
+exactly the 25 pages he scanned at 2400 dpi — no exceptions. He made that
+choice page by page with the paper in his hands.
+
+**THE SWEEP, and what it cost to get right.** Control's first bound — 100 mm²
+of connected mid-grey on `a4600` box-averaged 8×8, band 140–215 — FIRED ON THE
+RUNNING-HEAD RULE, a 1 mm strip across the page averaging to grey, at 135–186
+mm². Adding "≥ 3 mm in both dimensions" left 40 pages, and **region standard
+deviation does not separate a screen from dense text** (screens 8–16, text
+13–20), so the 40 regions went on one contact sheet and were READ:
+
+| class | pages | sizes | disposition |
+|---|---|---|---|
+| **A: screened boxes and tables, the grey carries meaning** | 13 — 018, 020, 021, 025, 026, 094, 099, 108, 109, 127, 136, 140, 147 | 1820–17377 mm² | **FORCE_CONTONE** |
+| B: grey header bars and small tints | 17 | 100–1300 mm² | stay bilevel |
+| C: halftone photos and drawings | 7 | — | stay bilevel |
+| D: false positives (a schematic, two listings) | 3 | — | — |
+
+**B stays bilevel because the trade runs the wrong way:** forcing a page to
+contone moves the WHOLE page to 150 dpi guetzli, so a listing page with a grey
+header row would lose the sharpness of the thing readers type from to keep a
+decorative tint. **C stays because `allbw` has accepted halftone loss on
+bilevel pages since it was written** and eleven issues have shipped on that
+basis; changing it mid-issue would make one issue inconsistent with the corpus
+on a decision the owner has not taken.
+
+**THE REAL FIX IS PER-REGION AND THE CHAIN DOES NOT HAVE IT.** Bilevel type
+over a contone ground (MRC-style) would keep both; whole-page classification
+cannot. Until then the rule is: **only a screened ground that carries MEANING
+buys a whole page's move to contone.**
+
 ### ONE FIXED 35 % THRESHOLD FOR EVERY BILEVEL PAGE — Otsu is not a shipping setting
 
 **Otsu adapts to CONTENT, not to paper**, which is the opposite of what it

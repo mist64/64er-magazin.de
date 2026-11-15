@@ -1085,6 +1085,29 @@ nothing to detect and no second case to check for. A crop delivery is always
 always sorts it into `png/{bw,gray,dots,c}/` and runs
 `tools/convert-scans.sh` before placing the output.
 
+### A DELIVERED CROP MAY CARRY AN ALPHA CHANNEL, AND `-alpha off` IS NOT ALWAYS RIGHT
+
+**The owner's instruction, 2026-11-06: a placed image carries no alpha —
+"remove the channel with `-alpha off` (keeps RGB), never composite".** That
+instruction had lived only in control's own notes until 2026-11-15, so SH10's
+builder met an alpha crop with nothing in these files to go on and had to reason
+it out. It is here now.
+
+**And `-alpha off` does the wrong thing when the cut-out sits over black.**
+MEASURED on SH10's 10-1 and 28-0: both arrived RGBA with a cut-out alpha whose
+underlying RGB is BLACK, so `-alpha off` keeps that RGB and ships **black
+bars** where the transparency was. The two cases:
+
+| the RGB under the alpha | operation |
+|---|---|
+| **is the image** (the usual case) | `-alpha off` — drop the channel, keep the pixels |
+| **is black, under a cut-out** | **flatten onto white** (`-background white -alpha remove`) |
+
+**Either way, verify against `sheets600`** at the crop's own box: the sheet is
+what the page actually looks like there, and it settles which of the two the
+file is. SH10 verified before choosing, which is what made it a decision rather
+than a guess.
+
 This does **not** loosen *owner crop wins*. What the owner decided is the
 FRAMING and the CHOICE — which figure ships as a picture, where it is cut, what
 it includes. Never re-cut, re-frame, extend or substitute a delivered crop, and

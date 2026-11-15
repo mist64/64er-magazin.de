@@ -67,6 +67,15 @@ removed. Don't leave `XXX` in any article.
 
 ## Per-byline expansion vs. tip-column dedupe
 
+**AND A TIP COLUMN WITH NO INTRO BYLINE STILL DEDUPES.** The shape below
+assumes an intro byline names the editor; SH10's 148 has none, and `dm`
+co-signs every tip instead. **The corpus is genuinely split** — 8609/62 and
+8612/79 dedupe, SH8607/147 and SH8608/157 expand per byline — so this is a
+decision and not a lookup, and the decision is DEDUPE: one entry for the
+editor. A meta that repeats one code sixteen times is noise to every reader of
+it, and the body already carries the per-tip signatures. SH10 followed 8609/62
+and 8612/79 on exactly this reasoning.
+
 Two shapes exist in the wild and the rule used to leave the choice
 implicit; pin it explicitly here.
 
@@ -368,6 +377,55 @@ for f in sorted(os.listdir(d)):
 PY
 ```
 
+### Check 7: A META IN ALPHABETICAL ORDER WHILE THE BODY IS NOT
+
+Check 6 asks whether every meta name appears in a byline. **A SORTED meta
+passes it**, because sorting changes no names — and a sorted meta is precisely
+the defect SH09's 92 Buchbesprechungen shipped and SH10 found twice more, in
+148 and 27. Order was invisible to this whole block, and in all three cases it
+was found by READING THE BYLINES.
+
+Strict order cannot be the test, because this rule allows two legitimate
+shapes that are mirror images: per-byline EXPANSION (the meta repeats a name
+once per printed byline) and tip-column DEDUPE (the body repeats an editor code
+the meta carries once). Measured, a subsequence test that collapses repeats
+fires on **55 of 492** chain-built files, almost all of them one shape or the
+other.
+
+**But the defect has its own signature: alphabetical.** A meta that follows the
+page is in the page's order, which is alphabetical only by accident.
+
+```bash
+"$PY" - "$dir" <<'PY'
+import io, os, re, sys, unicodedata
+def key(x):            # umlaut-insensitive, so Müller sorts where a reader puts it
+    return unicodedata.normalize('NFKD', x).encode('ascii', 'ignore').decode().casefold()
+d = sys.argv[1]
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = io.open(os.path.join(d, f), encoding='utf-8').read()
+    m = re.search(r'<meta name="author" content="([^"]*)"', s)
+    if not m: continue
+    meta = [p.strip() for p in m.group(1).split(',') if p.strip()]
+    body = []
+    for a in re.findall(r'<address class="author">(.*?)</address>', s, re.DOTALL):
+        inner = re.sub(r'<[^>]+>', '', a).strip().strip('()')
+        body += [x.strip() for x in re.split(r'[/,]', inner) if x.strip()]
+    if len(meta) < 3 or not body: continue          # 2 names sort by chance
+    km, kb = [key(x) for x in meta], [key(x) for x in body]
+    if km == sorted(km) and kb != sorted(kb):
+        print('  META IS ALPHABETICAL, BODY IS NOT  %-40s' % f[:40])
+        print('      meta:', meta[:6])
+        print('      body:', body[:6])
+PY
+```
+
+**MEASURED over the chain-built corpus: 2 of 101 files with 3+ entries**, and
+both are the same benign shape — a tip column whose editor code (`bj` on
+8609/155, `dm` on 8611/74) sorts to the front while the body puts the
+contributor first. So this is a READOUT, not a gate: two known hits to
+recognise, and anything else gets its bylines read in page order.
+
 ### What check 6 is, and the two stricter forms that DO NOT work
 
 **MEASURED before it shipped**, which is how the two stricter forms were
@@ -486,6 +544,22 @@ else.** An `<address>` that follows `anzufin-` reads as damage, so the byline
 cannot be put back without them. Everything else dropped on that page — other
 columns, captions, interleaved listing text — stays 190's. Note in `LOG.md`
 which lines 180 restored, so 190's walk is not asked to find them twice.
+
+## THE SLASH-SPLIT ONE-LINER KEPT ONLY THE LAST TOKEN
+
+The SILENT/UNDEFINED readout used `awk '{print $NF}'`, which keeps **the last
+slash token and throws the rest away** — against this file's own prose. MEASURED
+on SH10: `(Th. Rumbach/D. Winkler/ev/og)` yields only `og`, so `ev` was never
+tested against the Impressum at all, and `ev` is exactly the kind of code that
+needs it (UNDEFINED on SH10, adjudicated as Volker Everts from 8601–8606).
+
+Split on the slash and test **every** token that looks like a code:
+
+```bash
+grep -ho '<address class="author">[^<]*' "$dir"/*.html |
+  sed 's/.*>//; s/[()]//g' | tr '/,' '\n\n' |
+  sed 's/^ *//; s/ *$//' | grep -xE '[a-zäöü]{2,3}' | sort | uniq -c | sort -rn
+```
 
 ## Check every editor abbreviation against the ones already seen
 

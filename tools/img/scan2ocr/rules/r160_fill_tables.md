@@ -446,7 +446,12 @@ The sub-agent must:
 8. **Delete adjacent OCR-garbage paragraphs** next to a `TODO TABLE`
    placeholder (the OCR pipeline sometimes drops a flattened
    `<p>…<br>…</p>` next to the placeholder).
-9. **Beautify a COPY, compare, and write only if the file has not moved.**
+9. **Beautify a COPY, compare, and write only if the file has not moved** —
+   and SKIP IT WITH A LOG LINE IF THE TOOL IS NOT AVAILABLE. `npx --yes`
+   downloads the package, which a session may refuse (SH10, 2026-11-15); that
+   is a permission boundary and not something to work around. The formatting
+   is cosmetic, the HTML is valid without it, and this item used to read as
+   mandatory.
    `--replace` rewrites whole files, and 170 edits the same files at the same
    time — which a dispatch forbids in other words, and which this item used to
    order outright. The procedure:
