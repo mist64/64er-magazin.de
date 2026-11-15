@@ -1693,6 +1693,35 @@ overstepping.) A sub-agent that renders/crops for its own OCR must
 delete or /tmp-scope those files; the issue dir holds only shippable
 content.
 
+## Cross-cutting rule: A CHECK IS BROKEN IN FOUR WAYS, AND ONLY ONE OF THEM SHOWS
+
+SH10 found four of control's checks broken, each in a different way, and
+**every one was found by READING the block, not by running it** — three of them
+could not have been found by running it:
+
+| rule | the break | what a run showed |
+|---|---|---|
+| r005 7g | **could not pass** — `Path("issues")` against a cwd where it does not exist, so the ruling file was never read | red for ever, on a correctly ruled page |
+| r005 4b | **could not run** — called `R.drop_area_inside_mm2()`, a function that has never existed | AttributeError, the first time anyone tried |
+| r230 check 2 | **could not fail** — printed its findings and exited 0, so `\|\| rc=1` never fired | green for ever |
+| r280 canary | **could not fail** — `grep … && echo "✓"`, which returns 0 when the canary is MISSING and when it was never set | green for ever, silently |
+
+**The two that report green for ever are the dangerous ones.** A check that
+cannot pass annoys somebody into looking at it within one issue. A check that
+cannot fail is indistinguishable from a passing check, and nobody looks again.
+
+**SO EVERY CHECK IS EXERCISED IN THE FAILING DIRECTION BEFORE IT SHIPS** —
+r000 has said this for months, and these four shipped anyway because the
+sentence was read as advice. Plant the defect, see red, remove it, see green.
+If the check cannot be made to go red by any input, it is not a check.
+
+**AND TEST THE REPAIR, NOT ONLY THE DEFECT.** Fixing r280's `<code>` strip,
+control wrote the INVERSE of the instruction two sections below it — blanking
+every `<pre>` block instead of protecting it — having read that instruction
+minutes earlier. A candidate planted inside a listing showed it at once:
+`listing candidate kept = False`. The repair needs its own two-way test, and a
+plausible-looking diff is not one.
+
 ## Cross-cutting rule: ONE STRAY CONTROL BYTE DROPS A FILE OUT OF EVERY COUNT
 
 **BSD `grep` treats a file containing a NUL as BINARY and prints

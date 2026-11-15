@@ -769,7 +769,20 @@ TAG = re.compile(r'''<(?:"[^"]*"|'[^']*'|[^'">])*>''')
 def text(p):
     s = open(p, encoding='utf-8').read()
     s = re.sub(r'<!--.*?-->', ' ', s, flags=re.S)
-    s = re.sub(r'<code\b[^>]*>.*?</code>', ' ', s, flags=re.S | re.I)
+    # INLINE <code> ONLY, AND <pre> CONTENT STAYS. This stripped EVERY
+    # <code>, including the inner <code> of a <pre><code> listing -- so every
+    # candidate inside a listing vanished from the scan, while this rule's own
+    # section "<pre> AND ITS INNER <code> ARE IN SCOPE" says listings are in
+    # scope. The contradiction was DIAGNOSED on SH8607 and the expression was
+    # never changed: the rule arguing against its own tool (HARVEST 42).
+    # Protect the <pre> blocks, strip <code> only outside them, keep the rest.
+    # (Control's first repair of this blanked the <pre> blocks instead, which
+    # is the INVERSE of the instruction two sections down, and was caught by
+    # testing it against a candidate planted inside a listing.)
+    _parts = re.split(r'(<pre\b[^>]*>.*?</pre>)', s, flags=re.S | re.I)
+    s = ''.join(p if p[:4].lower() == '<pre'
+                else re.sub(r'<code\b[^>]*>.*?</code>', ' ', p, flags=re.S | re.I)
+                for p in _parts)
     return TAG.sub(' ', s)
 
 
@@ -795,7 +808,20 @@ PY
 #   SH8601 used: "Fehlerbehandlung ohne Programmabbruch"   (p101 banner,
 #                which OCR gave as "fehlerbehandlung c Programmabbhru ohne")
 CANARY="<the corrected string, from this issue>"
-grep -h "$CANARY" "$dir"/*.html >/dev/null && echo "  canary fix landed ✓"
+# AND IT HAS TO FAIL IN BOTH DIRECTIONS. As written this was
+#   grep -h "$CANARY" ... && echo "canary fix landed ✓"
+# which prints nothing and returns 0 when the canary is MISSING, and equally
+# when CANARY was never set at all -- so the block ended on a success. The
+# fourth check of this kind found on SH10 (r005 7g could not pass, r005 4b
+# could not run, r230 check 2 could not fail, this could not fail).
+case "$CANARY" in
+  *"<the corrected"*) echo "  FAIL: set CANARY to a repair YOU made on this issue"; rc=1 ;;
+esac
+if grep -haq "$CANARY" "$dir"/*.html; then
+  echo "  canary fix landed ✓"
+else
+  echo "  FAIL: canary not found -- the repair did not land: $CANARY"; rc=1
+fi
 
 # 4. THE ALL-LOWERCASE JAM, WHICH CHECKS 1-3 CANNOT SEE AT ALL.
 #    `bestehtaus` has no hyphen and no capital, so a planted one passed all
@@ -989,6 +1015,20 @@ Two internal contradictions, both met by every sub-agent on this issue:
    read the **corrected** form", which this rule's own section *EVIDENCE IS
    THE CROP, PLUS THE INDEX LINE AS A LOCATOR* says is impossible. **The
    requirement is crop-plus-locator**; agents did that and were right to.
+
+## IN A DUMP WITH BOTH COLUMNS, THE HEX DECIDES THE GLYPH
+
+A monitor dump prints the bytes AND their ASCII, so an ambiguous character in
+the ASCII column is not a judgement call: **decode the hex.** MEASURED on SH10
+148, line `$13000 47 4F 36 34 0D`: `47 4F 36 34` is `G O 6 4`, so the ASCII
+column reads `GO64m` with the LETTER O, whatever the typewriter face suggests.
+The bytes settle what 0/O never can.
+
+**And the same discipline unmade an earlier protection.** Set C of 190 reported
+`kplot $FFO` as a print error to preserve; the 280 crop shows `$FF0`, a ZERO.
+The print error is real but it is the THREE-DIGIT ADDRESS, not the glyph — so
+"protect the O" would have published a misreading as though the magazine had
+set it. A glyph claim is only as good as the last person who read the pixels.
 
 ## PASS 1 — `Hard-und → Hard- und` ONLY WHERE THE CROP SHOWS THE SPACE
 
