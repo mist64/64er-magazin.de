@@ -120,6 +120,33 @@ so 8612 repeated the defect twice: 169 (Preiswerter Schnellader above, 1000 Mark
 zu gewinnen! below) and 193 (Wir suchen die Anwendung above, Einmal im Monat
 below).
 
+## A RECURRING TITLE IS GREPPED AGAINST THE CORPUS BEFORE THE SPLIT
+
+**The split is where the name is fixed**: the filename comes from the `<h1>`,
+every later step addresses the file by that name, and 220's index keys on the
+title. So a recurring title — `MSE – Abtippen sicher und leicht gemacht`,
+`Checksummer`, `Fragen und Antworten`, a `Kurs` instalment — gets one grep
+across `issues/*/*.html` BEFORE 080 runs, not after.
+
+```sh
+ls issues/*/*MSE* ; grep -ho '<h1>[^<]*</h1>' issues/*/*MSE*.html | sort -u
+```
+
+**AND A MISMATCH IS A QUESTION, NOT A CORRECTION. THE PAGE ANSWERS IT.**
+MEASURED on SH10 p109: its title came out `leichtgemacht`, joined, against
+**20 of 21 printings in the corpus that separate it** — an outlier that looks
+exactly like an OCR join, and the builder's own report had even written it as
+two words while the file said one. Read on the page, the headline is set in
+three lines, `MSE – Abtippen / sicher und / leichtgemacht`, with the word whole
+on the third line and no hyphen or break inside it. **The print joined it, not
+the OCR.** So it stays as printed, per the owner's standing rule, and the
+variant goes in `LOG.md` with the corpus count beside it so the next reader
+does not "fix" it.
+
+A 20-to-1 corpus count is strong enough to make you look and never strong
+enough to overrule the page. r090 carries the same instruction for the TOC
+entry; this one is for the `<h1>` and the filename, which is what readers see.
+
 ## WHICH PAGES BELONG IN `64er.pages` — and how it is written
 
 030 omits a page carrying only an article's listing by design, so the page is

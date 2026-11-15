@@ -873,6 +873,33 @@ printed. Propose that shape FIRST.
 the owner cut it whole and it places once. The unit is the TABLE, not the page.
 
 
+## APPLY r160'S SERIES RULE WHEN YOU WRITE THE WORKLIST, NOT WHEN 160 RUNS
+
+r160 says **a numbered series is all typeset or all cropped** — decided for the
+series, not per caption. That rule lives in r160, so it fires at 160, which is
+AFTER the worklist has gone to the owner and he has started cutting.
+
+MEASURED on SH10, 2026-11-15: the 54-row worklist went over at 17:43, and at
+160 four Bild series turned out split between cropped and typeset members —
+10 (1–2 cropped, 3 typeset), 71 (1–4 and 10–24 cropped, 5–9 typeset), 101 (1–2
+cropped, 3–4 typeset), 126 (1 cropped, 2 typeset). Honouring r160 then needed a
+**supplement of 11 rows** delivered to an owner already at work, and the
+typeset versions stand in the HTML until the crops arrive.
+
+**So at 150, for every figure you put on the list, look at its SERIES.** If one
+member is cropped, every member goes on the list in the same delivery. The cost
+of asking at 150 is one grep of the caption numbers; the cost of asking at 160
+is a second pass for the owner.
+
+**AND A REVERSE-VIDEO COLUMN IS CONTENT, SO IT IS A CROP.** Two of SH10's
+supplement rows were not series members at all: the TEDMON dumps at 28-5 and
+28-24 print a reverse-field column that the typeset version drops, and on p56
+that column holds the REM banner's asterisks and `PROGRAMM
+VERSUCHSKANINCHEN` — real characters, printed in reverse field, which a
+`<pre>` renders as nothing or as black bars. SH8608's Bild 2 precedent for
+typesetting a monitor dump was set before anyone checked what the column held.
+**Read the column before you decide the dump is typesettable.**
+
 ## BEFORE A LISTING OR A TABLE GOES ON THE CROP WORKLIST, ASK WHETHER THE CHAIN CAN PRODUCE IT
 
 **The owner cuts what only a camera can get. Everything the chain can build,

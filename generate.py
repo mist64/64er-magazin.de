@@ -547,7 +547,22 @@ class Issue:
                   with open(file_path, 'r', encoding='latin-1') as file_obj:
                       listings[basename] = file_obj.read()
                   listings_bin[basename] = petcat2prg(listings[basename])
-              elif file.endswith('.seq') or file.endswith('.prg'):
+              # DOWNLOADABLE BINARIES, and this test is the ONLY gate on what
+              # reaches out/.  The copy loop below is path-based, and the
+              # `div.binary_download` path already emits a link for any
+              # filename -- so a file this test rejects gets a link and no
+              # file, i.e. a 404.
+              # .prg/.seq are Commodore.  .pas/.com are the CP/M side of a
+              # C 128 Sonderheft's disk: SH10 article 105 ships LIB.PAS and
+              # LIB.COM, the first non-Commodore files in the corpus,
+              # download-only by the owner's ruling of 2026-11-15 ("why not
+              # ship download-only?").
+              # CASE-INSENSITIVE, because CP/M filenames come off the disk
+              # in UPPERCASE: `LIB.PAS` does not end with `.pas`.  Control's
+              # first spelling of this test was case-sensitive and the test
+              # that "verified" it OR'd in a lowercased copy, so it passed a
+              # file the code would have rejected.
+              elif file.lower().endswith(('.seq', '.prg', '.pas', '.com')):
                   src_path = os.path.join(root, file)
                   file_path = os.path.join('prg', file)
                   with open(src_path, 'rb') as file_obj:
