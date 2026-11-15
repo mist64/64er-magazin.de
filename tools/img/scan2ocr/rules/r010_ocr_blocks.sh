@@ -25,7 +25,10 @@ LAST="${2:-$("$PY" -c 'import r010_ocr_blocks as m; print(m.ISS.pages)')}"
 # At this size the cores cap always binds first, which is the point: the
 # hardcoded -P 6 this replaces left 26 of 32 idle and made an 78-second job
 # take a quarter of an hour.
-LANES=$("$PY" -c 'import r000_issue; print(r000_issue.lanes(1.5))')
+# ${LANES:-...}: an INHERITED LANES wins.  A bare assignment here overwrote
+# `LANES=1 ./step.sh`, so an owner instruction to run serially evaporated
+# inside the script that was told to obey it.  (r000, PARALLELISE TO HALF.)
+LANES="${LANES:-$("$PY" -c 'import r000_issue; print(r000_issue.lanes(1.5))')}"
 echo "r010: $LANES lanes (~1.5 GB each, measured; half the free RAM)" >&2
 seq "$FIRST" "$LAST" | OMP_NUM_THREADS=1 xargs -P "$LANES" -n 8 "$PY" r010_ocr_blocks.py
 "$PY" r010_blocks_index.py

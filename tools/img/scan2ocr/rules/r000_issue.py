@@ -166,8 +166,25 @@ def lanes(lane_gb, reserve_cores=4):
 
     NOT for a step whose lanes are model calls -- those are bound by rate
     limits and by the credential race in r000_llm, not by this machine.
+
+    `LANES` IN THE ENVIRONMENT OVERRIDES ALL OF IT, which is how an owner
+    instruction reaches a step that computes its own width. 2026-11-15, SH10:
+    "dont parallelize image work at all THIS TIME. we need to conserve RAM".
+    The builder had no way to say so and monkey-patched this function from the
+    command line (`r000_issue.lanes = lambda *a, **k: 1`) -- which worked, and
+    which nothing in the chain had told it to do or would have recorded.
+    `LANES=1` is the same instruction, visible in the shell history and in
+    LOG.md. It is a CAP and a floor of 1: `LANES=1` means serial, and a value
+    larger than this function would have chosen is still honoured, because the
+    caller may know something about the machine that vm_stat does not.
     """
     import multiprocessing, os, subprocess
+    env = os.environ.get("LANES", "").strip()
+    if env:
+        try:
+            return max(1, int(env))
+        except ValueError:
+            pass               # a malformed LANES is ignored, never silently 1
     cores = multiprocessing.cpu_count()
     free_gb = 0
     try:

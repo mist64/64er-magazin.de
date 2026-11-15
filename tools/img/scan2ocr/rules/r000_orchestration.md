@@ -694,6 +694,21 @@ alone (paper frac 0.116 against 0.10), and a full-bleed cover has no own white
 to read — SH8607's p180 and p001 were both settled by their partners in three
 minutes.
 
+**AND ON A BOUND-IN CARD THE EDGE FINDER IS BLIND BY CONSTRUCTION, FOR THE
+SAME REASON THE SKEW MASK IS.** MEASURED on SH10, 2026-11-15: paper came out
+`high = [1, 2, 163-168]` on the own-white gap plus the leaf partner, and **the
+edge-finder pre-fill missed all four cards** (163-166). It was not a tuning
+problem. A card page is a small card in a large scan frame, so there is no
+own-white margin BEYOND the card for an edge finder to find — the dark border
+it sees is the scanner bed, not the leaf's edge. That is the same root cause as
+r005's skew mask reading the bed as ink on exactly those four pages
+(r005_masters_sheet.md, *THE SKEW MASK MUST EXCLUDE THE BED*, OPEN): on a card
+page, the frame is not the page.
+
+So on a card, **expect two of the three witnesses to be blind** and settle it
+on the own-white gap and the leaf partner. That is a derivation, not a
+fallback, and it does not go to the owner.
+
 **Owner, 2026-11-02: *"have it detect binding and paper type."*** Paper is
 derived, like binding. Only a disagreement the leaf CANNOT settle — both sides
 of one sheet in doubt — leaves the build, and it goes to **control**, not to
@@ -1594,6 +1609,53 @@ overstepping.) A sub-agent that renders/crops for its own OCR must
 delete or /tmp-scope those files; the issue dir holds only shippable
 content.
 
+## Cross-cutting rule: PROVE THE REPLACEMENT IS RUNNING BEFORE YOU WRITE THE NOTE
+
+A job you stopped and a job you restarted look identical from the inside: the
+bookkeeping is the same, the log entry is the same, the message to control is
+the same. The only difference is a process, and that is the one thing a
+narrative does not contain.
+
+MEASURED on SH10, 2026-11-15. The builder sampled the 3-lane peak correctly
+(`peak 10499 MB over 90 s`), killed the 3-lane run as instructed, let the three
+in-flight pages finish, wrote LOG.md and two errata entries, and reported the
+drop to 2 lanes. **The 2-lane run never started.** The build sat idle from
+12:39 to 12:45 and nothing in the issue's own record showed it: masters600 had
+stopped at 45 PNGs, the newest three stamped 12:39:19, no `r005`, `xargs` or
+`magick` process alive, and two background task outputs of ZERO bytes whose
+processes were gone. Control found it on a five-minute watchdog tick that read
+`2 processes, 0.0 GB resident, 0 CPU seconds`.
+
+**So: after stopping a job, confirm the replacement with a PID and a NEW
+ARTEFACT before writing anything about it.** One `ps` line and one output file
+whose mtime is after the restart. Report both.
+
+### AND `pgrep -f` IS NOT A WAITER — TWO OF THEM DEADLOCK EACH OTHER
+
+The root cause was a waiter loop built on `pgrep -f <pattern>`, and the trap is
+not the obvious one. VERIFIED on this machine, 2026-11-15:
+
+- **Self and ancestors are excluded automatically.** `pgrep -f FOO` inside a
+  shell whose own command line contains `FOO` returns **0** matches, because
+  macOS pgrep excludes the pgrep process *and all of its ancestors* unless
+  `-a` is given (so does `pkill`). A self-match test therefore PASSES and
+  teaches the wrong lesson.
+- **A SIBLING is not excluded.** A second waiter whose command line carries the
+  same pattern is matched (verified: count 1). So **two waiters watching one
+  pattern see each other and both wait for ever**, which is exactly what
+  happened here: neither was waiting on the job, each was waiting on the other.
+
+Wait on what you started, or on what it produces, never on a name:
+
+```sh
+"$PY" step.py & pid=$!; wait "$pid"          # the PID you have
+until [ -s out/046.stamp.txt ]; do sleep 10; done   # or the ARTEFACT
+```
+
+A pattern match is a guess about identity; a PID and an output file are facts.
+If a name really is all you have, `pgrep -f '[r]005_masters_sheet'` keeps the
+bracketed form out of the matcher's own argv — but prefer the two forms above.
+
 ## Cross-cutting rule: AN AGENT CAN BE STOPPED MID-STEP — LEAVE NOTHING STRANDED
 
 A sub-agent can be halted by the harness at any moment, with no report and no
@@ -1776,6 +1838,34 @@ because a wrong `pHYs` would rescale every millimetre constant in silence.
 
 A 2400 dpi master runs to about 900 MB, so an issue is
 ~180 GB and nothing about it is cheap to re-make.
+
+### AND THE OPERATOR'S NOTE BESIDE THE SCANS IS A HINT, NOT A MEASUREMENT
+
+Some scan directories carry a note from whoever made them —
+`/Volumes/S/png/<ID>/000MISSING.txt`. It is worth reading first: it says what
+the operator believes is complete, which spurious files were parked and why
+(SH10's names a corrupt 87 MB page and two duplicate re-scan pairs, all moved
+to `scan/<ID>/_dupes/`), and that is knowledge the scan itself does not carry.
+
+**But it is prose, and the per-page `pHYs` read is the measurement.**
+MEASURED on SH10, 2026-11-15: the note says "001,002,167,168 from 2 uncut A3
+wrapper sheets, 2400 dpi" plus "19 pages single pages, 2400 dpi (colour section
++ the 4 cards)" — 23 in all. `pHYs` reports **25**: 001-004, 008, 010, 011,
+013, 014, 016, 019, 020, 022-024, 027, 028, 031, 034, 163-168. The note is off
+by two, which on its own arithmetic moves the colour section from 15 pages to
+17.
+
+So: read the note, record what it claims, and then **derive the set and let the
+derivation win.** Where they disagree, the measurement is the input and the
+discrepancy goes in `LOG.md` — it is not a question for the owner and not
+something to reconcile with the operator.
+
+**AND A BRIEF THAT QUOTES THE NOTE IS QUOTING THE NOTE.** Control's SH10 brief
+listed the note's figures under the heading "the inputs, already verified on
+disk — do not re-derive them". They were not verified; they were read. The
+builder derived them anyway, per the `pHYs` instruction above, and that is how
+the two-page difference surfaced. **Nothing is "already verified" unless the
+brief says which command produced the number.**
 
 ### A `thumb/` you FIND beside the scans is NOT an input — re-derive it
 
@@ -2007,11 +2097,35 @@ is wrong: it puts a machine-wide outage behind a number every caller has to
 remember. `make_issue_pdf.sh` carried that advice in a comment for two issues
 and still went down, because the one caller that mattered forgot it.
 
-Ask for it, never write it down:
+Ask for it, never write it down -- and **let an inherited `LANES` win**:
 
 ```sh
-LANES=$("$PY" -c 'import r000_issue; print(r000_issue.lanes(19))')
+LANES="${LANES:-$("$PY" -c 'import r000_issue; print(r000_issue.lanes(19))')}"
 ```
+
+### `LANES` IN THE ENVIRONMENT IS HOW AN OWNER INSTRUCTION REACHES A STEP
+
+Owner, 2026-11-15, during SH10: *"dont parallelize image work at all THIS
+TIME. we need to conserve RAM"*. There was no way to say that to a step which
+computes its own width, so the builder monkey-patched the function from the
+command line — `import r000_issue; r000_issue.lanes = lambda *a, **k: 1` —
+which worked, and which nothing in the chain had told it to do or would have
+recorded anywhere.
+
+`r000_issue.lanes()` now returns `int(os.environ["LANES"])` when that is set,
+so **`LANES=1 <step>` is serial** and the instruction is visible in the shell
+history and in `LOG.md`. A malformed value is ignored rather than treated as 1.
+
+**AND THE `${LANES:-...}` FORM IS NOT COSMETIC.** The three shell steps that
+ask for a width wrote `LANES=$(...)` — a bare assignment, which **overwrites
+an inherited `LANES=1`**. So `LANES=1 ./r010_ocr_blocks.sh` would have gone
+wide anyway, inside the script that had just been told to run serially, with
+nothing printed to say so. Fixed 2026-11-15 in `r010_ocr_blocks.sh`,
+`r005_masters_spread.sh` and `r145_extract_figures.sh`; verified both ways
+(unset -> the computed value, `LANES=1` -> 1).
+
+**A knob the owner cannot reach is not a knob.** When an instruction can only
+be obeyed by editing or patching code, that is a defect in these files.
 
 The one argument is **that step's measured peak for one lane**, in GB. It is
 the only number worth arguing about and the only one a caller supplies.

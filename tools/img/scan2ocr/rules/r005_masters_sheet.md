@@ -357,11 +357,36 @@ $PY r005_masters_sheet.py 6 41 56 92 # named pages
 # ones running early keeps the tail short).  Their list comes from the pHYs
 # walk in witness 2 -- not from `identify -format '%x'`, which reports
 # pixels per CENTIMETRE.
-seq 1 "$($PY -c 'import r000_issue; from r000_issue import ISSUE
-print(r000_issue.load(ISSUE).pages)')" \
-  | OMP_NUM_THREADS=1 xargs -P "$($PY -c 'import r000_issue
-print(r000_issue.lanes(19))')" -n 1 $PY r005_masters_sheet.py
+# TWO PASSES, SPLIT BY THE PAGE'S OWN dpi.  `lanes(19)` is one number for the
+# whole issue and 19 GB is the 2400 dpi peak, so on a mixed issue it makes the
+# 600 dpi pages -- most of the issue -- as serial as the big ones for no
+# reason.  MEASURED on SH10, 2026-11-15, where 25 of 168 pages are at 2400:
+# those 25 were 69 % of a 4 h sweep.
+# `-P` IS THE LANE COUNT HERE, because this program has no pool: an inherited
+# LANES does nothing unless it is passed to xargs, so spell it `${LANES:-...}`.
+P24=$($PY -c 'import r000_issue; print(r000_issue.lanes(19))')     # 2400 dpi
+P06=$($PY -c 'import r000_issue; print(r000_issue.lanes(3.5))')    # 600 dpi
+# <list600> and <list2400> come from the pHYs walk in witness 2 -- NOT from
+# `identify -format '%x'`, which reports pixels per CENTIMETRE.
+printf '%s\n' <list600>  | OMP_NUM_THREADS=1 xargs -P "${LANES:-$P06}" -n 1 $PY r005_masters_sheet.py
+printf '%s\n' <list2400> | OMP_NUM_THREADS=1 xargs -P "${LANES:-$P24}" -n 1 $PY r005_masters_sheet.py
 ```
+
+**THE LANE PEAKS, MEASURED, because `lanes()` asks the caller for exactly this
+number and a guess at it is the whole ballgame.** SH10, 2026-11-15, serial
+timings from the masters600 mtimes: a **600 dpi page 31 s**, a **2400 dpi page
+5 min 21 s to 8 min 37 s**. Resident peaks: **one 2400 dpi page 19-21 GB**;
+**three 600 dpi lanes together 10.5 GB** and **two together 7.4 GB** — i.e.
+**~3.5-3.7 GB a lane**, measured twice at different widths, which is why
+`lanes(3.5)` above is a number and not a guess.
+
+**And 3.5 was MEASURED only after a prediction of 2 was acted on.** Control
+estimated "~6 GB for three lanes" from one page's figure; the real number was
+10.5. What saved it was that the instruction carried a BOUND and not a point
+estimate -- *if three lanes exceed ~10 GB together, drop to two and say so* --
+so the builder measured 10.5 in the first 90 s and dropped to 2 lanes without
+asking. State the cap, not the expectation (HARVEST: *hand over the
+distribution, not its centre*).
 
 **`$PY` is that line, in every fence in this file.** It is spelled relative to
 the rules directory, so a fence that uses it `cd`s there first; pasted from
@@ -412,8 +437,11 @@ descriptor. Page
 numbers are positional purely so the work can be split across processes, exactly
 as in `r010`.
 
-~45 s per page SERIAL, so ~2 h for 152 pages that way; on `lanes(19)` — 9 on
-this box — it is a fraction of that. Deterministic and local: no model is
+~45 s per page SERIAL **on an all-600 dpi issue**, so ~2 h for 152 pages that
+way; on `lanes(19)` — 9 on an idle box — a fraction of that. **A mixed issue is
+a different sum and the 45 s does not describe it:** SH10 measured 31 s for a
+600 dpi page and 5-9 MINUTES for a 2400 dpi one, so its 168 pages are ~4 h
+serial, of which the 25 big pages are ~2 h 40. Deterministic and local: no model is
 called, which is why fanning it out is free of the concurrency limits that
 constrain the model-calling steps.
 
@@ -2396,9 +2424,33 @@ pages never exercise.
 #     CANNOT ALWAYS ANCHOR A FIELD; IT CAN ALWAYS REFUSE TO PASS WITHOUT SAYING
 #     HOW MANY PAGES IT GAVE UP ON.
 #
-#     The only way past is an owner ruling, recorded by page in
+#     The only way past is a RULING, recorded by page in
 #     issues/<ID>/reviewed/field-not-applied.txt, one `NNN <reason>` per line.
 #     A page listed there is a page somebody has actually looked at.
+#
+#     AND THE RULING HAS TWO SHAPES.  p031 made this read as "repair it", and
+#     SH10 p023 is the other kind: a FULL-BLEED AD, where the trace may be
+#     perfectly right and there is no paper to correct at all.  Diagnose before
+#     disposing, because the two want different evidence:
+#
+#     (a) THE TRACE IS WRONG -- the box is outside FIELD_PAGE_MM but the leaf
+#         really is ~210 x 297.  This is p031.  Hand-trace the box, apply
+#         field_low with it, and record the proof: per cent of paper tinted at
+#         0-3 / 3-6 / 6-10 mm, fore edge and top, BEFORE and AFTER.  Shipping
+#         it uncorrected is the owner's call and nobody else's -- his words on
+#         SH09 were that we cannot just say we did not de-yellow this page.
+#
+#     (b) THE TRACE IS RIGHT AND THERE IS NO PAPER -- the ink covers the leaf
+#         to the trim.  The identity field is then the CORRECT answer and not a
+#         failure.  The entry must still carry a number: the uninked paper area
+#         on the page, in mm2 and as a per cent, with the threshold it was
+#         judged against.  This is control's ruling, not the owner's; he is
+#         asked about ink on paper, not about arithmetic on an ad.
+#
+#     The check exists so that the page is SEEN, not so that it is always
+#     repaired.  A line in field-not-applied.txt that says "no paper to
+#     correct, 0.4 % uninked, measured" is a pass; the same line without the
+#     number is not.
 $PY - <<'PY'
 import os, re, pathlib
 import r005_masters_sheet as R

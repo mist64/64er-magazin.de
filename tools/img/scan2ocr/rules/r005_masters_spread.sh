@@ -30,7 +30,8 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PYTHON:-$DIR/../../../../.venv/bin/python}"
 cd "$DIR"
-LANES=$("$PY" -c 'import r000_issue; print(r000_issue.lanes(19))')
+# An INHERITED LANES wins -- see r010_ocr_blocks.sh and r000.
+LANES="${LANES:-$("$PY" -c 'import r000_issue; print(r000_issue.lanes(19))')}"
 echo "r005: $LANES lanes (~19 GB each, half the free RAM, capped by cores)" >&2
 # The page count follows the ISSUE constant in r000_issue.py, asked of the
 # program itself rather than repeated here -- as r010_ocr_blocks.sh does.
