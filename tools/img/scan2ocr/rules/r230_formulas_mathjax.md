@@ -132,6 +132,13 @@ MACROS = (r'\frac', r'\sqrt', r'\cdot', r'\omega', r'\mathrm')
 # STRIP THE DELIMITED SPANS, THEN LOOK AT WHAT IS LEFT. Do not instead count
 # delimiters near each macro: the previous formula's closing \] cancels this
 # formula's opening \[, and every formula after the first reads as bare.
+# AND IT HAS TO RAISE.  This check PRINTED and then exited 0, every time, so
+# the `|| rc=1` above could never fire and the block's own promise that "every
+# check raises rc" was false for it. A check that cannot FAIL is worse than one
+# that cannot pass: it reports success for ever and nobody looks again. Found by
+# the SH10 builder reading it, 2026-11-15; check 3 below had the right shape all
+# along.
+bad = False
 for f in sorted(os.listdir(d)):
     if not f.endswith('.html'):
         continue
@@ -142,6 +149,8 @@ for f in sorted(os.listdir(d)):
     for kw in MACROS:
         for m in re.finditer(re.escape(kw), s):
             print(f"  bare LaTeX in {f}: {s[max(0, m.start()-20):m.start()+30]!r}")
+            bad = True
+sys.exit(1 if bad else 0)
 PYEOF
 
 # 3. balanced \( \) and \[ \] pairs per file
