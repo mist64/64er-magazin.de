@@ -33,6 +33,16 @@ forces a specific level).
 
 Structural overrides that DO apply:
 
+- **AND THIS RULE OVERRIDES THE PRINT'S WEIGHT WHEN THE TWO DISAGREE.** A box
+  title set in BODY-SIZE BOLD is a conflict: the owner's standing rule says
+  heading level follows the print, and the clause below says an aside's title
+  sits at the body's top level. **The aside rule wins, and it is the named
+  override** — SH10 applied it to 111's `Eingabehinweise zum Programm
+  »/BUTLER.$2000«`, moving it `<h3>` → `<h2>`, and check 2 had failed on it
+  before the move, which is the two-way evidence. The reason: an aside's title
+  is structural, so demoting it by its type size buries a box inside the
+  section it sits beside.
+
 - **An aside's heading sits AT the level of the article's top section
   headings — and one below only when sitting at that level would make it
   outrank the body.** So `<h2>` when the body has `<h2>` sections of its own —
@@ -493,5 +503,8 @@ decides it — not the precedent.
 
 SH8607: 9 body-size bold own-line heads moved h2 → h3 (86 ×2, 120 ×3, 122 ×3,
 125 ×1), as SH8608 did, against SH8606's reading of this rule which kept them
-at h2 BY DEFAULT. **The DEFAULT yields to the print.** Record the moved
-headings in the issue's `reviewed/`.
+at h2 BY DEFAULT. **The DEFAULT yields to the print.** Record the moved headings in
+**`issues/<ID>/reviewed/r290-headings.txt`** — one line per heading, with its
+file, the level before and after, and what the page shows. The clause used to
+say "in the issue's `reviewed/`" and named no file, so SH10 had to invent one;
+inventing the same name twice is luck, not a convention.

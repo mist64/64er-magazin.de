@@ -1715,6 +1715,27 @@ r000 has said this for months, and these four shipped anyway because the
 sentence was read as advice. Plant the defect, see red, remove it, see green.
 If the check cannot be made to go red by any input, it is not a check.
 
+### AND A NEGATIVE CLAIM NEEDS THE SWEEP THAT WOULD HAVE FOUND A POSITIVE
+
+"None of X" is the easiest sentence to write and the hardest to support. Twice
+on SH10 the builder reported a clean negative it had not checked, and caught
+itself both times:
+
+- at 250, "IDENTICAL: 8" was written before reading the **7** its own grep had
+  printed;
+- at 190, "no own-line head went to `<p><strong>` in set A" was written having
+  checked only set B. **290 found one** — article 20's
+  `Besonderheiten im CP/M-Modus:` — and the sweep that followed showed 4
+  whole-bold paragraphs in the issue, none of them a heading.
+
+Both were self-caught, and in the second case a LATER STEP caught it first,
+which is the gates doing their job. But the cost is a reversal arriving after
+the report that said there was nothing to reverse.
+
+**So a negative claim is reported with the sweep behind it or not at all:** say
+what was searched, over what set, and what the count was. "No X in the 27
+files, by `grep -c` over each" is a finding. "No X" is a belief.
+
 ### AND A DICT KEYED BY PAGE COLLAPSES EVERY RECORD BUT THE LAST
 
 The fifth shape, and the one that spread furthest. SH10's override check held
