@@ -151,6 +151,22 @@ flank test is a default and not a verdict:
   is Eliza's reply, and PETSCII has one hyphen and no en dash. This is the
   single remaining line in the fixture diff, and the report names it.
 
+- **a lowercase word on BOTH sides** — `word - word` in the middle of a
+  sentence. This is the shape a speck read as `-` lands in, and neither suspect
+  above can see it: they are asked about **bare numbers** and **quotations**
+  only. MEASURED on SH09: p012's speck was a suspect by luck (a digit followed
+  it); p014's `verwendete - Befehl LOAD` was not a suspect at all, and was
+  found only because someone scanned the KEPT list by eye. A real prose dash
+  has this shape too, so it is a **suspect, not a verdict** — read it on the
+  page. 2 confirmed specks on SH09, and **the issue's other 163 conversions
+  were never read against the page, so the rate is unknown, not zero.**
+
+**AND LIST EVERY CONVERSION WITH ITS PAGE, not only the suspects.** Both SH09
+specks fell outside every suspect shape the script had, so a report of suspects
+alone cannot bound this defect — it can only confirm the shapes already known.
+Print each conversion with its page and line so the bulk can be spot-read. A
+suspect list is a shortlist; it is not a census.
+
 **The script prints every hyphen it kept and every suspect it converted.** One
 further shape, not auto-detected: an OCR-spaced compound —
 `FOR..NEXT - Schleife` — converted, where what it wants is the hyphen
@@ -181,6 +197,20 @@ expected, not surprising.
 Resolve each against the page. Note the contrast with `„` (U+201E, the German
 low DOUBLE), which **is** a real quotation mark and folds to `"` in the table
 above.
+
+**AND THE SITE CAN BE LARGER THAN THE CHARACTER.** The table gives kinds for
+the mark alone, which assumes the text around it is sound. SH09 p003's site sat
+in a paragraph that 030 had interleaved with the OCR of a **picture**, a false
+`<h3>` among it: no punctuation mark makes that passage right, because the
+passage is not the page's.
+
+**A resolved mark inside garbage is not a resolved site.** Where the `‚` sits
+inside the OCR of a picture, or of two columns run together, resolve **the
+passage** from the page — not the character. And record it, because it reaches
+past this step: rewriting that passage changed the issue's `<h3>` count against
+030's handover, and nothing else in the chain expects a heading count to move
+at 070. Note the new count in `LOG.md`, so 290's hierarchy check and 310's
+invariants are read against the right number.
 
 **This step, not later.** A converted dash inside an `<h1>` changes the
 headline, and r080 derives the FILENAME from the h1 — so the conversion has to

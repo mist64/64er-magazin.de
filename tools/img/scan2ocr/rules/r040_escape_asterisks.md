@@ -69,6 +69,32 @@ space test eats real headings: a version that exempted only lines carrying
 `[digit` (on the false belief that 030 emits nothing but `# Title [pages]`)
 escaped all 69 of SH8604's `##`/`###` and stopped that build at 040.
 
+### AND THE SCRIPT PRINTS EVERY LINE-START `>` — A FALSE ONE IS 040'S TO FIX
+
+030 marks an article's intro paragraph as a line-start `>`, which 060 renders
+as `<p class="intro">`. So a `>` standing at the start of a line for any OTHER
+reason silently becomes an intro. The script prints all of them —
+`intros=N`, then one `intro?:` line each — and this file never said who acts
+on a false one.
+
+**r080's `intros>1` is a backstop and nothing more.** It counts a second intro
+without saying which of the two is wrong, and it is **blind when the false `>`
+is the only one in its file**: it reports `intros=1`, the expected value.
+
+**A false hit is 040's to resolve, before 060 runs.** Three shapes, all seen:
+
+- a listing line that wrapped — SH09 p074 `> ANLEGEN`, the tail of a fenced
+  line that 030 broke;
+- a monitor or BASIC prompt — SH8603 article 14, two among the real intros;
+- a prompt quoted in prose.
+
+Move the line back into its fence **exactly as printed** — the `>` is part of
+the listing, not markup — and log the page and the reason. Do not delete the
+`>` and do not leave it for 080 to find.
+
+MEASURED on the 030 handovers: SH8603 45 line-start `>`, two of them monitor
+lines; SH8604 17; SH09's one false hit was p074.
+
 ## Usage
 
 ```bash

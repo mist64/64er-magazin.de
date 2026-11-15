@@ -73,6 +73,24 @@ neither is being changed retroactively — but **any grep over `head1` must
 accept both forms**, or it silently misses a quarter of the corpus. The
 checks below do.
 
+**BUT FOR THE ISSUE YOU ARE WRITING, THE ANSWER IS `&amp;`, AND THE CORPUS
+TOTAL SAYS THE OPPOSITE.** Stopping at the total makes the literal form look
+like the one to pick, and SH09 wrote it that way first and had to redo it.
+Counting the `head1` metas themselves rather than the files
+— **1928 head1 values: 101 `&amp;`, 169 literal** — the literal form turns out
+to be concentrated in the issues that were made by hand:
+
+| issues | `&amp;` | literal `&` |
+|---|---|---|
+| SH8602, SH8603 | 0 | **33** |
+| SH8605, SH8607, SH8608, SH09 | 43 | **0** |
+| 8609, 8610, 8611, 8612, 8701 | 43 | **0** |
+
+**Every issue this chain has built writes `&amp;` and not one literal**, which
+follows from `r210_head_meta_apply.py` writing through `html.escape`. So
+match the issue's own neighbours, not the corpus; the total is a statement
+about the archive's history, not about what to write today.
+
 ## Briefing for the sub-agent
 
 The sub-agent must:

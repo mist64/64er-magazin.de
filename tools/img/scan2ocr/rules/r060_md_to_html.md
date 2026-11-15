@@ -77,6 +77,18 @@ pre-050, not the file Discount saw. The script now copies its exact input to
 `$TMPDIR_ISSUE/ocr/<ID>.pre060.md` before dropping it, and prints the path.
 Every later check that needs the converted source reads that copy.
 
+**AND THIS SURVEY OVER-REPORTS BY DESIGN — READ EACH HIT AGAINST THE ITEM
+BEFORE IT.** The pattern matches every line-start number from 2 up, which is
+every *correct* continuation of a list as well as every torn one. MEASURED on
+SH09: **29 hits, 21 of which simply continue the previous item's number.**
+Only 8 were the defect this section describes.
+
+So the hit count on its own says nothing, and a build that dispositions all 29
+one at a time spends its effort proving that the lists work. Compare each hit
+with the **preceding list item**: a hit that is its predecessor's number + 1,
+in the same run, is not the defect. **Report the two counts separately** --
+hits, and hits that break the run — and hand only the second set to 190.
+
 The fix is `<ol start="N">`, written at 190 against the source line.
 Grep for it after conversion and check every hit against the print.
 

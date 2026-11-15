@@ -333,7 +333,16 @@ PY
   # nothing and this check would have reported the entry for ever. A rule that
   # says "record it here" and a check that does not look there is the same
   # defect as a check that cannot pass.
-  omitted = set()
+  # AND A MISPRINTED START PAGE IS DECLARED THE SAME WAY.  090 writes a wrong
+  # printed page into toc_entries.txt AS PRINTED, by rule -- so where the
+  # misprint lands on a page no article claims, this check reports a dropped
+  # piece on a CORRECT issue, and `omitted-` is the wrong word for it (nothing
+  # was omitted).  MEASURED on SH09: the Inhalt prints Checksummer 64 V3 at
+  # p99; the article starts on p97 and 98/99 are ads.  The 090 precedent
+  # (SH8604, MSE 95/94) did not show this because that misprint fell INSIDE
+  # the article's own run.  Declared beside it:
+  #     misprinted-start 99 97   Checksummer 64 V3: Inhalt prints 99, article starts 97
+  omitted, misprint = set(), {}
   adj = os.path.join(d, 'adjudicated.txt')
   if os.path.exists(adj):
       for line in io.open(adj, encoding='utf-8'):
@@ -341,6 +350,9 @@ PY
           if m:
               start = int(m.group(1))
               omitted.update(range(start, start + int(m.group(2))))
+          m = re.match(r'misprinted-start\s+(\d+)\s+(\d+)', line)
+          if m:
+              misprint[int(m.group(1))] = int(m.group(2))
   ent = os.path.join(d, 'toc_entries.txt')
   if not os.path.exists(ent):
       sys.exit('no toc_entries.txt (pre-chain issue) -- skipped')
@@ -364,8 +376,19 @@ PY
       if norm(entry) not in ADS and page.isdigit():
           if int(page) in omitted:
               print('omitted ON PURPOSE  %-22s p%s  (adjudicated.txt)' % (entry, page))
+          elif int(page) in misprint:
+              # The declared real page must itself be claimed, or the misprint
+              # is hiding a dropped piece after all.
+              real = misprint[int(page)]
+              ok = 'article there' if real in claimed else 'AND NO ARTICLE AT p%d EITHER' % real
+              print('misprint DECLARED   %-22s printed p%s, article p%d  (%s)'
+                    % (entry, page, real, ok))
           elif int(page) not in claimed:
-              print('NO ARTICLE for Rubriken entry %-22s p%s' % (entry, page))
+              # NAME THE SECTION.  This said "Rubriken entry" for every entry
+              # in the file, and on SH09 the one it reported sits under
+              # `Tips und Tricks` -- so the message named the wrong box while
+              # asking the operator to go and look in it.
+              print('NO ARTICLE for %-12s %-22s p%s' % (section or '?', entry, page))
   PYEOF
   ```
 

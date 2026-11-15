@@ -102,7 +102,21 @@ Three further shapes this rule never named, all met on 8612:
 
 A `Bild N` referenced in the body that is NONE of the above *and* has no crop is a gap, not a no-op: log it to `LOG.md` (as with a referenced-but-missing table) rather than silently skipping.
 
-### A PAGE RANGE IS SET WITH A HYPHEN, WHATEVER THE PRINT SETS
+### A NUMERIC RANGE IN A KEY CELL IS SET WITH A HYPHEN, WHATEVER THE PRINT SETS
+
+(This section was headed *A PAGE RANGE*, and its reasoning is drawn from the
+page metadata — so on a table of **byte ranges** it reads as not applying.
+SH09 article 30 has 73 such key cells, `000–001`, `3–6`, set with an en dash in
+print, 30 px against the hyphen's 15 at 600 dpi. They are not pages.)
+
+**It applies to every numeric range in a key cell, byte ranges included.** Its
+own corpus count is all `N-N` cells, not only page specs — 1499 hyphens against
+18 en dashes — and its odd-one-out argument holds exactly as well: one table
+set with en dashes leaves 1499 rows elsewhere wrong by the new standard.
+
+**The print's dash is kept only INSIDE a word** (`Basic-zu-Assembler`, a dash
+in a title), which is the distinction the section already draws and which the
+page-only heading hid.
 
 Decided on 8701's *Jahres-Inhaltsverzeichnis '86* (580 rows, 353 ranges), where
 the print sets an en dash. MEASURED corpus-wide in typeset cells: `N-N` with a
@@ -119,6 +133,21 @@ the hyphen loses, unlike a dash INSIDE a title, which is the author's and stays
 as printed (8602/85's Titel column keeps its 59 en dashes). 8602/85, the
 nearest precedent, has no page ranges at all, which is why this had to be
 decided rather than looked up.
+
+### A `TERM – text` GLOSSARY KEEPS THE DASH AS ITS OWN COLUMN
+
+A glossary printed `TERM – text` has two readings and the rule named neither:
+the dash is a **separator** (two columns) or a **character** (one cell). SH09
+resolved it three different ways in one issue, each by a different hand —
+dBase Tabellen 1-7 dropped it, Floppy Tabellen 14-16 kept a column, 64'er-DOS
+Tabelle 1 kept it inside the key cell.
+
+**Keep it as its own column.** The precedent is SH8608, which keeps a `=`
+column for the same shape; a separator that is a glyph in one table and a
+column in the next is the odd-one-out defect again, one level down.
+
+**Unless the print sets the dash INSIDE the term** — then it is part of the
+key and stays in that cell.
 
 ### A NUMBERED SERIES IS ALL TYPESET OR ALL CROPPED — decide for the series
 
@@ -417,8 +446,17 @@ The sub-agent must:
 8. **Delete adjacent OCR-garbage paragraphs** next to a `TODO TABLE`
    placeholder (the OCR pipeline sometimes drops a flattened
    `<p>…<br>…</p>` next to the placeholder).
-9. Beautify all touched HTML at the end via
-   `npx --yes js-beautify --type html --indent-size 4 --wrap-line-length 0 --replace`.
+9. **Beautify a COPY, compare, and write only if the file has not moved.**
+   `--replace` rewrites whole files, and 170 edits the same files at the same
+   time — which a dispatch forbids in other words, and which this item used to
+   order outright. The procedure:
+   read the file, beautify the copy
+   (`npx --yes js-beautify --type html --indent-size 4 --wrap-line-length 0`,
+   no `--replace`), compare every `<pre>` and the non-whitespace text of both,
+   and write **only** if they match AND the file on disk is unchanged since
+   the read. MEASURED on SH09: all 16 files came back byte-identical, so
+   nothing was written at all — and the tool had first been shown to reformat
+   a planted file, so the no-op was the files' doing, not a broken command.
 10. **Do not commit.** Return a per-article placement table, plus any
     `[ILLEGIBLE]` cells, any `TODO TABLE` you couldn't replace, any
     tables intentionally skipped, and any LOG.md entries written.
@@ -676,6 +714,14 @@ impossible here, every table the sub-agent emits must be backed by
 - For each `<table>` placed, paste the pre-fix vs. post-fix counts
   from verifier check #6 (`<table>=N <figcaption>Tabelle…=M`), so
   the orchestrator sees Pass 3 actually advanced the totals.
+- **Per sweep, what is owed differs, and this list used to ask the same of
+  all of them.** The narrow-column sweep is a HINT LIST this rule itself
+  describes as finding nothing on its own: it returned **1271 hits on SH09**,
+  and one pasted line plus a disposition for each is a day's work that proves
+  nothing. **Disposition the VISUAL WALK's finds and the heading-word sweep's
+  hits one by one; COUNT the narrow-column hints** and report the count with
+  the walk that covers the same pages. A sweep whose output is reported as a
+  number must say which pages it covered.
 - For each Pass-3 candidate block walked (not just those extracted),
   paste the one line from `<OUT_DIR>/blocks/p<NNN>.txt` that flagged it
   plus a one-line disposition (`extracted`, `already image`, `already

@@ -112,6 +112,15 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
    * `entry` is **the bold title as printed, and only that**: not the blurb
      under it, and not a qualifier the TOC adds such as *(nur auf Diskette)*
      or a `Kurs:` prefix.
+   * **AND WHEN THE BOLD LINE IS A KICKER, THE ENTRY IS THE TITLE LINE.**
+     "The bold title and only that" has no answer when the bold line is not
+     the title. SH09 p005 prints **Eingabehilfen** in bold with
+     `Checksummer 64 V3` in regular weight below it; read literally, the entry
+     is `Eingabehilfen`, which matches no filename — and 100 compares the two.
+     The corpus settles it: SH8604, SH8605 and SH8606 all print
+     `Checksummer 64 V3` for the same recurring item, so that is the entry.
+     **The kicker survives in the `toc_title`** per r100's kicker clause, not
+     here. For a recurring item, check its earlier printings before choosing.
    * **Normalise the glyphs the way the article FILENAMES do** — `–` for the
      dash, `'` for the apostrophe, `...` for the ellipsis. The two are compared
      downstream, and 100 cannot match an entry whose dash is the other one.
@@ -174,8 +183,25 @@ for f in glob.glob(f'issues/{issue}/*.html'):
 for m in sorted(missing): print(f"missing from toc.txt: {m!r}")
 PY
 
-# 3. build the site for this issue and confirm no
-#    "ERROR: category not in toc.txt:" lines appear.
+# 3. the category check WITHOUT building the site.
+#    `generate.py ... local` calls shutil.rmtree(OUT_DIRECTORY) (generate.py
+#    :2553) before it writes anything, so running it while ANOTHER SESSION
+#    SERVES out/ deletes what is being served.  MEASURED on SH09: a sibling
+#    was serving out/ from `generate.py --issues SH8502 SH8503 SH8604 --future
+#    local` (pid 3044), so this check as written was not run at all.
+lsof -i :8000 -i :8001 -i :8766 | head        # anything serving out/?
+#    And it does not need the build: `ERROR: category not in toc.txt` is
+#    raised while the database LOADS.  CONFIG is parsed at import time
+#    (generate.py:175), so set argv, import, and construct the database:
+"$PY" -c "
+import sys; sys.argv = ['generate.py', '--issues', '<YYMM>', '--future']
+import generate; generate.ArticleDatabase(generate.IN_DIRECTORY)
+"
+#    Expect no 'ERROR: category not in toc.txt' line.  A 'Missing PDF' warning
+#    is expected at this step, and so is '<!!!> Has uncommited changes!'.
+#    Nothing in out/ is touched -- the rmtree is under `if __name__`.
+#    VERIFIED both ways on SH09: loads the issue (issues loaded: 1), prints no
+#    ERROR line, and out/ was left serving throughout.
 ```
 
 ## A SONDERHEFT WITH NO PRINTED RUBRIKEN BOX STILL LISTS `Rubriken`

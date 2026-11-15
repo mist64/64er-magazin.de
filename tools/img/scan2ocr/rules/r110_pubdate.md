@@ -156,9 +156,22 @@ PY
 # and grep matched every line).
 ID=$ISSUE                                  # e.g. 8608, or SH8603
 if [ "${ID#SH}" != "$ID" ]; then
-  YYMM=${ID#SH}                            # SH8603 -> 8603
-  # unpad the month: 03 -> 3
-  grep "Sonderheft $((10#${YYMM:2:2}))/${YYMM:0:2}" README.md
+  N=${ID#SH}
+  if [ ${#N} -eq 2 ]; then
+    # A YEAR-LESS SONDERHEFT ID -- SH09 and every one after it.  The id holds
+    # the NUMBER and no year, so there is nothing to slice a year out of:
+    # ${N:2:2} is empty and $((10#)) aborts with
+    #   10#: invalid integer constant
+    # which is how this block died on SH09, the first such id, and it would
+    # have died again on SH10.  The README bullet keeps the N/YY form for
+    # these ("Sonderheft 9/86", "Sonderheft 10/86", README 59-60: from number
+    # 8 the TITLE drops the year, the order pages keep it), so match on the
+    # number and read the year off the bullet.
+    grep "Sonderheft $((10#$N))/" README.md    # SH09 -> "Sonderheft 9/"
+  else
+    # SH8603 -> 8603; unpad the month: 03 -> 3
+    grep "Sonderheft $((10#${N:2:2}))/${N:0:2}" README.md
+  fi
 else
   grep "${ID:2:2}/${ID:0:2}" README.md     # 8608 → grep "08/86"
 fi
@@ -171,14 +184,42 @@ belonging to a different issue. SH8602's errata reported this and the harvest
 missed it, so SH8603 met it again. Padding matters too: the monthly bullets
 pad (`03/86`) and the Sonderheft bullets do not (`Sonderheft 3/86`).
 
-A small build check (will refuse if pubdate is in the future without
-`--future`):
+### AND IF `pubdate.txt` IS ALREADY THERE, THIS STEP DOES NOT WRITE ONE
+
+The cadence list and the PROVISIONAL-bound procedure both assume the step
+derives the date. **The owner sometimes sets it before the chain reaches 110**
+— SH09 and SH10 both arrived with `pubdate.txt` already written, SH10's
+(2026-12-19) before the build had begun. There is nothing to derive and
+nothing to carry to the decision list.
+
+**Leave the file exactly as it is**, say in `LOG.md` that the owner had already
+set it and what it reads, and run the README look as a **cross-check, not a
+source**: a disagreement between the owner's date and the README bullet is
+reported, never reconciled (the rule above: `pubdate.txt` is right and the
+bullet stays). The Sonderheft catch-up dates are the owner's schedule, not the
+printed date + 40 years, so a mismatch there is expected and is not a finding.
+
+### A small build check
 
 ```bash
-.venv/bin/python generate.py --issues <YYMM> local
-# or, while the issue is still future-dated:
-.venv/bin/python generate.py --issues <YYMM> --future local
+# NOT `generate.py ... local`: that calls shutil.rmtree(OUT_DIRECTORY)
+# (generate.py:2553) before writing, which DELETES out/ under a session that
+# is serving it -- see r090 check 3, where this cost SH09 the check.
+# CONFIG is parsed at import time (generate.py:175):
+.venv/bin/python -c "
+import sys; sys.argv = ['generate.py', '--issues', '<YYMM>', '--future']
+import generate; generate.ArticleDatabase(generate.IN_DIRECTORY)
+"
 ```
+
+**And it does NOT refuse a future pubdate, which this block used to claim.**
+The gate is `not (CONFIG.build_future or CONFIG.build_issues)` (generate.py
+:617), so **naming the issue with `--issues` bypasses it entirely**: MEASURED
+on SH09, the database loaded the issue at pubdate 2026-12-05 with no
+`--future` at all. Only a whole-site build without `--future` skips a
+future-dated issue. So this check proves the issue LOADS; it proves nothing
+about the date, and `--future` is there for the whole-site build, not for
+this one.
 
 ## Lessons / things to watch
 

@@ -256,6 +256,15 @@ grep -lE 'name="author" content=""' "$dir"/*.html && echo "  FAIL: empty content
 # 3. articles missing meta must match the Case B unsigned list. Cross-
 #    check against the same article in the previous issue: if 8606's
 #    Leserforum has no meta, 8607's Leserforum should also have none.
+#    KEY A SONDERHEFT RUBRIC ON THE RUBRIC, NOT THE EXACT TITLE.  title_key is
+#    the filename's first 30 characters, which only works where a rubric keeps
+#    its name.  A Sonderheft retitles them per theme: SH09's Q&A rubric is
+#    `94 Fragen und Antworten` against SH8608's `Fragen und Antworten zum C 16`,
+#    so the key misses and a correct unsigned rubric is reported every run.
+#    Match the rubric's own words (the first two or three), or carry the
+#    unsigned list for Sonderhefte in the brief; and when PREV is a Sonderheft
+#    of another theme, treat a miss as EXPECTED and answer it in reviewed/
+#    rather than editing the file.
 "$PY" -c "$(cat <<'PY'
 import os, re, sys
 d, prev = sys.argv[1], sys.argv[2]
@@ -325,7 +334,61 @@ for f in sorted(os.listdir(d)):
               f"shape mismatch (expansion vs dedupe)")
 PY
 )" "$dir"
+
+# 6. EVERY NAME IN THE META MUST APPEAR IN A BODY BYLINE.
+#    Check 5 gates on the meta having DUPLICATES, so a meta that is sorted and
+#    deduped is never looked at -- and that is what 080's wrapper wrote for
+#    SH09's 92 Buchbesprechungen: `Boris Schneider, ev, D. Hein, ...`, 14
+#    entries, against a body of 18 names starting `Dieter Hein/bj`, in a
+#    section whose rule is one meta entry per printed byline. It passed check 5
+#    and every other check in this block.
+"$PY" - "$dir" <<'PY'
+import io, os, re, sys
+d = sys.argv[1]
+def body_names(s):
+    out = []
+    for a in re.findall(r'<address class="author">(.*?)</address>', s, re.DOTALL):
+        inner = re.sub(r'<[^>]+>', '', a).strip().strip('()')
+        out += [x.strip() for x in re.split(r'[/,]', inner) if x.strip()]
+    return out
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = io.open(os.path.join(d, f), encoding='utf-8').read()
+    m = re.search(r'<meta name="author" content="([^"]*)"', s)
+    if not m: continue
+    body = body_names(s)
+    if not body: continue                     # Case B / unsigned-in-body shapes
+    meta = [p.strip() for p in m.group(1).split(',') if p.strip()]
+    orphan = [p for p in meta if p not in body]
+    if orphan:
+        print('  META NAME NOT IN ANY BYLINE  %-44s %s' % (f[:44], orphan))
+    extra = [p for p in dict.fromkeys(body) if p not in meta]
+    if extra:
+        print('  body-only (readout, often correct) %-38s %s' % (f[:38], extra))
+PY
 ```
+
+### What check 6 is, and the two stricter forms that DO NOT work
+
+**MEASURED before it shipped**, which is how the two stricter forms were
+thrown out:
+
+| form | fires on | verdict |
+|---|---|---|
+| meta == body, order and repeats included | **13 of 153** chain-built files | **rejected** — every one is the legitimate tip-column dedupe, where the body repeats `(tr)` per item and the meta carries it once |
+| meta must be an in-order subsequence of the body (surname-matched) | **100 of 1882** files | **rejected** — pre-chain metas are written alphabetically, and joined bylines (`M. und J. Heinz`) expand to two entries |
+| **a meta name in no byline at all** | **1 of 492** chain-built files | **shipped** |
+
+SH09 after its repair: **0 of 26**. And the one chain-built hit is a real
+finding, not noise: `SH8605/6 Speicherlandschaft` has meta `Heimo Ponnath`
+against the byline `(Heino Ponnath/tr)` — corpus 132 `Heimo` to 3 `Heino`.
+
+**Read it on the issue being built, not corpus-wide.** Over all issues,
+pre-chain ones included, the same check reports 233 of 1891, because an early
+meta carries the full name (`Norfried Mann`) against an abbreviated printed
+byline (`N. Mann`) — a shape this rule allows. The `body-only` line is a
+readout for the same reason: the editorial `Chefredakteur` and a body spelling
+the author out in full are both correct.
 
 ## Evidence-in-report requirement
 
@@ -410,6 +473,19 @@ signature may the article be treated as a Case B unsigned rubric.
 
 The byline is often set flush right on the same line as the closing sentence,
 which is why the OCR either loses it or glues it to the paragraph.
+
+**AND 180 RESTORES THE LINES THAT WENT WITH IT.** This section said a line is
+probably missing and stopped there — it never said whose job the line is, and
+r190's page walk also claims dropped text, so both steps could reasonably
+leave it to the other. On SH09 **four** articles (110, 119, 120, 139) each lost
+**two column-end lines** into one interleaved listing block, the byline among
+them.
+
+**The rule: 180 restores the lines the byline was taken with, and nothing
+else.** An `<address>` that follows `anzufin-` reads as damage, so the byline
+cannot be put back without them. Everything else dropped on that page — other
+columns, captions, interleaved listing text — stays 190's. Note in `LOG.md`
+which lines 180 restored, so 190's walk is not asked to find them twice.
 
 ## Check every editor abbreviation against the ones already seen
 

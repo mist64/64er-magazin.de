@@ -66,9 +66,25 @@ correct behavior is to verify the article exists, and if it doesn't,
 report it as N/A and move on.
 
 Test: `ls "issues/<YYMM>/"*[Bb]?cher*.html` (similar globs for
-`*Fachredakteur*`, `*Fehlerteufelchen*`). **Bücher and
-Fehlerteufelchen can stay filename-glob** — their article titles equal
-the rubric name, so the glob is reliable.
+`*Fachredakteur*`, `*Fehlerteufelchen*`) — **but the glob is only HALF the
+test.** This file said Bücher and Fehlerteufelchen "can stay filename-glob,
+their article titles equal the rubric name". **They do not always.** SH09's
+Bücher article is `92 Buchbesprechungen`, printed under a BÜCHER band, and the
+check reported `Bücher: N/A (no article in this issue)` — false, and the page
+had to be read to rule out a dropped input. r210 learned the same thing for
+Leserforum: count by the rubric band, not the filename.
+
+**MEASURED over the corpus, and NEITHER key alone is sufficient:**
+
+| key | finds | misses |
+|---|---|---|
+| filename `*[Bb]?cher*` | 33 files | `92 Buchbesprechungen` (SH09) |
+| `64er.head1` == the rubric | 24 files | all 10 pre-chain Bücher articles, which have **no `head1` at all**, and `8701/144 Bücher.html`, whose `head1` is `Hardware` |
+
+**So take the UNION, and read the page where the two disagree.** A rubric is
+present if the filename matches **or** a `64er.head1` equals the rubric name;
+`N/A` may only be reported when **both** tests come up empty, and the line
+must say so.
 
 **Editorial must NOT use a filename glob.** The editorial article is
 named by its headline, not by the word "Editorial" (8608's editorial
@@ -198,12 +214,21 @@ banner_adjudicated() {   # $1 = start page
 # matches nothing is a fatal "no matches found" that takes the whole block
 # with it.  (r000: THE VERIFICATION BLOCKS ARE BASH; this one no longer needs
 # to be.)  Iterate the directory, which always matches, and filter by name.
+# THE UNION OF THE TWO KEYS, because the filename is only half the test:
+# SH09's Bücher article is named `92 Buchbesprechungen` and the glob reported
+# "N/A (no article in this issue)" on an issue that has one.  head1 alone is
+# no better -- pre-chain Bücher articles carry no head1, and 8701's carries
+# `Hardware` -- so a rubric is present if EITHER key matches, and N/A requires
+# BOTH to be empty.
 for rub in Bücher Fehlerteufelchen Fachredakteur; do
   matches=$(for f in "$dir"/*.html; do
-              case "$(basename "$f")" in *"$rub"*) printf '%s\n' "$f";; esac
+              case "$(basename "$f")" in
+                *"$rub"*) printf '%s\n' "$f"; continue;;
+              esac
+              grep -q "64er\.head1\" content=\"$rub\"" "$f" && printf '%s\n' "$f"
             done)
   if [ -z "$matches" ]; then
-    echo "  $rub: N/A (no article in this issue)"
+    echo "  $rub: N/A (no article by FILENAME and none with head1=\"$rub\")"
     continue
   fi
   # `for f in $matches` word-splits "144 Bücher.html" at the space, and EVERY

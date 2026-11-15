@@ -3095,3 +3095,85 @@ mapped wrongly — once comparing a 2400 dpi raw against 600 dpi coordinates, on
 sampling the left margin while claiming to sample the drive. Both times the
 numbers looked decisive and were meaningless. **When a measurement contradicts
 what the owner can see on screen, the measurement is the thing to check first.**
+
+## SH09, 2026-11-15: the twenty errata that had not reached their rule
+
+SH09's `WORKFLOW_ERRATA.md` holds 58 entries. The issue's own build harvested
+the ones its rules had crashed on; **19 landed on rule files that this build
+never opened at all**, and a twentieth — r110's crash on a year-less id — sat
+in a file that WAS edited, for something else. That is the same shape as
+SH8607's nineteen: the record is complete and the rules are not, and the gap is
+invisible unless someone counts per ENTRY rather than per file.
+
+Measured before the work, so the size of it was known: 24 rule files changed in
+the build, 19 of 58 entries on files not among them, 39 unverified. Counting by
+file would have reported 24 of 24 done.
+
+All twenty are now in their rules: r040 (the intro readout's false hits),
+r050 (a key list printed one per line), r060 (the list survey over-reports by
+design), r070 (a third suspect dash shape; a U+201A site larger than the
+character), r080 (the byline test, the inline regex, table-only pages and the
+unclaimed-page enumeration, the stale `issues/8607` literals), r090 (a bold
+kicker; check 3 wiping `out/`), r100 (a declared misprint), r110 (the year-less
+id, an owner-set pubdate, the `--future` claim), r160 (four), r180 (three),
+r210 (`&amp;`), r240 (the Bücher glob).
+
+**Four of the twenty would have published something wrong**, and they are the
+reason this was not deferred behind SH10:
+
+- **r080's byline test** let `(ungeSHIFTet)` through as an `<address>` and into
+  the author meta beside the real author. A published false author.
+- **r110's README look** died on `SH09` with `10#: invalid integer constant`,
+  and SH10 is the next such id. It takes the issue NUMBER now, not a slice of
+  a year the id does not carry.
+- **r090's check 3** ran `generate.py … local`, which `rmtree`s `out/` before
+  writing — under a sibling session that was serving it. It loads the database
+  alone now and touches nothing.
+- **r100's coverage check** reported a dropped piece on a correct issue, and
+  called the wrong box: `NO ARTICLE for Rubriken entry` for an entry that sits
+  under `Tips und Tricks`.
+
+### AND TWO OF THE ERRATA'S OWN SUGGESTIONS WERE WRONG, WHICH MEASURING FOUND
+
+A suggestion written while the defect hurt is a hypothesis, not a fix.
+
+- **r080, the inline byline regex.** The entry proposed requiring "a name-like
+  token — a capitalised word, or `/xx`". Adding a bare capitalised word as an
+  alternative takes the corpus from 99 hits to **343, 210 distinct**, led by
+  `(Ltg.)`, `(RETURN)`, `(Listing 1)`, `(Floppy)` — it puts back exactly the
+  noise the anchoring was added to remove. What works is narrower and was
+  measurable: **every one of the corpus's 31 editor codes is TWO letters**, so
+  `{2,3}` → `{2}` drops `(vor)`, `(zurück)` and `(str)` and loses no byline.
+- **r180's proposed check 6**, "compare the meta with the `<address>` tokens,
+  order included". True for SH09 (0 of 26 after repair) and false as a gate:
+  **13 of 153** chain-built files fail it on the legitimate tip-column dedupe,
+  and the order-as-subsequence form fails **100 of 1882**, because pre-chain
+  metas are written alphabetically. What shipped is the one form that is
+  quiet on correct output: **a meta name that appears in no byline at all** —
+  1 of 492 chain-built files.
+
+**And that one hit is a real finding, in a published issue:** `SH8605/6
+Speicherlandschaft` carries meta `Heimo Ponnath` against the byline
+`(Heino Ponnath/tr)`. Corpus: 132 `Heimo` to 3 `Heino`. Surfaced to the owner,
+not changed — which spelling SH8605 prints is a question for its page.
+
+### EVERY NEW CHECK WAS RUN BOTH WAYS BEFORE IT WENT IN
+
+r000 requires it and it caught three bad drafts here. r050's placeholder scan
+was planted twice — a defect file (p114's one-key-per-line shape: 3 candidates,
+all three named) and a clean one (8 `<br>`, a paired `<sub>`/`<sup>`, and
+`<a> <s> <q>` inside a fence: 0 candidates), and the fenced copies are the
+point, because a check that flags them fails on correct output. Its first draft
+flagged `<sub>`/`<sup>` by rarity alone; **a real tag closes and a placeholder
+never does** is what separates them. r100's misprint key was run with and
+without the declaration (`NO ARTICLE for Tips und Tricks` → `misprint
+DECLARED … article p97 (article there)`). r110's README look was run on SH09,
+SH10, SH8603 and 8608 — all four branches. r240's union was run on SH09 (finds
+`92 Buchbesprechungen`, previously `N/A`), 8701 and 8606.
+
+### THE COUNT THAT MATTERS NEXT TIME
+
+**Count errata entries against their rule's TEXT, not against the file's mtime.**
+r110 was edited in this build and its crash was still there. A per-file tally
+said 24 of 24; a per-entry tally said 19 open, and the twentieth was hiding
+inside a file the tally called done.

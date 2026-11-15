@@ -129,6 +129,60 @@ that carries only an article's listing still belongs in that article's
 98-99). The SH8603 precedent for both lived only in a brief, so SH8604 had to
 rediscover it; it is a rule now.
 
+**AND A PAGE CARRYING ONLY A TABLE IS CLAIMED THE SAME WAY.** This said "only
+an article's listing", which reads as a rule about listings. SH09's p47, p81
+and p83 carry **only a table**, and 030 omitted all three exactly as it omits
+a listing page — their text with them. A table-only page inside an article's
+run belongs in that article's `64er.pages`.
+
+### AND ENUMERATE THE PAGES NO SPEC CLAIMS — THAT LIST IS THIS SECTION'S INPUT
+
+The rule asks which pages belong in a spec and never says how to find the ones
+that are in no spec at all, though that is the only place a page omitted by 030
+can show up. SH09 built the list by hand from its 28 specs and then read 46
+pages at thumb scale. Run this **before** the section is applied:
+
+```bash
+$PY - issues/$ID <<'PY_END'
+import glob, io, os, re, sys
+d = sys.argv[1]
+N = int(sys.argv[2]) if len(sys.argv) > 2 else 0     # the scan's page count
+claimed, by_page = set(), {}
+for f in sorted(glob.glob(os.path.join(d, '*.html'))):
+    s = io.open(f, encoding='utf-8').read()
+    m = re.search(r'64er\.pages" content="([^"]+)"', s)
+    if not m:
+        print('NO SPEC:', os.path.basename(f)); continue
+    for part in m.group(1).split(','):
+        mm = re.match(r'^(\d+)[a-z]?(?:-(\d+)[a-z]?)?$', part.strip())
+        if not mm:
+            print('UNPARSEABLE SPEC %r in %s' % (part, os.path.basename(f))); continue
+        a = int(mm.group(1)); b = int(mm.group(2) or a)
+        for p in range(a, b + 1):
+            claimed.add(p); by_page.setdefault(p, []).append(os.path.basename(f))
+hi = N or (max(claimed) if claimed else 0)
+missing = [p for p in range(1, hi + 1) if p not in claimed]
+print('%d pages claimed, 1..%d' % (len(claimed), hi))
+print('UNCLAIMED (%d): %s' % (len(missing), ' '.join(map(str, missing))))
+over = {p: len(v) for p, v in sorted(by_page.items()) if len(v) > 2}
+if over: print('claimed by 3+ articles:', over)
+PY_END
+```
+
+**It is a readout to be disposed, not a pass/fail.** Every unclaimed page is
+either a cover, an ad spread, a card, or a page 030 dropped — and only the
+last kind is a defect. MEASURED on published issues: **8701 81 unclaimed of
+1..187, SH8607 11, SH09 12.** Pass the scan's page count as the second
+argument; without it the range stops at the highest claimed page and an
+unclaimed tail is invisible.
+
+**And fix a spaced spec in the CONSOLIDATED file, before the script runs.**
+030 writes the spec spaced (`[30-34, 36-38]`) and the splitter copies the `<h1>`
+verbatim, so a spaced spec reaches the metas and gets corrected afterwards —
+by which time the FILENAMES have already been derived from the uncorrected h1.
+Correct the h1s in `issues/$ID/$ID.html` first, and one pass of the wrapper
+then produces specs that need no rewriting.
+
 **A page holding one article's tail and the next one's start is NOT the lettered
 case.** Lettering is for two articles *starting* on the same page (above).
 SH8604's 49, 126, 133 and 161 are tail-plus-start: the page number simply
@@ -162,16 +216,24 @@ After the script:
 
 ## Verification
 
+**`ID` IS SET FROM `ISSUE`, NOT WRITTEN INTO THE COMMANDS.** This block was
+literal `issues/8607` in all five checks — the same stale-literal class this
+rule records two sections below for the pair check, and r020's `seq 1 176`
+before that. On SH09 all five had to be substituted by hand in a scratch copy
+before they could be run, which is how a check stops being run at all.
+
 ```bash
+ID=${ISSUE:-$(cat tools/img/scan2ocr/rules/ISSUE.txt)}; echo "ID=$ID"
+
 # 1. how many articles came out
-ls issues/8607/*.html | wc -l                          # expect dozens
+ls issues/$ID/*.html | wc -l                           # expect dozens
 
 # 2. each file's <h1> matches its filename (modulo sanitisation).
 #    split sanitises `< > : " / \ | ? * +` → `_` (sanitize_filename), so
 #    apply the SAME substitution to the h1 before comparing — else a
 #    file `146 Billiges Vergnügen_.html` vs h1 `Billiges Vergnügen?`
 #    false-MISMATCHes.
-for f in issues/8607/*.html; do
+for f in issues/$ID/*.html; do
   base=$(basename "$f" .html | sed -E 's/^[0-9]+ //')
   h1=$(grep -oE '<h1>[^<]+</h1>' "$f" | head -1 | sed -E 's#</?h1>##g' | tr '<>:"/\\|?*+' '_')
   [ "$base" = "$h1" ] || echo "MISMATCH: $f  (file:'$base'  h1:'$h1')"
@@ -181,7 +243,7 @@ done
 #    DOCUMENTED EXCEPTION: Leserforum legitimately has ZERO <h1> —
 #    rule 200 restructures it with a <header> banner instead of an
 #    <h1>. Expect n=0 for the Leserforum file; that's not a failure.
-for f in issues/8607/*.html; do
+for f in issues/$ID/*.html; do
   n=$(grep -c '<h1>' "$f"); [ "$n" -eq 1 ] || echo "n=$n  $f"
 done
 
@@ -199,10 +261,10 @@ done
 # so SH8605 got four spaced specs from the script and they were rewritten by
 # hand.  Verified on SH8605: this form fires on a planted `content="90 - 97"`
 # and stays silent on the issue.
-grep -h '64er.pages" content=' issues/8607/*.html | grep -vE 'content="[0-9a-z,-]+"'
+grep -h '64er.pages" content=' issues/$ID/*.html | grep -vE 'content="[0-9a-z,-]+"'
 
 # 5. consolidated file is gone
-[ ! -f issues/8607/8607.html ] && echo "consolidated removed ✓"
+[ ! -f "issues/$ID/$ID.html" ] && echo "consolidated removed ✓"
 ```
 
 ## THE HEADLINE CAN BE SET INSIDE THE LEAD PHOTO — the OCR cannot see it
@@ -542,7 +604,21 @@ d = sys.argv[1]
 # code or a full-name byline, and it still catches the shape it was written for
 # ("(Jesko Schwarzer/dm) Listing auf Seite 54", 8611 p50) as well as a
 # paragraph-final "... ist gut. (sc)".
-_BY = r'\((?:[A-ZÄÖÜ][\w.\- ]{2,28}/)?[a-z]{2,3}\)'
+# A BARE EDITOR CODE IS EXACTLY TWO LETTERS.  With {2,3} this still matched a
+# key table: SH09's `&lt;+> = Blaettern (vor)` ends a paragraph in `(vor)` and
+# reported bylines=2 in a file with one byline -- the same class as the 135
+# distinct words the anchoring was added to remove.  MEASURED over the corpus's
+# 2,928 bylines: all 31 distinct editor codes are TWO letters, and narrowing
+# {2,3} -> {2} loses exactly one corpus hit, `(str)`, which is not a byline.
+# 99 hits/17 distinct before, 98/16 after.
+#
+# DISPROVED, the first fix proposed for this: "require a name-like token
+# (a capitalised word, or /xx)".  Adding a bare capitalised word as an
+# alternative takes the corpus from 99 hits to 343, 210 distinct, led by
+# (Ltg.), (RETURN), (Listing 1), (User-Port), (Floppy) -- it reintroduces the
+# noise the anchoring removed.  The capitalised name is only ever valid in
+# front of a slash.
+_BY = r'\((?:[A-ZÄÖÜ][\w.\- ]{2,28}/)?[a-z]{2}\)'
 INLINE = re.compile(r'(?:^\s*(?:<(?:strong|em|b|i)>\s*)*' + _BY +
                     r'|' + _BY + r'\s*(?:</(?:strong|em|b|i)>\s*)*$)')
 for f in sorted(glob.glob(os.path.join(d, '*.html'))):
@@ -705,6 +781,26 @@ intro before 190.
   single ALL-CAPS token** — 0 of the 1,355 is one, and a key name or a
   monitor keyword always is. Rejected paragraphs are printed and left as
   paragraphs, never dropped.
+- **AND IT ALSO REJECTS A TOKEN THAT CHANGES CASE INSIDE ITSELF** —
+  `ungeSHIFTet`. SH09 p113 heads a key list with `(ungeSHIFTet)`: no `=`, no
+  `;`, no digit, and `.isupper()` is False because of the leading `unge`, so
+  every clause above passed it. It became an `<address class="author">` and
+  then went into the author meta **beside the real author** — a published
+  false byline, found only by reading the wrapper's output against a heads
+  list. The multi-byline check does count it, as one more byline in a file
+  that has one, which is the value it reports for a correct file.
+  **The test: reject a bracketed token containing a lowercase letter
+  immediately followed by an uppercase one** (`[a-zäöüß][A-ZÄÖÜ]`).
+  MEASURED over the corpus's 1,558 distinct byline texts: **3 carry that
+  shape** — `(goloMAK)`, `(Endurion, goloMAK)`, `(ClausS)` — and all three are
+  modern contributors who typed in a listing, credited by hand, with a German
+  comment saying so. Like the two `<a href>` bylines this test already
+  rejects, **the splitter never writes them**, so rejecting the shape costs
+  nothing the script produces.
+- **AND CROSS-CHECK EVERY NEW `<address>` AGAINST THE AUTHOR META.** The false
+  byline above survived because nothing compared the two. r180's check 6 is
+  that comparison (added from the same SH09 finding): each file's author meta
+  against its `<address>` tokens, order included.
 - the embedded splitter's text replacements overlap with `r070_html_cleanup.sh`. That's
   intentional — running 070 first means the .html is already clean when split
   starts, and split's own replacements become no-ops. Either order is safe.

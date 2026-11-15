@@ -173,7 +173,87 @@ way; it was caught by eye after 070.
 **A whitelisted name sitting in a comma-separated run of escaped placeholders
 is a placeholder: escape it.** Judge by the neighbours, not by the name.
 
+**AND A KEY LIST PRINTED ONE PER LINE IS THE SAME CASE.** SH8607's XMENU put
+its placeholders in one comma-separated run, and this section generalised from
+that single shape. SH09 p114 prints **one key per line** —
+
+    &lt;f1&gt; Listing laden
+    <a> Zeile anfuegen
+    <s> Zeile suchen
+    <q> Programm beenden
+
+— so **no line carries both shapes**, and the "comma-separated run" clause
+does not reach it. Three tags shipped live: `<a>`, `<s>` and `<q>`.
+
+### THE GREP THAT WAS HERE COULD NOT FIND EITHER CASE
+
+It was:
+
 ```bash
-# a bare <p>/<s>/<b>/<i> on a line that also carries an escaped placeholder
 grep -nE '&lt;[a-z]+&gt;' issues/<ID>/*.html | grep -E '<(p|s|b|i)>'
 ```
+
+Run on the **HTML**, where `<p>` opens every paragraph, so the second grep
+matches **every line the first one passes**: 13 hits on SH09, all false, and
+not one of them the three real sites. And it could not have found them anyway
+— `<a>` and `<q>` are not in its `(p|s|b|i)` list, and p114's one-key-per-line
+list means no single line carries an escaped placeholder AND a live tag.
+A check keyed on one issue's layout, reading the wrong artefact, with a
+hand-written subset of the names it is looking for.
+
+**Read the `.md`, before 060, and count by NAME.** The discriminator that
+works is not the neighbours — it is that **a real tag closes and a placeholder
+never does**: `<sub>` has `</sub>`, `<a>` as a key has no `</a>`. Rarity is the
+second signal; the 030 handover's real inline tags run to dozens.
+
+```bash
+$PY - issues/<ID>/<ID>.md <<'PY_END'
+import re, sys, collections
+VOID = {'br', 'hr', 'img', 'wbr', 'col'}       # never close; not evidence either way
+def outside_fences(s):
+    out, infence = [], False
+    for line in s.splitlines():
+        if line.lstrip().startswith('```'):
+            infence = not infence
+            out.append('')
+            continue
+        out.append('' if infence else line)
+    return out
+lines = outside_fences(open(sys.argv[1], encoding='utf-8').read())
+OPEN  = re.compile(r'(?<!\\)<([a-z][a-z0-9]{0,2})>')     # attribute-less only
+CLOSE = re.compile(r'(?<!\\)</([a-z][a-z0-9]{0,2})>')
+opens, sites, closed = collections.Counter(), collections.defaultdict(list), set()
+for i, line in enumerate(lines, 1):
+    for m in OPEN.finditer(line):
+        opens[m.group(1)] += 1
+        sites[m.group(1)].append((i, line.strip()[:72]))
+    for m in CLOSE.finditer(line):
+        closed.add(m.group(1))
+esc = {i for i, l in enumerate(lines, 1) if re.search(r'&lt;[^<>\n]*&gt;', l)}
+cand = 0
+for name, n in sorted(opens.items(), key=lambda kv: (kv[1], kv[0])):
+    near = any(any(abs(i - e) <= 2 for e in esc) for i, _ in sites[name])
+    real = name in closed or name in VOID
+    flag = 'ok (paired/void)' if real else ('CANDIDATE' if (n <= 3 or near) else 'ok')
+    print(f'  <{name}> {n:4d}  closed={name in closed!s:5} near={near!s:5}  {flag}')
+    if flag == 'CANDIDATE':
+        cand += 1
+        for i, l in sites[name]:
+            print(f'      line {i}: {l}')
+print('candidates:', cand)
+PY_END
+```
+
+Expected: **0 candidates.** Every CANDIDATE is read on the page and then either
+escaped (it is a key) or paired (it is markup that lost its closing tag).
+
+**Exercised both ways before it shipped**, on two planted files, because a
+clean issue cannot exercise it:
+
+| planted | content | result |
+|---|---|---|
+| defect | p114's shape — `<a>` `<s>` `<q>` one per line, two of them beside an escaped `&lt;f1&gt;`, plus 8 real `<br>` | **3 candidates**, all three named, `<br>` passed as void |
+| clean | 8 `<br>`, a paired `<sub>`/`<sup>`, and `<a> <s> <q>` inside a fence | **0 candidates** |
+
+The fenced copies in the clean file matter: they are the shape a listing
+legitimately prints, and a check that flags them fails on correct output.
