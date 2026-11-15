@@ -2454,7 +2454,28 @@ pages never exercise.
 $PY - <<'PY'
 import os, re, pathlib
 import r005_masters_sheet as R
-acc = pathlib.Path("issues") / R.ISSUE / "reviewed" / "field-not-applied.txt"
+import r000_issue
+# ANCHOR THE PATH ON THE REPO, NOT ON THE CWD.  This read
+#     pathlib.Path("issues") / R.ISSUE / ...
+# and every fence in this file `cd`s to tools/img/scan2ocr/rules first (that is
+# what $PY's spelling requires), where `issues/` does not exist.  So `accepted`
+# was ALWAYS EMPTY and 7g could not be made green by any ruling: a page stamped
+# NOT APPLIED stayed "NOT RULED ON" for ever.  A CHECK THAT CANNOT PASS, in the
+# check written to stop pages going out unseen -- caught by the SH10 builder
+# reading it before running it, 2026-11-15.
+#
+# WHY IT SURVIVED ITS OWN TWO-WAY TEST: `R.OUT_MASTER` is absolute (it comes
+# from the issue descriptor), so the stamp sweep worked from any directory and
+# only the ruling file was relative; and control tested the pass branch from
+# the REPO ROOT with a planted file, not from the cwd the fence prescribes.
+# SH09's issues/SH09/reviewed/field-not-applied.txt was never created at all --
+# p031 was repaired instead, so SH09 ends with zero NOT APPLIED stamps and 7g
+# passes it trivially. The defect needed an issue with a genuinely unrepaired
+# page to show, and SH10 p023 is the first.
+#
+# THE LESSON, for every fence in this file: in a block that `cd`s, any path not
+# derived from the descriptor is suspect. Derive it.
+acc = pathlib.Path(r000_issue.ISSUES_ROOT) / R.ISSUE / "reviewed" / "field-not-applied.txt"
 accepted = {}
 if acc.exists():
     for line in acc.read_text(encoding="utf-8").splitlines():
