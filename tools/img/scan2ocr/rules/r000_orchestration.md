@@ -1857,6 +1857,22 @@ processes were gone. Control found it on a five-minute watchdog tick that read
 ARTEFACT before writing anything about it.** One `ps` line and one output file
 whose mtime is after the restart. Report both.
 
+**AND THE MIRROR: AFTER STOPPING A MIS-DISPATCHED AGENT, PROVE IT WROTE
+NOTHING.** MEASURED on SH10, 2026-11-15: the builder started 325's reader B on
+TEDMON pp41-55 while reader A was still on the same file — against the
+one-writer-per-file rule it had itself stated — noticed within a minute, and
+stopped B with `TaskStop`. What makes that a non-event rather than a near-miss
+with unknown consequences is the EVIDENCE it then gave: **no `r325-B.txt`
+exists, and article 28's mtime is still 21:29:37, before either reader
+began.** Absence of the output file plus an unchanged mtime on the shared file
+is the proof; "I stopped it quickly" is not.
+
+It reported the slip unprompted, having cost nothing and left no trace anybody
+else would have found. That is the behaviour to want: **a near-miss reported
+with its evidence is worth more than a clean report**, because the next
+dispatch is written by someone who knows the rule can be broken in a minute of
+inattention.
+
 ### AND `pgrep -f` IS NOT A WAITER — TWO OF THEM DEADLOCK EACH OTHER
 
 The root cause was a waiter loop built on `pgrep -f <pattern>`, and the trap is
