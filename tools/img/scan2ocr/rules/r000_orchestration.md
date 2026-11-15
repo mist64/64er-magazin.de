@@ -1715,6 +1715,31 @@ r000 has said this for months, and these four shipped anyway because the
 sentence was read as advice. Plant the defect, see red, remove it, see green.
 If the check cannot be made to go red by any input, it is not a check.
 
+### AND A DICT KEYED BY PAGE COLLAPSES EVERY RECORD BUT THE LAST
+
+The fifth shape, and the one that spread furthest. SH10's override check held
+its records in `listed[page] = record`, so **a page's second record replaced
+its first** — and p023 ended the build with THREE overrides. The check reported
+green while covering less and less of the page as the work on it grew.
+
+**DEMONSTRATED, not inferred**, which is the right way to retire a defect:
+with p023's `masters600 OVERRIDE field` line deleted, the repaired check goes
+RED naming `regrade_023.py`, while the old one prints
+`4 override(s) recorded, 0 defect(s)` — **green over a missing override.** It
+had a second fault beside it: any `OVERRIDE` anywhere in a stamp satisfied any
+record, so the wrong override counted as evidence for the right one.
+
+**Two of control's own checks had the same shape and are fixed with it:**
+r005 check 7g's `accepted[page] = line`, which silently dropped a second or
+revised ruling for one page (proven on a two-line ruling file: 1 of 2 lost,
+and the one shown was the LAST), and r100's `misprint[printed] = real`, where
+two entries printed at the same wrong page would have left one declaration
+clearing both.
+
+**So: accumulate a LIST per page, and print the COUNT.** A missing record then
+shows up as a number rather than as silence — which is the only form in which
+anybody notices it.
+
 **AND TEST THE REPAIR, NOT ONLY THE DEFECT.** Fixing r280's `<code>` strip,
 control wrote the INVERSE of the instruction two sections below it — blanking
 every `<pre>` block instead of protecting it — having read that instruction

@@ -369,7 +369,11 @@ PY
               omitted.update(range(start, start + int(m.group(2))))
           m = re.match(r'misprinted-start\s+(\d+)\s+(\d+)', line)
           if m:
-              misprint[int(m.group(1))] = int(m.group(2))
+              # A LIST, because two entries can be printed at the same wrong
+              # page: `misprint[printed] = real` would keep only the last and
+              # the check would then clear BOTH on one declaration. Same shape
+              # as SH10's override check collapsing records per page.
+              misprint.setdefault(int(m.group(1)), []).append(int(m.group(2)))
   ent = os.path.join(d, 'toc_entries.txt')
   if not os.path.exists(ent):
       sys.exit('no toc_entries.txt (pre-chain issue) -- skipped')
@@ -396,10 +400,13 @@ PY
           elif int(page) in misprint:
               # The declared real page must itself be claimed, or the misprint
               # is hiding a dropped piece after all.
-              real = misprint[int(page)]
-              ok = 'article there' if real in claimed else 'AND NO ARTICLE AT p%d EITHER' % real
-              print('misprint DECLARED   %-22s printed p%s, article p%d  (%s)'
-                    % (entry, page, real, ok))
+              reals = misprint[int(page)]
+              for real in reals:
+                  ok = 'article there' if real in claimed else 'AND NO ARTICLE AT p%d EITHER' % real
+                  print('misprint DECLARED   %-22s printed p%s, article p%d  (%s)%s'
+                        % (entry, page, real, ok,
+                           '  [%d declarations for this printed page]' % len(reals)
+                           if len(reals) > 1 else ''))
           elif int(page) not in claimed:
               # NAME THE SECTION.  This said "Rubriken entry" for every entry
               # in the file, and on SH09 the one it reported sits under

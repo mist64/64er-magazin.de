@@ -2564,7 +2564,13 @@ if acc.exists():
     for line in acc.read_text(encoding="utf-8").splitlines():
         line = line.split("#", 1)[0].strip()
         if line:
-            accepted[line.split()[0].zfill(3)] = line
+            # A LIST PER PAGE, NOT ONE LINE. `accepted[page] = line` silently
+            # dropped a second ruling for the same page, so a revised or
+            # contradictory ruling could sit in the file unread. Same shape as
+            # SH10's override check, where a dict keyed by page let the second
+            # record REPLACE the first and the check went green over a missing
+            # override (r005_a4_window, 2026-11-15).
+            accepted.setdefault(line.split()[0].zfill(3), []).append(line)
 skipped = []
 for f in sorted(os.listdir(R.OUT_MASTER)):
     if not f.endswith(".stamp.txt"):
@@ -2576,7 +2582,10 @@ for f in sorted(os.listdir(R.OUT_MASTER)):
         skipped.append((f[:3], kl, fl))
 for p, kl, fl in skipped:
     print(f"{p}  page-class {kl!r}  |  {fl}",
-          ("<= ACCEPTED: " + accepted[p]) if p in accepted else "<= NOT RULED ON")
+          ("<= ACCEPTED (%d line%s): %s" % (len(accepted[p]),
+                                            "" if len(accepted[p]) == 1 else "s",
+                                            " | ".join(accepted[p]))
+           if p in accepted else "<= NOT RULED ON"))
 print(f"pages delivered without the paper-yellowing field: {len(skipped)}; "
       f"ruled on by the owner: {sum(1 for p, _, _ in skipped if p in accepted)}")
 unruled = [p for p, _, _ in skipped if p not in accepted]
