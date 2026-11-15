@@ -576,6 +576,43 @@ ship with their photographs crushed, consistent with SH8602 and with the rest
 of the archive. So a crushed halftone is a known, accepted cost — report it,
 do not silently fix it.
 
+### AND IT CANNOT SEE A PALE COLOUR HALFTONE EITHER — THE OWNER'S EYE FOUND IT
+
+The classifier (`make_issue_pdf_mixed.sh:204`) decides colour by resizing
+a4600 to **8.333 % (50 dpi)**, blurring `0x1.5`, thresholding chroma at
+**12 % (≈31/255)** and then **eroding** with `Octagon:1`. That pipeline asks
+"does this page carry colour INK", and **a pale four-colour photograph defeats
+it by averaging**.
+
+MEASURED on SH10 p020, 2026-11-15, after the owner said flatly "p20 was ruled
+black and white, but is color":
+
+- the page carries a **colour photograph** — Bild 1 of Formel C, a cartridge, a
+  Centronics plug and an IC socket on ribbon cables, pale blue-grey ground,
+  beige ribbons, a red pin — **356 mm² of chroma ≥ 50 in one component**,
+  bbox x262–2404 y5130–6454 at 600 dpi, about 91 × 56 mm;
+- each halftone DOT is strongly chromatic, so a per-pixel read at 600 dpi sees
+  it at once (0.61 % of a4600 at chroma ≥ 50);
+- averaged to 50 dpi the ground becomes a tint of chroma **20–30**, under the
+  31 cut; the few patches that clear it are removed by the erode. **Result:
+  0.00079, against a 0.002 threshold.**
+
+The build's own preflight (`chroma > 80` at reduced scale) read **0.000 %** and
+was blind for the same reason. **Two independent measures agreed with each
+other and with nothing on the page**, which is what a shared blind spot looks
+like from the inside.
+
+**AND CONTROL'S COUNTER-MEASUREMENT WAS PARTLY BED.** The 0.84 % it reported
+was taken on `sheets600`, which still carries the scanner's yellow border
+(mean RGB 250/238/50, a 20–30 px strip on all four edges) — about 0.15 % of
+the figure, absent from `a4600` and outside the window. **Measure a page class
+on the image that SHIPS**, which is a4600, not on the sheet.
+
+**Lowering the cut is not the obvious fix**: paper tint and CCD fringing sit
+just under it, so a lower threshold trades this blindness for false colour
+pages. The corrected measure is chosen from the DISTRIBUTION across the issue
+at several cuts, not by moving one number.
+
 ### THE COLOUR GATE CANNOT SEE A NEUTRAL SCREEN, AND JBIG2 DELETES IT
 
 A page goes bilevel on its COLOUR fraction. **A grey halftone screen is

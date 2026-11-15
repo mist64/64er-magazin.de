@@ -1,5 +1,17 @@
 # 300 — Apply cross-issue Fehlerteufelchen errata to this issue's articles
 
+> **EVERY FUTURETEUFELCHEN NEEDS THE OWNER'S EXPLICIT OK BEFORE IT SHIPS.**
+> Owner, 2026-11-15, on SH10: *"they ALWAYS need to be OKed by me. record
+> this."* Drafting one is never the last step. The entry goes to him with its
+> TEXT and its GROUNDS — which of the allowed cases it is, and the evidence —
+> and it stays out of the published file until he says yes. SH10 had two
+> written into the HTML on control's rulings alone and had to put them to him
+> afterwards, which is the wrong order: an entry a reader could already have
+> seen is not a proposal.
+>
+> This applies to BOTH allowed cases — our own repair or divergence, and a
+> reprint missing its original's erratum. Neither is self-approving.
+
 **Applies to:** all — **this is a correction to the spec's first pass.** The rule does not build a Fehlerteufelchen rubric — it applies errata printed in LATER monthlies to THIS issue's articles, and later monthlies corrected Sonderheft articles too. 26 articles across `SH8501`-`SH8508` already carry `<aside class="fehlerteufelchen">`, and the rule's own step 1 already routes `Sonderheft N/YY → issues/SH<YY><NN>/`.
 
 **Goal:** the "Fehlerteufelchen" was 64'er's errata column. Corrections
