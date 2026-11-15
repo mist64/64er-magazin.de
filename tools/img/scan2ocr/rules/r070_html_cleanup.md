@@ -151,6 +151,15 @@ flank test is a default and not a verdict:
   is Eliza's reply, and PETSCII has one hyphen and no en dash. This is the
   single remaining line in the fixture diff, and the report names it.
 
+- **ARITHMETIC BETWEEN NAMED OPERANDS, which shape 1 does not cover.** Shape 1
+  asks for a number, a `$` hex address, a closing paren or a BASIC function on
+  both sides. It says nothing about a subtraction written in WORDS, and the
+  pass converts it: SH10 `Endadresse – Anfangsadresse` is a minus sign, and 6
+  such sites were restored by hand. A capitalised German noun naming an address
+  or a length (`Endadresse`, `Anfangsadresse`, `Startadresse`, `Blocklaenge`)
+  on both sides is arithmetic, not a dash. Same for key notation that the OCR
+  broke: SH10's `<CTRL+ - >` is the page's `←`, and 050 escapes the brackets
+  without touching what is inside them.
 - **a lowercase word on BOTH sides** — `word - word` in the middle of a
   sentence. This is the shape a speck read as `-` lands in, and neither suspect
   above can see it: they are asked about **bare numbers** and **quotations**
@@ -187,6 +196,14 @@ different kinds, so no single replacement is right and the script only
 | pure **noise** | `Dollar-‚Zeichen`, `Joystick-‚Modus` |
 | **any other punctuation the OCR has no glyph for** — `;` in a `PRINT` list, PETSCII `←` | `PRINT"FEHLER IN SEKTOR: ‚;TAB(20)ES` → `";` (SH8605 p27), `‚A Anfangszeilennummer` → `←A` (SH8605 p168) |
 
+| **the mark plus the NEXT character are ONE glyph** | SH10 p069 `‚881` is `$81` — a low mark followed by an `8`, together read for `$`. The resolution deletes TWO characters and writes one |
+
+**And that fifth kind arrived on the very next issue, as predicted.** It is
+different in kind from the four above: those replace the mark, this one
+replaces the mark AND the character after it, so a sweep that fixes `‚` in
+place cannot express the answer. Read the `‚` with its neighbour before
+deciding how many characters the site is.
+
 **The table is what has been SEEN, not what can occur.** SH8605 resolved 38
 sites against the page and two were none of the first three kinds — both BASIC
 or monitor punctuation that tesseract has no glyph for at all, so it emitted the
@@ -220,6 +237,32 @@ sites changed and five headlines with them, which renamed five files.
 **It also `git add`s the file it rewrote** (`git add "$1" 2>/dev/null || true`).
 r000 warns that self-staging scripts plus a shared index have swept files into
 the wrong commit three times, and r000's list now names this script too.
+
+### THE STEP IS IDEMPOTENT OVER ITS OWN OUTPUT AND DESTRUCTIVE OVER A HAND FIX
+
+**A re-run undoes every dash restored by hand.** The pass converts a spaced
+hyphen between two words to an en dash; a human who put a MINUS back (shape 1b
+above, SH10's 6 sites) has written exactly the input the pass converts. So
+`r070_html_cleanup.sh` is idempotent over the file IT produced, and
+**destructive over the file a reader corrected** — which is the state the file
+is in for the rest of the build.
+
+MEASURED on SH10, 2026-11-15: 6 restored minus signs, all 6 re-converted on a
+second pass. Its `LOG.md` carries DO NOT RE-RUN 070 for that reason.
+
+**So a hand fix at this step is not finished when the character is right.**
+Either:
+
+- record every site in `issues/<ID>/reviewed/070-hand-fixes.txt`, one
+  `<line> <before> -> <after> <why>` per entry, so a re-run can re-apply them
+  mechanically; or
+- do not re-run the step at all, and say so in `LOG.md` loudly enough that a
+  later operator fixing something else at 190 or 280 does not re-run it as
+  housekeeping.
+
+The first is better, because the second depends on somebody reading a log. And
+note which way the risk points: the step is re-run most often exactly when
+something ELSE has gone wrong, which is when the hand fixes are already there.
 
 **Order matters: fold the curly quotes FIRST, then `''`.** As shipped, `''` → `"`
 ran before the curly folding, so `TEDMON'’s` became `TEDMON''s` and a second run

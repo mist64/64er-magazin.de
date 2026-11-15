@@ -91,7 +91,8 @@ it — and its `.lower()` would have accepted `<P>` and `<I>` as HTML, which is
 exactly the mistake the script refuses to make.
 
 ```bash
-$PY - issues/<YYMM>/<YYMM>.md <<'PYEOF'
+ID=${ISSUE:-$(cat tools/img/scan2ocr/rules/ISSUE.txt)}
+$PY - "issues/$ID/$ID.md" <<'PYEOF'
 import re, sys
 def outside_fences(s):
     """The file's text with every ```-fenced region blanked out.
@@ -190,7 +191,7 @@ does not reach it. Three tags shipped live: `<a>`, `<s>` and `<q>`.
 It was:
 
 ```bash
-grep -nE '&lt;[a-z]+&gt;' issues/<ID>/*.html | grep -E '<(p|s|b|i)>'
+grep -nE '&lt;[a-z]+&gt;' "issues/$ID"/*.html | grep -E '<(p|s|b|i)>'
 ```
 
 Run on the **HTML**, where `<p>` opens every paragraph, so the second grep
@@ -207,7 +208,7 @@ never does**: `<sub>` has `</sub>`, `<a>` as a key has no `</a>`. Rarity is the
 second signal; the 030 handover's real inline tags run to dozens.
 
 ```bash
-$PY - issues/<ID>/<ID>.md <<'PY_END'
+$PY - "issues/$ID/$ID.md" <<'PY_END'
 import re, sys, collections
 VOID = {'br', 'hr', 'img', 'wbr', 'col'}       # never close; not evidence either way
 def outside_fences(s):
