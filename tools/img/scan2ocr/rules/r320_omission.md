@@ -245,6 +245,46 @@ class this rule exists to catch, hidden by its own exclusion.
 no hex address, sentence punctuation) as `PROSE INSIDE A LISTING BLOCK`, even
 though the block itself is excluded from the count. See r020.
 
+## AND A WHOLE PAGE CAN BE CLASSED `listing-standalone` — THEN ITS PROSE NEVER ENTERS THE PIPELINE
+
+The section above is about prose hidden INSIDE a block that reached the `.md`.
+This is one level up and worse: **the page itself is classed
+`listing-standalone` at 020, so 030 leaves it out of the article's range and
+the prose is never imported at all.**
+
+**EVERY CONSERVATION CHECK PASSES, and they are not lying.** MEASURED on SH10,
+2026-11-15: the top half of p116 — the end of one assembler example, an `<h3>`
+"Basic-Erweiterungen", two paragraphs and the start of the next example — never
+reached `SH10.md`, while 030 reported *"Paragraphs 2685, accounted for 2685,
+UNEXPLAINED LOSS 0"*. That number is correct. **You cannot lose what you never
+imported**, so arithmetic over the imported text is structurally incapable of
+seeing this class.
+
+**THE SIGNATURE IS TWO ARTEFACTS DISAGREEING, and it is mechanical and cheap.**
+030's header for article 111 reads `[111-115, 117]` — a GAP at 116 — while 080
+claims 116 for that article in its `64er.pages`. Neither artefact alone shows
+anything; the diff shows it at once.
+
+**Question 5, both parts:**
+
+**(a) Diff 030's header page-ranges against the final `64er.pages` metas, and
+explain every page that appears in one and not the other.** MEASURED on SH10:
+they differ on exactly the **21 pages 080 claimed by its owner-finding method**,
+all of them meta-only and none header-only — 84 `[87-90]`, 93 `[98]`,
+105 `[107]`, 109 `[110]`, 111 `[116, 118, 119]`, 119 `[120]`, 121 `[122]`,
+123 `[125, 126]`, 129 `[130, 131]`, 135 `[137-140]`, 148 `[149, 154, 158]`.
+A meta-only page is EXPECTED — being unclaimed by 030 is why 080 had to claim
+it — so the list is a readout, not a failure.
+
+**(b) For every page 020 classed `listing-standalone`, confirm ON THE PAGE that
+it carries no prose, and where it does, that the prose is in the HTML.** That
+is the half the arithmetic cannot do. On SH10, 21 pages to look at and exactly
+one of them — p116 — had carried prose.
+
+So the two steps compose: **080 finds the page, (a) says its content was never
+imported, (b) says whether that mattered.** Run (a) at 080, not here: it costs
+seconds and it would have caught p116 before the article was built on the gap.
+
 ## A PARAGRAPH THAT ENDS ON A LINE-BREAK HYPHEN IS TEXT LOST AT A COLUMN BREAK
 
 The print hyphenates at the end of every column. When the join fails, the

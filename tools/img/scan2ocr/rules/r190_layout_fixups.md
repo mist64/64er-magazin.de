@@ -505,6 +505,15 @@ correct headings in three other articles, which were restored: 123's seven
 (six menu points plus `Programmbeschreibung:`), 126's seven `Speicherstelle(n)`
 heads, 148's seven subheads.
 
+**AND THE MIRROR CASE CAME BACK THE OTHER WAY ON THE SAME ISSUE.** Set B's
+agent *described* article 84's `Für den C 128-Modus:` as bold run-in and set it
+as `<h3>` anyway; a crop of p085 shows the label standing ALONE with the body
+beginning on the next line, indented — so the `<h3>` was right and the
+DESCRIPTION was wrong. In set C a wrong description produced a wrong fix,
+because control acted on the description; in set B the same kind of wrong
+description produced a right fix, because the agent acted on the page. **Act on
+the page, including when the description is your own.**
+
 **And the same look keeps the genuinely run-in labels as they are:** SH10's
 129 `Eingabehinweise:` and 132's `f` / `x,y` / `w` / `q$` definitions all
 continue on the label's line, so they stay `<p><strong>`. One test, both
