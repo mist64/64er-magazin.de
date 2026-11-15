@@ -215,3 +215,24 @@ re-dispositioned — small, but it is a published issue's record, so do it
 deliberately and per issue. **The wider question is not queued and should be:**
 every 330 record made before this fix rests partly on bag-only pairings, and
 nobody has measured how many of SH8607's 23 pairs or SH8603's 17 are affected.
+
+## 14. 8612/21 carries no reprint note, and SH10 is its ORIGINAL
+
+MEASURED on SH10, 2026-11-15, at step 330 Step 0: article 27 matches
+`8612/21 Schneider-Test` at 0.82–0.95 over three blocks, and **SH10 is the
+earlier print** — it reached the kiosk "Ende September 1986", and 8612/40 cites
+"Sonderheft 10/86" itself. So 8612 reprints SH10, and our corpus has the pair
+the other way round purely because we publish chronologically and shipped 8612
+first.
+
+Step 140 had dismissed it as "not a lead" for exactly that reason: the
+direction was inverted, so the usual test (is the OTHER issue already
+published?) answered the wrong question.
+
+**What is owed:** `8612/21` is published with no reprint note pointing at
+SH10. Whether a reprint note belongs in the LATER-published but EARLIER-printed
+direction is itself a question nobody has answered — the metadata has only ever
+run one way. Decide the convention once, then apply it to this pair.
+
+**Not urgent, and not SH10's work:** the pair was diffed as an OCR cross-check
+with no credit claimed either way, per r330, *THE DIRECTION CAN BE REVERSED*.

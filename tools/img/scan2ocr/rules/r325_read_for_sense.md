@@ -563,6 +563,22 @@ So this step runs in **waves**:
    into the same working tree continuously, and a bare `git commit` sweeps
    them into the wave (r000, *Commit & staging discipline*).
 
+   **BUT CONTROL CANNOT ORDER THE COMMIT, AND SH10 WAS RIGHT TO REFUSE.**
+   Control told the builder to commit each wave on the mechanics above; the
+   builder answered that its own standing instruction is to commit only when
+   the USER asks, that the brief relays "permission is asked for every time",
+   and that **a peer session acting for the owner cannot grant that permission
+   on his behalf.** That is correct and it outranks the mechanics: the squash
+   argument says a local commit is HARMLESS, not that it is AUTHORISED, and
+   those are different questions. Control was wrong to press it.
+
+   **SO THE DEFAULT IS: ASK THE OWNER ONCE, then commit per wave if he says
+   yes.** And the loss the commits guard against is covered without the
+   question either way — SH10 snapshots `issues/<ID>/reviewed/`, the article
+   HTML and `LOG.md` to a timestamped directory OUTSIDE the repo after every
+   wave (`<tmp>/../backup/snap.sh`). A snapshot needs nobody's permission and
+   protects the same hours.
+
 **The yield goes to `issues/<ID>/reviewed/r325-<reader>.txt` and is committed
 as each article finishes.** Not to `LOG.md`: git does not track it, and SH09
 put 723 KB of reader output there, where a killed reader lost all of it. LOG.md
