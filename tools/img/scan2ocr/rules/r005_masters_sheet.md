@@ -789,6 +789,39 @@ instead of on its type.** `measure_skew` thresholds ink at
 small sheet most of that array is near-black bed, so the threshold lands inside
 the bed and the projection score is scoring a rectangle, not baselines.
 
+### A REPAIR THAT WIDENS A KEEP MASK IS TESTED ON THE PIXELS IT WOULD NEWLY KEEP — BEFORE IT RUNS
+
+Every repair here widens `keep` to stop the step erasing print, and the risk
+runs the other way: p023's hand box restored a photograph AND admitted the bed,
+needing a second repair the same evening for 125,512 px of gutter, fore-edge
+and foot. So the question "does this box admit bed" has an answer BEFORE the
+box is applied, and asking it then costs one pass over pixels that already
+exist.
+
+MEASURED on SH10 p002, 2026-11-15, over the exact 1,445,603 px that
+`regrade_002.py` would newly keep — the box's top 400 rows and left 150
+columns, where the pre-fix master is fabricated white:
+
+| what the sheet holds there | px | reading |
+|---|---|---|
+| white (lum 255) | 923,145 | white for white, no change |
+| dark (lum 11) | 404,275 | **B−R +1.0, blue-cast frac 0.008** |
+| mid-tone (lum 119) | 118,183 | B−R −139 — the red print |
+
+**The control is the same statistic on print the step already keeps**: rows
+400–1200 give a blue-cast fraction of **0.008**, identical to the new pixels.
+Bed carries the torn fringe's blue cast (B−R ≥ 12 on 85 % of strip mid-tones);
+these pixels do not. **No bed is admitted.**
+
+Two profiles finished it: the TOP is a 4 px (0.17 mm) light line at rows 0–3 —
+the trimmed paper edge — with print from row 5 (lum 32, B−R −30), and
+**r005b's window starts at y = 9, so rows 0–8 never ship anyway**; the LEFT is
+print to the scan's edge with no bed column at all.
+
+**Test before, not after.** Control asked for this check AFTER the regrade; the
+builder ran it BEFORE, which is the same work and prevents the defect instead
+of detecting it.
+
 ### TWO PRINTED STRAIGHTS THAT AGREE ARE A SCAN ROTATION; TWO GROUPS THAT DISAGREE ARE THE PASTE-UP
 
 The measurement that decides whether to level a page is not one angle, it is
