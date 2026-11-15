@@ -197,6 +197,17 @@ the page read: diagram, caption, then an orphan sentence, then the next
 heading. The caption is the last thing in the box on the page and must be the
 last thing in the element.
 
+**THE TEST IS WHAT THE TEXT DOES, NOT WHERE THE PRINTER PUT THE RULE.** p101's
+"Verdrahtungsschema der Centronics-Schnittstelle am Userport (Stecker für
+Userport: TRW 251-12-50-170; …)" names the connectors and the cable that the
+diagram above it shows, and is unreadable away from it: it is part of the
+figure. A prose box that merely shares a frame and reads perfectly well on its
+own is an `<aside>`, wherever the rule is printed — SH10's `13` Bild 2 and
+Bild 5 were both ruled that way (LOG 252, LOG 275) and **those rulings stand**.
+Control wrote this rule from p101 without scoping it, and for a few hours it
+contradicted them. Ask what the sentence is for before you ask which side of a
+rule it was printed on.
+
 **AND A FIGURE SITS WHERE IT PRINTS, NOT WHERE IT IS FIRST NAMED.** The same
 figure was placed directly after the paragraph ending "...koennen Sie Bild 2
 entnehmen.". In the plate that paragraph is followed by the `Anpassung` head
