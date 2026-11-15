@@ -547,6 +547,19 @@ Shape rules:
   *Kuriositätenecke* box above it. If an aside contains a second
   `<address class="author">`, suspect a merged neighbour.
 
+## A PARAGRAPH JOIN CAN WRITE A CONTROL BYTE — SCAN AFTER EVERY ONE
+
+Joining two OCR'd paragraphs concatenates whatever the OCR left between them,
+and on SH10 that included a **NUL**: article 28's
+`»PRINT CHR$(Code)x«\0ausgegeben`, written by set A's join. It is invisible in
+every editor and it made BSD `grep` treat the whole file as binary, so 210's
+count came back 25 of 27 and looked like a missed article.
+
+**So scan for control bytes after a join, not at the end of the build** — the
+command is in r000, *ONE STRAY CONTROL BYTE DROPS A FILE OUT OF EVERY COUNT*.
+This step is where they are created, so this step is the cheapest place to find
+them.
+
 ## BODY-FACE EXAMPLE LINES ARE NEITHER LISTING NOR PROSE
 
 Article 28 of SH10 carries **hundreds of example and monitor lines set in the

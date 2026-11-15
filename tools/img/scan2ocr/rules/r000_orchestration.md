@@ -1634,6 +1634,40 @@ overstepping.) A sub-agent that renders/crops for its own OCR must
 delete or /tmp-scope those files; the issue dir holds only shippable
 content.
 
+## Cross-cutting rule: ONE STRAY CONTROL BYTE DROPS A FILE OUT OF EVERY COUNT
+
+**BSD `grep` treats a file containing a NUL as BINARY and prints
+`Binary file ... matches` instead of counting it** — so the file silently
+leaves every grep-based tally in this chain, and a tally is how almost every
+check here works.
+
+MEASURED on SH10, 2026-11-15: a paragraph join at 190 wrote a NUL into article
+28's working copy (`»PRINT CHR$(Code)x«\0ausgegeben`), and 210's check 1 then
+read **25 of 27** head1 values instead of 26. **A shortfall that looks exactly
+like a missed article** — the one shape an operator is trained to chase — with
+nothing wrong at 210 at all. The builder found it, replaced the byte with a
+space, and scanned all 27 files: that was the only one.
+
+**Two requirements, because they do different jobs:**
+
+1. **`grep -a` in every check that counts**, so a stray byte cannot change a
+   number. Without it the number is wrong and looks plausible.
+2. **An explicit control-byte scan at every boundary from 190 on**, because
+   `-a` makes the count right and HIDES the byte. The byte itself is a defect:
+   it is in the published HTML, and no reader's browser should meet it.
+
+```sh
+for f in "issues/$ID"/*.html; do
+  n=$(LC_ALL=C tr -d '\11\12\15\40-\176\200-\377' < "$f" | wc -c | tr -d ' ')
+  [ "$n" != "0" ] && echo "  $n control byte(s) in $(basename "$f")"
+done
+```
+
+VERIFIED 2026-11-15 after the repair: SH10's 27 files clean, plain `grep`
+counting all 27, and **no control byte in any of the 1400+ published files** in
+the corpus — so this has not happened before, and the scan is cheap insurance
+rather than a known recurring fault.
+
 ## Cross-cutting rule: NEVER ADDRESS AN ARTICLE BY ITS FILENAME
 
 An article's filename is DERIVED from its printed headline, so it changes with
