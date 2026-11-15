@@ -789,6 +789,60 @@ instead of on its type.** `measure_skew` thresholds ink at
 small sheet most of that array is near-black bed, so the threshold lands inside
 the bed and the projection score is scoring a rectangle, not baselines.
 
+### THE BED IS BEHIND THE PAGE, SO IT CANNOT BE DETECTED INSIDE THE EDGE
+
+OWNER, 2026-11-15: *"why does the bed correction bleed so far into the page,
+EVER? the bed is behind the page, and the page has straight edges. we can
+detect the bed on the other side of the edge only."*
+
+He is right, and the code disagreed with him. `t.keep` is built geometrically
+and correctly — per-row traced left/right, per-column top/bottom, the page as a
+quadrilateral. Then the block that follows, "drop the bed that a line fit
+cannot clear", labels every bed-coloured component touching the scan frame and,
+where **more than half of a component lies outside the traced page**, deletes
+**the whole component** — every pixel of it, at any depth inside the page.
+There was no depth cap anywhere in the file.
+
+MEASURED, SH10 p031: the M&T book ad's grey-blue tint panel (L 61, B−R 6.5) is
+within a hair of the bed's own signature, runs to the fore edge and connects
+through it to the bed outside. The bed beyond that edge over the full height
+outweighs the panel, so the component was doomed and 1359.5 mm² of the panel
+died **30.7 mm inside the page**, destroying the reversed text printed on it.
+
+**The vote was never the right instrument.** It had been added after a real
+near-miss — p006's board photo connects to the bed through its own black chips,
+and an unconstrained flood erased a third of it — so the reach into the page
+was already known, and was bounded by *how big the blob is* rather than by
+*how far it goes*. A vote turns on how much bed happens to lie beyond the edge,
+which says nothing about whether the pixels inside are print.
+
+`BED_REACH_MM = 5.0`: a doomed component may delete pixels only within 5 mm of
+the traced line. **The value is measured.** Over all 168 SH10 pages and 1,493
+lost regions, the deepest genuine bed inside the page box is 3.4 mm (p147),
+then 3.1 (151), 2.7 (143), 2.6 (145), 2.5 (149/088/001) — and that depth is
+taken from the axis-aligned box, which lies at or outside the traced line, so
+true depth past the line is no greater. The losses the cap exists for sit at
+7.5 mm (p167) and 30.7 mm (p031). 5 mm separates them with 1.6 mm below and
+2.5 mm above.
+
+Tested four ways on a synthetic sheet at 031's real geometry (73 % of the
+component outside, so genuinely doomed): the deep interior survives whole
+(127,900/127,900 px), the near-edge band is still dropped whole
+(31,941/31,941), a pure bed sliver poking 2 mm past the line still goes whole
+(10,568/10,568), and the old code loses 159,841 px of page where the new code
+loses 31,941. **The first run of that test was a false PASS** — the toy sheet
+had too little bed outside the edge for the component to be doomed at all, so
+nothing exercised the cap. A test that cannot reach the branch it is testing
+reports PASS.
+
+**AND THIS DOES NOT FIX A WRONG TRACE.** SH10 p002's white top band is not a
+component at all: measured per 500 px column it is 0, 203, 174, 149, 123, 97,
+71, 46, 20, 0 px deep — a straight line falling 25.8 px per 500, i.e. −2.95°.
+That is the fitted top line itself, taken off an ink/bed edge where print runs
+to the scan edge, and no cap on the bed drop touches it. Two different defects
+with one symptom; the one that yields to a depth cap is the one whose lost
+region is ragged, not linear.
+
 ### A REPAIR THAT WIDENS A KEEP MASK IS TESTED ON THE PIXELS IT WOULD NEWLY KEEP — BEFORE IT RUNS
 
 Every repair here widens `keep` to stop the step erasing print, and the risk

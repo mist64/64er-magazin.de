@@ -156,10 +156,18 @@ gets in.
 
 ### AND CORRECTING THE PLATE IS THE SAME ERROR WITH THE SIGN FLIPPED
 
-In the same figure, on the same night, repairing the fabrication introduced its
-mirror image. The plate's third row reads **`DO`** — a letter O — in a column
-that then runs `D1` through `D7`. The magazine set the wrong glyph. The reset
-drawing silently corrected it to `D0`, and the markup it replaced had it right.
+In the same figure, the plate's third row reads **`DO`** — a letter O — in a
+column that then runs `D1` through `D7`. The magazine set the wrong glyph. The
+published markup reads `D0`. We corrected the plate.
+
+**AND CONTROL GOT THE ATTRIBUTION WRONG, which is worth more than the glyph.**
+Control told the owner the repair had introduced it and that "the markup it
+replaced had it right" — without opening the pre-fix markup. The builder did
+open it: `r101_before.html:63` already read `D0`. The correction entered at the
+ORIGINAL table fill, in the very same pass that wrote the invented row, and the
+repair merely carried it forward. **A claim about which step introduced a
+defect is a measurement, not an inference**, and the file that would settle it
+was two commands away.
 
 MEASURED, not eyeballed: on that same line the `0` of the Centronics pin `10`
 is a narrow oval and the `O` after the `D` is a wide full circle — different

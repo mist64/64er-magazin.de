@@ -365,6 +365,23 @@ BED_LUM = 70                                  # 0-255; the scanner bed.  The pro
 # component only goes if MOST OF IT LIES OUTSIDE the traced page.  A bed sliver
 # is ~all outside; a photo is ~all inside.
 BED_OUTSIDE_FRAC = 0.5
+# ...and that vote is STILL the wrong instrument on its own, because it turns on
+# how much bed happens to lie beyond the edge, which says nothing about whether
+# the pixels inside are print.  OWNER, 2026-11-15: "why does the bed correction
+# bleed so far into the page, EVER? the bed is behind the page, and the page has
+# straight edges. we can detect the bed on the other side of the edge only."
+# He is right.  The bed is BEHIND the paper, so inside the traced line it cannot
+# be seen at all; the only reason to drop anything there is that a straight line
+# fit cannot follow a torn edge, and that error is a millimetre or two.  So a
+# doomed component may delete pixels only within BED_REACH_MM of the traced
+# line.  Deeper than that the pixels are page, whatever the vote said.
+# MEASURED on SH10, 2026-11-15, over all 168 pages and 1,493 lost regions: the
+# deepest genuine bed inside the page box is 3.4 mm (p147), then 3.1 (151), 2.7
+# (143), 2.6 (145), 2.5 (149/088/001) -- and the depth is measured from the
+# axis-aligned box, which lies at or outside the traced line, so true depth past
+# the line is no greater.  The losses this cap is for sit at 7.5 mm (p167) and
+# 30.7 mm (p031).  5 mm separates them with 1.6 mm below and 2.5 mm above.
+BED_REACH_MM = 5.0
 
 # --- the page, and the canvas it is placed on ------------------------------
 # The traced page must come out one of the sizes THIS ISSUE ACTUALLY HAS.  A
@@ -2000,7 +2017,16 @@ def level_and_trace(page):
         outside = ND.sum(~t.keep, lab, labels)
         doomed = labels[(outside / np.maximum(total, 1)) > BED_OUTSIDE_FRAC]
         if len(doomed):
-            t.keep &= ~np.isin(lab, doomed)
+            # ...but only as far as BED_REACH_MM past the traced line.  `near`
+            # is true outside the page too (the distance goes negative there),
+            # so a bed sliver still goes whole; only the deep interior of a
+            # component that merely TOUCHES the bed is protected.
+            reach = BED_REACH_MM * MM
+            near = (xs[None, :] - t.xl[:, None]) <= reach
+            near |= (t.xr[:, None] - xs[None, :]) <= reach
+            near |= (ys[:, None] - t.yt[None, :]) <= reach
+            near |= (t.yb[None, :] - ys[:, None]) <= reach
+            t.keep &= ~(np.isin(lab, doomed) & near)
             t.dropped = len(doomed)
     return t
 
