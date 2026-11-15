@@ -129,8 +129,47 @@ spanning row so it reads as magazine text. **We publish the plate, not our own
 knowledge**, and a true sentence we wrote is still a sentence we wrote. The
 repair is to delete it, never to improve it.
 
-So: **when a figure needs a drawn line to be read, crop it.** A grid is cells
-whose position is the only thing the ruling says. Everything else is rule 150's.
+So: **when a figure needs a drawn line to be read, do not set it as a grid.**
+A grid is cells whose position is the only thing the ruling says.
+
+**THE REPAIR IS A DRAWING, NOT NECESSARILY A CROP.** Control's first
+instruction was to crop p101's Bild 2, and **the builder refused it and was
+right**: the owner had already ruled TYPESET ALL TEN on that worklist, and a
+crop we cut ourselves reverses his ruling on that figure. The figure was reset
+as the drawing — box-drawing characters in `<pre><code>`, the rules running
+letter to signal to pin, the bracket kept as drawn and `12 ── N` dangling with
+no rule and no pin. That carries what the table could not and leaves his ruling
+intact. Box-drawing characters have precedent in exactly three published
+articles — 8701/170, SH8603/60, SH8607/6 — two of which use `<pre><code>`.
+Crop only where no drawing can carry it, or where the owner has delivered one.
+
+**AND THE INVENTION ENTERS AT WORKLIST TIME.** p101's fabricated row was not
+improvised by the typesetting step. It was specified in the worklist line that
+step was given — *"101-2 as a 3-column table with an explicit GND-tie row
+(Userport 1 & A, 12 & N -> Centronics 16, joined to 33 and 19..30)"* — so
+r160b executed the plan faithfully and never had the chance to catch it. **A
+worklist line is written away from the plate**, which is exactly where a
+sentence that explains the figure can be mistaken for a sentence that is in it.
+So sweep the worklist too, not only the finished markup: a line that DESCRIBES
+an element in prose, rather than naming what is drawn, is where the invention
+gets in.
+
+### AND CORRECTING THE PLATE IS THE SAME ERROR WITH THE SIGN FLIPPED
+
+In the same figure, on the same night, repairing the fabrication introduced its
+mirror image. The plate's third row reads **`DO`** — a letter O — in a column
+that then runs `D1` through `D7`. The magazine set the wrong glyph. The reset
+drawing silently corrected it to `D0`, and the markup it replaced had it right.
+
+MEASURED, not eyeballed: on that same line the `0` of the Centronics pin `10`
+is a narrow oval and the `O` after the `D` is a wide full circle — different
+glyphs in the same face at the same size. **Print errors are left as printed**,
+and this is not a reprint missing its original's erratum, so it gets no
+Futureteufelchen either.
+
+Invention and correction look like opposite failures and are one failure:
+**substituting what we know for what is on the plate.** A step that has just
+been told to stop adding is exactly the step about to start tidying.
 
 **THE SIGNATURE TO SWEEP FOR** is a prose sentence set as a spanning cell. It
 is nearly always ours, because printed tables span a cell to carry a section
