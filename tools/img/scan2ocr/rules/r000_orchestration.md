@@ -266,6 +266,29 @@ printed type at 3x (pen is grey, uneven, and sits off the type's baseline), and
 say in the report which it was. Every reader of this issue's scan should be
 told to look for it.
 
+### AND NOT OUR OWN KNOWLEDGE OF THE SUBJECT, EITHER
+
+The plate rule is usually read as being about MARKS — dirt, a previous reader's
+pen, a damaged letter. It is also about what we KNOW and the magazine did not
+say.
+
+MEASURED on SH10, 2026-11-15. Typesetting article 126's `PIN-Belegung` wiring
+diagram as a table, the builder found that the print draws Userport 1 and A
+tied to ground (Centronics 16, 33, bracket 19–30) and draws 12 and N as a
+JOINED PAIR WITH NO LINE to ground or to the printer. **On the real hardware
+12 and N are ground too.** The table says only what is drawn, and that is
+correct: we are republishing a 1986 wiring diagram, not correcting one.
+
+**So do not supply what the page omits, even when you are right.** No extra
+ground row, and no German comment explaining the hardware either — a reader
+comparing our table with their copy of the magazine must find the same thing.
+The Futureteufelchen exists for OUR divergences, not for our expertise.
+
+**The line this does NOT cross:** identifying a GLYPH is reading, not
+improving. The same figure prints `DO` for the data line `D0`, and setting it
+as `D0` is the 0/O substitution r280 already prescribes — the magazine's
+intent is not in question there, only the shape of the character.
+
 ### WHAT WE PUBLISH IS THE ORIGINAL PRINTING PLATE, NOT THIS COPY
 
 Owner, 2026-10-08: ***"we always want the original printing plate info, no notes
