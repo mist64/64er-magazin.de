@@ -105,8 +105,8 @@ Two stronger witnesses, both free:
    interior colour.** MEASURED on SH8608: 002 157, 165 136, 166 134 (wrapper and
    card), then 164 99, 034 95, 025 94, 021 92, **163 87**, 010 80, 004 77,
    015 77, 001 57 — the back cover leaf 163/164 lands INSIDE the 2400 dpi
-   interior band. No contradiction arose because the owner had answered PAUSE 1,
-   but this witness would not have found it. Where a leaf sits in that band,
+   interior band. No contradiction arose because the binding was already
+   settled, but this witness would not have found it. Where a leaf sits in that band,
    only the owner's answer places it on the good stock.
 2. **The scan resolution marks COLOUR, not stock.** The owner scans COLOUR
    pages at 2400 dpi and everything else at 600 (owner, 2026-10-06: *"several
@@ -144,10 +144,10 @@ Two stronger witnesses, both free:
    for colour and for markings over EVERY page, independent of dpi; read dpi
    only as "the owner saw something here".
 
-   **BEFORE PAUSE 1 THAT CENSUS RUNS ON THE THUMBS.** This used to say "r006
-   has the measure" and stop, but r006's measure opens `masters600` and no
-   master exists yet — the census is wanted before PAUSE 1, because a marking
-   goes to the owner with the PAUSE 1 evidence. On the 150 dpi thumbs, cropped
+   **THAT CENSUS RUNS ON THE THUMBS, BEFORE ANY MASTER EXISTS.** This used to
+   say "r006 has the measure" and stop, but r006's measure opens `masters600`
+   and no master exists yet — the census is wanted this early because a marking
+   goes to the owner with the binding and paper evidence. On the 150 dpi thumbs, cropped
    3-93 % x 4-96 % to stay off the bed and the prop: the fraction of pixels
    with chroma `max-min > 80`, then an OVERLAY montage of every page above
    0.015 %, attributing each hit PLATE / HAND / FOXING by eye. **A number
@@ -212,8 +212,8 @@ behaviour the code does not have reads as a missing step rather than an error.
 
 Pre-fill from the UNION of the own-white gap and the edge-finder set, print
 the dpi beside each, and say which witness produced each page. A page named by
-only the edge finder is a candidate to check, not an answer. The owner confirms
-it against the physical copy at PAUSE 1 regardless.
+only the edge finder is a candidate to check, not an answer. The derivation is
+recorded with its evidence regardless (*BINDING IS DERIVED FROM THE SCAN*).
 
 The step pre-fills `high_pages` with what the edge-finder evidence points at and
 says, in the output, that it is a guess to be checked against the copy. **That
@@ -221,7 +221,7 @@ pre-fill is the one-sided witness the paragraph above tells you not to trust**,
 so read it as one of the three and not as the procedure — this sentence used to
 sit here reading like the step's answer.
 
-**MEASURE `colors.txt` BEFORE PAUSE 1, not after.** The own-white gap is the
+**MEASURE `colors.txt` BEFORE `r005_field.py` RUNS, not after.** The own-white gap is the
 strongest of the three witnesses, and the figures the step prints come from
 `ask_text()`, which needs `PAPER_RGB` / `LOW_GRADE` — i.e. a measured low
 profile. A fresh issue has none, so without this the gap is computed against
@@ -232,9 +232,9 @@ interior first, then put the three witnesses to the owner together.
 **BUT TAKE THAT RECIPE'S IMPORT FROM THIS VARIANT, NOT THAT ONE — AS WRITTEN IT
 IS CIRCULAR.** It opens `import r005_masters_spread as R`, and that module
 REFUSES TO LOAD while `binding` is absent (*"SH8608 has binding=None, not
-'spread'"*), while `binding` is exactly what PAUSE 1 is for. So the rule ordered
-a measurement before PAUSE 1 through a recipe that cannot run before PAUSE 1,
-and SH8608 had to write its own script. The recipe needs only `R.ISS` and
+'spread'"*), while `binding` is exactly what the derivation settles. So the rule
+ordered a measurement before the binding was written through a recipe that
+cannot run before it is, and SH8608 had to write its own script. The recipe needs only `R.ISS` and
 `R.THUMB_DIR`, and **`r005_masters_sheet` imports fine with `binding` absent**,
 so use this module:
 
@@ -243,7 +243,7 @@ import r005_masters_sheet as R          # NOT _spread: that one refuses
 ```
 
 and skip the owner's `high_pages` in the pool. Verified on SH8608 before its
-PAUSE 1 was answered: 124.8 M interior paper px, `p2 = [188 169 158]`, which is
+binding was written: 124.8 M interior paper px, `p2 = [188 169 158]`, which is
 the profile the builder had measured with its own script — same number, by a
 recipe the rule can now actually hand over.
 
@@ -345,7 +345,7 @@ trace to 209.2 × 296.9 mm (p050). Derive that issue's thumbs at
 ```bash
 cd tools/img/scan2ocr/rules
 PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare "$PY"
-$PY r005_field.py                    # ONCE, first after PAUSE 1
+$PY r005_field.py                    # ONCE, first after binding is written
 $PY r005_masters_sheet.py 6 41 56 92 # named pages
 
 # EVERY PAGE -- AND FAN IT OUT, because the program has no pool of its own.
@@ -370,10 +370,10 @@ appear in three fences here with no definition in any of them, so two of them
 ran `- <<'PY'` as a command and the Verification block ran on the system python
 (SH8605).
 
-**`r005_field.py` runs first after PAUSE 1, once per issue** — FIRST of the
+**`r005_field.py` runs first after the binding is written, once per issue** — FIRST of the
 005 programs, not first of the step: it ends in `R.first_action()`, which
-refuses an issue whose `binding` is not yet `sheet`, so it cannot run until
-PAUSE 1 has answered (SH8608). It measures the
+refuses an issue whose `binding` is not yet `sheet`, so it cannot run until the
+derivation has written one (SH8608). It measures the
 paper-yellowing field for each paper class — about 0.6 s a page on 28 lanes for
 a 600 dpi issue, 119 s for SH8605's 192 interior pages. It writes
 `field_<class>.txt` beside that class's `colors.txt` and nothing else. Run it
@@ -440,7 +440,7 @@ issues/<ID>/field_high.txt       ...beside that class's colors.txt  (r005_field.
 
 ## HAND THE OWNER THEIR TWO FILES NOW — and do not stop
 
-Two of PAUSE 2's deliverables are finished the moment this step is, and both
+Two of the three owner inputs are ready the moment this step is, and both
 are work the owner does **by hand**. Owner, 2026-10-05: **as soon as either is
 available, tell me and `open` it — and do not stop.** See r000, *An OWNER
 DELIVERABLE is handed over the MOMENT it exists*.
@@ -648,8 +648,95 @@ that nobody later reads a clean margin as evidence about the copy.
 - **A bed flood must not eat a photo.** p006's board picture bleeds into the
   torn edge and connects to the bed through its own black chips; an
   unconstrained connectivity pass erased a third of it. A component is dropped
-  only if **most of it lies outside** the traced page (`BED_OUTSIDE_FRAC`). A
-  bed sliver is ~all outside; a photo is ~all inside.
+  only if **most of it lies outside** the traced page (`BED_OUTSIDE_FRAC`).
+  **This paragraph used to end "A bed sliver is ~all outside; a photo is ~all
+  inside." That is the assumption, and SH09 broke it — see the next section.**
+  The fraction is per COMPONENT, so it is not a statement about the photo at
+  all: it is a race between the photo and whatever it touches.
+
+### AND ON SH09 THE BED WON THE RACE — THE DROP TOOK 2.79 % OF A PAGE
+
+**A page-turn photograph is printed hard to the edge ON PURPOSE**, because it
+continues on the facing page. So the one case the guard cannot survive is also
+a case every magazine contains.
+
+MEASURED on SH09 p030. The 1541's near-black chassis runs off the gutter, meets
+the bed beyond the fold, and the two are **one component**. The bed half is the
+larger, `outside/total > 0.5` holds, and `t.keep &= ~np.isin(lab, doomed)`
+removes the whole of it — including **1716.5 mm² lying deep inside the traced
+page**, which `process()` then writes as pure 255. The drive became a white
+silhouette in `masters600`, in `a4600` and in the delivered PDF. `sheets600`,
+written before the mask is applied, still holds it, which is why the owner's
+crops are correct and the PDF was not, and why this surfaced as *"the PDF is
+lighter than the master"* rather than as anything resembling its cause.
+
+Two more in the same issue, and the second is the other half of the bug:
+
+| page | removed inside | branch | what was lost |
+|---|---|---|---|
+| p030 | 1716.5 mm² | dark | the lead photo's chassis |
+| p167 | 186.2 mm² | dark | an ad's olive ground, bleeding off the foot |
+| p168 | 15.5 mm² | **prop** | yellow PRINT at the right bleed, read as the yellow prop |
+
+**So `prop_mask` has the same hole as `lum < BED_LUM`.** Print that bleeds off
+an edge can match what lies beyond it by colour just as easily as by darkness,
+and `bedlike` is the union of both tests.
+
+**And p031 was never safe either — it was lucky twice.** The drop would have
+taken 2947.7 mm² from inside its box, 2552 of it the other half of that same
+photograph. Before its yellowing repair the trace had failed and the whole
+sheet was published, so the drop's result was discarded; after it,
+`regrade_031.py` replaces `keep` with the hand box AFTER the drop runs, so it
+is discarded again. **A correct page that is correct by accident will stop
+being correct the first time somebody tidies the accident**, so say so beside
+the override, not only here.
+
+**THE FIX HAS TWO HALVES, AND THE SECOND IS NOT OPTIONAL.**
+
+**Limit the drop's REACH, do not loosen its test.** The removal is legitimate
+outside the traced page and in the fringe just inside the trim; it is never
+legitimate deep in the page. Drop a doomed component's pixels that lie outside
+`keep` or within a measured margin of it, and leave the rest. MEASURED on SH09,
+and there is clean air between the two populations: every correct removal
+inside the box is **≤ 12.6 mm²** and sits at the trim (p130 12.6, p001 14.1 at
+the foot edge, p125 11.1, p017 8.0, p132 4.5, everything else under 2.5), while
+the three defects are **15.5, 186.2 and 1716.5 mm²** reaching inward. **Choose
+the predicate on DISTANCE from the traced box, not on area** — area is the
+symptom and distance is the cause.
+
+**MEASURED, and the number is `DEPTH_MAX_MM = 10`.** Over all 49 dropped
+components that reach inside the line box anywhere in SH09: the deepest
+legitimate one is p017's bed notch at the foot, **4.45 mm** (then p092 1.82,
+p001 1.48, p132 1.48, p130 1.27, p125 0.51, the rest under 0.8), while the
+defects reach **23.66 mm** (p167), **48.68 mm** (p030) and **64.5 mm** (p031,
+latent). Ten sits in that gap with about 2.2× of margin either side.
+
+**The test is PER COMPONENT, not per pixel.** A per-pixel depth cap would still
+eat the outer 10 mm of a photograph that bleeds — p167's inside part has a
+*median* depth of 5.3 mm. So: a doomed component whose inside part reaches more
+than `DEPTH_MAX_MM` from the line box is **spared whole**; everything else about
+the drop is unchanged, and the trim bed still goes.
+
+**Area alone would not have worked**, which is why this paragraph once proposed
+it: p168's prop bite is 15.3 mm² against a largest legitimate 13.8 mm² — a
+margin of 1.5 mm², against a factor of five for depth on the dark branch.
+
+**AND THE PROP BRANCH IS NOT SOLVED.** p168's bite is only 3.64 mm deep and is
+not separable by depth from p017's 4.45 mm of real bed. No predicate defensible
+on this data catches it without risking legitimate bed, and SH09 offers just two
+prop samples (p018 0.34 mm legitimate, p168 3.64 mm defect) — too few to set a
+number. It did not matter there only because the bite sits at master x 5158–5244
+while the delivered window ends at 4961, so it never reached a published pixel.
+**That is a window away from mattering**: record it as open, and if the prop
+branch is ever to be fixed it wants a test on saturation shape, not on depth.
+
+**And the step must SAY what it removed.** p030's stamp records nothing: 2.79 %
+of the page was deleted in silence, and nothing downstream looks for a
+pure-255 patch inside a picture — not the mixed PDF build, not the marks
+census, which both read the damaged file and passed it. `t.dropped` counts
+components and is not written out at all. The stamp must carry the area removed
+INSIDE the traced box, per branch, and Verification must refuse past the
+margin. See check 4b.
 
 ### Accepted loss, decided explicitly
 
@@ -665,6 +752,111 @@ is gone. Re-measured after the profile was re-measured, over a 6 mm band inside
 each traced edge: p092 reads 0.55 % at the top and 0.25 % at the foot, p041
 1.0 % at the top, and every run of it sits **inside** the trim, on the printed
 section banner and the footer rule. No bed, no prop — see Verification step 4.
+
+### KNOWN DEFECT, OPEN — THE SKEW MASK MUST EXCLUDE THE BED
+
+**A sheet much smaller than the scan frame is levelled on the bed's outline
+instead of on its type.** `measure_skew` thresholds ink at
+`mean - 0.4·std` over `SKEW_CROP`, which is the whole array it is handed; on a
+small sheet most of that array is near-black bed, so the threshold lands inside
+the bed and the projection score is scoring a rectangle, not baselines.
+
+MEASURED, SH09, the bound-in Zahlkarte at p163–166 — a card filling about half
+the frame. On the p164 thumb the ink threshold is 81.7, covering 49.5 % of the
+crop, and 99.9 % of that ink is below lum 40. The result, read on the page box:
+
+| page | the step's own line | the card, measured on its page box |
+|---|---|---|
+| p163 | `+0.54 -> -0.02` | **−0.48** — near 0 before the step, rotated off true BY the step |
+| p164 | `-0.02 -> -0.02` | **+0.54** — measured blind, left alone, carries its own tilt |
+| p165 | `+0.58 -> -0.02` | **−0.48** — as p163 |
+| p166 | `-0.10 -> -0.10` | **+0.34** — as p164 |
+
+**So the step both misses a tilt and introduces one, on neighbouring pages of
+one physical card.** Where the bed's outline happens to read level the card's
+own skew survives unmeasured; where it reads tilted the step rotates the card by
+that amount. Four pages 0.3–0.6 deg out for two opposite reasons.
+
+**Why it has not been fixed here:** the correction belongs in the step's mask —
+build the ink mask inside the traced page, or inside the paper mask, rather than
+over the whole frame — and that changes the geometry of every page of every
+`sheet` issue. It was found with SH09's 005 already final and 010 run. Changing
+it under a live build would mean a re-run of 005 could not reproduce the masters
+beside it. **Do it before the next `sheet` binding starts, not during one.**
+
+**What the delivered pages were judged on, and it is not the residual figure.**
+0.3–0.6 deg sits inside this issue's 0.1–0.7 spread, but that spread is a
+description of pages levelled on their own type and says nothing about a page
+levelled on a bed. The test that matters for a reader is **whether the print is
+parallel to the page's own trim**: a card rotated with its traced edges reads
+straight, and absolute tilt against the canvas is invisible. Confirm parallelism
+on every affected page before accepting one — on SH09 that was confirmed on
+p163 and p164.
+
+**Published pages are not re-made for this** (*published PDFs are not re-made*).
+A `sheet` issue already out carries whatever its bed read.
+
+**A PAGE WHOSE SKEW MEASUREMENT FAILS IS STILL LEVELLED ON ITS TYPE.** The
+fallback is a hand override, not an unlevelled page. Leaving it is tempting
+under a code freeze and it is wrong: the convention of this step is *level on
+the type and let the trim fall where it falls* (*What the paper actually is* —
+edge tilt after levelling runs 0.14–1.12 deg on this issue), so a page left
+unlevelled is the only page in the issue not following it, created by a defect.
+SH09's four card pages were corrected as a `reviewed/` override in the p031
+shape, which leaves 005 frozen. Requirements, in order of what gets forgotten:
+
+- take the angle from the orientation whose peakiness clears `SKEW_PEAK_MIN`,
+  and **record which orientation it came from** — on the SH09 cards it was
+  rot90 for p163/p165 and horizontal for p164/p166;
+- **rotate the page in `a4600` AND in `masters600`.** Fixing one leaves the PDF
+  image and the page image half a degree apart;
+- **re-run 010 for those pages.** Blocks derived before the rotation are stale,
+  and a text layer left at the old geometry misregisters by ~1.8 mm at the
+  extremes of a 210 mm page;
+- re-run Verification check 3 on them: page-box residual ≤0.1 deg **at check
+  3's own scale**, which is `reduce(4)`, with peakiness NOT falling. The
+  threshold is meaningless without the scale: `measure_skew`'s own docstring
+  says the angle is scale-invariant and the MEASUREMENT is not, and the gap
+  between a thumb and a full-resolution reading runs to 0.22 deg on this step's
+  own measured examples (p116, and SH8606 p147 on a grade change alone). SH09's
+  p165 finishes at 0.00 reduced and +0.12 full-resolution; that is agreement,
+  not a miss. **Peakiness RISING is the confirmation** — all four SH09 cards
+  roughly doubled it. Peakiness dropping means the rotation found the wrong
+  axis; stop rather than accept it.
+
+**Choose the override angle by peakiness, not by `measure_skew`'s refine.**
+Sweep candidate corrections in 0.04 deg steps and take the one whose resulting
+peak is highest. On SH09 that agreed with the reading on three cards and
+corrected the fourth: p165's full-resolution refine said −0.44, which left
+−0.12 residual at peak 25.93, against peak 50.81 at −0.56. The refine maximises
+the projection score about a coarse guess; on a page the coarse guess was wrong
+about, peakiness is the better discriminator. **This is the override path's
+method only** — it is not a change to `measure_skew`, which runs on every page
+and is not in question here.
+
+**The override leaves EARLIER artefacts at the pre-levelling geometry**, and
+that must be recorded page by page. `sheets600` and `cmyk2400` are not re-made,
+so for an overridden page they hold the card as the bed read it. Two
+consequences: the `sheet-box` recovery fallback in `r005_masters_sheet.py`
+(correlating a master back against `sheets600`, good to 0.995+) does **not**
+apply to those pages, and any later geometric comparison against `sheets600`
+must exclude them or it will report the override as a defect. A grade
+comparison is unaffected — rotation does not move glyph p50.
+
+### A MEASUREMENT TAKEN ON A FABRICATED EDGE IS NOT A MEASUREMENT
+
+The step's own log line reports four edge angles, and on a sheet smaller than
+the frame some of those edges **are the frame**. SH09's cards sit at the canvas
+origin — `x0=0, y0=0` — so their L and T "edges" describe the scanner, carry no
+information about the card, and read as reassuringly near zero. An early reading
+of the SH09 cards as "print parallel to the trim" came from exactly those two
+columns; only R and B are the card.
+
+This is the bed defect above, one step further out: in both cases a number that
+looks like a measurement of the page is a measurement of the apparatus. **Before
+believing an edge angle, check the edge is not at the canvas boundary** — the
+`sheet-box` field in the stamp says where the traced page sat, and a 0 there is
+the warning. The same test applies to any later check that reads edges.
 
 ## The eight pages that have no paper to trace from
 
@@ -823,11 +1015,11 @@ would have nothing to switch on.
 
 An issue whose descriptor has no `paper` map is not graded at all: see *The
 first action*. **That is not the same as a descriptor that is incomplete on
-purpose.** r000's PAUSE 1 describes exactly that state — `binding` answered and
-`paper` still absent, pending the owner — and `first_action()` handles it by
+purpose.** r000's first action describes exactly that state — `binding` written and
+`paper` still absent — and `first_action()` handles it by
 asking only the unanswered key. So "no `paper` map" here means an issue that
 will never have one, not an issue that has not got there yet; do not read it as
-a reason to invent one before PAUSE 1. The legacy whole-issue `colors` key still loads, for an issue not
+a reason to invent one before the derivation has run. The legacy whole-issue `colors` key still loads, for an issue not
 yet migrated, and means what it always meant.
 
 ### One separation, two renders
@@ -1528,16 +1720,75 @@ PY
 #    So a non-zero reading here means "read the step's own `skew a -> b` line
 #    for this page", not "the page is tilted".  Compare the two before calling
 #    a page tilted.
+#
+#    AND IT READS THE PAGE BOX, NOT THE CANVAS.  It did not until 2026-11-06,
+#    which made it useless on exactly the pages that need it.  The master is the
+#    traced page moved to the canvas origin inside a fabricated margin; measuring
+#    skew over the whole canvas puts that margin, and on a small sheet the BED
+#    OUTLINE, into the ink mask.  Check 4 below has always read `page-px` for
+#    this reason.  Check 3 now does too.
+#
+#    MEASURED, SH09, the bound-in Zahlkarte at p163-166, a card filling about
+#    half the frame:
+#
+#      page   step's line        canvas peak   page box          page box rot90
+#      p163   +0.54 -> -0.02      6.41         -0.48, peak 2.81  -0.50, peak 22.23
+#      p164   -0.02 -> -0.02     10.94         +0.54, peak 11.15 +0.44, peak  5.78
+#      p165   +0.58 -> -0.02      6.11         -0.48, peak 2.43  -0.58, peak 23.42
+#      p166   -0.10 -> -0.10      9.59         +0.34, peak 14.18 +0.42, peak  5.33
+#      p100 (control)            18.62                            peak  4.09
+#
+#    On the page box the two orientations agree within 0.1 deg per page, so the
+#    reading is real and not noise.  The STEP's number is the blind one: on the
+#    p164 canvas the ink threshold is 81.7 covering 49.5 % of the crop, 99.9 % of
+#    it below lum 40 -- the step levelled on the bed's outline, not on the type.
+#
+#    THE STEP THEREFORE ROTATED TWO PAGES OFF TRUE.  p163 and p165 read near 0
+#    before the step and -0.48 after, by the same amount the step says it
+#    corrected.  p164 and p166 were measured at -0.02, left alone, and carry
+#    their own +0.54 / +0.34.  Four pages 0.3-0.6 deg out, for two opposite
+#    reasons.  See *THE SKEW MASK MUST EXCLUDE THE BED* for the fix, which is in
+#    the step and not in this check.
+#
+#    PEAKINESS IS PRINTED, AND IS NOT A GATE.  `skew_peakiness` against
+#    SKEW_PEAK_MIN would have stayed QUIET on p164: the bed has a sharp profile,
+#    so the contaminated canvas reading passes at 10.94.  A gate that is silent
+#    on the page it exists for is not a gate (HARVEST 7).  The number is printed
+#    so a reading can be weighed; nothing fails on it.
 $PY - <<'PY'
-import numpy as np, os
+import numpy as np, os, re
 from PIL import Image
 import r005_masters_sheet as R
 Image.MAX_IMAGE_PIXELS = None
+
+# Peakiness, from the SHEET module's own skew_score and constants.  r005_masters
+# has a skew_peakiness and this module does not import it: the two modules each
+# carry their own copy of measure_skew (sheet 1462, masters 395) with constants
+# that happen to agree today.  Computing it here from R.skew_score cannot drift
+# away from the angle printed beside it.  SKEW_PEAK_MIN is 6.0, and this is a
+# number to weigh, not a gate -- see the note above.
+def peak(gray):
+    h, w = gray.shape
+    t, b, l, r = R.SKEW_CROP
+    crop = gray[int(h * t):int(h * b), int(w * l):int(w * r)]
+    ink = (crop < crop.mean() - R.SKEW_INK_SIGMA * crop.std()).astype(np.float32)
+    lo, hi, st = R.SKEW_COARSE
+    sc = np.array([R.skew_score(ink, a) for a in np.arange(lo, hi + st / 2, st)])
+    return float(sc.max() / np.median(sc))
+
 for f in sorted(os.listdir(R.OUT_MASTER)):
     if not f.endswith(".png"):
         continue
-    a = np.array(Image.open(R.OUT_MASTER / f).reduce(4).convert("L"), float)
-    print(f, "residual %+.2f deg" % R.measure_skew(a))
+    s = (R.OUT_MASTER / f.replace(".png", ".stamp.txt")).read_text()
+    pw, ph = (int(v) for v in re.search(r"^page-px\s+(\d+) (\d+)$", s, re.M).groups())
+    # the TRACED PAGE only -- the master is that page at the canvas origin, so
+    # the box is [:ph, :pw]; the rest is fabricated margin (and, on a small
+    # sheet, bed).  Crop at full resolution, then reduce.
+    im = Image.open(R.OUT_MASTER / f).convert("L").crop((0, 0, pw, ph))
+    a = np.array(im.reduce(4), float)
+    print(f, "residual %+.2f deg  peak %5.2f  (rot90 %+.2f deg  peak %5.2f)"
+          % (R.measure_skew(a), peak(a), R.measure_skew(np.rot90(a)),
+             peak(np.rot90(a))))
 PY
 
 # 4. NO BED SURVIVES: a 6 mm band inside the TRACED PAGE's own four edges holds
@@ -1591,6 +1842,58 @@ PY
 #     correct pages read as a finding.  Crop one page's foot to confirm the
 #     shape, then move on.  What is NOT explainable this way is dark WITH prop,
 #     which is bed or the prop shadow, and that is the finding this check is for.
+
+# 4b. AND NO PRINT WENT WITH IT.  Check 4 asks whether any bed SURVIVED.  This
+#     one asks the opposite question, which nothing asked until SH09: how much
+#     of the PAGE did the bed drop take?  The two failures are not symmetric --
+#     surviving bed is a grey smudge at a trim, and a drop that overreaches
+#     deletes a photograph and writes pure white in its place, with no trace
+#     anywhere in the artefacts.
+#
+#     MEASURED on SH09: p030 lost 1716.5 mm² inside its traced page (2.79 % of
+#     it), p167 186.2 mm², p168 15.5 mm² on the PROP branch.  All three shipped.
+#     The stamp said nothing, the mixed PDF build read the damaged master and
+#     encoded it, the marks census read it and censused it, and the owner found
+#     it by eye on the delivered page.  `t.dropped` counts COMPONENTS and is
+#     never written out, so even the count was invisible.
+#
+#     The legitimate removals inside the box, same issue, same instrument: 12.6,
+#     14.1, 11.1, 8.0, 4.5 mm², every one a fringe at the trim.  So the
+#     populations do not overlap and a threshold is honest here -- but set it on
+#     the ISSUE being built, and state it, rather than inheriting SH09's.
+#
+#     Run the step's own `level_and_trace(page)` read-only and measure
+#     `line-box & ~keep`: area inside the traced box, its largest component,
+#     mean lum, and the prop-mask share so the branch is named.  Report BOTH
+#     before and after `locate()`, because an override can replace `keep` and
+#     discard the drop entirely -- which is the only reason SH09 p031 is intact,
+#     and is not a thing to rely on.
+$PY - <<'PY'
+import os, re
+import r005_masters_sheet as R
+MARGIN_MM2 = 15.0          # per page, inside the traced box; SH09: correct <=12.6, defects >=15.5
+rows, bad = [], []
+for f in sorted(os.listdir(R.OUT_MASTER)):
+    if not f.endswith(".stamp.txt"):
+        continue
+    page = int(f[:3])
+    t = R.level_and_trace(page)                      # read-only; writes nothing
+    inside = R.drop_area_inside_mm2(t)               # area, largest, lum, prop share
+    rows.append((page, inside))
+    if inside.area_mm2 > MARGIN_MM2:
+        bad.append((page, inside))
+for page, i in rows:
+    if i.area_mm2 > 0.5:
+        print(f"{page:03d}  inside-box removed {i.area_mm2:8.1f} mm²  largest {i.largest_mm2:8.1f}"
+              f"  mean lum {i.mean_lum:5.1f}  prop share {i.prop_share:4.2f}"
+              f"  {'<== OVER MARGIN' if i.area_mm2 > MARGIN_MM2 else ''}")
+assert not bad, (
+    f"the bed drop removed more than {MARGIN_MM2} mm² inside the traced page on "
+    f"{[p for p, _ in bad]}.  Look at each one against sheets600 before accepting it: "
+    f"a dark or prop-coloured area of PRINT that bleeds off an edge joins what lies "
+    f"beyond it and is dropped whole.  Record the owner's ruling per page if any of "
+    f"them is genuinely bed.")
+PY
 
 # 5. THE STAMP: every master names the grade that made it, and it is the CURRENT
 #    one.  This is the check that would have caught the three silently stale
@@ -2060,6 +2363,72 @@ produced before `level_and_trace()`, `Traced.locate()`, `FlatField` and the
 extra stamp lines existed. That is the check that the refactor moved code and
 nothing else — including on the `ink/bed` pages, which the sampled low-class
 pages never exercise.
+
+
+# 7g. NO PAGE GOES OUT WITHOUT ITS FIELD.  Checks 7a-7f all ask whether the
+#     field is RIGHT.  None of them asks whether it was APPLIED AT ALL, and the
+#     step is allowed to skip it: a page whose traced box falls outside
+#     FIELD_PAGE_MM gets FlatField(identity) and the honest stamp line
+#     `field  identity -- NOT APPLIED -- <why>`.  That line is true, and 7b
+#     verifies that it is true.  It is also the whole of the record.
+#
+#     MEASURED on SH09 p031, and it reached the OWNER before it reached a
+#     check.  The tracer read the sheet as 149.0 x 297.4 mm, which matches no
+#     page class, so the step published the whole levelled sheet at
+#     213.3 x 305.0 mm; field_box_ok() said no; and the page was graded with NO
+#     yellowing correction -- no fallback geometry, no window anchor, nothing.
+#     reviewed/recover_031.py then rescued the A4 window out of that master and
+#     did not apply the field either, so the delivered page has the right
+#     geometry and the wrong paper.  On the delivered image the fore edge runs
+#     +14.6 DN R-B across its whole length in the outer 3 mm with 99 % of the
+#     paper visibly tinted, and the top edge +16.1 DN at 100 %, against a class
+#     median of 0-1 % tinted and |R-B| <= 1.2.  Every other page of the issue
+#     carries the correction; this one page shows the browning the chain exists
+#     to remove.
+#
+#     The note sat in ONE stamp of 168 and nothing aggregated it.  How rare is
+#     it?  Not knowable from here, and say so rather than guess: a sweep of
+#     every masters600 stamp ON DISK found this one page, but SH09 is the only
+#     issue whose tmp survives -- the rest were cleaned.  What IS known is that
+#     trace failures are not unique to SH09: "Known outliers" below records two
+#     of 152 on an earlier issue.  Whether those pages also went out without
+#     their field, nobody checked, because until now nothing asked.  THE STEP
+#     CANNOT ALWAYS ANCHOR A FIELD; IT CAN ALWAYS REFUSE TO PASS WITHOUT SAYING
+#     HOW MANY PAGES IT GAVE UP ON.
+#
+#     The only way past is an owner ruling, recorded by page in
+#     issues/<ID>/reviewed/field-not-applied.txt, one `NNN <reason>` per line.
+#     A page listed there is a page somebody has actually looked at.
+$PY - <<'PY'
+import os, re, pathlib
+import r005_masters_sheet as R
+acc = pathlib.Path("issues") / R.ISSUE / "reviewed" / "field-not-applied.txt"
+accepted = {}
+if acc.exists():
+    for line in acc.read_text(encoding="utf-8").splitlines():
+        line = line.split("#", 1)[0].strip()
+        if line:
+            accepted[line.split()[0].zfill(3)] = line
+skipped = []
+for f in sorted(os.listdir(R.OUT_MASTER)):
+    if not f.endswith(".stamp.txt"):
+        continue
+    s = (R.OUT_MASTER / f).read_text()
+    fl = re.search(r"^field\s+(.*)$", s, re.M).group(1)
+    kl = re.search(r"^page-class\s+(.*)$", s, re.M).group(1).strip()
+    if "NOT APPLIED" in fl or kl == "uncropped sheet":
+        skipped.append((f[:3], kl, fl))
+for p, kl, fl in skipped:
+    print(f"{p}  page-class {kl!r}  |  {fl}",
+          ("<= ACCEPTED: " + accepted[p]) if p in accepted else "<= NOT RULED ON")
+print(f"pages delivered without the paper-yellowing field: {len(skipped)}; "
+      f"ruled on by the owner: {sum(1 for p, _, _ in skipped if p in accepted)}")
+unruled = [p for p, _, _ in skipped if p not in accepted]
+assert not unruled, (
+    f"these pages were graded with NO paper-yellowing correction and nobody has "
+    f"ruled on them: {unruled}.  Either give the page a traceable box and "
+    f"re-grade it, or record the owner's decision in {acc}.")
+PY
 
 
 ## Known outliers — two pages of 152 do not trace

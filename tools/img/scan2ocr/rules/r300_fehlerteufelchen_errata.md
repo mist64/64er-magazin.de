@@ -166,9 +166,9 @@ through.
 
 **THE OWNER'S DEFAULT IS NO FUTURETEUFELCHEN — and that is now stated, because
 not stating it turned every candidate into a question.** Print errors stay as
-printed, recorded in LOG.md only, and they **do not go on the PAUSE 2 list**.
+printed, recorded in LOG.md only, and they **do not go on the owner decision list**.
 MEASURED on SH8605: the nine r325 readers recorded 66 candidates (D21–D86), the
-PAUSE 2 report listed every one, and the owner was asked them one at a time —
+hand-over report listed every one, and the owner was asked them one at a time —
 answering "leave it" to D20 through D30 and then: *"did you learn yet"* (owner,
 2026-10-08).
 
@@ -396,6 +396,54 @@ MEASURED on SH8602: `prg/spline 64.txt` line 670 and `prg/reset-helfer.txt`
 line 190, both corrected by the magazine in 4/1986 and 5/1986, both left as
 printed on the owner's ruling (2026-10-04).
 
+## A CONDITIONAL erratum: the vocabulary gets a fourth word, because none of three was true
+
+The three words claim something about a FILE: the disk already had it right, we
+applied it, or the print alone was wrong. **An erratum whose change depends on
+the reader's own hardware is none of those** — applying it would break the
+readers it does not apply to, so the listing must stay as shipped, and saying
+`Reiner Druckfehler` (a program IS affected), `Disk-Version bereits korrigiert`
+(it was not) or `Korrektur im Programm angewendet` (it was not) would each be a
+false statement about the file.
+
+MEASURED on SH09 article 113: 8612's Fehlerteufelchen for Datev is reproduced
+verbatim with its `64'er 12/1986` trailer, the correction is **conditional on
+the reader's printer**, and `prg/datev.prg` is left unpatched. The builder
+reported that none of the three words fits rather than picking the nearest one,
+which is how a closed vocabulary is supposed to fail.
+
+So: **`<!-- Bedingte Korrektur, nicht angewendet -->`**, the condition named in
+the aside's prose, and the erratum named in a file, so the pair stays checkable
+— the new word is in `r300_status_pairs.py`'s `STATUS` precisely so the check
+still demands that record. **Which file depends on what the program is:**
+
+- a program with a listing — its own header line, as ever:
+  `;Fehlerteufelchen M/YYYY bedingt, nicht angewandt`
+- **a RAW BINARY has no header line, and must not be given a fabricated one.**
+  `generate.py` renders every `prg/*.txt` as a listing, so an invented text file
+  would ship to readers as a program. Its record goes in
+  `issues/<ID>/reviewed/errata_status.txt`, one tab-separated line of program,
+  erratum and disposition:
+
+```
+datev.prg	Fehlerteufelchen 12/1986	bedingt, nicht angewandt: the correction depends on the reader's printer
+```
+
+  The named program must exist in `prg/`, or the line satisfies the gate while
+  naming nothing — the check enforces that too.
+
+**I added the word without asking where its evidence could live**, and for a
+binary the answer was nowhere: SH09's build went red on a correct article with
+no edit available that would clear it, and the builder came up rather than
+inventing a file. A vocabulary and the places its evidence may live are one
+change, not two. This
+is the SECOND gap in a vocabulary declared closed (the first being a prg the
+owner left unapplied, which took a `;vor Fehlerteufelchen` header instead of a
+word). A vocabulary that keeps meeting states it cannot express is not closed;
+it is under-measured. **Do not stretch an existing word to fit — a status
+comment is read as a claim, and a false claim here tells a future build that
+nothing needs checking.**
+
 ## Verification
 
 ```bash
@@ -464,49 +512,25 @@ done
 # no leftover placeholder comments alongside an aside
 grep -rl '<!-- Fehlerteufelchen' "$dir"/*.html
 
-# THE LISTING'S OWN HEADER, WHICH THIS BLOCK USED TO IGNORE ENTIRELY.
-# Every check above reads the asides, so an issue whose prg/*.txt never got
-# their `;inkl. Fehlerteufelchen M/YYYY` header note passed clean -- the
-# always-GREEN mirror of a check that can never pass (r000).  MEASURED on
-# SH8608: article 108's aside said `Disk-Version bereits korrigiert` while
-# `prg/grafik c16.txt` carried no header note at all, and this block was happy.
-# A status comment is a claim about a FILE, so read the file.
+# THE LISTING'S OWN HEADER, WHICH THIS BLOCK USED TO IGNORE ENTIRELY, IS
+# `r300_status_pairs.py` NOW.  Every other check here reads the asides, so an
+# issue whose program files never got their `;inkl. Fehlerteufelchen M/YYYY`
+# header note passed clean -- the always-GREEN mirror of a check that can never
+# pass (r000).  MEASURED on SH8608: article 108's aside said `Disk-Version
+# bereits korrigiert` while `prg/grafik c16.txt` carried no header note at all,
+# and this block was happy.  A status comment is a claim about a FILE, so read
+# the file.
 #
-# WHAT THIS CAN AND CANNOT ASSERT.  The HTML does not say WHICH listing a
-# status comment is about, and one aside may cite an erratum that corrected
-# PROSE, which no `prg/*.txt` will ever record.  So this asks the weaker
-# question it can actually answer -- does ANY listing header name ANY of the
-# errata this article cites -- and that is enough to catch "no header note
-# anywhere", which is the defect seen in the wild.  A wrong PAIRING still
-# needs a human.
-"$PY" - "$dir" <<'PYEOF'
-import glob, os, re, sys
-d = sys.argv[1].rstrip('/')
-STATUS = ('Disk-Version bereits korrigiert', 'Korrektur im Programm angewendet')
-ERR = r'Fehlerteufelchen\s+(\d{1,2}/\d{4})'
-
-named = set()
-for t in glob.glob(os.path.join(d, 'prg', '*.txt')):
-    for ln in open(t, encoding='utf-8', errors='replace'):
-        # LEADING BLANK LINES COME FIRST IN THESE FILES.  Breaking on the first
-        # line that is not a `;` comment read nothing at all: every prg/*.txt
-        # in SH8606 opens with two empty lines before `;name.prg ==addr==`.
-        if not ln.strip():
-            continue
-        if not ln.startswith(';'):
-            break
-        named |= set(re.findall(ERR, ln))
-
-for p in sorted(glob.glob(os.path.join(d, '*.html'))):
-    s = open(p, encoding='utf-8').read()
-    if not any(st in s for st in STATUS):
-        continue
-    cites = set(re.findall(r"<!--\s*64'er\s+(\d{1,2}/\d{4})", s))
-    if cites and not (cites & named):
-        print("  FAIL %s: carries a status comment citing %s, but no "
-              "prg/*.txt header in this issue names any of them"
-              % (os.path.basename(p), ', '.join(sorted(cites))))
-PYEOF
+# AND A BINARY PROGRAM HAS NO FILE TO PUT A HEADER IN, which the check did not
+# allow for the moment the vocabulary grew a fourth word.  MEASURED on SH09
+# article 113: `prg/datev.prg` is a raw binary printed as an MSE hexdump, the
+# conditional status comment was correct, and the check went red on a correct
+# build with no edit available that would clear it.  So the script reads
+# `reviewed/errata_status.txt` as well -- durable, whitelisted, where
+# dispositions already live.  DO NOT fabricate a `prg/<name>.txt` for a binary:
+# generate.py renders `prg/*.txt` as a listing, so an invented text file would
+# ship to readers as a program.
+$PY tools/img/scan2ocr/rules/r300_status_pairs.py "$dir"
 ```
 
 Cross-check against the full checklist in
@@ -725,7 +749,8 @@ For each erratum:
 - [ ] Aside text matches print (preserve original typos, German spelling)
 - [ ] `<a href="#fehlerteufelchen" class="fehlerteufelchen_link">` wraps the right body element (or absent if article is a reprint missing that element)
 - [ ] Comment trailer `<!-- 64'er M/YYYY -->` names the FT issue
-- [ ] If listing-related: status comment `<!-- Korrektur im Programm angewendet -->` or `<!-- Disk-Version bereits korrigiert -->` above the issue trailer
+- [ ] If listing-related: status comment `<!-- Korrektur im Programm angewendet -->`, `<!-- Disk-Version bereits korrigiert -->` or `<!-- Bedingte Korrektur, nicht angewendet -->` above the issue trailer
+- [ ] And the erratum named in a FILE: the listing's own `;Fehlerteufelchen M/YYYY …` header, or `reviewed/errata_status.txt` when the program is a raw binary (`r300_status_pairs.py` checks exactly this)
 - [ ] If listing in `prg/<name>.txt`: header annotation + per-line markers in Style A or B (or disk-already-correct note)
 - [ ] No duplicate erratum (e.g. both a placeholder comment AND an aside)
 
@@ -788,7 +813,7 @@ the set, then check the thing you are about to change is IN it (r000).
 **What still goes to the owner:** a difference that changes what the program
 DOES, with no erratum to lean on and none of (a)-(c) to fall back on — the
 *Hyper-Graphics* shape below, where 12 instructions differ and nothing
-anywhere explains why. Report it at PAUSE 2 with the evidence.
+anywhere explains why. Report it on the owner decision list, with the evidence.
 
 Three shapes seen so far:
 
@@ -876,6 +901,7 @@ source marker. The corpus vocabulary — use it verbatim, do not invent wording:
 | `<!-- Reiner Druckfehler -->` | the error exists only in the print; no program is affected (a wrong figure number, a garbled sentence) |
 | `<!-- Disk-Version bereits korrigiert -->` | a program IS affected, but the Programm-Service disk already shipped the corrected version — nothing was patched |
 | `<!-- Korrektur im Programm angewendet -->` | the correction was applied to the listing in `prg/` |
+| `<!-- Bedingte Korrektur, nicht angewendet -->` | the erratum's change depends on the READER's hardware or configuration, so it cannot be applied unconditionally: the listing stays as shipped and the aside's prose states the condition |
 | `<!-- Reiner Druckfehler -->` (again) | **also** the value for a real code bug in an article with NO program file at all — see below |
 
 **A real code bug with no program file** has no word of its own, and the
@@ -903,7 +929,7 @@ already arrived at, stated as the rule rather than left as a worked example:
 > **An erratum whose disposition the owner has not decided STAYS UNMARKED.**
 > No comment at all — not an invented fourth word, and not one of the three
 > chosen as the closest fit. The open decision is named in `LOG.md` and carried
-> to PAUSE 2; the aside gets its comment when the answer comes back.
+> to the owner decision list; the aside gets its comment when the answer comes back.
 
 An unmarked aside is therefore a legitimate intermediate state, and a build
 that ends with one is not finished. Do not let a checklist that counts

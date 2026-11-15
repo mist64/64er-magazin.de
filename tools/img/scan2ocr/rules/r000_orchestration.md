@@ -216,13 +216,38 @@ rule's header to make a particular build go through. A rule that turns out to
 apply to both kinds is re-classified `all` **with the evidence in the commit
 message**, permanently, for every issue after it too.
 
-## THE SHAPE OF A BUILD: TWO PAUSES, AND NOTHING ELSE INTERRUPTS THE OWNER
+## THE SHAPE OF A BUILD: THREE OWNER INPUTS, EACH BLOCKING ONE THING
 
-An issue build stops for its owner **exactly twice**. Between those two points
-the chain runs unattended -- it does not ask, it does not wait, and it does not
-experiment. Everything it needs in between is either in these files or derivable
-from the scan; where it is not, that is a **defect in these files** and fixing it
-is part of the work (see *THE SCAN IS THE ONLY INPUT*).
+**There are no pauses.** Owner, 2026-11-06: *"pause 1 isn't a pause any more...
+pause 2 isn't a pause, it just blocks progress on two things."* The word is gone
+from this chain, because it described a build that stops, waits and resumes, and
+that is not what happens. What happens is that **two artefacts are each blocked
+on owner input, and they are independent of one another.**
+
+| # | the build hands over | the owner returns | **what is blocked until it comes back** |
+|---|---|---|---|
+| 1 | the cover source, `<tmp>/title_source_150.png` | `title.png`, retouched by hand | **the PDF** |
+| 2 | the crop worklist, and `<tmp>/sheets600/` to cut from | the cut figures | **the HTML** |
+| 3 | the marks census, each mark with a magnified crop | `dirt` / `a previous hand` / `the plate` for each, and a repainted master for the first two | **the PDF** |
+
+**The PDF is blocked on TWO owner inputs, 1 and 3. The HTML is blocked on ONE,
+input 2.** Neither artefact waits for the other: the PDF can be finished while
+the figures are still being cut, and the HTML can be finished while the marks
+are still being ruled on. The issue is done when both are.
+
+So there is no single moment the owner is "at" the build, and no moment the
+chain is idle. There are three deliveries out and three answers back, each one
+unblocking exactly what the table says and nothing else.
+
+**Binding and paper are NOT owner inputs.** The chain derives both from the scan
+and records them — binding on 2026-10-08, paper on 2026-11-02. What this file
+called "PAUSE 1" ceased to exist then; the heading here still announced it for a
+month afterwards, and the 8701 build read that as licence to ask.
+
+Apart from those three, the chain runs unattended -- it does not ask, it does
+not wait, and it does not experiment. Everything it needs is either in these
+files or derivable from the scan; where it is not, that is a **defect in these
+files** and fixing it is part of the work (see *THE SCAN IS THE ONLY INPUT*).
 
 **AND THE SCAN IS OF ONE PHYSICAL COPY, WHICH A PREVIOUS READER MAY HAVE
 WRITTEN ON.** Pen or pencil scans as ink, the OCR reads it as print, and it is
@@ -294,6 +319,112 @@ path and the verdict `below the cutoff — not surfaced`, precisely so the next
 build does not find them again and ask. The census is complete; the owner's
 queue is not the census.
 
+**BUT THE GATE ASKS WHETHER THE READER SEES SOMETHING, NOT WHETHER THE OWNER
+SHOULD PATCH.** Those are different questions and the gate only answers the
+first. The owner's reason for wanting marks is upstream: *"i need to patch the
+input master file."* So a mark that reduces to a few scattered pixels has NOT
+answered the owner's question — the master still carries whatever made them, and
+the next render (a different threshold, a page reclassified contone, a re-scan)
+may show all of it.
+
+**So a HAND that survives in any amount is surfaced, however little of it
+survives.** MEASURED on SH09 p111: a pen note reading roughly "M Blöcke",
+**26 x 3.8 mm on the master**, reduces to **49 scattered black pixels** at the
+35 % threshold and reads as faint dust in the PDF. Under the survival gate alone
+it would not be surfaced; it is surfaced, because the master has writing on it.
+Hand it over with **both** facts side by side — what it is on the master, and
+what it becomes in the artefact — so the owner is not asked to rule on dust.
+
+The three SH8607 marks that correctly did NOT reach the owner (`044c`, `123x`,
+`140x`) are the other case: pen hairline and pale-brown dashes, small on the
+master too. **The test is what the MASTER carries, with the survival gate
+deciding only how it is described** — not dirt that mostly drops, but a hand,
+a note, a stroke, anything a person put there.
+
+### "OURS" IS NOT A VERDICT THAT CLOSES A MARK — IT REASSIGNS IT TO US
+
+A mark the chain put there is correctly kept off the owner's queue: the owner
+rules `dirt` / `a previous hand` / `the plate`, and our own residue is none of
+the three. **But taking it off that queue does not take it out of the artefact**,
+and if `ours` is recorded like a verdict the mark is closed with the defect
+still shipping.
+
+MEASURED on SH09 p130: the raw scan shows the torn edge beside the bed and **no
+mark on the paper**, while the delivered bilevel page carries specks there — bed
+residue surviving the threshold. Right to withdraw it from the owner. The specks
+were still in `a4600` and in PDF page 130 when it was withdrawn.
+
+**So `ours` opens a repair obligation, with a gate, in the same breath as the
+withdrawal:**
+
+- record it in `marks.txt` with the verdict `ours — repair pending`, never a
+  bare `ours`, and keep the crop (SH09 used `marks_work/withdrawn/`);
+- **open the override record immediately**, in the `reviewed/` shape, so the
+  obligation is durable and a check reads RED until the pixels are fixed. An
+  obligation that lives only in a message is gone at the next context;
+- the repair may ride along with a rebuild the owner's verdicts force anyway —
+  that is scheduling, and it is fine. **Deferring the FIX is allowed; deferring
+  the RECORD is not.**
+
+**AND ONE INSTANCE IS A QUESTION ABOUT THE POPULATION.** Residue at a torn edge
+is not a property of p130; it is a property of how torn edges threshold.
+**Measure how many pages carry it before deciding what to do about it** — a
+survey is cheap, and choosing to defer a fix without knowing whether it is one
+page or forty is not deferring, it is guessing.
+
+SURVEYED on SH09: **15 of 144 bilevel pages**, 73 components, 132 black pixels
+in all — and only **two** carry anything a reader can see (p130, and p132 at
+44 px with a run of 4; the other 13 have at most 3 px, run 2). **Repair what
+passes the gate; record the rest** as `ours — below the gate, not repaired`, so
+the next build does not find them again and re-ask.
+
+**IT IS NOT IN THE BED STRIP, AND CALLING IT THAT SENDS THE FIX TO THE WRONG
+PLACE.** This section said "outside the traced edge" until the survey measured
+it: **0 of 4099 candidates lie outside the traced box.** The residue is INSIDE
+the traced edge, in the **torn fringe** of the paper itself — so a repair aimed
+at the fabricated fill zone would miss every one of them, and so would a 005
+mask change defined that way. The fringe is paper, which is why it is inside the
+trace; it is dark, which is why it survives the threshold. A fix belongs there,
+not at the bed.
+
+**Verify the ones you intend to repair against the raw**, one at a time. The
+survey's own criterion — neutral (median chroma < 25) within 1.5 mm of the bed —
+**cannot tell our residue from a genuine dirt speck sitting that close**, and a
+speck wrongly called ours is a mark taken off the owner's queue by a
+measurement. On SH09 both repair candidates were checked against the raw and
+showed no mark on the paper; the other 13 are below the gate, so the
+misclassification risk never reaches the owner either way.
+
+### A WHOLE-PAGE GROUND IS NOT A MARK
+
+A mark is something ON the page. The page's own colour, fibre and ageing are the
+**substrate**, and they are not `dirt` / `a previous hand` / `the plate` — so
+they do not belong in the census, where every verdict is one of those three.
+Put a whole-page finding to the owner as an **observation**, labelled as one,
+carrying no verdict and expecting none.
+
+MEASURED on SH09 p168: a grey-green mottle over the entire back-cover ground,
+**205.6 x 282.3 mm** at lum<200 — which is to say, the page. Checked against the
+raw and found to be fine green fibres in the paper, not a grade artefact, so it
+is real and worth one line. It is still not a mark, and listing it as one asks
+the owner to rule that the paper is dirt.
+
+**The test is whether a verdict would mean anything.** `the plate` is a claim
+about printing, `a previous hand` about a person, `dirt` about something resting
+on the surface. None of the three can be true of the stock itself. If no verdict
+fits, it is an observation, and the right place for the measurement is the
+grade record.
+
+### A WITHDRAWN DELIVERY KEEPS ITS ORIGINAL `handed` LINE
+
+If a deliverable goes over and turns out not to be usable, the owner's clock did
+not restart. Record `WITHDRAWN <time>` and a `re-delivered <time>` line beside
+the original `handed`, and leave that `handed` alone. The total then reads
+correctly from either end, and the time lost to a withdrawal is visible instead
+of being quietly removed from our side of the ledger. SH09 did this unprompted
+on the marks census.
+
+
 **YOU ARE SURFACING A FINDING, NOT REQUESTING A REMOVAL — THERE ARE THREE
 OUTCOMES.** This used to read as though flagging and removing were the same
 act. They are not, and on SH8608 the owner's answer split three marks two ways:
@@ -344,6 +475,136 @@ to 2.2 x 2.8 mm. Hand over **a crop at magnification, the colour scan beside
 the same spot in the delivered PDF, at the same scale**, with the size in mm.
 That is what let the owner decide in one pass.
 
+**"THE COLOUR SCAN" MEANS THE 2400 dpi MASTER, NOT A GRADED PAGE.** The left
+panel is cut from the scan as it arrived — the only input — and never from
+`a4600`, `masters600` or `sheets600`, all of which have been colour-corrected
+and levelled. The whole purpose of that panel is the mark's **own colour**, which
+is the owner's main evidence for `dirt` / `a previous hand` / `the plate`, and
+grading is precisely the thing that moves it: SH09's census has a blue mottled
+speckle (p004, p009) and a magenta-and-black line (p017), and a corrected page
+is the one place those colours cannot be trusted. **Name the file each panel was
+cut from**, so a panel pair can be checked rather than believed.
+
+**AND THE TWO PANELS MUST BE THE SAME SPOT.** A mis-registered pair is the
+failure mode this delivery has, and it cannot be caught by reading a sample of
+them — a wrong panel looks like a right one. **Check every pair mechanically**:
+each panel contains the recorded bounding box, both are at the stated scale, and
+neither is blank. Reading a handful by eye is a check on the generator's
+judgement, not on its arithmetic, and 110 crops is far past where eyes are the
+instrument.
+
+**No size floor.** The survival gate is the filter; a second one by size would
+drop marks silently and for no stated reason. 8701's census ran to 95 lines and
+SH09's to 110, which is the same order and the owner has not asked for fewer.
+
+**BUT THE FLOOR IS NOT WHERE A MARK GOES MISSING — THE POPULATION IS.** A rule
+against a reporting floor says nothing about the set the census was drawn from,
+and SH09's was drawn twice over a gate no pale mark could pass: the population
+is built from `lum < 153`, and the **chromatic** class additionally required
+**≥ 12 black px**. A pale coloured pen stroke has no dark core at all, so it has
+neither — it was in no sheet, no tile, no crop, and nothing in the census said
+it had been looked for. MEASURED on SH09: a red pencil stroke **3 mm long on
+p110**, found by chance at 190B by an agent reading the page for another reason.
+The re-read that followed — all 488 chroma components on the bilevel pages
+across 40 tiles, plus the 48 largest of 2240 pale components — added **four
+marks to a census of 111**.
+
+**SO A POPULATION GATE OWES A RECALL TEST, AND THE KNOWN MARKS ARE THE TEST
+DATA.** Precision is what a crop shows you; recall is invisible by
+construction, which is why it has to be measured instead of assumed. Run each
+population against the marks the census ALREADY holds and count how many it
+would have found. It costs one script run, needs no new eye work, and it is the
+only way the hole above announces itself before a reader does. This is the same
+defect as a gate that cannot represent the right answer (HARVEST §7, §13, §19),
+one layer earlier: the gate could have reported the mark correctly, and the mark
+never reached it.
+
+**AND THE RECALL TEST IS BIASED BY CONSTRUCTION — SAY SO WITH THE RESULT.**
+MEASURED on SH09's 112 surfaced marks, by bbox overlap, the misses per
+population: dark 20, cluster 104, pale 108, chroma 88, `lum<153` components 9,
+chromatic gate 92. The pale population's 108 looks damning and means almost
+nothing: **111 of the 112 marks reached the census through a `lum<153`
+population in the first place**, so the test measures each net against a catch
+the other nets made. A recall test over a census built by one instrument cannot
+measure a second instrument's recall on what the first never saw. It is still
+worth running, and it earned its keep here: of the four known hands, p110 is
+held by the **chroma population alone** — one net, no redundancy — which no
+amount of reading crops would have shown.
+
+**THE HOLE THAT REMAINS IS BOUNDED BY ARITHMETIC, NOT BY HAVING SWEPT ENOUGH.**
+What evades every population is a **pale, neutral** stroke: pale, so no chroma
+net holds it, and neutral, so it has no second net at all. It may stay recorded
+rather than hunted, for two reasons that are measurements and not judgement:
+
+- **On a bilevel page it cannot reach the reader.** `pale` means no pixel below
+  `lum 153`; the PDF's bilevel threshold is 35 %, i.e. `lum 89`. 153 > 89, so
+  such a component cannot produce one black pixel in the PDF, ever.
+- **On a contone page the faint sweep is the net**, and it works: the only two
+  marks in NO population at all — p012 and p168 — are both contone and both
+  came from that sweep.
+
+So the gap is a gap against the MASTER, not against the artefact, which is
+precisely why it is recorded (the owner's reason for wanting marks is upstream)
+and not dismissed. Record it with its numbers, as here, so a re-scan, a changed
+threshold or a page reclassified contone re-opens it; an unrecorded gap is
+indistinguishable from a clean sweep, which is the whole of the lesson above.
+**Closing it would mean a NEW population, not more reading of this one** — do
+not open one on the strength of a hypothetical example.
+
+### KNOWN DEFECT, OPEN — THE ISOLATION RULE DROPS EVERY MARK THAT TOUCHES PRINT
+
+**And this one is NOT bounded by the arithmetic above.** The section before this
+closes the pale-and-neutral hole by showing such a mark cannot reach the reader.
+A mark that touches print can be any darkness, and a **dark** one survives the
+threshold and lands in the PDF. The two holes are different in kind; I ruled the
+first closed and must not be read as having ruled this one with it.
+
+**MEASURED on SH09 p110**, with the census's own code, after the stroke turned up
+by chance at 190B:
+
+- the red pencil stroke is component `+4610+2322`, 44 x 30 px at half
+  resolution (about 3 mm), `lum min 163`;
+- it **passes** the pale population's `no pixel under 153`;
+- it **fails** `iso(..., r=6)`. Its nearest neighbour is 0.68 mm away, `lum min
+  46` — the `e`/`g` of *ausge-*. A second fragment of the same stroke,
+  `+4602+2342`, is **merged into the print's own component**;
+- at full resolution the stroke is 594 px at `chroma >= 22`, median `lum 206`,
+  and touches a `lum < 153` pixel at distance 0.
+
+**What that reaches, read off `census.py`:** `dark` applies the same `iso` at
+r=10 (about 0.85 mm) and `pale` at r=6, so **a mark within that distance of
+print is dropped by both.** A mark that crosses a glyph joins the glyph's
+component and can then surface only through the size limit or `cand.py`'s
+word-box route, which skips anything centred inside an OCR word. `chroma` has
+no isolation test at all — **which is the only reason p110 was ever seen.** A
+neutral hand mark touching print has no such net.
+
+So the census is weakest exactly where a reader's hand is most likely to have
+been: on top of the text. **And `marks.txt`'s LIMIT line is wrong about why.**
+It admits to missing marks "under 0.5 mm near a glyph", which reads as a size
+limit; a 3 mm stroke was dropped. State the real limit — *a mark touching print,
+or within about 0.85 mm of it, is not detected at any size, unless it is
+coloured* — and give the owner that sentence with the census, since their reason
+for wanting marks is to patch the master and this names what the list cannot
+contain.
+
+**DO NOT OPEN A NEW POPULATION ON THIS EVIDENCE, PLANT ONE AND MEASURE.** p110
+proves the mechanism but it is a COLOURED mark, so it cannot measure a neutral
+net's recall, and the recall test over the surfaced marks is biased by
+construction (above). The instrument that escapes the circularity is **ground
+truth we make ourselves**: on copies, draw synthetic strokes of known length and
+known luminance — dark and mid-tone, 3 mm and 10 mm — across a word, through a
+margin, and in white space on a couple of bilevel pages, run the census
+unchanged, and report which surface. That is one scripted run with an answer
+key, and it says both whether a new net is needed and what it has to be
+sensitive to. Planting is how r120's separator check was validated; use it here.
+
+**SH09 SHIPS WITHOUT IT.** The hole is recorded here with its mechanism and its
+measurement, the owner is told what the census cannot contain, and nothing in
+the queue is wrong — p110 is in it. Opening a population mid-build, against a
+census the owner is already reading, would cost a second owner pass for a
+finding nobody has demonstrated yet.
+
 **AND RECORD THE VERDICT WHERE THE NEXT BUILD WILL READ IT:
 `issues/<ID>/reviewed/marks.txt`**, one line per mark — page, what it is, its
 size in mm, and the verdict in the owner's own word (`dirt`, `hand`, `plate`).
@@ -382,11 +643,11 @@ series is not bound or printed the same way just because it is next. 8612's
 descriptor was copied from 8611's and silently inherited its `colors` path;
 SH8601 is `binding: "sheet"` and the Sonderheft after it may be anything.
 Write the descriptor fresh: copy only the SHAPE (which keys exist), never the
-values. Both values come from PAUSE 1.
+values. Both values are derived by the chain itself, before step 005.
 
-**PAUSE 1 — before step 005.** Binding, and which pages are which paper. This
-section used to open *"they cannot be answered from a scan"*. **Binding can, and
-as of 2026-10-08 it is not an owner question at all.**
+**BINDING AND PAPER — derived before step 005, asked of nobody.** This section
+used to open *"they cannot be answered from a scan"* and was the build's first
+stop. **Binding can, and as of 2026-10-08 it is not an owner question at all.**
 
 ### BINDING IS DERIVED FROM THE SCAN, NOT ASKED
 
@@ -464,14 +725,31 @@ questions; they are work only the owner can do:
 | # | deliverable | ready after | what the owner does |
 |---|---|---|---|
 | 1 | the **cover source**, `<tmp>/title_source_150.png` | 005, or 005b on a `sheet` binding | makes `title.png` by hand |
-| 2 | the **crop worklist** + `<tmp>/sheets600/` | the HTML is complete but for figures | cuts the figures from the graded pages |
+| 2 | the **crop worklist** | the HTML is complete but for figures | cuts the figures from the graded pages |
+| — | `<tmp>/sheets600/`, the graded pages themselves | **005** | looks them over; cuts from them once 2 arrives |
 | 3 | the **marks**, each with a crop at magnification — **ours already removed, not listed** | the mark census, before the PDF ships | rules each `dirt` / `a previous hand` / `the plate`, and repaints the master for the first two |
 
 **Hand each one over the moment it exists and keep going** — see *An OWNER
-DELIVERABLE is handed over the MOMENT it exists*. 1 and 2 arrive together once
-the graded pages are ready, which is what "once the graded files are ready"
-means; 3 goes over as soon as the census is complete and gated (*A MARK THAT
-DOES NOT SURVIVE INTO THE DELIVERED ARTEFACT IS NEVER PUT TO THE OWNER*).
+DELIVERABLE is handed over the MOMENT it exists*. 3 goes over as soon as the
+census is complete and gated (*A MARK THAT DOES NOT SURVIVE INTO THE DELIVERED
+ARTEFACT IS NEVER PUT TO THE OWNER*).
+
+**THE PAGES AND THE WORKLIST ARE NOT ONE DELIVERABLE, AND THIS TABLE SAID THEY
+WERE.** Until 2026-11-06 row 2 read "the crop worklist + `<tmp>/sheets600/`"
+and the paragraph here said 1 and 2 arrive together once the graded pages are
+ready — while the table below, correctly, dated `sheets600` to **005**. Three
+statements, two of them wrong, and the error is structural: **the pages exist at
+005 and the worklist cannot exist until the HTML does**, because the worklist is
+the list of figures the finished pages call for. They are separated above.
+
+The owner's *"ask me for crops and title once the graded files are ready"*
+(2026-11-02) is what got bundled. It names the moment the owner can start
+looking, not the moment a worklist can be written: 1 and the pages go over at
+005, the worklist follows when the HTML is complete but for figures. SH09 read the rule correctly against this
+file and asked, which is the only reason it was found.
+
+**And each of the three is timestamped at both ends** -- see *TIMESTAMP
+EVERY BLOCK ON THE OWNER*.
 
 **Everything else the build decides for itself**, and that includes the two it
 used to ask about: **binding** (*BINDING IS DERIVED FROM THE SCAN*) and
@@ -479,8 +757,10 @@ used to ask about: **binding** (*BINDING IS DERIVED FROM THE SCAN*) and
 fourth thing has either found a gap in these rules — say so, in
 `WORKFLOW_ERRATA.md` — or has not read them.
 
-**PAUSE 2 — the image boundary.** The chain runs from 005 to the end of the HTML
-with **no cut figures**, then stops and hands over. What it delivers:
+**THE IMAGE BOUNDARY — where the HTML runs out of work, and only the HTML.**
+The chain runs from 005 to the end of the HTML with **no cut figures**. At that
+point input 2 is the one thing between it and finished pages, so it hands over
+and **carries on with the PDF side**. What it delivers:
 
 1. `issues/<ID>/*.html` complete in every respect that does not need a figure --
    text, tables, listings, metadata, headings, errata, the lot;
@@ -489,9 +769,9 @@ with **no cut figures**, then stops and hands over. What it delivers:
 3. the **cover source** for `title.png` -- step 006 blocks on a hand-made 150 dpi
    `title.png` and the owner makes it from the scan. **This is handed over at
    005, not here** -- see *An OWNER DELIVERABLE is handed over the MOMENT it
-   exists*, below. By PAUSE 2 it should already be in the owner's hands;
+   exists*, below. By this point it should already be in the owner's hands;
    re-state it here only as a reminder of what is outstanding;
-4. **every owner decision accumulated since pause 1** (below).
+4. **every owner decision accumulated since the build started** (below).
 
 Then the owner cuts the figures and makes `title.png`. Then the chain resumes:
 place the images (150), build the PDF (006), re-run the end-of-issue gates.
@@ -510,8 +790,8 @@ are final from 005b, and nothing in 006 reads a crop. Reading this paragraph as
 a dependency cost both SH8606 and SH8608 a day of being described as blocked on
 figures when only their HTML was.
 
-The crop worklist still goes to the owner at PAUSE 2, because the HTML genuinely
-does wait.
+The crop worklist still goes over when the HTML is otherwise complete, because
+the HTML genuinely does wait on it. The PDF does not.
 
 **Step 006 is numbered early and RUNS LATE.** It is the issue PDF, it blocks on a
 hand-made input, and the PDF comes last anyway (*THE PAGE IMAGE IS `masters600`*).
@@ -519,10 +799,11 @@ Numbering is not a schedule.
 
 ### An OWNER DELIVERABLE is handed over the MOMENT it exists — and the chain does not stop
 
-PAUSE 2 is the point at which the chain **cannot make progress without the
-owner**. It is not the point at which the owner first hears from it.
+The image boundary is the point at which **the HTML** cannot make progress
+without the owner. It is not the point at which the owner first hears from the
+build, and it does not block the PDF.
 
-Two of the things PAUSE 2 hands over are **ready long before PAUSE 2**, and
+Two of the things the owner needs are **ready long before the HTML is**, and
 both are work the owner does by hand, so every hour they sit unmentioned is an
 hour of the owner's time the build is holding:
 
@@ -531,10 +812,19 @@ hour of the owner's time the build is holding:
 | the **uncut, deskewed, colour-corrected 600 dpi pages** — `<tmp>/sheets600/` | **005** | `open <tmp>/sheets600` |
 | the **150 dpi cover crop** for `title.png` | **005**, and on a `sheet` binding **005b** (it is a 25 % reduction of `<A4>/001.png` — `a4600` for `sheet`, `masters600` for `spread`; see r006) | `open <tmp>/title_source_150.png` |
 
+**AND `sheets600` IS A DIFFERENT COORDINATE SYSTEM FROM `masters600`.** The
+owner cuts from the sheet; every rule in the chain reads the master. The master
+is the traced page lifted out of the sheet and anchored at the canvas's
+top-left, so `sheet = master + sheet-box.x0/.y0` from
+`<tmp>/masters600/NNN.stamp.txt` — a pure integer translation, verified
+r = 1.00000 on SH09 pp 030/119/139, and non-zero on 162 of SH09's 168 pages, up
+to 86 px. Anything measured for the owner is measured on, or converted to, the
+sheet; see r150, *THE WORKLIST'S GEOMETRY IS IN THE `sheets600` FRAME*.
+
 **Owner, 2026-10-05:** as soon as either is available, **tell the owner and
 `open` it — and do NOT stop.** Carry on with the next step in the same breath.
-This is a notification, not a pause: the owner works on the title and reviews
-the pages while the chain runs on, and the two only have to meet at PAUSE 2.
+This is a notification, and nothing is blocked by it: the owner works on the
+title and reviews the pages while the chain runs on.
 
 So, at the end of 005:
 
@@ -554,6 +844,42 @@ master, the traced page box, the target size and an export warning in its crop
 worklist, and **made no file**, so the owner had to ask where it was. SH8603
 produced `title_source_150.png` and that is the precedent. Make the file.
 
+### TIMESTAMP EVERY BLOCK ON THE OWNER -- both ends of it
+
+**Owner, 2026-11-05:** *"and record the time when its blocked on me"*.
+
+The owner's hands are the scarcest input this chain has, and until now nothing
+measured them. Every point at which the build is waiting on the owner gets
+**two lines in `LOG.md`**, one when it hands over and one when the input lands:
+
+```
+OWNER-BLOCK  title.png            handed 2026-11-05 14:02  (005b complete)
+OWNER-BLOCK  title.png            received 2026-11-06 09:41  (19h39m)
+```
+
+Rules for the lines:
+
+1. **Read the clock, do not estimate it.** `date '+%Y-%m-%d %H:%M'` -- local
+   time, the same zone for every line. A model has no clock; a timestamp it
+   composed from context is a fabrication and worse than no line at all.
+2. **Both ends, every time.** A `handed` with no `received` means the build
+   never noticed the input arriving, which is the thing being measured.
+3. **One pair per input, and there is nothing else to count them by** -- the three
+   block different things at different times (`title.png` blocks 006, the crops
+   block the figures, the marks verdicts block the PDF shipping), and a single
+   single number for "the owner" hides which of the three was actually on the
+   critical path, and which artefact it was holding.
+4. **Note what the chain did in between.** A hand-over is not a stop
+   (*An OWNER DELIVERABLE is handed over the MOMENT it exists*), so `handed`
+   says which step ran next. Blocked-on-owner wall-clock during which the chain
+   was busy is not time the build lost, and the two must be told apart --
+   SH8606 and SH8608 were each described as blocked on figures for a day when
+   only their HTML was.
+5. **Total it at close.** The issue's closing report to the owner carries the
+   sum per deliverable and the build's own wall-clock beside it. `LOG.md` is
+   git-ignored and dies with the build (*Not `LOG.md` -- it is NOT durable*), so
+   a figure that is not in the closing report is not recorded anywhere.
+
 ### Owner decisions ACCUMULATE; they are not raised when found
 
 Several steps turn up something only the owner can settle:
@@ -566,15 +892,15 @@ Several steps turn up something only the owner can settle:
 
 None of these is a reason to stop and ask. **Write it to `LOG.md` the moment it
 is found** -- with the page, the evidence, and the question in one sentence --
-and carry on. They are delivered as one list at pause 2, where the owner is
-already looking at the issue. A question asked the moment it occurs costs the
+and carry on. They are delivered as one list with the crop worklist, where the
+owner is already looking at the issue. A question asked the moment it occurs costs the
 owner a context switch and the chain its momentum; the same question asked with
 nineteen others costs one sitting.
 
-### What legitimately CANNOT pass at pause 2
+### What legitimately CANNOT pass while the figures are out
 
-The end-of-issue gates are written for a finished issue. At pause 2 the issue is
-finished *except* for figures, so:
+The end-of-issue gates are written for a finished issue. With input 2 outstanding
+the issue is finished *except* for figures, so:
 
 - **Gate 1, "No stray TODO", cannot pass** -- every unplaced figure is a `TODO`
   by design. That is the deliverable, not a failure. Report the count; do not
@@ -586,7 +912,7 @@ The per-rule verifications that touch a **cut figure file** are likewise partly
 deferred. SURVEYED 2026-10-01 -- the blocks containing such a check are in
 **r150** (6, it is the placing step), **r160** (1), **r200** (2), **r240** (2) and
 **r300** (2). Defer only the checks that name a figure, not the whole block: the
-rest of each verification is about text and must pass at pause 2 like any other.
+rest of each verification is about text and must pass then like any other.
 
 Run every other gate. An agent that treats its own correct output as a failure
 will keep working past the hand-off and start inventing figures.
@@ -614,8 +940,8 @@ Nobody can recover that number afterwards, and it is what ranks the fixes.
 Giving up is allowed and is useful information. Say what you tried, which rule
 sent you there, and what was missing. The orchestrator either tells you to carry
 on -- the instructions were sufficient and you stopped early -- or fixes these
-files and points you at the change. **The owner is interrupted at the two pauses
-and for nothing else.**
+files and points you at the change. **The owner is interrupted for the three
+inputs in the table at the top of this file, and for nothing else.**
 
 ## THE CHAIN'S FIRST ACTION — DERIVE the binding, and which pages are which paper
 
@@ -1574,7 +1900,7 @@ did not. Found 2026-10-01, all dead:
 |---|---|---|
 | r150, r160 | `/tmp/64er_<YYMM>_pages/`, `/tmp/64er_<YYMM>_full.txt` | `<tmp>/masters600/NNN.png` and this issue's own OCR |
 | r160 | `~/DNB/<YYMM>/<YYMM>-cmyk/600_cropped/<NNN>.tiff` | `<tmp>/masters600/NNN.png` — same page, already deskewed and cut |
-| r130 | `issues/<YYMM>/64er_*.pdf`, `issues/<YYMM>/png/` | `<tmp>/masters600/NNN.png` and `<OUT_DIR>/blocks/pNNN.txt` / `NNN.labels.json`. Neither input exists during a build: the PDF is made at 006, after PAUSE 2, and there is no `png/` at all |
+| r130 | `issues/<YYMM>/64er_*.pdf`, `issues/<YYMM>/png/` | `<tmp>/masters600/NNN.png` and `<OUT_DIR>/blocks/pNNN.txt` / `NNN.labels.json`. Neither input exists during a build: the PDF is made at 006, late in the build, and there is no `png/` at all |
 | r300, r330 | `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf` | **gone.** For another issue use the repo's own `issues/<YYMM>/64er_19XX-XX.pdf`, or its scans |
 
 **What to do when a path in a rule does not exist.** Do not hunt for it and do
@@ -1779,6 +2105,98 @@ are bound by rate limits and by the credential race in `r000_llm.py` — four
 concurrent processes sharing one OAuth file once took out pages 84-176 of an
 overnight run. Their `LANES = 4` is a different constant answering a different
 question. Leave it alone.
+
+## Cross-cutting rule: AN AGENT'S PICTURES RUN OUT, AND GOING BACK TO ONE IS WHAT RUNS THEM OUT
+
+**There is a cap on the images one agent's request may carry. Past it, every
+further image comes back as `[media removed: request limit]`: the tool call
+SUCCEEDS, the picture is not there, and nothing the agent does afterwards
+brings it back.** The cap is on the REQUEST, and a request only ever grows, so
+from the moment it bites, that agent's vision work is over.
+
+**IT IS NOT A COUNT, AND DO NOT PLAN AGAINST ONE.** MEASURED on two builds with
+the same model: SH8608's step-325 reader D made **1,159 image reads over 193
+crops -- 6.0 looks per crop -- and was never stripped once**, peaking at 417 K
+of context. SH09's reader A made 2,991 reads over 127 crops -- **23.5 looks per
+crop** -- and was stripped from its ~50th read on, at 598 K. What is budgeted
+is the image payload still ALIVE in the request, so the number of pictures you
+may look at depends entirely on how many you are still carrying. **Going back
+to a picture you have already seen is what exhausts it**, and it is the one
+habit that is free to drop.
+
+MEASURED on SH09, 2026-11-06, where this cost a week of credits in one night.
+Six step-325 readers hit the cap independently after **43, 55, 56, 57, 63 and
+65** image reads:
+
+| | |
+|---|---|
+| crop reads by the eight sub-agents | **17,107** over **762 distinct crops** — 22.5 each, worst 33.8 |
+| of those that could have carried a picture | **about 440** (8 agents x ~55); the other **98 %** returned a blank |
+| context per reader | 400-600 K, never reset, mean **228 K of cache WRITTEN per call** |
+| spend | **445 M input-token equivalents in 107 minutes** -- 6.3x the most expensive step 325 ever run before it (SH8608, 71 M), and 2.5x a WHOLE normal build (median 175 M) |
+| edits produced | **56** |
+
+The readers were killed by the weekly usage limit at 06:47 with the step
+unfinished. Nothing was wrong with the machine, the model or the issue: the
+agents spent the night asking for pictures that could not be delivered.
+
+### Why the instruction they were following could not terminate
+
+r325 said, harvested from SH8607 where two readers had believed in pages they
+never saw: *"for every crop you rely on, confirm the image actually loaded"* —
+and the brief made that *"Re-read later, or list the page as not seen."*
+
+**Re-reading is the one action that cannot work.** Each retry appends another
+image to a request that is already over the cap, which evicts another image the
+agent still needs, which it then re-reads in turn. There is no exit, and every
+pass round the loop re-caches a 400 K context. A correct diagnosis — *you have
+not seen this page* — was given a remedy that makes the condition worse.
+
+### What any step that LOOKS at a page must do
+
+1. **Look at a crop ONCE.** This is the whole rule; the rest is bookkeeping. A
+   reader that looks once and moves on got 1,159 pictures on SH8608. A reader
+   that goes back got 50 on SH09. **Forty crops is the default budget for
+   planning a wave** -- it is under the lowest point the cap has ever bitten
+   (43), so a wave planned at forty is safe whatever the payload -- but the
+   budget is a floor you can exceed by reading once, never a licence to re-read
+   up to it.
+2. **`[media removed]` is a STOP.** The agent finishes the readings it already
+   has, writes down every crop it has NOT seen, and hands back. A short honest
+   not-seen list is a worklist for the next agent. A retry loop is a bill.
+3. **Read a crop once, and write down what it says BEFORE opening the next.**
+   The picture is a witness, not storage. A reading that exists only inside an
+   image is lost the moment that image is stripped — which is why SH09's reader
+   G rewrote its own ledger five times, each version headed *"authoritative"*,
+   *"supersedes every earlier reader G line"*, *"only this heading counts"*.
+4. **Size the work to the budget, not the budget to the work.** Step 325 needed
+   ~762 crops: that is nineteen agent-lives at forty each, not seven agents
+   told to look at everything. Split by CROPS NEEDED first, by words second.
+5. **A fresh agent gets a fresh cap** — measured six times over. So the shape
+   that works is **short waves of small readers, with the orchestrator
+   committing between waves**, never a few long-lived ones.
+6. **The orchestrator checks for the thrash, because the agent cannot see its
+   own bill.** Every sub-agent that looks at pictures reports `crops read /
+   crops actually seen`. Any gap means the cap bit, and the rest of its crops go
+   to a NEW agent. A report without those two numbers is not a finished report.
+7. **Ask whether the question needs a picture at all.** A question about WHERE
+   something sits -- how many spaces, which column, how many characters wide --
+   is arithmetic over glyph positions, and arithmetic costs no image budget.
+   MEASURED on SH09's r325 triage: six monospace spacing sites decided from
+   pitch and anchors, **never opened as images**, including twenty lines of a
+   reference table (r325, *A SPACING QUESTION IS ARITHMETIC*). Vision is for
+   what a glyph IS, never for where it sits.
+8. **Its yield lands somewhere DURABLE as it goes** — `issues/<ID>/reviewed/`,
+   committed per article. SH09's 723 KB of reader output went to `LOG.md`,
+   which git does not track, so an agent killed mid-run lost everything instead
+   of one article.
+
+**AND THIS IS NOT A STEP-325 RULE.** The same night, the step 190 sub-agent
+read 131 crops **2,226 times** with 1,183 of them stripped, following a rule
+that never mentions images at all. Any step that crops a page and looks at it
+is subject to this, whether or not its own rule says so — so this is the place
+it is written down, and every brief that sends an agent to look at a page
+carries points 1, 2, 3 and 6 verbatim.
 
 ## Cross-cutting rule: EVERY BASH FENCE IN EVERY RULE MUST PARSE
 
@@ -2065,6 +2483,14 @@ the END, by `tools/img/issue_pdf/`. A rule that renders from it cannot run at
 all -- 8610 hit this in nine rules, and every sub-agent had to be corrected in
 its dispatch. (Once the PDF exists its text layer is a candidate source, per
 the section below; the page IMAGE is still this file.)
+
+**THE BAN IS SCOPED TO THE ISSUE BEING BUILT.** Another, already published
+issue has no `<tmp>` and its page images are `/Volumes/S/png/<ID>/NNN.png`, the
+scans themselves — which is what r330 compares against, and what r150's reprint
+checks mean by *look at the other printings*. Only where there is no scan at
+all (8404) does r330's `pdftoppm` of a published PDF apply. A sub-agent on SH09
+read this ban as global, had no file left for SH8608, and rendered its PDF: see
+r150, *WHERE THE OTHER PRINTING'S PAGE IMAGE LIVES*.
 
 The render already exists, and it is better than a `pdftoppm` of the PDF would
 be: **`<tmp>/masters600/NNN.png`**, 600 dpi, A4, deskewed, cut and graded by

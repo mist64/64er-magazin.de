@@ -1938,3 +1938,1160 @@ and declined to hand-stamp.
 What moved instead was the evidence: out of the CLI transcript cache and into
 the issue's `reviewed/`. `~/.claude/projects/` rotates, sits outside the repo,
 and is not on the machine of whoever reads the ledger next.
+
+### 10. A HEADING IS A RULE, AND IT OUTLIVES THE RULE IT HEADS
+
+`r000_orchestration.md` carried *THE SHAPE OF A BUILD: TWO PAUSES* for a month
+after PAUSE 1 stopped being a pause. Binding became derivable on 2026-10-08,
+paper on 2026-11-02; both changes were made correctly, in the right sections,
+with their evidence — and neither touched the heading six hundred lines up that
+told the builder it would be stopping twice. The 8701 build read it as licence
+to ask, which is exactly what the two derivation rules were written to prevent.
+
+**A heading is read by builders who will not read the section under it.** The
+body text can carry a correction and a date and a precedent; the heading
+carries a number, and a wrong number in a heading beats a right paragraph. So:
+when a change removes a step, a pause, or a hand-over, grep the whole chain for
+the count. `grep -n 'twice\|two pauses\|both pauses'` would have found it on the
+day.
+
+### 11. "The input is missing" and "the input does not exist" are opposite records
+
+`r220_index_meta.md` recorded SH8601 shipping with zero `index_category` as a
+defect, because the rule had been skipped as `not applicable — kind` when the
+input was in fact there. Sonderheft 9 ships with zero too, and that is correct:
+the Gesamtinhaltsverzeichnis ends at 8/86. The artefacts are byte-for-byte
+indistinguishable and the records must not be.
+
+The rule now demands different evidence for each. For a Sonderheft past 8/86 the
+build must **rule out the input, not one file** — grep the CSV for the issue's
+`N/YY` key, show it returns nothing, and log `no index source: the CSV ends at
+8/86`. Without that line the next builder cannot tell a ruled-out input from an
+unread one, and will either re-litigate it or, worse, fill it in.
+
+**And filling it in is prohibited.** The obvious repair — classify the articles
+from the issue's own Inhalt page — produces a field that is indistinguishable in
+the file from the magazine's editorial classification. Same fault as the
+hand-written model stamp in §9: a written field says *stop looking*. Owner ruled
+ship without index, 2026-11-05.
+
+### 12. A deliverable table bundled two things that cannot be ready at the same time
+
+r000's owner-deliverable table listed row 2 as "the crop worklist +
+`<tmp>/sheets600/`", ready once "the HTML is complete but for figures", and the
+paragraph under it said 1 and 2 arrive together once the graded pages are ready.
+The table four hundred lines down, correctly, dated `sheets600` to **005**.
+Three statements about the same hand-over, two of them wrong.
+
+The error is structural, not a typo: **the graded pages exist at 005 and the
+worklist cannot exist until the HTML does**, because the worklist is the list of
+figures the finished pages call for. Nothing can make those one row. What got
+bundled was the owner's own phrasing — *"ask me for crops and title once the
+graded files are ready"* — which names the moment the owner can start looking,
+not the moment a worklist can be written.
+
+**A "ready after" column is a claim that has to hold for every row it covers.**
+When one cell covers two artefacts, split the row; a cell that is right about
+one of them reads as authority for both. SH09 hit this at 005, read the file
+correctly, could not reconcile it, and asked — which is the only reason it was
+found, and is what a sibling asking control is for.
+
+### 13. A CHECK THAT MEASURES THE CANVAS INSTEAD OF THE PAGE — and the gate I nearly added
+
+r005's sheet masters are the traced page moved to the canvas origin inside a
+fabricated margin. Verification check 4 has always read `page-px` off the stamp
+and looked only at the page. **Check 3, residual skew, read the whole canvas**,
+in the same verification block, in the same file. On a sheet much smaller than
+the frame that means measuring the bed, and the reading is meaningless on
+exactly the pages that need it.
+
+SH09's bound-in Zahlkarte made it visible: the step levelled p163 and p165 on
+the bed's outline and **rotated them off true by half a degree**, while reading
+p164 and p166 as level and leaving their own +0.54 and +0.34 in place. The step
+both misses a tilt and introduces one, on neighbouring pages of one card.
+
+Two things to carry forward.
+
+**When one check in a block knows to read the page box, every check in that
+block has the same problem.** `page-px` was written into the stamp precisely so
+that "every check that wants to look at the page and not at the fabricated
+margin" could, and its own comment says so. One consumer existed. Grep for the
+stamp field, not for the symptom.
+
+**AND I NEARLY FIXED IT WITH A GATE THAT COULD NOT SEE IT.** My ruling to the
+builder was that `measure_skew` was blind to 90°-rotated type and that
+`skew_peakiness` against `SKEW_PEAK_MIN` would catch it. Both halves were wrong,
+and the builder's measurements said so: the two orientations agree within
+0.1 deg on the page box, so the type is not the problem; and the contaminated
+canvas reading **passes peakiness at 10.94**, because a bed has a sharper
+profile than text. The gate would have stayed quiet on the one page it was being
+added for — HARVEST §7, a third time, now committed by the orchestrator rather
+than caught in a builder's rule. Peakiness is printed beside the angle so a
+reading can be weighed; nothing fails on it.
+
+**The lesson for ME, not the builder:** I diagnosed from the rule's docstring
+("skew of the TYPE") and the card's appearance, and proposed a threshold without
+measuring one page. The builder was told to confirm before acting and did, which
+is the only reason the wrong gate is not in the chain. A ruling from control is
+a hypothesis until the build has measured it, and it must be sent as one.
+
+### 14. A hand-repair is durable only when losing it turns a gate red
+
+p031's trace failed on a full-bleed photo at the gutter and was repaired by
+hand. The repair was correct and its record was not: a note in the git-ignored
+`LOG.md` and the script in `<tmp>/recovery/`, outside the repo. A clone would
+get a silently hand-edited master, and `r005_a4_window.py` rewrites the stamp
+with the pixels, so the next run of that step reverts the repair without a word.
+
+The shape that works, now in `issues/SH09/reviewed/` and general as written:
+
+1. the repair script itself, recording what failed and what it does, **refusing
+   a cut that already carries OVERRIDE**, and keeping the automatic cut beside
+   it;
+2. `a4600-overrides.txt`, one line per page — the record;
+3. a check with two tests: every master stamped `uncropped sheet` is named in
+   the record, and every page recorded as `repaired` carries OVERRIDE in its
+   stamp. Verified red both ways — fresh automatic stamp, and record removed.
+
+**Its limit is worth stating as part of it:** it is a stamp test, so it would
+not notice pixels changed with the stamp left intact. No path in the chain does
+that today. A check whose blind spot is written down is a check; one whose blind
+spot is assumed away is the trap in §13.
+
+### 15. THE APPARATUS KEEPS GETTING MEASURED INSTEAD OF THE PAGE
+
+Three times in one step, on one issue, a number that looked like a measurement
+of the page was a measurement of the equipment:
+
+1. the skew mask took in the **bed** on a sheet smaller than the frame, so the
+   step levelled two pages on the bed's outline (§13);
+2. Verification check 3 measured the **fabricated canvas margin** rather than
+   the traced page (§13);
+3. the step's edge angles for L and T on those cards are the **scan frame** —
+   the card sits at `x0=0, y0=0`, so two of the four columns describe the
+   scanner and read reassuringly near zero. A first reading of the cards as
+   "print parallel to the trim" came from those two columns.
+
+Each one reads as a plausible small number, which is why none of them failed
+anything. **The common test is cheap: ask what physical thing each number is
+of, before asking whether it is large.** For an edge, the stamp's `sheet-box`
+says where the traced page sat and a 0 is the warning. For a mask, ask what
+fraction of it is paper.
+
+And the resolution matters as much as the diagnosis. The cards were **levelled
+on their print**, not left as scanned, because the step's convention is written
+down — *level on the type and let the trim fall where it falls*, with edge tilt
+after levelling running 0.14–1.12 deg on this very issue. Leaving them would
+have made four pages the only ones in SH09 not following the convention, created
+by a defect. **A code freeze is a reason to use the override mechanism, not a
+reason to publish an unlevelled page.**
+
+A thing worth separating from all of it: the tilt the cards had in the scan was
+never a fact about the cards. On a `sheet` binding the leaf is laid on the glass
+by hand, so its angle in the frame is placement. What IS a fact about the card
+is relative — print parallel to the R trim within 0.07 deg, ~0.5 deg off the
+foot, a card cut out of square — and no rotation we apply can change it.
+**Preserving an artefact and preserving its accidental orientation are not the
+same thing**, and conflating them is how "publish the plate, not this copy"
+would get misread into shipping a crooked page.
+
+### 16. A TOLERANCE WITHOUT A SCALE IS NOT A TOLERANCE
+
+I required SH09's levelled cards to come back "≤0.1 deg residual" and did not
+say at which scale. p165 reads **0.00 at check 3's `reduce(4)` and +0.12 at full
+resolution**, and the builder correctly declined to decide which one I meant.
+
+The step's own documentation already answers it twice over — `measure_skew`'s
+docstring says the angle is scale-invariant and the MEASUREMENT is not, and two
+measured examples put the scale-to-scale gap at 0.22 deg (p116; SH8606 p147 on a
+grade change alone). So 0.12 between scales is agreement. **A threshold written
+against a quantity this file documents as scale-dependent has to name the
+scale**, or it is a number that cannot be met or missed. Fixed in the rule.
+
+And the better confirmation was not the threshold at all: **peakiness rose on
+all four pages**, roughly doubling. A residual near zero can mean the rotation
+is right or that the measurement has gone blind — §13 is exactly a zero of the
+second kind. A rising peak distinguishes them. The gate reads "peakiness NOT
+falling" now, which is the direction that carries information.
+
+**The builder also beat the rule's own method and said so.** `measure_skew`'s
+full-resolution refine put p165 at −0.44, leaving −0.12 residual at peak 25.93,
+while −0.56 gave peak 50.81. The refine maximises the projection score about a
+coarse guess, so on a page whose coarse guess was contaminated it refines
+confidently into the wrong place; sweeping for maximum peakiness does not. That
+is now the override path's method — and deliberately NOT a change to
+`measure_skew`, which runs on all 168 pages and was not what failed.
+
+### 17. AN OVERRIDE DOWNSTREAM LEAVES THE UPSTREAM ARTEFACTS LYING
+
+The SH09 card override re-made `masters600` and `a4600` and, correctly, did not
+touch `sheets600` or `cmyk2400`. So for four pages those directories hold the
+card as the bed read it, and the builder reported that unprompted rather than
+letting it be discovered.
+
+It matters because the step **documents a technique that reads them**: recovering
+`sheet-box` by correlating a master back against `sheets600`, good to 0.995+.
+On an overridden page that correlation is now against a differently-rotated
+image. Any later geometric comparison against `sheets600` has the same problem
+and would report the override itself as the defect.
+
+**So an override records which directories it re-made, and the rule records what
+that invalidates.** `a4600-overrides.txt` gained a `directories` column for
+exactly this, and the check now tests every directory a record names. A grade
+comparison is unaffected, because rotation does not move glyph p50 — which is
+worth saying, so the exclusion does not get drawn wider than it is.
+
+### 18. "PAUSE" WAS THE WRONG WORD FOR SIX WEEKS, AND THE WORD WAS DOING THE DAMAGE
+
+Owner, 2026-11-06: *"pause 1 isn't a pause any more. we decided the agent has to
+decide the paper and binding type. pause 2 isn't a pause, it just blocks
+progress on two things. and these two things are independent."*
+
+The chain described the owner's involvement as two points at which the build
+**stops**. Neither was ever that. PAUSE 1 stopped existing when binding and
+paper became derivable; PAUSE 2 was never a stop at all — it is the moment the
+**HTML** runs out of work, while the PDF carries on beside it. The vocabulary
+survived both facts and kept producing the same two errors: builds asked for
+things the chain could derive, and builds described themselves as blocked when
+only one of their two artefacts was.
+
+The structure that is true, and is now the shape of r000:
+
+| input | the owner returns | blocks |
+|---|---|---|
+| cover source | `title.png` | **the PDF** |
+| crop worklist + `sheets600` | the cut figures | **the HTML** |
+| marks census | a verdict per mark | **the PDF** |
+
+**The PDF is blocked on two owner inputs; the HTML on one; neither waits for the
+other.** That is three deliveries out and three answers back, each unblocking
+exactly one named thing — which is both more precise than "two pauses" and
+smaller, because nothing in it says the build stops.
+
+**A word that no longer matches is not a cosmetic debt.** Every derivation rule
+added since 2026-10-08 was written correctly and the heading above them went on
+promising a stop, so the heading won — §10 is the same failure one level down.
+Renaming it meant 34 occurrences across 12 files, every one of them a place a
+builder could have read the old model. `grep -rn 'PAUSE\|pause'` is the whole
+audit and it should be run whenever the owner's involvement changes shape.
+
+### 19. A GATE THAT ANSWERS A DIFFERENT QUESTION FROM THE ONE THE OWNER ASKED
+
+The marks census gates on *does the reader see it* — written after the owner
+was handed marks annotated "vanishes" and said ***"dont give me those, they will
+vanish!!"***. Correct, and it is not the whole of what the owner wants, because
+the owner's reason for wanting marks at all is upstream: *"i need to patch the
+input master file."*
+
+SH09 p111 is where the two part company: a pen note reading "M Blöcke",
+**26 x 3.8 mm on the master**, reduces to **49 scattered black pixels** at the
+PDF's 35 % threshold. The survival gate says dust, so don't surface. But the
+master has writing on it, and a later render — a different threshold, a page
+reclassified contone, a re-scan — shows the lot.
+
+**So the gate decides how a mark is DESCRIBED, not whether it is surfaced. What
+the MASTER carries decides that.** A hand — a note, a stroke, anything a person
+put there — goes over however little of it survives, with both facts side by
+side so the owner is not asked to rule on dust. Dirt that mostly drops still
+does not (SH8607's `044c`, `123x`, `140x` were right to stay off the queue:
+small on the master too).
+
+The general form, and it is the fourth variant of §7 in two days: **a gate
+inherits the question it was written for.** This one was written to stop a
+specific waste and became the test for a different decision. When a gate is
+added to prevent something, write down what it does NOT decide.
+
+### 20. "SHOULD SELF-CORRECT" IS NOT A VERIFICATION, AND I SAID IT
+
+I told SH09 that page 1's stale raster "should self-correct, confirm it did",
+citing r006's note that the cache is invalidated by a newer `title.png`. That
+invalidation lives in the **plain** script, which owns the cache; the **mixed**
+build only consumes it and never refreshes `001_150.png`. Replacing a cover and
+re-running the mixed build alone leaves the stale raster in place silently. The
+builder found this, not me, and filed it.
+
+Two things to keep.
+
+**I cited a mechanism without checking which script it was in.** The sentence
+was in the right file, under the right heading, about the right cache — and
+about the other program. A citation that is nearly right is the expensive kind,
+because it stops the reader looking.
+
+**And the cover gate could not have caught it either.** MEASURED: a page 1
+rastered from the RGBA cover differs from one rastered after `-alpha off` by
+**0.064 grey levels**, against a gate of 1 and ~24 for a machine-derived cover.
+The gate was sized to catch the wrong *image*, not two treatments of the right
+one. The verification that works is provenance — which file the raster came
+from, and when — which is what the build used: the embedded stream matched
+`guetzli-q97/001.jpg` byte for byte, a fresh q97 of the current raster hashed
+the same, and the RGBA file hashed differently. **Byte provenance beats a
+tolerance every time the difference is small and the stakes are binary.**
+
+### 21. I NAMED THE WRONG PLACE, AND THE NAME WOULD HAVE AIMED THE FIX
+
+I told SH09 to survey "specks in the bed strip outside the traced edge" and
+wrote that into r000, adding that a population would mean a 005 mask fix, "the
+same shape as *THE SKEW MASK MUST EXCLUDE THE BED*". The survey measured it:
+**0 of 4099 candidates lie outside the traced box.** The residue is INSIDE the
+traced edge, in the **torn fringe of the paper** — which is paper, which is why
+it is inside the trace, and dark, which is why it survives the threshold.
+
+Had the builder taken the instruction, the sweep would have found nothing and
+reported the page clean. Had it taken the analogy, the fix would have gone into
+a mask that never touches the fringe.
+
+**An analogy to a rule already in the file is the most expensive kind of wrong
+guess**, because it arrives with a citation. This one was reached from one page
+and a plausible mechanism, and the measurement took a few minutes. The builder
+ran it against the instruction rather than inside it, which is the only reason
+the error surfaced — and is what *If you are blocked, escalate to the
+ORCHESTRATOR* is for in the other direction.
+
+Second thing, smaller and worth keeping: the survey's criterion — neutral within
+1.5 mm of the bed — **cannot distinguish our residue from a genuine dirt speck
+sitting that close.** A speck wrongly called "ours" is a mark silently removed
+from the owner's queue by a measurement. The rule now requires the pages
+intended for repair to be checked against the raw one at a time; on SH09 both
+were, and the remaining 13 are below the gate, so nothing reached the owner
+either way. **A classifier that reassigns work away from a person needs its
+false-positive direction named.**
+
+### 22. THE CENSUS HAS NO VERDICT FOR THE PAPER ITSELF
+
+SH09 surfaced p168 — a grey-green mottle over the whole back-cover ground,
+205.6 x 282.3 mm, which is the page. Verified against the raw as fine green
+fibres in the stock and not a grade artefact, so the finding is real.
+
+It is still not a mark. **A mark is something ON the page; the page's own
+colour, fibre and ageing are the substrate.** Every verdict the census offers —
+`dirt`, `a previous hand`, `the plate` — is a claim that cannot be true of the
+stock: one is about something resting on the surface, one about a person, one
+about printing. Listing it as a mark asks the owner to rule that the paper is
+dirt.
+
+**So the test for the census is whether a verdict would MEAN anything.** Where
+none of the three can apply, it is an observation — hand it over labelled as
+one, with the measurement, expecting no answer, and keep it out of `marks.txt`.
+A census that admits findings no verdict fits will accumulate them, and every
+one costs the owner a decision that cannot be made.
+
+### 23. THE CENSUS POPULATION HAD A GATE NO PALE MARK COULD PASS
+
+The rules had said since SH8608 that the census carries **no size floor** — the
+survival gate is the filter, and a second one by size drops marks silently. That
+is about what gets REPORTED. Nothing had been said about the set the census is
+drawn FROM, and SH09's was drawn over two gates a pale mark cannot pass: the
+population is built from `lum < 153`, and the chromatic class additionally
+required **≥ 12 black px**. A pale coloured pen stroke has no dark core, so it
+satisfied neither, and no sheet, tile or crop ever contained it.
+
+**MEASURED:** a red pencil stroke 3 mm long on SH09 p110, found at 190B by an
+agent reading the page for an unrelated reason. The re-read that followed — all
+488 chroma components on the bilevel pages across 40 tiles, plus the 48 largest
+of 2240 pale components — added **four marks to a census of 111**. Of those
+four, one is a hand and is surfaced; the other three are flecks and scatter that
+do not survive the threshold, so they are recorded and not put to the owner,
+exactly as `044c`/`123x`/`140x` were on SH8607.
+
+The lesson is not "widen the mask". It is that **precision is what a crop shows
+you and recall is invisible by construction**, so a population gate owes a
+recall test, and the marks the census already holds are the test data: run each
+population against them and count what it would have found. One script run, no
+new eye work. This is the gate-that-cannot-represent-the-answer defect (§7, §13,
+§19) one layer earlier — the gate would have reported the mark correctly; the
+mark never reached it.
+
+Also recorded in r000: the hole that remains after the re-read is a pale,
+non-chromatic stroke, with the smaller pale components unread. **A bounded hole
+with its numbers written down is an acceptable place to stop; an unrecorded one
+is indistinguishable from a clean sweep.**
+
+### 24. NOTHING COMPARED A RAW BINARY TO ITS PRINT — IN ANY STEP
+
+r120 check 4 round-trips every BASIC listing: the .txt must re-tokenise to the
+.prg it came from, so a disk file that is not the printed program fails there.
+A program that ships as a RAW BINARY has no .txt and nothing to round-trip
+against, and I had never noticed that this leaves **no step in the whole chain
+comparing a binary disk file to its printed listing** — not 120, not 130, not
+190. The gap is invisible from inside check 4, which reports success on the
+population it can see.
+
+**MEASURED, SH09 p119 `turbotapecopy.prg`:** the disk file loads at $C700 with
+273 bytes of code; the printed listing starts at $C350. The disk holds the last
+fifth of the program and does not run alone. An agent found it at 130 while
+reading the page for placement — by hand and by luck — and r170 now recreates
+the program from the print, which is the right outcome by a route that does not
+repeat.
+
+`r120_binary_extent.py` closes it, and the shape of the fix is the point. The
+disk extent is exact; **the printed extent is not mechanical and the check does
+not pretend it is** — the OCR of that MSE hexdump reads `c35@`, `c3588`, `cIID`,
+`c5d®`, so a min/max over OCR'd hex columns would compare a correct file against
+a misread page and go red on good input or green on bad (§15 again: the
+apparatus, not the page). The two numbers come off the printed header row by
+eye, and the gate **fails on an unanswered line, not only on a mismatch** —
+a check that can only go red after someone has done the reading is no check at
+all. Measured cost on the most program-heavy issue in the corpus: 28 binaries,
+most of them a glance.
+
+**And the test I prescribed is biased, which the builder established and I had
+not.** Measured over the 112 surfaced marks, the pale population misses 108 of
+them — and **111 of the 112 entered the census through a `lum<153` population**,
+so the test measures each net against a catch the other nets made. A recall test
+over a census built by one instrument cannot measure a second instrument's
+recall on what the first never saw. It still earned its keep: p110 is held by
+the chroma population **alone**, which no amount of reading crops would show.
+And the hole that remains — a pale, NEUTRAL stroke — is now bounded by
+arithmetic rather than by effort: `pale` means no pixel below `lum 153`, the
+bilevel threshold is `lum 89`, so such a mark cannot produce one black pixel in
+the PDF; on contone pages the faint sweep is the net and it is the instrument
+that found the only two marks no population holds. **A gap against the master is
+recorded; a gap against the artefact would have to be closed.**
+
+**And the first red line after it went live was the tolerance trap.** SH09's
+`format-system.prg` has a four-byte disk tail, one past the 1-3 byte window the
+check inherited from check 4 — and the builder asked whether to widen the window
+rather than widening it. Right question: the window's 1-3 was measured on D64
+SECTOR tails, while this tail is the end-of-BASIC pointer the printed loader
+sets four bytes past the data it writes (`POKE 45,119:POKE 46,12` → $0C77, data
+to $0C73, all 1139 program bytes agreeing). **One number standing for two
+unrelated causes is §16 again**, and a 4-byte window would silently pass a
+program genuinely truncated by four. A second cause gets a REASON — an expected
+mismatch, reported and not counted, exactly as check 4 honours a
+`;inkl. Fehlerteufelchen` header — and the reason carries the evidence from the
+print, not the word "expected".
+
+### 25. A SKIP BRANCH SWALLOWED AN ENTIRE DISK, AND THE CHECK EXITED 0
+
+r120's check 3b exists because an orphan COUNT cannot see a dropped mid-disk
+separator; it prints the mapping instead. It keyed each separator's page off
+`-+\d+` — dashes immediately followed by digits — and `continue`d on anything
+that did not match, a branch added for SH8608's all-dash frame bars.
+
+**MEASURED on SH09's step-120 prg.txt:** 25 separator comments, all 25 matching
+the split, **0 matching `-+\d+`**, because SH09 spells them `-------s.102----`.
+Every separator was classified as a frame bar, the loop printed **nothing**, and
+the check exited **0** on an issue with 59 listings in 18 sections. The builder
+noticed because nothing came out, not because anything said so.
+
+Three things, all now in `r120_sections.py`:
+
+1. **A skip branch is a silent reclassification.** Every separator the dialects
+   cannot read is PRINTED as a non-page entry, so an unknown spelling shows up
+   as a long list rather than as silence.
+2. **An empty mapping is the loudest failure there is**, and it has two causes
+   that must not be confused — the wrong file (a post-130 prg.txt, whose
+   separators 130 has already removed) or a dialect the script does not know.
+   The script distinguishes them by whether the file has any directory entries
+   at all.
+3. **The dialect may not be guessed from "a number in the name."** SH09's own
+   disks carry `-------c128-----` and `----nur 1541----`, which a loose pattern
+   reads as page 128 and page 1541. The spellings are declared, most specific
+   first, and measured against their own issues: SH09 18 sections, SH8608 30
+   (`c16-NN`/`vc20-NN`, where the old check reported 9 as carrying no page),
+   8611 18.
+
+And the orphan half of the same check went the other way: it asserted on the
+EXISTENCE of an orphan, which is red on a correct build — every SH09-era disk
+opens with an unplaced intro screen (§ the REM-only case, 8701, is the same
+mistake). What may not pass is an orphan nobody has dispositioned, so the gate
+now reads the prose comment 130 writes above the figure. **120 leaves it red;
+130 turns it green.**
+
+### 26. THREE DEFECTS IN THE CHECKS I WROTE TO CLOSE §24 AND §25
+
+All three found by the builder running them, within a day of my committing them,
+and all three the same shape as the defects the checks exist to prevent. Written
+down because a new check is not a finished check, and because I am the one who
+keeps saying so.
+
+1. **`NO ARTICLE COVERS THIS PAGE`, 18 times, for one missing input.** Run
+   against a scratch directory holding only a `prg.txt`, the mapping had nothing
+   to map to and the script answered every section with a false finding instead
+   of saying the article metadata was absent. Two kinds of absent input (§11),
+   in the check I wrote to fix a different instance of §11.
+2. **A one-byte convention would have gone red on every correct binary.** An
+   MSE header prints the end address one PAST the last byte; a span from load
+   address + length is inclusive. The builder reported it before running the
+   28 readings — *"the agent will report that, not fudge it"* — which is the
+   right instinct and the reason it cost nothing. The answer now names its
+   convention and the script subtracts.
+3. **`c64.input#.prg` lost its answer to comment-stripping.** `line.split("#")`
+   truncated the name, so a line that HAD been answered read as unanswered —
+   in a gate whose entire premise is that an unanswered line fails. A `#` is a
+   comment only at the start of a line.
+
+The pattern across all three: **a check's failure modes have to be tested on
+real inputs, not just its success path.** Each one was invisible on the data I
+tested it against and obvious on the first real run.
+
+### 27. THE ISOLATION RULE IS WHY THE CENSUS CANNOT SEE A MARK ON TOP OF TEXT
+
+I had ruled the census's remaining recall hole bounded by arithmetic: a pale
+neutral mark cannot survive the bilevel threshold, so the reader never sees it
+(§23). That ruling is correct and it is NOT the whole hole. The builder measured
+why the pale population missed SH09's p110 — I had named two candidate causes
+and asked which — and it is **the isolation test, not the threshold**:
+
+- the stroke passes `no pixel under 153`, and **fails** `iso(r=6)`: its nearest
+  neighbour is 0.68 mm away, `lum min 46`, the `e`/`g` of *ausge-*, and a second
+  fragment of the same stroke is merged into the print's own component;
+- `dark` applies the same `iso` at r=10 (~0.85 mm), so **a mark within that
+  distance of print is dropped by both populations**, at any size — a 3 mm
+  stroke was dropped;
+- `chroma` has no isolation test, **which is the only reason p110 was ever
+  seen**. A NEUTRAL mark touching print has no such net.
+
+**So this hole is different in kind from §23's and my bound does not cover it:**
+a dark neutral mark touching print is dropped by the census AND survives the
+threshold into the PDF. It is a gap against the artefact, not only against the
+master. The census is weakest exactly where a reader's hand is most likely to
+have been — on top of the text — and `marks.txt`'s LIMIT line described the
+limit as a size ("under 0.5 mm near a glyph") when size is not what decides it.
+
+The methodological half matters as much. A recall test over the surfaced marks
+is biased (§23) and p110 cannot measure a neutral net because it is coloured, so
+the instrument is **ground truth we make ourselves**: plant synthetic strokes of
+known length and luminance across a word, through a margin and in white space,
+run the census unchanged, and read off which surface. r120's separator check was
+validated the same way. **Do not widen a mask against a hypothesis; plant an
+answer key and measure.** Recorded as a known open defect in r000; SH09 ships
+with the limit stated to the owner, because the owner's reason for wanting marks
+is to patch the master and they are entitled to know what the list cannot
+contain.
+
+### 28. A CLOSED VOCABULARY MET ITS SECOND UNEXPRESSIBLE STATE
+
+r300's three status comments are claims about a FILE: the disk already had it
+right, we applied the correction, or only the print was wrong. SH09 article 113
+reproduces 8612's Datev Fehlerteufelchen, whose change **depends on the reader's
+printer**, with `prg/datev.prg` left unpatched — and each of the three words
+would be a false statement about that file. The builder reported that none fits
+instead of picking the nearest, which is how a closed vocabulary is supposed to
+fail; the failure mode to fear is the opposite one, since a status comment is
+read as a claim and a false one tells a future build that nothing needs
+checking.
+
+Added `<!-- Bedingte Korrektur, nicht angewendet -->`, with the condition named
+in the aside's prose and `;Fehlerteufelchen M/YYYY bedingt, nicht angewandt` in
+the program file — and **added to the verification's `STATUS` tuple in the same
+edit**, because a new word the check does not know turns a correct build red,
+which is the mistake this file records twice already (the REM-only case, the
+orphan assertion).
+
+**This is the second gap in a vocabulary r300 calls closed** — the first was a
+prg whose printed erratum the owner left unapplied, which took a header comment
+rather than a word. A vocabulary that keeps meeting states it cannot express is
+not closed, it is under-measured; the honest form is to name the gap each time
+rather than to stretch a word.
+
+### 29. THE CROSS-ISSUE QUEUE WAS LIVING IN A CONVERSATION
+
+Findings about already-published issues pile up during every build — a
+transcription error in 8412 spotted while reading SH09's reprint of the same
+series, a caption in 8411, an entity sweep, a tools leak. They are not the live
+build's work (r000: the issue you are working on is the scope) and not control's
+to execute, so control parks them and assigns them later.
+
+**They were parked in context.** No file held them: the scratchpad is wiped
+between sessions and a summary keeps the sentence while losing the measurement,
+so the list survived only as long as a conversation did — and every re-telling
+cost a number. Measured while writing them down: of two counts carried that way,
+one was of asides where the file count is 3, and one "Interpol" item turned out
+to include a correct use of the word in a different issue's game menu.
+
+`tools/img/scan2ocr/rules/CORPUS_QUEUE.md` now holds them, and the rule that
+makes it worth having is that **every item carries the command that
+re-establishes it**, so the assignee never inherits a remembered number — not
+even from this file.
+
+### 30. I GREW A VOCABULARY AND LEFT ITS EVIDENCE NOWHERE TO LIVE
+
+§28 added `Bedingte Korrektur, nicht angewendet` and added it to the
+verification's `STATUS` tuple in the same edit, so that the check would still
+demand a program file naming the erratum. It demanded one that cannot exist:
+`prg/datev.prg` is a raw binary printed as an MSE hexdump, the check only read
+`prg/*.txt`, and the builder was left with a red line on a correct article and
+no edit that would clear it. It came up instead of inventing a file — and the
+file it would have had to invent, `prg/datev.txt`, would have SHIPPED TO READERS
+as a listing, because generate.py renders every `prg/*.txt` as one.
+
+**A vocabulary and the places its evidence may live are one change, not two.**
+I had just written, in the same commit, that a new word must go into the
+check's tuple so a correct build does not go red — and then produced the same
+failure one layer down, in the half I did not think about.
+
+The fix is also the general shape: the record for a binary goes in
+`reviewed/errata_status.txt`, where dispositions already live, which is durable
+and whitelisted, and NOT in the HTML that makes the claim — a claim attested by
+the file making it is the always-green mirror this check exists to prevent. The
+check became `r300_status_pairs.py` so it could be tested: five published
+issues reproduce their previous pairings, and the reviewed route was exercised
+on all three of its failure modes (a program not in `prg/`, a malformed line, no
+record at all).
+
+**And the condition was already in the corpus, which the test found.** Running
+the new script over every issue carrying a status comment, `8609/156` fails:
+its aside claims `Disk-Version bereits korrigiert` for 10/1986 while
+`viza.patch.bas.txt` carries no such header and the article's other two
+programs are MSE-rendered BINARIES with no header line to carry one. The
+preceding check failed on it identically, so it has been red or unrun since
+that check was added. **A new check's first job is to run on the whole corpus,
+not only on the issue that prompted it** — that run cost one command and turned
+"a one-off SH09 problem" into a documented condition with a second instance
+(CORPUS_QUEUE 11).
+
+### 31. TWO NAMES FOR "THE PAGE", AND NOTHING SAID THEIR PIXELS DISAGREE
+
+The build reads `masters600`; the owner cuts from `sheets600`. Both are "the
+600 dpi page", both are named in the rules dozens of times, and **no rule said
+a box measured on one lands somewhere else on the other.** The builder found it
+while writing SH09's crop worklist and measured it before handing the file
+over: `sheets600` 5040x7203-7205 against `masters600` 5457x7181, content up to
+86 px right and 14 px down of its master position.
+
+The relation turned out to be exact and already recorded — step 005 lifts the
+traced page out of the sheet and anchors it at the canvas's top-left, and the
+stamp's `sheet-box` is where it came from. VERIFIED by correlating a 400x400
+master patch into the sheet on SH09 pp 030, 119 and 139: **r = 1.00000, residual
+0 px**, so `sheet = master + sheet-box.x0/.y0` is the whole of it. The canvas
+width difference is fabricated margin and moves nothing.
+
+MEASURED: **162 of SH09's 168 pages have a non-zero offset**, max 86 px in x
+(p099), 14 px in y (p042) — 3.6 mm at 600 dpi. SH8608's worklist quoted the
+master frame and said nothing; its tmp is gone, so the reach cannot be
+recovered.
+
+**A worklist row is a rough `WxH+X+Y` the owner refines by eye, which is
+exactly why this survived.** A systematic right shift that is always smaller
+than the slop of the measurement never announces itself. The fix is two lines —
+measure on `sheets600`, name the frame in the header — and the general shape is
+that **an artefact handed to a human needs its frame stated, because the human
+cannot ask the stamp file.**
+
+### 32. THE SUB-AGENT'S "SLIP" WAS THE RULE'S, AND THE RULE HAD NO ROUTE AT ALL
+
+The SH09 worklist agent reported itself for rendering SH8608's pages with
+`pdftoppm`, which its brief forbids. **It was right to report it and the breach
+was not its.** r150 tells the builder to look at another printing — *A
+RECURRING ARTICLE'S FIGURES FOLLOW ITS OTHER PRINTINGS*, *Has a prior printing
+already set it?* — and named **no file** for the other printing's pages. A
+published issue's `<tmp>` is wiped. The brief said *"Never `pdftoppm`; the page
+image is masters600"*, naming a directory that for SH8608 does not exist. So
+the one tool that could answer the question was the one tool it was told not to
+use, and it chose the answer over the ban.
+
+The ban's reason has always been scoped and the scope was never written down:
+*while the issue is being built* that PDF does not exist, and `masters600` is
+better. It says nothing about another issue, and **r330 prescribes exactly that
+`pdftoppm` render for 8404**, the one issue with no scans — so the chain
+simultaneously banned and required the same command, with no sentence anywhere
+telling them apart.
+
+The route that existed all along: **`/Volumes/S/png/<ID>/NNN.png`**, the scans,
+53 issues deep, which r330 already calls *the authority for their side* — plus
+the delivered crops in `issues/<ID>/*.png`, 89 for SH8608, durable and in the
+repo. Both are now named in r150 and the scope is in r000.
+
+**A prohibition without a scope is read as global, and the case it was never
+about is then unreachable.** §16 is the same failure in the other mood: there a
+tolerance was stated with no scale to measure it at, here a ban with no case to
+apply it to. A constraint that does not say what it is about gets read as
+applying to everything, and the builder is left choosing between two rules
+instead of following one.
+
+### 33. I PRESCRIBED A RETRY AGAINST A HARD CAP, AND IT COST A WEEK OF CREDITS IN ONE NIGHT
+
+Owner, 2026-11-14: *"we burnt through a whole weeks worth of tokens, which is
+like 5x as much as usually, AND we didnt finish."* Measured from the session
+transcripts, it is worse than 5x: the SH09 builder session spent **4,913 M
+input-token equivalents** against **3,568 M for every other session in this
+project put together**, 9.6x the median previous build. **99.6 % of it was in
+sub-agents**, and 95 % of that in the eight that ran on the night of 11-06.
+
+**Where it went:** seven step-325 readers started at 05:00 and were killed by
+the weekly usage limit at 06:47. In 107 minutes they made **17,107 crop reads
+over 762 distinct crops**. There is a hard per-request image cap; six of them
+hit it after 43, 55, 56, 57, 63 and 65 reads. **About 440 of those 17,107 reads
+could have carried a picture. The other 98 % returned `[media removed: request
+limit]`** — a successful tool call with nothing in it. Context per reader ran
+400-600 K and never reset, so the mean call WROTE 228 K of cache: reader A
+alone wrote 790 M cache tokens, more than this control session's entire
+two-month history, for one article. The night produced **56 edits**, none
+committed, and 723 KB of reader output in `LOG.md`, which git does not track.
+
+**The instruction was mine.** §SH8607 harvested a real fault — two readers
+believed in pages they had never seen — and I wrote the remedy as *"for every
+crop you rely on, confirm the image actually loaded"*, which SH09's brief made
+*"Re-read later, or list the page as not seen."* The diagnosis was right and
+the remedy was the one action that cannot work: the cap is on the REQUEST and a
+request only grows, so each retry evicts another image the agent still needs,
+which it then re-reads. A thrash with no exit, at a full re-cache per pass.
+
+**A correct diagnosis does not make a remedy correct, and I shipped the pair as
+one thought.** §30 is the same failure — a word added without asking where its
+evidence could live. Here it is a retry added without asking what happens when
+the thing retried is permanently unavailable. **Before writing "try again", say
+what changes between the attempts.** Nothing changed between these.
+
+What is in the rules now (r000, *A SUB-AGENT GETS ABOUT FIFTY PICTURES*, with
+r325 and r190 pointing at it): forty crops per agent; read once and write the
+reading down before opening the next; `[media removed]` is a STOP and the
+unseen list is the next wave's input; split by crops before words; short waves
+of fresh agents, because a fresh agent gets a fresh cap; the orchestrator
+reconciles `crops read / crops seen` because the agent cannot see its own bill;
+and the yield lands in `reviewed/`, committed per article.
+
+**And it was never a step-325 rule.** The same night, step 190's part-B agent
+read 131 crops 2,226 times with 1,183 stripped, under a rule that never
+mentions images. The cap belongs where every step reads it, which is why it is
+a cross-cutting rule in r000 — **§10 again: the rule that governs the behaviour
+has to sit where the behaviour is, not where it was first noticed.**
+
+**CORRECTION, same day.** §33 first wrote the cap as a flat "about fifty
+pictures per agent". It is not a count. SH8608's step-325 reader D, on the same
+model, made **1,159 image reads over 193 crops and was never stripped once**
+(context peak 417 K, mean cache-write 40 K/call) — against SH09 reader A's
+2,991 reads over 127 crops, stripped from ~50 on (598 K, 228 K/call). The
+budget is on the image payload still ALIVE in the request, so **how many
+pictures you get depends on how many you are still carrying**. Re-reading is
+not merely wasteful, it is the thing that spends the allowance: SH8608 looked
+6.0 times per crop and lived, SH09 looked 23.5 times and died. The rule now
+leads with *look once*, and keeps forty only as the planning figure for a wave.
+**I nearly shipped a gate that could not represent the correct answer** — a
+reader doing the right thing would have stopped at forty for no reason, and the
+number would have looked validated every time.
+
+**SECOND CORRECTION — AND IT IS ABOUT HOW I MEASURED.** §33's first figures
+were wrong by roughly an order of magnitude: I scanned the transcripts for
+`"usage"` blocks and summed them, and **the transcript re-serialises earlier
+messages inside later records**, so the same usage block is counted many times
+over. The factor is not constant — it grows with conversation length, 1.8x on
+one file and 8.8x on another — so even the RATIOS were wrong. The owner's
+`/usage` caught it: 508.9 M cache-read for a session where I had reported
+6.97 B. **Dedupe every usage record by its `msg_...` id, and check the total
+against `/usage` before quoting it.**
+
+The corrected numbers, which change the size of the fault but not its shape:
+
+| step 325, per issue | agents | cost |
+|---|---|---|
+| 8701 | 2 | 4.5 M |
+| SH8606 | 12 | 22.2 M |
+| SH8607 | 12 | 33.7 M |
+| SH8608 — the full-dress run that worked | 17 | 70.9 M |
+| **SH09 — the run that did not finish** | 9 | **444.7 M** |
+
+A whole build session runs 102-215 M (median 175). So SH09's step 325 alone
+cost **2.5 whole builds**, and **6.3x the most expensive 325 before it**; the
+SH09 session as a whole is 563 M against a 175 M median, which is the owner's
+"5x as much as usually" measured at 3.2x. **The qualitative findings are
+untouched** — 98 % of image reads blank, 23.5 looks per crop against SH8608's
+6.0, the readers' own ledgers declared void — because those came from counting
+deduplicated tool-call ids, not from the usage blocks.
+
+**A number I computed wrongly is worth as little as a number I remembered**,
+and I put four inflated figures into two rules and a commit message before the
+owner's `/usage` contradicted them. The lesson is the cheap one: when a
+measurement can be checked against an instrument somebody else owns, check it
+BEFORE it becomes a rule.
+
+### 34. THE BUILDER ANSWERED SIX PICTURE QUESTIONS WITHOUT A PICTURE
+
+In the r325 triage the builder settled six monospace spacing sites — including
+twenty lines of article 111's reference table — **by measuring glyph positions
+and never opening the crop**: derive the pitch from two anchors beside the
+site, divide the offset, read off the column. `64` p77's `ALT` moved one cell
+at 44.8 px pitch; p76's asterisk box was counted at 41.5 px and found one star
+too wide; `111`'s descriptions sat at +327..332 px from their addresses, which
+is 8 cells, so column 16 and not 15.
+
+**This retires a gap that had been recorded as unfixable.** r325's SH8607 entry
+said monospace spacing is *undecidable* where the face drifts 36-44 px across a
+line, and told readers to keep the transcription and record the site. The drift
+defeats a GLOBAL pitch; it does not defeat a measurement. Two anchors beside
+the site give the pitch where the site is, and the answer carries its own
+arithmetic.
+
+**And it is free of the thing that broke this step.** Nothing it reads is an
+image, so it does not compete for the payload budget of §33 — which is now
+point 7 of that rule: *ask whether the question needs a picture at all*. Vision
+answers what a glyph IS; arithmetic answers where it sits, and we had been
+spending vision on both.
+
+**The builder found this, not me.** It came up because the new discipline makes
+every crop cost something visible — when looking is rationed, not looking gets
+invented. The old shape, with pictures apparently free, had no reason to.
+
+### 35. THREE LIMITS ON THE ARITHMETIC, FOUND BY USING IT
+
+§34's measuring method met its edges within a day of being written, and all
+three came back from the readers rather than from me.
+
+**1. A glyph can be wider than its cell.** MEASURED on SH09 p077 by ink
+columns: `#`, `<` and `>` have 52-53 px of ink and advance 80, 69 and 110 px
+against a 41.5 px pitch — 1.93, 1.66 and 2.65 cells. No whole-cell sum across
+one of them is valid. **Two readers reported it incompatibly and both were
+right**: one gave the advance ("two cells"), one the ink ("52-53 px"), which
+are different quantities, and the rule needed both. The method that survives is
+not counting cells at all but **comparing the same construct on the same page**
+— on that pair every landmark agreed to the pixel and only `ALT` moved, +42 px,
+one space. With no comparable line the site is undecidable, which now means
+*no legible comparison* and nothing else.
+
+**2. A rule that names a case gets read as naming only that case.** I wrote
+that a wrapped COMMENT joins with a space. A reader met a listing TITLE broken
+at the box width, applied the same reasoning, and asked whether it was allowed
+— correctly, because the rule did not say. It is the same break for the same
+reason, and the rule now tests what the text IS, not what it is called.
+**I named a comment only because a comment was the case in front of me**, which
+is how §10 and §32 start.
+
+**3. The cheapest witness is sometimes not a measurement either.** 365 of the
+445 rows of article 30's Listing 21 were never opened, because their bytes are
+verified against the disk file by step 120 — exact, complete, and free. The eye
+went to the 80 rows with no disk witness and to a 500-cell table with none at
+all. **Vision, arithmetic, and a byte-for-byte comparison are three witnesses
+of descending cost and ascending strength**, and the step now picks the
+strongest available per site rather than defaulting to the one that looks like
+reading.
+
+**And the coverage line has to keep them apart.** *"365 rows not read by eye;
+bytes verified against `prg/<name>`; columns measured at 41.5 px"* is three
+claims with three warrants. Rounding that to "read in full" is the false
+displayed list of §33 in a politer costume.
+
+### 36. "PROSE JOINS" WAS TOO SIMPLE, AND THE SAME BLOCK HELD BOTH ANSWERS
+
+§35 generalised a wrapped comment to any prose in the box. A reader then asked
+about two broken lines **in one `<pre>`** — article 111's Bild 1 — and they go
+opposite ways, which the flat rule could not express:
+
+- `Mit Anfangsadresse DIM's` / `vergleichen`: the continuation sits at col 16,
+  the column every description in that block starts at. **Join.**
+- `SYNTAX: SYS 49164, (linkes Grenzelement),` / `(rechtes Grenzelement)`:
+  `(rechtes` starts at x=3453, exactly under `(linkes` at 3453 — col 19,
+  neither the description column nor the margin. **Keep.**
+
+**The wrap was forced in both; the indent was chosen in only one.** A
+continuation at the running column is overflow and carries nothing. A
+continuation parked under a particular word is a statement about structure, the
+same kind the comment column makes, and joining deletes it.
+
+The test is arithmetic, so it is decidable everywhere — and the evidence for
+both verdicts was **already in the triage file**, measured for a different
+purpose a few hours earlier. §34's habit of recording the arithmetic rather
+than the verdict paid for itself inside a day: the question arrived and the
+answer was already on disk, with its anchors.
+
+**Three times now a rule of mine has named the case in front of me and been
+read as naming only that case** (§32 a ban without scope, §35 a comment that
+was really any prose, this one a join that was really an overflow). The pattern
+is the same each time: I wrote the INSTANCE and meant the PRINCIPLE. Write the
+test, then give the instance as its example.
+
+### 37. THE RULE HAD PRESCRIBED TOOLING FOR A MONTH AND NOBODY HAD BUILT IT
+
+SH09's builder sized step 330 before spending anything — 13,000 differences
+whole-article, 2,700 with `--partial` — and stopped, because r330's merged-
+reprint section prescribes `diff --range`, content-hash keys and a per-pair
+record in `reviewed/`, and **the tool has none of the three**. The section was
+written after SH8607's 23 pairs came to 74,621 lines, as the fix for exactly
+this, and then nothing was built. A rule that prescribes tooling which does not
+exist is a rule that cannot be followed, and it had been in that state since
+SH8607.
+
+**And the first thing measuring found was worse than the volume.** The tool
+paired blocks by token bag normalised over the SMALLER bag — its own docstring
+said so — so a short block scored high against any long block containing its
+words. SH09's 39-word paragraph paired with an 8-word fragment at **0.800**,
+sequence similarity 0.085, and the whole paragraph was then diffed against the
+fragment. On SH8608 against 8512/146, **78 of 85 MOVED pairings were spurious**:
+`FAST` against an 87-word paragraph, `Insert` against *Flagge für
+INSERT-Modus*. Those records are published.
+
+Three things now exist:
+
+1. **`MOVED_COVER`**, a two-sided coverage test. The overlap must cover the
+   LARGER bag too, because a MOVED block is the SAME block in another place.
+   Regression: the STREHLOW/STEHLOW byline the feature was built for survives
+   at cover 0.50, and the 97-word moved letter at 0.97.
+2. **`--record PATH`**, a hash-keyed record: the key is a content hash, so a
+   later fix does not renumber it — which the tool's own comments had asked for
+   since the day a `WordStar`/`Wordstar` difference moved from D-006 to D-007
+   and verify went on reporting D-006 as dispositioned.
+3. **A class per difference, deciding who looks.** On SH09's article 64 against
+   SH8608/79: MECHANICAL 56 (whitespace, case, punctuation — counted, never
+   read), CANDIDATE 105 (29 near-identical spans, 76 dropped words), EDITORIAL
+   139 (the magazine re-wrote the passage). **Only the CANDIDATEs need a
+   reader**, which is 105 rather than 300.
+
+**The classifier's first cut was wrong and measuring caught it.** It called any
+span of three words or fewer a CANDIDATE, which put `erläutern`/`klären` and
+`wieso`/`warum` in front of a reader — the magazine rewriting, not a
+transcription error. What a reader can adjudicate is a span that is nearly the
+same STRING (an OCR slip looks like its original) or a word absent on one side.
+A different word of the same length is editorial at any length.
+
+**The lesson is the one this week keeps teaching from a new angle: measure the
+job before dispatching agents at it.** §33 was seven agents sent at an
+unmeasured job. This time the builder measured first, found the job impossible
+as specified, and stopped — which cost one message instead of a week.
+
+### 38. THREE SILENT MISSES IN THE GATE THAT WAS SUPPOSED TO CATCH THE MISSES
+
+Extending `verify` to read the per-pair records turned up three defects, and
+all three were SILENT — the gate reported success while checking nothing.
+
+1. **The leads cell was split on `+` and the whole part added.** A merged
+   reprint's cell is comma-separated, so SH09's article 30 — seven originals
+   from `8410/153` to `8506/116` — went in as ONE string that matches no LOG
+   row. The gate reported a phantom missing lead and **checked none of the
+   seven**. Now `re.findall` over the cell.
+2. **A lead with no page was dropped without a word.** `8406` alone matched
+   `\d{4}/\d+` nowhere, so a claimed original was never required to have a row.
+   It is now reported as what it is: a lead that can be neither resolved nor
+   diffed.
+3. **My own record loader keyed pairs by BASENAME**, and article 94 merges
+   fourteen letters pages of which **eight are all called `Leserforum.html`**.
+   Six records collapsed onto one key and left the gate in silence. Keyed by
+   path: 21 loaded became 27.
+
+**I wrote the third one today, in the same hour as a rule about checks that
+cannot see.** The defect is the identical shape to the two I had just fixed —
+a key that is not unique, assumed to be — and knowing the pattern did not stop
+me instantiating it. What caught it was not care: it was counting the records
+loaded against the records on disk, which is the only reason the number 21
+looked wrong beside 30.
+
+**So the loader now NAMES what it cannot read** rather than skipping it. SH09's
+three small pairs are recorded in a hand-written shape from before
+`diff --record` existed; the gate prints each and requires its pair to verify
+the older way. **A record silently ignored is the same failure as a difference
+silently unnumbered**, which is where this whole section started.
+
+Regression after all three: 8701, SH8603, SH8606 and SH8607 verify unchanged,
+and SH09's 27 machine-written records show **0 CANDIDATEs without a valid
+disposition** — the builder's claim, confirmed from the files rather than
+taken.
+
+### 39. THE STEP WAS GREEN AND ITS OWN RULE HAD NOT BEEN FOLLOWED
+
+`verify issues/SH09` reported **OK, 32 pairs** — every CANDIDATE dispositioned,
+the leads table complete, the THEIRS list blind-read. And r330 has said since
+SH8607: *"when a reprint pair's prose yields a confirmed THEIRS, sweep the
+pair's `<code>` blocks by hand before closing it."* **Ten pairs carry a
+confirmed THEIRS and no reader had swept one.** The builder said so itself,
+unprompted, in the same message that reported the step closed.
+
+The diff cannot find this damage by construction: `<pre>`/`<code>` are excluded
+from the comparison, which is exactly why what lives there has never been read —
+`1T0 40`, `FORJ=OTO 4`, `S=1—S`, two program lines merged into one. 28 such
+sites across 14 issues, and several do not run.
+
+So the gate now demands the **declaration** it cannot perform:
+`CODE-SWEEP <record>: N block(s) read, M finding(s)` in
+`reviewed/r330-theirs.txt`, one per pair carrying a THEIRS. SH09 went from OK
+to ten named problems the moment it existed — **which is the check working, not
+the issue getting worse.**
+
+**This is the same shape as §33's coverage line and §35's three warrants, a
+third time: a gate can rarely do the work, but it can always refuse to pass
+without a statement of what was done.** Where a rule says "by hand", the gate's
+job is to make the hand say so.
+
+**And the blind re-read earned its keep in a way I had not predicted.** It was
+built to stop a reader confirming its own first value. On 8501 it instead
+caught the first reading's SCOPE: V had reported that the BC header prints
+`$1C00` and that the HTML has `$ 1800` in both cells, where in fact the DC cell
+is right and only BC is wrong. The blind reader confirmed `$1C00` for BC and
+`$ 1800` for DC independently, which halved a correction before it reached the
+owner. **A second reading checks what a claim COVERS, not only whether its
+value is right** — say that when asking for one.
+
+### 40. THE PAGE SAID IT HAD BEEN SKIPPED, AND THE SKIP WAS THE WHOLE RECORD
+
+The owner looked at SH09 p031 and said *"31 has yellowing on the sides — we try
+to remove the yellowing, and i have not found any other page with this much
+yellowing."* He was right, and the page's own stamp had said so since 5
+November:
+
+```
+field        identity -- NOT APPLIED -- traced page 213.3 x 305.0 mm is
+             outside the 205-212 x 293-301 mm a field can be anchored on
+page-class   uncropped sheet
+```
+
+The tracer read the sheet as 149.0 x 297.4 mm, which matches no page class, so
+step 005 published the whole levelled sheet; `field_box_ok()` then refused the
+box and the page was graded with **no paper-yellowing correction at all** — no
+fallback geometry, no window anchor, nothing. `reviewed/recover_031.py` later
+rescued the A4 window out of that master and did not apply the field either,
+which is why the delivered page has the right geometry and the wrong paper.
+Measured on the delivered image: the fore edge runs **+14.6 DN R−B** over its
+whole length in the outer 3 mm with 99 % of the paper visibly tinted, the top
+edge **+16.1 DN at 100 %**, against a class median of 0–1 % tinted and
+|R−B| ≤ 1.2.
+
+**Nothing was wrong with the record and nothing was wrong with the honesty.**
+Check 7b even verifies that a skipped page carries the identity digest rather
+than the fitted one — the stamp is forbidden from claiming pixels the field did
+not touch, and it did not claim them. The failure is that the admission lived
+in **one stamp file out of 168** and no check counted it. Six checks asked
+whether the field was *right*. None asked whether it had been *applied*.
+
+Fixed as r005 check **7g**: count every page whose stamp says `NOT APPLIED` or
+whose class is `uncropped sheet`, print them, and refuse unless each one is
+ruled on by the owner in `issues/<ID>/reviewed/field-not-applied.txt`. Both
+branches were exercised before it was trusted — it fails naming `031`, and
+passes once `031` is listed.
+
+**The shape, for the fourth time this build:** *a gate can rarely do the work,
+but it can always refuse to pass without a statement of what was done.* §38 was
+three silent misses in a gate; §39 was a green step whose rule had not been
+followed; this one is a step that knew exactly what it had skipped, wrote it
+down correctly, and passed anyway. **Writing it down is not a gate.** When a
+step is allowed to give up on a page, something downstream has to count the
+pages it gave up on, or the build's only reader is the owner's eye.
+
+**And one honest limit, because the first draft of 7g overstated it.** I wrote
+that a sweep of every issue found one such page in the whole corpus. It did
+not: SH09 is the only issue whose `tmp` still exists, so the sweep covered one
+issue. The rule now says that, and points at *Known outliers*, which records
+two trace failures of 152 pages on an earlier issue — whether those pages also
+shipped without their field, nobody checked, because until now nothing asked.
+
+### 41. A MEDIAN IS NOT A BOUND, AND THE AGENT STOPPED ON IT EXACTLY AS ASKED
+
+Dispatching the SH09 p031 colour repair I wrote the acceptance test myself:
+*"p031 must land inside the class median (0–1 % tinted at 0–10 mm,
+|R−B| ≤ 1.2), not merely 'better'. If it does not, stop and report rather than
+iterating on the threshold."*
+
+The builder fixed the page, measured it, found **3 of 9 cells outside that
+bound**, and stopped with the work uncommitted. That was the right call on the
+instruction as written, and it cost a round trip, because **the instruction was
+wrong**. A median is the centre of a distribution: half the class sits above it
+by construction, so no single page can be *required* to sit at it. The test I
+meant was *inside the class RANGE, and not an outlier*.
+
+The builder's own numbers answered the right question already:
+
+| cell | after | class median | class **max** |
+|---|---|---|---|
+| fore 0–3 mm | 1.85 % tinted, R−B +1.20 | 0 %, +0.8 | **94 %** |
+| bottom 3–6 mm | 2.68 % | 1 % | **4 %** |
+| bottom 6–10 mm | 1.67 % | 1 % | **5 %** |
+
+And the two bottom cells were not even paper: those pixels average 222/221/225
+with R−B −0.1/−0.2 — grey-blue print edges by the footer, the **opposite sign**
+from yellowing. Bottom 3–6 was 4 % *before* the repair and 2.68 % after. What
+the owner complained of went from 99 % to 2 % on the fore edge and 100 % to 0 %
+on the top.
+
+**Two things to carry forward.**
+
+**When an acceptance test is derived from a distribution, hand over the
+distribution, not its centre.** Give the range, the max, or an explicit
+"outlier" definition. A centre used as a ceiling fails work that is correct,
+and the failure looks like a defect in the work rather than in the test.
+
+**And the stop was still worth its cost.** The alternative behaviour — nudging
+the threshold until the numbers pass — is the one that destroys the evidence,
+and nothing downstream would ever have revealed it. §38 and §40 are both about
+checks that passed when they should have stopped; this is the first entry in
+this build about one that stopped when it should have passed, and that is the
+cheaper of the two mistakes by a long way. **Pay the round trip. Do not teach
+an agent to negotiate with its own acceptance test.**
+
+### 42. THE CACHE THAT UNDOES A REPAIR, AND THE RULE THAT ARGUED AGAINST ITS OWN TOOL
+
+Two defects found while repairing one page each, and both would have silently
+reverted the repair.
+
+**The jbig2 cache was keyed on existence.** `make_issue_pdf_mixed.sh` phase 3
+read `[[ -s "$JB/$n.jb2" ]] && continue` — once a page's JBIG2 stream exists it
+is never remade. MEASURED on SH09 p111: the owner retouched a pencil note out
+of the raw scan, the master was re-derived, and **a plain rebuild re-shipped the
+old stream with the note still in it.** The builder caught it only by removing
+`111.jb2` by hand. A one-page repair upstream is precisely the moment this
+phase must not be skipped, and the existence test guarantees it is. Fixed: the
+cache now compares against its source and regenerates when the source is newer.
+All three branches tested — stale cache rebuilds, fresh cache skips, absent
+cache rebuilds.
+
+**And r005b's rule argued against its own program.** The file said *"No
+arguments … There is no per-page invocation and no page list — cutting a subset
+would fit a different window"*, and again, in the override section, *"has no
+per-page mode and re-cuts all pages"*. The program has taken page numbers for
+some time: `pages = [int(a) for a in sys.argv[1:]]`. It measures every page
+whatever it is given — the fit is always global — and cuts only the pages named.
+The old warning's *reason* had become false: the subset never reaches the fit.
+
+The cost of believing the rule: a one-page re-cut looks like it needs a 168-page
+re-cut, and a 168-page re-cut **reverts every page carrying an OVERRIDE** — the
+exact damage the same paragraph warns about. SH09 had two such pages on the
+same day. Both claims corrected, with the correction itself written down, so the
+next reader can tell a current statement from a surviving one.
+
+**The shape.** §40 was a step that recorded what it skipped and passed anyway;
+this is a tool that skipped without recording, and a rule that described a tool
+it no longer matched. **A cache is a claim that nothing upstream changed, and
+a rule is a claim about a program as it is now.** Neither claim re-checks
+itself, and both were wrong in the same hour. When a one-page repair is made
+anywhere in the chain, the question is not "did I rebuild?" but "what along the
+way believes it already has the answer?"
+
+
+### 43. THE STEP DELETED A PHOTOGRAPH AND WROTE IT DOWN NOWHERE
+
+The owner, looking at the finished PDF: *"why is p30 so light"*. The answer was
+not grading, not the PDF, not the downscale, and not the halftone — I offered
+each of those in turn, on measurements I had taken in the wrong place, and he
+rejected all four before the real one was found.
+
+**r005's bed drop deleted 1716.5 mm² — 2.79 % — of p030**, including most of
+the lead photograph, and `process()` wrote the deleted pixels as pure 255.
+
+The mechanism, once found, is simple and general. `bedlike = lum < BED_LUM |
+prop_mask` is labelled into components; any component touching the scan frame
+whose area is more than `BED_OUTSIDE_FRAC` (0.5) outside the traced page is
+removed **whole**. On p030 the 1541's near-black chassis runs off the gutter —
+because it is a page-turn picture and is *printed* to the edge on purpose —
+meets the bed beyond the fold, and the two are one component. The bed half is
+larger, so the drive went with it.
+
+Three pages in SH09, and the third names the second half of the bug:
+
+| page | removed inside the page | branch |
+|---|---|---|
+| p030 | 1716.5 mm² | dark |
+| p167 | 186.2 mm² | dark |
+| p168 | 15.5 mm² | **prop** — yellow PRINT read as the yellow prop |
+
+**And the rule had already written the warning.** *"A bed flood must not eat a
+photo … an unconstrained connectivity pass erased a third of it."* The guard
+added then assumed the photo outweighs what it touches. At a page turn it does
+not, and the guard is a race, not a test.
+
+**p031 is intact by accident, twice.** The drop would have taken 2947.7 mm²
+from inside its box; its failed trace published the whole sheet, and later
+`regrade_031.py` replaced `keep` after the drop had run. Both times the result
+was discarded. **A page that is correct by accident stops being correct the
+first time somebody tidies the accident** — so that now has to be written
+beside the override, not only in the rule.
+
+**The lesson is the one this build keeps producing, in its sharpest form yet.**
+`t.dropped` counts the components it removed. It is never written to the stamp,
+never printed, never checked. Verification 4 asks whether any bed SURVIVED and
+nothing asked the opposite question. The mixed PDF build read the damaged
+master and encoded it; the marks census read it and censused it; both passed.
+**The step knew exactly what it had done and the knowledge died inside the
+function.** Fixed as r005 check 4b and an r006 interior-hole check, plus a
+reach limit so the drop cannot delete deep inside the page at all.
+
+**On my own part in it:** I twice published a conclusion from a region I had
+mapped wrongly — once comparing a 2400 dpi raw against 600 dpi coordinates, once
+sampling the left margin while claiming to sample the drive. Both times the
+numbers looked decisive and were meaningless. **When a measurement contradicts
+what the owner can see on screen, the measurement is the thing to check first.**

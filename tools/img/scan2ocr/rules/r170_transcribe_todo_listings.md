@@ -454,10 +454,11 @@ grep -l '<pre>TODO</pre>' "$dir"/*.html && echo "  FAIL: <pre>TODO</pre> survive
 # 2. no <p>TODO LISTING</p> left
 grep -l '<p>TODO LISTING</p>' "$dir"/*.html && echo "  FAIL: TODO LISTING survived"
 
-# 2a. A WHOLE-LISTING CROP NOT CUT YET IS NOT A FAILURE -- it is PAUSE 2 work,
+# 2a. A WHOLE-LISTING CROP NOT CUT YET IS NOT A FAILURE -- it waits on the
+#     owner's crops,
 #     exactly as r200 says of its banner.  An unreadable PETSCII glyph sends the
 #     listing to r150's crop worklist as `<article-page>-l<N>.png`, and the crop
-#     arrives at PAUSE 2 -- so checks 1 and 3 report the placeholder on every run
+#     arrives with the rest of the cut figures -- so checks 1 and 3 report the placeholder on every run
 #     until the owner delivers it, with nothing in the rule saying that is the
 #     expected state.  On SH8606 it is Grafik 2000's Listing 2 (p120, a screen
 #     printout with reverse-video glyphs and no checksums) waiting on `114-l2.png`.

@@ -427,6 +427,23 @@ and all three of SH8607's listing-side findings (8411 `inRAM`'s neighbours,
 reason. Report them as side findings, with the same blind second reading a
 `THEIRS` in prose gets.
 
+**AND THE GATE NOW REFUSES TO PASS WITHOUT THE DECLARATION.** `verify` cannot
+do the sweep — `<pre>`/`<code>` are excluded from the comparison, which is the
+whole reason the damage lives there — but it can insist that the sweep was
+reported. A pair whose record carries a `THEIRS` needs a line in
+`reviewed/r330-theirs.txt`:
+
+```
+CODE-SWEEP r330-30-8501_148.txt: 7 block(s) read, 0 finding(s)
+```
+
+MEASURED on SH09, 2026-11-14: `verify` passed 32 pairs, and this rule's own
+requirement had been met by none of them — **ten pairs carry a confirmed
+THEIRS and no reader had swept one**. The step was closed, reported and green.
+A requirement that only a rule states is a requirement a gate cannot see, and
+this one had been stated since SH8607, where all three listing-side findings
+came out of exactly this sweep.
+
 **AND DO NOT READ THE JOIN AS DAMAGE WITHOUT THE REST OF THE LINE.** The 91
 faithful ones are correct and must not be "fixed": `FORI=1TO10` is what the
 machine prints. The corpus count alone says nothing — it was 140 before the
@@ -1291,7 +1308,7 @@ r000, and recorded in the errata as having moved mid-run.
 
 A three-digit assumption anywhere in this file is the same bug. The D-numbers
 are positional, so they also renumber whenever the diff is re-run — see
-*re-run r330's diff remap* in the PAUSE 2 hand-over.
+*re-run r330's diff remap* in the crop hand-over.
 
 ## The disposition vocabulary has two gaps
 
@@ -1481,6 +1498,97 @@ Three consequences:
   not renumber them (and see *A REMAP LEAVES REFERENCES STALE*);
 - **(c)** keep the disposition record in `issues/<ID>/reviewed/r330-<pair>.txt`,
   which is durable, and leave only the summary table in LOG.md.
+
+> **BUILT, 2026-11-14 — and for a month this section prescribed tooling that
+> did not exist.** SH09's builder sized the step before spending (13,000
+> differences whole-article, 2,700 with `--partial`), found that none of (a),
+> (b) or (c) was implemented, and stopped rather than hand-adjudicate. What
+> exists now is **(b)** and **(c)** as `diff --record PATH`, which writes
+> `reviewed/r330-<pair>.txt` keyed by a content hash; **(a)** is served by
+> `--partial` plus the pairing fix below rather than a separate `--range`.
+
+## THE PAIRING WAS MEASURED OVER THE SMALLER BAG, AND A FRAGMENT CAPTURED A PARAGRAPH
+
+`bag_similarity` divided the shared tokens by the **smaller** of the two bags,
+so a short block scored high against any long block that happened to contain
+its words. MEASURED 2026-11-14:
+
+- SH09's 39-word *"Zugegebenermaßen ist das »Datei-Handling«…"* paired with
+  SH8608's 8-word *"die sequentielle Datei »test« zum Schreiben zu öffnen."* at
+  **0.800** on four shared words, sequence similarity **0.085** — and the whole
+  paragraph was then diffed against the fragment.
+- On SH8608's Basic-Kurs against `8512/146`, **78 of 85 MOVED pairings were
+  spurious**: `FAST` against an 87-word paragraph, `Insert` against *Flagge für
+  INSERT-Modus*, table headings against unrelated prose.
+
+`MOVED_COVER = 0.35` now requires the overlap to cover the LARGER bag too,
+because **a MOVED block is the SAME block in another place**. The case the
+feature was built for survives: 8701's STREHLOW/STEHLOW byline at cover 0.50
+and its 97-word moved letter at 0.97. Three published issues' tables are off by
+one as a result — CORPUS_QUEUE 13.
+
+## THE CLASS DECIDES WHO LOOKS, AND MOST DIFFERENCES NEED NOBODY
+
+`diff --record` classifies every difference, and this is what makes a merged
+reprint affordable. MEASURED on SH09's article 64 against SH8608/79, 300
+differences:
+
+| class | n | what it is | who reads it |
+|---|---|---|---|
+| `MECHANICAL` | 56 | whitespace, case or punctuation only | nobody — counted and stated in aggregate |
+| `CANDIDATE` | 105 | 29 near-identical spans, 76 dropped words | **a reader, one at a time** |
+| `EDITORIAL` | 139 | the magazine re-wrote the passage | nobody — stated in aggregate with its count |
+
+**Only a CANDIDATE can be a transcription error**, which is the only thing this
+step can fix. An OCR slip looks LIKE its original, so it shows as a
+near-identical span (`Kommatas`/`Kommata`, `Variablen`/`Variable`,
+`Maschinensprache-Äquivalent`/`Maschinenspracheäquivalent`); a dropped word
+shows as a short span absent on one side. A DIFFERENT word is the magazine
+re-editing, at any length — the first cut of this classifier called every span
+of three words or fewer a candidate and put `erläutern`/`klären` and
+`wieso`/`warum` in front of a reader, which is a verdict nobody can give.
+
+**So a merged pair's record is: every CANDIDATE dispositioned, and one
+aggregate line each for MECHANICAL and EDITORIAL with their counts.** That is
+the per-pair record (c) asks for, and it is 105 judgements instead of 300.
+
+### `verify` READS THE RECORD — a merged pair is NOT dispositioned in LOG.md
+
+`verify` used to want one `- D-NNN DISPOSITION` line per whole-article
+difference under a `###` heading in LOG.md, which for SH09's thirty pairs is
+thousands of lines of a file git does not track. **A pair that has a
+`reviewed/r330-*.txt` written by `diff --record` is now verified FROM IT**, and
+LOG.md keeps the summary table only, exactly as the merged-reprint section
+asks. The gate's question becomes: is every CANDIDATE dispositioned with a word
+from the vocabulary? MECHANICAL and EDITORIAL carry their class and need no
+reader.
+
+**Records are indexed by the two FILES their header names, not by filename** —
+so a renamed record still verifies, and, more to the point, **not by basename**:
+article 94 merges fourteen letters pages and **eight of its originals are all
+called `Leserforum.html`**. Keyed by basename, six records vanished from the
+gate without a word. MEASURED on SH09, where fixing it took 21 loaded records
+to 27.
+
+**And a record file the loader cannot read is NAMED, not skipped.** SH09's
+three small pairs were recorded by hand before `--record` existed, in a
+different shape; the gate prints each one and requires its pair to verify the
+older way. A record silently ignored is the same failure as a difference
+silently unnumbered.
+
+### THE LEADS CELL IS SCANNED FOR EVERY LEAD IT NAMES
+
+The REPRINTS lead cell used to be split on `+` and the whole PART added. A
+merged reprint's cell is comma-separated — SH09's article 30 names
+`8410/153, 8411/117, 8412/139, 8501/148, 8503/130, 8505/145, 8506/116` — so
+**all seven went in as one string that could never match a LOG row**: the gate
+reported a phantom missing lead and checked none of the seven. It is now
+`re.findall` over the whole cell.
+
+**A lead with no page is reported rather than dropped.** `8406` alone matched
+nothing and disappeared, so a claimed original was never required to have a
+row. A lead is `issue/page`; without the page it can be neither resolved nor
+diffed, and saying so is the gate's job.
 
 **Vocabulary closed on this issue, as this rule asks:** a figure not yet placed
 is **CROP**; a dash-glyph-only difference is **PRINT**, with a sentence saying

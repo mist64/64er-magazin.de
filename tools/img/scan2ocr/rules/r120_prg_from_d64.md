@@ -332,93 +332,81 @@ grep -oE '"-+[^"]*"' issues/8607/prg.txt | sort -u
 #     Kuenstliche Intelligenz and Eliza.  The separator names one start
 #     page; the files divide between two articles at step 130.
 
-# 3. Cross-check: no <figure> block in prg.txt was emitted without a
-#    section separator above it (orphan listing — would have no
-#    article to place into):
-$PY - issues/<YYMM>/prg.txt <<'PYEOF'
-import re, sys
-s = open(sys.argv[1], encoding='utf-8').read()
-# A SECOND DISK SIDE RESETS THE SECTION. Without this, side B's files fall
-# under side A's LAST separator and are counted as placed. MEASURED on 8611:
-# side B has nine files and no separators of its own -- its whole directory
-# sits under side A's "Achtung! Rueckseite bespielt" banner -- so the orphan
-# count read 1 where the truth was 10, and the check that exists to find
-# unplaceable listings reported the issue clean.
-chunks = re.split(r'(<!--[^>]*"----+[^"]*"[^>]*-->|<!-- [^>]*\.[Dd]64[^>]*-->)', s)
-section = None; orphan = 0; orphans = []
-for c in chunks:
-    if c.startswith('<!--'):
-        section = None if '.D64' in c or '.d64' in c else c.strip()
-        continue
-    if '<figure' in c and section is None:
-        orphan += c.count('<figure')
-        orphans += re.findall(r'data-filename="([^"]+)"', c)
-print(f"orphan figures (no section separator yet): {orphan}")
-for o in orphans[:12]:
-    print("   ", o)
-PYEOF
+# 3. Every listing must sit under a section separator whose page an article
+#    covers -- an orphan listing has no article to be placed into, and a
+#    section pointing at a page no article covers is a separator misread.
+#    BOTH ARE `r120_sections.py` (3b below): it computes the orphan list on
+#    its way to the mapping, so there is no separate count to run here.  The
+#    heredoc that used to live at this spot counted orphans only, and the
+#    count is the part that cannot see the defect.
 
-# 3b. AND THE ORPHAN COUNT IS NOT THE CHECK.  It can only see files before the
-#     FIRST separator: remove a MID-disk separator and its files fall silently
-#     under the PREVIOUS one, still "placed", count unchanged.  MEASURED on
-#     SH8605, planted on copies under <tmp>/scratch_120/plant/: removing the
-#     "6" separator took the count 1 -> 4, and removing "77" left it UNCHANGED
-#     while 77's files had joined 69's article.  Re-verified here on SH8605's
-#     own step-120 prg.txt (51 figures, 21 separators): with "77" removed the
-#     orphan count stays at 4 and the mapping shows 69's article going from 5
-#     files to 11 -- the merge is visible in one line and invisible to a count.
-#
+# 3b. AND THE ORPHAN COUNT IS NOT THE CHECK, SO CHECK 3 IS A SCRIPT NOW:
+#     `r120_sections.py`, which prints the MAPPING -- every section to the
+#     article whose `64er.pages` covers its page -- and exits non-zero.
+$PY tools/img/scan2ocr/rules/r120_sections.py issues/<ID>
+
 #     RUN IT AT STEP 120 TIME.  By the time an issue is published, 130 has
 #     moved every PLACED listing into its article, so `issues/<ID>/prg.txt`
 #     holds only what was never placed and the separators are gone with it:
 #     8611's and 8612's published prg.txt have no numbered separator at all.
+#     Against a published file the script says so instead of reporting zero
+#     sections; for an issue already past 130, read the step-120 file out of
+#     git (`git show <the 120 commit>:issues/<ID>/prg.txt`).
 #
-#     So print the MAPPING and read it: for each separator, the files under it
-#     must belong to an article whose `64er.pages` CONTAINS that separator's
-#     page.  A count cannot be the evidence here; the mapping can.
-$PY - issues/<YYMM> <<'PYEOF2'
-import glob, os, re, sys
-root = sys.argv[1]
-s = open(os.path.join(root, "prg.txt"), encoding="utf-8").read()
-pages = {}                                  # printed page -> article file
-for f in sorted(glob.glob(os.path.join(root, "*.html"))):
-    m = re.search(r'64er\.pages" content="([^"]+)"',
-                  open(f, encoding="utf-8").read())
-    if not m:
-        continue
-    for part in m.group(1).split(","):
-        a, _, b = part.strip().partition("-")
-        a = re.sub(r"[a-z]$", "", a)
-        b = re.sub(r"[a-z]$", "", b or a)
-        if a.isdigit():
-            for n in range(int(a), int(b) + 1):
-                pages[n] = os.path.basename(f)
-chunks = re.split(r'(<!--[^>]*"----+[^"]*"[^>]*-->|<!-- [^>]*\.[Dd]64[^>]*-->)', s)
-sep = None
-for c in chunks:
-    if c.startswith("<!--"):
-        sep = None if ".D64" in c or ".d64" in c else c.strip()
-        continue
-    files = re.findall(r'data-filename="([^"]+)"', c)
-    if not files:
-        continue
-    # A SECTION'S PAGE IS ITS LAST *NUMBERED* SEPARATOR; AN ALL-DASH BAR IS A
-    # FRAME, NOT A SECTION.  SH08.D64 frames every section as
-    # `****` / `---c16-NN` / `-- name --` / `----------------`, and the closing
-    # all-dash bar matches the split pattern too -- so 3b reported
-    # "SEPARATOR CARRIES NO PAGE NUMBER" for 9 of SH8608's sections and its
-    # whole mapping was unusable until the agent re-keyed on the last numbered
-    # separator by hand.
-    if sep and not re.search(r"-+\d+", sep):
-        continue                      # a frame bar: not a section boundary
-    m = re.search(r"-+(\d+)", sep or "")
-    pg = int(m.group(1)) if m else None
-    art = pages.get(pg)
-    flag = "" if art else ("  <- NO ARTICLE COVERS THIS PAGE" if pg
-                           else "  <- SEPARATOR CARRIES NO PAGE NUMBER")
-    print(f"  sep {sep!r:46s} page {pg} -> {art}{flag}")
-    print(f"      {len(files)} files: {', '.join(files[:6])}")
-PYEOF2
+#     WHY A MAPPING AND NOT A COUNT.  The orphan count can only see files
+#     before the FIRST separator: remove a MID-disk separator and its files
+#     fall silently under the PREVIOUS one, still "placed", count unchanged.
+#     MEASURED on SH8605, planted on copies under <tmp>/scratch_120/plant/:
+#     removing the "6" separator took the count 1 -> 4, and removing "77" left
+#     it UNCHANGED while 77's files had joined 69's article.  RE-MEASURED on
+#     SH09 with the new script, removing the "s.111" separator: section count
+#     18 -> 17 and s.110 goes from 1 file to 3, absorbing quicksort -- visible
+#     in one line, invisible to any count.  The script cannot FAIL on a merge;
+#     it makes one legible.  Read the mapping.
+#
+#     THE CHECK THAT PRINTED NOTHING.  The version of 3b that lived here as a
+#     heredoc keyed the page off `-+\d+` -- dashes immediately followed by
+#     digits -- and SKIPPED, silently, anything that did not match, a branch
+#     added for SH8608's all-dash frame bars.  SH09's separators are spelled
+#     `-------s.102----`.  MEASURED on SH09's step-120 prg.txt: 25 separator
+#     comments, 25 of them matching the split, 0 matching `-+\d+`, so all 25
+#     were taken for frame bars and the check printed NOTHING and exited 0 on
+#     an issue with 59 listings in 18 sections.  A mapping with no sections in
+#     it is now the loudest failure the script has.
+#
+#     AND THE DIALECT MAY NOT BE GUESSED FROM "A NUMBER IN THE NAME".  SH09's
+#     own disks carry `-------c128-----` and `----nur 1541----`, which a loose
+#     pattern reads as page 128 and page 1541.  The spellings are declared in
+#     `DIALECTS`, most specific first, and every del entry the list cannot read
+#     is PRINTED as a non-page entry rather than dropped -- an unknown spelling
+#     shows up as a long list, not as silence.  Measured, all three dialects
+#     against their own issues: SH09 18 sections (`s.NN`, and `s.99/100` is one
+#     section over two pages), SH8608 30 (`c16-NN`, `vc20-NN` -- the old check
+#     reported 9 of them as carrying no page), 8611 18 (`--------------24`).
+#
+#     THE SEPARATOR POPULATION IS "EVERY `del` DIRECTORY ENTRY", not "every
+#     comment with dashes in it".  A del file is a separator, always, so the
+#     population needs no guess about how the bars are drawn: dotted bars,
+#     `****`, name bars and machine bars all land in the non-page list to be
+#     eyeballed once.
+#
+#     AN ORPHAN IS A WORKLIST ITEM, NOT A FAILURE.  Every SH09-era disk opens
+#     with an intro screen that sits before the first separator and is never
+#     placed (leser-info is closed, owner 2026-10-07), so a check that fails on
+#     the existence of an orphan goes red on a correct build -- the mistake this
+#     file already records for the REM-only case.  What may not happen is an
+#     orphan NOBODY HAS SAID ANYTHING ABOUT, so the script wants the prose
+#     comment 130 writes above the figure and names the ones that have none.
+#     SO 120 LEAVES THIS CHECK RED AND 130 TURNS IT GREEN, and 130 is not done
+#     while it is red.  Measured at 120: SH09 1 unexplained orphan (leserinfo),
+#     SH8608 2 (c16-info, vc20-info), 8611 12 (leser-info!, checksummer, mse
+#     and side B's nine music files).
+#
+#     A PROSE NOTE IS NOT MATCHED WITH `[^>]*`.  130's dispositions quote the
+#     HTML they talk about -- SH09's turbotapecopy note contains
+#     `<pre>TODO</pre>` -- so a `>`-free comment body stops at the first tag and
+#     the note goes unseen.  Measured: the one orphan that HAD been explained
+#     read as unexplained.
 
 # 4. ROUND-TRIP every listing: the .txt must re-tokenise to the .prg it
 #    came from.
@@ -580,6 +568,100 @@ print(f"round-trip failures: {bad}   "
 assert not bad, f"{bad} listing(s) no longer re-tokenise to their disk .prg"
 
 PY
+
+# 5. DOES EACH RAW BINARY HOLD THE WHOLE PRINTED PROGRAM?
+#    `r120_binary_extent.py`.  Check 4 above round-trips every BASIC listing,
+#    so a disk file that is not the printed program is caught there.  A program
+#    that ships as a RAW BINARY has no .txt and nothing to round-trip against,
+#    and until this check existed NO STEP COMPARED A BINARY DISK FILE TO ITS
+#    PRINT AT ALL -- not 120, not 130, not 190.
+$PY tools/img/scan2ocr/rules/r120_binary_extent.py issues/<ID> <tmp>/scratch_120/extent.txt
+
+#    MEASURED, SH09 p119 `turbotapecopy.prg`: the disk file loads at $C700 and
+#    carries 273 bytes of code, while the printed listing starts at $C350.  The
+#    disk holds the last fifth of the program and does not run alone.  It was
+#    found at 130 by an agent reading the page -- by hand, and by luck.  The
+#    article now carries `<pre>TODO</pre>` for r170 to recreate the program from
+#    the print, which is the right outcome; the point of this check is that the
+#    outcome should not depend on someone happening to look.
+#
+#    THE DISK EXTENT IS EXACT, THE PRINTED EXTENT IS NOT MECHANICAL, and the
+#    check does not pretend otherwise.  Load address and length give the disk
+#    span to the byte.  The print has to be read with an eye: MEASURED on p119,
+#    the OCR of that MSE hexdump reads `c35@`, `c3588`, `cIID`, `c5d®`, so a
+#    min/max over OCR'd hex columns would compare a correct file against a
+#    misread page -- red on good input, or green on bad.  A printed assembler or
+#    MSE listing names its own first and last address in its header row, and
+#    reading those two numbers is two glances.
+#
+#    SO THE GATE FAILS ON AN UNANSWERED LINE, not only on a mismatch.  The
+#    script writes one line per raw binary into the answers file and stays red
+#    until each says `$C350-$C818` or `not printed`.  A check that can only go
+#    red once someone has already done the reading is no check at all.
+#    MEASURED on SH09: 28 raw binaries, every one of them placed in an article
+#    and offered to the reader as a download.  28 readings on the most
+#    program-heavy issue in the corpus; most are a glance (`dos v3`,
+#    `double-dos`, the two SMON kernels and `p-dita` are disk-only extras).
+#
+#    AND `not printed` IS NOT ONE ANSWER, IT IS TWO.  MEASURED on SH09: of
+#    thirteen `not printed` lines, SEVEN were disk-only extras and SIX were
+#    programs the magazine DOES print, without a `Name :` header -- `mse`
+#    (loader p100), `format-system` (loader p59 + disassembly p57-58),
+#    `quicksort m 1` (loader p112), `spooling` (screen dump p43),
+#    `c64.open.ass` and `c64.read_wr.ass` (monitor disassemblies p66, p68).
+#    For those six the check compared nothing AND SAID NOTHING, which is the
+#    vacuous gate again (HARVEST 11, 19).  So the answers are four:
+#      `not printed`            not in the magazine at all.  Silent.
+#      `$C000-$C01A disasm`     printed without a header: the span off the
+#                               FIRST and LAST printed address.  Compared.
+#      `$C350-$C818 excl`       printed with a header.  Compared.
+#      `no span <reason>`       printed, extent NOT established.  Stays RED.
+#      `$0801-$0C73 ; <reason>` the spans DISAGREE and the difference is
+#                               disposed of.  Reported, never counted, exactly
+#                               as check 4 honours a `;inkl. Fehlerteufelchen`
+#                               header.  The reason is the evidence and names
+#                               what the PRINT says.
+#    AND THE TAIL WINDOW IS NOT WIDENED TO SWALLOW A SECOND PHENOMENON.
+#    MEASURED on SH09 `format-system`: a FOUR-byte tail, one past the window
+#    below, whose cause is not a sector tail -- the printed loader pokes 1139
+#    bytes to $0C73 and then `POKE 45,119:POKE 46,12`, setting the end-of-BASIC
+#    pointer to $0C77, so the disk's four extra bytes (`33 2C 31 3F`) sit
+#    between the printed DATA and the printed POINTER while all 1139 program
+#    bytes agree.  One number standing for two unrelated causes is a tolerance
+#    without a scale (HARVEST 16), and a 4-byte window would also pass a
+#    program genuinely truncated by four bytes.  A second cause gets a REASON.
+#    An extent resting on the OCR of a hexdump is not established -- this rule
+#    measured that OCR misreading hex addresses two sections up.  Open the page.
+#
+#    A DISK TAIL OF 1-3 BYTES IS THE DOCUMENTED CASE, NOT A FINDING, exactly as
+#    in check 4: a .prg off a D64 can carry bytes past the end of the program.
+#    MEASURED here: SH09's two monitor disassemblies stop at RTS, 2 bytes before
+#    their disk files end, and `turbotapecopy.prg` carries one byte ($01 at
+#    $C810) past the printed end.  Reported, not counted -- and turbotapecopy
+#    stays red on the 944-byte HEAD it is missing, which is the real difference.
+#
+#    A disagreeing span is r300's to dispose of.  An incomplete disk file is NOT
+#    an erratum in the magazine -- it is a defect in OUR input, and the repair is
+#    r170 recreating the program from the print.
+#
+#    WHOSE END IS IT.  An MSE or assembler header prints the end as one PAST
+#    the last byte -- `c0fd` for a program whose last byte is $C0FC -- while a
+#    span from load address + length is INCLUSIVE.  Compared straight, every
+#    correct binary goes red by one byte, which is the cry-wolf defect the
+#    REM-only case above already records.  So the ANSWER names its convention:
+#    `$C000-$C0FC` is inclusive, `$C000-$C0FD excl` is the header's own number
+#    and the script subtracts.  Transcribe the page verbatim and add the word;
+#    hand-arithmetic on 28 lines is its own error source.  A one-byte-only
+#    mismatch says so in the failure line.
+#
+#    THE FINISHED FILE BELONGS IN `issues/<ID>/reviewed/prg_extent.txt`.
+#    `<tmp>` is wiped between sessions and the readings are precisely the kind
+#    of "we looked at this and dispositioned it" record `reviewed/` exists for
+#    (and is whitelisted for) -- a later build must not re-read 28 pages to
+#    learn what this one already read.  Work in `<tmp>/scratch_120/` while the
+#    answers are being filled in, copy it to `reviewed/` when it is complete,
+#    and commit it.  The disposition of anything RED also goes where r300 and
+#    prg.txt's own prose comment put it (as p119's does).
 ```
 
 If you see orphans, the very first listings on the disk preceded any

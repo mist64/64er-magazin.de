@@ -29,6 +29,32 @@ Two forms it does NOT read, so do not take its silence as coverage:
 Expect a **small** number of findings: 8611 2, SH8601 9, 8609 and 8610 0. A
 flood means a form it cannot parse, not an issue full of errors.
 
+## A DUMP WITH A DISK WITNESS IS VERIFIED BY COMPARISON, NOT BY EYE
+
+**Where our hand-typed `<pre>` can be compared byte for byte against the
+program on the disk, that comparison IS the coverage, and reading the rows with
+an eye adds nothing.** The disk file is a better witness than a reader: it is
+exact, it is complete, and it costs no image budget (r000, *AN AGENT'S PICTURES
+RUN OUT*). Crops are for the rows that have no such witness.
+
+MEASURED on SH09, 2026-11-14: article 30's Listing 21 is 445 rows, of which
+**365 were never opened as images** — their bytes verified against the disk by
+the step-120 comparison, their columns measured by arithmetic. The eye went to
+the 80 rows that are not covered that way, and to Tabelle 5 of article 79,
+~500 cells with no witness at all.
+
+**Say it exactly in the coverage line, and never as "read in full".** The form
+is *"N rows not read by eye; bytes verified against `prg/<name>` by <which
+check>; columns measured at <pitch>"* — three different claims with three
+different warrants. A coverage statement that rounds this to "read" is the
+false-displayed-list failure in a politer costume, and §33 is what that costs.
+
+**This does not reach a dump with NO disk file**, which is most of them, nor a
+table of numbers, nor anything whose value is the glyph rather than the byte.
+And it does not excuse the ROW STRUCTURE: how many rows there are, where they
+break and what sits in the comment column are still the page's, and still
+arithmetic (*A SPACING QUESTION IS ARITHMETIC*).
+
 ## Why this exists: every other pass is blind in the same way
 
 By the time this step runs, the issue has been through r280 (word cleanup),
@@ -233,9 +259,9 @@ is a report, never a worklist.
 
 **THE OWNER'S DEFAULT IS NO FUTURETEUFELCHEN — and that is now stated, because
 not stating it turned every candidate into a question.** Print errors stay as
-printed, recorded in LOG.md only, and they **do not go on the PAUSE 2 list**.
+printed, recorded in LOG.md only, and they **do not go on the owner decision list**.
 MEASURED on SH8605: the nine r325 readers recorded 66 candidates (D21–D86), the
-PAUSE 2 report listed every one, and the owner was asked them one at a time —
+hand-over report listed every one, and the owner was asked them one at a time —
 answering "leave it" to D20 through D30 and then: *"did you learn yet"* (owner,
 2026-10-08).
 
@@ -345,6 +371,149 @@ Two things make that report decidable, and both are the reporter's job:
   same distinction. Mark each row, and never let "would crash" stand unmarked
   when nothing was executed.
 
+## A SPACING QUESTION IS ARITHMETIC, AND ARITHMETIC NEEDS NO PICTURE
+
+**How many spaces stand between two tokens of a monospaced listing is a
+measurement, not a reading, and the cheapest way to answer it is not to look at
+all.** Take the glyph x-positions out of `labels.json` / `blocks/pNNN.txt`, or
+an ink-column profile of the crop, derive the pitch from two reference glyphs
+ON OR BESIDE THE LINE IN QUESTION, and divide. The answer is a column number,
+and it carries its own proof.
+
+MEASURED on SH09, 2026-11-14 — six sites settled this way in the r325 triage,
+**none of them opened as an image**:
+
+| site | the arithmetic |
+|---|---|
+| `64` p77 `LDY #>ALT ;POINTER` | pitch 44.8 px from `LDA`@438 to `;DEM`@1065 = 14 cols. `#`/`>` start at 616/697 on both lines; `A` of ALT at 766 on the LDA line, 808 on the LDY line = **+42 px = one cell**. `;POINTER`@1066 = `;DEM`@1065, so one space fewer after ALT |
+| `64` p71 `JMP LOOP1` | pitch 41 px from the `...` dots at 2795/2836/2877; mnemonics at 2782/2783, operand `L` at 2949 (LOOP2) against 2990 (LOOP1) = **+41 px = one extra cell** |
+| `64` p76 asterisk box | 19 asterisk runs after `;` at 41.5 px pitch, top row 2513..3260, bottom 2517..3264; the closing `*` at 3259 = col 19 — **counted, not eyeballed**, and the box was one star too wide |
+| `30` p43 `03C1 4C 08 AF JMP` | pitch 51.8 px; address-to-mnemonic offset 726 px on 03C1 against 725 and 726 on its neighbours — JMP sits in the shared mnemonic column |
+| `111` p111/p112 Bild 1 | pitch ~41.6 px from `$C056`@286 to `QUICKSORT`@619 = 8 cells; descriptions at +327..332 px = **8 cells, so column 16, not 15** — twenty-odd lines of a reference table corrected from one pitch and two anchors |
+
+**Why this beats looking, on both counts.** It answers what the eye cannot:
+SH8607 recorded these sites as *undecidable* because the face drifts 36-44 px
+across a line, and a drifting pitch defeats a GLOBAL constant — not a local
+one. Two anchors beside the site give the pitch where the site is. And it
+costs no image budget at all (r000, *AN AGENT'S PICTURES RUN OUT*), so it does
+not compete with the crops that genuinely need an eye.
+
+**Record the arithmetic, not the verdict.** Every line above carries its pitch,
+its anchors and its offsets, so the next build can check the sum instead of
+re-reading the page. A bare "col 16" would be a claim; the numbers are
+evidence.
+
+### WHERE THE ARITHMETIC BREAKS: A GLYPH WIDER THAN ITS CELL
+
+**`#`, `<` and `>` in the typewriter face do not advance one cell, and no
+whole-cell sum across one of them is valid.** MEASURED on SH09 p077,
+2026-11-14, by ink columns on the `LDA #<ALT` / `LDY #> ALT` pair the triage
+settled:
+
+| quantity | measurement |
+|---|---|
+| ink width of `#`, `<`, `>` | **53, 53, 52 px** |
+| advance `#` -> next glyph | **80 and 81 px** = 1.93 cells at the 41.5 px pitch |
+| advance `<` -> `ALT` | 69 px = **1.66 cells** |
+| advance `>` -> `ALT` | 110 px = **2.65 cells** |
+
+**Two readers reported this differently and both were right**: one said "two
+cells" (the ADVANCE, 80 px), one said "52-53 px" (the INK). They are different
+quantities — the ink is what you see, the advance is what moves the grid — and
+for these glyphs neither is a whole cell.
+
+**So never compute an absolute column across a wide glyph. Compare like with
+like instead.** On that pair every shared landmark agrees to the pixel —
+mnemonic at 437/438, `#` at 616/616, `<`/`>` at 696/697, `;` at 1065/1065 — and
+only `ALT` moves, 765 against 807. **+42 px = one cell = one space.** Exact,
+and it never counts the wide glyphs at all. That is the method: find the same
+construct on the same page, align the landmarks, read the difference.
+
+**With no comparable line the site is undecidable: keep the transcription and
+record it.** SH09's `GET#1 ... IF ST<>64` on p040 is one, correctly left alone
+with an erratum. *Undecidable* now has exactly one meaning — **no legible
+comparison** — and is no longer a verdict on a drifting face.
+
+**It does NOT replace vision for what a glyph IS** — a comma against a full
+stop, `O` against `0`, a dust speck against a colon. Those are shape questions
+and they need the picture. Pitch arithmetic answers WHERE, never WHAT.
+
+## A LISTING'S COLUMNS ARE THE PAGE'S, NOT A HOUSE STYLE — BUT ITS LINE BREAKS ARE NOT
+
+**Re-lay a hand-typed listing to the columns the print sets.** This is not a
+new rule; it is r000's *CONSISTENCY WITH THE PAGE BEATS CONSISTENCY WITH
+ITSELF* applied where it is easiest to forget: *"Match the page, site by site;
+do not normalise."*
+
+The machine-name exception does not reach here, twice over. It exists only
+because "match the page" had **no answer to give** — a thin gap measuring
+neither a closed pair nor a word space — whereas a monospaced listing answers
+exactly, by arithmetic, at a measured pitch (see *A SPACING QUESTION IS
+ARITHMETIC*). And that exception explicitly excludes anything inside `<pre>` or
+`<code>`, "where the string is typed in by a reader".
+
+MEASURED on SH09, 2026-11-14: article 64's p068 prints **two spaces after the
+address and the comment at column 22**, at 41.5 px pitch, where our HTML had
+one space and column 18 — normalised consistently, and consistently unlike the
+page.
+
+**AND THE REPRINT IS NOT THE AUTHORITY FOR ITS OWN LAYOUT EITHER.** SH8608/79
+is the earlier printing of that article and our HTML of it collapses the
+columns the same way. Its page does not: SH8608 p80 prints `LDA #$01`, a wide
+gap, then `;LOGISCHE FILENUMMER 1`. **So the reprint's HTML was evidence of our
+habit, not of the paper**, and a reader who cites it is citing us. MEASURED
+over the corpus: of 250 assembler `<pre>` blocks, **15 collapse every comment
+to one space, in four issues** (8601, SH8601, SH8602, SH8608) — a 6 % residue,
+so re-laying to the page is also what the other 235 already do. CORPUS_QUEUE 12
+holds the fifteen.
+
+**Expect r330 to flag the divergence and do NOT answer it by re-normalising.**
+SH09 matching its own page while SH8608's HTML does not is the correct state
+until the queue item is run; record it as a known whitespace divergence with
+the pitch measurement beside it.
+
+### The print's LINE BREAKS are not re-laid
+
+Only the gaps **within** a line are the print's. Text too long for the column
+wraps onto a continuation line — SH8608 p80's `;SEKUNDÄRADRESSE 1 = DATEN AUF
+BAND` / `SCHREIBEN` — and that break is the column's width, not the listing's
+structure.
+
+**The test is what the text IS, not what it is called.** Prose inside the box
+joins with a space: a comment, and equally **a listing's title or a note set
+inside its frame**, which SH09's reader M joined on Listings 9, 10 and 12 and
+was right to — the rule said "comment" only because a comment was the case in
+front of me, and a title broken at the box width is the same break for the same
+reason. Code joins without a space.
+
+### BUT A CONTINUATION'S INDENT CAN BE A CHOICE, AND THEN IT STAYS
+
+**Join a continuation whose indent carries no information — one sitting in the
+column the wrapped text already occupies. Keep it, as its own line, where the
+print puts it somewhere the wrap would not have gone**, because then the indent
+is a decision about meaning and joining destroys it. The test is arithmetic, so
+it is decidable at every site.
+
+MEASURED on SH09's article 111, Bild 1 — a hand-typed memory map, both lines in
+the same `<pre>`, both broken at the box width, and they go opposite ways:
+
+| line | measured | verdict |
+|---|---|---|
+| `Mit Anfangsadresse DIM's` / `vergleichen` | `vergleichen` sits at **col 16**, the column every description in the block starts at | **join** — the wrap had nowhere else to go |
+| `SYNTAX: SYS 49164, (linkes Grenzelement),` / `(rechtes Grenzelement)` | `(rechtes` starts at **x=3453, exactly under `(linkes` at 3453** — col 19, which is neither the description column nor the margin | **keep** — the typist aligned the second argument under the first |
+
+The wrap was forced in both; **the indent was chosen in only one**, and that is
+the whole distinction. A continuation at the running column is overflow. A
+continuation parked under a particular word is the same kind of statement as an
+assembler listing's comment column, which this rule already preserves.
+
+SH8608 p80's `;SEKUNDÄRADRESSE 1 = DATEN AUF BAND` / `SCHREIBEN` is the first
+kind: `SCHREIBEN` sits in the comment column, so it joins. That earlier example
+is unchanged, and this test is why. The standing
+convention stands: **no column-wrap `<br>`**. A re-lay that reproduced the
+print's line breaks would import this copy's column width into a medium that
+has none.
+
 ## Granularity
 
 Word-level substitutions only — r000's *OCR cleanup granularity* applies in
@@ -363,6 +532,32 @@ is where the errors nothing else can see actually live.
 Readers must work in small steps and report as they go. A reader that goes
 silent for a long stretch gets killed by the watchdog and loses its work.
 
+**AND SPLIT BY CROPS BEFORE WORD COUNT, BECAUSE THE CROPS ARE WHAT RUN OUT.**
+A reader gets about fifty images in its whole life (r000, *A SUB-AGENT GETS
+ABOUT FIFTY PICTURES*), so the unit of planning is **forty crops per reader**,
+not an article and not a word count. SH09 needed ~762 crops for 168 pages —
+nineteen reader-lives, which is why seven long-lived readers could not do it at
+any price.
+
+So this step runs in **waves**:
+
+1. Estimate the crops: the sites a reader must see with its own eyes, not the
+   pages. Divide by forty. That is the number of readers, and they run in
+   waves of a few at a time, not all at once.
+2. Each reader reads a crop ONCE, writes its reading down immediately, and
+   never opens that crop again. The image is a witness, not storage.
+3. At forty crops, or at the first `[media removed]`, the reader **stops
+   looking**, finishes the readings it already has, and hands back a list of
+   what it did not see. That list is the next wave's input, not a failure.
+4. The orchestrator commits each wave's yield before starting the next, and
+   reconciles `crops read / crops seen` per reader. Any gap means the cap bit.
+
+**The yield goes to `issues/<ID>/reviewed/r325-<reader>.txt` and is committed
+as each article finishes.** Not to `LOG.md`: git does not track it, and SH09
+put 723 KB of reader output there, where a killed reader lost all of it. LOG.md
+keeps the coverage statement and the narrative; the FIX, REJECT and
+PRINT-ERROR tables are evidence and live in `reviewed/`.
+
 ## Verification
 
 1. Every fix carries `was -> is`, the page, and the crop it was read from.
@@ -371,6 +566,11 @@ silent for a long stretch gets killed by the watchdog and loses its work.
    SH8601's reject list is the table above.
 3. Each reader states its honest coverage: what it read in full, and what (if
    anything) it skimmed.
+3b. **Each reader reports `crops read / crops actually seen`, and the list of
+   crops it did not see.** A report without those two numbers is not finished:
+   they are the only way the orchestrator can tell a reader that looked from
+   one that was handed blanks. Reader-seen must equal reader-read, or the
+   remainder is re-dispatched to a FRESH reader, never retried in place.
 4. `generate.py --issues <ID> --future --join` exits 0.
 
 ## Recorded in LOG.md
@@ -392,11 +592,29 @@ The fix table, the reject table, and the coverage statement, per reader.
    several sites. **Say the fallback: keep the transcription and record the
    site as undecidable.** Do not let a reader invent a space from a drifting
    column.
+
+   > **SUPERSEDED, 2026-11-14 — MEASURE THE PITCH LOCALLY AND IT IS DECIDABLE.**
+   > See *A SPACING QUESTION IS ARITHMETIC* below. The drift defeats a GLOBAL
+   > pitch, not a measurement; take two reference glyphs beside the site and
+   > the column falls out. "Undecidable" is now the fallback when no reference
+   > pair is legible, not the answer to a drifting face.
 4. **An image can fail to load silently for a sub-agent** ("media removed", a
    request limit). Two readers first believed they had checked pages they had
    never seen; one said so, and a second reader re-did them with vision.
    **In the 325 brief: for every crop you rely on, confirm the image actually
    loaded, and report the pages you could not see.**
+
+   > **ERRATUM, 2026-11-14 — THE REMEDY WAS WORSE THAN THE FAULT.** SH09's
+   > brief turned this into *"Re-read later, or list the page as not seen"*,
+   > and seven readers spent **445 M input-token equivalents in 107 minutes**
+   > -- 2.5x a whole normal build -- re-reading pictures that could never
+   > arrive: **17,107 crop reads
+   > over 762 crops, about 98 % of them blank, 56 edits to show for it**, and
+   > the step unfinished when the weekly limit killed them. The cap is on the
+   > REQUEST and a request only grows, so retrying is the one action guaranteed
+   > not to work. **`[media removed]` is a STOP, not a retry** — see r000,
+   > *A SUB-AGENT GETS ABOUT FIFTY PICTURES*, which is binding here and
+   > everywhere else. The diagnosis above stands; only the remedy was wrong.
 
 **Also, for r280 Pass 3:** step 010 joins a line break after `Low/` or `-/`
 **with a space** — 14 sites in SH8607's Memory Map ("Low-/ High", "VC 20/ C 64").

@@ -7,7 +7,7 @@ typesets. Don't promote / demote on structure alone — judge against
 the print's typographic weight.
 
 **A HEADING LEVEL IS NEVER AN OWNER QUESTION.** Apply the printed weight. If
-you are about to put a heading level on the PAUSE 2 list, apply it instead.
+you are about to put a heading level on the owner decision list, apply it instead.
 MEASURED on SH8605: 178's 33 error-message heads are body-size bold run-ins in
 print — h3 by the rule above — were set as `<h2>`, and went to the owner as a
 "presentation" question. Owner, 2026-10-08: *"clearly h3. if it looks like h3,

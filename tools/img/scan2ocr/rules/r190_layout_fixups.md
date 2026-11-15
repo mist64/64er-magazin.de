@@ -26,6 +26,15 @@ Until it does, finding the boxes is this rule's own job, from the scan.)
 
 ## Briefing for the sub-agent
 
+**THIS STEP LOOKS AT PAGES, SO IT IS BOUND BY THE IMAGE CAP** — r000, *A
+SUB-AGENT GETS ABOUT FIFTY PICTURES, AND THE FIFTY-FIRST IS BLANK*. Forty
+crops per agent, each read once and written down before the next is opened,
+`[media removed]` is a stop and not a retry, and the report carries `crops
+read / crops actually seen`. MEASURED on SH09, 2026-11-06: this step's part-B
+agent read **131 crops 2,226 times**, 1,183 of them already stripped, and the
+rule said nothing about images at all — which is exactly why the cap is stated
+in r000 and not only where somebody remembered it.
+
 The sub-agent must:
 
 

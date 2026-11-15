@@ -247,7 +247,16 @@ echo "  bilevel: $(echo $bilevel | wc -w)   contone: $(echo $contone | wc -w)"
 
 # ---- Phase 3: JBIG2 the bilevel pages, lossless (cached) ----------------------------------------
 for n in $bilevel; do
-  [[ -s "$JB/$n.jb2" ]] && continue
+  # CACHED ON FRESHNESS, NOT ON EXISTENCE.  This used to be `[[ -s ... ]] &&
+  # continue`, which keeps a .jb2 forever once it exists.  MEASURED on SH09
+  # p111: its master was re-derived from a retouched raw to remove a pen note,
+  # and a plain rebuild re-shipped the OLD jbig2 with the note still in it --
+  # the repair was undone by the cache and nothing said so.  A one-page repair
+  # upstream is exactly when this phase must NOT be skipped, so compare against
+  # the source: regenerate when the source is newer than the cached stream.
+  if [[ -s "$JB/$n.jb2" ]] && [[ ! "$(src_of "$n")" -nt "$JB/$n.jb2" ]]; then
+    continue
+  fi
   ( S="$(src_of "$n")"
     magick "$S" -colorspace Gray "${THRESH[@]}" -depth 1 "$JB/$n.pbm"
     jbig2 -p "$JB/$n.pbm" > "$JB/$n.jb2"

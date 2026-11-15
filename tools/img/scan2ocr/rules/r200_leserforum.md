@@ -326,7 +326,7 @@ else
   echo "  look: no <header> banner. Correct if the page prints only the plain" \
        "running-head bar (SH8605/155, SH8608/8); crop it if it prints a motif."
 fi
-# A BANNER NOT CUT YET IS NOT A FAILURE EITHER -- it is PAUSE 2 work.  Pointing
+# A BANNER NOT CUT YET IS NOT A FAILURE EITHER -- it waits on the owner's crops.  Pointing
 # an <img> at a file that does not exist ships a broken image, so until the crop
 # is delivered the banner stays OUT of the HTML (the <h1> remains) and the page
 # goes on the crop worklist as `<page>-0.png`.  That case lands in the `look`

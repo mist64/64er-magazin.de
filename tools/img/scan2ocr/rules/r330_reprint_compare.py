@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import glob
+import hashlib
 import html.parser
 import io
 import os
@@ -353,6 +354,17 @@ def similarity(a, b):
 # notion of order; a good enough match is MOVED and is diffed like any pair.
 MOVED_SIM = 0.45             # token-bag overlap; the pairing floor is 0.45 too
 
+# AND THE OVERLAP IS MEASURED BOTH WAYS, OR A FRAGMENT CAPTURES A PARAGRAPH.
+# `bag_similarity` divides by the SMALLER bag, so a short block scores high
+# against any long block that happens to contain its words.  MEASURED on SH09,
+# 2026-11-14: our 39-word "Zugegebenermassen ist das >>Datei-Handling<<..."
+# paired with SH8608's 8-word "die sequentielle Datei >>test<< zum Schreiben zu
+# oeffnen." at 0.800, on four shared words, sequence similarity 0.085 -- and
+# then the whole paragraph was diffed against the fragment, which is where the
+# pair's "substantive" differences came from.  A MOVED block is the SAME block
+# in another place, so the overlap has to cover both sides.
+MOVED_COVER = 0.35           # shared tokens over the LARGER bag
+
 
 def _bag(blk):
     c = {}
@@ -372,7 +384,17 @@ def bag_similarity(x, y):
     return shared / (min(sum(bx.values()), sum(by.values())) or 1)
 
 
-def find_moved(only_a, only_b, floor=MOVED_SIM):
+def bag_coverage(x, y):
+    """The same overlap over the LARGER bag -- how much of the longer block
+    the shorter one actually accounts for.  See MOVED_COVER."""
+    bx, by = _bag(x), _bag(y)
+    if not bx or not by:
+        return 0.0
+    shared = sum(min(v, by.get(k, 0)) for k, v in bx.items())
+    return shared / (max(sum(bx.values()), sum(by.values())) or 1)
+
+
+def find_moved(only_a, only_b, floor=MOVED_SIM, cover=MOVED_COVER):
     """[(a_block, b_block, sim)] -- one-sided blocks that are really MOVED."""
     out, used = [], set()
     cand = sorted(((bag_similarity(x, y), i, j)
@@ -382,6 +404,8 @@ def find_moved(only_a, only_b, floor=MOVED_SIM):
     for sim, i, j in cand:
         if sim < floor or i in seen_a or j in used:
             continue
+        if bag_coverage(only_a[i], only_b[j]) < cover:
+            continue                 # a fragment inside a paragraph, not the same block
         seen_a.add(i); used.add(j)
         out.append((only_a[i], only_b[j], sim))
     return out
@@ -439,7 +463,7 @@ def window(tokens, lo, hi, context):
 
 
 def diff_report(a_path, b_path, context=6, min_sim=0.45, out=sys.stdout,
-                partial=False):
+                partial=False, record=None):
     """`partial` is for a PARTIAL reprint, where only some blocks are reprinted.
 
     r330 says to restrict the diff to the reprinted blocks, and this tool had
@@ -505,6 +529,10 @@ def diff_report(a_path, b_path, context=6, min_sim=0.45, out=sys.stdout,
                 print(f"\nD-{n:03d}  BLOCK ONLY IN {side}  <{blk2.role}>", file=out)
                 print(f"  {side:<{w}}: {blk2.text}", file=out)
                 print(f"  {(A if x is None else B):<{w}}: (nothing aligned)", file=out)
+                if record is not None:
+                    ta = blk2.text if x is not None else ""
+                    tb = blk2.text if x is None else ""
+                    record.append((n, blk2.role, f"BLOCK ONLY IN {side}", ta, tb))
                 continue
         sm = difflib.SequenceMatcher(None, x.tokens, y.tokens, autojunk=False)
         for tag, i1, i2, j1, j2 in sm.get_opcodes():
@@ -524,6 +552,8 @@ def diff_report(a_path, b_path, context=6, min_sim=0.45, out=sys.stdout,
             print(f"\nD-{n:03d}  {kind}  <{role}>", file=out)
             print(f"  {A:<{w}}: …{pre_a} 〈{mid_a}〉 {post_a}…", file=out)
             print(f"  {B:<{w}}: …{pre_b} 〈{mid_b}〉 {post_b}…", file=out)
+            if record is not None:
+                record.append((n, role, kind, mid_a, mid_b))
 
     ja = sum(x.hyphen_joins for x in a_blocks)
     jb = sum(x.hyphen_joins for x in b_blocks)
@@ -601,6 +631,98 @@ STEP_HEAD = re.compile(r"^##\s+Step\s+330\b", re.M)
 NEXT_H2 = re.compile(r"^##\s+(?!#)", re.M)
 
 
+# ---------------------------------------------------------------------------
+# the hash-keyed, classified record
+#
+# r330 has asked since SH8607 for (a) a per-pair record in reviewed/, (b) keyed
+# by CONTENT rather than position, because "the D-numbering is positional, one
+# aside shifts every difference after it".  Neither existed, so SH8607's 23
+# pairs came to 74,621 lines of positional record that had to be regenerated
+# twice.  This is that record.
+#
+# The class decides WHO looks.  MEASURED on SH09's article 64 against SH8608/79
+# (300 differences, a merged and re-edited reprint):
+#   MECHANICAL  96   whitespace, case or punctuation only -- counted, not read
+#   CANDIDATE   105  near-identical spans (29) and dropped words (76): the
+#               sites where one of the two transcriptions could be wrong, and
+#               the only ones r330 exists to catch
+#   EDITORIAL   the rest -- the magazine re-wrote the passage; a per-difference
+#               verdict on a rewrite says nothing and costs everything
+# ---------------------------------------------------------------------------
+
+CAND_SIM = 0.60          # char similarity above which two spans are "the same, nearly"
+DROPPED_WORDS = 2        # a span absent on one side, this short: a dropped word
+
+
+def _flat(s, case=True, punct=False):
+    s = re.sub(r"\s+", " ", s).strip()
+    if not case:
+        s = s.lower()
+    if punct:
+        s = re.sub(r"[^\w\s]", "", s)
+    return s
+
+
+def classify(a, b):
+    """(class, subclass) for one difference's two spans.
+
+    The first cut of this used "three words or fewer on either side" for
+    CANDIDATE and put `erläutern`/`klären` and `wieso`/`warum` in front of a
+    reader -- the magazine re-writing a sentence, which is not a transcription
+    error and never will be.  What a reader can actually adjudicate is a span
+    that is nearly the same string (an OCR slip looks LIKE its original), or a
+    word or two present on one side and absent on the other (a dropped word).
+    A different word of the same length is editorial, whatever its length.
+    """
+    if not a or not b:
+        other = a or b
+        if len(_flat(other).split()) <= DROPPED_WORDS:
+            return "CANDIDATE", "dropped-word"
+        return "EDITORIAL", "one-sided"
+    if _flat(a) == _flat(b):
+        return "MECHANICAL", "whitespace"
+    if _flat(a, case=False) == _flat(b, case=False):
+        return "MECHANICAL", "case"
+    if _flat(a, case=False, punct=True) == _flat(b, case=False, punct=True):
+        return "MECHANICAL", "punctuation"
+    if difflib.SequenceMatcher(None, _flat(a, case=False),
+                               _flat(b, case=False)).ratio() >= CAND_SIM:
+        return "CANDIDATE", "near-identical"
+    return "EDITORIAL", "rewritten"
+
+
+def record_key(a, b):
+    """A stable id for a difference: its CONTENT, not its position."""
+    h = hashlib.sha1()
+    h.update(_flat(a, case=False).encode("utf-8"))
+    h.update(b"\x00")
+    h.update(_flat(b, case=False).encode("utf-8"))
+    return h.hexdigest()[:8]
+
+
+def write_record(path, a_path, b_path, rows):
+    counts = {}
+    lines = []
+    for n, role, kind, ta, tb in rows:
+        cls, sub = classify(ta, tb)
+        counts[cls] = counts.get(cls, 0) + 1
+        disp = "" if cls == "CANDIDATE" else cls
+        lines.append(f"{record_key(ta, tb)}\t{cls}\t{sub}\tD-{n:03d}\t{disp}\t"
+                     f"{_flat(ta)[:120]}\t{_flat(tb)[:120]}")
+    with open(path, "w", encoding="utf-8") as fh:
+        print(f"# r330 record: {a_path}", file=fh)
+        print(f"#          vs: {b_path}", file=fh)
+        print(f"# key\tclass\tsubclass\tD\tdisposition\tours\ttheirs", file=fh)
+        print(f"# The key is a content hash: an edit elsewhere does not renumber it.",
+              file=fh)
+        print(f"# Every CANDIDATE needs a disposition from "
+              f"{sorted(DISPOSITIONS)}; MECHANICAL and EDITORIAL carry their class.",
+              file=fh)
+        for ln in lines:
+            print(ln, file=fh)
+    return counts
+
+
 def _cells(line):
     parts = [c.strip() for c in line.strip().strip("|").split("|")]
     return [re.sub(r"^`|`$", "", c) for c in parts]
@@ -621,6 +743,63 @@ def _log_section(log_text):
     rest = log_text[matches[-1].end():]
     nxt = NEXT_H2.search(rest)
     return rest[: nxt.start()] if nxt else rest
+
+
+CODE_SWEEP = re.compile(r"CODE-SWEEP\s+\S+:\s*\d+\s+block", re.I)
+RECORD_HDR = re.compile(r"^#\s+r330 record:\s*(.+?)\s*$")
+RECORD_VS = re.compile(r"^#\s+vs:\s*(.+?)\s*$")
+
+
+def load_records(issue_dir):
+    """{(our path, their path): (path, counts, undispositioned)}, plus a list
+    of record files this could not read.
+
+    KEYED BY PATH, NOT BASENAME.  Article 94 merges fourteen letters pages and
+    EIGHT of its originals are called `Leserforum.html`, so a basename key
+    collapsed them onto one entry and six records vanished from the gate in
+    silence -- a check that cannot see, which is the thing this file's comments
+    keep being about.
+
+    The per-pair record r330 has asked for since SH8607.  A merged reprint's
+    LOG section keeps the summary table only -- per-D lines for 30 pairs were
+    74,621 lines there once -- so the dispositions live in reviewed/ and this
+    is how the gate finds them.  Indexed by the two FILES named in the record's
+    own header, not by its filename, so a renamed record still verifies.
+    """
+    out, unreadable = {}, []
+    for path in sorted(glob.glob(os.path.join(issue_dir, "reviewed", "r330-*.txt"))):
+        a = b = None
+        counts, undone = {}, []
+        with open(path, encoding="utf-8") as fh:
+            for line in fh:
+                if line.startswith("#"):
+                    m = RECORD_HDR.match(line.rstrip())
+                    if m:
+                        a = m.group(1)
+                    m = RECORD_VS.match(line.rstrip())
+                    if m:
+                        b = m.group(1)
+                    continue
+                cells = line.rstrip("\n").split("\t")
+                if len(cells) < 5:
+                    continue
+                key, cls, _sub, dnum, disp = cells[0], cells[1], cells[2], cells[3], cells[4]
+                counts[cls] = counts.get(cls, 0) + 1
+                if disp.strip() == "THEIRS":
+                    counts["_theirs"] = counts.get("_theirs", 0) + 1
+                if cls == "CANDIDATE" and not disp.strip():
+                    undone.append(f"{key} ({dnum})")
+                elif cls == "CANDIDATE" and disp.strip() not in DISPOSITIONS:
+                    undone.append(f"{key} ({dnum}) disposition {disp.strip()!r} "
+                                  f"not one of {sorted(DISPOSITIONS)}")
+        if a and b:
+            out[(os.path.normpath(a), os.path.normpath(b))] = (path, counts, undone)
+        else:
+            # NOT silently: a record this cannot read is a record nobody checks.
+            # The hand-written shape from before `--record` existed lands here,
+            # and that is fine only while its pair verifies the older way.
+            unreadable.append(path)
+    return out, unreadable
 
 
 def verify(repo, issue_dir):
@@ -677,9 +856,24 @@ def verify(repo, issue_dir):
             if in_leads and line.strip().startswith("|"):
                 c = _cells(line)
                 if len(c) >= 2 and c[1] not in ("claimed original",) and not set(c[1]) <= set("-: "):
-                    for part in c[1].split("+"):
-                        if re.search(r"\d{4}/\d+", part):
-                            claimed.add(part.strip())
+                    # FIND EVERY LEAD IN THE CELL, WHATEVER SEPARATES THEM.
+                    # This used to split on "+" and then add the whole PART,
+                    # so a comma-separated cell -- which is what a merged
+                    # reprint has -- went in as ONE string of seven leads that
+                    # could never match a LOG row: the gate reported a phantom
+                    # missing lead and checked none of the seven real ones.
+                    # MEASURED on SH09's article 30, whose cell names 8410/153
+                    # through 8506/116.
+                    found = re.findall(r"(?:SH)?\d{4}/\d+", c[1])
+                    claimed.update(found)
+                    # A LEAD WITH NO PAGE IS A DEFECT, NOT A THING TO SKIP.
+                    # `8406` alone matched nothing and was dropped in silence,
+                    # so a claimed original was never required to have a row.
+                    for bare in re.findall(r"(?<![\w/])(?:SH)?\d{4}(?![\w/])", c[1]):
+                        if not any(f.startswith(bare) for f in found):
+                            problems.append(
+                                f"REPRINTS.md names {bare!r} with no page -- a lead is "
+                                "issue/page, and a page-less lead cannot be resolved or diffed")
         logged = {r[2] for r in rows}
         for lead in sorted(claimed):
             if lead not in logged:
@@ -708,6 +902,16 @@ def verify(repo, issue_dir):
     # Derive NOT CHECKED from what was actually REPORTED, not from one exit
     # point: a row can bail out at any of half a dozen `continue`s above, and a
     # list built at only the last of them is itself a check that cannot see.
+    theirs_path = os.path.join(issue_dir, "reviewed", "r330-theirs.txt")
+    theirs_text = (open(theirs_path, encoding="utf-8").read()
+                   if os.path.isfile(theirs_path) else "")
+    records, unreadable = load_records(issue_dir)
+    if records:
+        print(f"(reading {len(records)} per-pair record(s) from "
+              f"{os.path.join(issue_dir, 'reviewed')})")
+    for path in unreadable:
+        print(f"(not a `diff --record` file, so its pair must verify from LOG.md: "
+              f"{os.path.basename(path)})")
     pairs, ok_pairs = [], set()
     for r in rows:
         mark = len(problems)
@@ -750,6 +954,34 @@ def verify(repo, issue_dir):
             else:
                 ok_pairs.add((lead, key))
                 print(f"OK: {key} ← {lead} — UNRESOLVED, {len(cands)} candidate(s) reported")
+            continue
+
+        # A PAIR WITH A reviewed/ RECORD IS VERIFIED FROM IT, NOT FROM LOG.md.
+        rec_key = (os.path.normpath(sh_file), os.path.normpath(monthly))
+        if rec_key in records:
+            path, counts, undone = records[rec_key]
+            if undone:
+                problems.append(f"{lead}: {path} has {len(undone)} CANDIDATE(s) "
+                                f"without a valid disposition: " + ", ".join(undone[:6]))
+            elif counts.get("_theirs") and not CODE_SWEEP.search(
+                    theirs_text.replace("\n", " ")
+                    if os.path.basename(path) in theirs_text else ""):
+                # A CONFIRMED THEIRS OBLIGES A BY-HAND <code> SWEEP OF THAT
+                # PAIR, and no diff can do it: `<pre>`/`<code>` are excluded
+                # from the comparison, so the damage that lives there -- `1T0
+                # 40`, `FORJ=OTO 4`, `S=1—S` -- is invisible to every check in
+                # this file.  The gate cannot do the sweep; it can refuse to
+                # pass without the DECLARATION, which is the same shape as
+                # r325's coverage line.
+                problems.append(
+                    f"{lead}: {counts['_theirs']} THEIRS in {os.path.basename(path)} "
+                    f"but reviewed/r330-theirs.txt has no "
+                    f"`CODE-SWEEP {os.path.basename(path)}: N block(s) read, M finding(s)` "
+                    "line -- a confirmed THEIRS obliges a by-hand <code> sweep of its pair")
+            else:
+                ok_pairs.add((lead, key))
+                print(f"OK: {key} ← {lead} — {os.path.basename(path)}: "
+                      + ", ".join(f"{k} {v}" for k, v in sorted(counts.items())))
             continue
 
         if verdict == "NOT-A-REPRINT":
@@ -934,6 +1166,9 @@ def main(argv=None):
                    help="a PARTIAL reprint: diff only the blocks that paired, "
                         "and do not report one-sided blocks (the un-reprinted "
                         "remainder). The count is still printed.")
+    d.add_argument("--record", metavar="PATH",
+                   help="also write a hash-keyed, classified record of every "
+                        "difference to PATH (issues/<ID>/reviewed/r330-<pair>.txt)")
     d.add_argument("--min-similarity", type=float, default=0.45,
                    help="below this, two blocks are not the same paragraph (default 0.45)")
 
@@ -995,8 +1230,16 @@ def main(argv=None):
     for p in (args.a, args.b):
         if not os.path.isfile(p):
             raise SystemExit(f"r330: no such file: {p}")
+    rows = [] if args.record else None
     diff_report(args.a, args.b, context=args.context, min_sim=args.min_similarity,
-                partial=args.partial)
+                partial=args.partial, record=rows)
+    if args.record:
+        counts = write_record(args.record, args.a, args.b, rows)
+        total = sum(counts.values())
+        print(f"\nRECORD  {args.record}: {total} difference(s) -- "
+              + ", ".join(f"{k} {v}" for k, v in sorted(counts.items())))
+        print("        Only the CANDIDATE lines need a reader; the record is "
+              "keyed by content hash, so a later fix does not renumber it.")
     return 0
 
 

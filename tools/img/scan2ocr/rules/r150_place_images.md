@@ -33,7 +33,7 @@ when the prose merely mentioned the figure, and matching issue-wide let a bare
 
 **AND IT IS A LEAD, NOT THE WORKLIST.** The extractor takes its candidates from
 the block index, so **a caption the layout analysis folded into a figure or box
-region never reaches it at all**. MEASURED on SH8605's PAUSE 2 survey (every
+region never reaches it at all**. MEASURED on SH8605's hand-over survey (every
 editorial page at 20 %, 600 dpi where needed): **39 printed captions are missing
 from `figure_captions.txt` altogether** — 6 ×6, 20 ×2, 30 ×2, 40, 69, 77 ×8,
 90, 101 ×4, 111, 149 ×10, 164 ×3. They have a shape in common: the caption is
@@ -46,6 +46,24 @@ frame.
 **So the worklist comes from LOOKING AT EVERY EDITORIAL PAGE**, with this file
 as a cross-check — not the other way round. A build that trusted the file would
 have handed the owner a worklist missing about a quarter of the figures.
+
+**AND NO PAGE GOES ON THE WORKLIST WHILE ITS GRADE IS STILL IN QUESTION.** The
+owner cuts his crops out of `sheets600/NNN.png`, so a worklist row is an
+instruction to cut *those* pixels. If the page is re-graded afterwards, the
+crop he already cut came off the old grade and nothing will ever say so — the
+PNG looks fine, it is simply made of different paper from the page around it.
+MEASURED on SH09: p031 was graded with no paper-yellowing correction at all
+(r005 check 7g, HARVEST 40), and worklist row 25 told the owner to cut figure
+`30-0b` from `sheets600/031.png`. Cut before the re-grade, that figure carries
+a +14.6 DN R−B edge cast the rest of the issue does not. Cut after, it matches.
+
+So before the worklist is handed over, and again before any row is re-issued:
+no page on it may have an open re-grade, an unruled `NOT APPLIED` stamp, or a
+pending `reviewed/` override. If one does, either settle it first or mark the
+row `HOLD — <why>` and tell the owner in the same breath, so he cuts the other
+rows and leaves that one. **The cheapest moment to catch this is before he
+picks up the knife; the most expensive is after the figure is placed, because
+by then it is one PNG among forty and nothing distinguishes it.**
 
 In the other direction the file carries spurious ROWS, which cost a line and
 nothing more: a prose mention `(Bild 5)` or a DATA line `BILD 7` opens like a
@@ -164,10 +182,49 @@ the earlier one is not evidence of a convention.
 **Mind what `_` means elsewhere in the corpus before reading a digit off it.**
 There are 3 underscore names in 4001 PNGs. `26-5_9` is this form — and its own
 digits do not describe its contents, since it carries Bild 9 and Bild 6. The
-other two, `36-4_1` and `36-4_2`, use `_` for **a part of** Bild 4: two halves
-of one numbered figure, placed as `old_edition` / `new_edition` inside a single
-`<figure>`. So the separator alone does not tell you which case you have — read
-the captions.
+other two, `36-4_1` and `36-4_2`, are **the same Bild 4 in SH8501's two
+Auflagen** — the whole figure twice, not a part of it — placed as
+`old_edition` / `new_edition` inside a single `<figure>`, the same mechanism
+that sets *Warum ein Sonderheft?* against *Warum eine zweite Auflage?* in that
+issue's editorial. So the separator alone does not tell you which case you have
+— read the captions.
+
+> **ERRATUM, 2026-11-06.** This paragraph said those two were *"two halves of
+> one numbered figure"*, which made `_` look like the corpus form for a picture
+> that arrives in two cuts. It is not. Both files are the complete directory
+> listing of Bild 4, at 4497x2684 and 2211x1345 px, one per print run. **Nothing
+> in the corpus split a picture until SH09 had to** — the section below is that
+> case, and it was written by checking this precedent rather than citing it.
+
+### ONE PICTURE ACROSS THE PAGE TURN IS TWO CUTS, `-a` AND `-b`
+
+A cut comes out of one `sheets600` page, so **a picture that crosses the page
+turn cannot be one crop.** Its halves are on two sheets, each with its own trim
+and its own skew, and the binding has eaten whatever ran through the gutter;
+joining them would be our reconstruction of the picture rather than the plate.
+Two cuts, in reading order — `<page>-<n>a` and `<page>-<n>b`, both named for the
+page the FIRST half is on — and each is placed as its own `<figure>`, adjacent,
+the way `56-0a/b/c` are.
+
+MEASURED on SH09, 2026-11-06: `30-0a` (p30) and `30-0b` (p31) are the halves of
+one cut-out colour photograph — a diskette and a red arrow pointing into the
+slot of a 1541 whose opened body carries on across the turn. Both bleed to
+their trim. It is the lead picture of *In die Geheimnisse der Floppy
+eingetaucht*.
+
+**AND THIS DOES NOT REVERSE THE TABLE CASE.** *A table printed across two pages
+is ONE crop* still holds, and the difference is checkable rather than a matter
+of kind: **ask whether the two halves can be butted without inventing a pixel.**
+A table's rows continue and the paper destroyed no part of them, so yes — one
+crop. A photograph across the gutter, no — two.
+
+**`-a`/`-b` ALREADY MEANT THIS, AND IT MEANS SOMETHING ELSE TOO.** SH8608's
+`56-0a/b/c` are three separate computers in one lead slot; SH09's `6-1a`/`6-1b`
+are two photographs under one printed caption. The letter does not mean *half
+of*: it means **one of several cuts belonging to one printed unit, in reading
+order**, and both shapes are that. So the worklist's last column says WHICH —
+SH09's reads *"one picture in two cuts because it is on two sheets"* — because
+the letters cannot carry it and the next build reads the row, not this rule.
 
 ### PROSE PRINTED INSIDE A CUT FRAME GOES WITH THE CROP
 
@@ -608,7 +665,19 @@ cropped, even when the prose never references it and the print never labels
 it.** That is the one place where position decides, against the paragraph above
 — and it is a narrow place, so check all of it before claiming it:
 
-- the drawing sits **directly under the article's headline**, before the body;
+- the drawing sits **directly under the article's headline**, before the body
+  — and *before the body* is GEOMETRY, not reading order: **nothing of the
+  article's text stands above it in its own column.** MEASURED on SH09,
+  2026-11-06: `106-0` (a man with an axe over a table of papers) and `139-0`
+  (a figure bursting through a door marked 1541) are framed, signed "bo"
+  drawings at the top of column 2, inside the band under a full-width
+  headline, with the bold intro beside them in column 1. In reading order they
+  come after the intro; in their own column nothing comes before them, and
+  they are **in the lead slot**. That is exactly what separates them from
+  SH8608's p105 and p144 below, which carry body text above them in their own
+  column. **This paragraph used to end "and they are lead drawings." The owner
+  omitted both — see the next section.** The geometry was right; the
+  conclusion drawn from it was not;
 - it is the article's **`<page>-0`**, i.e. nothing else occupies the lead slot;
 - it is **framed or set as an opening illustration**, not dropped into leftover
   space further down.
@@ -626,6 +695,39 @@ it — *"cropping SH8606/108-0 was a mistake."* It is a cartoon with no printed
 caption that the prose never mentions, and **it sits at line 223 of 532**,
 between two paragraphs on interrupt handling. The `-0` said lead slot; the page
 said leftover space. The position settles it and the name never could.
+
+### AND THE LEAD SLOT PROPOSES — IT DOES NOT DISPOSE
+
+**The position test puts a drawing on the worklist. It does not settle what the
+drawing IS.** MEASURED on SH09, 2026-11-14: `106-0` and `139-0` passed every
+clause of the lead-slot exception above — framed, signed, directly under a
+full-width headline, nothing above them in their own column, each its article's
+`-0` — and the owner cut neither. His word: *"the others are comics i decide to
+omit."* Both articles ship with no lead picture, and that is not a gap.
+
+So the exception's two halves pull in opposite directions and both are the
+owner's: **2026-10-17, a drawing in the lead slot is cropped even when nothing
+references or labels it** (SH8608, all four); **2026-11-14, a comic in the lead
+slot is omitted anyway** (SH09, both). They are not in conflict — the first is
+about *position*, the second about *what the thing is*, and the cartoon test
+was never repealed. The lead slot stops a cartoon being dropped for sitting at
+the top of a page; it does not turn a cartoon into a figure.
+
+**So a drawing that reaches the worklist through the lead slot ALONE — no
+reference in the body, no printed label — is listed and marked as such**, e.g.
+`lead slot only; omit if cartoon`, so the owner rules on it with the rest of
+the crops instead of discovering it placed. Where he omits one, the closing
+report says *omitted by the owner*, never *missing*, and no TODO and no
+stand-in goes in its place.
+
+**And the worklist header has to stop contradicting this.** SH09's read
+*"Cartoons and ads are left out"* while listing two cartoons, because the
+lead-slot clause had already promoted them — so the header made a promise the
+rows broke, and the owner delivered 44 of 47 with no way to tell which absences
+were his decision and which were oversights. Three had to go back to him. The
+header now reads: *"Cartoons and ads are left out, except a drawing in the lead
+slot, which is listed for you to rule on."*
+
 
 MEASURED on SH8608: `10-0` (teacher at a blackboard, with the article's own
 headline lettered on the board), `67-0` (a key tagged MONITOR unlocking a door
@@ -789,7 +891,19 @@ its row. Each has a one-line check and each has now been got wrong:
 
 **WHEN YOU REUSE A REPRINT'S CROP, REUSE THE PICTURE AND NOTHING ELSE.** The
 caption is always THIS printing's, read off this issue's own page, and the two
-printings may well differ in it. MEASURED on SH8608/129 against SH8603/76,
+printings may well differ in it.
+
+**AND REUSE NEEDS THE SAME PLATE, NOT THE SAME DRAWING.** The standard is
+SH8608/129 against SH8603/76 below — *identical to the pixel*. A reproduction
+at another scale, or relettered, or in colour where this one is not, is a
+different plate, and shipping it would publish the other issue's printing as
+this one's. MEASURED on SH09, 2026-11-06: rows `140-1` … `140-6` are the same
+six figures as 8510's `34-1` … `34-6` — four of them the same drawings at
+another size, `34-2` and `34-4` the colour versions of ours. **All six rows
+stay**, and each names the prior file so the owner can see it is cutting that
+art a second time. The corpus is full of these — SH09's worklist alone cites
+8411/117, 8501/148, 8505/145, 8506/116 and 8612/21 — and the citation is the
+work; the reuse is not. MEASURED on SH8608/129 against SH8603/76,
 2026-10-17: the picture is identical to the pixel, and the captions are not —
 ours prints *"Taste und <B> erzeugt werden."* where SH8603 prints *"Taste und B
 erzeugt werden."*, and ours ends *"(Bild 1) so aus"* with no full stop where
@@ -880,6 +994,39 @@ listing — not an instruction to typeset it.** A one-sentence ruling relayed
 without the count behind it is a guess wearing the owner's voice, and it is the
 supervisor's job to do that count before passing the ruling on, not the
 builder's to undo it afterwards.
+### WHERE THE OTHER PRINTING'S PAGE IMAGE LIVES — AND WHY THE `pdftoppm` BAN DOES NOT REACH IT
+
+A published issue has no `<tmp>`: it was wiped when its build finished. Its page
+images are **`/Volumes/S/png/<ID>/NNN.png`**, the scans themselves — 53 issues
+including SH09 — which r330
+names as *the authority for their side*.
+
+**THEIR RESOLUTION VARIES BY ISSUE, AND SOMETIMES INSIDE ONE — MEASURE, DO NOT
+ASSUME.** MEASURED 2026-11-14: the monthlies are 2400 dpi throughout (8603 p055
+20496x28751, 8510 p034 20761x28751), while SH8608's inner pages are 600 dpi
+(p105 5054x7188) under a 2400 dpi cover (p001 20408x28751). This paragraph said
+"inner pages about 5050x7190, covers at 2400 dpi" until SH09's builder measured
+a monthly and found otherwise — **I had generalised one issue's shape to 53**,
+which is the same error as carrying a count forward without re-measuring it.
+
+Look there, and at the delivered crops
+in `issues/<ID>/*.png`, which are durable and in the repo: 89 of them for
+SH8608.
+
+**The ban on `pdftoppm` is scoped to the issue being BUILT**, where that PDF
+does not exist yet and `masters600` is the better image (r000, *THE PAGE IMAGE
+IS `masters600`*). It was never about another issue's published PDF — r330
+prescribes exactly that render for 8404, the one issue with no scans at all.
+
+MEASURED on SH09, 2026-11-06: a sub-agent sent to compare SH09's layout against
+SH8608 rendered SH8608's pages with `pdftoppm` and reported itself for breaking
+its brief. It had nowhere else to go. **This section sends you to another
+printing and named no file for it**, and the brief said *"Never `pdftoppm`; the
+page image is masters600"* — which for SH8608 names a directory that no longer
+exists. A ban with no stated scope is read as global, and then the one case it
+was never about has no route at all. Nothing of SH09 was rendered that way, and
+the finding the agent brought back stands.
+
 ## Two resolution buckets, and which one a figure is in
 
 `tools/convert-scans.sh` states the project's convention for every image file
@@ -1011,6 +1158,44 @@ box in the master and say what is there.** If the characters are already gone,
 it is the plate (r000, *WHAT WE PUBLISH IS THE ORIGINAL PRINTING PLATE*) and
 there is nothing to fix. A claim that the conversion destroyed content must
 name the content the master still has.
+
+## THE WORKLIST'S GEOMETRY IS IN THE `sheets600` FRAME — SAY SO IN ITS HEADER
+
+**You look at `masters600`, the owner cuts from `sheets600`, AND THEY ARE NOT
+THE SAME COORDINATE SYSTEM.** Every rule that tells you to look at a page names
+`masters600`; r000 hands the owner `sheets600` at the end of 005; until
+2026-11-06 nothing said that a box measured on the one lands somewhere else on
+the other.
+
+The relation is exact. Step 005 crops the traced page out of the sheet and
+anchors it at the canvas's top-left, so
+
+    sheet_x = master_x + sheet-box.x0
+    sheet_y = master_y + sheet-box.y0
+
+with `sheet-box` read from `<tmp>/masters600/NNN.stamp.txt`. It is a pure
+integer translation — no rotation, no scale, because both images are levelled by
+the same measurement. VERIFIED on SH09 pp 030, 119 and 139 by correlating a
+400x400 master patch into the sheet: **r = 1.00000 at exactly that offset**,
+residual 0 px in both axes.
+
+MEASURED on SH09, 2026-11-06: **162 of 168 pages carry a non-zero offset**, up
+to **86 px in x** (p099) and **14 px in y** (p042) — 3.6 mm at 600 dpi, which is
+the width of a figure's edge. The canvases differ as well (`masters600`
+5457x7181 against `sheets600` 5040x7203-7205, and about 5290 wide on the four
+cover pages), but that difference is fabricated margin and moves nothing; only
+`sheet-box` does.
+
+So, two lines of the worklist's job:
+
+- **measure its boxes on `sheets600`**, the file the owner actually opens, and
+- **say in the header which frame they are in**, the way SH09's does.
+
+A row is a rough `WxH+X+Y` that the owner refines by eye, so the frame has never
+been fatal — but it is a systematic shift of up to 86 px on 96 % of pages, and
+that is exactly the error that survives by looking like a rough number. SH8608's
+worklist quoted the master frame and said nothing; its tmp is gone, so how far
+that reached cannot be recovered.
 
 ## Alt text — describe only what is visible
 

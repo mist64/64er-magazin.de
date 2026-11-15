@@ -29,12 +29,22 @@ PY=${PYTHON:-../../../../.venv/bin/python}   # the repo venv; never bare "$PY"
 $PY r005_a4_window.py            # no arguments: every page
 ```
 
-**No arguments.** The program measures every page in `sheets600`, fits ONE
-`(S, B)` offset pair per parity, and cuts every page to `<tmp>/a4600/`, one
-`NNN.png` and one `NNN.stamp.txt` each. There is no per-page invocation and no
-page list — the whole point of the step is that the window is fitted across the
-issue and then applied rigidly, so cutting a subset would fit a different
-window.
+**Optional page numbers.** `r005_a4_window.py` with no arguments measures every
+page in `sheets600`, fits ONE `(S, B)` offset pair per parity, and cuts every
+page to `<tmp>/a4600/`, one `NNN.png` and one `NNN.stamp.txt` each. Given page
+numbers (`… r005_a4_window.py 111`), it still **measures every page** — the fit
+is always global, which is the whole point of the step — and then cuts and
+overlays only the pages named.
+
+**Measuring globally and cutting selectively are not in tension, and this file
+used to say they were.** It read *"There is no per-page invocation and no page
+list … cutting a subset would fit a different window"*, which was true of an
+earlier program and false of this one: the subset never reaches the fit. The
+claim survived into SH09, where a page had to be re-cut after a regrade and the
+rule's own text argued for re-cutting all 168 — which would have reverted every
+page carrying an OVERRIDE. **A per-page re-cut rewrites `measured.json` and
+`a4_windows.json` for every page, with identical windows**, so check the
+windows afterwards rather than the file's mtime.
 
 **Two env knobs, which `r005_masters_sheet` ("No CLI knobs, no env knobs") does
 not cover because they are this program's, not that one's:**
@@ -405,12 +415,46 @@ PY
 #     was to append the UNIFIED line to the two stamps by hand; that is the
 #     wrong direction, because it makes the stamp say something the program did
 #     not do.  Fix the program or the check, then RE-RUN -- and re-run the
-#     recovery script afterwards, because `r005_a4_window.py` has no per-page
-#     mode and re-cuts all pages, silently restoring the WRONG automatic window
-#     on every recovered page (SH8608 p009 and p142).  The recovery script lives
+#     recovery script afterwards.  A re-run over ALL pages silently restores the
+#     WRONG automatic window on every recovered page (SH8608 p009 and p142), so
+#     NAME THE PAGES: the program takes page numbers and cuts only those, while
+#     still fitting the window across the issue.  (This paragraph used to say it
+#     had no per-page mode.  It has one -- `pages = [int(a) for a in
+#     sys.argv[1:]]` -- and believing otherwise is what makes a one-page repair
+#     look like it needs a 168-page re-cut.)  The recovery script lives
 #     in `<tmp>`, covers every recovered page, is idempotent (it refuses on an
 #     a4600 that already carries an OVERRIDE), and its path is recorded in
 #     LOG.md.
+#
+#     AND A RECOVERY THAT FIXES THE GEOMETRY AND NOT THE PAPER IS HALF A
+#     RECOVERY.  MEASURED on SH09 p031.  Step 005 could not trace the page
+#     (the bleeding photo's outer boundary read as bed, so the trace came back
+#     149.0 x 297.4 mm), published the whole levelled sheet, and therefore
+#     graded it with an IDENTITY field -- `field_box_ok()` refuses a box
+#     outside FIELD_PAGE_MM.  `recover_031.py` then rescued the A4 window out
+#     of that master and mirrored the bed fringe away.  It fixed everything
+#     visible in a window check and nothing about the colour, so the delivered
+#     page had the right geometry and the wrong paper: fore edge +14.6 DN R-B
+#     across its whole length in the outer 3 mm, top edge +16.1 DN, against a
+#     class median of |R-B| <= 1.2.  Every window check was green.
+#
+#     So when a page needs an override at all, ask BOTH questions: does it have
+#     its window, and does it have its field?  A page that failed to trace has
+#     usually failed both, because the two share one cause -- no traced box --
+#     and only one of them is visible to the eye that is checking windows.
+#     The cure is the same object in both cases: a hand-measured page box.
+#     Measure it once, re-grade the page with it against the EXISTING class
+#     field (no refit -- the page was rejected from the fit, but the fit is a
+#     class shape the other pages already carry), then re-window and re-run the
+#     recovery.  MEASURED on p031: box x 2..4968, y 4..7038 = 210.2 x 297.8 mm,
+#     inside FIELD_PAGE_MM, and the edge tint fell to +1.2/5 %, +0.8/1 %,
+#     +0.2/0 % on fore, top and bottom -- inside the class median.
+#
+#     AND THE OVERRIDE MUST STAMP WHAT IT DID, in both directions.  The stamp
+#     may not claim pixels the field did not touch (r005_masters_sheet, check
+#     7b) -- and it may not stay silent about pixels the field DID touch, or
+#     check 7g goes on failing a page that has been fixed and the right answer
+#     looks like the wrong one.
 
 # 2. The anchor lands on the glyph -- check the overlay on a sample, per
 #    parity, rather than trusting the transform.  (By eye: `overlay()` writes

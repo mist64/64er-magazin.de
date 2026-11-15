@@ -24,7 +24,7 @@ are not.
 - `issues/<YYMM>/prg/` — the actual `.txt` / `.prg` files.
 - `<OUT_DIR>/blocks/pNNN.txt` and `NNN.labels.json` — for verbatim captions.
   (This used to name `issues/<YYMM>/64er_*.pdf`, which does not exist during a
-  build: the PDF is made at step 006, after PAUSE 2. The concatenation target
+  build: the PDF is made at step 006, late in the build. The concatenation target
   used to be a `/tmp` path, which r000 forbids — write it under `<tmp>`.)
 - `issues/<YYMM>/<page> ….html` — the article files to receive
   figures.
@@ -54,7 +54,7 @@ divergence, no aside — see r170, *THE PRINTED LAST ROW MAY BE PADDED*.
 **`data-range` is BASIC-only.** It selects by LINE NUMBER, so a binary has no
 way to express the same thing — and a binary's range mismatch is just as real:
 SH8603 had printed dumps whose address span differs from the disk file's. Until
-there is an address form, report the mismatch at PAUSE 2 (it is a print/disk
+there is an address form, report the mismatch on the owner decision list (it is a print/disk
 difference, so r300's standing ruling applies) and record the printed span in
 the caption or in LOG.md. Do not silently ship the full dump as if it matched.
 
@@ -321,7 +321,7 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
 
 ## A print/disk difference is the OWNER's call — see r300
 
-Where a figure, a caption, a line range or a listing on the page disagrees with the disk file this step is placing, **stop and report it with the evidence**; it is a PAUSE 2 decision and not this step's. The full ruling, with the three shapes it covers, is in r300 under *EVERY PRINT/DISK DIFFERENCE IS AN OWNER DECISION, ALWAYS*. Do not take a previous issue's answer as a precedent.
+Where a figure, a caption, a line range or a listing on the page disagrees with the disk file this step is placing, **stop and report it with the evidence**; it is an owner decision and not this step's. The full ruling, with the three shapes it covers, is in r300 under *EVERY PRINT/DISK DIFFERENCE IS AN OWNER DECISION, ALWAYS*. Do not take a previous issue's answer as a precedent.
 
 ## An element you cannot place does NOT go at the end
 

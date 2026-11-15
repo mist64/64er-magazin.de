@@ -11,7 +11,7 @@ outright on `SH8602`.
 
 So for a Sonderheft: write the bound as a PROVISIONAL `pubdate.txt`, say in
 LOG.md that it is provisional and which bullet it came from, and carry it to
-PAUSE 2 as an owner decision. Never present a bound as a date.
+the owner decision list. Never present a bound as a date.
 
 **And when there is no usable bound at all, the date is the owner's and you do
 not derive one.** Two cases, both live:
@@ -76,7 +76,7 @@ That's the whole file. No comments, no metadata.
 If `README.md` doesn't yet have a bullet for the issue — and for every
 issue after the last one planned, it does not — **the plan date is the
 OPERATOR's to give.** Write the DERIVED bullet and list it for the owner to
-confirm at PAUSE 2 — that is not inventing one. Do not invent one that is not derived. The rule used to say "add one
+confirm on the decision list — that is not inventing one. Do not invent one that is not derived. The rule used to say "add one
 first" without saying where the date comes from, which asks an agent to
 write a number it has no source for.
 

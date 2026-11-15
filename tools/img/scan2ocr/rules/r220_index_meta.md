@@ -60,6 +60,34 @@ An earlier note here had it backwards and told the builder to write nothing.
 its 29 articles because this rule was skipped as `not applicable — kind`.
 Published; not fixed retroactively (owner, 2026-10-03). Do not repeat it.
 
+### NO INPUT IS NOT THE SAME DEFECT AS A MISSED INPUT — from Sonderheft 9 on
+
+`Gesamtinhaltsverzeichnis Sonderhefte.csv` covers `1/85`–`8/85` and
+`1/86`–`8/86`, and that is the whole of it: the file was added at the start of
+the project as "1985/86 only" and **its source is recorded nowhere**, not in
+this chain and not in the commit. No issue publishes it as an article, none of
+the eight built Sonderhefte carries an index or register, and there is no
+Sonderheft OCR to search. So for **Sonderheft 9 and every one after it there is
+no index input at all.**
+
+**Owner, 2026-11-05: ship without index.** `index_category` and `index_title`
+stay unwritten, and that is the correct outcome, not SH8601's defect repeated.
+The two look identical in the artefact and must not be confused in the record:
+
+| | SH8601 | SH09 onward |
+|---|---|---|
+| why no metadata | the rule was skipped as `not applicable — kind` | **the input does not exist** |
+| what the evidence must show | nothing — the input existed and was missed | that `N/YY` is absent from the CSV |
+| what to write in the log | a defect | `no index source: the CSV ends at 8/86` |
+
+So the test from the section above still stands and now cuts the other way:
+**rule out the INPUT, not one file.** For a Sonderheft past 8/86, grep the
+Gesamtinhaltsverzeichnis for its `N/YY` key, show it returns nothing, and say
+so. That is a complete answer. Do not reconstruct rows from the issue's own
+Inhalt page: a derived classification is indistinguishable in the file from the
+magazine's own editorial one, which is the fault this chain already learned from
+the hand-written model stamp (see r020).
+
 **The apply script HAS a Sonderheft reader** — `parse_sonderheft_csv` in
 `r220_index_meta_apply.py`, which keys on **column 3**, exactly as stated
 above and as the function's own docstring says. (This paragraph said column 4,

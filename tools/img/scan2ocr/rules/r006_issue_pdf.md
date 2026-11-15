@@ -54,6 +54,59 @@ glossy cover leaves behind. That file:
 Every other page of the PDF is exactly what step 005 produced, reduced by the
 `issue_pdf` recipe. The cover is the one page a human touches.
 
+### A RETOUCHED `title.png` WITH ALPHA: REMOVE THE ALPHA CHANNEL
+
+**Owner, 2026-11-06:** *"if i give you a retouched title with alpha, remove the
+alpha channel"*. The published `issues/<ID>/title.png` is **RGB, with no alpha
+channel**. This reverses a ruling made the same day to place such a file
+byte-unchanged; the owner's rule governs.
+
+**Remove the channel; do not composite onto a background.**
+
+```bash
+magick "<the owner's file>" -alpha off issues/<ID>/title.png
+```
+
+`-alpha off` drops the channel and **keeps every RGB value as the retoucher
+left it**. `-alpha remove` is the other thing and is wrong here: it composites
+onto `-background` first, which lightens the soft edge into a halo the owner
+did not paint. On SH09's edge pixels the two differ by the whole of the
+difference between the cover's teal (43/153/188) and a white composite
+(123/191/213). **Changing no pixel's colour is the point.**
+
+**WHY, AND IT IS NOT ONLY TIDINESS.** An alpha channel left in place is
+flattened independently by each consumer, onto a different background:
+
+| artefact | code | background |
+|---|---|---|
+| the PDF | `make_issue_pdf_mixed.sh` | **white** |
+| the site's `title.jpg` | `generate.py:1712 convert_and_copy_image` | **`wheat`**, via `-alpha remove -alpha off` |
+
+So one cover rendered two ways. Removing the channel at placement makes both
+consumers read identical pixels, and the flatten in each is then a no-op.
+
+**CHECK WHAT IS UNDER THE ALPHA BEFORE DROPPING IT.** Dropping the channel
+reveals whatever RGB the retouch left beneath the non-opaque pixels. Soft edges
+over the cover's own colour are the normal case and drop cleanly — measure the
+RGB mean under the non-opaque pixels and expect cover content (SH09: 43/153/188,
+its own teal). **A genuine hole is different**: alpha at or near 0 over an
+*area* may have no meaningful colour under it, and dropping it would publish
+whatever was there. Stop and ask on a hole; soft edges are not one.
+
+Record in `LOG.md` how many pixels were non-opaque, the minimum alpha, and the
+RGB mean beneath them. **The owner's own file is never modified** — the removal
+produces the repo copy.
+
+**NOT RETROACTIVE.** 10 of the 50 covers published before this rule are RGBA
+(8701: 23,083 px non-opaque, min alpha 151; SH8601: 11,741, min 170; SH8504:
+32,587, min 34; SH8508: 47,809, min 5). They stay as they are. `title.jpg` is
+regenerated from `title.png`, so re-making one would change a published page to
+no purpose.
+
+The cover gate is unaffected: `make_issue_pdf_mixed.sh` refuses at **2 grey
+levels** of MAE, a flatten-plus-quantisation costs ~0.01, and a machine-derived
+cover differs by ~24. With no alpha to flatten the comparison is exact.
+
 So this step BLOCKS on that hand-off: if `issues/<ID>/title.png` is missing,
 or older than the cover master it should have been made from, the PDF is not
 ready to build. Ask for it; do not substitute the raw master, because then the
@@ -84,6 +137,22 @@ Two further traps found with it, both now closed in the scripts:
 - **the mixed build does not make the 150 dpi pages at all** — it consumes the
   plain script's cache. It now compares page 1's cached pixels against
   `title.png` (MAE ≤ 1) and refuses to assemble otherwise.
+
+  **AND THAT COMPARISON CANNOT SEE A FLATTEN.** MEASURED on SH09: the difference
+  between a page 1 rastered from an RGBA cover (flattened onto white) and the
+  same cover with `-alpha off` is **0.064 grey levels** — against a gate of 1,
+  and against ~24 for a machine-derived cover. The gate was sized to catch the
+  wrong *image*, not two treatments of the right one. **A cover replaced after
+  the raster was made is invisible to every cover check**, so verify page 1 by
+  PROVENANCE — which file the raster was made from and when — never by MAE.
+
+  **THE MIXED BUILD NEVER REFRESHES `001_150.png`.** Invalidation on a newer
+  `title.png` lives in the *plain* script, which owns that cache; the mixed
+  build only consumes it. So replacing the cover and re-running the mixed build
+  alone leaves the stale raster in place **silently**, and this file said it
+  "should self-correct" until 2026-11-06, which is wrong. Re-make the 150 dpi
+  page 1 explicitly whenever `title.png` changes, before the mixed build runs,
+  and check `001_150.png` is newer than `title.png`.
 
 - the **per-quality guetzli cache is also keyed on existence**
   (`[[ -s "$qd/$n.jpg" ]] || guetzli …`), so a cover change reached the 150 dpi
@@ -788,7 +857,7 @@ the standard; it was never written down, so this is where it lives now.
 
 | field | value | evidence |
 |---|---|---|
-| `/Title` (DocInfo) **and** `dc:title` (XMP) | monthly `64'er MM/YY`; **Sonderheft `64'er Sonderheft NN/YY`** | 30/30 monthlies, 8/8 Sonderhefte |
+| `/Title` (DocInfo) **and** `dc:title` (XMP) | monthly `64'er MM/YY`; Sonderheft **to SH8608** `64'er Sonderheft NN/YY`; **from SH09** `64'er Sonderheft N` | 30/30 monthlies, 8/8 Sonderhefte, and SH09 |
 | `/Author` (DocInfo) | `Markt & Technik` | 38/38 |
 | `/Subject`, `/Keywords` | **absent — never written** | 0/38 carry either |
 | `/CreationDate` = `/ModDate` | the build's own timestamp | 37/38 (`8609` is the only file without them) |
@@ -800,6 +869,16 @@ does **not** carry the theme, the long year, or the repo's `SH` prefix. That is
 also how the archive's own index names them: `Gesamtinhaltsverzeichnis
 Sonderhefte.csv` cites a Sonderheft article as `1/86`. So `SH8601` is
 `64'er Sonderheft 01/86`.
+
+**AND FROM SONDERHEFT 9 THE YEAR GOES AWAY, BECAUSE THE COVER DROPS IT.**
+Owner, 2026-11-14, on the delivered SH09 PDF: *"the title in the metadata is
+wrong, it's should be Sonderheft 9, not 9/86."* From number 9 the cover stops
+naming a year and simply counts on, which is also why the issue ID is `SH09`
+and not `SH8609` (see `pubdate.txt`'s rule). So the tag is `Sonderheft 9` …
+`Sonderheft 25`, with **no zero padding and no year**, and the `NN/YY` shape
+above is correct only for `SH8501`–`SH8608`. The two shapes do not overlap:
+there was never a *Sonderheft 9* of 1986 in the old numbering, because 1986's
+ninth is this one.
 
 The reason the shape matters: `64'er ` + issue tag is the only string a reader,
 a library catalogue or a file manager ever sees for the document, and it is the
@@ -905,6 +984,30 @@ exiftool -overwrite_original \
 
 Never re-run the build for a metadata fix: the guetzli quality search is hours,
 and a rebuild changes the pixels for nothing.
+
+### A POST-BUILD FIX IS SILENTLY UNDONE BY THE NEXT REBUILD — SAY SO WHERE THE REBUILD LOOKS
+
+Anything applied to the finished PDF — a metadata write, a page reorder, a
+swapped image — lives **outside** the build, so the next run of
+`make_issue_pdf*.sh` reverts it without a word. **Record every post-build fix in
+`issues/<ID>/reviewed/`, saying what was applied, why, and the condition under
+which it must or must not be applied again.**
+
+MEASURED on SH09, 2026-11-14. The owner: *"the four blue order/payment sheets
+come after the last page, after the cover. seems like the png/ order was wrong.
+i'll fix it later. but do fix it in the pdf."* So the fix went into the PDF and
+not into the inputs, deliberately — the owner holds a crop worklist citing the
+current sheet numbers, and renumbering `png/` now would invalidate it.
+
+The reorder was done with **pikepdf page reordering alone**: 168 pages out,
+per-page raw image streams byte-identical and merely re-ordered, `qpdf --check`
+clean, nothing in `masters600`, `sheets600`, the OCR, the marks census or the
+worklist touched. Pages 163-166 (the blue Bestell-/Zahlkarte leaves, 878x1240)
+moved behind 167-168 (the covers, 1240x1754). `reviewed/pdf-postfix.txt`
+records it, and states the two conditions that matter: **a rebuild before the
+owner fixes `png/` must re-apply the reorder after step 006, and once `png/` is
+fixed it must NOT be applied again.** A pending marks repair on p130/p132 makes
+that a live possibility, not a hypothetical.
 
 ## RE-CUTTING A PAGE MEANS RE-OCR'ING IT — the OCR layer carries the geometry
 
@@ -1190,6 +1293,56 @@ cp <tmp>/<name>.pdf <repo>/issues/<ID>/$("$PY" -c \
 first, worst build entered history: a 99.8 MB PDF with the wrong cover and the
 wrong insert geometry, swept in by a wildcard add. Add the path explicitly, and
 look at `git status` first.
+
+## AND NO PICTURE SHIPS WITH A HOLE PUNCHED IN IT
+
+Step 005 may delete part of a page: the bed drop removes dark or prop-coloured
+components that reach off the edge of the scan, and every deleted pixel is
+written as **pure 255**. When it takes bed, that is the point. When it takes
+print, the page ships with a white hole and **nothing in this step notices** —
+the mixed build encoded SH09 p030 with 1716.5 mm² of its lead photograph
+deleted, and the marks census read the same file and censused it.
+
+So before the PDF is built, for every page that will go in as **contone**:
+measure the largest 4-connected run of **exactly 255** that lies **inside** the
+traced page and is not touching its edge. A photograph has no such region; a
+hole does. MEASURED on SH09 the three damaged pages carried 15.5, 186.2 and
+1716.5 mm² of it, while an undamaged contone page's largest interior pure-white
+component is the paper between picture elements and is small.
+
+A hit is a stop. Look at the page against `sheets600`, which is written before
+the mask is applied and therefore still holds what was deleted — that
+comparison is the whole diagnosis and it takes one crop.
+
+**This check exists because the failure is silent in every artefact.** The
+stamp did not record it, `t.dropped` counts components and is never written
+out, Verification 4 asks only whether bed SURVIVED, and the page looks
+perfectly ordinary unless you know what was there. The owner found it by eye on
+a delivered page, which is the most expensive place to find anything.
+
+## NO CONTONE PAGE SHIPS WHOSE MASTER SAYS THE FIELD WAS NOT APPLIED
+
+Step 005 is allowed to give up on a page: one whose traced box falls outside
+`FIELD_PAGE_MM` is graded with an identity field and its master stamp says
+`field  identity -- NOT APPLIED -- <why>`. That is honest, and r005 check 7g
+now refuses to pass while any such page is unruled. **This step checks it
+again at the last place it can still be caught**, because the two steps are
+days apart and a page can be repaired in between by a `reviewed/` override
+that fixes the window and not the paper — which is exactly what happened to
+SH09 p031, whose delivered fore edge ran +14.6 DN R−B at 99 % of paper pixels
+tinted while every window check was green.
+
+Before the PDF is built, for every page that will go in as **contone**:
+
+```sh
+grep -l 'NOT APPLIED' "$TMPDIR_ISSUE"/masters600/*.stamp.txt
+```
+
+Any hit is a stop. Either the page is re-graded on a hand-measured box, or the
+owner's ruling for it is already in `issues/<ID>/reviewed/field-not-applied.txt`
+— the same file r005 check 7g reads, so the two gates cannot disagree. A
+bilevel page cannot carry this fault: its paper is exactly 255 by construction.
+
 
 ## Verification
 

@@ -11,7 +11,7 @@ rules — `rNNN_name.md` is the rule, `rNNN_name.{py,sh}` its code.
 
 **Read `tools/img/scan2ocr/rules/r000_orchestration.md` first, before anything
 else and before touching any file.** It is the contract: the step chain and
-each step's disposition, the two points at which a build stops for its owner,
+each step's disposition, the three owner inputs and what each one blocks,
 where the 2400 dpi masters are and that they are the only input, which Python
 to use, and the conventions every step shares. A build that starts without it
 repeats mistakes the file already records.
