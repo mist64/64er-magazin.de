@@ -1305,14 +1305,49 @@ deleted, and the marks census read the same file and censused it.
 
 So before the PDF is built, for every page that will go in as **contone**:
 measure the largest 4-connected run of **exactly 255** that lies **inside** the
-traced page and is not touching its edge. A photograph has no such region; a
-hole does. MEASURED on SH09 the three damaged pages carried 15.5, 186.2 and
-1716.5 mm² of it, while an undamaged contone page's largest interior pure-white
-component is the paper between picture elements and is small.
+traced page and is not touching its edge. MEASURED on SH09 the three damaged
+pages carried 15.5, 186.2 and 1716.5 mm² of it.
 
-A hit is a stop. Look at the page against `sheets600`, which is written before
-the mask is applied and therefore still holds what was deleted — that
-comparison is the whole diagnosis and it takes one crop.
+**BUT "A PHOTOGRAPH HAS NO SUCH REGION" IS FALSE, AND THIS CHECK SAID SO UNTIL
+SH10.** A printed highlight clipped at 255 is exactly such a region. MEASURED
+on SH10 p023: **211–304 mm²** of interior pure white, which is the white
+**spine of the "Microsoft Multiplan" box in the ad photograph** — the spine's
+type intact, the photograph whole, nothing deleted. By size alone that page is
+indistinguishable from SH09 p167's 186.2 mm² of deleted print.
+
+**THE DISCRIMINATOR IS `sheets600`, NOT THE SIZE.** `sheets600` is the same
+render *before* the keep mask is applied, so:
+
+- a **hole** is a region where `masters600` and `sheets600` DIFFER — the mask
+  removed what the sheet still holds;
+- a **highlight** is a region where they are IDENTICAL — the white was printed.
+
+```sh
+# VERIFIED both ways on SH10 p023, 2026-11-15:
+#   as delivered      -> blob 304.49 mm², 100.0000 % identical  => highlight, pass
+#   with a 14x30 mm hole planted inside the photo
+#                     -> blob 633.04 mm²,  82.1108 % identical  => HOLE, stop
+```
+
+**AND THE TWO RENDERS ARE NOT PIXEL-ALIGNED, SO THE COMPARISON NEEDS THE
+OFFSET AND A CONTROL.** `masters600` is 5457×7181 and `sheets600` is 5040×7205;
+the master is the sheet on a larger canvas with fabricated white margins. The
+translation is the stamp's own `sheet-box` line — `sheet = master + (x0, y0)`,
+measured on p023 as (7, 1) with mean |diff| **0.0000** over an 800×800 window.
+
+Comparing the same slice of each WITHOUT that offset reads **17.35 % identical**
+on a correct page and says HOLE: a 7-pixel shift makes type and halftone differ
+almost everywhere. Control made that mistake on 2026-11-15 and sent an urgent
+repair order for a page that was perfectly intact; the builder disproved it in
+eleven minutes with the comparison done properly.
+
+**So the check reads a CONTROL WINDOW FIRST** — 800×800 of plain page, which
+must come back ≥ 99.9 % identical. If it does not, the mapping is wrong and
+nothing else in the output means anything. An 83 % difference across a region
+is not a page with a hole in it; it is a page compared with the wrong page.
+
+A hit that survives the control is a stop: look at the page against
+`sheets600`, which still holds what was deleted.
 
 **This check exists because the failure is silent in every artefact.** The
 stamp did not record it, `t.dropped` counts components and is never written

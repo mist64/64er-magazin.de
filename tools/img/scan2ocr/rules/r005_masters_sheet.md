@@ -789,6 +789,25 @@ instead of on its type.** `measure_skew` thresholds ink at
 small sheet most of that array is near-black bed, so the threshold lands inside
 the bed and the projection score is scoring a rectangle, not baselines.
 
+**AND ON A CYAN-ONLY CARD THE INK MASK SEES NOTHING AT ALL, WHICH IS WHY SH09
+READ ALL FOUR AS TILTED.** MEASURED on SH10's own Zahlkarte, 2026-11-15: the
+cards are printed in cyan alone, so a DARK-ink mask reads **0 % ink** and the
+angle it returns describes nothing. Read on the **red channel**, where cyan is
+dark, with a 0.04° sweep, and measure rows AND columns so the two can agree:
+
+| page | rows | cols | verdict |
+|---|---|---|---|
+| 163 | +0.00 | +0.08 (peak 12–15) | level, left alone |
+| 165 | 0.00 | 0.00 (peak 18–24) | level, left alone |
+| 164 | **+0.32** | **+0.28** | a real tilt, overridden |
+| 166 | **+0.20** | **+0.20** | a real tilt, overridden |
+
+Check 3 agreed independently (+0.32, +0.18). **So only TWO of the four were
+tilted on SH10, not all four** — and the SH09 table below, which found all four
+off, was measured with a dark mask on the same cyan stock. Whether SH09's p163
+and p165 were really rotated by the step or were another blind reading is now
+open; the method to settle it is the red channel.
+
 MEASURED, SH09, the bound-in Zahlkarte at p163–166 — a card filling about half
 the frame. On the p164 thumb the ink threshold is 81.7, covering 49.5 % of the
 crop, and 99.9 % of that ink is below lum 40. The result, read on the page box:
@@ -1896,31 +1915,68 @@ PY
 #     before and after `locate()`, because an override can replace `keep` and
 #     discard the drop entirely -- which is the only reason SH09 p031 is intact,
 #     and is not a thing to rely on.
+#     `R.drop_area_inside_mm2(t)` IS NOT A FUNCTION AND NEVER WAS.  This fence
+#     called it from the day it was written and nothing noticed until the SH10
+#     builder read the check before running it (AttributeError, 2026-11-15) --
+#     the second unrunnable check of control's in one day.  What the trace
+#     object really carries is below.
+#
+#     AND THE PAGE IS A QUADRILATERAL, NOT A RECTANGLE.  `t.xl`/`t.xr` are
+#     per-ROW arrays and `t.yt`/`t.yb` are per-COLUMN arrays, so "inside the
+#     page" is the INTERSECTION of both conditions. Control's first attempt did
+#     `int(t.xl)` and died on "only 0-dimensional arrays can be converted".
 $PY - <<'PY'
-import os, re
+import os, sys
+import numpy as np
+from scipy import ndimage
 import r005_masters_sheet as R
 MARGIN_MM2 = 15.0          # per page, inside the traced box; SH09: correct <=12.6, defects >=15.5
-rows, bad = [], []
-for f in sorted(os.listdir(R.OUT_MASTER)):
-    if not f.endswith(".stamp.txt"):
-        continue
-    page = int(f[:3])
+pages = [int(a) for a in sys.argv[1:]] or [int(f[:3]) for f in sorted(os.listdir(R.OUT_MASTER))
+                                           if f.endswith(".stamp.txt")]
+bad = []
+for page in pages:
     t = R.level_and_trace(page)                      # read-only; writes nothing
-    inside = R.drop_area_inside_mm2(t)               # area, largest, lum, prop share
-    rows.append((page, inside))
-    if inside.area_mm2 > MARGIN_MM2:
-        bad.append((page, inside))
-for page, i in rows:
-    if i.area_mm2 > 0.5:
-        print(f"{page:03d}  inside-box removed {i.area_mm2:8.1f} mm²  largest {i.largest_mm2:8.1f}"
-              f"  mean lum {i.mean_lum:5.1f}  prop share {i.prop_share:4.2f}"
-              f"  {'<== OVER MARGIN' if i.area_mm2 > MARGIN_MM2 else ''}")
+    keep = np.asarray(t.keep, dtype=bool)
+    H, W = keep.shape
+    rows_i, cols_i = np.arange(H)[:, None], np.arange(W)[None, :]
+    inside = ((cols_i >= t.xl[:, None]) & (cols_i <= t.xr[:, None]) &
+              (rows_i >= t.yt[None, :]) & (rows_i <= t.yb[None, :]))
+    dropped = inside & ~keep
+    px = 1.0 / (R.MM * R.MM)
+    area = dropped.sum() * px
+    w_mm = (np.median(t.xr) - np.median(t.xl)) / R.MM
+    h_mm = (np.median(t.yb) - np.median(t.yt)) / R.MM
+    if dropped.any():
+        lab, n = ndimage.label(dropped)
+        sizes = np.asarray(ndimage.sum(dropped, lab, range(1, n + 1)))
+        k = int(sizes.argmax())
+        largest = float(sizes[k]) * px
+        ys, xs = np.where(lab == k + 1)
+        at = f"{xs.mean()/R.MM:6.1f},{ys.mean()/R.MM:6.1f} mm"
+    else:
+        largest, n, at = 0.0, 0, "      -       "
+    if area > 0.5:
+        print(f"{page:03d}  box {w_mm:6.1f}x{h_mm:6.1f} mm  dropped inside {area:9.2f} mm2"
+              f"  largest {largest:8.2f} mm2 at {at}  comps {n:4d}"
+              f"  {'<== OVER MARGIN' if area > MARGIN_MM2 else ''}", flush=True)
+    if area > MARGIN_MM2:
+        bad.append(page)
 assert not bad, (
     f"the bed drop removed more than {MARGIN_MM2} mm² inside the traced page on "
-    f"{[p for p, _ in bad]}.  Look at each one against sheets600 before accepting it: "
+    f"{bad}.  Look at each one against sheets600 before accepting it: "
     f"a dark or prop-coloured area of PRINT that bleeds off an edge joins what lies "
     f"beyond it and is dropped whole.  Record the owner's ruling per page if any of "
     f"them is genuinely bed.")
+# AND A NUMBER FROM THIS CHECK IS NOT A VERDICT ABOUT THE DELIVERED PAGE.
+# It measures level_and_trace()'s drop against the AUTOMATIC trace.  A page
+# repaired by a reviewed/ override -- SH09 p031, SH10 p023 -- has had `keep`
+# REPLACED by a hand box, so the drop reached no delivered pixel and 4b still
+# reports the automatic figure.  MEASURED on SH10 p023: 4b says 933.19 mm2
+# inside a 173.9 mm box, and masters600 is 100.0000 % identical to sheets600
+# inside the hand box, i.e. nothing was removed at all.  Before repairing
+# ANYTHING on the strength of this check, compare the two renders through the
+# stamp's `sheet-box` offset with a control window -- the method and the trap
+# are in r006, AND NO PICTURE SHIPS WITH A HOLE PUNCHED IN IT.
 PY
 
 # 5. THE STAMP: every master names the grade that made it, and it is the CURRENT
@@ -2102,6 +2158,28 @@ PY
 #     band whose "paper" does not come out at 230 or above is full-bleed art and
 #     is skipped -- otherwise a photograph running to the trim is measured as
 #     yellowed paper.
+#
+#     THE 230 CUT ADMITS PALE PRINTED TINT, AND A ROBUST STATISTIC DOES NOT
+#     RESCUE IT.  MEASURED on SH10 p011, bottom 25 mm: 29.73 DN mean against a
+#     6.0 ceiling, on a band crossing a printed pale-yellow figure box at RGB
+#     251/246/221 -- above the cut, so not skipped, and its R-B IS 30 by
+#     construction.  Control proposed a median instead of a mean; the builder
+#     measured it and DISPROVED that: over the band's top-15 % luminance
+#     pixels, n=41812, mean 29.73 and MEDIAN 39.00, p25 0.0, p75 58.0.  The box
+#     is most of the bright pixels in the band, so every centre statistic reads
+#     the box.
+#
+#     BROWNING AND PALE INK ARE THE SAME COLOUR; THE DIFFERENCE IS SPATIAL.
+#     Browning rises monotonically toward the trim and is present on EVERY page
+#     of a class; printed art has a sharp edge and is a per-page event.  So the
+#     next form of this check compares each band against THAT BAND'S
+#     DISTRIBUTION ACROSS THE CLASS -- p011's bottom 25 mm against the other
+#     160 bottom 25 mm bands -- and flags an outlier, which is then looked at.
+#     That is the language p031's proof already used ("against a class median
+#     of 0-1 % tinted"), it would have caught p031, and it would have passed
+#     p011.  NOT BUILT: it was found mid-build on SH10 and a check is not
+#     rewritten under a running issue.  Until it is, a band that fails here is
+#     diagnosed by eye and recorded with the art's RGB, as SH10 p011 was.
 #
 #     MEASURED on SH8605's 099 120 114 162 008, built both ways: mean
 #     |d(R-B)| to the page centre 6.12 DN with the field off and 0.58 with it
@@ -2393,6 +2471,11 @@ nothing else — including on the `ink/bed` pages, which the sampled low-class
 pages never exercise.
 
 
+(This block is FENCED SEPARATELY on purpose: it used to sit after the closing
+``` of the Verification block above, so anyone extracting that fence dropped 7g
+without noticing. SH10 added it back by hand, 2026-11-15.)
+
+```bash
 # 7g. NO PAGE GOES OUT WITHOUT ITS FIELD.  Checks 7a-7f all ask whether the
 #     field is RIGHT.  None of them asks whether it was APPLIED AT ALL, and the
 #     step is allowed to skip it: a page whose traced box falls outside
@@ -2502,6 +2585,7 @@ assert not unruled, (
     f"ruled on them: {unruled}.  Either give the page a traceable box and "
     f"re-grade it, or record the owner's decision in {acc}.")
 PY
+```
 
 
 ## Known outliers — two pages of 152 do not trace
