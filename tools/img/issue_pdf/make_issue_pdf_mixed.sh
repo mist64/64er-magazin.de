@@ -201,15 +201,36 @@ if [[ ! -s "$CLASS" ]]; then
   echo "[classify] measuring colour and halftone"
   classify_one() {
     S="$1"; n=$(basename "$S"); n="${n%.*}"
+    # BLURRED measure: "does the page carry colour INK". It resizes to 50 dpi
+    # first, so a PALE COLOUR HALFTONE averages away -- SH10 p020's colour
+    # photograph (356 mm2, 91x56 mm) read 0.00079 here against a 0.002 cut and
+    # shipped bilevel until the OWNER saw it. Kept because it is the measure
+    # that is robust to paper tint and CCD fringing.
     c=$(magick "$S" -resize 8.333% -blur 0x1.5 \
         \( -clone 0 -separate -evaluate-sequence max \) \
         \( -clone 0 -separate -evaluate-sequence min \) \
         -delete 0 -compose MinusSrc -composite \
         -threshold 12% -morphology Erode Octagon:1 -format "%[fx:mean]" info:)
+    # DOT-LEVEL measure, beside it: chroma >= 50/255 per PIXEL at full
+    # resolution, no resize and no blur, so each halftone dot is counted as the
+    # strongly chromatic thing it is. MEASURED over SH10's 168 pages: every
+    # contone page is >= 0.0188, every bilevel page is <= 0.00006, and p020 sits
+    # at 0.0061 -- a hundredfold gap on BOTH sides, which is why the cut is
+    # 0.002 and not a tuned number. Lowering the BLURRED cut instead does not
+    # work: at 8 % / 6 % it fires p162, whose "colour" is a pale cream strip of
+    # PAPER at the window edge (RGB 252/246/231).
+    d=$(magick "$S" \
+        \( -clone 0 -separate -evaluate-sequence max \) \
+        \( -clone 0 -separate -evaluate-sequence min \) \
+        -delete 0 -compose MinusSrc -composite \
+        -threshold 19.6% -format "%[fx:mean]" info:)
     h=$(magick "$S" -resize 25% -colorspace Gray -statistic Median 3x3 -write mpr:g +delete \
         \( mpr:g -threshold 25% \) \( mpr:g -threshold 78% \) -compose MinusSrc -composite \
         -morphology Erode Octagon:2 -format "%[fx:mean]" info:)
-    printf "%s\t%.5f\t%.5f\n" "$n" "$c" "$h"
+    # The page is CONTONE if EITHER measure says colour: the blurred one sees
+    # solid colour ink, the dot-level one sees a pale halftone, and neither
+    # sees both.
+    printf "%s\t%.5f\t%.5f\t%.5f\n" "$n" "$c" "$h" "$d"
   }
   export -f classify_one
   for n in $pages; do src_of "$n"; done | xargs -P "$JOBS" -I{} bash -c 'classify_one {}' \
@@ -219,9 +240,17 @@ echo "  classified $(wc -l < "$CLASS" | tr -d ' ') pages"
 
 # ---- Phase 2: decide, per page, what carries it -------------------------------------------------
 bilevel=""; contone=""
-while IFS=$'\t' read -r n c h; do
+# A pageclass.tsv written before the dot-level measure existed has THREE
+# columns; treat a missing 4th as 0 so an old cache still classifies, rather
+# than reading an empty string into awk and failing on every page.
+while IFS=$'\t' read -r n c h d; do
+  d="${d:-0}"
   keep=0
-  if awk "BEGIN{exit !($c < $COLOUR_MAX)}"; then
+  # EITHER measure may call the page colour. $c is the blurred one (solid
+  # colour ink, robust to paper tint); $d is the dot-level one (a pale colour
+  # halftone, which $c averages away). Neither sees both -- SH10 p020 read
+  # 0.00079 blurred and 0.0061 dot-level, with the owner's eye as the tiebreak.
+  if awk "BEGIN{exit !($c < $COLOUR_MAX && $d < $COLOUR_MAX)}"; then
     if [[ "$MODE" == "allbw" ]]; then keep=1
     elif awk "BEGIN{exit !($h < $HALFTONE_MAX)}"; then keep=1; fi
   fi
