@@ -3500,9 +3500,25 @@ delivers the cover — and the stand-in must never enter `issues/`. Three
 attempts on SH8607 found two traps; this is what worked, verbatim:
 
 1. copy the repo **without `.git`** and without the other issue directories;
-2. copy `issues/<ID>` **plus the shared directories `issues/fav` and
-   `issues/fonts`** — the generator copies
-   `issues/fav/apple-touch-icon-dev.png` and dies without it;
+2. copy `issues/<ID>` **plus every shared asset under `issues/`** — the two
+   directories `issues/fav` and `issues/fonts`, AND THE 13 LOOSE FILES AT THE
+   TOP OF `issues/`. The generator copies them all and dies on the first one
+   missing: `issues/fav/apple-touch-icon-dev.png` was the trap SH8607 found,
+   and SH10 then died on `FileNotFoundError: 'issues/logo.svg'` because this
+   step named only the directories. Copy by shape rather than by list, so the
+   recipe cannot go stale:
+
+   ```sh
+   mkdir -p "$S/issues"
+   cp -R issues/fav issues/fonts "$S/issues/"
+   find issues -maxdepth 1 -type f -exec cp {} "$S/issues/" \;   # the loose assets
+   cp -R "issues/$ID" "$S/issues/"
+   ```
+
+   As of 2026-11-15 the loose set is `favicon-dev.ico favicon.ico
+   fehlerteufelchen.svg futureteufelchen.svg logo.png logo.svg lunr.js
+   mastodon.svg mastodon_blue.svg pdf.svg rss.svg search.js style.css` — 13
+   files. The `find` above does not need that list to be right;
 3. put `<tmp>/title_source_150.png` in as `issues/<ID>/title.png`;
 4. `git init` **and make an EMPTY COMMIT** — `generate.py` runs
    `git rev-parse --abbrev-ref HEAD` and dies on a repo with no HEAD;

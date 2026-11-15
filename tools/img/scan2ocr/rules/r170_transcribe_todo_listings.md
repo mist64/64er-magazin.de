@@ -168,6 +168,23 @@ its own loader sums, and its DATA bytes equal `prg/mse.prg[$0801..$0EAB]`.
 
 ## Cropping listing regions from the page scan
 
+### ONE AGENT PER LISTING, BECAUSE A LONG LISTING EXHAUSTS AN IMAGE BUDGET
+
+A listing typed from the page is read in column crops, and a long one runs to
+dozens of them. **An agent has a finite image budget and a long listing can
+spend all of it**, after which it cannot see the page at all and the work has
+to start again in a fresh agent. MEASURED on SH10, 2026-11-15: the agent typing
+`xlv 3.6` and `datawandler v3.5` — two listings of ~86 and ~115 lines, printed
+un-crunched — ran out of image budget before finishing and both had to be
+re-dispatched.
+
+**So dispatch ONE agent per listing, and for a listing over about 60 printed
+lines, one agent per page-range.** Carry the crop coordinates in the brief
+(step 010's block index already has them, below) so the fresh agent does not
+spend its budget rediscovering them. r000's image cap is the same constraint
+one level up: about four images survive a turn, and `[media removed: request
+limit]` arrives with no error.
+
 Don't guess crop coordinates by trial-and-error. Step 010 already wrote the
 block index; grep it for the `Listing` caption line:
 
