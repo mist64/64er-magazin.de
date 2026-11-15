@@ -1504,6 +1504,24 @@ When the completion notification arrives:
    notices: a missing baseline reads as an empty one, which is exactly what a
    first run looks like. Check the path, and check the mtime.
 3. Run the rule's `## Verification` block in the main session.
+   **MEASURED, SH10, 2026-11-15: five steps re-checked (040, 050, 060, 070,
+   080) and all five came back IDENTICAL to the sub-agent's numbers — not one
+   disagreement.** So keep doing it, but know what it is: a CONFIRMATION, and
+   not where the catches come from. On the same five steps every finding of
+   consequence came out of the SUB-AGENTS' OWN REPORTS — r040's pair-parity
+   defect and the line it shipped on, 060's stray block, all five of 070's
+   items, 080's 21 page placements and three rule-fit notes. The orchestrator's
+   own two were a placeholder it hit raw and one documented behaviour that was
+   not a defect at all.
+   **Which means the BRIEFING buys more than the re-check does.** A sub-agent
+   told what the rule is for reports the gap in the rule; one told only what to
+   run reports that it ran it. Step 2 above (`ls` the outputs) stays mandatory
+   regardless, because that is the claim-versus-evidence check and SH8604 shows
+   it firing.
+   Control had this backwards and said so in a brief — "you have re-run every
+   sub-agent's checks and found something each time" — and the builder
+   corrected the attribution unprompted, giving away its own credit to be
+   accurate. Record where a finding came from, not where it was confirmed.
 4. Read a few sample touched files (3–5 is usually enough).
 5. Diff `git status --short` against the expected set of changes:
    files that should have been touched, and only those.

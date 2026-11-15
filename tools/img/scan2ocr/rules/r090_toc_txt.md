@@ -112,6 +112,18 @@ import r010_ocr_blocks as OB; print(OB.SRC_DIR)')     # <tmp>/masters600
    * `entry` is **the bold title as printed, and only that**: not the blurb
      under it, and not a qualifier the TOC adds such as *(nur auf Diskette)*
      or a `Kurs:` prefix.
+   * **AND WHEN NOTHING BUT A BLURB IS PRINTED, THE ENTRY IS THE HEADER.**
+     SH10 p006's section prints no title at all — only the blurb beneath it.
+     "The bold title and only that" has no answer for that, so take the
+     section's own printed HEADER as the entry and say in `LOG.md` that there
+     was no title line to take.
+   * **AND A BOLD TITLE CAN CONTINUE ON A REGULAR-WEIGHT LINE.** SH10 p109
+     prints **MSE** in bold with `– Abtippen sicher und leicht gemacht` in
+     regular weight after it, which is ONE title in two weights, not a title
+     plus a blurb. Join them, per r100's join rule, and the entry is the whole
+     thing. Contrast the kicker below, where the bold line is NOT part of the
+     title: the test is whether the regular-weight text completes the sentence
+     the bold text begins.
    * **AND WHEN THE BOLD LINE IS A KICKER, THE ENTRY IS THE TITLE LINE.**
      "The bold title and only that" has no answer when the bold line is not
      the title. SH09 p005 prints **Eingabehilfen** in bold with
@@ -203,6 +215,20 @@ import generate; generate.ArticleDatabase(generate.IN_DIRECTORY)
 #    VERIFIED both ways on SH09: loads the issue (issues loaded: 1), prints no
 #    ERROR line, and out/ was left serving throughout.
 ```
+
+## AN ENTRY PRINTED LOOSE, WITH NO BOX, STILL HAS A SECTION
+
+MEASURED on SH10: the Inhalt prints the **Impressum** line loose, beneath the
+Tips & Tricks box, with no Rubriken box anywhere on the page. The clause below
+keys on the BOX being absent and so reads as "nothing is printed" — but the
+entry itself IS printed here, just unframed.
+
+**The box is how the section is usually read, not what the section IS.** An
+entry printed loose keeps its line in `toc_entries.txt`, and its `section` is
+assigned by precedent: **the Impressum is `Rubriken`** (SH8602, SH8603, and
+SH10 followed them). Record in `LOG.md` that the section came from precedent
+rather than from a printed box, because the next reader will look for the box
+and not find it.
 
 ## A SONDERHEFT WITH NO PRINTED RUBRIKEN BOX STILL LISTS `Rubriken`
 

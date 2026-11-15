@@ -169,6 +169,33 @@ if over: print('claimed by 3+ articles:', over)
 PY_END
 ```
 
+### AND HOW TO FIND THE OWNER OF AN UNCLAIMED PAGE, in order of strength
+
+The enumeration above says WHICH pages no spec claims and nothing about whose
+they are, which left SH10 to invent the method. It worked, so it is the rule
+now — read in this order and stop at the first that settles it:
+
+1. **The printed caption on the page.** `Listing N. …`, `(Schluß)`,
+   `Fortsetzung`, `Teil 2` name the piece and often the article outright.
+2. **The running head**, which carries the rubric or the article's own words.
+3. **The dump's load address**, matched against the addresses the candidate
+   article's own text and `prg/` files use. A listing tail belongs to the
+   program it continues, and the addresses say which program that is.
+4. **The facing page at thumb scale**, for a schematic or a table with no
+   caption: the article that references it is usually the one it sits inside.
+
+MEASURED on SH10: 030's specs left **41 pages unclaimed**, and **21 of them were
+listing, schematic and table pages that this method gave to their owners** —
+p87–90 Schaltplan to *Hardware-Tips*, p98 the BDOS table to *CP/M*, and the
+listing tails at 107, 110, 116, 118, 120, 122, 125, 130–131, 137–140, 149,
+154, 158. What was left is 20 pages: the covers, the Inhalt, the ads and ad
+spreads and the Zahlkarte — and **none of them a page 030 had dropped**.
+
+**AND A LISTING TAIL CAN LAND ON ANOTHER ARTICLE'S START PAGE.** SH10's 119 and
+126 carry the tail of one article's listing and the start of the next. That is
+the tail-plus-start case, not the lettered case: the page number goes in BOTH
+articles' `64er.pages` undecorated, exactly as for prose.
+
 **It is a readout to be disposed, not a pass/fail.** Every unclaimed page is
 either a cover, an ad spread, a card, or a page 030 dropped — and only the
 last kind is a defect. MEASURED on published issues: **8701 81 unclaimed of
@@ -656,9 +683,16 @@ Three things this used to get wrong, two found on 8611 and one on SH8603:
   distinct**, every one an editor code or a full-name byline, with the 8611
   p50 shape still caught.
 
-Operator eyeballs the list and confirms every entry is a legitimate
-paired article. Anything unexpected is the actionable signal — fix
-that file, not the rule.
+Operator eyeballs the list and confirms every entry is **either a legitimate
+paired article OR a signed collection**. Anything else is the actionable
+signal — fix that file, not the rule.
+
+**THE SIGNED COLLECTIONS ARE ALWAYS IN THIS LIST AND ARE NOT FINDINGS.** The
+text here used to say every entry should be a paired article, which makes the
+commonest entries look like defects: a Tips & Tricks column has one byline per
+tip and a Bücher page one per review. MEASURED on SH10: *Tips & Tricks* reports
+**16 bylines** and *Bücher* **4**, both correct and both expected every issue.
+Read them as a count to recognise, not as a pair to verify.
 
 ## A RUN OF SHORT SIGNED ITEMS THE PRINTED INHALT DOES NOT LIST IS ONE ARTICLE
 

@@ -59,7 +59,24 @@ Because you are already reading the printed TOC page here to build the
   `toc_title` — delete the placeholder. That is the test, not a list of rubric
   names: it catches the monthly rubrics (Leserforum, Bücher, Vorschau,
   Fehlerteufelchen, Impressum, Editorial) and equally a Sonderheft's Impressum
-  or a section whose TOC line repeats its headline. Apply the test to this
+  or a section whose TOC line repeats its headline.
+
+  **AND A RUBRIC WHOSE TOC LINE IS A HEADER PLUS A BLURB STILL GETS NONE.**
+  SH10 p006's Inhalt prints `Fragen und Antworten` and a descriptive blurb
+  beneath it, and nothing that is a title. The blurb is the Inhalt's teaser,
+  not a title, so there is no `toc_title` and the site's `<title>` fallback is
+  correct. MEASURED over the corpus, Q&A and Leserforum rubrics: **1 of 42
+  carries a `toc_title` at all**, and that one (8612/40) carries the rubric's
+  own name, not a blurb — SH09's own `94 Fragen und Antworten` carries none.
+  Do not ask the owner about this; 41 of 42 is the answer.
+
+  Contrast the entries that legitimately DO carry prose: the software and
+  programme listings, which print `Title (64'er, 11/84)<br>description`. Those
+  are a structured entry whose description is part of the printed line, and
+  there are 85 of them. The discriminator is whether the prose is PART OF THE
+  ENTRY or a teaser ABOUT it.
+
+  Apply the test to this
   issue's TOC page; do not carry a rubric list over from another issue.
 - Verbatim from the TOC print (anti-memory): the TOC often abbreviates
   or expands differently than the headline; type what the TOC page
