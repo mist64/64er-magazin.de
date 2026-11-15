@@ -300,8 +300,25 @@ Critical preservation rules:
 
 ## Verification
 
+**THE RUBRIC'S FILE IS AN ARGUMENT, because its NAME varies and so does its
+ID.** This block hard-coded `issues/<YYMM>/<START> Leserforum.html`, which is
+wrong on any issue whose rubric is titled anything else: SH10's is
+`6 Fragen und Antworten zum C 128.html`. And the stable id is no key either —
+MEASURED over the 46 `class="qa"` articles in the corpus, **six distinct ids**:
+`leserforum` 34, `profis-helfen-einsteigern` 4, `fragen-antworten` 4, `geos` 2,
+`fua_128er` 1, `brechtl` 1.
+
+So pass the file in. To FIND it when you do not know it, ask for the shape
+rather than the name — then let check 1 below verify the file you chose:
+
+```sh
+grep -l 'class="qa' "issues/$ID"/*.html      # candidates, by shape
+```
+
 ```bash
-file="issues/<YYMM>/<START> Leserforum.html"
+ID=${ISSUE:-$(cat tools/img/scan2ocr/rules/ISSUE.txt)}
+file="$1"      # the rubric article, e.g. "issues/$ID/6 Fragen und Antworten zum C 128.html"
+[ -f "$file" ] || { echo "  FAIL: pass the rubric file as \$1"; exit 1; }
 
 # 1. article uses qa class
 # The class list may carry MODIFIERS -- "qa numbered" is the numbered variant.

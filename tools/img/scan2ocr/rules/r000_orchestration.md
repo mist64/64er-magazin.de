@@ -1634,6 +1634,31 @@ overstepping.) A sub-agent that renders/crops for its own OCR must
 delete or /tmp-scope those files; the issue dir holds only shippable
 content.
 
+## Cross-cutting rule: NEVER ADDRESS AN ARTICLE BY ITS FILENAME
+
+An article's filename is DERIVED from its printed headline, so it changes with
+every issue — and a rule that types one in is wrong on the next issue, silently,
+because a missing file reads as an absent rubric rather than as a broken check.
+
+**THREE OF THESE SURFACED IN ONE DAY**, 2026-11-15, on SH10:
+
+- **r200** hard-coded `issues/<YYMM>/<START> Leserforum.html`; SH10's rubric is
+  `6 Fragen und Antworten zum C 128.html`, so every check in that block was
+  unrunnable. And the stable id is no key either: 46 `class="qa"` articles in
+  the corpus carry **six distinct ids**.
+- **r240**'s Bücher check globbed `*[Bb]?cher*` and reported
+  `Bücher: N/A (no article in this issue)` on an issue whose Bücher article is
+  `92 Buchbesprechungen` — false, and it needed a page read to rule out a lost
+  input. `head1` is no key on its own either: ten pre-chain Bücher articles
+  carry none, and 8701's reads `Hardware`.
+- **r080**'s Verification typed `issues/8607` into all five checks, so on SH10
+  they had to be substituted by hand before they could be run at all.
+
+**The three answers, in order of preference:** take the file as an ARGUMENT;
+find candidates by SHAPE (`class="qa"`, a `head1` band, a `64er.id`) and then
+verify the one you chose; take the UNION of two keys where neither is reliable
+alone, and say which matched. **Never type a name, and never trust one key.**
+
 ## Cross-cutting rule: PROVE THE REPLACEMENT IS RUNNING BEFORE YOU WRITE THE NOTE
 
 A job you stopped and a job you restarted look identical from the inside: the
