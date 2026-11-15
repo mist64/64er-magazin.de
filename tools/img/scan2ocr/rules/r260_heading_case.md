@@ -59,7 +59,16 @@ heading-all-caps     1   UNNEW ist der Programmname, so gedruckt
 ```
 
 The check clears a heading whose text appears in the reason, and otherwise
-clears up to `n` of them, reporting an over-count as r310 does. The copy of
+clears up to `n` of them, reporting an over-count as r310 does.
+
+**AND THAT MATCH IS A SUBSTRING MATCH, WHICH IS TOO LOOSE.** An adjudication
+written for one heading clears any other whose text occurs inside the reason:
+`BOX` adjudicated as a BASIC keyword would clear a heading named `BOX` and
+equally one named `BOXEN`, or a reason mentioning `BRIEFBOX`. Match on WORD
+BOUNDARIES (`\bTEXT\b`, case-sensitive) so a short heading cannot be cleared
+by an unrelated sentence. SH10 adjudicated 14 headings in one article, and the
+loose form would have cleared any later heading containing one of those
+fourteen words. The copy of
 this scan in *Briefing for the sub-agent* deliberately does **not** clear
 anything: there it is a candidate list to walk, not a gate.
 
@@ -147,13 +156,31 @@ for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
         # right as printed. If every uppercase run is a keyword, this is not
         # display type set in caps. (Found the first time this block actually
         # ran -- the heredoc terminator defect had prevented that.)
-        BASIC = {'POKE','PEEK','SYS','LOAD','SAVE','PRINT','OPEN','CLOSE',
-                 'DATA','GET','INPUT','RUN','LIST','NEW','CLR','DIM','DEF',
-                 'FOR','NEXT','GOTO','GOSUB','RETURN','IF','THEN','ELSE',
-                 'REM','ON','ERROR','WAIT','USR','FRE','VERIFY','CMD','TAB',
-                 'SPC','CHR','ASC','AND','OR','NOT','TO','STEP','END','STOP',
-                 'CONT','RESTORE','READ','LET','MID','LEFT','RIGHT','VAL',
-                 'STR','LEN','INT','ABS','SGN','SQR','RND','POS','STATUS'}
+        # THE KEYWORD SET IS DERIVED, NOT TYPED. This was a hand-written
+        # BASIC 2.0 list, so on a C 128 issue every 7.0 command read as display
+        # caps: SH10's article 71 has 14 such headings (GRAPHIC, COLOR, DRAW,
+        # BOX, CIRCLE, PAINT, CHAR, LOCATE, RDOT, SCALE, SCNCLR, WIDTH, RCLR,
+        # RGR), all printed in caps and all correct as printed.
+        # tools/checksummer.py carries the dialect tables the chain tokenises
+        # listings with, so take them from there and walk `parent`: dialect
+        # '2' gives 77 keywords, '3' (BASIC 7.0) gives 127.
+        import sys as _s; _s.path.insert(0, 'tools')
+        import checksummer as _C
+        def _kw(dialect):
+            out, seen, d = set(), set(), str(dialect)
+            while d and d in _C.tokens and d not in seen:
+                seen.add(d)
+                spec = _C.tokens[d]
+                for seg in spec.get('segments', []):
+                    out.update(t.strip() for t in seg.get('tokens', []) if t)
+                d = spec.get('parent')
+            return out
+        BASIC = _kw('3')          # the issue's dialect; '2' for a C 64 issue
+        # AND THE TABLE IS A TOKENISER'S, SO IT IS NOT COMPLETE FOR THIS USE.
+        # MEASURED on SH10: 13 of those 14 headings are in dialect 3, and
+        # WIDTH is not -- a real 7.0 command whose token the table lacks. A
+        # keyword the set misses still goes through adjudication; the
+        # derivation cut SH10's manual work from 14 headings to 1.
         runs = re.findall(r'[A-ZÄÖÜẞ]{2,}', t)
         if runs and all(r in BASIC for r in runs):
             continue
@@ -255,13 +282,31 @@ for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.html'))):
         # right as printed. If every uppercase run is a keyword, this is not
         # display type set in caps. (Found the first time this block actually
         # ran -- the heredoc terminator defect had prevented that.)
-        BASIC = {'POKE','PEEK','SYS','LOAD','SAVE','PRINT','OPEN','CLOSE',
-                 'DATA','GET','INPUT','RUN','LIST','NEW','CLR','DIM','DEF',
-                 'FOR','NEXT','GOTO','GOSUB','RETURN','IF','THEN','ELSE',
-                 'REM','ON','ERROR','WAIT','USR','FRE','VERIFY','CMD','TAB',
-                 'SPC','CHR','ASC','AND','OR','NOT','TO','STEP','END','STOP',
-                 'CONT','RESTORE','READ','LET','MID','LEFT','RIGHT','VAL',
-                 'STR','LEN','INT','ABS','SGN','SQR','RND','POS','STATUS'}
+        # THE KEYWORD SET IS DERIVED, NOT TYPED. This was a hand-written
+        # BASIC 2.0 list, so on a C 128 issue every 7.0 command read as display
+        # caps: SH10's article 71 has 14 such headings (GRAPHIC, COLOR, DRAW,
+        # BOX, CIRCLE, PAINT, CHAR, LOCATE, RDOT, SCALE, SCNCLR, WIDTH, RCLR,
+        # RGR), all printed in caps and all correct as printed.
+        # tools/checksummer.py carries the dialect tables the chain tokenises
+        # listings with, so take them from there and walk `parent`: dialect
+        # '2' gives 77 keywords, '3' (BASIC 7.0) gives 127.
+        import sys as _s; _s.path.insert(0, 'tools')
+        import checksummer as _C
+        def _kw(dialect):
+            out, seen, d = set(), set(), str(dialect)
+            while d and d in _C.tokens and d not in seen:
+                seen.add(d)
+                spec = _C.tokens[d]
+                for seg in spec.get('segments', []):
+                    out.update(t.strip() for t in seg.get('tokens', []) if t)
+                d = spec.get('parent')
+            return out
+        BASIC = _kw('3')          # the issue's dialect; '2' for a C 64 issue
+        # AND THE TABLE IS A TOKENISER'S, SO IT IS NOT COMPLETE FOR THIS USE.
+        # MEASURED on SH10: 13 of those 14 headings are in dialect 3, and
+        # WIDTH is not -- a real 7.0 command whose token the table lacks. A
+        # keyword the set misses still goes through adjudication; the
+        # derivation cut SH10's manual work from 14 headings to 1.
         runs = re.findall(r'[A-ZÄÖÜẞ]{2,}', t)
         if runs and all(r in BASIC for r in runs):
             continue
