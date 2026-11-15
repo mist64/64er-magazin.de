@@ -789,6 +789,29 @@ instead of on its type.** `measure_skew` thresholds ink at
 small sheet most of that array is near-black bed, so the threshold lands inside
 the bed and the projection score is scoring a rectangle, not baselines.
 
+### TWO PRINTED STRAIGHTS THAT AGREE ARE A SCAN ROTATION; TWO GROUPS THAT DISAGREE ARE THE PASTE-UP
+
+The measurement that decides whether to level a page is not one angle, it is
+**how many printed straights agree with each other.** MEASURED on SH10's
+wrapper sheet, 2026-11-15, four pages by the same method:
+
+| page | the straights | reading |
+|---|---|---|
+| **001** | the rule under `SONDERHEFT 10 … DM 14,-` **+0.58** (peak 19.8), the photo frame's top border **+0.54** (peak 28.4), whole-page red rows +0.54 | two independent straights agree within 0.04 — **a scan rotation, levelled at +0.56** |
+| **002** | the `Funktion garantiert!` box top **+0.00** (peak 10.5), whole-page +0.02 — but the bottom-right coupon lines **+0.16** (peak 18.1) and the MACROTRON footer box **+0.18** (peak 8.6) | the minority pair agrees with ITSELF and disagrees with the page — **one block of the ad's own paste-up sitting ~0.17° off. NOT levelled** |
+| 168 | all four frame edges turning the same way, +0.37 to +0.57 | **a rotation**, levelled at +0.44 |
+| 167 | type level on edges running T +0.54 / B +0.58 | the TRIM is out of square, the print is not — **not levelled** |
+
+**So: level the page only when straights from DIFFERENT PARTS of it agree.**
+When a minority group agrees with itself, that group is crooked on the plate —
+the magazine pasted it up that way — and rotating the page to straighten it
+would tilt everything else. A paste-up block is the plate, and the plate stays.
+
+**And a weak peak is not a reading.** 002's sweep said `+0.02` everywhere at
+peaks of 1.4–2.8 before anyone measured a straight; 001's said `+0.00` at
+`ink 3, filled 1.17 %`. Both were blindness. Quote the peak with the angle, or
+the angle means nothing.
+
 **AND ON A CYAN-ONLY CARD THE INK MASK SEES NOTHING AT ALL, WHICH IS WHY SH09
 READ ALL FOUR AS TILTED.** MEASURED on SH10's own Zahlkarte, 2026-11-15: the
 cards are printed in cyan alone, so a DARK-ink mask reads **0 % ink** and the
