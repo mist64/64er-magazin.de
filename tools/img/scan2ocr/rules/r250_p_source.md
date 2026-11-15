@@ -190,7 +190,7 @@ contact pattern (street address, ZIP code, `Postfach`, phone,
 `Tel.`, etc.):
 
 ```bash
-grep -nE '<p[^>]*>(Info|Bezug|Bezugsquelle|Bezugsadresse|Hersteller|Vertrieb|Anbieter|Kontakt|Adresse|Preis|Literatur|Buchtitel|Buchbesprechung):' \
+grep -anE '<p[^>]*>(Info|Bezug|Bezugsquelle|Bezugsadresse|Hersteller|Vertrieb|Anbieter|Kontakt|Adresse|Preis|Literatur|Buchtitel|Buchbesprechung):' \
   issues/<YYMM>/*.html | grep -v 'class="source"'
 ```
 
@@ -254,10 +254,17 @@ Critical guardrails:
 
 ## Verification
 
-**AN ISSUE WITH NO SOURCE NOTES IS A VALID NO-OP.** A Sonderheft carries no
-vendor footers at all — SH8604 has none — so a clean run of this step
-legitimately changes nothing, and the report says so rather than hunting for
-something to tag. Two shapes that are **not** source notes and must not be
+**AN ISSUE WITH NO SOURCE NOTES IS A VALID NO-OP**, and a clean run of this
+step legitimately changes nothing, so the report says so rather than hunting
+for something to tag.
+
+**BUT "A SONDERHEFT CARRIES NO VENDOR FOOTERS AT ALL" IS FALSE.** SH8604 has
+none, which is where that sentence came from; **SH10 has seven** — article 141
+×1 (an unlabelled book citation, implicit *Literatur*), 20 ×1, 24 ×1 (a
+two-line footer) and 27 ×4. The step was still a no-op there because all seven
+were already tagged `<p class="source">` by 050 and resolved at 170/180/190,
+which is a different fact from the issue not having any. One issue's absence is
+not a property of the KIND. Two shapes that are **not** source notes and must not be
 qualified: an inline series marker such as `(SH2/85)`, and the Impressum,
 whose whole body is addresses.
 

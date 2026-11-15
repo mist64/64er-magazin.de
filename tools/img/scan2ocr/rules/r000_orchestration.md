@@ -1527,10 +1527,17 @@ When the completion notification arrives:
    notices: a missing baseline reads as an empty one, which is exactly what a
    first run looks like. Check the path, and check the mtime.
 3. Run the rule's `## Verification` block in the main session.
-   **MEASURED, SH10, 2026-11-15: of nine steps re-checked, EIGHT came back
-   identical to the sub-agent's numbers (040, 050, 060, 070, 080, 090, 100,
-   140) and ONE disagreed — and the disagreement was the agent reporting a
-   DEFECT THAT WAS NOT THERE.** Set A of 190 reported article 28's Bild 15 and
+   **MEASURED, SH10, 2026-11-15: of ELEVEN steps re-checked, nine came back
+   identical, and the two that did not failed in OPPOSITE directions.** At 190
+   set A the agent reported a defect that was not there (article 28's Bild 15
+   and Bild 23 called "figures EMPTY, tables missing"; both held their step-160
+   tables, 11 and 15 `<tr>`), so a repair of something unbroken was averted. At
+   250 the agent counted 7 source paragraphs as 8 — it had counted a two-line
+   footer twice — and **the orchestrator wrote "IDENTICAL: 8" before reading
+   the 7 its own grep had printed**, then caught and corrected itself.
+   **THE RE-CHECK IS WORTH NOTHING IF THE REPORT IS WRITTEN BEFORE THE OUTPUT
+   IS READ.** That is a third failure mode, distinct from both of the others:
+   the check was run, it was right, and the sentence about it was wrong. Set A of 190 reported article 28's Bild 15 and
    Bild 23 as "figures EMPTY, figcaption only, tables missing"; the re-check
    found both holding their step-160 tables, 11 and 15 `<tr>`. Nothing was
    lost, and a repair of something unbroken was averted.
@@ -1690,6 +1697,15 @@ VERIFIED 2026-11-15 after the repair: SH10's 27 files clean, plain `grep`
 counting all 27, and **no control byte in any of the 1400+ published files** in
 the corpus — so this has not happened before, and the scan is cheap insurance
 rather than a known recurring fault.
+
+**AND THE `-a` SWEEP IS NOT DONE, DELIBERATELY.** MEASURED: **63 `grep`
+invocations across these rules read an issue's HTML without `-a`, 30 of them
+counting** (`-c`, `-l`, piped to `wc`). Patching all of them blind, mid-build,
+across thirty files would be a large change for a fault the corpus has never
+had — and `-a` only makes the COUNT right while hiding the byte, which is the
+actual defect. So **the scan above is the primary defence**, and `-a` goes in
+when a check is next touched for its own reasons. r250's check 1 was the first
+to be fixed that way, 2026-11-15.
 
 ## Cross-cutting rule: NEVER ADDRESS AN ARTICLE BY ITS FILENAME
 
