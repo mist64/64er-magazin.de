@@ -967,6 +967,39 @@ master, the traced page box, the target size and an export warning in its crop
 worklist, and **made no file**, so the owner had to ask where it was. SH8603
 produced `title_source_150.png` and that is the precedent. Make the file.
 
+### AND EVERY BLOCK IS `open`ed, AND POINTED AT IN EVERY MESSAGE UNTIL IT COMES BACK
+
+**Owner, 2026-11-16:** *"when waiting for me, `open` the file/folder so i will
+see"* and *"point me to it after every message with an emoji prepended"*.
+
+The rule above is from 2026-10-05 and covered inputs 1 and 2 only. It is now
+all four, and it has a second half:
+
+1. **The moment the build blocks on the owner, `open` the thing.** Not a path
+   in a sentence — the actual `open`, so it appears on his screen.
+2. **Every message sent while still waiting ends with a pointer line to it,
+   with an emoji prepended**, so it is findable in a scrollback full of
+   progress. One line per outstanding input, naming the full path.
+3. The pointer stops the moment the answer is in. A pointer to something
+   already answered is noise, and noise is how a real block gets missed.
+
+| input | what is `open`ed |
+|---|---|
+| 1 the cover source | `<tmp>/title_source_150.png` |
+| 2 the crop worklist | `<tmp>/sheets600/` **and** the worklist file itself |
+| 3 the marks census | `<tmp>/marks/` — the magnified panels and their INDEX |
+| 4 the Futureteufelchen candidates | the candidate list file |
+
+**Which means inputs 3 and 4 must BE a file or a folder.** A census that lives
+in a chat message and a candidate list that lives in `LOG.md` cannot be
+`open`ed, and `LOG.md` is explicitly not durable (*Not `LOG.md` -- it is NOT
+durable*). Write them out, then open them. The precedent is the cover crop:
+*"The cover crop is a FILE, not a recipe"* — SH8602 documented the recipe and
+made no file, and the owner had to ask where it was.
+
+This applies to **control as much as to a builder**: the supervising session
+asks the owner nothing it cannot point at.
+
 ### TIMESTAMP EVERY BLOCK ON THE OWNER -- both ends of it
 
 **Owner, 2026-11-05:** *"and record the time when its blocked on me"*.
