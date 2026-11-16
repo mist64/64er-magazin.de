@@ -315,9 +315,24 @@ can check whether it moved:
 | 031 | ~384 mm² light strip | between the traced right line and the true paper edge, beside the slate panel the cap restored |
 | 008 | 149,657 px | L/R, 810/808 failed boundary samples |
 | 022 | 61,012 px | R, 729 failed samples |
+| 166 | 3 slivers, <1 mm2 | the card's TORN right edge, found by the late eye pass |
 
 031 is the useful one to re-measure: the cap moved its deep loss from 5 mm to
 0.5 mm and left this strip untouched, so the two defects are now cleanly
 separated on a single page. `tmp/fitres/gain_031_look.png` shows both at once —
 magenta is what the cap gave back, and the lighter strip to its right is what
 this item still owes.
+
+**AND THE SMALLEST ONE SETTLED THE REPAIR QUESTION FOR ALL OF THEM.** p166's
+three slivers (0.25 x 1.35, 0.30 x 1.10, 0.08 x 0.47 mm, lum 153-165, chroma
+~27) ship, because the cards are contone -- unlike the 15 bilevel torn-edge
+residues in marks.txt, which vanish at the 35 % cutoff. So the standing label
+`ours -- below the gate, not repaired` is false for them and they are recorded
+as `ours -- ships, not repaired`. **A reason that holds for one member of a
+class is not thereby the class's reason**; 18 residues filed under one
+justification, 3 of which ship, is a record nobody can check.
+
+They are not repaired, and the argument is scale within one defect: rebuilding
+a delivered PDF to clear under 1 mm2 of the same mechanism this issue already
+ships 384 mm2 of, on 031, is not defensible. When this item lands they all move
+together and are re-measured together.

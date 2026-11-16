@@ -605,6 +605,18 @@ certainly why the other three got one.
 remaining coverage is actually made of on that page** — not how many other
 checks nominally touched it. Eight nets that cannot see cyan are not eight
 checks.
+
+**AND THE OUTCOME IS PART OF THE RECORD, BECAUSE IT DECIDES THE NEXT CASE.**
+The card was read. It carried no hand — the question only a person can answer,
+and the answer was clean. But it also carried two plate specks and **three
+torn-edge residues of OUR OWN making** that the eight nets had surfaced as
+nothing at all. So the gap was not theoretical: one person looking found five
+things on one page that the automatic cover had missed entirely.
+
+Write down which way it came out. *"We read it and found nothing"* and *"we
+read it and found five things"* are opposite evidence about whether the missed
+check mattered, and the next person deciding whether to run a late pass has
+only the record to go on.
 ### AND ITS SIZE IS NOW MEASURED, NOT ASSERTED — THE PLANTED-STROKE TEST
 
 r000 has always asked for a planted-stroke test and no build had run one. SH10
