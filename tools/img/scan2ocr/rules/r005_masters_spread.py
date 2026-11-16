@@ -1219,6 +1219,31 @@ def punch_priors(geoms):
         m, _, sh = template_score([c[1] for c in f["holes"]])
         if sh is not None:
             shift.append(sh)
+    # AN EMPTY SET IS A CONDITION, NOT A CRASH.  With no hole fold anywhere,
+    # np.median gives nan and np.percentile raises IndexError on the empty
+    # list -- which is how 8702 met this, four lines into a `cut` whose real
+    # problem was that its clip template had not been derived yet.  The window's
+    # x is pinned on the fold, and a fold that did not come from the holes is
+    # not a fold (see the comment block below, and 8701's p92/p178), so there
+    # is nothing to fall back to and nothing to invent.  Say which, and stop.
+    if not dist:
+        sys.exit(
+            "r005 cut: NO page in this geometry set has a fold from the holes.\n"
+            "  The window's x is pinned on the fold, and a fold that did not come\n"
+            "  from the holes is not a fold -- that is 8701's p92/p178 failure --\n"
+            "  so cut cannot place the window for this issue.\n"
+            "  Usual cause: this issue's clip template has not been derived yet and\n"
+            "  the built-in one does not match its punches; the measure log then\n"
+            "  reads 'fold none' or 'colour fold' on every page.  Derive the template\n"
+            "  (>= 20 pages' stored candidates), re-run measure, then cut.\n"
+            "  MEASURED on 8702, 2026-11-16.")
+    if not shift:
+        sys.exit(
+            "r005 cut: %d page(s) have a hole fold, but template_score returned no\n"
+            "  shift for any of them, so the punch template cannot be placed.  This\n"
+            "  is a template/tolerance mismatch, not a missing fold: check the clip\n"
+            "  template against the stored candidates before going further."
+            % len(dist))
     return float(np.median(dist)), float(np.median(shift)), float(np.percentile(dist, 5))
 
 

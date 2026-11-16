@@ -1120,6 +1120,23 @@ Two things to know while that is true:
 
 ## `cut` — issue-wide
 
+### AND IT REFUSES, BY NAME, WHEN NO PAGE HAS A HOLE FOLD
+
+`cut` stops with a message naming the condition when **no** page in the
+geometry set got its fold from the holes. There is nothing to fall back to:
+the window's x is pinned on the fold, and a fold that did not come from the
+holes is not a fold — 8701's p92 and p178 are what that costs. The usual cause
+is not a bad issue but a missing step: this issue's clip template has not been
+derived yet and the built-in one does not match its punches, so every measure
+line reads `fold none` or `colour fold`. Derive the template from at least 20
+pages' stored candidates, re-run `measure`, then `cut`.
+
+MEASURED on 8702, 2026-11-16: it read `fold none` on two gate pages and a
+colour fold with 66 non-fitting candidates on the third, and `cut` died four
+lines into `punch_priors` with `IndexError: index -1 is out of bounds` from
+`np.percentile` over an empty list — an error about array indices, for a
+condition that has a name.
+
 ```
 geometry/*.json
   -> FIT one (S, B) per parity over the pages that have their own wordmark

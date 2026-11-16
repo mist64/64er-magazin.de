@@ -3463,3 +3463,23 @@ mid-write instead of trusting its last line.
 not the step that read it. The finding arrived sideways, from a check with a
 different job — which is the same shape as SH10's page 2, where the owner's eye
 was the detector of last resort.
+
+### AND AN EMPTY SET IS A CONDITION, NOT AN IndexError → r005 spread
+
+Same build, same evening. `cut` died in `punch_priors` with `IndexError: index
+-1 is out of bounds`, from `np.percentile` over an empty list, because no page
+in the set had a fold from the holes — the clip template had not been derived
+yet and the built-in one does not match 8702's punches.
+
+The crash is the small part. **The condition has a name and the code did not
+say it**: with no hole fold there is nothing to pin the window's x on, nothing
+to fall back to, and nothing that may be invented — a fold that did not come
+from the holes is not a fold, which is 8701's p92 and p178. An exception about
+array indices sends the reader into the percentile call; a sentence naming the
+condition sends them to the step they skipped. `cut` now stops with that
+sentence, and with the two-line instruction that fixes it.
+
+Note which way the empty set could have gone: `np.median([])` returns `nan`
+with a warning, and `nan` would have flowed into the window placement and cut
+the whole issue wrong. The IndexError three characters further on is the only
+reason this was a stop rather than a silent miscut.
