@@ -2198,6 +2198,13 @@ opencv-python-headless                            # r005_a4_window only (binding
 pikepdf lxml PyPDF2 lunr python-dateutil pytz     # 006 issue_pdf, and generate.py
 ```
 
+**And what it does NOT have, because a measuring snippet will reach for them:**
+`skimage` and `tifffile` are not installed and are not going to be. Read a TIFF
+through PIL or `magick`; `scipy.ndimage` and `cv2` cover what `skimage` is
+usually wanted for. MEASURED on SH10: `import tifffile`, in a one-off snippet
+reading `cmyk2400`, raised `ModuleNotFoundError` -- harmless, and one failed
+call that the list above could have saved.
+
 and on `PATH`: **tesseract 5.x with `deu`** (010), **imagemagick**, **poppler**
 (`pdftoppm`), **ghostscript**, **qpdf**, **vice** (`petcat`, step 120), and a
 **rust toolchain** to build `tools/img/cmyk_reconstruction` (005).

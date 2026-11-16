@@ -69,6 +69,36 @@ In the other direction the file carries spurious ROWS, which cost a line and
 nothing more: a prose mention `(Bild 5)` or a DATA line `BILD 7` opens like a
 caption and becomes a candidate. Read the row, not the count.
 
+### AN UNCUT FIGURE HAS EXACTLY TWO ARTEFACTS, AND NEITHER IS IN THE HTML
+
+A figure the owner has not cut yet produces **the worklist row and the
+placement plan, and nothing else**: `<tmp>/crop_worklist.txt` and
+`<tmp>/r150/placement_plan.txt`. It never produces a placeholder in the HTML --
+not an empty `<figure>`, not a comment, not an `<img>` pointing at a file that
+does not exist. A placeholder is indistinguishable from a placed figure to
+every step after this one, and the one thing it is guaranteed to do is ship.
+
+MEASURED on SH10: r000 says "every unplaced figure is a TODO" and this rule
+placed only delivered PNGs, so the step had no stated shape for the gap between
+them and stopped to ask. The stop was right and the rule was what cost it; the
+answer is one sentence long and it is now above.
+
+### AND THE SERIES RULE IS r160'S, APPLIED AT WORKLIST TIME
+
+r160 says a numbered series is **all typeset or all cropped**. That is a
+decision about the worklist, not about the typesetting, so it is made HERE:
+**one cropped member puts the whole series on the list.** A series is the print
+labelling, not the prose's -- `Teil N` on the page and `Plan N` in the text are
+one series, anchored at the first text that names the whole set (84-x1..x4 on
+SH10).
+
+MEASURED on SH10: the worklist excluded the typeset members of four series (10,
+71, 101, 126). The conflict was invisible until r160 had typeset them, and by
+then the owner was already cutting -- a supplement of 8 rows, plus 2 for the
+TEDMON dumps, handed over mid-knife. The check costs one pass over the worklist
+before it is handed over: for every row, is any other member of its series
+missing from the list?
+
 ### THE page -> Bild MAP IS DERIVABLE. DO NOT HAND-KEEP IT.
 
 The block index already answers it, per page, in one line:

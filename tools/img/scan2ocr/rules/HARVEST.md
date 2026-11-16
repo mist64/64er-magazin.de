@@ -3407,3 +3407,38 @@ The defect was in the build and the rule gap was in control's file. The owner
 caught it by opening the artefact and looking at it, after four sign-offs that
 each examined a record instead. **Every verification in the chain ran on
 something other than the thing being delivered.**
+
+## SH10, 2026-11-16: the four errata that were still only errata
+
+Closing sweep over `issues/SH10/WORKFLOW_ERRATA.md`, run because the owner
+asked whether the rules were up to date. Nineteen entries: two asked for
+nothing (a rule that held; a fix already applied as code), thirteen were
+already in the rules, and **four had a `Suggested.` line and no rule behind
+it.** That gap is the thing worth recording. An erratum file is a list of
+claims on the rules, and the only way to know which are still outstanding is to
+look for each one IN the rules — the entry's own LIVE / SAME SESSION / LATER
+classification says when it was written, never whether it landed.
+
+### AN UNCUT FIGURE HAS TWO ARTEFACTS, AND THE SERIES RULE IS DECIDED AT WORKLIST TIME → r150
+
+Two entries, both about the worklist r150 hands the owner. The first cost a
+stop and a ruling: the step had no stated shape for a figure that is not cut
+yet, and stopped rather than invent a placeholder — the right instinct, and the
+rule should not have made it a question. The second cost a supplement of ten
+rows handed over after the owner had started cutting: r160's "a series is all
+typeset or all cropped" is a decision about the WORKLIST, and r150 never said
+so, so the conflict only surfaced once r160 had typeset four series.
+
+### TWO INTEGERS, OR STOP → r010_ocr_blocks.sh
+
+`r010_ocr_blocks.sh "163 168"` OCR'd nothing, rebuilt the block index without
+those pages, and **exited 0** — `seq` is not the last command of its pipeline,
+so `set -e` never saw it. The builder's quoting was the error; the script
+letting it through with a success code is the defect, because the only thing
+that caught it was counting the outputs afterwards. Now two integers or exit 2.
+
+### AND THE ENVIRONMENT SECTION SAYS WHAT IS NOT THERE → r000
+
+`skimage` and `tifffile` are not in the venv. The section listed what to
+install and what to import, which answers the question only if you already
+suspect the answer. One failed `import tifffile` in a measuring snippet.

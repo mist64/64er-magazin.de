@@ -17,6 +17,19 @@ cd "$DIR"
 # 8609's, and would have run 24 pages past the end of a 152-page Sonderheft.
 FIRST="${1:-1}"
 LAST="${2:-$("$PY" -c 'import r010_ocr_blocks as m; print(m.ISS.pages)')}"
+# A range handed over as ONE quoted argument -- r010_ocr_blocks.sh "163 168" --
+# made `seq` print "invalid floating point argument", OCR'd NOTHING, rebuilt the
+# block index without those pages, and exited 0: seq is not the last command of
+# its pipeline, so `set -e` never saw it fail.  MEASURED on SH10, 2026-11-16;
+# caught only by counting the outputs afterwards.  Two integers, or stop.
+for v in FIRST LAST; do
+  case "${!v}" in
+    ''|*[!0-9]*) echo "r010: $v must be a single integer, got '${!v}'" >&2; exit 2 ;;
+  esac
+done
+if (( FIRST < 1 || LAST < FIRST )); then
+  echo "r010: bad page range $FIRST..$LAST" >&2; exit 2
+fi
 # Lanes: half the free RAM, capped by the cores -- r000_orchestration.md,
 # *PARALLELISE TO HALF THE FREE RAM*.  1.5 GB a lane is MEASURED on 8611:
 # RSS sampled every 5 s across a 28-lane run peaked at 1.03 GB for the python
