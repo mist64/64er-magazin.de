@@ -1098,6 +1098,26 @@ notes         [str, ...]    the NOTEs above, in the order they were made
 "stats": {parity: {"pages": n, "mean_unknown": f}}, "pages": {"NNN":
 {"anchor": "logo"|"edges", "fold": source, "unknown": f}}}`.
 
+### `measure` ALWAYS WRITES THE ARCHIVE, AND THAT IS A GAP, NOT A SETTING
+
+`grade_page` writes `masters2400/NNN.png` and `cmyk2400/NNN.tif` on every page
+it grades, with no switch. r000's *When it does not fit* offers "stream it off"
+or "do not write it" — and **this program implements neither.** So a sample run
+on a volume that cannot hold the full archive still writes ~0.85 GB a page of
+it, which is what makes the clip-template sample (20-25 pages, r005 asks for at
+least 20 stored candidates) cost ~17-21 GB before anyone has ruled where the
+archive lives. MEASURED on 8702, 2026-11-16.
+
+Two things to know while that is true:
+
+- `masters2400/NNN.png` is **not** pure archive here — `grade_page` reads it
+  straight back to make `sheets600` by a 4:1 reduce. Only `cmyk2400/NNN.tif`
+  (the separation, and the larger of the two: 96 GB of 8701's 159) can simply
+  not be written.
+- A sample is therefore **recoverable, not free**: name the sampled pages in
+  `LOG.md` so the set can be moved to the archive's real home, or deleted, as
+  one unit once the destination is ruled.
+
 ## `cut` — issue-wide
 
 ```
