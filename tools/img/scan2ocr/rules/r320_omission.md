@@ -329,6 +329,28 @@ werden"*). A plain `<p>` starting with a lowercase word is worse still: 172
 files, mostly glossary and listing entries. Neither is usable; the hyphen is
 the only precise signal.
 
+**AND BOTH SHAPES ARE BLIND TO THE SPLIT THAT STARTS WITH A CAPITAL.** Every
+signal above keys on the second half looking like a continuation — lowercase,
+or a trailing hyphen. A paragraph broken at a sentence boundary produces a
+second half that begins with a capital and a full stop at the end, which is
+indistinguishable from a real paragraph by any text test. SH10 article 28,
+2026-11-16: *"Geben Sie diesen Befehl unverändert ein."* sat in its own `<p>`
+and is printed inside the preceding paragraph, after an inline monitor input.
+r310's soft net ran over it and read clean, correctly — it cannot see this.
+
+**THE EVIDENCE IS INDENTATION, AND IT IS ON THE PLATE, NOT IN THE TEXT.** This
+article indents every real paragraph; the line in question is set flush left,
+so it continues the one above. That is a one-second reading of the page and
+there is no text-only substitute for it. **So when a page is open anyway, check
+the indentation of any short sentence standing alone after a set-off line** —
+the split that the nets cannot reach is exactly this shape.
+
+**AND THE HTML OFTEN CORROBORATES ONCE YOU KNOW.** Three paragraphs later the
+same article already had the identical form — prose, `<br>`, monitor input,
+`<br>`, more prose, all in one `<p>`. An article's own established pattern is
+evidence about its outliers, and it costs one grep after the plate has
+settled the question.
+
 
 ## A GATE WHOSE MATCHER CAN'T READ THE FIX IT ASKED FOR (8701, p33)
 
