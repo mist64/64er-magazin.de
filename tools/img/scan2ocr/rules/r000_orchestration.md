@@ -574,6 +574,37 @@ indistinguishable from a clean sweep, which is the whole of the lesson above.
 **Closing it would mean a NEW population, not more reading of this one** — do
 not open one on the strength of a hypothetical example.
 
+
+### AND A POPULATION LIST NAMES THE WHOLE SET OR NAMES ITS EXCLUSION
+
+The census records which pages were read BY EYE, because that is the part no
+net can vouch for. SH10's line read *"… and the cards 165, 167, 168."* There
+are four cards. New 166 was not read, and nothing anywhere — not the census,
+not LOG, not the build's own messages — gave a reason. It was not blank, not
+special, and not covered by some other pass: it was simply missed, and the
+record's phrasing ("the cards") read as though it had not been.
+
+**That is the defect, independent of what is on the card.** A list introduced
+by the name of a set is read as the set. When it is a subset, every later reader
+inherits a coverage claim nobody ever made, and the gap is undiscoverable from
+the record itself — it took counting the members to see it.
+
+So: **a population list is complete, or it names what it leaves out and why.**
+"the cards" means four. Three cards with the fourth named and excused is a
+record; three cards called "the cards" is a false one.
+
+**AND THE GAP WAS WORST EXACTLY WHERE THE NETS WERE WEAKEST.** The argument for
+letting it stand was that the automatic nets ran on all 168 pages. But these
+cards are printed CYAN ONLY — `level_cards.py` measured **0.0 % ink** on them
+at `lum < 90/130`, which is why r005 could not even find their skew. The nets
+lean on dark ink; on this stock they are nearly blind. The by-eye pass was not
+redundant cover for these four pages, it was the only cover, which is almost
+certainly why the other three got one.
+
+**When deciding whether a missed check is worth running late, ask what the
+remaining coverage is actually made of on that page** — not how many other
+checks nominally touched it. Eight nets that cannot see cyan are not eight
+checks.
 ### AND ITS SIZE IS NOW MEASURED, NOT ASSERTED — THE PLANTED-STROKE TEST
 
 r000 has always asked for a planted-stroke test and no build had run one. SH10
