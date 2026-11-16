@@ -1436,7 +1436,11 @@ incremental update — no re-encode, ~4 KB):
 ```sh
 D=$(date -r <tmp>/<name>.pdf "+%Y:%m:%d %H:%M:%S%z" | sed 's/\(..\)$/:\1/')
 T="64'er Sonderheft N"              # from SH09 on -- no year, no zero padding.
-                                    # "64'er Sonderheft NN/YY" only for SH8501-SH8608;
+                                    # "64'er Sonderheft NN/YY" only for SH8501-SH8608,
+                                    # WITH the zero padding they already carry --
+                                    # "64'er Sonderheft 01/85" through "08/86" are
+                                    # correct and stay (owner, 2026-11-16: "no leading
+                                    # zero only for 9+").  Do not "fix" them.
                                     # "64'er MM/YY" for a monthly.
 exiftool -overwrite_original -Title="$T" -XMP-dc:Title="$T" \
   -Author="Markt & Technik" -XMP-pdf:Author= \
