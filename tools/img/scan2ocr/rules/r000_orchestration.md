@@ -2065,6 +2065,27 @@ A pattern match is a guess about identity; a PID and an output file are facts.
 If a name really is all you have, `pgrep -f '[r]005_masters_sheet'` keeps the
 bracketed form out of the matcher's own argv — but prefer the two forms above.
 
+### AND `pkill` STOPS A CHILD, NOT THE LOOP — CONFIRM BY THE ARTEFACT
+
+MEASURED on 8702, 2026-11-16, and it is the same family as the waiter above. A
+backgrounded `for` loop reading each page's `pHYs` with `magick identify` was
+"stopped" with a `pkill`. The kill landed on the `identify` that happened to be
+running; **the loop spawned the next one and went on appending** to
+`<tmp>/phys.txt` for as long as nobody looked. The file was then read as
+finished, and what caught it was not the stop but a later thumb check tripping
+over a malformed row — the half-written line where the kill landed.
+
+A kill is not a stop until the thing it was producing stops growing:
+
+```sh
+wc -l <tmp>/phys.txt; sleep 5; wc -l <tmp>/phys.txt   # equal, or it is still running
+```
+
+Better, stop the loop and not its child — `TaskStop` on the background task, or
+the PID captured when it was started — and then **rewrite the output rather
+than trust its tail.** A loop killed mid-write leaves a truncated last row that
+every reader after it takes for data.
+
 ## Cross-cutting rule: AN AGENT CAN BE STOPPED MID-STEP — LEAVE NOTHING STRANDED
 
 A sub-agent can be halted by the harness at any moment, with no report and no

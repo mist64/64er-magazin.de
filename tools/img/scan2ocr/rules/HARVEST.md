@@ -3442,3 +3442,24 @@ that caught it was counting the outputs afterwards. Now two integers or exit 2.
 `skimage` and `tifffile` are not in the venv. The section listed what to
 install and what to import, which answers the question only if you already
 suspect the answer. One failed `import tifffile` in a measuring snippet.
+
+## 8702, 2026-11-16: a kill that landed on a child while the loop went on writing
+
+The builder's own slip, caught by the builder, reported before I asked, and
+worth a rule because the detection was luck. A backgrounded `for` loop reading
+`pHYs` per page was stopped with `pkill`; the kill took the running `magick
+identify` and the loop started the next one. `<tmp>/phys.txt` kept growing and
+was then read as finished. A thumb check tripped over the malformed row left
+where the kill landed — a check looking for something else entirely.
+
+### A KILL IS NOT A STOP UNTIL THE OUTPUT STOPS GROWING → r000
+
+Filed beside `pgrep -f` IS NOT A WAITER, which is the same mistake pointed the
+other way: both treat a process name as a handle on a job. Wait on a PID or an
+artefact; stop the loop, not its child; and rewrite an output that was killed
+mid-write instead of trusting its last line.
+
+**And note what did NOT catch it.** Not the stop, not a check on `phys.txt`,
+not the step that read it. The finding arrived sideways, from a check with a
+different job — which is the same shape as SH10's page 2, where the owner's eye
+was the detector of last resort.
