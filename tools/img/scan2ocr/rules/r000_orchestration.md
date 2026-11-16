@@ -1715,6 +1715,31 @@ r000 has said this for months, and these four shipped anyway because the
 sentence was read as advice. Plant the defect, see red, remove it, see green.
 If the check cannot be made to go red by any input, it is not a check.
 
+### AND A FIFTH: A CHECK THAT ANSWERS A NEIGHBOURING QUESTION
+
+The four above are broken. This one works perfectly and is still misread,
+which makes it harder to catch: it answers a question next to the one you
+asked, and the answer sounds like the one you wanted.
+
+MEASURED, SH10, 2026-11-16. Control asked for a sha over every page's
+`masters600` stamp, before and after the re-derive, to prove nothing but the
+six moved pages had changed. It came back clean — 158 of 160 byte-identical,
+the two differing only in override notes — and that **does** settle what it was
+asked: the trace is deterministic and the new cap moved no traced box.
+
+**The builder then said what it does not settle: the stamp carries no pixel
+hash.** `BED_REACH_MM` acts on `keep` AFTER the trace, so by construction it
+cannot change a stamp — identical stamps are exactly what a working cap
+produces, and a broken one produces them too. Whether any page's PIXELS changed
+is a different measurement, the per-page sha over the images themselves.
+
+So, before accepting a green: **name the thing that would still be green if the
+change had done nothing, and the thing that would still be green if it had done
+something terrible.** If the same check is green in both worlds, it is evidence
+about the machinery, not about the output. Metadata identity is not output
+identity; a log line saying a step ran is not the step's result; a row count
+matching is not the rows matching.
+
 ### AND A NEGATIVE CLAIM NEEDS THE SWEEP THAT WOULD HAVE FOUND A POSITIVE
 
 "None of X" is the easiest sentence to write and the hardest to support. Twice
