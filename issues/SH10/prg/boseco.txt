@@ -1,0 +1,184 @@
+;boseco.prg ==1c01==
+;version=70
+  100 rem" boot sektor constructor
+  110 :
+  120 rem" by oliver mangold, laichingen
+  130 rem" dez. 1985
+  140 :
+  150 l=0:i=0:bl=0:t$="":x=0:y=0:le=0:l1=0:a$="":a=0:t=0:sl=0:hi=0:lo=0:pl=0:an=0
+  160 goto 500
+  170 :
+  180 rem" eingaberoutine
+  190 :
+  200 t$="":char,x,y:forl1=1tole:print".";:next
+  210 char,x,y,""
+  220 :
+  230 poke 2598,0:poke 2599,0
+  240 getkeya$
+  250 a=asc(a$)
+  260 if a=13 then print".";:poke 2599,1:return
+  270 if a=20 or a=157 then 370
+  280 if a>90 and a<193 then 230
+  290 if a<32 or a>218 then 230
+  300 t$=t$+a$:printa$;:le=le-1:x=x+1
+  310 if le>0 then 230
+  320 geta$:ifa$=chr$(13) then print" ";:poke 2599,1:return
+  330 if a$=chr$(20) or a$=chr$(157) then 370
+  340 goto 320
+  350 :
+  360 :
+  370 poke 2599,1
+  380 if len(t$)=0 then 230
+  390 if le=0 then print" ";:goto 410
+  400 print ".";
+  410 le=le+1:x=x-1
+  420 t$=left$(t$,len(t$)-1)
+  430 char,x,y,"."
+  440 char,x,y
+  450 :
+  460 goto 230
+  470 :
+  480 rem" start hauprogramm
+  490 :
+  500 dim b%(110,256)
+  510 :
+  520 scnclr
+  530 char,15,2,chr$(18):print" BoSeCo ";chr$(146)
+  540 char,3,5,"Ein Programm zum Erstellen von"
+  550 char,3,7,"Boot - Sektoren."
+  560 char,3,10,"(c) by Oliver Mangold"
+  570 char,10,11,"Hagsbucherweg 20"
+  580 char,10,12,"7903 Laichingen"
+  590 char,10,13,"Tel.07333/4260
+  600 char,10,23,"Bitte Taste dr{CBM-X}cken."
+  610 getkeya$
+  620 :
+  630 rem" block 1/0 init
+  640 :
+  650 bl=1 : restore 1820
+  660 fori=1 to 6 : read b%(bl,i) :next
+  670 fori=1 to 13 : read b%(bl,67+i) : next
+  680 :
+  690 rem" 1. folgeblock init
+  700 :
+  710 bl=2 : restore 1870
+  720 fori=1 to 69 : read b%(bl,31+i) : next
+  730 :
+  740 scnclr
+  750 char,3,3,"Bitte geben Sie den Text, der"
+  760 char,3,5,"beim Booten angezeigt werden"
+  770 char,3,7,"soll, ein."
+  780 :
+  790 char,1,10,"Text :":y=12:x=1:le=38:gosub 200
+  800 :
+  810 rem" text in block 1/0 schreiben und rest mit space auff{CBM-X}llen
+  820 :
+  830 bl=1:t$=chr$(13)+chr$(14)+chr$(150)+t$
+  840 l=len(t$)
+  850 fori=1to l :b%(bl,7+i)=asc(mid$(t$,i,1)) : next
+  860 if l=41 then 890
+  870 fori=l+8 to 48 : b%(bl,i)=32 : next
+  880 b%(bl,49)=13
+  890 :
+  900 b%(bl,51)=0:fori=52 to 67:b%(bl,i)=234:next
+  910 :
+  920 scnclr
+  930 :
+  940 an=0
+  950 :
+  960 rem" prg-name und ladeadressen einlesen
+  970 :
+  980 scnclr
+  990 char,3,1,"Bitte geben Sie nun Programm-"
+ 1000 char,3,3,"namen, Ladeadresse und L{CBM-F}nge an."
+ 1010 char,0,6:y=5
+ 1020 if an=5 then 1190
+ 1030 print"   Name Prg.";:printan+1;":":x=17:y=y+1:le=16:gosub200
+ 1040 if t$="" then 1190
+ 1050 an=an+1
+ 1060 na$(an)=t$
+ 1070 :
+ 1080 print:print"   Ladeadresse :":x=17:y=y+1:le=5:gosub200
+ 1090 t=val(t$):nh(an)=int(t/256):nl(an)=t-256*nh(an)
+ 1100 print:print"   L{CBM-F}nge       : ";:x=17:y=y+1:le=5:gosub200
+ 1110 la(an)=val(t$)
+ 1120 :
+ 1130 y=y+1
+ 1140 print:print
+ 1150 goto 1020
+ 1160 :
+ 1170 rem"programme einlesen und in folgebl{CBM-C}cke schreiben
+ 1180 :
+ 1190 scnclr:b%(2,1)=an:bl=2:pl=101:sl=0
+ 1200 char,3,3,"Programme einlesen."
+ 1210 k=6
+ 1220 fori= 1 to an
+ 1230 char,2,k,"Diskette f{CBM-X}r ":print na$(i)
+ 1240 char,2,k+2,"einlegen und Return dr{CBM-X}cken."
+ 1250 k=k+4
+ 1260 :
+ 1270 sl=sl+la(i-1):lo=8308+sl:hi=int(lo/256):lo=lo-256*hi
+ 1280 b%(2,6+i)=hi : b%(2,1+i)=lo
+ 1290 getkeya$:if a$<>chr$(13) then 1290
+ 1300 dopen#1,(na$(i))
+ 1310 :
+ 1320 get#1,a$:get#1,a$
+ 1330 forj= 1 to la(i)
+ 1340 get#1,a$:if a$=""thena$=chr$(0)
+ 1350 b%(bl,pl)=asc(a$)
+ 1360 pl=pl+1:if pl=257 then pl=1:bl=bl+1
+ 1370 nextj
+ 1380 :
+ 1390 b%(2,16+i)=int(la(i)/256):b%(2,11+i)=la(i)-256*b%(2,16+i)
+ 1400 b%(2,21+i)=nl(i):b%(2,26+i)=nh(i)
+ 1410 :
+ 1420 dclose#1
+ 1430 next i
+ 1440 :
+ 1450 rem" jsr aufrufe in block 1 integrieren
+ 1460 :
+ 1470 fori= 0 to an-1
+ 1480 b%(1,i*3+81)=32  : rem" jsr
+ 1490 b%(1,i*3+82)=b%(2,22+i) : rem" lo-byte
+ 1500 b%(1,i*3+83)=b%(2,27+i) : rem" hi-byte
+ 1510 next
+ 1520 b%(1,i*3+81)=76:b%(1,i*3+82)=3:b%(1,i*3+83)=64
+ 1530 :
+ 1540 rem" anzahl der nachzuladenden bl{CBM-C}cke in block 1 schreiben
+ 1550 :
+ 1560 b%(1,7)=bl-1
+ 1570 :
+ 1580 rem" boot-sektoren auf disk schreiben
+ 1590 :
+ 1600 scnclr:char,5,10,"Bitte Diskette f{CBM-X}r Boot-Sektor "
+ 1610 char,5,12,"einlegen ."
+ 1620 char,5,14,"Dann Taste dr{CBM-X}cken."
+ 1630 getkeya$
+ 1640 t=1:s=0
+ 1650 open 15,8,15:open 2,8,2,"#"
+ 1660 fori=1tobl
+ 1670 print#15,"b-p 2 0"
+ 1680 forj=1to256:print#2,chr$(b%(i,j));:next
+ 1690 print#15,"u2 2 0";t;s
+ 1700 print#15,"b-a 0";t;s
+ 1710 s=s+1:if s=21 then t=t+1:s=0
+ 1720 next
+ 1730 :
+ 1740 close2:close15
+ 1750 char,5,20,ds$
+ 1760 char,5,22,"Nochmal ...?"
+ 1770 x=18:y=22:le=1:gosub200
+ 1780 if t$<>"j" then end
+ 1790 goto 1600
+ 1800 rem" datas f{CBM-X}r kenncode,bootprogramm etc.
+ 1810 :
+ 1820 data 67,66,77
+ 1830 data 16,32,0
+ 1840 :
+ 1850 data 169,80,141,0,10,169,11,141,1,10,32,47,32
+ 1860 :
+ 1870 data 206,16,32,48,63,173,16,32,168,185,17,32,133,142,185,22,32,133,143
+ 1880 data 185,32,32,170,185,37,32,133,158,185,42,32,133,159,224,0,48,22,160,0
+ 1890 data 177,142,145,158,136,208,249,230,143,230,159,202,48,12,208
+ 1900 data 240,173,16,32,168,185,27,32,168,208,230,76,47,32,96
+ 1910 :

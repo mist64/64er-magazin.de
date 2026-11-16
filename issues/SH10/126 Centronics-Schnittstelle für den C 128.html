@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Centronics-Schnittstelle für den C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="G.M. Ritter, nj">
+    <meta name="64er.issue" content="Sonderheft 10">
+    <meta name="64er.pages" content="126-128">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen">
+    <meta name="64er.index_title" content="Centronics Schnittstelle">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Drucker">
+    <meta name="64er.id" content="centronics">
+</head>
+
+<body>
+    <article>
+        <h1>Centronics-Schnittstelle für den C 128</h1>
+        <p class="intro">Wir machen kurzen Prozeß mit den Anschlußproblemen Ihres Druckers! Mit einem leicht herstellbaren Kabel und unserem Programm können Sie mit nahezu allen Druckern problemlos am C 128 arbeiten.</p>
+
+        <p>Der C 128 besitzt mit dem Basic 7.0 einen recht umfangreichen Befehlswortschatz, der auch die hochauflösende Grafikprogrammierung unterstützt. Doch was nützt die schönste Grafik auf dem Bildschirm, wenn man sie nicht auch auf einem Drucker ausgeben kann? Wenn Sie einen Drucker mit Centronics-Schnittstelle besitzen, gehören Sie zu den Menschen, die dieses Problem nicht länger betrifft. Der abgedruckte Druckertreiber enthält eine Routine zur Umwandlung von CBM-ASCII nach Standard-ASCII, so daß im Textmodus nun weiterhin auch die deutschen Umlaute wie jedes andere Zeichen verwendet und ausgedruckt werden können. CBM-Sonder- und Grafikzeichen können jedoch nicht auf dem Drucker realisiert werden. Es ist deshalb ratsam, derartige Zeichen in eigenen Listings als CHR$(Zeichen) darzustellen.</p>
+
+        <p>Der Centronics-Druckertreiber für den C 128 (Listing 1) liegt im freien RAM-Bereich von $1300 bis $17E3 und wird mit SYS 4864 aktiviert. Hierbei wird die Betriebssystemroutine zur Ausgabe von Zeichen auf den Treiber umgelenkt. Nach &lt;RUN/STOP + RESTORE&gt; oder einem Reset muß das Programm erneut aktiviert werden.</p>
+
+        <p>Das Treiberprogramm wird über die Sekundäradresse gesteuert. Bei Sekundäradresse Null wird der Text ohne ASCII-Wandlung ausgegeben; bei Sekundäradresse 1 bis 14 erfolgt eine Zeichensatzanpassung über eine 256 Byte lange Tabelle ($142a bis $1529), die auch nach eigenen Bedürfnissen angepaßt werden kann. Die Sekundäradresse 15 ist reserviert für die Ausgabe einer hochauflösenden Grafik. Durch Übertragung der Ziffern 1 oder 2 kann die Größe der Hardcopy bestimmt werden (siehe Beispiel-Listing 2 und Bild 1). Die größtmögliche Hardcopy (Ziffer 2) entspricht ungefähr DIN A5. Durch mehrstellige Ziffern kann die Hardcopy beliebig oft wiederholt werden. Vor jeder Hardcopy wird zur Druckjustage eine Leerzeile gedruckt.</p>
+
+        <figure>
+            <img src="126-1.png" alt="Zwei Druckerhardcopies einer Sternfigur, »Test der kleinen Hardcopy« und »Test der grossen Hardcopy«, beschriftet DEMO-FIGUR EPSON-HARDCOPY">
+            <figcaption>Bild 1. Mit Listing 2 können diese beiden Hardcopies erstellt und ausgedruckt werden</figcaption>
+        </figure>
+
+        <h2>Anpassungen</h2>
+
+        <p>Abhängig vom Drucker oder der individuellen Anforderung des Benutzers, können einige Voreinstellungen des Treibers durch Modifikation, zum Beispiel mit dem eingebauten Maschinensprachemonitor, geändert werden. Die entsprechenden Speicherstellen und die Bedeutung der voreingestellten Inhalte sind nachfolgend beschrieben.</p>
+
+        <h3>Speicherstelle $1303 (dezimal 4867):</h3>
+
+        <p>In dieser Speicherstelle ist die Gerätenummer abgelegt. Der Ursprungswert ist #4. Soll ein Drucker mit der Gerätenummer #5 angesprochen werden, so muß der Inhalt dieser Adresse entsprechend geändert werden.</p>
+
+        <h3>Speicherstelle $1304 (dezimal 4868)</h3>
+
+        <p>Durch den Inhalt dieser Speicherstelle wird festgelegt, ob am Zeilenende Carriage Return (CR = Wagenrücklauf) gesendet wird (Inhalt = 0) oder Carriage Return mit Line Feed (LF = Zeilenvorschub) (Inhalt = 1). Voreingestellt ist CR und LF.</p>
+
+        <h3>Speicherstellen $142a bis $1529 (dezimal 5162 bis 5417)</h3>
+
+        <p>In diesem Speicherbereich befindet sich die Umwandlungstabelle für die Anpassung von CBM-ASCII nach Standard-ASCII. Die hier aufgeführten Werte werden bei Sekundäradresse ungleich Null anstelle der üblichen Codes an den Drucker gesendet. Zur Darstellung der Umlaute auf einem Epson-Drucker müssen die Codes über diese Tabelle gewandelt werden. Die richtigen Codes sind hierin bereits enthalten.</p>
+
+        <h3>Speicherstellen $1540 bis $1544 (dezimal 5440 bis 5444)</h3>
+
+        <p>Hier befindet sich die für Initialisierung der kleineren Standard-Hardcopy wichtige Escape-Sequenz:<br>
+1b 2a 04 40 01 (27, '*', 4, &lt;320,>320)</p>
+
+        <h3>Speicherstellen $1546 bis $154A (dezimal 5446 bis 5450)</h3>
+
+        <p>In diesem Bereich ist die entsprechende Escape-Sequenz für die vergrößerte Hardcopy-Routine enthalten:<br>
+1b 2a 06 80 02 (27, '*', 6, &lt;640, >640)</p>
+
+        <h3>Speicherstelle $156f (dezimal 5487)</h3>
+
+        <p>In diesem Register ist der Randabstand für die Standard-Hardcopy enthalten (Voreinstellung #20).</p>
+
+        <h3>Speicherstelle $1570 (dezimal 5488)</h3>
+
+        <p>Der Randabstand für die vergrößerte Hardcopy ist in dieser Speicherstelle mit #7 voreingestellt.</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <td>A</td>
+                    <td>GND</td>
+                    <td>16</td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td>Flag-Busy</td>
+                    <td>11 oder</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Flag-Acknowl.</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>D0</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>D1</td>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>D2</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>D3</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>D4</td>
+                    <td>6</td>
+                </tr>
+                <tr>
+                    <td>J</td>
+                    <td>D5</td>
+                    <td>7</td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>D6</td>
+                    <td>8</td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>D7</td>
+                    <td>9</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>PA2-Strobe</td>
+                    <td>1</td>
+                </tr>
+            </table>
+            <figcaption>Bild 2. Anschlußbelegung für ein Parallelkabel zwischen dem Userport des C 128 und einem Centronics-Drucker</figcaption>
+        </figure>
+
+        <p>Wollen Sie einen Drucker anschließen, der keine Grafik-Hardcopy beherrscht, können Sie die Hardcopy-Routinen entfernen. Dazu ist in Adresse $1401 der Wert $0f (dezimal 15) in $10 (dezimal 16) zu ändern, und der Speicherbereich von $1300 (dezimal 4864) bis einschließlich $1529 (dezimal 5417) auf Diskette zu speichern. Auf diese Weise erhält man den reinen Druckertreiber ohne Hardcopy-Funktion.</p>
+
+        <p>Zum Anschluß eines Druckers mit Centronics-Schnittstelle wird ein Kabel mit Userport-Stecker und ein 36poliger Amphenol-Stecker benötigt. Als Kabel kann ein 11adriges Computer- oder ein 10adriges Fernmeldekabel mit Abschirmung verwendet werden. Die Länge des Kabels sollte 3 Meter nicht überschreiten. Die Kabel- beziehungsweise Pinbelegung können Sie Bild 2 entnehmen.</p>
+
+        <address class="author">(G.M. Ritter/nj)</address>
+
+        <figure>
+            <pre data-filename="druckertr. 128.prg" data-name="Centronics-Druckertreiber" data-mse=mse1></pre>
+            <figcaption>Listing 1. Centronics-Druckertreiber für den C 128. Bitte geben Sie das Programm im C 64-Modus mit dem MSE ein.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="druckertr. 128.prg" data-name="Centronics-Druckertreiber"></div>
+        <figure>
+            <pre data-filename="demo hrdcpy" data-name="Hardcopy-Demo"></pre>
+            <figcaption>Listing 2. Programm zur Demonstration der beiden integrierten Hardcopy-Routinen.</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

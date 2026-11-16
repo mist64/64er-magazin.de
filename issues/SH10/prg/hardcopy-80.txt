@@ -1,0 +1,233 @@
+;hardcopy-80.prg ==1c01==
+;version=70
+    1 rem "                         Hardcopy-80
+    2 :
+    3 rem "    Maschinenroutine zur Ausgabe des 80-Zeichen Hires-Bildschirms des
+    4 rem "           C-128 auf einen FX-80 oder kompatiblen Drucker
+    5 :
+    6 rem "                          (c) by KRW
+    7 :
+    8 rem "                            10/1985
+    9 :
+   10 :
+   11 :
+  100 fast: bank 0
+  110 qd$=chr$(17)  : rem "Cursor down
+  120 cl$=chr$(147) : rem "Screen clear
+  130 :
+  140 print cl$; tab(30); "Hardcopy-80"
+  150 print tab(30); qd$; "(c)  by KRW"
+  160 print tab(20); qd$; qd$; "* Datazeilen lesen"
+  170 for sp=dec("f000") to dec("f33d")
+  180 read co: poke sp,co
+  190 next sp
+  200 :
+  210 print tab(20); qd$; "* Installation"
+  220 print tab(25); qd$; "Die Druckeradresse ist"; peek(dec("f10a"))
+  230 print tab(25); "Die Sekund{CBM-F}radresse ist"; peek(dec("f0f7"))
+  240 print tab(25); "Linefeed wird zum Drucker gesandt: ";
+  250 if peek(dec("f220"))=5 then print "nein": else print "ja"
+  260 print tab(20); qd$; qd$; "{SHIFT-+}nderungen gew{CBM-X}nscht ?  (j/{rvon}n{rvof}) ";
+  270 getkey wa$
+  280 if wa$="n" or wa$=chr$(13) then print "nein": goto 640
+  290 if wa$<>"j" then 270
+  300 print "ja"
+  310 print tab(20); qd$; "Eingabe der Druckeradresse (oder 'c' fur Centronics) ";
+  320 input ad$
+  330 if ad$<>"c" and (val(ad$)<4 or val(ad$)>15) then 320
+  340 if ad$="c" then begin
+  350 :poke dec("f0f7"),255
+  360 bend: else begin
+  370 :print tab(20); "Eingabe der Sekund{CBM-F}radresse ";
+  380 :input sa$
+  390 :if val(sa$)<0 or val(sa$)>15 then 380
+  400 :poke dec("f10a"),val(ad$)
+  410 :poke dec("f0f7"),val(sa$)
+  420 bend
+  430 print tab(20); "soll Linefeed gesendet werden (j/{rvon}n{rvof}) ";
+  440 getkey wa$
+  450 if wa$="j" then begin
+  460 print "ja"
+  470 poke dec("f220"),6
+  480 bend: else begin
+  490 if wa$<>"n" and wa$<>chr$(13) then 440
+  500 print "nein"
+  510 poke dec("f220"),5
+  520 bend
+  530 print tab(20); qd$; "Angaben richtig ?  ({rvon}j{rvof}/n) ";
+  540 getkey wa$
+  550 if wa$=chr$(13) or wa$="j" then print "ja": goto 640
+  560 if wa$="n" then begin
+  570 :print "nein"
+  580 :goto 220
+  590 bend: else begin
+  600 :goto 540
+  610 bend
+  620 :
+  630 :
+  640 print cl$; tab(20); "* {SHIFT-+}nderung der Bildausgabeparameter (j/{rvon}n{rvof}) ";
+  650 getkey wa$
+  660 if wa$="n" or wa$=chr$(13) then print "nein": goto 1190
+  670 if wa$<>"j" then 650
+  680 print "ja"
+  690 print tab(25); qd$; "Druckmodus ('0' -> Ende der Eingaben) ";
+  700 getkey nr$
+  710 bn=val(nr$)
+  720 if ((bn=0 and nr$<>"0") or bn>4) then 700
+  730 print nr$
+  740 if bn=0 then 1190
+  750 cl=peek(dec("f323")+bn-1)
+  760 xf=cl and 3
+  770 yf=cl and 192
+  780 rv=cl and 32
+  790 if (yf and 128)=0 then begin
+  800 :yf=1
+  810 bend: else begin
+  820 :if (yf and 64)=0 then begin
+  830 ::yf=2
+  840 :bend: else begin
+  850 ::yf=4
+  860 :bend
+  870 bend
+  880 fx=peek(dec("f31b")+bn-1)
+  890 print tab(25); qd$; qd$; "Druckmodus: "; bn
+  900 print tab(25); qd$; "Vervielfachen in x-Richtung: "; xf
+  910 print tab(25); "Vervielfachen in y-Richtung: "; yf
+  920 print tab(25); "Reverse on:                  ";
+  930 if rv then print "ja": else print "nein"
+  940 print tab(25); "Punktdichte    ('ESC * n') : "; fx
+  950 print tab(20); qd$; qd$; "neue Vervielfachung in x-Richtung: (1,2,3) ";
+  960 getkey wa$
+  970 if wa$<"1" or wa$>"3" then 960
+  980 print wa$
+  990 cl=val(wa$)
+ 1000 print tab(20); "neue Vervielfachung in y-Richtung: (1,2,4) ";
+ 1010 getkey wa$
+ 1020 if wa$<>"1" and wa$<>"2" and wa$<>"4" then 1010
+ 1030 print wa$
+ 1040 if wa$="4" then cl=cl or 192
+ 1050 if wa$="2" then cl=cl or 128
+ 1060 print tab(20); "Revers (j/n):                              ";
+ 1070 getkey wa$
+ 1080 if wa$<>"j" and wa$<>"n" then 1070
+ 1090 if wa$="j" then cl=cl or 32: print "ja": else print "nein"
+ 1100 poke dec("f323")+bn-1,cl
+ 1110 print tab(20); "neue Punktdichte f{CBM-X}r FX-80:  (0-7)         ";
+ 1120 getkey wa$
+ 1130 if wa$<"0" or wa$>"7" then 1120
+ 1140 fx=val(wa$)
+ 1150 poke dec("f31b")+bn-1,fx
+ 1160 print fx
+ 1170 goto 690
+ 1180 :
+ 1190 print tab(20); qd$; qd$; "* Abspeichern der Maschinenroutine"
+ 1200 print tab(20); qd$; "Bitte Diskette in Laufwerk 8 einlegen (TASTE)"
+ 1210 getkey wa$
+ 1220 scratch "hardcopy-80.m"
+ 1230 if ds>1 then print ds$: stop
+ 1240 bsave "hardcopy-80.m",u8,on b0,p(dec("f000")) to p(dec("f33e"))
+ 1250 if ds then print ds$
+ 1260 :
+ 2000 :
+ 2010 data 141,67,243,32,204,242,162,22,189,39,243,157,0,12,202,16,247,174,67
+ 2020 :
+ 2030 data 243,240,4,224,5,144,87,162,204,142,13,12,162,255,142,14,12,32,0,12
+ 2040 :
+ 2050 data 169,7,162,210,142,13,12,162,255,142,14,12,32,0,12,162,0,160,0,136
+ 2060 :
+ 2070 data 208,253,202,208,250,56,8,169,7,162,210,142,13,12,162,255,142,14,12
+ 2080 :
+ 2090 data  32,0,12,169,4,162,195,142,13,12,162,255,142,14,12,32,0,12,40,176
+ 2100 :
+ 2110 data   1,96,162,40,160,125,142,13,12,140,14,12,76,0,12,202,189,31,243,72
+ 2120 :
+ 2130 data 189,27,243,141,53,242,189,35,243,141,63,243,41,3,170,160,128,169
+ 2140 :
+ 2150 data   2,140,52,242,141,51,242,202,240,19,24,152,109,52,242,141,52,242,173
+ 2160 :
+ 2170 data  51,242,105,2,141,51,242,202,208,237,160,160,169,0,140,73,241,141
+ 2180 :
+ 2190 data  81,241,162,100,142,66,243,44,63,243,8,16,2,112,9,78,66,243,14,73
+ 2200 :
+ 2210 data 241,46,81,241,40,48,9,78,66,243,14,73,241,46,81,241,172,73,241,173
+ 2220 :
+ 2230 data  81,241,140,96,241,141,98,241,169,0,141,64,243,141,65,243,169,0,162
+ 2240 :
+ 2250 data 189,142,13,12,162,255,142,14,12,32,0,12,169,4,160,12,140,69,243,192
+ 2260 :
+ 2270 data 255,240,49,162,186,142,13,12,162,255,142,14,12,162,5,32,0,12,162
+ 2280 :
+ 2290 data 192,142,13,12,162,255,142,14,12,32,0,12,144,4,104,76,26,240,162,4
+ 2300 :
+ 2310 data 169,201,141,13,12,169,255,141,14,12,32,0,12,169,27,32,123,242,169
+ 2320 :
+ 2330 data  51,32,123,242,104,32,123,242,32,31,242,76,85,241,24,173,64,243,105
+ 2340 :
+ 2350 data   0,141,64,243,173,65,243,105,0,141,65,243,169,72,162,243,141,147,241
+ 2360 :
+ 2370 data 142,148,241,169,0,160,0,141,70,243,140,71,243,162,18,173,65,243,160
+ 2380 :
+ 2390 data 204,140,13,12,160,205,140,14,12,32,0,12,162,19,173,64,243,32,0,12
+ 2400 :
+ 2410 data 162,31,160,218,140,13,12,160,205,140,14,12,32,0,12,141,255,255,238
+ 2420 :
+ 2430 data 147,241,208,3,238,148,241,56,173,70,243,233,1,141,70,243,173,71,243
+ 2440 :
+ 2450 data 233,0,141,71,243,176,223,162,0,160,8,169,0,141,62,243,62,72,243,46
+ 2460 :
+ 2470 data  62,243,62,152,243,46,62,243,44,63,243,16,2,112,41,62,232,243,46,62
+ 2480 :
+ 2490 data 243,62,56,244,46,62,243,44,63,243,48,24,62,136,244,46,62,243,62,216
+ 2500 :
+ 2510 data 244,46,62,243,62,40,245,46,62,243,62,120,245,46,62,243,173,62,243
+ 2520 :
+ 2530 data  32,58,242,136,208,182,232,224,80,208,175,206,66,243,240,6,32,31,242
+ 2540 :
+ 2550 data  76,68,241,169,204,141,13,12,169,255,141,14,12,32,0,12,24,76,65,240
+ 2560 :
+ 2570 data 160,5,140,71,243,172,71,243,185,51,242,32,123,242,206,71,243,16,242
+ 2580 :
+ 2590 data  96,0,0,0,42,27,13,10,142,67,243,140,68,243,44,63,243,16,11,170,112
+ 2600 :
+ 2610 data   5,189,7,243,80,3,189,23,243,141,62,243,173,63,243,72,41,3,141,70
+ 2620 :
+ 2630 data 243,104,41,32,240,8,173,62,243,73,255,141,62,243,173,62,243,32,123
+ 2640 :
+ 2650 data 242,206,70,243,208,245,174,67,243,172,68,243,96,72,173,69,243,201
+ 2660 :
+ 2670 data 255,240,14,169,210,141,13,12,169,255,141,14,12,104,76,0,12,162,3
+ 2680 :
+ 2690 data 160,221,32,247,242,104,162,1,160,221,32,247,242,162,13,160,221,32
+ 2700 :
+ 2710 data 231,242,162,0,160,221,32,231,242,41,251,32,251,242,9,4,32,251,242
+ 2720 :
+ 2730 data 162,13,160,221,32,231,242,41,16,240,245,169,0,162,3,160,221,76,247
+ 2740 :
+ 2750 data 242,32,195,242,162,2,160,221,32,231,242,9,4,32,251,242,162,0,160
+ 2760 :
+ 2770 data 221,32,231,242,9,4,76,251,242,134,252,132,253,160,0,162,252,142,170
+ 2780 :
+ 2790 data   2,162,0,76,162,2,134,252,132,253,160,0,162,252,142,185,2,162,0,76
+ 2800 :
+ 2810 data 175,2,0,3,12,15,48,51,60,63,192,195,204,207,240,243,252,255,0,15
+ 2820 :
+ 2830 data 240,255,7,7,3,3,23,23,23,23,1,33,131,163,72,173,0,255,133,254,169,0
+ 2840 :
+ 2850 data 141,0,255,104,32,255,255,72,165,254,141,0,255,104,96
+ 2860 :
+ 2870 end
+ 2880 :
+60000 zz$="hardcopy-80": un=8
+60010 open 15,un,15,"s0:"+zz$
+60020 gosub 60100
+60030 save zz$,un
+60040 gosub 60100
+60050 verify zz$,un
+60060 close 15
+60070 end
+60080 :
+60100 input#15, s1, s$, s2, s3
+60110 if s1=1 then print s2; s$
+60120 if s1<20 then return
+60130 print s1 ", " s$ "," s2; "," s3
+60140 close 15

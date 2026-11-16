@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zu CP/M</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="rf">
+    <meta name="64er.issue" content="Sonderheft 10">
+    <meta name="64er.pages" content="93-100">
+    <meta name="64er.head1" content="CP/M">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Software">
+    <meta name="64er.index_category" content="Tips &amp; Tricks C128|CP/M Verschiedenes">
+    <meta name="64er.id" content="tips_cpm">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zu CP/M</h1>
+        <p class="intro">Hier finden Sie tolle Neuigkeiten und eine Menge Anregungen, mit denen Sie CP/M in den Griff bekommen und dessen Vorteile voll ausnutzen können.</p>
+
+        <p>Nachdem man sich als CP/M-Einsteiger durch das sehr dürftig ausgefallene Handbuch von Commodore gearbeitet hat, wird zwar klar, daß es sich hier um ein Betriebssystem handeln muß, welches mit dem C 128 und C 64 nichts zu tun hat. Es bleiben für den Einsteiger wie auch für den Profi viele Fragen offen. »Tips &amp; Tricks zu CP/M« zeigt weiterführende Anwendungsmöglichkeiten von CP/M auf, die sich nicht auf das Kopieren von Dateien mit »PIP« beschränken.</p>
+
+        <h2>Submit – oder so ähnlich...</h2>
+
+        <p>Im Handbuch stößt man irgendwann einmal darauf. »SUBMIT.COM« und »PROFILE.SUB« werden dort in der gewohnt mageren Art und Weise beschrieben. Die eigentliche Arbeits- und Wirkungsweise bleibt im Dunkeln verborgen. Also werden wir etwas Licht ins »SUBMIT«-Dunkel bringen. »SUBMIT« ist ein Programm auf der CP/M-Systemdiskette, mit dem mehrere »COM«-Files nacheinander und ohne Unterbrechung abgearbeitet werden können. Natürlich muß dem Computer irgendwie mitgeteilt werden, welche Programme er in welcher Reihenfolge abarbeiten soll. Da man am besten an einem Beispiel lernt und versteht, betrachten wir eine mögliche Anwendung von »SUBMIT« etwas genauer.</p>
+
+        <p>Man stelle sich den für einen CP/M-Programmierer klassischen Fall vor: Ein Programm wird im Quellcode eingetippt, compiliert, eventuell assembliert und gelinkt. Es wäre eine echte Arbeitserleichterung, wenn man nicht jedesmal die einzelnen Programme aufrufen müßte, sondern diese automatisch nacheinander geladen würden. »SUBMIT« bietet genau diese Möglichkeiten. Nehmen wir an, Sie haben den Quellcode eines Programms in einer Datei namens »PRG.C«. Bei der letzten Compilation tauchte ein Fehler auf und es soll neu editiert und umgewandelt werden. Um sich nun das einzelne Starten der Compiler-Teile zu sparen, erstellt man als erstes die »SUBMIT«-Datei, entweder mit dem CP/M-Editor oder einer Textverarbeitung. Der erstellte Text sieht folgendermaßen aus:</p>
+
+        <pre><code>ED PRG.C
+CC PRG
+MAC PRG
+LNK PRG
+</code></pre>
+
+        <p>Diese Datei erhält den Namen »COMPILE.SUB«. Das Kürzel »SUB« ist für die Arbeit mit »SUBMIT« zwingend notwendig. Das Ganze wird mit »SUBMIT COMPILE« gestartet. Als erstes wird der Editor (ED) mit der Datei PRG.C geladen. Nachdem die Änderung durchgeführt und der Editor nach dem Speichern wieder verlassen wird, tritt automatisch der Compiler (CC) in Aktion und compiliert die Quelldatei PRG.C. In derselben Weise agieren im Anschluß der Assembler (MAC) und der Linker (LNK). Wohlgemerkt, alle Programme werden automatisch gestartet, gesteuert durch »SUBMIT«. Natürlich müssen sich alle angesprochenen Programme und Dateien auf derselben Diskette befinden.</p>
+
+        <p>Eine weitere Anwendung wäre die komplette Steuerung von zusammenhängenden Programmabläufen. Für umfangreiche Anwendungen sind meist mehrere Programme notwendig, um das gewünschte Ergebnis zu erhalten. Ein Beispiel wäre die Lagerverwaltung. Man benötigt Programme zur Datenerfassung, Datenauswertung und Datenaktualisierung. Da diese Programme, um Fehler zu vermeiden, nicht wahllos durcheinander gestartet werden dürfen, wird der genaue Programmablauf in einer »SUB«-Datei festgehalten und mit »SUBMIT« gestartet.</p>
+
+        <p>Doch bleiben wir vorerst bei unserem Compiler-Beispiel. Was nützt es, wenn die Programmaufrufe nicht variabel gehalten werden können, wenn man für jedes neue Programm eine eigene »SUB«-Datei erstellen muß? Natürlich bietet »SUBMIT« diesen Komfort. Es sind bis zu neun Variable möglich. Zugelassen ist wieder jedes ablauffähige COM-File. Die Variable werden in einer besonderen Form angegeben: als erstes ein Dollarzeichen und dann die Nummer der jeweiligen Variable. Die zu übergebenden Werte werden im »SUBMIT«-Aufruf mit angegeben. Dazu wieder ein kleines Beispiel. Als erstes sollen alle Dateien angezeigt werden, die Assembler-Quellcode enthalten (Dateikennung: ASM). Danach wird die angegebene Datei assembliert und gelinkt. Ist dies erfolgreich abgeschlossen, werden die überflüssigen, aus der Assemblierung entstandenen Dateien mit geändertem Namen auf ein anderes Laufwerk kopiert. Auf der Originaldiskette werden diese Dateien (Dateienkennung: SYM,PRN) gelöscht und das Inhaltsverzeichnis der Diskette auf den Bildschirm gebracht. Um diese bereits relativ umfangreiche Aktion mit »SUBMIT« auszuführen, wird folgende SUB-Datei benötigt:</p>
+
+        <pre><code>DIR *.ASM
+MAC $1
+HEXCOM $1
+PIP
+&lt;B:$2.SYM = A:$1.SYM
+&lt;B:$2.PRN = A:$1.PRN
+&lt;
+ERA $1.PRN
+ERA $1.SYM
+DIR
+</code></pre>
+
+        <p>Um die allgemeine Verwirrung nicht noch zu steigern, folgt eine ausführliche Erklärung der obigen Datei. Die Datei wird mit dem Namen »TEST.SUB« gespeichert. Vergewissern Sie sich immer vor einem »SUBMIT«-Aufruf, daß alle angeforderten Programme auf der entsprechenden Diskette vorhanden sind. Nehmen wir an, das Assemblerprogramm »DISK.ASM« soll assembliert werden und die zu kopierenden Dateien sollen die Namen »DRUCK.SYM« und »DRUCK.PRN« erhalten. Um das gewünschte Ergebnis zu erhalten, wird »SUBMIT« folgendermaßen aufgerufen:</p>
+
+        <pre><code>SUBMIT TEST DISK DRUCK
+</code></pre>
+
+        <p>Der erste Parameter nach »SUBMIT« gibt die auszuführende SUB-Datei an. Alle weiteren Parameter werden den in der SUB-Datei verwendeten Variablen zugeordnet. So erhält im Beispiel $1 den Wert DISK und $2 den Wert DRUCK. Tippfehler in bezug auf die Variablen nimmt »SUBMIT« sofort übel. Noch vor der Ausführung wird die Prozedur auf Ihre Syntax überprüft. Leider überprüft »SUBMIT« nicht, ob alle verlangten Dateien und Programme auf den entsprechenden Laufwerken zur Verfügung stehen. Hier wären wir bei einem kleinen Manko angelangt. Es gibt keine Möglichkeit, eventuelle durch Falscheingaben auftretende Fehler abzufangen. Wenn beispielsweise statt »DISK« versehentlich »DIS« eingegeben wird, werden alle Programme der SUB-Datei normal gestartet, brechen aber nach kurzer Zeit mit den programminternen Fehlermeldungen ab. Danach wird das nächste Programm gestartet und bricht ebenfalls mit einer wüsten Fehlermeldung ab. Dieses Spiel treibt »SUBMIT«, bis die gesamte SUB-Datei abgearbeitet ist. Für den Anwender zeigt sich CP/M hier von seiner unfreundlichen Seite, doch keine Angst, die Daten auf den eingelegten Disketten nehmen durch solche Fehleingaben keinen Schaden.</p>
+
+        <p>Vorausgesetzt die SUB-Datei ist in Ordnung, erscheint am Bildschirm als erstes eine Auflistung aller »ASM«-Dateien. Danach wird automatisch der CP/M-Assembler »MAC« geladen, der die auf die Variable »$1« zugewiesene Datei assembliert. Die im »SUBMIT«-Aufruf angebene Datei muß dazu mit der Dateikennung »ASM« in Laufwerk A zu finden sein. »MAC« erstellt sodann die Dateien »DISK.HEX«, »DISK.PRN« und »DISK.SYM«. Von »HEXCOM«, das als nächstes geladen wird, wird ein ablauffähiges »COM«-File mit dem Namen »DISK.COM« erstellt. Die nächsten beiden Anweisungen der »SUB«-Datei benötigen eine formatierte Diskette in Laufwerk B. Dorthin werden die Dateien »DISK.PRN« und »DISK.SYM« kopiert. Diese neuen Dateien erhalten die Namen der zweiten Variablen »$2« und zwar »DRUCK.PRN« und »DRUCK.SYM«. Die nächste Anweisung in der kleinen »SUB«-Datei offenbart wieder eine kleine Besonderheit von »SUBMIT«: Nach dem Programmaufruf, in diesem Fall »PIP«, werden die benötigten Parameter in der »SUB«-Datei angegeben. Derartige Eingaben werden mit einer nach rechts geöffneten spitzen Klammer gekennzeichnet. Im obigen Beispiel werden die Druck- und Symboldatei auf Laufwerk B kopiert. Die letzte Klammer ohne Parameter kennzeichnet für PIP das Ende der Operation. Zum Schluß werden noch die Dateien »DISK.SYM« und »DISK.PRN« auf der Arbeitsdiskette in Laufwerk A gelöscht, da diese auf Laufwerk B gesichert wurden. Nach der Ausgabe des Disketteninhaltsverzeichnisses beendet »SUBMIT« seine Arbeit und überläßt die Kontrolle über das System wieder dem Anwender. Nun wissen Sie, wie man mit »SUBMIT« arbeitet. Doch das Rätsel um das im Handbuch so mager beschriebene »PROFILE.SUB« ist immer noch nicht gelüftet. Der Aufbau entspricht genau dem der bereits ausführlich besprochenen »SUB«-Datei. Doch nun zum eigentlichen Sinn der »PROFILE.SUB«. Beim »Booten« von CP/M sucht das Betriebssystem, bevor es die Kontrolle an den CCP (Kommandoprozessor) übergibt, als erstes die Datei »PROFILE.SUB« auf der Systemdiskette. Findet CP/M diese Datei, geschieht genau dasselbe, als wenn »PROFILE.SUB«, was auch ohne weiteres möglich ist, mit »SUBMIT« aufgerufen würde. Die dort angegebenen Programme werden geladen und ausgeführt. Für den Aufbau der Datei gelten die gleichen Bedingungen, wie für eine entsprechende durch »SUBMIT« aufzurufende Datei. Wo aber liegt der Nutzen für den Anwender? Die Vorteile liegen auf der Hand. Man kann beispielsweise beim Laden des Systems sofort das Datum setzen lassen, sowie die Tastaturkonfiguration ändern. Natürlich können alle zur Verfügung stehenden »COM«-Files aufgerufen werden. Eine weitere Möglichkeit wäre das Anfertigen von Sicherheitskopien unmittelbar nach dem Laden des Systems. Werden auf einer Diskette im Laufe einer Sitzung Dateien verändert, erweist sich dies oft als nützlich. Die Probleme, die das magere Handbuch gerade mit »SUBMIT« und der Datei PROFILE.Sub aufwirft, sind jetzt hoffentlich aus dem Weg geräumt, so daß einer effektiven Nutzung dieser komfortablen CP/M-Einrichtungen nichts mehr im Wege steht.</p>
+
+        <h2>Die Sache mit den Usern</h2>
+
+        <p>Wenn CP/M gebootet wird, befindet man sich automatisch in der User-Ebene Null (User=Benutzer, Anwender). Was hat es nun mit den anderen User-Bereichen, es gibt deren 16 (0-15), auf sich? Werden in einem anderen User-Bereich Daten gespeichert, legt CP/M ein weiteres Inhaltsverzeichnis für diese Ebene an. Die dort untergebrachten Daten können nur unter dieser User-Nummer bearbeitet werden. Wollen Sie beispielsweise unter Ebene drei arbeiten, so geben Sie einfach »USER« ein. Der Computer fragt dann nach der gewünschten Nummer.</p>
+
+        <p>Wie können nun diese User-Bereiche sinnvoll eingesetzt werden? Wenn sich nicht alles im Bereich Null abspielen soll, bietet sich hier die Möglichkeit an, etwas Organisation auf die Diskette zu bringen. So kann man beispielsweise im Bereich Null das System zum Booten speichern. Will man mit Wordstar und dBase auf einer Diskette arbeiten und dBase-Dateien in Wordstar laden, hat man die Möglichkeit, für dBase und Wordstar je einen eigenen Benutzerbereich anzulegen.</p>
+
+        <h2>Der Trick mit »SYS«</h2>
+
+        <p>Leider kann auf Dateien von anderen Benutzerebenen nicht ohne weiteres zugegriffen werden. Doch auch dafür gibt es eine Lösung. Eine solche gemeinsame Datei muß sich in der Bedienerebene Null befinden. Zusätzlich muß dieser Datei mit dem »SET«-Kommando ein »SYS«-Attribut zugeordnet werden, damit diese als bereichsübergreifende Systemdatei erkannt wird. Dazu ein Beispiel, in dem die oben erworbenen Kentnisse zu »SUBMIT« benötigt und vertieft werden. Als erstes muß natürlich die verwendete Diskette entsprechend vorbereitet werden. Das Ergebnis soll folgendermaßen aussehen: In der Benutzerebene Null liegt das System, sowie die dBase beiliegende Beispieldatei »BUECHER.DBF«. In den User-Bereich eins kopiert man alle nötigen Dateien, die zum korrekten Ablauf von dBase benötigt werden. Zu guter Letzt wird die Ebene zwei mit den nötigen Dateien zu Wordstar versorgt. Dann kann es praktisch schon losgehen. Doch anstatt jetzt umständlich zwischen den User-Ebenen hin und her zu schalten, werden wir für diesen Zweck eine, diesmal etwas größere, »SUBMIT«-Datei aufbauen (Bild 1). Diese »SUBMIT«-Datei soll nun folgenden Vorgang bearbeiten: Die Datei »BUECHER.DBF« wird als erstes in der Benutzerebene eins auf die von Wordstar zu lesende Datei »TEST.TXT« umgewandelt. Dazu muß in dBase nach dem Eröffnen der Datei mit »USE« folgende Anweisung erteilt werden:</p>
+
+        <pre><code>COPY TO TEST DELIMITED WITH,
+</code></pre>
+
+        <figure>
+            <pre>user 0
+era test.txt
+b:set buecher.dbf[rw,sys]
+user 1
+dbase
+&lt;$1
+user 0
+pip a:=a:test.txt[g1]
+b:set test.txt[rw,sys]
+user 1
+era test.txt
+user 2
+ws
+user 0
+era test.txt
+pip a:=a:test.txt[g2]
+b:set test.txt[rw,sys]
+user 2
+era test.txt
+user 0</pre>
+            <figcaption>Bild 1. SUB-Datei mit allen Schikanen</figcaption>
+        </figure>
+
+        <p>Damit wäre die Datei »TEST.TXT« erstellt. Danach muß dieses File in die Benutzerebene Null kopiert und mit dem Attribut »SYS« für Systemdatei versehen werden. Diese Aufgabe erledigt das »SET«-Kommando. Nun tritt in Bereich zwei Wordstar in Aktion. Zur Demonstration genügt es, wenn eine Zeile der eingelesenen Datei »TEST.TXT« verändert wird.</p>
+
+        <p>Nach dem Verlassen von Wordstar wird die Datei wieder in Bereich Null kopiert und mit dem »SYS«-Attribut versehen. Wo aber ist der praktische Nutzen dieses Beispiels zu sehen? Wenn Sie bestimmte Daten aus dBase-Dateien in Wordstar-Briefen verwenden wollen, können Sie so auf die dBase-Daten zugreifen. Wie das genau funktioniert, entnehmen Sie bitte der CP/M-Ecke aus der 64'er-Ausgabe 7/86. Doch nun wieder zum Ablauf der »SUBMIT«-Datei. Als erstes wird, falls nicht aktiv, User Null eingeschaltet. Die dort eventuell vorhandene Datei »TEST.TXT« wird gelöscht, um mögliche Schreib-Lesefehler zu vermeiden. Um von verschiedenen Benutzerbereichen auf »BUECHER.DBF« zugreifen zu können, muß diese Datei mit dem »SYS«-Attribut ausgestattet werden, was mit dem folgenden Set-Befehl erreicht wird. In Laufwerk B muß sich in diesem Fall die Systemdiskette befinden oder eine beliebige andere Diskette, die das Programm »SET« enthält. Nachdem dann in User Eins umgeschaltet ist, wird dort dBase geladen. Haben Sie beim Aufruf der SUB-Datei ein Datum mit angegeben, so wird dies automatisch durch $1 gesetzt, ansonsten wird die Datumseingabe übergangen. Sobald sich dBase mit dem Prompt (Punkt) meldet, führen Sie den oben angegebenen »COPY«-Befehl durch. In Ebene zwei haben Sie damit eine Datei Namens »TEST.TXT« erzeugt. Nachdem dBase mit »QUIT« verlassen wurde, kopiert »PIP« diese Datei in die Ebene Null, wo sie mit Hilfe von »SET« das SYS-Attribut erhält. Um Speicherplatz zu sparen, erfolgt als nächstes die Löschung der Datei »TEST.TXT« im Benutzerbereich eins. Nachdem in Ebene zwei geschaltet ist, wird sofort Wordstar geladen. Laden Sie zunächst »TEST.TXT« und verändern Sie einen beliebigen Satz. Nachdem Wordstar wieder verlassen ist, wird in Ebene Null die alte Testdatei gelöscht und die neue aus Ebene zwei herauskopiert. Nachdem sie dort wieder als Systemdatei gekennzeichnet ist, wird die Datei in Ebene zwei gelöscht und in den Bereich Null zurückgesprungen. Damit sollten jetzt alle noch bestehenden Probleme mit »SUBMIT«-Dateien und User-Bereichen gelöst und einer sinnvollen Anwendung dieser mächtigen CP/M-Komponenten nichts mehr im Wege stehen.</p>
+
+        <h2>Timestamps, Initdir und Set</h2>
+
+        <p>Diese drei sehr interessanten CP/M-Befehle bieten ein optimales Werkzeug für die interne Verwaltung der Diskettendateien. Die Möglichkeiten reichen von Datums- und Zeitprotokollierung der einzelnen Zugriffe bis hin zum Paßwortschutz für einzelne Dateien, Label und sogar des Systems. Wie komfortabel und hilfreich diese Optionen sein können, lernt man erst nach längerer Anwendung zu schätzen. So erhält man jederzeit Auskunft über die letzten Dateizugriffe und kann somit auch die große Palette der »DIR«-Optionen nützen. Doch jetzt zur näheren Erklärung und Beschreibung dieser Eigenschaften. Die Eintragung der sogenannten Timestamps, das sind die Zeit- und Datumseinträge, ist leider im Handbuch nicht sehr ausführlich beschrieben. Denn allein mit dem Kommando »INITDIR« ist es noch lange nicht getan. Zwar wird mit diesem Systemprogramm die Diskette für die Aufnahme von Timestamps vorbereitet, doch ganz ohne das Programm geht es auch wieder nicht. Also nicht vergessen, als erstes immer mit »INITDIR« die Diskette initialisieren. Die Timestamps können mit dem Kommando »DIR[DATE]« ausgegeben werden. Doch ein Versuch nach »INITDIR« führt lediglich zu einer Fehlermeldung, die besagt, daß die Diskette gar nicht für Timestamps vorbereitet ist. Was soll denn das? Die Diskette ist zwar für Einträge vorbereitet, aber die dafür vorgesehene Funktion des Systems ist noch nicht aktiviert. Dazu haben wir zum Glück ein Allround-Programm mit Namen »SET« zur Verfügung. Diese Funktionen werden speziell zum Setzen der Zeit- und Datumskennungsart benötigt. Drei Möglichkeiten stehen zur Verfügung: Datum und Zeit der Entstehung soll festgehalten werden (Set[create=on]); Eintragen des letzten Dateizugriffs bei Dateien mit dem Read-Write-Attribut (Set[access=on]) und die Speicherung der Zeitdaten über die letzte Dateiveränderung (Set[update=on]). Doch Vorsicht, Create und Access schalten sich gegenseitig aus! Mit Update wird nur ein Zeiteintrag gemacht, wenn die Datei effektiv verändert wurde. Bei einem reinen Lesezugriff erfolgt bei Update keinerlei Aktion. Eine Diskette, die mit »INITDIR« initialisiert wurde und mit »SET[CREATE=ON, UPDATE=ON]« für Zeit- und Datumseinträge vorbereitet wird, gibt schließlich mit der entsprechenden »DIR«-Option ein optisch ansprechendes und vor allem informatives Bild ab (Bild 2). Ein Inhaltsverzeichnis dieser Art erhalten Sie, nachdem die Diskette für Zeit- und Datumseinträge aktiviert wurde und dann mit folgendem »DIR«-Befehl abgerufen wird:</p>
+
+        <pre><code>DIR[DATE,USER=ALL,NOPAGE]
+</code></pre>
+
+        <figure>
+            <pre>Directory For Drive B: User 0
+Name         Bytes  Recs  Attributes Prot  Update            Create
+BUECHER  DBF    6k    44  Sys RW     None
+CCP      COM    4k    25  Dir RW     None
+CPM+     SYS   24k   184  Dir RW     None
+D        TXT    0k     0  Dir RW     None  08/05/86 03:13    08/05/86 12:58
+PIP      COM   10k    68  Dir RW     None
+SUBMIT   COM    6k    42  Dir RW     None
+TEST     BAK    2k     3  Dir RW     None  08/05/86 04:07    08/05/86 12:59
+TEST     SUB    2k     3  Dir RW     None  08/05/86 01:58    08/05/86 02:12
+TEST     TXT    2k    11  Sys RW     None  08/05/86 10:12    08/05/86 10:12
+Total Bytes     =  56k    Total Records =   380  Files Found =   9
+Total 1k Blocks =  52     Used/Max Dir Entries For Drive B:  25/ 128
+
+Directory For Drive B: User 1
+Name         Bytes  Recs  Attributes Prot  Update            Create
+DBASE    COM   20k   158  Dir RW     None
+DBASEMSG TXT   60k   475  Dir RW     None
+DBASEOVR COM   42k   328  Dir RW     None
+Total Bytes     =  122k   Total Records =   961  Files Found =   3
+Total 1k Blocks =  121    Used/Max Dir Entries For Drive B:  25/ 128
+
+Directory For Drive B: User 2
+Name         Bytes  Recs  Attributes Prot  Update            Create
+WS       COM   16k   128  Dir RW     None
+WSMSGS   OVR   26k   194  Dir RW     None
+WSOVLY1  OVR   34k   266  Dir RW     None
+Total Bytes     =  76k    Total Records =   588  Files Found =   3
+Total 1k Blocks =  75     Used/Max Dir Entries For Drive B:  25/ 128</pre>
+            <figcaption>Bild 2. Informatives Inhaltsverzeichnis mit DIR</figcaption>
+        </figure>
+
+        <p>Sieht doch schon richtig professionell aus, oder etwa nicht? Der von CP/M erhobene Anspruch auf Professionalität muß sich schließlich irgendwo bestätigen.</p>
+
+        <p>»SET« kann noch einiges mehr. Eine der Optionen, die vor allem für Leute mit Top-Secret-Daten interessant ist, präsentiert sich mit einem vielfältigen Paßwortschutz in vielen Ebenen. Dafür sind allerdings ausnahmsweise genügend Informationen im Handbuch zu finden, so daß darauf hier nicht näher eingegangen werden muß.</p>
+
+        <h2>Was nicht im Handbuch steht</h2>
+
+        <p>Allerdings ist der Paßwortschutz nur dann 100prozentig, wenn das Directory-Label mit einem solchen versehen ist. In diesem Fall besteht keine Möglichkeit, den Schutz mit »SET [PROTECT=OFF]« auszuschalten, da immer wieder das lästige Paßwort abgefragt wird. Andernfalls können nach dem Abschalten des Schutzes alle Dateien ohne Probleme bearbeitet werden. Leider ist der Mensch nicht unfehlbar. Daher kommt es immer wieder vor, daß ein Paßwort vergessen wird. Handelt es sich dabei um den Schutz für das Disketten-Label, kommt anscheinend jede Hilfe zu spät. An diesem Punkt weichen wir total von der CP/M-Linie ab und wenden uns dem guten alten C 64 zu. C 64 und CP/M 3.0? Wer einen guten Diskettenmonitor für den C 64 besitzt, ist aus dem Schneider. Denn, man will es beinahe nicht glauben, damit können auch CP/M-Disketten bearbeitet werden. Eine ideale Voraussetzung, um der eigenen Vergeßlichkeit ein Schnippchen zu schlagen. Allerdings ist eine CP/M-Diskette anders aufgebaut als die des C 64. Sollte jemand auf die Idee kommen, die Directory in Block 18 zu suchen, wird er eine herbe Enttäuschung erleben. Das CP/M-Inhaltsverzeichnis findet sich immer in der den Systemblöcken unmittelbar folgenden Spur, also in Spur eins oder zwei. Dort liegt in den Sektoren null bis acht das eigentliche Directory. Bei der Editierung der entsprechenden Blöcke taucht auf dem Bildschirm ein wahrer Zeichenwirrwarr auf. Das sollte aber nicht weiter stören. Die Namenseinträge sind ohne weiteres zu finden. Soll nur das Paßwort einer bestimmten Datei gelöscht werden, fährt man in Sektor 15 oder 20 an den Anfangsbuchstaben und füllt mindestens 23 Byte mit dem Hexadezimalwert E5. Versuchen Sie nicht Ihr Paßwort zu finden, dieses befindet sich verschlüsselt hinter dem Dateinamen. Genauso wird das Paßwort für das Disketten-Label gelöscht. Dabei wird allerdings auch der Diskettenname überschrieben. Der kann dafür ohne Paßwort-Probleme neu angelegt werden. Sollten jetzt einige Hacker glauben, die Anschaffung von CP/M wäre eine lohnende Sache, schließlich kann endlich der Kopierschutz gebrochen werden, kann man nur einen der großen Vorteile der CP/M-Software erwidern: Ein Großteil der auf dem Markt erhältlichen Programme sind ohne jeglichen Kopierschutz erhältlich. Von der angebotenen Public-Domain-Software ganz zu schweigen.</p>
+
+        <h2>Was tun mit dem Editor?</h2>
+
+        <p>Ein vieldiskutiertes Thema ist und bleibt der zum System gelieferte Editor. Dieses Monstrum an angeblicher Eingabehilfe erweist sich bereits nach dem ersten Laden als völlig unkomfortabel. Dazu muß gesagt werden, daß dieser Editor aus den Anfangszeiten von CP/M stammt. Damals war das Fortschritt. Heute kann man ohne »ED« auskommen, wenn Software wie Wordstar und Turbo-Pascal zur Verfügung steht. Diese Editoren bieten nicht nur einen sehr hohen Komfort, sondern erzeugen ASCII-Dateien, die von jedem Compiler verarbeitet werden. Der Programmierer kann hier auf alle Vorteile der Textverarbeitung zurückgreifen, ohne sich sonderliche Nachteile einzuhandeln. Für diejenigen, die sich trotzdem mit dem CP/M-Editor zufriedengeben müssen, ein paar Hinweise und nähere Erläuterungen. Geladen wird der Editor mit angehängtem Dateinamen. Ist die angehängte Datei noch nicht auf Diskette, wird automatisch ein neues File angelegt. Ansonsten wird die gewünschte Datei geöffnet. Wohl gemerkt, sie wird nur geöffnet. Wenn direkt nach dem Aufruf einer der List-Befehle des ED angewandt wird, passiert nichts. Die Begründung liegt in der Natur des ED. Er ist ein sogenannter zeilenorientierter Editor. Das heißt, der Text kann nur zeilenweise bearbeitet werden. Full-Screen-Editoren dagegen lassen ein Bewegen des Cursors an eine beliebige Stelle des Bildschirms zu. Weiterhin arbeitet der CP/M-Editor mit Datenpuffern. Dieser Datenpuffer ist lediglich ein Speicherbereich, in dem der Text zwischengespeichert wird. Es wird also nicht auf der Diskette gearbeitet, sondern direkt im freien Speicherplatz. Nach dem Starten des ED mit Dateinamen ist dieser Speicher prinzipiell leer. Mit dem Editorbefehl #A wird der Puffer von der Diskette mit Daten versorgt. Erst dann kann der Anwender den angeforderten Text bearbeiten. Doch Vorsicht! Verwenden Sie nicht sofort die Einfügeanweisung »I«. Der ED-interne Zeilenzeiger steht nach dem Laden des Textes immer auf Zeile eins. Um ans Text- beziehungsweise Pufferende zu springen, muß der Cursor erst mit der Anweisung »-B« auf das Ende gestellt werden. Danach kann dann mit dem Einfügen begonnen werden. Ein weiteres Problem stellt die Positionierung des Cursors innerhalb einer Zeile dar. Eine eingegebene Zeile kann leider nicht ohne weiteres editiert werden. Sie wollen beispielsweise folgende Zeile ändern: »Sehr gehrte Damen und Herren,«. Dazu muß erst auf der entsprechenden Stelle positioniert werden, um ein »e« einzugeben. Positioniert wird auf den Buchstaben, nach dem etwas eingefügt wird. In diesem Fall lautet der Befehl »7C«. Jetzt kann mit »I« der fehlende Buchstabe erfaßt werden. Die editierte Zeile muß mit »CONTROL-Z« verlassen werden. Erfolgt der Abbruch mit »RETURN« hängt der ED ein Zeilenendezeichen an. ED schneidet den hinteren Teil der Zeile ab und bildet mit dem Rest eine neue Zeile. Zum Löschen existieren zwei Befehle. Die Anweisung »K« löscht innerhalb einer Zeile, während mit »D« ganze Zeilen gelöscht werden. Wenn es bei diesen beiden Anweisungen zu Verwechslungen kommt, wird der Text stark verändert. Man wirft besser doch noch einen Blick ins Handbuch, um solche nervenaufreibenden Fehler zu vermeiden.</p>
+
+        <h2>Die Innereien</h2>
+
+        <p>Vor allem jene, die gerne mehr über ein System wissen oder es gar manipulieren wollen, finden im folgenden nützliche Hinweise.</p>
+
+        <p>Ein Directory-Eintrag unter CP/M kann höchstens 16 KByte Diskettendaten verwalten. Für alle weiteren angefangenen 16 KByte ist jeweils ein weiterer Directory-Eintrag vonnöten. Sicher haben Sie schon einmal bemerkt, daß es nach einem Diskettenwechsel länger als normal dauert, die Directory auszulesen. Dafür gibt es eine systembedingte Erklärung. Im Arbeitsspeicher des Computers befindet sich der sogenannte File-Control-Block (FCB), in den ein Directory-Eintrag aufgenommen wird. Im FCB (Bild 3) sind beispielsweise die Laufwerksnummer, der Dateiname, die Anzahl der abgelegten Records oder die Nummer des aktuellen Records gespeichert. Er repräsentiert praktisch den momentan aktuellen Zustand einer in Bearbeitung befindlichen Datei.</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Byte</th>
+                        <th>Beschreibung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>Laufwerksnummer</td>
+                    </tr>
+                    <tr>
+                        <td>1-8</td>
+                        <td>Dateiname</td>
+                    </tr>
+                    <tr>
+                        <td>9-11</td>
+                        <td>Extension</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>Nummer des Eintrags</td>
+                    </tr>
+                    <tr>
+                        <td>13-14</td>
+                        <td>Intern reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>abgelegte Records</td>
+                    </tr>
+                    <tr>
+                        <td>16-31</td>
+                        <td>Nummern der für die Datei belegten Blöcke</td>
+                    </tr>
+                    <tr>
+                        <td>32</td>
+                        <td>nächster Record</td>
+                    </tr>
+                    <tr>
+                        <td>33-34</td>
+                        <td>absoluter Record bei Direktzugriff</td>
+                    </tr>
+                    <tr>
+                        <td>35</td>
+                        <td>Überlauf-Flag für BDOS-Funktion 35</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 3. Der FCB-Block von CP/M</figcaption>
+        </figure>
+
+        <p>Ohne dieses Modul läuft unter CP/M absolut nichts. Das BDOS ist der fleißigste Arbeiter im System. Vor allem für den Assemblerprogrammierer bietet das BDOS Möglichkeiten, die eine effektive Programmierung mit minimalem Aufwand erlauben. Aufgebaut ist das BDOS aus einer Menge von einzelnen Funktionen, die Ein-/Ausgabe zwischen den einzelnen Geräten steuern. Jede Funktion hat ihre eigene Nummer, unter der sie im Maschinenprogramm aufgerufen werden kann. Die Einsprungadresse ins BDOS ist $0005 hexadezimal. Die Nummer der gewünschten Funktion wird in einem Register übergeben, ebenso die Adresse der zu bearbeitenden Speicherstelle. Der Assemblerprogrammierer muß sich um keine einzige Ein-/Ausgaberoutine kümmern. Er hat nur dafür zu sorgen, daß die richtigen Parameter der gewählten Funktion übergeben werden. Im Anschluß folgt eine Übersicht der BDOS-Funktionen.</p>
+
+        <figure>
+            <table class="plain">
+                <thead>
+                    <tr>
+                        <th colspan="4">Die BDOS-Funktionen</th>
+                    </tr>
+                    <tr>
+                        <td colspan="4">Als erstes wird die Funktionsnummer genannt, danach die Bedeutung und die benötigten Parameter.</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3">0</td>
+                        <td colspan="3">System Reset</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Warmstart; Rücksprung zum System.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>00H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">1</td>
+                        <td colspan="3">Console Input</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">liest ein Zeichen von der Konsole.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>01H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Gedrücktes Zeichen:</td>
+                        <td></td>
+                        <td>in Register: A</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">2</td>
+                        <td colspan="3">Console Output</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Gibt ein Zeichen auf den Bildschirm aus.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>02H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Auszugebendes Zeichen:</td>
+                        <td></td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">3</td>
+                        <td colspan="3">Auxiliary Input</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Liest ein Zeichen aus dem AUXIN-Kanal.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>03H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Gelesenes Zeichen:</td>
+                        <td></td>
+                        <td>in Register: A</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">4</td>
+                        <td colspan="3">Auxiliary Output</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Legt ein Zeichen auf den AUXOUT-Kanal.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>04H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Auszugebendes Zeichen:</td>
+                        <td></td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">5</td>
+                        <td colspan="3">List Output</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Gibt ein Zeichen auf den Drucker aus.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>05H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Auszugebendes Zeichen:</td>
+                        <td></td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td colspan="3">sollte nicht verwendet werden</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">7</td>
+                        <td colspan="3">Auxiliary Input Status</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Zeichen zur Eingabe an AUXIN?</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>07H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Ergibt in Register A:</td>
+                        <td>FFH für ja<br>00H für nein</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">8</td>
+                        <td colspan="3">Set Iobyte</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Zeichen zur Ausgabe an AUXOUT?</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>08H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Ergibt in Register A:</td>
+                        <td>FFH für ja<br>00H für nein</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">9</td>
+                        <td colspan="3">Print String</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">String, mit $ abgeschlossen, auf den Bildschirm ausgeben.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>09H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Stringadresse:</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">10</td>
+                        <td colspan="3">Read Console Buffer</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Liest einen String von Konsole ein.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>0AH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Pufferadresse:</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">11</td>
+                        <td colspan="3">Get Console Status</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Prüft, ob Zeichen von Tastatur eingegeben wurden.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>0BH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Ergibt in Register A:</td>
+                        <td>00H für nein<br>01H für ja</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">12</td>
+                        <td colspan="3">Return Version Number</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Gibt die Nummer der verwendeten Version zurück.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>0CH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Rückgabe:</td>
+                        <td></td>
+                        <td>in Register: HL</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">H = 0 = CP/M 80<br>Nummer in L: BDOS-Versionsnummer</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">13</td>
+                        <td colspan="3">Reset Disk System</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Die Datenpufferadresse (DMA) bei Laufwerk A wird auf 80H gesetzt.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>0DH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">14</td>
+                        <td colspan="3">Select Disk</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">setzt aktuelles Laufwerk.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>0EH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Laufwerk (A=1,B=2,...)</td>
+                        <td></td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Gibt in Register A ein Error-Flag und in Register H einen physikalischen Fehler zurück.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="6">15</td>
+                        <td colspan="3">Open File</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Öffnet eine Datei.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>0FH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse:</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td>Directory-Code:</td>
+                        <td></td>
+                        <td>in Register: A</td>
+                    </tr>
+                    <tr>
+                        <td>Fehler:</td>
+                        <td></td>
+                        <td>in Register: H</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">16</td>
+                        <td colspan="3">Close File</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Schließt eine Datei.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>10H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Ansonsten wie Funktion 15.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">17</td>
+                        <td colspan="3">Search For First</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Sucht den ersten Eintrag einer Datei im Directory.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>11H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">18</td>
+                        <td colspan="3">Search For Next</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Sucht nach Ausführung von Funktion 17 den nächsten Eintrag.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>12H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">19</td>
+                        <td colspan="3">Delete File</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Löscht nicht schreibgeschützte Dateien.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>13H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Gibt in H einen Diskettenfehler und in A den Directory-Code zurück.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">20</td>
+                        <td colspan="3">Read Sequential</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Liest den folgenden Record einer Datei.<br>Ergebnis kommt in den Datenpuffer.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>14H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Gibt in A einen Fehler-Code und in H einen physikalischen Fehler zurück.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">21</td>
+                        <td colspan="3">Write Sequential</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Beschreibt den folgenden Record aus dem Datenpuffer.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>15H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Fehlerrückgabe wie Funktion 20.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">22</td>
+                        <td colspan="3">Make File</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Legt ein neues File an. Da noch keine Daten vorhanden sind, kommt in die Directory ein Leerstring.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>16H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">23</td>
+                        <td colspan="3">Rename File</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Umbenennen von Dateien. Im FCB müssen die ersten 16 Byte den alten und die restlichen 16 Byte den neuen Namen enthalten.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>17H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">24</td>
+                        <td colspan="3">Return Login Vector</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Fragt die angeschlossenen Laufwerke ab. Gibt einen 16-Bit-Wert in HL zurück, wobei das niederwertige Bit für Laufwerk A steht und das höchstwertige für P.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>18H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Rückgabe Login Vector</td>
+                        <td></td>
+                        <td>in Register: HL</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">25</td>
+                        <td colspan="3">Return Current Disk</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Gibt das aktuelle Laufwerk an. Laufwerk A=0, B=1, usw.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>19H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Rückgabe Laufwerk</td>
+                        <td></td>
+                        <td>in Register: A</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">26</td>
+                        <td colspan="3">Set DMA Address</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Datenpufferadresse für Schreib-/Lesezugriffe setzen.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>1AH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>DMA-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">27</td>
+                        <td colspan="3">Get Addr (Alloc)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Adresse des Blockbelegungs-Verzeichnisses holen. Wird von SHOW zur Ermittlung des freien Speicherplatzes verwendet.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>1BH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Adresse zurück:</td>
+                        <td></td>
+                        <td>in Register: HL</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">28</td>
+                        <td colspan="3">Write Protect Disk</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Das gewählte Laufwerk erhält einen temporären Schreibschutz.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>1CH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">29</td>
+                        <td colspan="3">Get Read-Only Vector</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Ermittelt schreibgeschützte Laufwerke.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>1DH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">30</td>
+                        <td colspan="3">Set File Attributes</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Aktiviert Dateiattribute, oder setzt diese zurück. Überträgt entsprechenden FCB-Eintrag.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>1EH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">31</td>
+                        <td colspan="3">Get DPB-Address</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Sucht die Adresse des Disk-Parameter-Blocks.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>1FH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Die Adresse wird ins HL-Register gebracht.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">32</td>
+                        <td colspan="3">Set/Get User Code</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Setzen oder Abfragen der aktuellen Benutzernummer.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>20H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>0FFH</td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">In Register A wird die aktuelle Benutzernummer zurückgegeben.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">33</td>
+                        <td colspan="3">Read Random</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Lesen eines Records im Direktzugriff.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>21H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">In den Registern A und H werden die Fehlermeldungen zurückgegeben.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">34</td>
+                        <td colspan="3">Write Random</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Schreiben eines Records im Direktzugriff.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>22H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">sonst wie Funktion 33.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">35</td>
+                        <td colspan="3">Compute File Size</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Dateigröße in Records ermitteln. Die Größe wird in den Erweiterungsbytes für relativen Dateizugriff des FCB abgelegt.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>23H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Fehler werden in Register A und H zurückgegeben.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">36</td>
+                        <td colspan="3">Set Random Record</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Momentane Record-Nummer ermitteln und im FCB ablegen.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>24H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">37</td>
+                        <td colspan="3">Reset Drive</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Reset für einzelnes Laufwerk durch Übergabe eines 16-Bit-Wertes. Niederwertiges Bit ist Laufwerk A, höchstwertiges ist P.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>25H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Laufwerksvektor</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td>38</td>
+                        <td colspan="3">Nur für MP/M</td>
+                    </tr>
+                    <tr>
+                        <td>39</td>
+                        <td colspan="3">Nur für MP/M</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">40</td>
+                        <td colspan="3">Write Random With Zero</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Wie Funktion 34, jedoch mit vorhergehendem Auffüllen des Records mit Nullen.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>28H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">In A und H werden Fehler zurückgegeben.</td>
+                    </tr>
+                    <tr>
+                        <td>41</td>
+                        <td colspan="3">Nur für MP/M</td>
+                    </tr>
+                    <tr>
+                        <td>42</td>
+                        <td colspan="3">Nur für MP/M</td>
+                    </tr>
+                    <tr>
+                        <td>43</td>
+                        <td colspan="3">Nur für MP/M</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">44</td>
+                        <td colspan="3">Set Multi-Sector Count</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Während ständiger Schreib-/Lesevorgänge des BDOS können maximal 128 Records auf einmal bearbeitet werden.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>2CH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Anzahl der Sektoren</td>
+                        <td></td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">45</td>
+                        <td colspan="3">Set BDOS Error Mode</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Physikalische und erweiterte Fehler werden abgefangen.<br>Register E=255: Return Error Mode<br>Register E=254: Return and Display Mode</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>2DH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>BDOS-Fehler-Modus</td>
+                        <td></td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">46</td>
+                        <td colspan="3">Get Disk Free Space</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Auf Disketten mit RW-Attribut wird der freie Speicherplatz ermittelt.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>2EH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Laufwerksnummer</td>
+                        <td></td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Die Größe des freien Speichers in Records steht in den ersten drei Byte der DMA.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">47</td>
+                        <td colspan="3">Chain to Program</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Overlay von Programmen. Die Befehlszeile muß sich im DMA-Puffer befinden und mit 00H abgeschlossen sein. Register E muß auf FFH gesetzt werden.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>2FH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Overlay-Flag</td>
+                        <td></td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">48</td>
+                        <td colspan="3">Flush Buffers</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Die Pufferinhalte werden recordweise auf die Diskette abgespeichert.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>31H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Flag f. Puffer löschen</td>
+                        <td></td>
+                        <td>Register: E</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Zum Löschen Register E auf FFH setzen.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">49</td>
+                        <td colspan="3">Get/Set System Control Block (SCB)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Lesen und Schreiben des SCB.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>31H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">50</td>
+                        <td colspan="3">Direct Bios Calls</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Aufruf von BIOS-Routinen, die in Bank 0 abgelegt sind.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>32H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>BIOS-Funktions-Nr.</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">59</td>
+                        <td colspan="3">Load Overlay</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Laden von RSX-Modulen.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>3BH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">In den Registern A und H werden Fehler zurückgegeben.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">60</td>
+                        <td colspan="3">Call Resident System Extension</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Aufruf einer RSX-Systemerweiterung.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>3CH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>RSX-Funktions-Nr.</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">98</td>
+                        <td colspan="3">Free Blocks</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Alle Blöcke, die während den BDOS-Aktivitäten vorübergehend angelegt wurden, werden gelöscht. Vorsicht: Alle Dateien mit Close schließen.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>62H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Fehler werden in den Registern A und H abgelegt.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">99</td>
+                        <td colspan="3">Truncate File</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Dem letzten Record einer Datei wird eine wahlfrei Nummer im FCB eingetragen.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>63H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">100</td>
+                        <td colspan="3">Set Directory Label</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Setzen oder Ändern des Directory-Labels.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>64H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">101</td>
+                        <td colspan="3">Return Directory Label Data</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Im Label wird nach dem Byte gesucht, das Informationen über Paßwortschutz und Timestamps enthält. Register A wird mit diesem Register geladen.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>65H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Laufwerk:</td>
+                        <td></td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">102</td>
+                        <td colspan="3">Read File Date Stamps and Paßwort Mode</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Der Paßwort-Modus und Timestamps für Dateien wird ermittelt. FCB muß vorher mit dem Dateinamen belegt werden.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>66H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">103</td>
+                        <td colspan="3">Write File XFCB</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Schreiben oder aktualisieren eines speziell für geschützte Dateien erstellten Directory-Eintrags.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>67H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>FCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">104</td>
+                        <td colspan="3">Set Date and Time</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Stellen der internen Uhr. Übergabe der Zeit in Register DE im BCD-Format.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>68H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Dat-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">105</td>
+                        <td colspan="3">Get Date and Time</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Interne Uhr abfragen.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>69H</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Die Zeit wird im BCD-Format in Register DE übergeben.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">106</td>
+                        <td colspan="3">Set Default Password</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Vorgabe eines Paßworts, bevor auf eine geschützte Datei zugegriffen wird.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>6AH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Paßwort-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">107</td>
+                        <td colspan="3">Return Serial Number</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Feststellen der CP/M-Seriennummer.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>6BH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Die Nummer wird in einem 6-Byte-Feld gespeichert, dessen Adresse in Register DE steht.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">108</td>
+                        <td colspan="3">Get/Set Program Return Code</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Return-Code für Programme ermitteln oder setzen. Neuen Code in Registerpaar DE übergeben, um den alten Wert auszulesen, DE auf FFFFH setzen.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>6CH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">109</td>
+                        <td colspan="3">Get/Set Console Mode</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Konsolen-Modus ermitteln oder neu setzen. Dazu muß ein 16-Bit-Wert in DE stehen. Bei Abfrage muß DE gleich FFFFH sein. Die Informationen finden sich in HL.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>6DH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">110</td>
+                        <td colspan="3">Get/Set Output Delimiter</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Die Ausgabe-Begrenzung für Strings wird gesetzt oder ermittelt (Standard=$). Bei Abfrage Register DE auf FFFFH setzen. Das Ergebnis befindet sich in Register A.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>6EH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>Zum Setzen:</td>
+                        <td>Wert</td>
+                        <td>in Register: E</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">111</td>
+                        <td colspan="3">Print Block</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Ein im Console-Control-Block definierter String, dessen Adresse in DE liegt, wird nach CONOUT gesendet.</td>
+                    </tr>
+                    <tr>
+                        <td>Parameter:</td>
+                        <td>6FH</td>
+                        <td>in Register: C</td>
+                    </tr>
+                    <tr>
+                        <td>CCB-Adresse</td>
+                        <td></td>
+                        <td>in Register: DE</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">112</td>
+                        <td colspan="3">List Block</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Hat dieselbe Wirkung wie Funktion 111.<br>Es wird lediglich auf LST: ausgegeben.</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">152</td>
+                        <td colspan="3">Parse Filename</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Wandelt einen von der Konsole eingegebenen Dateinamen in das interne FCB-Format um. DE enthält die Adresse eines Puffers mit folgenden Daten:<br>0 und 1 = Adresse des vorgegebenen Strings<br>2 und 3 = Adresse des FCB</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Übersicht BDOS-Funktionen (Schluß)</figcaption>
+        </figure>
+
+        <p>Diese Auflistung, die alle Funktionen des BDOS enthält, ist nicht nur für den Assemblerprogrammierer von Nutzen. Dem Anwender hilft sie vor allem beim Analysieren von Systemfehlern. Bei den CP/M-Fehlermeldungen wird immer nur die Funktionsnummer ausgegeben, in der der Fehler auftrat. Anhand dieser Nummer kann die eigentliche Ursache für den Programmabbruch festgestellt werden. Hinter der angegebenen Funktionsnummer verbirgt sich der Schlüssel zu obiger Auflistung. Dort brauchen Sie nur noch unter der entsprechenden Funktionsnummer nachzusehen und schon haben Sie die genaue Ursache für den Ausstieg. Wenn sich das System beispielsweise mit einem Fehler in Funktion 15 meldet, sieht man auf einen Blick, daß eine Datei nicht eröffnet werden konnte. Der Programmierer fragt sich zu Recht, wie diese Routinen in eigenen Programmen verwendet werden. Die angegebenen Register werden mit den erforderlichen Daten gefüllt. Die Funktionsnummer wird dabei immer im Register C übergeben. Die sonst erforderlichen Daten werden in einem weiteren Register oder Registerpaar gespeichert. Danach wird mit »CALL 5« das BDOS aufgerufen. So können alle Routinen des BDOS im eigenen Programm verwendet werden. Man spart sich die Zeit zum Schreiben eigener entsprechender Routinen, da man durch die Vielfalt der BDOS-Routinen bereits eine große Makrobibliothek zur Verfügung hat. Noch ein Tip für Assemblerprogrammierer, die Texte als Konstanten verwenden. In den ersten beiden Byte des definierten Puffers werden Informationen zur Stringlänge abgelegt. Im ersten Byte findet sich die Definitionslänge, im zweiten die wirkliche Länge des Strings. Bei Ausgaben über die BDOS-Funktion 9 ist zu beachten, daß am Ende des Strings ein Dollar-Zeichen steht, da dieses als Endemarke verwendet wird. Sollen von Konsole eingelesene Strings (Funktion 10) wieder ausgegeben werden, müssen diese erst mit dem Dollarzeichen am Ende versehen werden. Die Informationen über die Länge der Konstanten befinden sich, wie bereits erwähnt, in den ersten beiden Bytes.</p>
+
+        <h2>Das BIOS – Schichtarbeit im Untergrund</h2>
+
+        <p>Auf einer weit niedrigeren Ebene als BDOS arbeitet eine weitere CP/M-System-Komponente: das BIOS. Es ist für die Steuerung der Peripherie und der computerinternen Hardware zuständig. Der Zugriff auf die BIOS-Routinen erweist sich als weitaus schwieriger als beim BDOS. Zum Glück können die meisten benötigten Operationen mit den BDOS-Funktionen ausgeführt werden. Schwierig wird es allerdings, wennn man zum Beispiel auf einzelne Blöcke und Sektoren der Diskette zugreifen will. Dies kann nur unter Verwendung der BIOS-Routinen gelöst werden. Nachfolgend eine Liste der Funktionen:</p>
+
+        <figure>
+            <table class="plain">
+                <thead>
+                    <tr>
+                        <th>Nr.</th>
+                        <th>Funktion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>Kaltstart</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Warmstart</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Konsolenabfrage (A=0: keine Taste, sonst 255)</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Zeichen von Konsole nach A</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Zeichen von C an Konsole</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Zeichen von C an Drucker</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Zeichen von C an Hilfskanal</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Zeichen von Hilfskanal an A</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Schreib-/Lesekopf auf Spur 0 stellen</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Laufwerk anwählen (DPH-Adresse in HL)</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Spur anwählen (Nummer in BC)</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>Sektor anwählen (Nummer in BC)</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>Adresse (in BC) für DMA setzen</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>Sektor nach anwählen lesen</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>Sektor nach anwählen schreiben</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>Druckerstatus abfragen</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>Sektornummer (in BC) anhand von Skewing-Tabelle (Beginn in DE) übersetzen (Ergebnis in HL)</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>Konsolen-Status prüfen</td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td>Eingabe-Status für Hilfskanal prüfen</td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td>Ausgabe-Status für Hilfskanal prüfen</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>Adresse für I/O-Gerätenamen-Tabelle ermitteln</td>
+                    </tr>
+                    <tr>
+                        <td>21</td>
+                        <td>Physikalische Geräte in Tabelle initialisieren</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>DPH-Adresse für Laufwerk ermitteln (nach HL)</td>
+                    </tr>
+                    <tr>
+                        <td>23</td>
+                        <td>Fortlaufende Sektoren für Read and Write zählen</td>
+                    </tr>
+                    <tr>
+                        <td>24</td>
+                        <td>Löscht physikalischen Sektorpuffer</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>Blockverschiebung: von Adresse in DE nach Adresse in HL, Anzahl der Byte in Registerpaar DC</td>
+                    </tr>
+                    <tr>
+                        <td>26</td>
+                        <td>Zeit setzen/abfragen</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>Speicherbank (Nummer in A) anwählen</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>Speicherbank (Nummer in A) für DMA-Operationen anwählen</td>
+                    </tr>
+                    <tr>
+                        <td>29</td>
+                        <td>Zielbank (Reg. B) und Quellbank (Reg. C) für Funktion 25, bei Verschiebung zwischen verschiedenen Banken</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Übersicht BIOS-Funktionen</figcaption>
+        </figure>
+
+        <p>DPH bedeutet Disk-Parameter-Header, eine Tabelle, die wichtige Informationen über die Steuerung der Laufwerke enthält. DPB steht für Disk-Parameter-Block, dieser stellt die nötigen Disketteninformationen zur Verfügung. Beide Tabellen liegen in Bank 0, so daß nicht unmittelbar darauf zugegriffen werden kann.</p>
+
+        <p>Um diese BIOS-Funktionen für eigene Programme zu nutzen, verwendet man die BDOS-Funktion 50. Allerdings muß vorher eine Tabelle (Bild 4) im Speicher kreiert werden, deren Adresse dem BDOS in Register DE übermittelt werden muß. Gibt das BIOS Werte zurück, stehen diese nach Ausführung in den entsprechenden Registern. Interessant erscheint die Möglichkeit, direkt auf die einzelnen Sektoren auf Disk zuzugreifen. Dazu bietet BDOS keine Funktion an, so daß auf BIOS auszuweichen ist.</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Byte</th>
+                        <th>Beschreibung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>BIOS-Funktionsnummer</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Inhalt Register A</td>
+                    </tr>
+                    <tr>
+                        <td>2 und 3</td>
+                        <td>Inhalt Registerpaar BC</td>
+                    </tr>
+                    <tr>
+                        <td>4 und 5</td>
+                        <td>Inhalt Registerpaar DE</td>
+                    </tr>
+                    <tr>
+                        <td>6 und 7</td>
+                        <td>Inhalt Registerpaar HL</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 4. Übergabetabelle für BDOS-Funktion 50</figcaption>
+        </figure>
+
+        <h2>Direkte Systemmanipulation</h2>
+
+        <p>Im BDOS existiert eine Tabelle, in der wichtige Informationen für alle Systemteile abgelegt sind. Dieses nur 100 Byte lange Schlüsselelement nennt sich System-Control-Block (Bild 5). Zwar verändern viele BDOS-Aufrufe diese Tabelle, der Anwender kann aber über die BDOS-Funktion 49 darauf zugreifen. Dabei sollte mit äußerster Vorsicht vorgegangen werden, da unsachgemäße Einträge zum Systemabsturz führen. Dazu wird wieder eine Tabelle zur Verfügung gestellt, die in der TPA gespeichert ist. Byte null enthält das angesprochene SCB-Element. Byte eins enthält die Anweisung für die BDOS-Funktion. Soll ein Byte des SCB gesetzt werden, erhält Byte eins den Wert FFH (»H« steht immer für hexadezimal), soll ein Wort gesetzt werden, den Wert FEH, soll ein Wert abgefragt werden, erhält Byte eins den Wert 00H. Das Ergebnis der Abfrage wird in Byte zwei bei 1-Byte-Werten, und in Byte zwei und drei bei 2-Byte-Werten abgelegt.</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nummer</th>
+                        <th>Beschreibung</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>00H-04H</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>05H</td>
+                        <td>BDOS-Versions-Nummer</td>
+                    </tr>
+                    <tr>
+                        <td>06H-09H</td>
+                        <td>User Flags</td>
+                    </tr>
+                    <tr>
+                        <td>0AH-0FH</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>10H-11H</td>
+                        <td>Program Error Return Code</td>
+                    </tr>
+                    <tr>
+                        <td>12H-19H</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>1AH</td>
+                        <td>Anzahl der Bildschirmspalten</td>
+                    </tr>
+                    <tr>
+                        <td>1BH</td>
+                        <td>Aktuelle Bildschirmzeile</td>
+                    </tr>
+                    <tr>
+                        <td>1CH</td>
+                        <td>Seitenlänge Bildschirm</td>
+                    </tr>
+                    <tr>
+                        <td>1DH-21H</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>22H-23H</td>
+                        <td>CONIN-Flag</td>
+                    </tr>
+                    <tr>
+                        <td>24H-25H</td>
+                        <td>CONOUT-Flag</td>
+                    </tr>
+                    <tr>
+                        <td>26H-27H</td>
+                        <td>AUXIN-Flag</td>
+                    </tr>
+                    <tr>
+                        <td>28H-29H</td>
+                        <td>AUXOUT-Flag</td>
+                    </tr>
+                    <tr>
+                        <td>2AH-2BH</td>
+                        <td>LSTOUT-Flag</td>
+                    </tr>
+                    <tr>
+                        <td>2CH</td>
+                        <td>Page-Modus</td>
+                    </tr>
+                    <tr>
+                        <td>2DH</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>2EH</td>
+                        <td>Flag für CTRL-H = DEL</td>
+                    </tr>
+                    <tr>
+                        <td>2FH</td>
+                        <td>Flag für DEL = CTRL-H</td>
+                    </tr>
+                    <tr>
+                        <td>30H-32H</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>33H-34H</td>
+                        <td>Konsolen-Modus (BDOS 109)</td>
+                    </tr>
+                    <tr>
+                        <td>35H-36H</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>37H</td>
+                        <td>Ausgabe-Delimiter (BDOS 110)</td>
+                    </tr>
+                    <tr>
+                        <td>38H</td>
+                        <td>Flag für Druckerausgabe</td>
+                    </tr>
+                    <tr>
+                        <td>39H-3BH</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>3CH-3DH</td>
+                        <td>Derzeitige DMA-Adresse</td>
+                    </tr>
+                    <tr>
+                        <td>3EH</td>
+                        <td>Aktuelles Laufwerk</td>
+                    </tr>
+                    <tr>
+                        <td>3FH-43H</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>44H</td>
+                        <td>Aktuelle Benutzernummer</td>
+                    </tr>
+                    <tr>
+                        <td>45H-49H</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>4AH</td>
+                        <td>BDOS-Multi-Sector-Count (BDOS 44)</td>
+                    </tr>
+                    <tr>
+                        <td>4BH</td>
+                        <td>BDOS-Error-Mode (BDOS 45)</td>
+                    </tr>
+                    <tr>
+                        <td>4CH-4FH</td>
+                        <td>Suchpfad für 4 Laufwerke (SETDEF)</td>
+                    </tr>
+                    <tr>
+                        <td>50H</td>
+                        <td>Laufwerk für temporäre Dateien</td>
+                    </tr>
+                    <tr>
+                        <td>51H</td>
+                        <td>Laufwerk, das letzten Fehler meldete</td>
+                    </tr>
+                    <tr>
+                        <td>52H-56H</td>
+                        <td>Reserviert</td>
+                    </tr>
+                    <tr>
+                        <td>57H</td>
+                        <td>Flag für Ausgabeart der BDOS-Meldungen</td>
+                    </tr>
+                    <tr>
+                        <td>58H-59H</td>
+                        <td>Tage seit dem 1. Januar 1978</td>
+                    </tr>
+                    <tr>
+                        <td>5AH</td>
+                        <td>Stunden im BCD-Format</td>
+                    </tr>
+                    <tr>
+                        <td>5BH</td>
+                        <td>Minuten im BCD-Format</td>
+                    </tr>
+                    <tr>
+                        <td>5CH</td>
+                        <td>Sekunden im BCD-Format</td>
+                    </tr>
+                    <tr>
+                        <td>5DH-5EH</td>
+                        <td>Basisadresse des Common-Speicherbereichs</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 5. Die SCB-Block-Beschreibung</figcaption>
+        </figure>
+
+        <p>Alle, die mit dem Z80- oder 8080/8085-Assembler umzugehen verstehen, haben jetzt die Informationen erhalten, um sogar größere Systemmanipulationen vornehmen zu können. Der CP/M-Einsteiger kann sein System effektiver und mit weniger Fehlern als bisher nutzen. Vor allem ist bewiesen, daß CP/M zwar kein Betriebssystem zum Spielen ist, sich aber hervorragend für ernsthafte Anwendungen eignet. In der 64'er werden wir in Zukunft des öfteren einige CP/M-Programme, von denen es Tausende gibt, für Sie testen und vorstellen.</p>
+
+        <address class="author">(rf)</address>
+    </article>
+</body>
+
+</html>

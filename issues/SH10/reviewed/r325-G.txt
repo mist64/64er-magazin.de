@@ -1,0 +1,145 @@
+# r325 reader G — SH10 articles 111, 119, 121, 123, 126, 129, 132, 135
+# Locator: word-diff of article text against truth/NNN.txt, plus a sense read of every article;
+# tesseract tsv over masters600 (word boxes, 600 dpi px) to place crops. Crops are montages of
+# masters600 regions (page:x,y,w,h[:scale]), numbered cNN; each read once.
+
+## Article 111 "Butler – Eine Hilfe für Basic- und Assemblerfans" (pp 111-119)
+crop c01 = 111:400,4800,2100,190 | 111:2560,2930,1600,100 | 112:210,3620,2150,90 | 112:2450,2130,1980,190 |
+           112:2450,2580,1450,300 | 112:2450,3650,500,90 | 112:2450,4095,2180,95 | 112:2450,4270,1100,100 | 112:2450,5460,1600,160
+FIX     p112 "FOR I=0 TO 127:MEMFILL 1024,2023,1:SLEEP" -> "…2023,I:SLEEP" (letter I, the loop variable). c01
+FIX     p112 "SCNCLR O0" -> "SCNCLR 0". c01
+FIX     p112 "MEMCOPY 30000, 30999, 1024" -> "MEMCOPY 30000,30999,1024" (typewriter face, no gaps). c01
+FIX     p112 MEMINV example "BANK O" -> "BANK 0" (zero; same glyph as BANK 0 two lines above). c01
+FIX     p112 "Adr1+ Anz" -> "Adr1+Anz". c01
+FIX     p112 "BANK O:PRINT MEMLOC (1024,2023, \"123\")" -> "BANK 0:PRINT MEMLOC (1024,2023,\"123\")". c01
+REJECT  p111 »/BUTLER.1« / »/BUTLER.2« with the slash — printed so (truth/111 dropped it). c01
+REJECT  p111 "…nach unten schieben <ESC> + <I>" — printed exactly so (no "(=ESC+I)"). c01
+PRINT-ERROR p112 "weitersrcollen" — page prints it. c01
+crop c02 = 113:310,1720,1000,460 | 113:320,4220,2140,110 | 113:320,4400,1000,100 | 113:310,5750,1600,110 |
+           113:2540,3300,2160,600 | 113:2560,6290,1000,280 | 114:215,1270,1000,190 | 114:215,1530,1000,110 |
+           114:2450,1195,1150,200 | 114:2450,2125,1100,110 | 114:2450,2955,900,280
+  Like-with-like: CHG 4633,DEC("8000") (HTML closed, page) sets "(" and the opening quote exactly as
+  Z80CALL DEC("A000"); NEWESC ASC("1"),DEC("CABC") and ASC("2"),DEC("CACA") stacked, every glyph aligned —
+  the apparent gap is the typewriter quote's offset in its cell, not a space.
+FIX     p113 "Z80CALL DEC( \"A000\")" -> "Z80CALL DEC(\"A000\")". c02
+FIX     p114 "Z80CALL DEC( \"B000\")" -> "Z80CALL DEC(\"B000\")". c02
+FIX     p114 "NEWESC ASC(\"1\") ,DEC(\"CABC\")" -> "NEWESC ASC(\"1\"),DEC(\"CABC\")" (aligned with the ASC("2") line below). c02
+FIX     p114 "NEWCMD \"BELL\",DEC( \"C98E\")" -> "…DEC(\"C98E\")". c02
+FIX     p114 "PRINT DUMMY( \"ABC\")" -> "PRINT DUMMY(\"ABC\")". c02
+FIX     p113 prose "SYS DEC(\" 1300\")" -> "SYS DEC(\"1300\")" — page sets the quotes with equal sidebearing on both
+        sides of 1300 (" 1300 "), i.e. typographic, not a space typed inside the string; the HTML had it on one side only. c02
+FIX     p114 "$c9 RET" -> "$C9 RET" (upper case, as on p113). c02
+FIX     p113 "— schnelleres Editieren…" and the three other list dashes: em dash "—" -> en dash "–" (page sets the short
+        dash; truth/113 reads – too). c02
+REJECT  p113 heading "Aufruf des Z80-Prozessors von Basic aus" stands BEFORE "Achtung: Die Nummern werden beim Kopieren…"
+        (a TRANS note) — the page prints it there, heading with double rule directly above "Achtung". Print order kept. c02
+REJECT  p113 "HIDE Nummer oder HIDE," — trailing comma printed. c02
+REJECT  p113/114 "$ED $B0" — the B0 zero matches the zeros of DEC("B000") on the same page. c02
+crop c03 = 115:2540,1440,1500,280 | 115:310,6180,1800,450 | 115:2840,4850,1200,180 | 116:220,470,1600,200 |
+           116:2900,2010,1000,190 | 116:220,2070,800,120
+FIX     p115 "\"WORD Adr ;Adresse der Routine (low/high)" -> ".WORD Adr …" (page: full stop). c03
+FIX     p115 JSR $1396 / $13C7 block re-laid to the page's comment column (was one space before every ";"):
+        pitch 42.75 px from JSR@322 -> $1396@493 (4 cells); ";"@870/870/870/871/871 = (870-322)/42.75 = 12.8 -> col 13
+        on all five lines; ".WORD"/"Adr" 335/572 = col 0/6. No glyph changed. tsv only, c03 for the glyphs.
+FIX     p115 LDA #Adr-1 / PHA / JMP $02DF block re-laid likewise: pitch 42.25 px from JMP@2553 -> $02DF@2722;
+        ";"@3141..3143 on all six lines = (3142-2553)/42.25 = 13.9 -> col 14 (one cell right of the JSR block's, +40 px
+        measured relative to the line start on both). c03
+REJECT  p115 "JSR $13C7" — page prints $13C7 (tesseract read $1307). c03
+PRINT-ERROR / FT-CANDIDATE (owner default: none) p115 "LDA #Adr-1 ;höherwertiges Byte" and "LDA #Adr-1 ;niederwertiges
+        Byte" — page prints both identically, with no </> (or LOW/HIGH) operator; likewise p115/p116 "LDA #Liste / LDY #Liste"
+        (both blocks) and "LDA #Tab1 / LDX #Tab1", "#Tab2" — the high/low selector is missing in print in every pair.
+        A reader assembling it as printed loads the same byte twice (reasoned, not run). Kept as printed. c03
+REJECT  p116 "TabLg1 .EQU *-Tab1" — page prints the asterisk (truth/116 normalised it). c03
+REJECT  p113 VEC table "20 A=45:BANK 0" — tesseract reads "BANK O"; same face as the BANK 0 lines confirmed in c01; kept.
+Coverage 111: read in full (all prose, headings, both typeset tables, the aside, every hand-typed <pre>); word-diffed
+  against truth/111-119. Not re-laid / not checked by eye: the p115-117 assembler blocks (Liste/Beleg/Tab, LnAdr/ListLn)
+  beyond the opcode lines in c03 — their columns were already laid out; the indent change from 6 to 9 at ".WORD ListLn"
+  (p116->p117 boundary?) was NOT measured. The Z80 dumps check themselves: >0A000/>0A008 and >0B000/>0B008 rows agree
+  byte for byte with the $xx/mnemonic lines (01 00 20 = LD BC,2000H … 36 01 = LD (HL),1, ED B0 = LDIR, C9 = RET).
+  Disk-backed listings (data-filename) out of scope.
+
+## Article 119 "Tornado-Copy 1571" (pp 119-120)
+crop c04 = 119:300,4160,2150,120 | 121:2780,2390,1900,1650
+REJECT  p119 intro "Floppy 1571/ 1570" — page sets a space after the slash mid-line (not a line-break join). c04
+Coverage 119: read in full; word-identical to truth/119 apart from machine-name spacing. FIX: none.
+
+## Article 121 "Der C 128 geht eigene Wege" (pp 121-122)
+REJECT  p121 Bild 1 table — every cell matches the page ($00-$02 … bis Byte $FF); the page sets the ranges as
+        "$00 - $02" with a spaced dash, HTML "$00-$02" closed: kept (range notation, no change of meaning). c04
+Coverage 121: read in full; prose word-identical to truth/121-122; table checked cell by cell on c04. FIX: none.
+
+## Article 123 "»Zeichensetzereien« auf dem C 128" (pp 123, 125-126)
+Coverage 123: read in full; word-identical to truth/123,125,126 (only <…> key markup differs in my tokeniser). Every
+  line-number reference checked against the disk witness prg/zeichen-fix.txt instead of a crop: 80-160 copy (160 slow),
+  170 Hauptmenü, 370 ON NU GOTO, 460 = {CBM-P} row, 470-540 {CBM-N}…{CBM-H}, 550 = {CBM-Y} row, 700-790 Matrix,
+  800 Zeichen verändern, 890 Cursor bewegen, 1240 Punkt setzen, 2100-2200, 2210-2240, 2250 Fehler. All agree.
+REJECT  p125 "In den Zeilen 810 bis 940 … Die Zeilen 890 bis 1230" overlap — the listing has 890 REM cursor bewegen and
+        940 GOTO 830, so both ranges are the magazine's (and both true). No crop needed (disk witness).
+FIX: none. Crops: none.
+
+## Article 126 "Centronics-Schnittstelle für den C 128" (pp 126-128)
+crop c05 = 126:2480,6195,1450,100 | 127:2530,5920,1600,460 | 128:250,6540,2150,100 | 128:2400,5640,2250,200 | 128:2490,6190,2150,100
+Hex/decimal pairs checked against each other (arithmetic) — all agree: $1303=4867, $1304=4868, $142a-$1529=5162-5417
+  (= 256 bytes, as the text says), $1540-$1544=5440-5444, $1546-$154A=5446-5450, $156f=5487, $1570=5488, $1300=4864,
+  $0f=15, $10=16. Escape sequences: 320=$0140 -> 40 01, 640=$0280 -> 80 02.
+Disk witness prg/"druckertr. 128.prg" (load $1300, end $17E3 = the text's $17E3): $1303=04 (#4), $1304=01 (CR+LF),
+  $1540: 1b 2a 04 40 01, $1546: 1b 2a 06 80 02, $156f=$14 (#20), $1570=$07 (#7), $1401=$0f (CMP #$0F), table at $142a
+  starts 00 01 02 03. Every value the article states is the program's.
+REJECT  p127 "(27, '*', 4, <320,>320)" closed vs "(27, '*', 6, <640, >640)" spaced — the page sets exactly that
+        difference. c05
+REJECT  p126 only the first head "Speicherstelle $1303 (dezimal 4867):" carries a colon — printed so. c05
+REJECT  p128 "$0f (dezimal 15)" — page "$0f" (tesseract "$0Of"). c05;  "11adriges" — page "11" (tesseract "1f"). c05
+Bild 2 pin table: series check, not a crop — A GND, B FLAG, C-L = D0-D7 in order onto Centronics pins 2-9, M PA2 -> 1
+  (Strobe), Busy 11 / Acknowledge 10, GND 16: a complete, monotone series, identical to the block index reading.
+Coverage 126: read in full (prose, all heads, the pin table); word-identical to truth/126-128. FIX: none.
+
+## Article 129 "80-Zeichen-Grafik" (pp 129-131)
+crop c06 = 129:280,2485,2140,100 | 129:280,4140,2140,170 | 129:280,4850,2140,170 | 129:2530,4870,2140,180
+REJECT  p129 "Bit 6=1 / 5=1 / 7=1" closed — page closed (truth/129 spaced them). c06
+REJECT  p129 "POKE 54785, (3*16+2)" with the space after the comma — printed. c06
+REJECT  p129 "stehen die Befehle GRAFIK, BOX" (not GRAPHIC) — printed GRAFIK. c06
+REJECT  p129 "SYS DEC (\"1303\")" and "sys dec (\"1303\")" — space before "(" printed; quotes typographic. c06
+Addresses checked against the disk witness prg/graphik-80.txt: PAINT+BOX $61a8-$6388 -> $1672 (5060/5080), DRAW
+  $6797-$67d6, CIRCLE $668e-$674c, "Strecke zeichnen" $9b30-$9c18 landing at $1952 (5320), setpoint $1400-$1671 (3060),
+  copy loop in 5000-5340 as the text says. All agree.
+Futureteufelchen (graphik-80.m) protected, not touched.
+Coverage 129: read in full; word-identical to truth/129-131 except the spacings above. FIX: none.
+
+## Article 132 "Character 80" (pp 132-134)
+crop c07 = 132:255,6280,2140,180 | 132:2485,3600,1750,120 | 133:270,1150,1550,200 | 133:2515,2620,2140,100 |
+           133:2520,5580,2140,270 | 134:240,5310,1250,100 | 134:240,5490,2140,190
+FIX     p132 "POKE 5061,128: POKE 5066, 144: POKE 5108,48" -> "…POKE 5066,144: …" (typewriter, no gap; the
+        companion line "POKE 5066,239" is closed too). c07
+FIX     p133 "BLOAD \"GRAPHIK-80.m\": SYS DEC ( 1303\")" -> "SYS DEC (\"1303\")" — the opening quote was lost; the page
+        prints it (and the space before "(" is the page's). c07
+REJECT  p132 "Seiten 4 - 28 und 4 - 29" — page sets a spaced dash; kept as transcribed. c07
+REJECT  p133 "(-4,20)" — page prints a minus; kept as hyphen-minus like the protected formula minuses (070 list). c07
+REJECT  p134 k1 = 1,873; k2 = 2; k3 = 0,874 and k1 = 1,126; k2 = 2; k3 = 0,501 — page. 1,873 and 0,874 also stand in the
+        disk witness prg/character-80.a.txt (lines 4360/4410 comments). c07
+PRINT-ERROR p133 "⟨CSR DOWN⟩schiebt" — no space in print. c07
+PRINT-ERROR (decided, protected) p133 "x_neu = w + y·sin w" — not touched.
+Listing 1 (hand-typed <pre>, lines 4200-15460): its 427 DATA numbers verified against the disk witness
+  prg/graphik-80.m.prg by program — bytes $1AB7-$1BFF (329) then $139E-$13FF (98), identical in order, which is also
+  what lines 4260/4320 load. Not read by eye; row breaks not re-measured.
+Coverage 132: read in full (prose, formulas, the Polarkoordinaten example, Listing 1 via the disk). Word-diff against
+  truth/132-134 otherwise identical.
+
+## Article 135 "Hardcopy 80" (pp 135-140)
+crop c08 = 135:295,1035,2140,110 | 135:2530,1810,2140,380 | 136:2480,5050,2140,110 | 136:2480,5495,2140,110 | 136:2480,5765,2140,100
+REJECT  p135 intro "80-Zeichen- HiRes-Bildschirm" — page sets the gap mid-line (not a line-break join). c08
+REJECT  p136 "Görlitz-Interface VC 2.6" — printed spaced (not a machine-name sweep artefact); "VCI 2.8" printed. c08
+REJECT  p136 "»ESC * $03 $80 $07«" — page "ESC * $03 $80" (the $07 on the next line is not in the crop; truth/136 and
+        tesseract agree). 3*640 = 1920 = $0780, so $80 $07 is the right n1/n2 for the triple-width line. c08 (partial)
+PRINT-ERROR p135 "2.)wählen Sie im Installationsmenü" — page prints "2.)" closed, after a "1." item. c08
+Arithmetic: "über 1,5 Millionen Pixel" = 640·3 · 200·4 = 1 536 000 — agrees. Pin table = the 126 series (A GND, B FLAG/
+  BUSY, C-L D0-D7, M PA2/STROBE), complete and in order.
+Coverage 135: read in full (prose, the ol, the pin table, the call examples); word-identical to truth/135-136 except
+  list numbering (markup). Listings 1/2 are disk-backed (data-filename). FIX: none.
+
+## Summary reader G
+Crops read / seen: 8 / 8 (c01-c08, montages, each opened once; all loaded). Unseen: none.
+FIX 20 lines (111: 18 incl. 4 dashes on one line and 2 comment-column re-lays; 132: 2). REJECT 24. PRINT-ERROR 4 +
+1 decided/protected (x_neu). FT-CANDIDATE 1 (111 p115/116: #Adr-1 / #Liste / #Tab pairs printed without the </>
+selector) — owner default: no Futureteufelchen.
+Verification 4 (generate.py --future --join) NOT run: issues/SH10/title.png does not exist and the brief forbids the
+default local mode; left to control's scratch-copy gate. Edited files byte-scanned: no control bytes.

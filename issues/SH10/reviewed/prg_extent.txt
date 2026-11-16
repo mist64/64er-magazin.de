@@ -1,0 +1,27 @@
+# r120 check 5: the printed extent of each raw binary.
+# <filename> TAB $start-$end        end INCLUSIVE (the last byte of the program)
+# <filename> TAB $start-$end excl   end AS THE HEADER PRINTS IT, one past the last byte
+# <filename> TAB $start-$end disasm  span off the FIRST and LAST printed address (no `Name :` header)
+# <filename> TAB not printed        not in the magazine at all -- a disk-only extra
+# <filename> TAB no span <reason>   printed, extent NOT established -- stays red
+# ... TAB $start-$end ; <reason>    the spans disagree and the difference is disposed of; the reason is the evidence
+# STRENGTH OF THE READINGS (SH10, r120): each a single reading by one agent, on a 1400 px rendering of a4600/<page>.png (1:3.5); headers also cross-read against the OCR (ocr/out/<page>.json) and the file's own first/last bytes.
+# Headers read: /butler.1 p116, /butler.$2000 p118 (end row p119), tornado copy p119, druckertr. 128 p128, blanker 64mode + 10er-tast p150, vdchc.0c00 p152.
+# Loaders, computed: mse from the p109 loader (FOR I=2048 TO 3755, first DATA byte the $00 at $0800); list-hilfe from the disk's own list-hilfe.basic (same loader as p148-149: FOR I=2816 TO 3231, BSAVE P2816 TO P3231), its 416 DATA bytes against the file; memory retter from p155 Listing 10 (CHR$(0);CHR$(19) then 384 bytes), first 14 DATA values read against the file; graphik-80.m from p130 Listing 1 (BSAVE P(DEC("1300")) TO P(DEC("1AB7"))).
+# not printed: ieee kern 64/128 (p13: "Sie finden es dort unter dem Namen »IEEE KERN 64«", EPROM images; no hex row in the OCR of p13-19); 10er-tast.src, vdchc.src (p150-153 print only the MSE objects, Listings 5 and 7; no assembler text on p148-161 except Listing 2 LIST-Routine and Listing 4 Blanker).
+ieee kern 64.prg	not printed
+ieee kern 128.prg	not printed
+mse.prg	$0801-$0EAB disasm
+_butler.1.prg	$1300-$173E excl
+_butler.2.prg	$2000-$2CEB excl ; printed as »/BUTLER.$2000« (p118-119, header 2000 2ceb, Listing 3), typed at $2000 in C 64 mode and moved by the article's own steps (p119 Eingabehinweise: T 2000 2CEB F000, S"/BUTLER.2",08,F000,FCEB); same 3307 bytes plus one byte of row padding ($49 at $FCEB, printed in row 2ce8); rows 2000 and 2ce8 equal the file
+tornado copy.prg	$1C01-$2646 excl
+druckertr. 128.prg	$1300-$17E4 excl
+graphik-80.m.prg	$1300-$1AB6 disasm
+list-hilfe.prg	$0B00-$0C9F disasm ; the loader's DATA run to $0C9F (line 20 FOR I=2816 TO 3231) but its own line 40 BSAVE P2816 TO P3231 saves to $0C9E: the disk file is that BSAVE, 415 of 415 bytes equal the DATA, the 416th DATA byte is a $00
+blanker 64mode.prg	$C000-$C03F excl
+blanker c64m.src.prg	no span -- an assembler SOURCE, not a program: printed as text, p150 Listing 4 (lines 100-120, 200-630, incl. the doubled 400/410); the disk text has those 55 lines plus 8 header lines 130-190 (C64-Version aus Sonderheft 7/86, Anpassung von F. Mueller) the print omits. A load span says nothing about a source; this answer form has no slot for it.
+10er-tast.prg	$C000-$C088 excl
+10er-tast.src.prg	not printed
+vdchc.0c00.prg	$0C00-$0DFF excl
+vdchc.src.prg	not printed
+memory retter.prg	$1300-$147F disasm

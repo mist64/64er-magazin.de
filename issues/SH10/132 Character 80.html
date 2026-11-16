@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Character 80</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dieter Winkler, Thomas Rumbach, og">
+    <meta name="64er.issue" content="Sonderheft 10">
+    <meta name="64er.pages" content="132-134">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik">
+    <meta name="64er.id" content="character-80">
+</head>
+
+<body>
+    <article>
+        <h1>Character 80</h1>
+        <p class="intro">Die erste Erweiterung zu Graphik 80 ist die des CHAR-Befehls. Er beherrscht jetzt verschiedene Schriftgrößen in mehreren Richtungen und ist variabler als der PRINT-Befehl.</p>
+
+        <p>Das im folgenden Text beschriebene Programm »Character 80« ist eine Ergänzung des 640x200-Punkte-Grafikpaketes »Graphik 80« für den C 128, das in Ausgabe 12/85 vorgestellt und auf den vorhergehenden Seiten noch einmal abgedruckt wurde. »Character 80« fügt in den Basic-Interpreter des C 128 einen neuen CHAR-Befehl ein, der bei eingeschaltetem VDC-Grafikbildschirm wirksam wird. Der CHAR-Befehl dient dazu, Buchstaben, Ziffern oder ganze Textzeilen auf dem Grafikbildschirm darzustellen. Er vertritt den PRINT-Befehl, den man nur im Textmodus verwenden kann. Man benötigt den CHAR-Befehl zum Beispiel, um die Achsen eines Koordinatensystems zu beschriften oder um den Spielstand in einem Spiel mit Grafikdarstellung einzublenden. Ein wichtiger Befehl also, der nun auch in Graphik 80 nicht länger fehlen soll.</p>
+
+        <h2>Der neue CHAR-Befehl</h2>
+
+        <p>Die CHAR-Routine für den 80-Zeichen-Bildschirm wurde völlig neu geschrieben und gegenüber der im Basic 7.0 vorgesehenen CHAR-Routine für den 40-Zeichen-Bildschirm stark erweitert. Aus diesem Grund hat sich die Syntax des Befehls geändert. Der neue Befehl lautet:</p>
+
+        <pre><code>CHAR [f],x,y,[w],q$</code></pre>
+
+        <p><strong>f</strong>: ist ein ganzzahliger Wert zwischen 0 und 1. Wird für f eine Null angegeben, so wird der Text in q$ in der Farbe des Bildschirmhintergrunds ausgegeben. Nimmt f den Wert eins an, dann wird der Text in q$ in der Zeichenfarbe ausgegeben (vergleiche Beschreibung des COLOR-Befehls im Bedienungshandbuch, Seite 4 bis 35).</p>
+
+        <p><strong>x,y</strong>: sind die Grafik-Koordinaten des Mittelpunktes des ersten Zeichens in q$. x darf zwischen 0 und 639, y zwischen 0 und 199 liegen.</p>
+
+        <p><strong>w</strong>: ist der Winkel, um den der String q$ gegenüber der Waagerechten (x-Achse) um (x,y) gedreht wird. w darf zwar eine beliebige positive Integerzahl sein, aber nur die Winkel 0, 90, 180, 270, 360, ... Grad ergeben lesbare Textdarstellungen. Für den Fall, daß w nicht angegeben wird, ist w mit Null vorbesetzt.</p>
+
+        <p>Für f,x,y,w dürfen auch Variable oder numerische Ausdrücke, deren Ergebnis im erlaubten Bereich liegt, eingesetzt werden.</p>
+
+        <p><strong>q$</strong>: ist eine Zeichenkette in Anführungszeichen, eine Stringvariable oder ein beliebiger Ausdruck des Typs String. Steuerzeichen innerhalb von »q$« bis auf ⟨RVS ON⟩, ⟨RVS OFF⟩, ⟨CSR UP⟩ und ⟨CSR DOWN⟩ werden ignoriert. ⟨RVS ON⟩ schaltet die Invers-Darstellung ein, ⟨RVS OFF⟩ schaltet sie wieder aus. ⟨CSR UP⟩ setzt den folgenden Text eine Halbzeile höher, ⟨CSR DOWN⟩ setzt den folgenden Text eine Halbzeile tiefer.</p>
+
+        <p>Der neue CHAR-Befehl wird nur bei eingeschalteter 640x200-Punkte-Grafik aktiv. Im 80-Zeichen-Textmodus oder bei VIC-Grafiken bleibt der alte CHAR-Befehl so, wie er im Bedienungshandbuch des C 128 auf den Seiten 4 - 28 und 4 - 29 beschrieben ist, erhalten.</p>
+
+        <p>An dieser Stelle seien ein paar Sätze erlaubt zum Vergleich der Basic 7.0-Version des CHAR-Befehls und Character 80. Nach der alten Version des CHAR-Befehls durften x und y nur Werte zwischen 0 und 79 beziehungsweise 0 und 24 annehmen. Auf dem Grafikbildschirm wurde eine Textdarstellung simuliert, wie sie auch im Textmodus möglich ist. Diese Methode hat den Vorteil, daß der CHAR-Befehl auch im Textmodus zur direkten Positionierung einer Textzeile angewandt werden kann. Punktgenaues Einfügen eines Textes in ein Grafikbild – etwa bei der Beschriftung von Funktionsgraphen – ist jedoch nur möglich, wenn die Position des Grafik-Cursors als Bezugspunkt für den Beginn der Zeichenkette dient. Character 80 betrachtet die in x und y angegebene Grafik-Cursorposition, als Mittelpunkt des ersten Buchstabens in der Zeichenkette q$.</p>
+
+        <p>Der nächste und vielleicht auffälligste Unterschied zwischen neuer und alter CHAR-Routine ist die Möglichkeit, Textzeilen nicht nur waagerecht (w=0), sondern auch senkrecht aufwärts (w=90) und abwärts (w=270) und auf dem Kopf stehend (w=180) auszugeben. Dabei wird berücksichtigt, daß die Auflösung in x-Richtung mit 640 Punkten wesentlich höher ist als die 200-Punkte-Auflösung in y-Richtung. Durch Einführen eines drehwinkelabhängigen Korrekturfaktors wurde erreicht, daß ein und dieselbe Textzeile in y-Richtung fast genauso lang und so hoch erscheint wie in x-Richtung. Wie oben dargestellt, werden für w auch andere als die genannten Werte akzeptiert. Die Auflösung von 8 x 8 Punkten pro Buchstaben reicht aber leider nicht, um für beliebige Winkel lesbare Darstellungen zu erreichen. Character 80 kann auf zwei verschiedene Schriftgrößen eingestellt werden. Voreingestellt ist eine vergrößerte Schrift, die etwa 40 Zeichen in der Waagerechten erlaubt. Mit</p>
+
+        <pre><code>POKE 5061,128: POKE 5066,144: POKE 5108,48</code></pre>
+
+        <p>kann auch auf die normale 80-Zeichen-Schrift umgestellt werden. Mit</p>
+
+        <pre><code>POKE 5061,223: POKE 5066,239: POKE 5108,192</code></pre>
+
+        <p>kann die vergrößerte Schrift gewählt werden. Vor allem beim Senkrechtschreiben ist die zuletzt genannte Betriebsart der besseren Lesbarkeit wegen vorzuziehen.</p>
+
+        <p>Und noch eine dritte wichtige Änderung der CHAR-Routine wurde mit Character 80 eingeführt: Abhängig davon, ob im Textmodus (mit CHR$(14) beziehungsweise CHR$ (142)) Groß-/Grafik- oder Groß-/Kleinschrift eingestellt wurde, stellt auch der neue CHAR-Befehl Groß-/Grafik- oder Groß-/Kleinschrift dar. Dadurch wird der gesamte Zeichensatz des CHAR-ROMs nutzbar. Die Umschaltung Invers-/Normalschrift kann jetzt innerhalb von q$ mit den vom PRINT-Befehl her bekannten Steuerzeichen vorgenommen werden, ebenso wie das Hoch- und Tiefstellen von ganzen Textteilen in Halbschritten. Auf diese Weise kann eine ganze Textzeile, egal wie viele Indizes, Potenzen und Inversteile sie enthält, mit einem einzigen Befehl ausgegeben werden. Auch mehrfaches Tiefer- oder Höherstellen hintereinander wird erkannt.</p>
+
+        <p>Nach der ausführlichen Beschreibung der Möglichkeiten der neuen CHAR-Routine nun zum praktischen Teil! Es folgt ein »Sechs-Stufen-Plan« zum Einfügen des neuen Befehls in das Grafikpaket Graphik 80.</p>
+
+        <p>1) Laden Sie das Basic-Programm Graphik 80.</p>
+
+        <p>2) Fügen Sie die abgedruckten Basic-Zeilen (Listing 1) in das Programm ein.</p>
+
+        <p>3) Ersetzen Sie die Zahl 215 in Zeile 10100 durch die Zahl 183 und die Zahl 103 in Zeile 10120 durch die Zahl 26.</p>
+
+        <p>4) Ersetzen Sie in Zeile 5580 die Endadresse des zu speichernden Bereichs ($1ab7) durch die neue Endadresse ($1c00).</p>
+
+        <p>5) Löschen Sie die alte und speichern Sie die neue Version von Graphik 80.</p>
+
+        <p>6) Starten Sie das Programm mit RUN.</p>
+
+        <p>Wenn das Programm ohne Fehlermeldung abgelaufen ist und sich kein Fehler beim Abtippen der DATA-Zeilen eingeschlichen hat, dann befindet sich jetzt das fertige neue Grafikpaket Graphik 80 auf Ihrer Diskette. Sie können es wie gewohnt mit</p>
+
+        <pre><code>BLOAD "GRAPHIK-80.m": SYS DEC ("1303")</code></pre>
+
+        <p>laden und starten.</p>
+
+        <h2>Ein bißchen Theorie</h2>
+
+        <p>Die meisten Leser, vorausgesetzt, daß sie bis hierher durchgehalten haben, werden nun fragen: Wie funktioniert der CHAR-Befehl überhaupt? Auch Leser, die (noch) keinen C 128 besitzen und ihren eigenen CHAR-Befehl schreiben wollen, werden sich dafür interessieren, nach welchem Prinzip der CHAR-Befehl aufgebaut ist:</p>
+
+        <p>Allen Zeichen des CBM-Zeichensatzes liegt eine Matrix aus 8 x 8 Punkten zugrunde. Acht nebeneinanderliegende Punkte in der Horizontalen werden von den acht Bit eines Bytes im CHAR-ROM dargestellt. Acht solcher Zeilen (entsprechend acht Byte im CHAR-ROM) in der Vertikalen bilden die Matrix für ein Zeichen. Alle Bits in dieser Matrix, die den Wert »1« haben, liefern einen farbigen Punkt auf dem Bildschirm. Alle Bits mit dem Wert »0« werden in der Farbe des Bildschirmhintergrundes dargestellt. Es gibt 128 verschiedene Zeichen im Commodore-Zeichensatz, die wahlweise normal oder invertiert ausgegeben werden können. Insgesamt werden also 256 x 8 = 2 KByte Speicherplatz für einen Zeichensatz benötigt. Welches dieser 256 verschiedenen Zeichen an welcher Stelle auf dem Bildschirm erscheinen soll, das ist im Bildschirmspeicherbereich vermerkt: Jedem Platz auf dem Bildschirm ist genau ein Platz im Video-RAM zugeordnet. Steht im zehnten Speicherplatz des Video-RAMs eine »24«, dann wird an der zehnten Position auf dem Bildschirm das 24. Zeichen des CHAR-ROMs dargestellt. Im CHAR-ROM sind für dieses Zeichen die 8 Byte von 24 x 8 (=192) bis 24 x 8 + 7 (=199) reserviert. Zusätzlich zum Video-RAM gibt es noch einen genauso großen Farbspeicherbereich. Zu jedem Byte im Video-RAM gehört genau ein Byte im Color-RAM. In diesem Byte ist verzeichnet, in welcher Farbe das Zeichen erscheinen soll, und – im Falle des 8563 im C 128 – ob es blinkend oder mit Unterstreichung dargestellt wird. Diese Überlegungen gelten nur für den Textmodus. In dieser Betriebsart übernimmt der Videocontroller die Aufgabe, die den Zeichen des Video-RAM entsprechenden Bytes aus dem CHAR-ROM zu holen und an der richtigen Stelle auf den Bildschirm zu zeichnen. Schaltet man dagegen den Grafikmodus ein, dann wird die gesamte Zeicheninformation nur aus dem Video-RAM ausgelesen, der CHAR-ROM-Bereich wird nicht mehr angesprochen. Gleichzeitig wird aber ein sehr viel größerer Bildschirmspeicher benötigt: 1 Bit für jeden Punkt, also rund 16 KByte bei einer Auflösung von 200 x 640 Punkten (mehr zu diesem Thema im Beitrag Graphik 80). Da aber der Videocontroller nur noch Punkte darstellen kann, braucht man ein eigenes Programm, um die Zeichen aus dem CHAR-ROM auf dem Bildschirm abzubilden. Alle 64 Punkte der 8 x 8-Matrix müssen einzeln ermittelt und über die Routine »Punkt setzen« ausgegeben werden. Genauso macht es auch Character 80. Zunächst wird der Grafik-Cursor vom Mittelpunkt auf den rechten oberen Eckpunkt der 8 x 8-Matrix verschoben. Dann wird das erste Byte des Buchstabens, den man darstellen will, aus dem CHAR-ROM geholt. Man liest das erste Bit dieses Bytes und setzt einen Punkt an die Position des Grafik-Cursors, wenn das Bit »1« ist. Ist das Bit »0«, dann geschieht nichts. Danach wird der Cursor in waagerechter Richtung um einen Punkt nach links verschoben. Man liest das zweite Bit, gibt den nächsten Punkt aus, rückt den Cursor eins weiter nach links und so weiter, bis alle acht Bit abgearbeitet sind. Dann holt man das zweite Byte des gewählten Buchstabens, setzt den Cursor eins tiefer und anschließend auf den rechten Rand zurück. Von dort beginnt das Spiel von vorn: Achtmal untereinander, acht Punkte nebeneinander. Dabei ist es unwesentlich, ob man, wie hier für Character 80 beschrieben, rechts oben oder links unten anfängt. Nachdem der letzte Punkt des Buchstabens gezeichnet ist, wird der Grafik-Cursor auf den Mittelpunkt des folgenden Buchstabens verschoben, die Routine ist bereit für das nächste Zeichen.</p>
+
+        <p>Welche Zeichen ausgegeben werden, das steht in der Zeichenkette q$. CHAR geht so vor: Es nimmt den ersten Buchstaben der Kette, stellt fest, das wievielte Zeichen im CHAR-ROM diesem Buchstaben entspricht (CBM-ASCII – Bildschirmcode – Wandlung) und gibt dieses Zeichen aus. Dann wird das zweite Zeichen geholt, ausgewertet und ausgegeben und so weiter bis zum Ende der Zeichenkette. Steuerzeichen innerhalb dieses Strings werden einfach übergangen. Nur die Steuerzeichen ⟨CSR UP⟩, ⟨CSR DOWN⟩, ⟨RVS ON⟩ und ⟨RVS OFF⟩ werden (in unserem Fall!) erkannt. ⟨CSR UP⟩ bewirkt, daß der Grafik-Cursor vier Zeilen (<sup>1</sup>/<sub>2</sub> Buchstabe) nach oben verschoben wird, ⟨CSR DOWN⟩schiebt ihn vier Zeilen nach unten. ⟨RVS ON⟩ setzt ein Flag, das bei der Ermittlung der CHAR-ROM-Adresse abgefragt wird. ⟨RVS OFF⟩ löscht dieses Flag wieder. Das RVS ON-Flag ist die Vier, das RVS OFF-Flag die Null. Die Zahlen wurden gerade deshalb ausgewählt, weil man so nur das RVS-Flag zum High-Byte der CHAR-ROM-Anfangsadresse addieren muß, um den richtigen Speicherbereich zu treffen. Ein Beispiel zur Erklärung: Der CHAR-ROM-Speicher für Groß-/Kleinschrift beginnt bei $d800, der inverse Groß-/Kleinschriftzeichensatz bei $dc00; ist der Inversmodus ausgeschaltet, dann ist das RVS-Flag 0: $d8+$0=$d8; bei eingeschaltetem Inversmodus ist das RVS-Flag 4: $d8+$4=$dc. Ob als Anfangsadresse $d000 für Groß-/Grafikschrift oder $d800 für Groß-/Kleinschrift gewählt wird, das hängt vom Inhalt der Speicherstelle $f1 ab, die unter anderem anzeigt, welcher der beiden Zeichensätze schon im Textmodus voreingestellt wurde.</p>
+
+        <h2>Koordinatentransformation</h2>
+
+        <p>Nun fehlt nur noch ein Punkt in der Beschreibung des Prinzips, nach dem Character 80 arbeitet: Wie dreht man die dargestellte Zeichenkette um den Mittelpunkt des ersten Buchstabens?</p>
+
+        <p>Der Mittelpunkt (x,y) des ersten Buchstabens ist der Ursprung eines gedachten kartesischen Koordinatensystems. Die Horizontale des Bildschirms ist die Richtung der x-Achse dieses Koordinatensystems, die Vertikale des Bildschirms ist die Richtung der y-Achse. Alle Bildpunkte innerhalb einer zusammenhängenden Zeichenkette eines CHAR-Befehls werden relativ zum Ursprungspunkt dieses Koordinatensystems berechnet: Der Mittelpunkt des zweiten Buchstabens erhält also zum Beispiel die Koordinaten (0,8), die rechte obere Kante des dritten Buchstabens die Koordinaten (-4,20) (y-Richtung wie die physikalische Richtung von oben nach unten). Alle Punkte eines Strings werden nach diesem Schema berechnet. Anschließend wird das Koordinatensystem um den Winkel w gedreht. Man könnte ebenso sagen: Der berechnete Punkt wird um den Ursprung des Koordinatensystems gedreht; der Algorithmus bleibt der gleiche. Er lautet:</p>
+
+        <p>x<sub>neu</sub> = w + y·sin w</p>
+
+        <p>y<sub>neu</sub> = y·cos w - x·sin w</p>
+
+        <p>Darin sind x und y die nicht gedrehten Koordinaten (relativ zum Ursprung des gedachten Koordinatensystems) und x<sub>neu</sub> und y<sub>neu</sub> die Koordinaten des gedrehten Koordinatensystems, die tatsächlich auf dem Bildschirm erscheinen. Nun taucht aber noch ein kleines Problem auf:</p>
+
+        <p>In x-Richtung ist die Auflösung unseres Bildschirms wesentlich höher als in y-Richtung, man sieht auch im HiRes-Modus die Bildschirmzeilen, aber nicht die -spalten. Deshalb müssen noch Korrekturfaktoren eingeführt werden, die dafür sorgen, daß dasselbe Wort in y-Richtung genauso lang erscheint wie in x-Richtung. Die vollständige Formel lautet dann:</p>
+
+        <p>x<sub>neu</sub> = k<sub>1</sub>·x·cos w + k<sub>2</sub>·y·sin w</p>
+
+        <p>y<sub>neu</sub> = y·cos w - k<sub>3</sub>·x·sin w</p>
+
+        <p>Als günstigste Werte für die Korrekturfaktoren wurden gefunden:</p>
+
+        <p>k<sub>1</sub> = 1,873; k<sub>2</sub> = 2; k<sub>3</sub> = 0,874.</p>
+
+        <p>Damit erhält man eine im Vergleich zum Textmodus leicht vergrößerte Darstellung. Mit k<sub>1</sub> = 1,126; k<sub>2</sub> = 2 und k<sub>3</sub> = 0,501 erhält man die Schrift in Originalgröße. In der Praxis (in unserem Fall) wird so verfahren, daß zuerst die einfachen Koordinaten ohne Drehung berechnet werden, dann die Drehung ausgeführt (im Assemblerlisting »jsr rotate«) und schließlich wird der berechnete Punkt eingezeichnet. Der beschriebene Algorithmus für die Drehung des Koordinatensystems um den Ursprung – zumindest in der allgemeinen Form ohne Korrekturfaktoren – ist übrigens nicht nur für Zeichendarstellung geeignet, sondern ein allgemeingültiger Koordinatentransformations-Algorithmus. Wer ihn für eigene Programme benutzen will, der findet im Assemblerlisting zu Character 80 das ohne die anderen Programmteile von Graphik 80 lauffähige Unterprogramm »rotate«. Dort ist die Parameterübergabe an das Unterprogramm genau beschrieben. Im Assemblerlisting Character 80 ist auch die praktische Programmierung der gesamten CHAR-Anweisung beschrieben, weitere Kommentare sind also wohl nicht mehr nötig.</p>
+
+        <p>Zum Schluß noch ein Tip für experimentierfreudige Assemblerprogrammierer: Das Programm ist so geschrieben, daß Drehungen der Schrift um beliebige Winkel möglich sind. Leider sind die Schriftzeichen bei einer Auflösung von 8 x 8 Punkten bei nicht-rechtwinkligen Drehungen unleserlich. Abhilfe könnte hier vielleicht eine Verdopplung der Auflösung auf 16 x 16 Punkte schaffen. Im Assemblerlisting müssen zu diesem Zweck nur wenige Konstanten geändert werden. Die meiste Arbeit ist es aber, einen neuen Zeichensatz mit 32 Byte pro Zeichen zu entwickeln. Doch nur Mut, wir sind gespannt auf Ihre Ergebnisse. Und noch ein Tip: Der Basic-Interpreter akzeptiert bei manchen Befehlen außer »absoluten«, kartesischen Koordinaten (x,y) auch Polarkoordinaten der Form (r;w). Der Interpreter erkennt Polarkoordinaten daran, daß x und y nicht durch ein Komma, sondern durch ein Semikolon voneinander getrennt sind. Der Radius r ist die Zahl vor dem Semikolon, der Winkel w steht nach dem Semikolon. Die Verfasser haben das folgende Beispiel ausprobiert:</p>
+
+        <!-- So im Heft gedruckt: Das Beispielprogramm steht im Heft zwischen dem letzten Absatz und der Autorenzeile. -->
+        <pre><code>10 GRAPHIC 6,1
+20 FOR I=0 TO 360
+30 DRAW ,320,100 TO 80;I
+40 DRAW 0,320,100 TO 80;I
+50 NEXT I
+60 GRAPHIC 5
+</code></pre>
+
+        <address class="author">(Dieter Winkler/Thomas Rumbach/og)</address>
+
+        <figure>
+            <pre>4200 REM " *** <u>N</u>EUE <u>C</u><u>H</u><u>A</u><u>R</u>-<u>R</u>OUTINE LADEN *** "
+4220 :
+4240 PRINT TAB(25) "<u>N</u>EUE <u>C</u><u>H</u><u>A</u><u>R</u>-<u>R</u>OUTINE"
+4260 A= DEC("1AB7"): E= DEC("1BFF")
+4280 GOSUB 8000
+4300 :
+4320 A= DEC("139E"): E= DEC("13FF")
+4340 GOSUB 8000
+4360 :
+5550 SCRATCH "GRAPHIK-80.M"
+14150 :
+15000 REM " *** <u>D</u>ATAS F<span style="text-decoration: overline;">X</span>R DIE <u>C</u><u>H</u><u>A</u><u>R</u>-<u>R</u>OUTINE *
+      ** "
+15010 :
+15020 DATA 169,0,141,0,255,162,25,32,218,205
+      ,48,3,76,215,103,32,50,158,162,31
+15030 :
+15040 DATA  32,82,158,32,6,158,140,92,17,141
+      ,93,17,169,0,162,7,157,96,17,202
+15050 :
+15060 DATA  16,250,133,113,32,92,121,32,123,
+      135,133,112,164,113,196,112,240,19
+15070 :
+15080 DATA 169,127,141,0,255,177,36,162,0,14
+      2,0,255,32,5,27,230,113,208,231
+15090 :
+15100 DATA  96,168,201,18,208,4,169,4,208,6,
+      201,146,208,5,169,0,133,243,96,201
+15110 :
+15120 DATA 145,208,15,56,173,98,17,233,4,141
+      ,98,17,176,3,206,99,17,96,201,17
+15130 :
+15140 DATA 208,15,24,173,98,17,105,4,141,98,
+      17,144,3,238,99,17,96,41,127,201
+15150 :
+15160 DATA  32,144,193,152,201,128,176,12,20
+      1,96,144,4,41,223,176,8,41,191,144
+15170 :
+15180 DATA   4,41,127,9,64,162,0,160,3,133,1
+      08,134,109,6,108,38,109,136,208,249
+15190 :
+15200 DATA  24,165,108,105,0,133,108,165,109
+      ,166,241,48,3,105,208,44,105,216
+15210 :
+15220 DATA 101,243,133,109,32,239,27,162,1,1
+      42,0,255,160,7,177,108,72,136,16
+15230 :
+15240 DATA 250,162,0,142,0,255,162,8,134,106
+      ,134,107,104,42,72,144,6,32,158
+15250 :
+15260 DATA  19,32,0,20,238,96,17,208,3,238,9
+      7,17,198,107,208,233,24,169,1,109
+15270 :
+15280 DATA  98,17,141,98,17,144,3,238,99,17,
+      104,56,173,96,17,233,8,141,96,17
+15290 :
+15300 DATA 176,3,206,97,17,162,8,198,106,208
+      ,196,56,173,98,17,233,4,141,98,17
+15310 :
+15320 DATA 176,3,206,99,17,24,173,96,17,105,
+      12,141,96,17,144,3,238,97,17,96
+15330 :
+15340 DATA  56,173,96,17,233,4,141,96,17,176
+      ,3,206,97,17,76,27,27
+15350 :
+15360 DATA 160,43,32,116,154,162,3,189,96,17
+      ,157,84,17,157,88,17,202,16,244
+15370 :
+15380 DATA 169,144,32,243,154,14,84,17,46,85
+      ,17,14,86,17,46,87,17,162,39,160
+15390 :
+15400 DATA 223,32,243,19,160,239,162,35,32,2
+      43,19,160,37,32,109,157,162,31,32
+15410 :
+15420 DATA 112,157,141,49,17,140,50,17,162,3
+      9,160,41,32,124,157,162,33,32,112
+15430 :
+15440 DATA 157,141,51,17,140,52,17,96,169,19
+      2,32,174,157,157,49,17,152,157,50
+15450 :
+15460 DATA 17,96</pre>
+            <figcaption>Listing 1. Fügen Sie die Basic-Zeilen in das Basic-Programm »Graphik 80« ein und nehmen Sie bitte die im Text erwähnten Änderungen vor</figcaption>
+        </figure>
+        <div style="display: none;">
+            <pre data-filename="character-80.a" data-name="Character-80.a"></pre>
+        </div>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,117 @@
+;datawandler v3.5.prg ==1c01==
+;version=70
+    1 scnclr:print"{home}{home}":window0,0,39,24,1
+    2 gosub30
+    3 rem" *****  einlesen und schreiben der datas  *****
+    4 fast:ifsw=0thensw=1:banksb
+    5 ifaf$="h"thenre$="r$":he$="dec(r$)":sy$="dec("+chr$(34)+hex$(b)+chr$(34)+")":elsere$="r":he$="r":sy$=str$(b)
+    6 print"{clr} delete 29-":print:print:  print"goto 7":goto22
+    7 z1$=str$(z)+" fast:bank"+str$(sb):print"{clr}"z1$
+    8 z=z+s:z2$=str$(z)+" fora="+str$(b)+"to"+str$(e)+":read"+re$+":pokea,"+he$+":next":printz2$
+    9 z=z+s:z3$=str$(z)+" slow: sys "+sy$:printz3$:z=z+s:print"goto 11"
+   10 goto21
+   11 bz=0
+   12 scnclr:
+   13 printz;"data";
+   14 ifaf$="d"then15:else16
+   15 ford=btob+7:t=peek(d):t$=str$(t):t$=right$(t$,len(t$)-1):t$=right$("000"+t$,3):printt$;",";:next:goto17
+   16 forj=btob+7:t$=right$(hex$(peek(j)),2):printt$;",";:next
+   17 printchr$(20)
+   18 z=z+s:b=b+8:bz=bz+1
+   19 ifbz<7 and b< e+1 then goto 13
+   20 if b < e+1then print"goto 11":elseslow:print"delete -28"
+   21 print:print
+   22 poke842,19
+   23 fortp=843 to 843+9
+   24 poketp,13
+   25 next
+   26 poke208,10
+   27 end
+   28 slow
+   29 rem"  *****   aufbau des menue's  *****
+   30 fast:scnclr:color0,1 :color4,1:
+   31 print"{gry1}{rvon}M                                      N {gry3}{rvof}UDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDI{rvon}{gry1} "
+   32 forl=1to20
+   33 print"{gry1}{rvon} {rvof}{gry3}G                                    H{gry1}{rvon} "
+   34 next:
+   35 print"{gry1}{rvon} {rvof}{gry3}JFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFK{rvon}{gry1} N                                      M"
+   36 print"{home}{wht}{down}{down}{down}{rght}{rght}{rght}1) adressen hexadezimal oder{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}dezimal eingeben (h/d)
+   37 print"{down}{rght}{rght}{rght}2) startadresse       :"
+   38 print"{down}{rght}{rght}{rght}3) endadresse         :"
+   39 print"{down}{rght}{rght}{rght}4) erste zeilennummer :"
+   40 print"{down}{rght}{rght}{rght}5) schrittweite       :"
+   41 print"{down}{rght}{rght}{rght}6) datas hexadezimal oder{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}dezimal ausgeben (h/d)"
+   42 print"{down}{rght}{rght}{rght}7) speicherbank (0-15):"
+   43 slow:print:print:print
+   44 rem"  *****   menue abfrage  *****
+   45 trap113:forc=1to7:print"{wht}{up}{rght}{rght}{rght}meine antwort auf        {left}{left}{left}{left}{left}{left}{left}{left}";c;"{red}"
+   46 onc gosub51,60,70,80,90,100,110
+   47 next
+   48 print"{wht}{up}{rght}{rght}{rght}eingaben okay ?  (j/n)":getkeye$:ife$<>"j"ande$<>"n"then48:elseife$="j"thengoto49:else30
+   49 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":fora=1to19:print"{up}{up}{rght}{rght}{rght}                                  {rght}{rght}{rght}";:next:window2,2,37,21:goto4
+   50 rem"  *****  adressen hex. oder dez. eingeben ?  *****
+   51 poke55485,2:getkeya1$:ifa1$<>"h"anda1$<>"d"then51:elsehd$=a1$:ifhd$="h"thenpoke1213,8:return:elsepoke1213,4:return
+   52 :
+   53 :
+   54 :
+   55 :
+   56 :
+   57 :
+   58 :
+   59 rem"  *****   startadresse   *****
+   60 st$="":ifhd$="h"theng=4:elseg=5
+   61 print"{up}"tab(23):fork=1tog:getkeym$(k):st$=st$+m$(k):print;m$(k);:next:ifhd$="h"then62:else63
+   62 b=dec(st$):print"{home}{down}{down}{down}{down}{down}{down}";tab(26);"$"hex$(b);b:forv=1to14:print:next:return
+   63 b=val(st$):print"{home}{down}{down}{down}{down}{down}{down}";tab(26);"$"hex$(b);b:forv=1to14:print:next:return
+   64 :
+   65 :
+   66 :
+   67 :
+   68 :
+   69 rem"  *****   endadresse   *****
+   70 st$="":ifhd$="h"theng=4:elseg=5
+   71 print"{up}"tab(23):fork=1tog:getkeym$(k):st$=st$+m$(k):print;m$(k);:next:ifhd$="h"then72:else73
+   72 e=dec(st$):print"{home}{down}{down}{down}{down}{down}{down}{down}{down}";tab(26);"$"hex$(e);e:forv=1to12:print:next:return
+   73 e=val(st$):print"{home}{down}{down}{down}{down}{down}{down}{down}{down}";tab(26);"$"hex$(e);e:forv=1to12:print:next:return
+   74 :
+   75 :
+   76 :
+   77 :
+   78 :
+   79 rem"  *****    erste zeilennummer    *****
+   80 ze$="":print"{up}"tab(23)"     {left}{left}{left}{left}{left}";:fork=1to5:getkeyz$:ifz$=chr$(13)then81:elseze$=ze$+z$:print;z$;:next
+   81 z=val(ze$):ifz<30thenprint:goto80:else print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(26)z:forv=1to10:print:next:return
+   82 :
+   83 :
+   84 :
+   85 :
+   86 :
+   87 :
+   88 :
+   89 rem  *****   schrittweite   *****
+   90 sw$="":print"{up}"tab(23)"     {left}{left}{left}{left}{left}";:fork=1to2:getkeys$:ifs$=chr$(13)then91:elsesw$=sw$+s$:prints$;:next
+   91 s=val(sw$):print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(26)s:forv=1to8:print:next:return
+   92 :
+   93 :
+   94 :
+   95 :
+   96 :
+   97 :
+   98 :
+   99 rem"  *****  datas hex. oder dez. ausgeben  *****
+  100 poke55925,2:getkeya1$:ifa1$<>"h"anda1$<>"d"then100:elseaf$=a1$:ifaf$="h"thenpoke1653,8:return:elsepoke1653,4:return
+  101 :
+  102 :
+  103 :
+  104 :
+  105 :
+  106 :
+  107 :
+  108 :
+  109 rem"  *****   speicherbank   *****
+  110 sb$="":print"{up}"tab(23)"     {left}{left}{left}{left}{left}";:fork=1to2:getkeyb$:ifb$=chr$(13)then111:elsesb$=sb$+b$:printb$;:next
+  111 sb=val(sb$):ifsb>15thenprint:goto110:elseprint"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(26)sb:forv=1to3:print:next:return
+  112 rem"  *****    fehlerbehandlung    *****
+  113 trap113:fz=el
+  114 fz=int(fz/10):print"{left}{left}{left}{left}{left}     {left}{left}{left}{left}{left}"
+  115 onfz-5goto60,70,80,90,100,110

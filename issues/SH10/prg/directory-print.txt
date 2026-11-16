@@ -1,0 +1,80 @@
+;directory-print.prg ==1c01==
+;version=70
+   10 rem *******************************
+   20 rem **   3*directory-print       **
+   30 rem **    h. t e t e n s         **
+   40 rem **(c)****************31.5.1986*
+   50 :
+   60 print"{clr}{down} {rvon}    * * *  h.  t e t e n s   * * * (c){rvof}"
+   70 print"{down}{down} dieses programm druckt das directory"
+   80 print"   des c-64 oder c-128 slow+fast (!)"
+   90 print"{down} 3-/5-spaltig in index+schmalschrift"
+  100 g=rwindow(2):if g=80 then 160
+  110 print"{down} (1) 40-zeichen-modus"
+  120 print" (2) 80-zeichen-modus: doppelte geschw.":poke 198,0
+  130 : getkey g$:if g$<"1"org$>"2" then 130
+  140 : if g$="1"then 500:else print"{down}{rvon}80-zeichen-modus ein{rvof}, dann return"
+  150 : input g$:if g$=""then 100
+  160 : fast
+  500 dim f$(200):gosub 3000:rem ---drucker-auswahl, schrift-auswahl
+  510 print"{down}{down}{down}{rvon}menu:{rvof}"
+  520 print" (0) gelesene diskette nochmal drucken"
+  530 print" (1) naechste disk lesen, 1 mal drucken"
+  540 print" (2) naechste disk lesen, 2 mal drucken"
+  550 print" (3) naechste disk lesen, 3 mal drucken"
+  560 print" (4) naechste disk lesen, 4 mal drucken"
+  570 print" 8d) drucker, schrift aendern"
+  580 print" (e) ende":g$="":poke 198,0
+  590 get g$:if g$="e"then slow:end
+  600 : if g$="d" then gosub 3000:goto 510
+  610 : if g$="" or g$<"0"or g$>"9"then 590
+  620 : if g$="0"then f9=1:goto 2020
+  630 f9=val(g$)
+  640 :
+ 1000 : open1,8,0,"$":rem * * * * * * * leseroutine * * * * * * *
+ 1010 :  print"{down}{rvon}";
+ 1020 :  get#1,a$,a$,a$,a$,a$,a$,a$
+ 1030 :  if st<>0 then print"{rvon}>>>kein directory vorhanden<<<{rvof}":close1:goto510
+ 1040 :  a=0:for i=0 to 6:f$(i)="  ":next
+ 1050 :     for i=len(f$(a)) to 25
+ 1060 :      get#1,a$:if a$=chr$(34)then 1080
+ 1070 :      f$(a)=f$(a)+a$
+ 1080 :     next:print f$(a):a=a+1
+ 1090 :  get#1,a$:ifa$<>"" then 1090
+ 1100 :  get#1,a$,b$:if a$=""and b$=""then 1140
+ 1110 :  get#1,a$,b$:c$=str$(asc(a$)+asc(b$)*256):f$(a)=right$("   "+c$+" ",5)
+ 1120 :  for i=0 to 5-len(c$):get#1,a$:nexti
+ 1130 :  goto1050
+ 1140 : close1
+ 1150 :
+ 2000 fz$=c$+" block frei.":f$(a-1)=".":b=a-1
+ 2010 if b/s<>int(b/s) then b=b+1:goto 2010
+ 2020 : open 1,4,(f0-1):rem     * * * * * druckerroutine * * * * *
+ 2030 :  if f1=1 then print#1,chr$(27)chr$(15);
+ 2040 :  if f2=1 then print#1,chr$(27)chr$(83)chr$(1);chr$(27)chr$(65)chr$(5);
+ 2050 :    for i=1 to f9
+ 2060 :     print#1,"** h.tetens **";chr$(14);f$(0);chr$(20);fz$
+ 2070 :      for j=1 to 79:print#1,"=";:next j:print#1
+ 2080 :         for k=1 to b/s:n$=""
+ 2090 :          for l=0 to s:print#1,n$;f$(k+l*b/s);:n$=" ":nextl:print#1
+ 2100 :         next k:if f9>1 then print#1:print#1:print#1
+ 2110 :    next i
+ 2120 :  print#1,chr$(27)chr$(64)
+ 2130 : close1
+ 2140 goto 510
+ 2150 :
+ 3000 print"{down}{down}{down}bitte "chr$(18)"drucker"chr$(146)" einschalten,  waehlen:"
+ 3010 print" (1) fx-8o epson":print" (2) f+ riteman":poke 198,0
+ 3020 : getkey g$:if g$>="1"and g$<="2" then f0=val(g$):else goto 3020
+ 3030 : if f0=1 then print"{down}{rvon}fx-80 -schrift:{rvof}":else print"{down}{rvon}f+ -schrift:{rvof}"
+ 3040 print" (1) normal-schrift, din a-4, 3-spaltig"
+ 3050 print" (2) index-schrift,  din a-4, 3-spaltig"
+ 3060 print" (3) schmal-schrift, disk,    3-spaltig"
+ 3070 print" (4) index + schmal, disk,    3-spaltig"
+ 3080 print" (5) schmal-schrift, din a-4, 5-spaltig"
+ 3090 print" (6) index + schmal, din a-4, 5-spaltig":poke 198,0
+ 3100 : getkey g$:if g$<"1"or g$>"6" then 3100
+ 3110 : g=val(g$):s=3:if g>=5 then s=5:g=g-2     :rem 3/5-spaltig
+ 3120 :          f1=0:if g>=3 then f1=1:g=g-2    :rem schmal
+ 3130 :          f2=0:if g>=2 then f2=1          :rem schmal
+ 3140 return

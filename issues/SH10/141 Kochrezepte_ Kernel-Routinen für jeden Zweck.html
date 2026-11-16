@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Kochrezepte: Kernel-Routinen für jeden Zweck</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="ah">
+    <meta name="64er.issue" content="Sonderheft 10">
+    <meta name="64er.pages" content="141-148">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Tips & Tricks">
+    <meta name="64er.toc_title" content="Kernel-Routinen für jeden Zweck">
+    <meta name="64er.index_title" content="Kochrezepte: Kernel-Routinen für jeden">
+    <meta name="64er.index_category" content="Software-Grundlagen|Assembler">
+    <meta name="64er.id" content="rom">
+</head>
+
+<body>
+    <article>
+        <h1>Kochrezepte: Kernel-Routinen für jeden Zweck</h1>
+        <p class="intro">Um komfortabel und schnell Programme in Assembler zu schreiben, müssen Sie sich im Betriebssystem auskennen. Wir zeigen Ihnen, wo die wichtigen Routinen liegen und wie man sie anwendet.</p>
+
+        <p>Wenn Sie häufig Programme in Assembler schreiben, ist die im C 128 integrierte Software wie Betriebssystem und Basic-Interpreter für die eigene Programmentwicklung sehr hilfreich. So gut wie alle Routinen lassen sich von eigenen Maschinenprogrammen aus nutzen. Aber wie? Wie werden die Routinen aufgerufen, welche Parameter müssen ihnen übergeben werden, wie werden sie angewendet...? Die offenen Fragen, die auf den Programmierer zukommen, wachsen schnell ins Uferlose. Damit Sie nicht enttäuscht den C 128 in die Ecke stellen oder nur noch in Basic programmieren, geben wir Ihnen wertvolle Tips und Tricks, die Ihnen beim Programmieren in Assembler helfen.</p>
+
+        <h2>Der Bildschirm-Editor</h2>
+
+        <p>Um Programme oder Daten komfortabel eingeben zu können, enthält das Betriebssystem des C 128 einen Bildschirm-Editor, der – im Gegensatz zu vielen anderen Mikrocomputern – ein sogenannter »Fullscreen-Editor« ist. Dieser Typ eines Bildschirm-Editors erlaubt es dem Anwender, sich mit dem Cursor völlig frei auf dem Bildschirm zu bewegen, hier und dort Änderungen am Programm vorzunehmen, die beim Drücken der &lt;RETURN&gt;- beziehungsweise &lt;ENTER&gt;-Taste sofort ausgeführt werden.</p>
+
+        <p>Das Gegenstück hierzu, der sogenannte »Line-Editor«, erlaubt Cursor-Bewegungen und damit auch Änderungen nur innerhalb der aktuellen Bildschirmzeile. Basic-Programmzeilen, die geändert werden sollen, müssen hier zum Beispiel mit einer Art EDIT-Befehl extra aufgerufen werden, um dann einzeln bearbeitet werden zu können.</p>
+
+        <p>Vom Basic-Interpreter oder vom Betriebssystem her beschränken sich die Funktionen des Editors im wesentlichen auf zwei Funktionen: Das Einlesen von Zeichen über die Tastatur und das Ausgeben von Zeichen auf dem Bildschirm. Hinzu kommen beim C 128 noch einige Funktionen, die zum Beispiel Bildschirmfenster setzen und ähnliches.</p>
+
+        <p>Der Aufruf der Editor-Funktionen erfolgt über eine Sprungleiste. Unter einer Sprungleiste ist eine Reihe von JUMP-Befehlen zu verstehen, die ihrerseits zu den eigentlichen Arbeitsroutinen springen. Hier werden Sie sich fragen, wozu solch eine Sprungleiste nützlich ist. Auf den ersten Blick stellt sie doch lediglich eine gewisse Platzverschwendung und, gerade bei zeitkritischen Programmen, eine Verlängerung der Befehls-Ausführungszeit dar.</p>
+
+        <p>Der Grund ist eigentlich ganz einfach. Auch Betriebssysteme sind Programme, und für Programme gilt der schöne Satz: Ein Programm ist nie fehlerfrei; es sei denn, es ist veraltet.</p>
+
+        <p>Während der Programmierung eines doch recht umfangreichen Betriebssystems treten immer wieder Fehler zutage, die eine Änderung am Programm erfordern. Hiermit geht aber leider auch eine gewisse Verschiebung der Programmroutinen einher, womit ebenfalls alle Programme zu ändern wären, die auf das Betriebssystem oder, in diesem Fall den Editor, zugreifen.</p>
+
+        <p>Bei Verwendung einer Sprungleiste ist man dieser Arbeiten enthoben, da die Adresse der Funktion innerhalb der Sprungleiste immer gleich bleibt. Nur die JUMP-Befehle zeigen jetzt unter Umständen auf andere Adressen.</p>
+
+        <p>An dieser Stelle sollen die wichtigsten Routinen des Betriebssystem kurz erläutert werden, um aufzuzeigen, wie der Assembler-Programmierer diese Routinen sinnvoll verwenden kann.</p>
+
+        <p>Weiterhin wollen wir ein wenig unsere Trickkiste öffnen und – gerade am noch recht unbekannten C 128 – ein paar Tricks und Kniffe zeigen. Hierzu gehört unserer Meinung nach aber auch dann und wann ein Hinweis auf das, was man einen guten Programmierstil nennt, zum Beispiel auch die Verwendung der oben erwähnten Sprungleisten, gerade auch in Ihren eigenen Programmen. Umfangreiche Programme haben die Eigenart, nie ganz fertig zu sein und gerade die Verwendung solcher, doch eigentlich ganz simpler, Hilfsmittel kann eine Menge Arbeit ersparen. Vor allem dann, wenn man nicht so komfortable Hilfsmittel wie einen Assembler zur Verfügung hat, der ein Programm, von sagen wir acht KByte, vollständig neu assembliert; natürlich unter Umrechnung aller absoluten Sprünge.</p>
+
+        <p>Die erwähnte Sprungleiste umfaßt 16 Funktionen, die teilweise vom Anwender verwendet werden können und die auch das restliche Betriebssystem verwendet.</p>
+
+        <p>Zunächst einmal eine tabellarische Auflistung der möglichen Funktionen:</p>
+
+        <table class="plain">
+            <tr>
+                <th>Name</th>
+                <th>Adresse</th>
+                <th>Funktion</th>
+            </tr>
+            <tr>
+                <td>jpcint</td>
+                <td>$C000</td>
+                <td>Videochip/Editor initialisieren</td>
+            </tr>
+            <tr>
+                <td>jdsply</td>
+                <td>$C003</td>
+                <td>Ausgabe AC auf Schirm, Attribut in XR</td>
+            </tr>
+            <tr>
+                <td>jlp2</td>
+                <td>$C006</td>
+                <td>Zeichen aus Tastatur-Puffer nach AC</td>
+            </tr>
+            <tr>
+                <td>jloop5</td>
+                <td>$C009</td>
+                <td>Zeichen vom Schirm nach AC</td>
+            </tr>
+            <tr>
+                <td>jprint</td>
+                <td>$C00C</td>
+                <td>Schirm-Ausgabe AC</td>
+            </tr>
+            <tr>
+                <td>jscorg</td>
+                <td>$C00F</td>
+                <td>Schirm-Organisation lesen</td>
+            </tr>
+            <tr>
+                <td>jkey</td>
+                <td>$C012</td>
+                <td>Tastatur-Abfrage</td>
+            </tr>
+            <tr>
+                <td>jrep</td>
+                <td>$C015</td>
+                <td>Code aus Tast.-Tab. holen, REPEAT-Test</td>
+            </tr>
+            <tr>
+                <td>jplot</td>
+                <td>$C018</td>
+                <td>Cursor-Position lesen/schreiben</td>
+            </tr>
+            <tr>
+                <td>jcurs</td>
+                <td>$C01B</td>
+                <td>Cursor-Position im 80-Zeichen-BS setzen</td>
+            </tr>
+            <tr>
+                <td>jesc</td>
+                <td>$C01E</td>
+                <td>Bearbeitung der ESC-Funktionen</td>
+            </tr>
+            <tr>
+                <td>jkyset</td>
+                <td>$C021</td>
+                <td>Funktionstaste belegen</td>
+            </tr>
+            <tr>
+                <td>jrsirq</td>
+                <td>$C024</td>
+                <td>Raster-Interrupt bearbeiten</td>
+            </tr>
+            <tr>
+                <td>jint80</td>
+                <td>$C027</td>
+                <td>80-Zeichen-Schirm initialisieren</td>
+            </tr>
+            <tr>
+                <td>jswap</td>
+                <td>$C02A</td>
+                <td>Umschalten 40/80-Zeichen-Schirm</td>
+            </tr>
+            <tr>
+                <td>jwind</td>
+                <td>$C02D</td>
+                <td>Schirm-Fenster definieren</td>
+            </tr>
+        </table>
+
+        <p>Die einzelnen Routinen werden im folgenden jeweils kurz besprochen, da sie einige der wichtigsten Routinen für die Kommunikation mit dem Computer von eigenen Programmen enthalten.</p>
+
+        <h3>jpcint ($C000) Videochip/Editor initialisieren</h3>
+
+        <p>Diese Routine setzt nach dem Einschalten des Computers beziehungsweise einem Drücken des RESET-Tasters die Grundeinstellung der Video-Controller und der für das Editorprogramm wichtigen Speicheradressen.</p>
+
+        <h3>jdsply ($C003) Ausgabe AC auf Schirm, Attribut in XR</h3>
+
+        <p>Hiermit kann ein beliebiges Zeichen direkt auf den Bildschirm gebracht werden, wobei das Zeichen im Akku stehen und bereits im Bildschirmcode vorliegen muß. Das X-Register muß das hierfür gültige Attribut-Byte enthalten, also die Farbinformation für den 40-Zeichen-Bildschirm, und für den 80-Zeichen-Bildschirm zusätzlich die Attribute für Unterstreichen, Blinken und so weiter. Das Attribut-Byte hat folgenden Aufbau:</p>
+
+        <table>
+            <tr>
+                <th>Bit</th>
+                <th>40-Zeichen-Schirm</th>
+                <th>80-Zeichen-Schirm</th>
+            </tr>
+            <tr>
+                <td>0-3</td>
+                <td>Farbinformation<br>0000 = Schwarz<br>0001 = Weiß<br>0010 = Rot<br>0011 = Grün<br>0100 = Violett<br>0101 = Dunkelgrün<br>0110 = Blau<br>0111 = Gelb<br>1000 = Hellbraun<br>1001 = Braun<br>1010 = Rosa<br>1011 = Dunkelgrau<br>1100 = Grau<br>1101 = Hellgrün<br>1110 = Hellblau<br>1111 = Hellgrau</td>
+                <td>Farbinformation<br>0000 = Schwarz<br>0001 = Grau<br>0010 = Blau<br>0011 = Hellblau<br>0100 = Dunkelgrün<br>0101 = Hellgrün<br>0110 = Dunkelgrau<br>0111 = Grün<br>1000 = Rot<br>1001 = Rosa<br>1010 = Hellbraun<br>1011 = Violett<br>1100 = Braun<br>1101 = Gelb<br>1110 = Hellgrau<br>1111 = Weiß</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>–</td>
+                <td>0 = Blinken aus<br>1 = Blinken an</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>–</td>
+                <td>0 = Unterstreichen aus<br>1 = Unterstreichen an</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>–</td>
+                <td>0 = Normale Darstellung<br>1 = Inverse Darstellung</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>–</td>
+                <td>0 = Grafik/Großbuchstaben<br>1 = Klein-/Großbuchstaben</td>
+            </tr>
+        </table>
+
+        <p>Im 40-Zeichen-Modus werden die Farben, und damit das Attribut-Byte, wie beim C 64 dargestellt. Es werden also lediglich die untersten 4 Bit verwendet.</p>
+
+        <p>Im 80-Zeichen-Modus wird lediglich das Bit 6 ($40) nicht verwendet. Wie auch beim 40-Zeichen-Bildschirm werden die inversen Zeichen durch ein gesetztes oberstes Bit des Schirmcodes dargestellt ($00 bis $7F = normales Zeichen, $80 bis $FF = inverses Zeichen). Das Bit 7 (Grafikdarstellung) ist im Zusammenhang mit der &lt;SHIFT+CBM&gt;-Taste zu sehen, mit der bekanntlich von Großbuchstaben/Grafikzeichen auf Klein-/Großschreibung umgeschaltet werden kann. Im Gegensatz zum 40-Zeichen-Modus beziehungsweise zum C 64 ist es hier aber möglich, Zeichen aus beiden Zeichensätzen gleichzeitig auf dem Schirm zu sehen. Während im 40-Zeichen-Modus der Zeichensatz umgeschaltet wird, bestimmt hier lediglich das oberste Bit des Attribut-Bytes, welcher Zeichensatz für das einzelne Zeichen herangezogen werden soll. Hierdurch sind insgesamt 512 verschiedene Schriftzeichen gleichzeitig auf dem Bildschirm darstellbar, und zwar 128 Zeichen, diese in inverser Darstellung (=256) und das Ganze noch in zwei Zeichensätzen (=512).</p>
+
+        <p>Der Zeichensatz des VDC befindet sich im eigenen 16-KByte-RAM-Bereich des VDC und kann mit eigenen Routinen verändert werden. Hierdurch ist es zum Beispiel möglich, die dort enthaltenen inversen Zeichen durch eigene Zeichen zu ersetzen, und die Revers-Darstellung durch das Setzen des entsprechenden Attribut-Bits zu erreichen. Hierdurch läßt sich die Anzahl der darstellbaren Zeichen noch einmal verdoppeln, so daß insgesamt 1024 (!) verschiedene Zeichen gleichzeitig auf dem Schirm sichtbar sein können.</p>
+
+        <p>Die Routine »jdsply« schreibt das Zeichen an die aktuell gesetzte Schreibposition, die durch die Speicherstellen »pnt« ($E0/$E1) als Basisadresse und »pntr« ($SEC) als ffset markiert wird. Die zugehörige Adresse im Attributspeicher wird durch die Routine selbständig errechnet und befindet sich nach der Rückkehr in der Adresse »user« ($E2/$E3).</p>
+
+        <h3>jlp2 $C006 Zeichen aus Tastaturpuffer nach AC</h3>
+
+        <p>Während des Interrupts werden Tastendrücke zunächst nur registriert und in den dafür vorgesehenen Tastaturpuffer von zehn Zeichen eingelesen. Mit der Routine »jlp2« können Sie nun aus eigenen Programmen Zeichen von der Tastatur holen, wobei die Zeichen dann aus dem Tastaturpuffer geholt werden, sofern dort Zeichen vorhanden sind.</p>
+
+        <p>Nach dem Aufruf der Funktion enthält der Akkumulator das gelesene Zeichen oder, wenn kein Tastendruck vorliegt, eine Null. Der Inhalt des Tastaturpuffers wird durch die Routine um dieses eine Byte vermindert. Die Speicherstelle »ndx« ($D0) gibt dabei an, wieviel Zeichen sich gerade im Tastaturpuffer befinden.</p>
+
+        <p>Die Funktionstasten &lt;F1&gt; bis &lt;F8&gt; sowie auch die &lt;HELP&gt;-Taste und die &lt;SHIFT+RUN/STOP&gt;-Taste werden dabei etwas anders behandelt. Auf die Funktionstasten &lt;F1&gt; bis &lt;F8&gt; können mit dem KEY-Befehl Texte oder auch Befehle gelegt werden, die dann beim Drücken der entsprechenden Taste ausgeführt werden. Hierzu dient ein weiterer Zähler »kyndx« ($D1), der angibt, wieviel Zeichen auszugeben sind und das Indexfeld »keyidx« ($D2), das auf das aktuelle Zeichen aus der Key-Definition zeigt. Die Funktionstasten haben dabei Vorrang vor dem normalen Tastaturpuffer. Wenn zum Beispiel die Tasten &lt;A&gt;, &lt;F1&gt; und &lt;B&gt; betätigt werden, werden bei mehrfachem Aufruf von »jlp2« zunächst die einzelnen Zeichen des Tastaturstrings der Funktionstaste &lt;F1&gt;, sofern vorhanden, zugewiesen und anschließend daran das »A« und das »B« gelesen.</p>
+
+        <h3>jloop5 $C009 Zeichen vom Schirm nach AC</h3>
+
+        <p>Die Routine »jloop5« liest ein Zeichen aus dem Bildschirmspeicher im ASCII-Format. Gelesen wird wieder aus der Adresse, die durch die aktuelle Bildschirmposition »pnt« ($E0/$E1) und den Offset »pntr« ($EC) angegeben wird. Nach der Rückkehr enthält der Akkumulator das gelesene Zeichen und die Variable »tcolor« ($F2) das dazugehörende Attribut-Byte.</p>
+
+        <h3>jprint $C00C Schirm-Ausgabe AC</h3>
+
+        <p>Mit Hilfe dieser Routine ist es möglich, ein Zeichen auf den Bildschirm zu bringen, wobei hier das Zeichen, im Gegensatz zur Routine »jdsply«, im ASCII-Format übergeben werden muß. Es können hier alle Zeichen, auch Steuerzeichen wie Cursor-Bewegungen, Farbumschaltungen und so weiter verwendet werden. Diese Routine wird zum Beispiel auch vom Basic innerhalb des PRINT-Befehls aufgerufen.</p>
+
+        <h3>jsorg $C00F Schirm-Organisation lesen</h3>
+
+        <p>Beim C 128 ist es, im Gegensatz zum C 64, wie bei den großen CBM-Computern möglich, ein Bildschirmfenster zu setzen. Das bedeutet, daß die normalerweise eingestellte Bildschirmgröße von 25 Zeilen zu 40 beziehungsweise 80 Zeichen jederzeit vom Anwender geändert werden kann, und irgendwelche Schirm-Ausgaben, zumindestens mit PRINT-Befehlen, sich nur noch auf dieses Schirmfenster beziehen. Mit der Routine »jscorg« können Sie sich jederzeit einen Überblick verschaffen, wie die momentane Aufteilung des Bildschirms ist. Nach dem Aufruf der Routine enthält das X-Register die momentane Anzahl zulässiger Spalten (Zeichen pro Zeile), das Y-Register die maximal zulässige Anzahl Zeilen und der Akku die Zeilenbreite insgesamt, also entweder 40 oder 80.</p>
+
+        <h3>jkey $C012 Tastatur-Abfrage</h3>
+
+        <p>Diese Routine übernimmt die eigentliche Tastatur-Abfrage und das Bereitstellen der eingelesenen Zeichen im Tastaturpuffer. Für den Anwender ist sie unerheblich, da diese Abfrage im Interrupt selbsttätig vorgenommen wird.</p>
+
+        <h3>jrep $C015 Code aus Tastaturtabelle holen, REPEAT-Test</h3>
+
+        <p>Auch diese Routine ist für den Anwender uninteressant, da sie im Interrupt selbsttätig ausgeführt wird. Aufgrund der, in der Tastatur-Abfrage ermittelten, Tastennummer wird aus der zuständigen Tastaturtabelle der zugehörige ASCII-Wert ermittelt und geprüft, ob für diese Taste eine Wiederholung (Repeat) zulässig ist, sofern die Taste noch seit dem letzten Aufruf gedrückt ist.</p>
+
+        <h3>jplot $C018 Cursor-Position lesen/schreiben</h3>
+
+        <p>Hiermit ist es jederzeit möglich festzustellen, an welcher Position auf dem Bildschirm sich momentan der Cursor befindet, unabhängig davon, ob er gerade sichtbar ist oder nicht. Die Cursor-Position ist im übrigen die Position, an der das nächste mit PRINT beziehungsweise der Routine »jprint« auszugebende Zeichen erscheint.</p>
+
+        <p>Um die Cursor-Position zu lesen, muß zuvor das Carry-Flag mit dem Befehl »SEC« gesetzt werden. Nach dem Aufruf der Routine enthält das X-Register die aktuelle Zeilennummer der Cursor-Position und das Y-Register die aktuelle Position innerhalb der Zeile. Beide Werte sind immer relativ zur linken oberen Ecke des aktuellen Bildschirmfensters zu sehen.</p>
+
+        <p>Zum Schreiben der Cursor-Position muß vor dem Aufruf zunächst das Carry-Flag mit dem Befehl »CLC« gelöscht werden. Außerdem muß das X-Register die gewünschte Zeilennummer und das Y-Register die gewünschte Spalte enthalten; beide Werte wieder relativ zur linken oberen Ecke des Schirmfensters. Die erfolgreiche Ausführung des Befehls wird durch ein gelöschtes Carry-Flag angezeigt. Ist das Carry-Flag gesetzt, ist ein Fehler aufgetreten, also zum Beispiel eine Zeilennummer verwendet worden, die nicht in die aktuelle Fenstergröße paßt.</p>
+
+        <p>Die aktuelle Zeichenposition »pnt« ($E0/$E1), der Spaltenoffset »pntr« ($EC) sowie der Zeiger auf den Attributspeicher »user« ($E2/$E3) werden entsprechend neu errechnet.</p>
+
+        <h3>jcurs $C01B Cursor-Position im 80-Zeichen-BS setzen</h3>
+
+        <p>Im 80-Zeichen-Bildschirm wird der Cursor hardwaremäßig vom VDC erzeugt, also nicht wie beim 40-Zeichen-Bildschirm durch einfaches Invertieren des aktuellen Zeichens. Mit der Routine »jcurs« wird die aktuelle Cursor-Position an den VDC übergeben und dort auf die entsprechende Stelle im Bildschirmspeicher gesetzt. Die Adresse wird wieder durch die aktuelle Zeichenposition »pnt« ($E0/$E1) und den Spaltenoffset »pntr« ($EC) markiert, die selbstverständlich vorher auf die gewünschte Adresse zu setzen sind.</p>
+
+        <p>Das An- beziehungsweise Abschalten des Cursors kann leider nicht über eine Routine der Editor-Sprungleiste erreicht werden. Die entsprechenden Routinen heißen »crsron« ($CD6F) zum Einschalten und »crsrof« ($CD9F) zum Abschalten des Cursors. Beide Routinen wirken sich immer auf den gerade aktuellen Schirm, also wahlweise den 40-Zeichen- oder 80-Zeichen-Bildschirm, aus.</p>
+
+        <p>Der Cursor-Modus für den 40-Zeichen-Bildschirm wird durch die Adresse »blnon« ($0A26) festgelegt. Ist dort das Bit 6 ($40) gesetzt, wird ein fester Cursor erzeugt, ist das Bit nicht gesetzt, wird ein blinkender Cursor erzeugt.</p>
+
+        <p>Im 80-Zeichen-Modus sind noch ein paar Steuerungen mehr möglich. Hierzu dient die Adresse »curmod« ($0A2B), die bitweise die gewünschte Cursor-Form angibt. Die einzelnen Bits haben folgende Bedeutung, wobei nicht alle Möglichkeiten im C 128 genutzt, aber durchaus verwendet werden können:</p>
+
+        <table class="plain">
+            <tr>
+                <th>Bit</th>
+                <th>Bedeutung</th>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Nicht benutzt</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Wenn das Bit "1" ist, blinkt der Cursor; ist das Bit "0", steht der Cursor fest</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Dieses Bit arbeitet in Zusammenhang mit Bit 6: Ist Bit 6 = "0" und Bit 5 = "1", dann ist der Cursor abgeschaltet. Ist Bit 6 = "1", bestimmt dieses Bit die Blinkfrequenz:<br>"0" = schnell<br>"1" = langsam (Normalzustand)</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Immer "0"</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Sollte immer "0" sein; das Bit wird als höchstwertiges Bit zu den folgenden Bits 0 bis 2 betrachtet</td>
+            </tr>
+            <tr>
+                <td>0-2</td>
+                <td>Diese Bits geben an, an welcher Punktposition innerhalb des Zeichens der Cursor beginnen soll</td>
+            </tr>
+        </table>
+
+        <p>Beim C 128 wird ein Zeichen aus acht Punktreihen zu jeweils acht Punkten, also insgesamt 64 Punkten, zusammengesetzt. Der Cursor wird durch Invertieren der entsprechenden vertikalen Reihen dargestellt, wobei durch die Bits 0 bis 2 gewählt wird, an welcher Position er beginnen soll. Sind alle Bits »0« beginnt der Cursor an der ersten Position; es wird also ein Block-Cursor dargestellt. Mit dem binären Wert 7 (alle drei Bit = »1«) beginnt der Cursor in der letzten Punktposition; es wird also ein Unterstrich-Cursor dargestellt. Es sind hier natürlich auch Zwischenwerte möglich, die allerdings recht seltsam aussehen können (halber Cursor und ähnliches).</p>
+
+        <p>Das Bit 3 stellt das oberste Bit dieser Punktkombination dar. Der Grund liegt darin, daß der VDC durch andere Programmierung Zeichen auch mit 16 Punktzeilen darstellen könnte. Die Auflösung ist dabei natürlich erheblich besser, und die Zeichen sind in sich viel geschlossener und schärfer. Leider sind Farbmonitore erschwinglicher Preisklasse hiermit überfordert, daher wurde darauf verzichtet. Diese Möglichkeit merkt man übrigens auch bei einer Analyse der im VDC-RAM abgelegten Zeichensätze. Im Zeichensatz-ROM belegen die beiden Zeichensätze zusammen nur 4 KByte; im VDC-RAM jedoch 8 KByte. Hinter jeder Zeichendefinition, die aus 8 Byte besteht, befindet sich hier jeweils eine weitere Gruppe von 8 Null-Byte, um die 16 möglichen Punktreihen zu belegen.</p>
+
+        <p>Hier noch einmal die sinnvollen Cursor-Formen in tabellarischer Übersicht:</p>
+
+        <table class="plain">
+            <tr>
+                <th>Wert</th>
+                <th>Cursor-Form</th>
+            </tr>
+            <tr>
+                <td>$00</td>
+                <td>Block-Cursor, fest</td>
+            </tr>
+            <tr>
+                <td>$07</td>
+                <td>Unterstrich-Cursor, fest</td>
+            </tr>
+            <tr>
+                <td>$20</td>
+                <td>Cursor ausgeschaltet</td>
+            </tr>
+            <tr>
+                <td>$40</td>
+                <td>Block-Cursor, schnell blinkend</td>
+            </tr>
+            <tr>
+                <td>$47</td>
+                <td>Unterstrich-Cursor, schnell blinkend</td>
+            </tr>
+            <tr>
+                <td>$60</td>
+                <td>Block-Cursor, langsam blinkend</td>
+            </tr>
+            <tr>
+                <td>$67</td>
+                <td>Unterstrich-Cursor, langsam blinkend</td>
+            </tr>
+        </table>
+
+        <h3>jesc $C01E Bearbeitung der ESC-Funktionen</h3>
+
+        <p>Der C 128 besitzt diverse Editor-Funktionen, die über eine ESCAPE-Sequenz aufgerufen werden. Hierzu wird zunächst &lt;ESC&gt; gedrückt und anschließend ein Buchstabe von &lt;A&gt; bis &lt;Z&gt; oder das &lt;§&gt;-Zeichen, beziehungsweise der &lt;@> bei der ASCII-Tastatur. Ein nochmaliges &lt;ESC&gt; direkt hinter dem ersten schaltet die Funktion sofort wieder aus, falls &lt;ESC&gt; versehentlich gedrückt wurde. Diese Funktionen können auch über PRINT-Befehle beziehungsweise die oben erwähnte Routine »jprint« ausgeführt werden.</p>
+
+        <p>Die Routine »jesc« ruft die entsprechenden Editor-Funktionen direkt, ohne vorheriges &lt;ESC&gt;, auf. Hierzu ist vor dem Aufruf im Akkumulator der gewünschte Befehlsbuchstabe zu setzen.</p>
+
+        <p>Die möglichen Befehle in tabellarischer Auflistung:</p>
+
+        <table class="plain">
+            <tr>
+                <th>Akkuinhalt</th>
+                <th>Funktion</th>
+            </tr>
+            <tr>
+                <td>§</td>
+                <td>Bildschirm ab Cursor-Position löschen</td>
+            </tr>
+            <tr>
+                <td>A</td>
+                <td>Autoinsert-Modus einschalten. Vor der Ausgabe eines Zeichens wird vorher mit »Insert« automatisch eine freie Stelle eingerichtet.</td>
+            </tr>
+            <tr>
+                <td>B</td>
+                <td>Rechte untere Fensterecke an aktueller Cursor-Position setzen</td>
+            </tr>
+            <tr>
+                <td>C</td>
+                <td>Autoinsert-Modus ausschalten</td>
+            </tr>
+            <tr>
+                <td>D</td>
+                <td>Aktuelle Zeile löschen. Der Rest des Bildschirms wird nach oben gerollt</td>
+            </tr>
+            <tr>
+                <td>E</td>
+                <td>Festen Cursor setzen</td>
+            </tr>
+            <tr>
+                <td>F</td>
+                <td>Blinkenden Cursor setzen</td>
+            </tr>
+            <tr>
+                <td>G</td>
+                <td>Glocke zulassen. Beim Betätigen von &lt;CTRL+G&gt; Glockensignal, desgleichen bei der Ausgabe von CHR$(7) auf dem Bildschirm.</td>
+            </tr>
+            <tr>
+                <td>H</td>
+                <td>Glocke abschalten. Ein Aufruf der Glocke wird ignoriert</td>
+            </tr>
+            <tr>
+                <td>I</td>
+                <td>Zeile an der Cursor-Position einfügen. Die folgenden Zeilen verschieben sich nach unten</td>
+            </tr>
+            <tr>
+                <td>J</td>
+                <td>Cursor an den Anfang der Zeile setzen</td>
+            </tr>
+            <tr>
+                <td>K</td>
+                <td>Cursor auf Zeilenende setzen</td>
+            </tr>
+            <tr>
+                <td>L</td>
+                <td>Bildschirm-Rollen einschalten. Wird bei PRINT-Befehlen der untere Rand erreicht, werden die Zeilen nach oben gerollt und eine Leerzeile am Schirmende eingefügt.</td>
+            </tr>
+            <tr>
+                <td>M</td>
+                <td>Bildschirm-Rollen ausschalten. Wird bei PRINT-Befehlen der untere Rand erreicht, wird die Ausgabe wieder am oberen Schirmrand fortgesetzt.</td>
+            </tr>
+            <tr>
+                <td>N</td>
+                <td>Negativ-Darstellung ausschalten (siehe »R«)</td>
+            </tr>
+            <tr>
+                <td>O</td>
+                <td>Einfüge-, Anführungszeichen- und Reverse-Modus (zum Beispiel nach Anführungszeichen) ausschalten</td>
+            </tr>
+            <tr>
+                <td>P</td>
+                <td>Zeile bis Cursor-Position löschen</td>
+            </tr>
+            <tr>
+                <td>Q</td>
+                <td>Zeile ab Cursor-Position löschen</td>
+            </tr>
+            <tr>
+                <td>R</td>
+                <td>Negativ-Darstellung einschalten. Der gesamte Bilschirminhalt wird invertiert, allerdings nicht der Bilschirmrahmen</td>
+            </tr>
+            <tr>
+                <td>S</td>
+                <td>Block-Cursor einschalten</td>
+            </tr>
+            <tr>
+                <td>T</td>
+                <td>Obere linke Fensterecke an aktuelle Cursor-Position setzen</td>
+            </tr>
+            <tr>
+                <td>U</td>
+                <td>Unterstrich-Cursor einschalten</td>
+            </tr>
+            <tr>
+                <td>V</td>
+                <td>Schirm um eine Zeile aufwärts rollen</td>
+            </tr>
+            <tr>
+                <td>W</td>
+                <td>Schirm um eine Zeile abwärts rollen</td>
+            </tr>
+            <tr>
+                <td>X</td>
+                <td>Umschalten von 40- auf 80-Zeichen-Modus und zurück</td>
+            </tr>
+            <tr>
+                <td>Y</td>
+                <td>Standard-Tabulatoren setzen</td>
+            </tr>
+            <tr>
+                <td>Z</td>
+                <td>Alle Tabulatoren löschen</td>
+            </tr>
+        </table>
+
+        <h3>jkyset $C021 Funktionstaste belegen</h3>
+
+        <p>Hiermit können die Funktionstasten von Assemblerprogrammen aus mit Werten belegt werden. Hierzu sind zunächst einige Vorbereitungen zu treffen. In der Zeropage ist an drei aufeinander folgenden Adressen ein Zeiger auf den neuen, der Funktionstaste zuzuordnenden Text einzurichten. Anschließend ist in den Akkumulator die Adresse des ersten Bytes dieses Zeigers zu laden, in das X-Register die Nummer der Funktionstaste laut unten stehender Tabelle und in das Y-Register die Länge des Textes.</p>
+
+        <p>Die Funktionstaste &lt;F1&gt; soll zum Beispiel mit dem Text »Testbelegung« definiert werden, der in der Bank 1 an der Adresse $3000 steht. Hierzu wird zunächst einmal ein Zeiger in der Zeropage eingerichtet, sinnvollerweise an einer sonst nicht benötigten Stelle, zum Beispiel den Adressen $FA bis $FF.</p>
+
+        <p>Belegt wird also</p>
+
+        <p>$FA mit $00, dem Low-Byte der Adresse $3000<br>
+            $FB mit $30, dem High-Byte der Adresse $3000<br>
+            $FC mit $01, der Banknummer</p>
+
+        <p>Anschließend werden die Prozessor-Register geladen, und zwar:</p>
+
+        <p>AC mit $FA, der Zeigeradresse<br>
+            XR mit $01, der Nummer der Funktionstaste<br>
+            YR mit $0C, der Länge des Textes</p>
+
+        <p>Nun kann die Routine aufgerufen und die Funktionstaste belegt werden. Mögliche Funktionstasten sind die Tasten &lt;F1&gt; bis &lt;F8&gt;, die &lt;HELP&gt;-Taste und die &lt;SHIFT-RUN/STOP&gt;-Taste. Die anzugebende Nummer finden Sie in der folgenden Tabelle:</p>
+
+        <table class="plain">
+            <tr>
+                <th>Nummer</th>
+                <th>Taste</th>
+                <th>Standardwert</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>&lt;F1&gt;</td>
+                <td>GRAPHIC</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>&lt;F2&gt;</td>
+                <td>DLOAD"</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>&lt;F3&gt;</td>
+                <td>DIRECTORY + CHR$(13)</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>&lt;F4&gt;</td>
+                <td>SCNCLR + CHR$(13)</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>&lt;F5&gt;</td>
+                <td>DSVAVE"</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>&lt;F6&gt;</td>
+                <td>RUN + CHR$(13)</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>&lt;F7&gt;</td>
+                <td>LIST + CHR$(13)</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>&lt;F8&gt;</td>
+                <td>MONITOR + CHR$(13)</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>&lt;SHIFT+RUN/STOP&gt;</td>
+                <td>DL"*" + CHR$(13) + RUN + CHR$(13)</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>&lt;HELP&gt;</td>
+                <td>HELP + CHR$(13)</td>
+            </tr>
+        </table>
+
+        <p>Beachten Sie bitte beim Belegen der Funktionstasten, daß alle zehn Definitionen zusammen nicht mehr als 246 Zeichen umfassen dürfen.</p>
+
+        <h3>jrsirq $C024 Raster-Interrupt bearbeiten</h3>
+
+        <p>Diese Routine ist für den Anwender nicht von Belang, da sie im Interrupt automatisch aufgerufen wird. Sie dient zur Umschaltung von Grafik- und Textbildschirm, wenn im Basic ein Grafikmodus mit geteiltem Schirm eingestellt wurde. Beim Aufbau wird das Bild jeweils zeilenweise aufgebaut, wobei eine Zeile immer einer vertikalen Punktbreite entspricht. Der gesamte Bildschirm umfaßt theoretisch etwa 250 Zeilen inklusive des oberen und unteren Rahmens, wobei, je nach Monitor, einige Zeilen nicht sichtbar sind. Der VIC kann nun veranlaßt werden, bei Erreichen einer bestimmten Rasterzeile einen Interrupt auszulösen. Solche Interrupts werden von dieser Routine bearbeitet, die dann jeweils vom Grafikschirm auf den Textschirm umschalten und somit einen geteilten Bildschirm simulieren.</p>
+
+        <h3>jint80 $C027 80-Zeichen-Schirm initialisieren</h3>
+
+        <p>Mit dieser Routine wird der Zeichengenerator in das RAM des VDC kopiert. Wie schon erwähnt, wird beim Betätigen der &lt;ASCII/DIN&gt;-Taste der jeweils aktuelle Zeichensatz übertragen. Diese Funktion übernimmt die vorliegende Routine, die den Zeichengenerator von der Adresse $D000 in Bank 14 in das RAM des VDC kopiert.</p>
+
+        <h3>jswap $C02A Umschalten 40/80-Zeichen-Schirm</h3>
+
+        <p>Diese Funktion schaltet auf den jeweils anderen Bildschirm, also von 40 Zeichen auf 80 Zeichen oder umgekehrt, um. Sie entspricht vollständig der Funktion »ESC X« und wird von dieser auch aufgerufen.</p>
+
+        <h3>jwind $C02D Bildschirmfenster definieren</h3>
+
+        <p>Mit dieser Funktion können Bildschirmfenster gesetzt werden, wie auch schon mit den Funktionen »ESC B« beziehungsweise »ESC T«. Vor dem Aufruf ist im Akkumulator die gewünschte Zeilennummer absolut, das heißt also von 0 bis 24 und im X-Register die gewünschte Spalte, ebenfalls absolut, also von 0 bis 39 beziehungsweise 0 bis 79, anzugeben. Bei gesetzem Carry-Flag wird die rechte untere Ecke des Fensters gesetzt, bei gelöschtem Carry-Flag die linke obere Ecke.</p>
+
+        <h2>Das Kernel</h2>
+
+        <p>Das Kernel umfaßt alle Funktionen, die zum ordnungsgemäßen Betrieb des Computers notwendig sind, und ruft seinerseits auch den Editor auf. Im Kernel sind alle Routinen enthalten, um den Datenverkehr auf dem seriellen Bus zur Floppy oder einem Drucker zu regeln, sowie die gesamte Bedienung der RS232-Schnittstelle und des Kassettenrecorders. Weiterhin übernimmt es die Bearbeitung von Interrupts, also IRQ und NMI sowie die erstmalige Einstellung aller Systemparameter nach dem Einschalten oder dem Drücken des Reset-Tasters.</p>
+
+        <p>Auch das Kernel verfügt über eine Sprungleiste, die hier allerdings am Ende des Programms liegt und über die alle notwendigen Funktionen aufgerufen werden können. Der grundlegende Teil der Sprungleiste ist übrigens mit der des C 64 identisch; sie ist nur um einige Funktionen erweitert worden, die beim C 128 hinzugekommen sind.</p>
+
+        <p>Hier zunächst einmal eine tabellarische Auflistung der einzelnen Funktionen, und anschließend eine eingehende Besprechung der wichtigsten Routinen. Alle Routinen unterhalb der punktierten Linie sind übrigens identisch mit denen des C 64.</p>
+
+        <table class="plain">
+            <tr>
+                <th>Name</th>
+                <th>Adresse</th>
+                <th>Funktion</th>
+            </tr>
+            <tr>
+                <td>kspio</td>
+                <td>$FF47</td>
+                <td>Auf I/O schnelle Floppy umschalten</td>
+            </tr>
+            <tr>
+                <td>kclsal</td>
+                <td>$FF4A</td>
+                <td>Alle Files von Gerät in AC schließen</td>
+            </tr>
+            <tr>
+                <td>kc64md</td>
+                <td>$FF4D</td>
+                <td>Auf C 64-Modus umschalten</td>
+            </tr>
+            <tr>
+                <td>kdmacl</td>
+                <td>$FF50</td>
+                <td>DMA-Anforderung ext. RAMs zulassen</td>
+            </tr>
+            <tr>
+                <td>kbotcl</td>
+                <td>$FF53</td>
+                <td>Boot-Programm von Diskette laden</td>
+            </tr>
+            <tr>
+                <td>kphenx</td>
+                <td>$FF56</td>
+                <td>Aufruf Kaltstartroutinen Funktionskarte</td>
+            </tr>
+            <tr>
+                <td>klkupl</td>
+                <td>$FF59</td>
+                <td>Geräte- &amp; Sek.-Adr. über la (ac) suchen</td>
+            </tr>
+            <tr>
+                <td>klkups</td>
+                <td>$FF5C</td>
+                <td>Geräte-Adr. über Sek.-Adr. (yr) suchen</td>
+            </tr>
+            <tr>
+                <td>kswapr</td>
+                <td>$FF5F</td>
+                <td>Umschalten 40/80-Zeichen-BS</td>
+            </tr>
+            <tr>
+                <td>kdlchr</td>
+                <td>$FF62</td>
+                <td>80-Zeichen-BS initialisieren</td>
+            </tr>
+            <tr>
+                <td>kpfkey</td>
+                <td>$FF65</td>
+                <td>Funktionstaste belegen</td>
+            </tr>
+            <tr>
+                <td>kstbnk</td>
+                <td>$FF68</td>
+                <td>Bank für LOAD/SAVE/VERIFY setzen</td>
+            </tr>
+            <tr>
+                <td>kgtcfg</td>
+                <td>$FF6B</td>
+                <td>MMU-Wert zu Bank in xr nach ac</td>
+            </tr>
+            <tr>
+                <td>kjsrfr</td>
+                <td>$FF6E</td>
+                <td>JSR, Bank xr</td>
+            </tr>
+            <tr>
+                <td>kjmpfr</td>
+                <td>$FF71</td>
+                <td>JMP, Bank xr</td>
+            </tr>
+            <tr>
+                <td>kifetv</td>
+                <td>$FF74</td>
+                <td>LDA (FETVEC),y von Bank in xr</td>
+            </tr>
+            <tr>
+                <td>kistav</td>
+                <td>$FF77</td>
+                <td>STA (STAVEC),y in Bank in xr</td>
+            </tr>
+            <tr>
+                <td>kicmpv</td>
+                <td>$FF7A</td>
+                <td>CMP (CMPVEC),y mit Bank in xr</td>
+            </tr>
+            <tr>
+                <td>kprimm</td>
+                <td>$FF7D</td>
+                <td>Folgenden Text ausgeben und überspringen</td>
+            </tr>
+            <tr>
+                <td>kpcint</td>
+                <td>$FF81</td>
+                <td>Videochips/Editor initialisieren</td>
+            </tr>
+            <tr>
+                <td>kioini</td>
+                <td>$FF84</td>
+                <td>I/O-Bausteine initialisieren</td>
+            </tr>
+            <tr>
+                <td>kramts</td>
+                <td>$FF87</td>
+                <td>RAM, Kass.-Puffer u. Vectoren einrichten</td>
+            </tr>
+            <tr>
+                <td>kresto</td>
+                <td>$FF8A</td>
+                <td>Standard-I/O-Vektoren einrichten</td>
+            </tr>
+            <tr>
+                <td>kvecto</td>
+                <td>$FF8D</td>
+                <td>User-I/O-Vektoren einrichten</td>
+            </tr>
+            <tr>
+                <td>kstmsg</td>
+                <td>$FF90</td>
+                <td>Flag setzen Unterdrückung Meldungen</td>
+            </tr>
+            <tr>
+                <td>ksecnd</td>
+                <td>$FF93</td>
+                <td>Ausgabe Sek.-Adr. nach LISTEN auf IEC-Bus</td>
+            </tr>
+            <tr>
+                <td>ktsksa</td>
+                <td>$FF96</td>
+                <td>Ausgabe Sek.-Adr. nach TALK auf IEC-Bus</td>
+            </tr>
+            <tr>
+                <td>kmemtp</td>
+                <td>$FF99</td>
+                <td>höchste Speichergrenze lesen/schreiben</td>
+            </tr>
+            <tr>
+                <td>kmembt</td>
+                <td>$FF9C</td>
+                <td>unterste Speichergrenze lesen/schreiben</td>
+            </tr>
+            <tr>
+                <td>kscnky</td>
+                <td>$FF9F</td>
+                <td>Tastatur-Abfrage</td>
+            </tr>
+            <tr>
+                <td>ksetmo</td>
+                <td>$FFA2</td>
+                <td>Timeout-Flag IEC-Bus setzen</td>
+            </tr>
+            <tr>
+                <td>kacptr</td>
+                <td>$FFA5</td>
+                <td>Zeichen von IEC-Bus nach AC</td>
+            </tr>
+            <tr>
+                <td>kciout</td>
+                <td>$FFA8</td>
+                <td>Ausgabe ac auf IEC-Bus</td>
+            </tr>
+            <tr>
+                <td>kuntlk</td>
+                <td>$FFAB</td>
+                <td>Ausgabe UNTALK auf IEC-Bus</td>
+            </tr>
+            <tr>
+                <td>kunlsn</td>
+                <td>$FFAE</td>
+                <td>Ausgabe UNLISTEN auf IEC-Bus</td>
+            </tr>
+            <tr>
+                <td>klistn</td>
+                <td>$FFB1</td>
+                <td>Ausgabe LISTEN auf IEC-Bus</td>
+            </tr>
+            <tr>
+                <td>ktalk</td>
+                <td>$FB4</td>
+                <td>Ausgabe TALK auf IEC-Bus</td>
+            </tr>
+            <tr>
+                <td>kreads</td>
+                <td>$FFB7</td>
+                <td>Aktueller Status nach AC</td>
+            </tr>
+            <tr>
+                <td>kstlfs</td>
+                <td>$FFBA</td>
+                <td>la, fa, sa aus ac, xr, yr setzen</td>
+            </tr>
+            <tr>
+                <td>kstnam</td>
+                <td>$FFBD</td>
+                <td>fnlen, fnadr aus ac, xr, yr setzen</td>
+            </tr>
+            <tr>
+                <td>kopen</td>
+                <td>$FFC0</td>
+                <td>Logisches File öffnen</td>
+            </tr>
+            <tr>
+                <td>kclose</td>
+                <td>$FFC3</td>
+                <td>Logisches File schließen</td>
+            </tr>
+            <tr>
+                <td>kchkin</td>
+                <td>$FFC6</td>
+                <td>Eingabe-Kanal öffnen</td>
+            </tr>
+            <tr>
+                <td>kckout</td>
+                <td>$FFC9</td>
+                <td>Ausgabe-Kanal öffnen</td>
+            </tr>
+            <tr>
+                <td>kclrch</td>
+                <td>$FFCC</td>
+                <td>Ein/Ausgabe-Kanal schließen</td>
+            </tr>
+            <tr>
+                <td>kbasin</td>
+                <td>$FFCF</td>
+                <td>Zeichen akt. Kanal nach AC</td>
+            </tr>
+            <tr>
+                <td>kbsout</td>
+                <td>$FFD2</td>
+                <td>Ausgabe AC auf akt. Kanal</td>
+            </tr>
+            <tr>
+                <td>kloads</td>
+                <td>$FFD5</td>
+                <td>LOAD/VERIFY (AC) ab Adresse in xr/yr</td>
+            </tr>
+            <tr>
+                <td>ksaves</td>
+                <td>$FFD8</td>
+                <td>Save ab ac bis xr, yr</td>
+            </tr>
+            <tr>
+                <td>ksttim</td>
+                <td>$FFDB</td>
+                <td>System-Uhr setzen</td>
+            </tr>
+            <tr>
+                <td>krdtim</td>
+                <td>$FFDE</td>
+                <td>System-Uhr nach ac, xr, yr</td>
+            </tr>
+            <tr>
+                <td>kstop</td>
+                <td>$FFE1</td>
+                <td>Stop-Taste lesen</td>
+            </tr>
+            <tr>
+                <td>kgetin</td>
+                <td>$FFE4</td>
+                <td>Zeichen akt. Kanal nach AC</td>
+            </tr>
+            <tr>
+                <td>kclall</td>
+                <td>$FFE7</td>
+                <td>Filetabelle löschen, Vorgabe-I/O</td>
+            </tr>
+            <tr>
+                <td>kclock</td>
+                <td>$FFEA</td>
+                <td>System-Uhr aktualisieren</td>
+            </tr>
+            <tr>
+                <td>kscror</td>
+                <td>$FFED</td>
+                <td>BS-Organisation lesen</td>
+            </tr>
+            <tr>
+                <td>kplot</td>
+                <td>$FFF0</td>
+                <td>Cursor-Pos. lesen/schreiben</td>
+            </tr>
+            <tr>
+                <td>kiobas</td>
+                <td>$FFF3</td>
+                <td>Basisadresse I/O-Bausteine nach xr/yr</td>
+            </tr>
+        </table>
+
+        <h3>kspio $FF47 Auf I/O schnelle Floppy umschalten</h3>
+
+        <p>Mit dieser Funktion wird auf die schnelle Floppyroutine umgeschaltet, die allerdings nur mit den Floppylaufwerken 1570 und 1571 verwendet werden kann. Das Carry-Flag bestimmt, ob die Routine eingeschaltet (Carry gelöscht) oder ausgeschaltet (Carry gesetzt) werden soll.</p>
+
+        <h3>kclsal $FF4A Alle Files von Gerät in AC schließen</h3>
+
+        <p>Mit dieser Funktion können alle Daten gleichzeitig geschlossen werden, die auf der im Akku angegebenen Geräteadresse geöffnet sind. Ein gesetzes Carry-Flag nach der Rückkehr zeigt einen Fehler innerhalb der Routine an.</p>
+
+        <h3>kc64md $FF4D Auf C 64-Modus umschalten</h3>
+
+        <p>Diese Routine schaltet auf den C 64-Modus um, wobei ein Rücksprung von dort nur mit der Reset-Taste möglich ist. Diese Routine wird auch vom Basic-Befehl »GO64« aufgerufen.</p>
+
+        <h3>kdmacl $FF50 DMA-Anforderung externer RAMs zulassen</h3>
+
+        <p>Diese Routine dient zum DMA (Direct Memory Access = direkter Speicherzugriff) durch externe Geräte. Im Normalbetrieb des C 128 ist sie nicht von Belang.</p>
+
+        <h3>kbotcl $FF53 Boot-Programm von Diskette laden</h3>
+
+        <p>Mit dem Basic-Befehl »BOOT« kann zum Beispiel das CP/M-Betriebssystem geladen werden, in dem der Block 0 in der Spur 1 der Diskette gelesen wird, wo weitere Anweisungen wie Programmname, Startadresse und so weiter zu finden sind. Diese Routine ruft die entsprechende Funktion auf, wobei im Akkumulator die Laufwerknummern 0 oder 1 im ASCII-Code, also $30 oder $31, und im X-Register die Gerätenummer stehen müssen. Wenn der gelesene Sektor ein Bootsektor ist, wird das Programm ausgeführt, ansonsten wird der Aufruf ignoriert.</p>
+
+        <h3>kphenx $FF56 Aufruf Kaltstartroutinen Funktionskarte</h3>
+
+        <p>Diese Routine dient zum Aufruf der zusätzlichen Funktionskarte, die im normalen C 128 nicht enthalten ist. Wird die Routine hier aufgerufen, wird ein normaler »Boot« von Gerät 8, Laufwerk 0, durchgeführt.</p>
+
+        <h3>klkupl $FF59 Geräte- und Sekundäradresse über la (ac) suchen</h3>
+
+        <p>Zu einer vorgegebenen logischen Dateinummer im Akkumulator werden die zugehörige Gerätenummer und die Sekundäradresse in der Dateitabelle gesucht. Das Carry-Flag zeigt an, ob ein entsprechender Eintrag in der Dateitabelle gefunden wurde. Ist das Carry-Flag gesetzt, ist diese Datei nicht geöffnet. Ist das Carry-Flag gelöscht, enthält das X-Register die Geräteadresse, das Y-Register die Sekundäradresse und der Akkumulator die logische Dateinummer.</p>
+
+        <h3>klkups $FF5C Geräteadresse über Sekundäradresse (yr) suchen</h3>
+
+        <p>Zu einer vorgegebenen Sekundäradresse im Y-Register werden die zugehörige logische Dateinummer und die Sekundäradresse gelesen. Das Carry-Flag zeigt an, ob ein entsprechender Eintrag in der Dateitabelle gefunden wurde. Ist das Carry-Flag gesetzt, ist diese Datei nicht geöffnet. Ist das Carry-Flag gelöscht, enthält das X-Register die Geräteadresse, das Y-Register die Sekundäradresse und der Akkumulator die logische Dateinummer.</p>
+
+        <h3>kswapr $FF5F Umschalten 40/80-Zeichen-Bildschirm</h3>
+
+        <p>Diese Routine ruft die unter den Editor-Funktionen beschriebene Routine »jswap« auf.</p>
+
+        <h3>kdlchr $FF62 80-Zeichen-Bildschirm initialisieren</h3>
+
+        <p>Diese Routine ruft die unter den Editor-Funktionen beschriebene Routine »jint80« auf.</p>
+
+        <h3>kpfkey $FF65 Funktionstaste belegen</h3>
+
+        <p>Diese Routine ruft die unter den Editor-Funktionen beschriebene Routine »ikyset« auf.</p>
+
+        <h3>kstbnk $FF68 Bank für LOAD/SAVE/VERIFY setzen</h3>
+
+        <p>Beim Eröffnen von Diskettendateien müssen in der Regel Dateinamen angegeben werden, deren Adressen in der Speicherstelle »fnadr« ($BB/$BC) zu finden sind. Beim C 128 muß darüber hinaus noch die Bank angegeben werden, auf die sich diese Adresse bezieht. Die Bank wird mit dieser Funktion gesetzt, wobei das X-Register die entsprechende Bit-Kombination für das MMU-Register und der Akkumulator die Banknummer enthalten muß.</p>
+
+        <h3>kgtcfg $FF6B MMU-Wert zu Bank in XR nach AC</h3>
+
+        <p>Zu jeder RAM- oder ROM-Bank des C 128 gehört eine entsprechende Bit-Kombination, die in das Konfigurationsregister der MMU zu schreiben ist, um die gewünschte Speicherverteilung zu erhalten. Hierzu existiert im Kernel-ROM eine entsprechende Tabelle. Diese Routine sucht zu einer gegebenen Banknummer im X-Register die entsprechende Kombination aus der Tabelle und stellt sie im Akkumulator zur Verfügung.</p>
+
+        <h3>kjsrfr $FF6E JSR, Bank xr</h3>
+
+        <p>Diese Routine ruft ein Unterprogramm auf, das sich in einer beliebigen Speicherbank befinden kann. Hierzu muß das X-Register die Banknummer enthalten, und die Speicherstellen »areg« und folgende die entsprechenden gewünschten Registerinhalte beim Eintritt in das Unterprogramm. Die Logik entspricht hier einem JSR-Befehl.</p>
+
+        <h3>kjmpfr $FF71 JMP, Bank xr</h3>
+
+        <p>Diese Routine ruft ein Programm auf, das sich in einer beliebigen Speicherbank befinden kann. Hierzu muß das X-Register die Banknummer enthalten, und die Speicherstellen »areg« und folgende die entsprechenden gewünschten Registerinhalte beim Eintritt in das Programm. Die Logik entspricht hier einem JMP-Befehl.</p>
+
+        <h3>kifetv $FF74 LDA (FETVEC),y von Bank in xr</h3>
+
+        <p>Mit Hilfe dieser Routine kann ein Byte aus einer anderen Speicherbank als der, in der das aktuelle Programm gerade läuft, gelesen werden. Hierzu muß das Y-Register die Banknummer und der Akkumulator die Adresse eines Adressenpaars aus der Zeropage enthalten, in der die zu lesende Adresse steht. Die Funtkion entspricht somit in etwa einem »LDA (Adresse),y«-Befehl.</p>
+
+        <h3>kistav $FF77 STA (STAVEC),y in Bank in xr</h3>
+
+        <p>Mit Hilfe dieser Routine kann ein Byte in eine andere Speicherbank als die, in der das aktuelle Progrmm gerade läuft, geschrieben werden. Hierzu muß das X-Register die Banknummer und die Speicherstelle »stashx« ($02B9) die Anfangsadresse eines Registerpaars aus der Zeropage enthalten, in der die zu schreibende Adresse steht. Die Funktion entspricht somit in etwa einem »STA (Adresse),y«-Befehl.</p>
+
+        <h3>kicmpv $FF7A CMP (CMPVEC),y mit Bank in xr</h3>
+
+        <p>Mit Hilfe dieser Routine kann ein Byte im Akkumulator mit einem Byte aus einer anderen Speicherbank als der, in der das aktuelle Programm gerade läuft, verglichen werden. Hierzu muß das X-Register die Banknummer enthalten, und die Speicherstelle »cmparx« ($02CD) die Anfangsadresse eines Registerpaars aus der Zeropage, in der die zu vergleichende Adresse steht. Die Funktion entspricht somit in etwa einem »CMP (Adresse),y«-Befehl.</p>
+
+        <h3>kprimm $FF7D Folgenden Text ausgeben und überspringen</h3>
+
+        <p>Mit Hilfe dieser Routine kann ein beliebiger Text, der direkt auf den JSR-Befehl folgt, auf dem Bildschirm ausgegeben werden. Der Text kann beliebig lang sein und muß mit »$00« beendet werden. Anschließend wird die Verarbeitung mit dem auf den Text folgenden Befehl fortgesetzt. Diese Routine ist im übrigen ein Musterbeispiel für trickreiche Programmierung und ist somit durchaus eine genaue Analyse wert.</p>
+
+        <h3>kpcint $FF81 Videochips/Editor initialisieren</h3>
+
+        <p>Diese Routine ruft die unter den Editor-Funktionen besprochene Routine »jpcint« auf.</p>
+
+        <h3>kioini $FF84 I/O-Bausteine initialisieren</h3>
+
+        <p>Mit dem Aufruf dieser Routine werden alle Ein-/Ausgabe-Bausteine auf ihre Standardwerte nach dem Einschalten des Rechners gesetzt. Wird ein Anwender-Programm von anderen Programmen aufgerufen und herrscht Unklarheit über die aktuelle Einstellung der Peripherie-Bausteine, so kann hiermit ein definierter Zustand hergestellt werden.</p>
+
+        <h3>kramts $FF87 RAM, Kassettenpuffer und Vektoren einrichten</h3>
+
+        <p>Mit dieser Routine werden die Zeiger auf die Ein-/Ausgabe-Puffer neu eingerichtet und die Speichergrenzen auf die Standardwerte festgelegt.</p>
+
+        <h3>kresto $FF8A Standard-I/O-Vektoren einrichten</h3>
+
+        <p>Diese Routine stellt die normalen I/O-Vektoren, zum Beispiel für IRQ, Öffnen einer Datei und so weiter wieder her. Sie kann aufgerufen werden, wenn diese Vektoren ganz oder teilweise verändert wurden, um den Grundzustand wiederherzustellen.</p>
+
+        <h3>kvecto $FF8D User-I/O-Vektoren einrichten</h3>
+
+        <p>Hiermit können die I/O-Vektoren auf eigene Adressen gesetzt werden. Hierzu muß im X-Register das Low-Byte und im Y-Register das High-Byte der Vektorentabelle gesetzt werden. Die Vektorentabelle selbst muß alle 16 möglichen Vektoren enthalten, um Fehler zu vermeiden. Sie baut sich aus jeweils einem Wort (2 Byte) in der Reihenfolge Low-Byte, High-Byte auf, die auf die Adressen der aufzurufenden Routinen zeigen. Die Original-Vektortabelle »vectss« ($E073) kann hierfür teilweise kopiert werden.</p>
+
+        <h3>kstmg $FF90 Flag setzen Unterdrückung Meldungen</h3>
+
+        <p>Bei der Abarbeitung von Systemroutinen können Fehler auftreten, wie zum Beispiel ein nicht angegebener Dateiname und ähnliches. Normalerweise würde dann auf dem Bildschirm eine entsprechende Fehlermeldung erscheinen. Diese Routine setzt ein Flag, mit dem die Ausgabe dieser Meldung verhindert (Akku = $40) oder ermöglicht (Akku = $00) werden kann. Zusätzlich kann durch ein gesetztes Bit 7 ($80 beziehungsweise $C0) verhindert werden, daß bei Operationen, wie zum Beispiel dem Laden von Programmteilen, der Text »searching for...« oder auch »press play...« auf dem Bildschirm erscheint.</p>
+
+        <h3>ksecnd $FF93 Ausgabe Sekundäradresse nach LISTEN auf IEC-Bus</h3>
+
+        <p>Hiermit wird die gewünschte Sekundäradresse nach einem Listen-Befehl auf dem IEC-Bus ausgegeben, um dem Peripheriegerät mitzuteilen, über welche Sekundäradresse die folgenden Daten abzulegen sind. Die gewünschte Sekundäradresse muß sich beim Aufruf im Akkumulator befinden.</p>
+
+        <p>Hierzu kurz noch eine Anmerkung: Die gesamte Steuerung des IEC-Bus ist recht komplex und kann schnell durcheinander kommen, wenn die korrekte Reihenfolge der Listen-, Unlisten-, Talk- und sonstigen Befehle nicht eingehalten wird. Noch nicht so erfahrene Programmierer sollten daher auf die eigene Anwendung der IEC-Routinen verzichten, und besser mit den weiter unten beschriebenen Funktionen »kchkin«, »kckout«, »kgetin« und »kbsout« arbeiten. Bei der Verwendung dieser Routinen übernimmt das Betriebssystem die gesamte Steuerung des IEC-Bus; allerdings sind diese Routinen insgesamt etwas langsamer als die direkte Steuerung.</p>
+
+        <h3>ktksa $FF96 Ausgabe Sekundäradresse nach TALK auf IEC-Bus</h3>
+
+        <p>Hiermit wird die gewünschte Sekundäradresse nach einem Talk-Befehl auf dem IEC-Bus ausgegeben, um dem Peripheriegerät mitzuteilen, über welche Sekundäradresse die folgenden Daten zu senden sind. Die gewünschte Sekundäradresse muß sich beim Aufruf im Akkumulator befinden. Ansonsten gilt auch hier der unter »ksecnd« gegebene Hinweis.</p>
+
+        <h3>kmemtp $FF99 Höchste Speichergrenze lesen/schreiben</h3>
+
+        <p>Diese Routine liest oder schreibt wahlweise die höchste Speicheradresse, die vom Benutzerprogramm (und hier ist auch der Basic-Interpreter ein Benutzer!) verwendet werden kann. Über das Carry-Flag wird gesteuert, ob die Adresse geschrieben (Carry nicht gesetzt) oder gelesen (Carry gesetzt) werden soll. Beim Setzen muß im X-Register das Low-Byte und im Y-Register das High-Byte der Adresse stehen; beim Lesen enthalten die angegebenen Register die momentan gültigen Werte.</p>
+
+        <h3>kmembt $FF9C Unterste Speichergrenze lesen/schreiben</h3>
+
+        <p>Diese Routine liest oder schreibt wahlweise die unterste Speicheradresse, die vom Benutzerprogramm verwendet werden kann. Über das Carry-Flag wird gesteuert, ob die Adresse geschrieben (Carry nicht gesetzt) oder gelesen (Carry gesetzt) werden soll. Beim Setzen muß im X-Register das Low-Byte und im Y-Register das High-Byte der Adresse stehen; beim Lesen enthalten die angegebenen Register die momentan gültigen Werte.</p>
+
+        <h3>kscnky $FF9F Tastatur-Abfrage</h3>
+
+        <p>Hiermit wird die unter den Editor-Funktionen besprochene Routine »jkey« aufgerufen.</p>
+
+        <h3>ksetmo $FFA2 Timeout-Flag IEC-Bus setzen</h3>
+
+        <p>Diese Funktion wird vom System nicht verwendet. Die entsprechende Speicherstelle für das Verhindern des IEC-Timeout, wie zum Beispiel bei den großen CBM-Rechnern, ist zwar vorhanden, wird aber nicht verwendet. Somit dürfte die Routine nur als Platzhalter anzusehen sein, um ein Verschieben der restlichen Adressen zu verhindern.</p>
+
+        <h3>kacptr $FFA5 Zeichen von IEC-Bus nach AC</h3>
+
+        <p>Diese Routine liest ein Zeichen direkt vom IEC-Bus in den Akkumulator. Zuvor müssen die entsprechenden Talkroutinen aufgerufen werden. Hierfür gilt ansonsten auch der unter »ksecnd« geschriebene Hinweis.</p>
+
+        <h3>kciout $FFA8 Ausgabe ac auf IEC-Bus</h3>
+
+        <p>Das Zeichen im Akkumulator wird direkt auf dem IEC-Bus ausgegeben. Zuvor müssen die entsprechenden Listenroutinen aufgerufen werden. Hierfür gilt ansonsten auch der unter »ksecnd« gegebene Hinweis.</p>
+
+        <h3>kuntlk $FFAB Ausgabe UNTALK auf IEC-Bus</h3>
+
+        <p>Auf dem IEC-Bus wird ein »Untalk« ausgegeben, also die Aufforderung, das Senden von Daten einzustellen. Hierfür gilt ansonsten auch der unter »ksecnd« gegebene Hinweis.</p>
+
+        <h3>klistn $FFB1 Ausgabe LISTEN auf IEC-Bus</h3>
+
+        <p>Hiermit wird auf dem IEC-Bus ein »Listen« ausgegeben, also die Kennzeichnung, daß jetzt Daten-Bytes folgen. Hierfür gilt ansonsten auch der unter »ksecnd« gegebene Hinweis.</p>
+
+        <h3>ktalk $FFB4 Ausgabe TALK auf IEC-Bus</h3>
+
+        <p>Hiermit wird auf dem IEC-Bus ein »Talk« ausgegeben, also die Kennzeichnung, daß jetzt Daten zu senden sind. Hierfür gilt ansonsten auch der unter »ksecnd« gegebene Hinweis.</p>
+
+        <h3>kreads $FFB7 Aktueller Status (RS232 beziehungsweise Syst.) nach AC</h3>
+
+        <p>Hiermit kann der aktuelle Status nach einer Ein-/Ausgabeoperation abgefragt werden. Der Status enthält eine Null, wenn die Operation fehlerfrei abgeschlossen wurde, ansonsten wird, bitweise verschlüsselt, ein Hinweis auf die Art des Fehlers gegeben. Die einzelnen Bits haben, sofern sie auf »1« gesetzt sind, folgende Bedeutung:</p>
+
+        <table class="plain">
+            <tr>
+                <th>Bit</th>
+                <th>Bedeutung</th>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>Timeout (Zeitüberschreitung) beim Schreiben</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Timeout (Zeitüberschreitung) beim Lesen</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Zu kurzer Datenblock (Nur Kassette)</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Zu langer Datenblock (Nur Kassette)</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Schwerer Fehler, nicht weiter spezifiziert</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Prüfsummenfehler</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Dateiende, kein Fehler, nur ein Hinweis</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Angesprochenes Gerät nicht angeschlossen oder Bandende (nur Kassette)</td>
+            </tr>
+        </table>
+
+        <h3>kstlfs $FFBA la, fa, sa aus ac, xr, yr setzen</h3>
+
+        <p>Die aktuellen Parameter für eine zu öffnende Datei können hiermit gesetzt werden. Der Akkumulator muß die logische Dateinummer, das X-Register die Gerätenummer und das Y-Register die Sekundäradresse enthalten. Zusätzlich ist im Anschluß an diese Funktion unter Umständen noch der Dateiname mit der im folgenden beschriebenen Funktion »setnam« anzugeben.</p>
+
+        <h3>kstnam $FFBD fnlen, fnadr aus ac, xr, yr setzen</h3>
+
+        <p>Hiermit können die Parameter für einen Dateinamen beim Eröffnen einer Datei gesetzt werden. Der Akkumulator muß die Länge des Dateinamens und, sofern die Länge nicht null – also kein Dateiname vorhanden – ist, das X-Register das Low-Byte der Dateinamenadresse und das Y-Register das High-Byte enthalten. Zusätzlich ist noch mit der Routine »setbnk« (siehe dort) die Banknummer zu definieren, in der der Dateiname steht. Falls nicht schon geschehen, werden außerdem mit der oben beschriebenen Routine »kstlfs« die Parameter für Dateinummer, Geräte- und Sekundäradresse definiert.</p>
+
+        <h3>kopen $FFC0 Logisches File öffnen</h3>
+
+        <p>Eine zuvor mit den oben beschriebenen Parametern versehene Datei kann mit dieser Routine geöffnet werden. Nach der Operation zeigt das Carry-Flag an, ob die Funktion erfolgreich (Carry nicht gesetzt) oder fehlerhaft (Carry gesetzt) war.</p>
+
+        <h3>kclose $FFC3 Logisches File schließen</h3>
+
+        <p>Eine zuvor geöffnete Datei kann mit dieser Funktion wieder geschlossen werden. Der Akkumulator muß hierzu die logische Dateinummer enthalten. Nach der Operation zeigt das Carry-Flag an, ob das Eröffnen erfolgreich (Carry nicht gesetzt) oder fehlerhaft (Carry gesetzt) war.</p>
+
+        <h3>kchkin $FFC6 Eingabe-Kanal öffnen</h3>
+
+        <p>Diese Routine dient zum Einlesen von Daten von beliebigen Geräten. Zuvor ist eine entsprechende Datei zu öffnen, wobei hier jedes Gerät verwendet werden kann, das als Eingabegerät zugelassen ist, also IEC-Bus (Gerätenummern 4 bis 15), Kassette (#1), RS232-Schnittstelle (#2) und Bildschirm (#0).</p>
+
+        <p>Beim Aufruf der Routine muß das X-Register die logische Dateinummer enthalten. Alle folgenden Aufrufe zum Beispiel der Routine »kgetin« (siehe dort) lesen jeweils ein Zeichen vom angesprochenen Gerät, bis mit der Routine »kclrch« die Eingabe wieder auf die Tastatur zurückgestellt wird.</p>
+
+        <h3>kckout $FFC9 Ausgabe-Kanal öffnen</h3>
+
+        <p>Diese Routine dient zum Ausgeben von Daten auf beliebige Geräte. Zuvor ist eine entsprechende Datei zu öffnen. Dabei kann jedes Gerät verwendet werden, das als Ausgabegerät zugelassen ist, also IEC-Bus (Gerätenummern 4 bis 15), Kassette (#1), RS232-Schnittstelle (#2) und Bildschirm (#3).</p>
+
+        <p>Beim Aufruf der Routine muß das X-Register die logische Dateinummer enthalten. Alle folgenden Aufrufe zum Beispiel der Routine »kbsout« (siehe dort) schreiben jeweils ein Zeichen auf das angesprochene Gerät, bis mit der Routine »kclrch« die Ausgabe wieder auf den Bildschirm zurückgestellt wird.</p>
+
+        <h3>kclrch $FFCC Ein/Ausgabe-Kanal schließen</h3>
+
+        <p>Diese Routine stellt nach erfolgter Datenein- oder -ausgabe wieder auf den Bildschirm als Ausgabe- und die Tastatur als Eingabegerät zurück.</p>
+
+        <h3>kbasin $FFCF Zeichen vom aktiven Kanal nach AC</h3>
+
+        <p>Hiermit wird ein Zeichen vom aktiven Eingabe-Kanal gelesen. Normalerweise wird ein Zeichen aus der aktuellen Bildschirmposition gelesen, es sei denn, mit »kchkin« ist zuvor eine Datei als Eingabe-Kanal aktiviert worden.</p>
+
+        <h3>kbsout $FFD2 Ausgabe AC auf aktiven Kanal</h3>
+
+        <p>Hiermit wird ein Zeichen auf dem aktiven Ausgabe-Kanal ausgegeben. Normalerweise wird ein Zeichen an der aktuellen Bildschirmposition ausgegeben, es sei denn, mit »kckout« wurde zuvor eine Datei als Ausgabe-Kanal aktiviert.</p>
+
+        <h3>kloads $FFD5 Load/verify (AC) ab Adresse in xr/yr</h3>
+
+        <p>Hiermit kann ein Programm geladen beziehungsweise mit einem im Speicher stehenden Programm verglichen werden. Hierzu sind zunächst die Parameter für den Dateinamen zu setzen, und dann die Routine aufzurufen. Im Akkumulator muß angegeben werden, ob ein »Load« (Akku = $00) oder ein »Verify« (Akku &lt;> $00) durchgeführt werden soll. Der Lade- oder Vergleichsvorgang beginnt ab der in der Datei angegebenen Startadresse, sofern die Sekundäradresse null ist. Ist die Sekundäradresse ungleich null, so wird die Datei an die Adresse geladen, die im X-Register (Low-Byte) und im Y-Register (High-Byte) angegeben ist.</p>
+
+        <h3>ksaves $FFD8 Save ab ac bis xr, yr</h3>
+
+        <p>Mit dieser Routine kann ein im Speicher stehendes Programm in einer Datei gesichert werden. Hierzu sind zunächst die Parameter für den Dateinamen zu setzen, und dann die Routine aufzurufen. Im Akkumulator muß die Adresse eines Zeropage-Registerpaares angegeben werden, das die Startadresse im Speicher enthält. Die Endadresse wird beim Aufruf mitgeteilt, wobei das X-Register das Low-Byte und das Y-Register das High-Byte enthalten muß.</p>
+
+        <h3>ksttim $FFDB Systemuhr setzen</h3>
+
+        <p>Das Betriebssystem des C 128 stellt eine Systemuhr zur Verfügung, die jeweils im Interrupt fortgeschrieben wird. Mit dieser Routine kann die Uhr auf einen neuen Wert gesetzt werden, wobei die Uhrzeit in <sup>1</sup>/<sub>60</sub>-Sekunden anzugeben ist. Eine Sekunde entspricht somit dem Wert 60, eine Minute dem Wert 3600 und eine Stunde dem Wert 216000. Die Uhrzeit ist aus diesen Werten zu errechnen, wobei zum Beispiel 10 Uhr, 5 Minuten und 20 Sekunden dem Wert 2179200 entspricht. Diese Zahl ist ins binäre Datenformat umzurechnen und in drei Byte der Routine zu übergeben, wobei der Akkumulator das höchstwertige Byte enthält. In unserem Beispiel enthalten die Register folgende Werte:</p>
+
+        <p>Akku = 33, XR = 64 und YR = 128, denn (33 * 65536) + (64 * 256) + 128 = 2179200.</p>
+
+        <h3>krdtim $FFDE Systemuhr nach ac, xr, yr</h3>
+
+        <p>Die vom C 128 verwaltete Systemuhr kann mit dieser Routine gelesen werden, wobei die Uhrzeit als Anzahl der seit Null Uhr vergangenen <sup>1</sup>/<sub>60</sub>-Sekunden zu interpretieren ist. Eine Beschreibung finden Sie beim vorhergehenden Befehl. Die Register enthalten die Werte in der dort angegebenen Reihenfolge.</p>
+
+        <h3>kstop $FFE1 &lt;RUN/STOP&gt;-Taste lesen</h3>
+
+        <p>Durch diese Routine kann festgestellt werden, ob die &lt;RUN/STOP&gt;-Taste gedrückt wurde. Nach dem Aufruf der Funktion ist das Zero-Flag entsprechend gesetzt, das heißt ein BEQ-Befehl direkt nach der Routine verzweigt, wenn die &lt;RUN/STOP&gt;-Taste gedrückt wurde. Zu beachten ist, daß die Routine auch gleichzeitig – natürlich nur bei gedrückter &lt;RUN/STOP&gt;-Taste – die Standard-Ein/Ausgabe-Kanäle Tastatur und Bildschirm wieder herstellt.</p>
+
+        <h3>kgetin $FFE4 Zeichen vom aktiven Kanal nach AC</h3>
+
+        <p>Die Routine liest ein Zeichen vom aktiven Kanal in den Akkumulator, also im Normalfall von der Tastatur, es sei denn, mit »kchkin« ist der Eingabe-Kanal zuvor auf ein anderes Gerät umgeleitet worden.</p>
+
+        <h3>kclall $FFE7 Filetabelle löschen, Vorgabe-I/O</h3>
+
+        <p>Diese Routine setzt zunächst wieder die Standard-Ein/Ausgabe-Kanäle und schließt gleichzeitig alle eventuell offenen Dateien aller Gerätenummern.</p>
+
+        <h3>kclock $FFEA Systemuhr aktualisieren</h3>
+
+        <p>Diese Routine, die vom Interrupt aufgerufen wird, erhöht die Systemuhr um eine <sup>1</sup>/<sub>60</sub>-Sekunde. Sie sollte nur benutzt werden, wenn Sie eine eigene Interrupt-Routine und die Systemuhr in Ihrem Programm verwenden. Es muß allerdings sichergestellt sein, daß nur der periodisch ausgelöste System-Interrupt und nicht etwa Interrupts durch Ein-/Ausgabe-Bausteine diese Routine aufrufen; ansonsten ist mit großen Abweichungen in der Genauigkeit der Uhr zu rechnen.</p>
+
+        <h3>kscror $FFED Bildschirm-Organisation lesen</h3>
+
+        <p>Diese Routine ruft die unter den Editor-Funktionen beschriebene Funktion »jscorg« auf.</p>
+
+        <h3>kplot $FF0 Cursor-Position lesen/schreiben</h3>
+
+        <p>Diese Routine ruft die unter den Editor-Funktionen beschriebene Funktion »jplot« auf.</p>
+
+        <h3>kiobas $FFF3 Basis-Adresse I/O-Bausteine nach xr/yr</h3>
+
+        <p>Hiermit erhalten Sie nach dem Aufruf die Basis-Adresse der Ein-/Ausgabe-Bausteine ($D000) im X-Register (Low-Byte) und Y-Register (High-Byte).</p>
+
+        <p>Damit ist unsere Reise durch das Betriebssystem des C 128 abgeschlossen. Bleibt nur noch, Ihnen viel Erfolg beim kreativen Programmieren mit Ihrem Computer zu wünschen. Auch wenn beim ersten Anlauf nicht alles so funktioniert, wie Sie es sich vorstellen, lassen Sie den Kopf nicht hängen. Es ist noch kein Meister vom Himmel gefallen.</p>
+
+        <address class="author">(ah)</address>
+
+        <p class="source">Der vorstehende Artikel ist ein Auszug aus dem Buch:<br>
+            C 128 ROM-Listing, erschienen bei Markt&amp;Technik, Hans-Pinsel-Straße 2, 8013 Haar, Best.-Nr.: ISBN 3-89090-221-9, Preis: 49 Mark</p>
+    </article>
+</body>
+
+</html>

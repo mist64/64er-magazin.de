@@ -1,0 +1,304 @@
+;character-80.a.prg ==1c01==
+    1 rem "        Character-80.a
+    2 :
+    3 rem "holt Character aus ROM auf Hires
+    4 :
+    5 rem "         (c) by KRW
+    6 :
+    7 rem "            1985
+    8 :
+    9 rem "         version 1.2
+   10 :
+   11 :
+   12 rem "*** {SHIFT--}bergabe: ***"
+   13 :
+   14 rem "Mittelpunkt des zu setzenden Punktes
+   15 rem "in $1150/51 (x) und $1152/53 (y)
+   20 :
+   30 n$="character.m"
+   40 open 15,8,15,"s0:"+n$: gosub 60100
+   50 open 2,8,2,n$+",p,w": gosub 60100
+   60 :
+   70 sys 9*4096
+   80 ;
+   90 .opt o2
+  100 ;
+  110 ; "*** Variable ***"
+  120 ;
+  130 varadr  = $24           ; "Adresse der Zeichenkette in Bank 1
+  140 cntbyt  = $6a           ; "Byte-Z{CBM-F}hler
+  150 bits    = $6b           ; "Bit-Z{CBM-F}hler
+  160 zero    = $6c           ; "2-Byte-Arbeitszeiger
+  170 length  = $70           ; "L{CBM-F}nge der darzustellenden Zeichenkette
+  180 posi    = $71           ; "Zeiger auf akt. Buchstaben i.d. Zeichenkette
+  190 rvsflag = $f3           ; "Flag f{CBM-X}r invertierte Darstellung
+  200 xpos    = $1160         ; "relative Position des Buchstabencursors
+  210 ypos    = $1162         ; "zum Ausgangspunkt (x/y)
+  220 ;
+  230 ; "*** Konstanten ***"
+  240 ;
+  250 centrx  = 4             ; "Zentrierung: Abstand des Mittelpunktes von
+  260 centry  = 4             ; "den Eckpunkten (x/y)
+  270 chrrom  = $d000         ; "Anfang des Character-ROMs, Gro{CBM-V}-/Graphikschrift
+  280 chrrom2 = $d800         ; "Anfang des Character-ROMs, Gro{CBM-V}-/Kleinschrift
+  290 ;
+  300 ; "*** Unterprogrammadressen ***"
+  310 ;
+  320 rotate  = $139e         ; "Drehung ausf{CBM-X}hren (UP s.u. !)
+  330 setpnt  = $1400         ; "Punkt setzen/ l{CBM-C}schen (UP in 'Graphik-80')
+  340 chrold  = $67d7         ; "'alter' CHAR-Befehl im BASIC-ROM
+  350 chkcom  = $795c         ; "pr{CBM-X}fen, ob Komma
+  360 fetvar  = $877b         ; "Adresse der Zeichenkette nach $64
+  370 fetang  = $9e06         ; "Winkel holen
+  380 fetcol  = $9e32         ; "Farbparameter holen
+  390 fetcor  = $9e52         ; "Koordinaten holen
+  400 fetvdc  = $cdda         ; "Inhalt des 8563(VDC)-Registers in X holen
+  410 ;
+  420 *= $1ab7
+ 1000 ;
+ 1010 ; " *** 'Hauptschleife': Auswertung des BASIC-Befehls CHAR *** "
+ 1020 ;
+ 1030 ^       lda #$00
+ 1040 ^       sta $ff00     ; "ROM+I/O einschalten
+ 1050 ^       ldx #$19
+ 1060 ^       jsr fetvdc    ; "Inhalt des Registers 25 im VDC holen
+ 1070 ^       bmi chrnew    ; "Graphikmodus, dann neue CHAR-Routine
+ 1080 ^       jmp chrold    ; "Textmodus, dann 'normale' CHAR-Routine
+ 1090 chrnew  jsr fetcol    ; "Farbparameter holen
+ 1100 ^       ldx #$1f
+ 1110 ^       jsr fetcor    ; "Koordinaten nach $1150-1153 holen
+ 1120 ^       jsr fetang    ; "Drehwinkel
+ 1130 ^       sty $115c     ; "nach $115c/5d holen
+ 1140 ^       sta $115d
+ 1150 ^       lda #$00
+ 1160 ^       ldx #$07
+ 1170 leer    sta xpos,x    ; "Bereich von $1160 bis 1167 l{CBM-C}schen
+ 1180 ^       dex
+ 1190 ^       bpl leer
+ 1200 ^       sta posi      ; "Zeiger akt. Position in der Zeichenkette auf 0
+ 1210 ^       jsr chkcom    ; "auf Komma testen
+ 1220 ^       jsr fetvar    ; "Adresse der Zeichenkette holen
+ 1230 ^       sta length    ; "L{CBM-F}nge merken
+ 1240 chrok   ldy posi      ; "akt. Zeichen in der Zeichenkette
+ 1250 ^       cpy length    ; "schon Ende
+ 1260 ^       beq fertig    ; "ja => Routine fertig
+ 1270 ^       lda #$7f
+ 1280 ^       sta $ff00     ; "Bank 1 einschalten
+ 1290 ^       lda (varadr),y; "nein => Zeichen holen
+ 1300 ^       ldx #$00
+ 1310 ^       stx $ff00     ; "Bank 15 einschalten
+ 1320 ^       jsr chr0      ; "Zeichen auswerten/ ausgeben
+ 1330 ^       inc posi      ; "ein Zeichen weiter
+ 1340 ^       bne chrok     ; "Schleife ---->
+ 1350 fertig  rts
+ 1360 ;
+ 1370 ; " *** Zeichen ausgeben oder auswerten *** "
+ 1380 ;
+ 1390 chr0    tay            ; "Zeichen in Y merken
+ 1400 ^       cmp #"{rvon}"       ; "Ist Zeichen von CHAR verwertbares Steuerzeichen ?
+ 1410 ^       bne inst2
+ 1420 ^       lda #$04       ; "Reverse-Flag setzen
+ 1430 ^       bne inst2a
+ 1440 inst2   cmp #"{rvof}"
+ 1450 ^       bne inst3
+ 1460 ^       lda #$00       ; "Reverse-Flag l{CBM-C}schen
+ 1470 inst2a  sta rvsflag
+ 1480 ^       rts
+ 1490 inst3   cmp #"{up}"       ; "Halbschritt h{CBM-C}her
+ 1500 ^       bne inst4
+ 1510 hoch    sec
+ 1520 ^       lda ypos
+ 1530 ^       sbc #centry    ; "Halbschritt h{CBM-C}her = akt. y-Pos.-1/2*Zeichenh{CBM-C}he
+ 1540 ^       sta ypos
+ 1550 ^       bcs hoch1
+ 1560 ^       dec ypos+1
+ 1570 hoch1   rts
+ 1580 inst4   cmp #"{down}"       ; "Halbschritt tiefer
+ 1590 ^       bne code
+ 1600 tief    clc
+ 1610 ^       lda ypos
+ 1620 ^       adc #centry    ; "Halbschritt tiefer = akt. y-Pos.+1/2*Zeichenh{CBM-C}he
+ 1630 ^       sta ypos
+ 1640 ^       bcc tief1
+ 1650 ^       inc ypos+1
+ 1660 tief1   rts
+ 1670 ;
+ 1680 ; " *** Zeichen von String- in Bildschirmcode wandeln *** "
+ 1690 ;
+ 1700 code    and #$7f       ; "Code 128-255 nach 0-127 wandeln
+ 1710 ^       cmp #" "       ; "druckbares Zeichen ?
+ 1720 ^       bcc fertig     ; "nein, dann fertig
+ 1730 ^       tya            ; "Zeichen
+ 1740 ^       cmp #$80       ; "gr{CBM-C}{CBM-V}er als 127 ?
+ 1750 ^       bcs chr99      ; "ja -->
+ 1760 ^       cmp #$60       ; "kleiner als 96 ?
+ 1770 ^       bcc chr97      ; "ja -->
+ 1780 ^       and #%11011111 ; "Zeichen 96-127 nach 64-95 wandeln
+ 1790 ^       bcs chr98      ; "immer
+ 1800 chr97   and #%10111111 ; "Zeichen 64-95 nach 0-31 wandeln, Zeichen 32-63
+ 1810 ^       bcc chr98      ; "bleiben unver{CBM-F}ndert, weiter bei chr98
+ 1820 chr99   and #%01111111 ; "Zeichen 192-223 nach 64-95, 160-191 und 224-255
+ 1830 ^       ora #%01000000 ; "nach 96-127 wandeln
+ 1840 chr98   ldx #$00       ; "CHARROM-Adresse des Zeichens errechnen:
+ 1850 ^       ldy #$03       ; "Code * 8
+ 1860 ^       sta zero
+ 1870 ^       stx zero+1
+ 1880 chr01   asl zero       ; "3 mal nach links schieben
+ 1890 ^       rol zero+1     ; "entspricht zero=zero*8
+ 1900 ^       dey
+ 1910 ^       bne chr01
+ 1920 ^       clc
+ 1930 ^       lda zero
+ 1940 ^       adc #<chrrom   ; "zur CHAR-ROM-Startadresse addieren
+ 1950 ^       sta zero       ; "als Zeiger in der Zeropage merken
+ 1960 ^       lda zero+1
+ 1970 ^       ldx $f1        ; "Attribut-Flag
+ 1980 ^       bmi uplow      ; "Bit 7 gesetzt, wenn Gro{CBM-V}-/Kleinschrift gew{CBM-F}hlt
+ 1990 ^       adc #>chrrom   ; "high-Byte der CHARROM-Adresse f{CBM-X}r Gro{CBM-V}-/Graphik
+ 2000 ^       .byt $2c
+ 2010 uplow   adc #>chrrom2  ; "high-Byte der CHARROM-Adresse f{CBM-X}r Gro{CBM-V}-/Klein
+ 2020 ^       adc rvsflag    ; "wenn Reverse-Modus eingeschaltet, noch 4 dazu
+ 2030 ^       sta zero+1
+ 2040 ^       jsr chradd
+ 2050 ^       ldx #$01       ; "Bytes des gew{CBM-X}nschten Zeichens aus ROM holen
+ 2060 ^       stx $ff00      ; "CHAR-ROM einschalten
+ 2070 ^       ldy #7         ; "8 Bytes holen
+ 2080 chr1    lda (zero),y   ; "und auf Stack
+ 2090 ^       pha            ; "schieben
+ 2100 ^       dey
+ 2110 ^       bpl chr1
+ 2120 ^       ldx #$00       ; "alte RAM-Konfiguration zur{CBM-X}ck
+ 2130 ^       stx $ff00
+ 2140 ^       ldx #8
+ 2150 ^       stx cntbyt     ; "Byte-Z{CBM-F}hler 8 Bytes
+ 2160 chr2    stx bits       ; "zu je 8 Bits
+ 2170 chr3    pla            ; "auszugebendes Bit
+ 2180 ^       rol            ; "ins carry-Bit holen
+ 2190 ^       pha
+ 2200 ^       bcc chr3a      ; "'Leer-Punkt' {CBM-X}berspringen
+ 2210 ^       jsr rotate     ; "Drehung ausf{CBM-X}hren
+ 2220 ^       jsr setpnt     ; "Punkt setzen/ l{CBM-C}schen
+ 2230 chr3a   inc xpos
+ 2240 ^       bne chr4
+ 2250 ^       inc xpos+1
+ 2260 chr4    dec bits
+ 2270 ^       bne chr3
+ 2280 ^       clc
+ 2290 ^       lda #$01
+ 2300 ^       adc ypos       ; "n{CBM-F}chstes Byte A Zeilen tiefer
+ 2310 ^       sta ypos
+ 2320 ^       bcc chr9
+ 2330 ^       inc ypos+1
+ 2340 chr9    pla            ; "abgearbeitetes Byte
+ 2350 ^       sec            ; "x-Koordinate wiederherstellen
+ 2360 ^       lda xpos
+ 2370 ^       sbc #8
+ 2380 ^       sta xpos
+ 2390 ^       bcs chr11
+ 2400 ^       dec xpos+1
+ 2410 chr11   ldx #8         ; "bit-Z{CBM-F}hler neu laden
+ 2420 ^       dec cntbyt     ; "Byte-Z{CBM-F}hler erniedrigen
+ 2430 ^       bne chr2
+ 2440 ^       sec            ; "Buchstabencursor
+ 2450 ^       lda ypos       ; "auf Mittelpunkt zur{CBM-X}ckstellen:
+ 2460 ^       sbc #$04       ; "1. y-Richtung
+ 2470 ^       sta ypos
+ 2480 ^       bcs chr10
+ 2490 ^       dec ypos+1
+ 2500 chr10   clc
+ 2510 ^       lda xpos
+ 2520 ^       adc #centrx+8  ; "2. x-Richtung
+ 2530 ^       sta xpos       ; "Mittelpunkt des n{CBM-F}chsten Zeichens
+ 2540 ^       bcc chr12
+ 2550 ^       inc xpos+1
+ 2560 chr12   rts
+ 2570 ;
+ 2580 chradd  sec
+ 2590 ^       lda xpos
+ 2600 ^       sbc #centrx    ; "Offset zur Zentrierung
+ 2610 ^       sta xpos       ; "abziehen
+ 2620 ^       bcs chradd1
+ 2630 ^       dec xpos+1
+ 2640 chradd1 jmp hoch
+ 2650 ;
+ 2660 .end
+ 4000 :
+ 4010 rem " *** UP Koordinatentransformation ($139e-$13ff) *** "
+ 4020 :
+ 4030 close 2
+ 4040 n$="rotate.m"
+ 4050 print#15,"s0:"+n$: gosub 60100
+ 4060 open 2,8,2,n$+",p,w": gosub 60100
+ 4070 :
+ 4080 sys 9*4096
+ 4090 .opt o2
+ 4100 *= $139e
+ 4110 ;
+ 4120 ; " *** Unterprogrammadressen ***"
+ 4130 ;
+ 4140 sinus   = $9a74  ; "Sinus und Cosinus des Winkels in ($1131+Y) berechnen
+ 4150 multi   = $9af3  ; "Koordinaten in $1154-$115b mit sin/cos multiplizieren
+ 4160 add     = $9d6d  ; "Koord. ($1131+Y) plus ($1131+X) gleich (A,Y)
+ 4170 add2    = $9d70  ; "Koord. (A,Y) plus ($1131+X) gleich (A,Y)
+ 4180 subtr   = $9d7c  ; "(A,Y) gleich Koord. ($1131+Y) minus ($1131+X)
+ 4190 divide  = $9dae  ; "($1131+x)*(A,Y)/2^16
+ 4200 ;
+ 4210 ;
+ 4220 ^       ldy #$2b        ; "sin u.cos des Winkels in $115c/d berechnen
+ 4230 ^       jsr sinus       ; "und in $114a/b (sin), $114c/d (cos) ablegen
+ 4240 ^       ldx #$03
+ 4250 kopier  lda $1160,x
+ 4260 ^       sta $1154,x     ; "die rel. Koordinaten x ($1160/61) und
+ 4270 ^       sta $1158,x     ; "y ($1162/63) in $1154/55 und $1158/59
+ 4280 ^       dex             ; "bzw. $1156/57 und $115a/5b
+ 4290 ^       bpl kopier      ; "abspeichern
+ 4300 ^       lda #%10010000  ; "Flag: 0 sinus, 1 cosinus, Bit 7-4 g{CBM-X}ltig
+ 4310 ^       jsr multi       ; "die 4 Koord. in $1154-115b entspr. dem Flag in A                                mit sin/cos multipl.u.Ergeb.in $1154-5b ablegen
+ 4320 ^       asl $1154       ; "x-Anteil von (x neu) mal 2
+ 4330 ^       rol $1155
+ 4340 ^       asl $1156       ; "y-Anteil von (x neu) mal 2
+ 4350 ^       rol $1157
+ 4360 ^       ldx #$27        ; "x-Anteil von (y neu) mal 0,874
+ 4370 ^       ldy #$df
+ 4380 ^       jsr korrig
+ 4390 ^       ldy #$ef        ; "verdoppelten x-Anteil von (x neu) mal 0,937
+ 4400 ^       ldx #$23
+ 4410 ^       jsr korrig      ; "ergibt 'Gesamtkorrekturfaktor' von 1,873
+ 4420 ^       ldy #$25
+ 4430 ^       jsr add         ; "$1156/57 + $1154/55 = (A,Y)
+ 4440 ^       ldx #$1f
+ 4450 ^       jsr add2        ; "(A,Y) + $1150/51 = (A,Y)
+ 4460 ^       sta $1131       ; "als x-Koordinate f{CBM-X}r 'setpoint' merken
+ 4470 ^       sty $1132
+ 4480 ^       ldx #$27
+ 4490 ^       ldy #$29
+ 4500 ^       jsr subtr       ; "$115a/5b - $1158/59 = (A,Y)
+ 4510 ^       ldx #$21
+ 4520 ^       jsr add2        ; "(A,Y) + $1152/53 = (A,Y)
+ 4530 ^       sta $1133       ; "als y-Koordinate f{CBM-X}r 'setpoint' merken
+ 4540 ^       sty $1134
+ 4550 ^       rts
+ 4560 ;
+ 4570 korrig  lda #$c0        ; "low-Byte des Multiplikationsfaktors
+ 4580 ^       jsr divide      ; "high-Byte in Y, die 16-Bit-Zahl in ($1131+X)
+ 4590 ^       sta $1131,x     ; "wird multipliziert, das Produkt in ($1131+X)
+ 4600 ^       tya             ; "abgelegt
+ 4610 ^       sta $1132,x
+ 4620 ^       rts
+ 4630 ;
+ 4640 .end
+ 4650 end
+ 4660 :
+60000 zz$="character-80.a": un=8
+60010 open 15,un,15,"s0:"+zz$
+60020 gosub 60100
+60030 save zz$,un
+60040 gosub 60100
+60050 verify zz$,un
+60060 close 15
+60070 end
+60100 input#15, s1, s$, s2, s3
+60110 if s1=1 then print s2; s$
+60120 if s1<20 then return
+60130 print s1 ", " s$ "," s2; "," s3
+60140 close 15

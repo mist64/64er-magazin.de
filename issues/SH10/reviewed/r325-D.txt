@@ -1,0 +1,97 @@
+# r325 reader D — SH10 articles 3, 6, 71
+# Locator: tesseract tsv over masters600 (word boxes, 600 dpi px). Crops are montages
+# of masters600 regions (x,y,w,h at 600 dpi), numbered cNN; each read once.
+
+## Article 3 "C 128 – der Weg zum Profi" (p3)
+Read in full against truth/003.txt (word-identical except Tips&Tricks spacing).
+
+REJECT  p3  "Tips&amp;Tricks" (x2) stays closed — truth/003 reads "Tips & Tricks"; page prints
+        "Tips&Tricks" closed at both sites. crop c01 = 003:600,5200,1200,120 + 003:3500,6000,1100,120
+PRINT-ERROR p3 "Wer seinen C 128 schon einmal geöffnet hat, wird der freie Steckplatz aufgefallen sein"
+        (grammar: dem/wird) — page prints "wird der". crop c01 = 003:1100,6360,1100,120
+FIX: none.
+
+## Article 6 "Fragen und Antworten zum C 128" (pp 6-7, 9)
+Read in full; word-diffed against truth/006,007,009 (only diffs: einwandrei, Markt&Technik spacing,
+machine-name spacing). Futureteufelchen AND/OR 64 protected, not touched.
+Crop c02 = 007:400,990,1300,100 | 006:2000,3225,600,90 | 006:2700,3160,1100,90 | 006:3700,6390,1100,180 |
+           009:3900,1990,1300,180 | 009:3900,2760,1300,110 | 007:2300,3415,1100,100 | 009:3000,5890,1300,180 | 009:1700,4270,1100,90
+
+PRINT-ERROR p7  "einwandrei" (Manfred Kramer letter) — page prints "einwandrei" (truth/007 normalised it to einwandfrei). c02 007:400,990
+PRINT-ERROR p7  "Machinenprogramme" — page prints it. c02 007:2300,3415
+REJECT      p6  "Dietmar Hoffman" (one n) — page prints "Hoffman". c02 006:2000,3225
+REJECT      p6  "Markt&amp;Technik-Buch" closed — page closed (truth/006 spaced it). c02 006:2700,3160
+REJECT      p6  "Ihre Software" capital I — page prints "Ihre". c02 006:3700,6390
+REJECT      p9  "was kostet Sie?" capital S — page prints "Sie". c02 009:3900,2760
+REJECT      p9  "C 128-Mode" (not -Modus) — page prints "C128-Mode". c02 009:1700,4270
+REJECT      p9  "Speichererweiterungen 1700 (256 KByte) und 1750 (512 KByte)" — page "1700"/"1750 (512" seen in c02;
+            "(256" read by tesseract and truth/009 alike, not seen by eye in c02 (left of crop). The 1700 was a 128 KB unit:
+            magazine statement, not ours -> see FT-CANDIDATE list.
+FT-CANDIDATE p9 Cursor-Positionierung: »CHAR ,38,12«, wobei 38 die Spalte und 15 die Zeile angibt — command says row 12,
+            text says 15; page prints both as such (c02 009:3900,1990). Reader typing it gets row 12; harmless. Reasoned, not run.
+            Owner default: no Futureteufelchen.
+FT-CANDIDATE p9 1700 = 256 KByte (Commodore 1700 is 128 KB; 1764 is 256 KB) — from memory, not cited; low value. Owner default: no FT.
+PRINT-ERROR? p6 "die Gerätenummer einer der beiden Laufwerke" — grammar as in truth/006; not separately cropped (two readings agree).
+FIX: none.
+
+## Article 71 "Wunderwelt der Grafik" (pp 71-83)
+Read in full (all prose, headings, captions, the 5 typeset tables, every hand-typed <pre>). Word-diffed
+against truth/071-083; every digit run of the HTML confirmed present in a tesseract tsv of pp 71-83; every
+syntax/command line compared token-for-token with the tesseract line (spacing of SCALE 1, 400, 300 /
+CIRCLE A, XM,YM, RX,RY, W1,W2, W, S / PAINT A, X1,Y1, M / CHAR A, XT,YT, A$, R agree with page reading).
+Listings 1-3 are <pre data-filename> (disk) — out of scope; the article's line references (Zeile 20, 30,
+40-60; RUN200 / RUN160) checked against prg/multicolortest1.txt, multicolortest2.txt, hires-farbaend..txt: agree.
+Bild 6 checked self-consistently (RGBI bits = dez for all 16 rows) AND by eye (names + 40-Z codes): agrees.
+Bild 7 by eye: agrees. Bild 5, 8, 9: agree with truth; not separately cropped.
+
+FIX p75 hand-typed <pre> "$3E2/$3E3" (crop c03 = 075:240,2300,1900,820; last line c05 = 075:700,3140,1100,90):
+    was:  .$3E2: $DB = bin.1101 1011 / t j / 13 / ı1 / h'grün-1 /d'grau-1 Vordergr./Hintergr. $3E3: $D1 = bin.1101 0001 / j t / 13/ 1 / h'grün-1 / weiß-1 Vordergr./Multicolori1  (7 lines)
+    is:   10 lines, columns measured: pitch 41.9 px (bin.1101 @806 -> 1011 @1183 = 9 cells), col0 = $3E3 @312
+          "$3E2: $DB = bin.1101 1011"
+          arrows ↑ at col 17 and col 22 (tesseract ink-left 1025/1231 = 5 cells apart; "13" @1019 col 17, "11" @1225 col 22)
+          "                 13 / 11"   ("/" @1140 col 20)
+          "          h'grün-1 /d'grau-1"   (h'grün @724 col 10, "/d'grau" @1099 col 19)
+          "          Vordergr./Hintergr."  (own line; @725, y2724 — the HTML had joined it with the $3E3 line)
+          "$3E3: $D1 = bin.1101 0001", arrows same x, "                 13 /  1" ("1" @1268 = +43 px = one cell right of "11"@1225, units aligned)
+          "          h'grün-1 / weiß-1" (weiß @1180 col 21), "          Vordergr./Multicolor1" (seen: digit 1, not i)
+    Leading "." before $3E2: a grey speck at x282, left of the block margin (col0 = 312) — dirt, not text; dropped.
+FIX p73 <pre> "WINDOW 0,0, 39,24" -> "WINDOW 0,0,39,24" — page closed. crop c04 = 073:400,2790,900,100
+FIX p74 <pre> 'PRINT CHR$(2) "A"' -> 'PRINT CHR$(2)"A"' — page closed. crop c04 = 074:350,4090,1000,110
+FIX p76 "schließen lassen könnte aber die Suche" -> "könnte – aber" — dash at line end on page. c05 = 076:200,2910,2300,190
+FIX p82 "der richtige Kreis das heißt derjenige" -> "Kreis – das heißt" — line-end dash. c05 = 082:2400,3330,2300,280
+FIX p82 "wie in X-Richtung gezeichnet werden soll" -> "X-Richtung – gezeichnet" — line-end dash. c05 (same strip)
+FIX p83 "demselben Bildschirm mehrfach angewendet" -> "Bildschirm – mehrfach" — line-end dash. c05 = 083:200,2600,2300,190
+    (Sweep: tesseract tsv of pp 3,6,7,9,71-83 searched for every dash token that ends or starts a line; the four
+     above were the only prose ones missing from the HTML. Pattern: a line-final en dash was dropped at the join.)
+
+REJECT p81 "dort eine Farbe vorhanden, die von der ausgewählten" — truth/081 adds "ist"; page has no "ist". c04 = 081:500,5410,1500,110
+REJECT p81 "er führt sein verborgenes Leben" — truth/081 "ein"; page "sein". c04 = 081:3000,3600,1200,110
+REJECT p82 "Bezugssystem" — truth/082 "Bezugsystem"; page "Bezugssystem". c05 = 082:1300,5640,1000,110
+REJECT p82 "Grafik-Modi 1 und 2:X:Y = 1.6" / "3 und 4:X:Y = 3.2" closed after colon — page closed. c05 = 082:2400,4390,1300,200
+REJECT p82 SCALE n = 0 lists only "Grafik-Modi 1 und 2: X von 0 bis 319, Y von 0 bis 199" — tsv of p82 has n=0 / Grafik-Modi 1 und 2: / X von.. / n = 1 with nothing between; nothing lost (no crop).
+REJECT p77 "BSAVE"Bild",ON B0,P7168 TO P16191" — page agrees. c05 = 077:400,4000,1400,110
+REJECT p79 "größer als 33024" — page agrees. c05 = 079:600,4120,700,100
+REJECT p72 mark left of "Bildecke" (tsv dash token) — the frame line of Bild 3's box, no text. c06 = 072:2300,980,800,100
+REJECT p72 mark left of "(320*200)/8 = 8000" — speck, no dash. c06 = 072:100,5480,1000,110
+REJECT list items "<p>— …" (page sets en dash "–") — issue-wide house form (111, 148, 20, 28, 71 all use "<p>— "); not changed.
+
+PRINT-ERROR p83 "Die Zuordungen von »n«" — page prints "Zuordungen". c05 = 083:1700,3840,700,110
+PRINT-ERROR p73 "8192 bis 16385 Zeichenspeicher" and "Im Bereich 8192 bis 16385" (16 KB RAM ends at 16383) — page prints 16385 at both. c04 = 073:2700,2600,700,100 + 073:3000,4300,700,100
+PRINT-ERROR p77 "Nach all diesen etwas ermüdende aber notwendigen", p77 "alle beiden Farben", p76 "ab Zeile 160 beziehungsweise 200"
+    (Listing 2 MULTICOLORTEST2 continues at 200, Listing 3 HIRES-FARBAEND at 160 — the order is swapped against
+    the listings; prg/*.txt RUN200 / RUN160) — truth agrees on the words; not cropped.
+
+FT-CANDIDATE p81 CIRCLE 1,80,100,40:DRAW 1,0,40 TO 159,40 / DRAW 1,0,120 TO 159,120 — the text calls these the
+    tangents at the top and bottom of a circle centred y=100 with radius 40, i.e. y=60 and y=140; printed 40/120
+    (seen, c04 = 081:300,820,1800,200). A reader typing it sees lines that miss the circle altogether rather than
+    "cut" it. Reasoned, not run. Owner default: no Futureteufelchen.
+FT-CANDIDATE p73 16385 (above). Reasoned. Owner default: no FT.
+
+## Coverage — reader D
+Read in full: 3 (p3), 6 (pp 6-7, 9), 71 (pp 71-83). Nothing skimmed, nothing not reached.
+Out of scope: Listings 1-3 of 71 (<pre data-filename>, disk-owned).
+Images: 6 montage images (c01-c06) read / 6 seen, holding 32 page strips; none unseen, no [media removed].
+Not by eye (two independent readings agree — truth + tesseract): "(dezimal994)/(dezimal995)" closed, Handbuch page
+numbers 5-80/5-82/4-4/4-28/4-29, S-table rows S=10/20/30, Bild 5/8/9 cell text, 6's "einer der beiden Laufwerke".
+Totals: FIX 7 (all in 71) | REJECT 17 | PRINT-ERROR 7 | FT-CANDIDATE 4 (owner default: none added).
+Verification 4 (generate.py --future --join) not run by this reader — left to control (parallel readers).

@@ -1,0 +1,19 @@
+;f-tasten 1-10.prg ==242b==
+;version=70
+   10 rem undefinieren der f-tasten 1-10
+   20 rem  f 9 =  shift+run/stop
+   30 rem  f10 =  help-taste
+   40 rem  von frank probst im mai '86
+   50 :
+   60 a$="go64"+chr$(13)
+   70 f=10                :rem f-tastennummer
+   80 :
+   90 bank 1              :rem variablenbank
+  100 sd=pointer(a$)     :rem adresse des stringdiscriptors
+  110 l=peek(sd)         :rem = l=len(a$)
+  120 poke 252,peek(sd+1):rem lo-byte des stringzeigers
+  130 poke 253,peek(sd+2):rem hi-byte des stringzeigers
+  140 poke 254,1         :rem banknummer
+  150 :
+  160 bank 15
+  170 sys 65381,252,f,l  :rem aufruf von pfkey ($ff65)

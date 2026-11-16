@@ -1,0 +1,488 @@
+;hardcopy-80.a.prg ==1c01==
+    1 rem "                         Hardcopy-80
+    2 :
+    3 rem "            Routine erstellt Hires-Bilder auf FX-80
+    4 :
+    5 rem "                          (c) by KRW
+    6 :
+    7 rem "                             1985
+    8 :
+    9 rem "                          Version 1.4
+   10 :
+   11 :
+   50 zz$="hardcopy-80.m"
+   60 open 15,8,15,"s0:"+zz$
+   70 gosub 60100
+   80 open 2,8,2,zz$+",p,w"
+   90 gosub 60100
+  100 :
+  110 sys 9*4096
+  120 .opt o2
+  130 ;
+  140 ; "*** Konstante ***"
+  150 ;
+  160 nrcmd   = 4             ; "Anzahl der Befehle
+  170 bell    = 7             ; "Klingelzeichen
+  180 lf      = 10            ; "Linefeed
+  190 cr      = 13            ; "Return
+  200 esc     = 27            ; "Escape
+  210 fa      = 4             ; "Ger{CBM-F}teadresse des Druckers
+  220 sa      = 12            ; "Sekund{CBM-F}radresse des Druckers
+  230 ;
+  240 ; "*** Speicherstellen ***"
+  250 ;
+  260 savadr  = $fc           ; "Adress{CBM-X}bergabe (2 Byte)
+  270 savcnfg = $fe           ; "MMU-Registerzwischenspeicher
+  280 ldpnt   = $02aa
+  290 stpnt   = $02b9
+  300 ;
+  310 ; "*** Kernalroutinen ***"
+  320 ;
+  330 setnam  = $ffbd
+  340 setlfs  = $ffba
+  350 open    = $ffc0
+  360 close   = $ffc3
+  370 clrchn  = $ffcc
+  380 chkout  = $ffc9
+  390 chrout  = $ffd2
+  400 ;
+  410 quant   = $7d28
+  420 ;
+  430 ldfar   = $02a2         ; "von anderer Bank laden
+  440 stfar   = $02af         ; "in andere Bank speichern
+  450 ;
+  980 *= $f000
+  990 ;
+ 1000 init     sta savx      ; "gew{CBM-X}nschten Modus zwischenspeichern
+ 1010 ^        jsr incent    ; "Initialisierung der Centronicsschnittstelle
+ 1020 ^        ldx #endfar-jsfar
+ 1030 copyfar  lda jsfar,x   ; "Sprungroutine in gemeinsamen
+ 1040 ^        sta $0c00,x   ; "Speicherbereich kopieren
+ 1050 ^        dex
+ 1060 ^        bpl copyfar
+ 1070 ^        ldx savx      ; "Modus zur{CBM-X}ckholen
+ 1080 ^        beq error     ; "=0 -> Fehler
+ 1090 ^        cpx #nrcmd+1  ; "Anzahl der Druckmodi+1
+ 1100 ^        bcc init1     ; "kleiner -> erlaubt
+ 1110 error    ldx #<clrchn  ; "I/O auf Standard
+ 1120 ^        stx $0c0d
+ 1130 ^        ldx #>clrchn
+ 1140 ^        stx $0c0e
+ 1150 ^        jsr $0c00
+ 1160 ^        lda #bell     ; "2* Bell -> Fehler
+ 1170 ^        ldx #<chrout  ; "1* Bell -> Ende OK
+ 1180 ^        stx $0c0d
+ 1190 ^        ldx #>chrout
+ 1200 ^        stx $0c0e
+ 1210 ^        jsr $0c00
+ 1220 ^        ldx #0        ; "Warteschleife f{CBM-X}r Piepton
+ 1230 ^        ldy #0
+ 1240 err1     dey
+ 1250 ^        bne err1
+ 1260 ^        dex
+ 1270 ^        bne err1
+ 1280 ^        sec           ; "Fehler
+ 1290 ende     php           ; "Einsprung zum Beenden der Routine
+ 1300 ^        lda #bell
+ 1310 ^        ldx #<chrout
+ 1320 ^        stx $0c0d
+ 1330 ^        ldx #>chrout
+ 1340 ^        stx $0c0e
+ 1350 ^        jsr $0c00
+ 1360 ^        lda #4        ; "Druckerfile schlie{CBM-V}en
+ 1370 ^        ldx #<close   ; "und zur{CBM-X}ck ins BASIC
+ 1380 ^        stx $0c0d
+ 1390 ^        ldx #>close
+ 1400 ^        stx $0c0e
+ 1410 ^        jsr $0c00
+ 1420 ^        plp           ; "Fehlerstatus vom Stack holen
+ 1430 ^        bcs ende1     ; "Fehlerabbruch
+ 1440 ^        rts           ; "fehlerfrei
+ 1450 ;
+ 1460 ende1    ldx #<quant   ; "Illegal Quantity
+ 1470 ^        ldy #>quant
+ 1480 ^        stx $0c0d
+ 1490 ^        sty $0c0e
+ 1500 ^        jmp $0c00
+ 1510 ;
+ 1520 init1    dex           ; "x als Zeiger in Tabellen
+ 1530 ^        lda prtvor,x  ; "Papiervorschub des Druckers
+ 1540 ^        pha           ; "retten
+ 1550 ^        lda prtctl,x  ; "Druckersteuerung
+ 1560 ^        sta prtcmd1
+ 1570 ^        lda ctrl,x    ; "Programmsteuerbyte
+ 1580 ^        sta steuer
+ 1590 ^        and #%00000011 ; "aus x-Vervielfachung Anzahl
+ 1600 ^        tax           ; "der zu Uebertragenden Bytes pro Zeile errechnen
+ 1610 ^        ldy #<640     ; "Wert fuer keine Vervielfachung
+ 1620 ^        lda #>640
+ 1630 ^        sty prtcmd+1
+ 1640 ^        sta prtcmd
+ 1650 ^        dex
+ 1660 ^        beq init3     ; "keine Vervielfachung
+ 1670 init2    clc           ; "mal Vervielfachung
+ 1680 ^        tya           ; "Low-Byte
+ 1690 ^        adc prtcmd+1
+ 1700 ^        sta prtcmd+1
+ 1710 ^        lda prtcmd
+ 1720 ^        adc #>640
+ 1730 ^        sta prtcmd
+ 1740 ^        dex
+ 1750 ^        bne init2
+ 1760 init3    ldy #<160     ; "aus y-Vervielfachung Anzahl
+ 1770 ^        lda #>160     ; "der zu kopierenden Bytes errechnen
+ 1780 ^        sty copyl+1
+ 1790 ^        sta copyh+1
+ 1800 ^        ldx #100      ; "max. Anzahl der Druckerzeilen
+ 1810 ^        stx anzzei    ; "in Zaehler
+ 1820 ^        bit steuer
+ 1830 ^        php
+ 1840 ^        bpl init31    ; "keine Vervielfachung
+ 1850 ^        bvs init4     ; "v=1 -> y=y*2
+ 1860 init31   lsr anzzei    ; "Zeilen /2
+ 1870 ^        asl copyl+1   ; "Anzahl *2
+ 1880 ^        rol copyh+1
+ 1890 init4    plp
+ 1900 ^        bmi init5     ; "n=1 -> y=y*2*2
+ 1910 ^        lsr anzzei
+ 1920 ^        asl copyl+1
+ 1930 ^        rol copyh+1
+ 1940 init5    ldy copyl+1   ; "errechnete Anzahl in Z{CBM-F}hler uebernehmen
+ 1950 ^        lda copyh+1
+ 1960 ^        sty countl+1
+ 1970 ^        sta counth+1
+ 1980 ^        lda #0
+ 1990 ^        sta scrpnt    ; "Bildschirmzeiger auf Anfang Bildschirm
+ 2000 ^        sta scrpnt+1
+ 2010 ^        lda #0        ; "Druckerkanal {CBM-C}ffnen
+ 2020 ^        ldx #<setnam  ; "L{CBM-F}nge des Namen = 0
+ 2030 ^        stx $0c0d
+ 2040 ^        ldx #>setnam
+ 2050 ^        stx $0c0e
+ 2060 ^        jsr $0c00
+ 2070 ^        lda #4        ; "logische Filenummer (la)
+ 2080 ^        ldy #sa       ; "Sekund{CBM-F}radresse (sa)
+ 2090 ^        sty sekadr
+ 2100 ^        cpy #$ff      ; "Centronics ?
+ 2110 ^        beq in2       ; "ja -> kein File auf seriellem Bus {CBM-C}ffnen
+ 2120 ^        ldx #<setlfs
+ 2130 ^        stx $0c0d
+ 2140 ^        ldx #>setlfs
+ 2150 ^        stx $0c0e
+ 2160 ^        ldx #fa       ; "Ger{CBM-F}teadresse (fa)
+ 2170 ^        jsr $0c00
+ 2180 ^        ldx #<open    ; "File {CBM-C}ffnen
+ 2190 ^        stx $0c0d
+ 2200 ^        ldx #>open
+ 2210 ^        stx $0c0e
+ 2220 ^        jsr $0c00
+ 2230 ^        bcc in12      ; "Fehler bei OPEN aufgetreten -> Abbruch
+ 2240 ^        pla           ; "Papiervorschubsteuerung vom Stack
+ 2250 ^        jmp error
+ 2260 ;
+ 2270 in12     ldx #4        ; "Ausgabe auf Drucker umlenken
+ 2280 ^        lda #<chkout
+ 2290 ^        sta $0c0d
+ 2300 ^        lda #>chkout
+ 2310 ^        sta $0c0e
+ 2320 ^        jsr $0c00
+ 2330 in2      lda #esc      ; "Druckervorschub einstellen
+ 2340 ^        jsr aufbus
+ 2350 ^        lda #"3"      ; "Vorschub = nn/216 Zoll
+ 2360 ^        jsr aufbus
+ 2370 ^        pla
+ 2380 ^        jsr aufbus    ; "nn ausgeben
+ 2390 ^        jsr drucker   ; "Drucker in Bitmode schalten
+ 2400 ^        jmp copy1
+ 2410 ;
+ 2420 copy     clc           ; "Zeiger f{CBM-X}r Bildschirmram erh{CBM-C}hen
+ 2430 ^        lda scrpnt
+ 2440 copyl    adc #00       ; "wird bei init eingesetzt
+ 2450 ^        sta scrpnt
+ 2460 ^        lda scrpnt+1
+ 2470 copyh    adc #00
+ 2480 ^        sta scrpnt+1
+ 2490 copy1    lda #<buffer  ; "Zeiger auf Anfang des Buffers
+ 2500 ^        ldx #>buffer
+ 2510 ^        sta bufpnt+1
+ 2520 ^        stx bufpnt+2
+ 2530 countl   lda #$00      ; "Anzahl der Bytes (low Byte)
+ 2540 counth   ldy #$00      ; "Anzahl der Bytes (High Byte)
+ 2550 ^        sta counter
+ 2560 ^        sty counter+1
+ 2570 ;
+ 2580 ; "*** Bytes aus Bildschirmspeicher ins RAM kopieren ***"
+ 2590 ;
+ 2600 ^        ldx #18
+ 2610 ^        lda scrpnt+1  ; "Bildschirm-RAM-Adresse (High Byte)
+ 2620 ^        ldy #<$cdcc
+ 2630 ^        sty $0c0d
+ 2640 ^        ldy #>$cdcc
+ 2650 ^        sty $0c0e
+ 2660 ^        jsr $0c00
+ 2670 ^        ldx #19
+ 2680 ^        lda scrpnt    ; "Bildschirm-RAM-Adresse (Low Byte)
+ 2690 ^        jsr $0c00
+ 2700 ^        ldx #31
+ 2710 ^        ldy #<$cdda
+ 2720 ^        sty $0c0d
+ 2730 ^        ldy #>$cdda
+ 2740 ^        sty $0c0e
+ 2750 copy2    jsr $0c00     ; "Byte holen
+ 2760 bufpnt   sta $ffff     ; "und ins RAM speichern (Adresse wird eingesetzt)
+ 2770 ^        inc bufpnt+1
+ 2780 ^        bne copy3
+ 2790 ^        inc bufpnt+2
+ 2800 copy3    sec           ; "Z{CBM-F}hler herrunterz{CBM-F}hlen
+ 2810 ^        lda counter
+ 2820 ^        sbc #1
+ 2830 ^        sta counter
+ 2840 ^        lda counter+1
+ 2850 ^        sbc #0
+ 2860 ^        sta counter+1
+ 2870 ^        bcs copy2
+ 2880 ;
+ 2890 ; "*** Ins RAM kopierte Bytes verarbeiten ***"
+ 2900 ;
+ 2910 ^        ldx #0        ; "Byte in der aktuellen Zeile
+ 2920 pr1      ldy #8        ; "8 Bit pro Byte
+ 2930 pr2      lda #0        ; "Data l{CBM-C}schen
+ 2940 ^        sta data
+ 2950 ^        rol row1,x
+ 2960 ^        rol data
+ 2970 ^        rol row2,x
+ 2980 ^        rol data
+ 2990 ^        bit steuer    ; "vervielfachen ?
+ 3000 ^        bpl pr3       ; "keine Vergr{CBM-C}{CBM-V}erung in y-Richtung
+ 3010 ^        bvs out       ; "*4
+ 3020 pr3      rol row3,x
+ 3030 ^        rol data
+ 3040 ^        rol row4,x
+ 3050 ^        rol data
+ 3060 ^        bit steuer
+ 3070 ^        bmi out       ; "*2
+ 3080 ^        rol row5,x
+ 3090 ^        rol data
+ 3100 ^        rol row6,x
+ 3110 ^        rol data
+ 3120 ^        rol row7,x
+ 3130 ^        rol data
+ 3140 ^        rol row8,x
+ 3150 ^        rol data
+ 3160 out      lda data      ; "fertiges Byte laden
+ 3170 ^        jsr ausgabe   ; "Bits verarbeiten und ausgeben
+ 3180 ^        dey           ; "n{CBM-F}chstes Bit
+ 3190 ^        bne pr2       ; "Byte noch nicht fertig
+ 3200 ^        inx           ; "n{CBM-F}chstes Byte in dieser Zeile
+ 3210 ^        cpx #80       ; "alle 80 Byte dieser Zeile fertig ?
+ 3220 ^        bne pr1       ; "nein
+ 3230 ^        dec anzzei    ; "ja -> Zeilenz{CBM-F}hler erniedrigen
+ 3240 ^        beq spa1      ; "= 0 -> fertig
+ 3250 ^        jsr drucker   ; "sonst Drucker f{CBM-X}r neue Zeile anweisen
+ 3260 ^        jmp copy      ; "neue Zeile bearbeiten
+ 3270 ;
+ 3280 spa1     lda #<clrchn
+ 3290 ^        sta $0c0d
+ 3300 ^        lda #>clrchn
+ 3310 ^        sta $0c0e
+ 3320 ^        jsr $0c00
+ 3330 ^        clc           ; "Ende fehlerfrei
+ 3340 ^        jmp ende
+ 3350 ;
+ 3360 ; "*** Druckeransteuerung ***"
+ 3370 ;
+ 3380 drucker  ldy #5        ; "Anzahl der Befehlbytes
+ 3390 ^        sty counter+1
+ 3400 dr1      ldy counter+1
+ 3410 ^        lda prtcmd,y
+ 3420 ^        jsr aufbus    ; "an Drucker senden
+ 3430 ^        dec counter+1
+ 3440 ^        bpl dr1
+ 3450 ^        rts
+ 3460 ;
+ 3470 prtcmd   .byt 0, 0     ; "Anzahl Punkte pro Zeile (wird eingesetzt)
+ 3480 prtcmd1  .byt 0, "*", esc, cr, lf; "Druckmodus (wird eingesetzt)
+ 3490 ;
+ 3500 ; "*** Ausgabensteuerung ***"
+ 3510 ;
+ 3520 ausgabe  stx savx      ; "x retten
+ 3530 ^        sty savy      ; "y retten
+ 3540 ^        bit steuer
+ 3550 ^        bpl aus2      ; "kein Vervielfachen in y-Richtung
+ 3560 ^        tax
+ 3570 ^        bvs aus1
+ 3580 ^        lda doppel,x  ; "y=y*2
+ 3590 ^        bvc aus2      ; "unbedingter Sprung
+ 3600 ;
+ 3610 aus1     lda vier,x    ; "y=y*4
+ 3620 aus2     sta data      ; "Byte zwischenspeichern
+ 3630 ^        lda steuer
+ 3640 ^        pha
+ 3650 ^        and #%00000011 ; "Vervielfachung in x-Richtung
+ 3660 ^        sta counter   ; "als Z{CBM-F}hler
+ 3670 ^        pla
+ 3680 ^        and #%00100000 ; "REVERSE
+ 3690 ^        beq aus3      ; "nein
+ 3700 ^        lda data
+ 3710 ^        eor #$ff
+ 3720 ^        sta data
+ 3730 aus3     lda data
+ 3740 ^        jsr aufbus    ; "an Drucker
+ 3750 ^        dec counter
+ 3760 ^        bne aus3
+ 3770 ^        ldx savx      ; "Register zur{CBM-X}ckspeichern
+ 3780 ^        ldy savy
+ 3790 ^        rts
+ 3800 ;
+ 3810 ; "*** Byte ausgeben (seriell/centronics) ***"
+ 3820 ;
+ 3830 aufbus   pha
+ 3840 ^        lda sekadr    ; "Centronics ?
+ 3850 ^        cmp #$ff
+ 3860 ^        beq auf1      ; "ja
+ 3870 ^        lda #<chrout
+ 3880 ^        sta $0c0d
+ 3890 ^        lda #>chrout
+ 3900 ^        sta $0c0e
+ 3910 ^        pla           ; "Byte zur{CBM-X}ckholen
+ 3920 ^        jmp $0c00     ; "und ausgeben (seriell)
+ 3930 ;
+ 3940 auf1     ldx #<$dd03   ; "DDRB auf Ausgabe
+ 3950 ^        ldy #>$dd03
+ 3960 ^        jsr indst
+ 3970 ^        pla           ; "Byte zur{CBM-X}ckholen
+ 3980 ^        ldx #<$dd01   ; "PRB
+ 3990 ^        ldy #>$dd01
+ 4000 ^        jsr indst
+ 4010 ^        ldx #<$dd0d   ; "IRQ l{CBM-C}schen
+ 4020 ^        ldy #>$dd0d
+ 4030 ^        jsr indld
+ 4040 ^        ldx #<$dd00   ; "Strobe
+ 4050 ^        ldy #>$dd00
+ 4060 ^        jsr indld
+ 4070 ^        and #$fb
+ 4080 ^        jsr indst1
+ 4090 ^        ora #$04
+ 4100 ^        jsr indst1
+ 4110 auf2     ldx #<$dd0d   ; "auf Druckerantwort warten
+ 4120 ^        ldy #>$dd0d
+ 4130 ^        jsr indld
+ 4140 ^        and #$10
+ 4150 ^        beq auf2
+ 4160 initcia  lda #0        ; "DDRB (sicherheitshalber) auf Eingang
+ 4170 ^        ldx #<$dd03
+ 4180 ^        ldy #>$dd03
+ 4190 ^        jmp indst
+ 4200 ;
+ 4210 ; "*** Init Centronics ***"
+ 4220 ;
+ 4230 incent   jsr initcia   ; "Centronics initialisieren
+ 4240 ^        ldx #<$dd02
+ 4250 ^        ldy #>$dd02
+ 4260 ^        jsr indld     ; "Strobebit
+ 4270 ^        ora #%00000100 ; "auf Ausgabe
+ 4280 ^        jsr indst1
+ 4290 ^        ldx #<$dd00
+ 4300 ^        ldy #>$dd00
+ 4310 ^        jsr indld     ; "Strobepegel
+ 4320 ^        ora #%00000100 ; "auf high
+ 4330 ^        jmp indst1
+ 4340 ;
+ 4350 ;
+ 4360 ; "*** aus anderer Bank laden ***"
+ 4370 ;
+ 4380 indld    stx savadr
+ 4390 ^        sty savadr+1
+ 4400 indld1   ldy #$00
+ 4410 ^        ldx #savadr
+ 4420 ^        stx ldpnt
+ 4430 ^        ldx #$00      ; "Bank 15 & I/O einblenden
+ 4440 ^        jmp ldfar
+ 4450 ;
+ 4460 ; "*** in andere Bank speichern ***"
+ 4470 ;
+ 4480 indst    stx savadr
+ 4490 ^        sty savadr+1
+ 4500 indst1   ldy #$00
+ 4510 ^        ldx #savadr
+ 4520 ^        stx stpnt
+ 4530 ^        ldx #$00      ; "Bank 15 & I/O einblenden
+ 4540 ^        jmp stfar
+ 4550 ;
+ 4560 ; "*** Tabellen ***"
+ 4570 ;
+ 4580 doppel   .byt %00000000, %00000011, %00001100, %00001111
+ 4590 ^        .byt %00110000, %00110011, %00111100, %00111111
+ 4600 ^        .byt %11000000, %11000011, %11001100, %11001111
+ 4610 ^        .byt %11110000, %11110011, %11111100, %11111111
+ 4620 ;
+ 4630 vier     .byt %00000000, %00001111, %11110000, %11111111
+ 4640 ;
+ 4650 prtctl   .byt 7, 7
+ 4660 ^        .byt 3, 3
+ 4670 ;
+ 4680 prtvor   .byt 23, 23
+ 4690 ^        .byt 23, 23
+ 4700 ;
+ 4710 ctrl     .byt %00000001, %00100001
+ 4720 ^        .byt %10000011, %10100011
+ 4730 ;
+ 4740 ; "Erkl{CBM-F}rung der Steuerbits (ctrl-Tabelle)
+ 4750 ;
+ 4760 ;" bit 7  = 0 : normal
+ 4770 ;"        = 1 : vervielfachen in y-Richtung
+ 4780 ;" bit 6  = 0 : y=y*2 (nur g{CBM-X}ltig  wenn bit 7 = 1)
+ 4790 ;"        = 1 : y=y*4 (nur g{CBM-X}ltig  wenn bit 7 = 1)
+ 4800 ;" bit 5  = 0 : normal
+ 4810 ;"        = 1 : reverse
+ 4820 ;" bit 0/1    : vervielfachen in x (0 bis 3 mal; 0 = kein Ausdruck)
+ 4830 ;
+ 4840 ;  "*** jsr far (wird nach $0c00 verschoben) ***"
+ 4850 ;
+ 4860 jsfar    pha
+ 4870 ^        lda $ff00     ; "aktuelle Konfiguration retten
+ 4880 ^        sta savcnfg
+ 4890 ^        lda #$00      ; "Bank 15 & I/O einblenden
+ 4900 ^        sta $ff00
+ 4910 ^        pla
+ 4920 ^        jsr $ffff     ; "wird {CBM-X}berschrieben
+ 4930 ^        pha
+ 4940 ^        lda savcnfg   ; "alte Konfiguration wiederherstellen
+ 4950 ^        sta $ff00
+ 4960 ^        pla
+ 4970 endfar   rts
+ 4980 ;
+ 4990 data     *= *+1
+ 5000 steuer   *= *+1        ; "Kontrollwort
+ 5010 scrpnt   *= *+2        ; "Bildschirmzeiger
+ 5020 anzzei   *= *+1        ; "Anzahl der Bildschirmzeilen
+ 5030 savx     *= *+1        ; "Zwischenspeicher fuer x-Register
+ 5040 savy     *= *+1        ; "Zwischenspeicher fuer y-Register
+ 5050 sekadr   *= *+1        ; "Sekund{CBM-F}radresse
+ 5060 counter  *= *+2        ; "Z{CBM-F}hler fuer verschieden Zwecke
+ 5070 buffer   =*
+ 5080 row1     = buffer + (0*80)
+ 5090 row2     = buffer + (1*80)
+ 5100 row3     = buffer + (2*80)
+ 5110 row4     = buffer + (3*80)
+ 5120 row5     = buffer + (4*80)
+ 5130 row6     = buffer + (5*80)
+ 5140 row7     = buffer + (6*80)
+ 5150 row8     = buffer + (7*80)
+ 5160 ;
+59980 .end
+59990 end
+60000 zz$="hardcopy-80.a": un=8
+60010 open 15,un,15,"s0:"+zz$
+60020 gosub 60100
+60030 save zz$,un
+60040 gosub 60100
+60050 verify zz$,un
+60060 close 15
+60070 end
+60080 :
+60100 input#15, s1, s$, s2, s3
+60110 if s1=1 then print s2; s$
+60120 if s1<20 then return
+60130 print s1 ", " s$ "," s2; "," s3
+60140 close 15

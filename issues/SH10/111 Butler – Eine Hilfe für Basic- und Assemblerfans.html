@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Butler – Eine Hilfe für Basic- und Assemblerfans</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="J.Blechinger, ah">
+    <meta name="64er.issue" content="Sonderheft 10">
+    <meta name="64er.pages" content="111-119">
+    <meta name="64er.head1" content="Anwendung">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen">
+    <meta name="64er.toc_title" content="Butler – Eine Betriebssystem-Erweiterung">
+    <meta name="64er.index_title" content="Butler – eine Hilfe für Basic und Assembler">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Programmieren">
+    <meta name="64er.id" content="butler">
+</head>
+
+<body>
+    <article>
+        <h1>Butler – Eine Hilfe für Basic- und Assemblerfans</h1>
+        <p class="intro">Machen Sie mehr aus Ihrem C 128. »Butler« gestattet Ihnen ein komfortableres Arbeiten mit dem Computer. Der Editor wurde verbessert, und neben einer Reihe von nützlichen Befehlen lassen sich von nun an auch Maschinenroutinen des Z80-Prozessors vom Basic aus aufrufen.</p>
+
+        <p>Bei dem vorliegenden Programm BUTLER handelt es sich um eine Betriebssystemerweiterung, die zu Beginn aktiviert werden muß, dann aber stets verfügbar bleibt. Das Programm setzt sich aus zwei Teilen zusammen, von denen der eine im freien Speicherbereich von $1300 bis $1BFF und der andere am oberen Ende des Textspeichers zwischen $F000 und $FEFF liegt. Durch Änderung des Zeigers, der das Ende des verfügbaren Textspeichers definiert, schützt es sich vor Überschreiben durch einen Basic-Text.</p>
+
+        <h3>Verwendungsmöglichkeiten</h3>
+
+        <p>Das Programm ermöglicht ein komfortableres Arbeiten mit dem C 128. Es ist nur im C 128-Modus verwendbar, da es intensiv Betriebssystemroutinen nutzt und speziell auf die Besonderheiten und zahlreichen Möglichkeiten des C 128 zugeschnitten ist.</p>
+
+        <p>Das Betriebssystem wurde im wesentlichen an zwei Stellen erweitert: Die Verwendung der Tastatur wurde erleichtert und um einige Funktionen erweitert. Das ohnehin umfangreiche Basic 7.0 wurde mit weiteren nützlichen Befehlen und Funktionen ausgestattet.</p>
+
+        <p>Aber nicht nur für Basic-Programmierer dürfte dieses Programm interessant sein, sondern auch Freunden der Maschinensprache bietet es viele Unterroutinen, auf die zurückgegriffen werden kann. Detailliertere Information ist dem betreffenden Abschnitt dieser Beschreibung zu entnehmen.</p>
+
+        <h3>Aktivierung</h3>
+
+        <p>Um das Programm zu starten, benutzt man am einfachsten den RUN-Befehl:</p>
+
+        <pre><code>RUN "BUTLER"
+</code></pre>
+
+        <p>Das kleine Basic-Programm lädt die Dateien »/BUTLER.1« und »/BUTLER.2« (Dieser Programmteil muß erst generiert werden. Lesen Sie dazu die Eingabehinweise am Schluß dieses Artikels.) mit dem BOOT-Befehl in den Speicher, wobei sie auch gleich initialisiert werden. Die Erweiterung bleibt aktiv, bis der RESET-Taster betätigt oder mittels dem Basic-Aufruf</p>
+
+        <pre><code>SYS DEC("1303")
+</code></pre>
+
+        <p>die Abschaltung veranlaßt wird. Eine erneute Aktivierung ist mit</p>
+
+        <pre><code>SYS DEC("1300")
+</code></pre>
+
+        <p>möglich.</p>
+
+        <h2>Tastaturerweiterungen</h2>
+
+        <h3>Vereinfachte Eingabe von Escape-Sequenzen</h3>
+
+        <p>Wer fand es nicht auch schon lästig, beim Einfügen oder Löschen von Bildschirmzeilen ständig wechselnd die &lt;ESC&gt;-Taste und den jeweiligen Buchstaben drücken zu müssen? All jenen ist geholfen! Nun kann man die &lt;ALT&gt;-Taste gedrückt halten und dann die betreffende Kommandotaste betätigen. Dies funktioniert bei allen Escape-Sequenzen und natürlich mit automatischer Wiederholung, falls die Kommandotaste ebenfalls gedrückt gehalten wird.</p>
+
+        <h3>Cursorfunktionen</h3>
+
+        <p>Nichts wesentlich Neues, aber zur Verwendung für den einen oder anderen vielleicht vorteilhafter, sind folgende neue Escape-Sequenzen:</p>
+
+        <p>&lt;ESC&gt; + &lt;HOME&gt; oder &lt;ALT+HOME&gt;: Cursor an den Anfang der untersten Fensterzeile</p>
+
+        <p>&lt;ESC&gt; + &lt;Ü&gt; oder &lt;ALT+Ü&gt;: Fenster ab der aktuellen Cursorposition löschen (für deutsche Tastatur)</p>
+
+        <p>&lt;ESC&gt; + &lt;INS/DEL&gt; oder &lt;ALT+INS/DEL&gt;: Fensterzeile löschen und restlichen Teil des Fensters nach oben schieben (=ESC+D)</p>
+
+        <p>&lt;ESC&gt; + &lt;SHIFT+INS/DEL&gt; oder &lt;ALT+SHIFT+INS/DEL&gt;: Fensterzeile einfügen; dazu alle Zeilen ab der aktuellen nach unten schieben &lt;ESC&gt; + &lt;I&gt;</p>
+
+        <h2>LISTfunktionen</h2>
+
+        <p>Neben den einfacheren Funktionen des letzten Abschnitts bietet der BUTLER aber auch komplexere Kommandos, um das gespeicherte Basic-Programm zu LISTen oder über den Bildschirm zu scrollen. Die Kommandos können durch Escape-Sequenzen oder als ALT-Tastenkombinationen eingegeben werden und stellen keine Basic-Befehle dar. Dabei ist die aktuelle Position des Cursors stets gleichgültig.</p>
+
+        <p>Um die Kommandos erklären zu können, ist etwas zu deren Arbeitsweise vorauszuschicken. Wird ein Kommando ausgelöst, dann wird das Bildschirmfenster nach einer Zeilennummer abgesucht, und zwar je nach Kommando entweder von oben nach unten, um die oberste oder von unten nach oben, um die unterste Zeilennummer zu finden. Damit die Suchzeit möglichst kurz bleibt, wird eine Zeilennummer nur erkannt, wenn sie in der ersten Spalte beginnt. Doch dies ist ja normalerweise immer der Fall. Wird keine Nummer gefunden, behandelt das Programm dies als sinnvollen Sonderfall.</p>
+
+        <h3>Doch nun zu den Kommandos:</h3>
+
+        <p>&lt;ESC&gt; + &lt;CRSR&gt;-unten beziehungsweise &lt;ALT+CRSR&gt;-unten: weiterblättern<br>unterste Zeilennummer suchen; falls keine existiert ab Programmanfang, sonst ab der Basic-Zeile mit nächstgrößerer Nummer so viele Zeilen listen, wie im Fenster Platz haben. Falls nicht genügend nachfolgende Basic-Zeilen existieren, wird stets die letzte Seite des Programms gelistet.</p>
+
+        <p>&lt;ESC&gt; + &lt;CRSR&gt;-hoch beziehungsweise &lt;ALT+CRSR&gt;-hoch: zurückblättern<br>oberste Zeilennummer suchen; falls keine existiert bis Programmende, sonst bis zur Basic-Zeile mit nächstkleinerer Nummer so viele Zeilen listen, wie im Fenster Platz haben. Falls nicht genügend vorausgehende Basic-Zeilen existieren, wird die erste Seite des Programms gelistet.</p>
+
+        <p>&lt;ESC&gt; + &lt;CRSR&gt;-rechts beziehungsweise &lt;ALT+CRSR&gt;-rechts: Zeile weiter<br>unterste Zeilennummer suchen; falls keine existiert, die erste Seite des Programms listen, sonst die Basic-Zeile mit nächstgrößerer Nummer unter der Zeile mit der gefundenen Zeilennummer ausgeben.</p>
+
+        <p>&lt;ESC&gt; + &lt;CRSR&gt;-links beziehungsweise &lt;ALT+CRSR&gt;-links: Zeile zurück<br>oberste Zeilennummer suchen; falls keine existiert, die letzte Seite des Programms listen, sonst die Basic-Zeile mit nächstkleinerer Nummer in der Fensterzeile vor der Zeile mit der oberen Zeilennummer ausgeben.</p>
+
+        <p>&lt;ESC&gt; + &lt;LF&gt; beziehungsweise &lt;ALT+LF&gt;: Seite noch einmal<br>oberste Zeilennummer suchen; falls keine existiert ab Programmanfang, sonst ab der zugehörigen Basic-Zeile so viele Zeilen ausgeben, wie in das Fenster passen. Falls nicht genügend Basic-Zeilen existieren, um das Fenster zu füllen, wird die letzte Seite des Programms gelistet.</p>
+
+        <p>&lt;ALT+HELP&gt;: Bereich um Fehlerzeile listen<br>wie der Basic-Befehl HELP, nur werden hier außer der fehlerhaften Zeile zusätzlich einige Zeilen davor und danach ausgegeben.</p>
+
+        <h2>Wichtige Hinweise</h2>
+
+        <p>Anmerkung: Beim Listen der letzten Programmseite oder beim Zurückblättern führen Basic-Zeilen, die sich über mehr als eine Fensterzeile erstrecken, dazu, daß einige Zeilen unnötig ausgegeben werden.</p>
+
+        <h3>Bemerkungen zur Verwendung:</h3>
+
+        <p>Da die Kommandos sich stets am aktuellen Fensterinhalt orientieren, ist es gleichgültig, wie bereits gelistete Zeilen auf den Bildschirm gekommen sind. Man kann sich also jederzeit mit dem LIST-Befehl einen Zeilenbereich ausgeben lassen und dann zeilenweise weitersrcollen oder seitenweise weiterblättern.</p>
+
+        <p>Möchte man sich das Basic-Programm von vorn seitenweise ansehen, löscht man einfach das Bildschirmfenster und blättert mit &lt;ESC&gt; + &lt;CRSR&gt;-unten oder &lt;ALT+CRSR&gt;-unten. Will man von hinten anfangen, löscht man ebenfalls das Fenster und blättert entsprechend mit &lt;ESC&gt; + &lt;CRSR&gt;-oben oder &lt;ALT+CRSR&gt;-oben.</p>
+
+        <p>Ist man sich über die Arbeitsweise der Kommandos im klaren, dann lassen sich diese noch vorteilhafter einsetzen, indem man eine Zeilennummer geeignet im Fenster positioniert und dann eines der Kommandos auslöst.</p>
+
+        <h2>Basic-Erweiterungen</h2>
+
+        <h3>Speicherbefehle:</h3>
+
+        <p>Wer in Basic mit Bytes hantiert, mußte bisher mit PEEK und POKE vorliebnehmen. Doch gerade bei so einfachen, maschinennahen Operationen macht sich die relativ langsame Arbeitsgeschwindigkeit schnell bemerkbar, weil man in der Regel nicht nur einzelne Bytes, sondern ganze Speicherbereiche zu bewältigen hat. Will man trotzdem nicht gleich auf Assembler ausweichen, sind die neuen Operationen dieses Abschnitts bestimmt nützlich.</p>
+
+        <p>Wie bei PEEK und POKE muß vor Ausführung eines Befehls die zu benutzende Speicherbank angewählt werden. Dies kann wie gewohnt mit dem BANK-Befehl erfolgen. Da es jedoch zum Beispiel beim Kopierbefehl auch möglich sein soll, von einer Speicherbank auf eine andere umzukopieren, sind manchmal zwei vorzuwählende Speicherbänke erforderlich. Diese können mit folgendem Befehl eingestellt werden:</p>
+
+        <pre><code>BANKS BankNr1,BankNr2
+</code></pre>
+
+        <p>für bestimmte Operationen Speicherbank BankNr1 und BankNr2 vorwählen; der erste Operand überschreibt die mit dem BANK-Befehl ausgewählte Speicherbank; der zweite Operand wird gesondert gespeichert.</p>
+
+        <p>Im folgenden gilt für die Befehlsoperanden normalerweise stets die erste Banknummer. Nur bei Befehlen mit zwei Speicherbereichen wird für den zweiten Bereich die zweite Banknummer verwendet. Der Befehl BANKS wird in den nächsten Abschnitten noch mehrfach auftauchen.</p>
+
+        <p>Der Erklärung der Speicherbefehle ist jeweils ein Beispiel angefügt. Die Beispiele operieren im 40-Zeichen-Bildschirmspeicher, so daß die Wirkungsweise der Befehle direkt mitverfolgt werden kann.</p>
+
+        <h3>Doch nun die Speicherbefehle im einzelnen:</h3>
+
+        <pre><code>MEMFILL Adr1,Adr2,Wert
+</code></pre>
+
+        <p>Speicherbereich von Adr1 bis einschließlich Adr2 mit Wert füllen. Beispiel:</p>
+
+        <pre><code>BANK 0
+FOR I=0 TO 127:MEMFILL 1024,2023,I:SLEEP 1:NEXT
+</code></pre>
+
+        <pre><code>MEMCOPY Adr1a,Adr1b,Adr2a
+</code></pre>
+
+        <p>Speicherbereich von Adr1a bis einschließlich Adr1b in den Bereich ab Adr2a kopieren. Beispiel:</p>
+
+        <pre><code>BANKS 0,1:MEMCOPY 1024,2023,30000
+SCNCLR 0
+BANKS 1,0:MEMCOPY 30000,30999,1024
+</code></pre>
+
+        <pre><code>MEMSWAP Adr1a,Adr1b,Adr2a
+</code></pre>
+
+        <p>Speicherbereich von Adr1a bis einschließlich Adr1b mit dem Bereich ab Adr2a austauschen. Beispiel:</p>
+
+        <pre><code>BANKS 0,1
+FOR I=1 TO 10:MEMSWAP 1024,2023,30000:NEXT
+</code></pre>
+
+        <pre><code>MEMINV Adr1,Adr2
+</code></pre>
+
+        <p>Speicherbereich von Adr1 bis einschließlich Adr2 invertieren, also die Reihenfolge aller Bytes im angegebenen Bereich umdrehen. Beispiel:</p>
+
+        <pre><code>BANK 0
+FOR I=1 TO 10:MEMINV 1024,2023:SLEEP 1:NEXT
+</code></pre>
+
+        <pre><code>MEMROT Adr1,Adr2,Anz
+</code></pre>
+
+        <p>Speicherbereich von Adr1 bis einschließlich Adr2 gemäß Anz vorwärts rotieren lassen. Dies bewirkt, daß der Bereich von Adr1 bis Adr1+Anz ans Ende, der restliche Bereich zum Anfang kopiert wird. Beispiel:</p>
+
+        <pre><code>BANK 0:MEMROT 1024,2023,40
+</code></pre>
+
+        <p>Anmerkung: Der Befehl eignet sich nicht dazu, den 40-Zeichen-Bildschirm rotieren zu lassen, da die Daten zwischenzeitlich scheinbar wild durcheinander geraten. Der Befehl ist vielmehr bei der Vertauschung von aneinandergrenzenden Datenbereichen unterschiedlicher Größe nützlich, wenn kein Zwischenspeicher zur Verfügung steht.</p>
+
+        <pre><code>MEMLOC (Adr1,Adr2,String)
+</code></pre>
+
+        <p>Speicherbereich von Adr1 bis einschließlich Adr2 nach dem ersten Auftreten der Zeichenkette String absuchen. Eine Zeichenkette wird nur erkannt, wenn sie mit voller Länge im angegebenen Bereich liegt. Falls die Suche erfolgreich war, wird die Anfangsadresse, sonst stets Null zurückgegeben. Beispiel:</p>
+
+        <pre><code>BANK 0:PRINT MEMLOC (1024,2023,"123")
+</code></pre>
+
+        <p>Anmerkung: Möchte man den Bildschirm nach einer anderen Zeichenkette absuchen, ist der spezielle Bildschirmcode zu beachten. Bei Ziffern deckt er sich mit dem normalen Code.</p>
+
+        <h3>Adreßoperationen</h3>
+
+        <p>Möchte man auf zwei aufeinanderfolgende Byte zugreifen, weil diese beispielsweise einen Zeiger repräsentieren, so ist dies mit PEEK und POKE etwas umständlich. Ferner ist es im Basic oft gar nicht möglich, den Wert eines Sprungvektors zu verändern, der in der Unterbrechungsroutine verwendet wird, ohne daß zwischenzeitlich ein inkonsistenter Sprungvektor entsteht, der dann zum Absturz des Computers führt.</p>
+
+        <p>Erleichterung schaffen folgende neuen Operationen:</p>
+
+        <pre><code>CHG Adr,Wert
+</code></pre>
+
+        <p>Speicherstellen Adr und Adr+1 mit dem niederwertigen und dem höherwertigen Byte des Operanden Wert beschreiben. Unterbrechungen werden während des Änderns nicht zugelassen.</p>
+
+        <pre><code>VEC (Adr)
+</code></pre>
+
+        <p>Werte der Speicherstellen Adr und Adr+1 auslesen und in eine Adresse umrechnen. Bei Adr muß das niederwertige, bei Adr+1 das höherwertige Byte stehen. Beispiel:</p>
+
+        <table class="plain">
+            <tr>
+                <td><code class="mono">BANK 0</code></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><code class="mono">PRINT VEC(4624)-VEC(45)</code></td>
+                <td><code class="mono">Länge des Basic-Textes</code></td>
+            </tr>
+            <tr>
+                <td><code class="mono">CHG 4633,DEC("8000")<br>PRINT USR(1)</code></td>
+                <td><code class="mono">USR-Vektor ändern und verwenden</code></td>
+            </tr>
+            <tr>
+                <td><code class="mono">CHG 808,DEC("F4A2")<br>CHG 808,DEC("F66E")</code></td>
+                <td><code class="mono">&lt;RUN/STOP&gt;-Taste inaktivieren und wieder aktivieren</code></td>
+            </tr>
+            <tr>
+                <td><code class="mono">10 INPUT"NR";B<br>20 A=45:BANK 0<br>30 DO:A=VEC(A):NR=VEC(A+2)<br>40 LOOP UNTIL A=0 OR NR=B<br>50 PRINT"ADR: ";A</code></td>
+                <td><code class="mono">Nummer einlesen, Anfangsadresse der zugehörigen Basic-Zeile suchen und ausgeben</code></td>
+            </tr>
+        </table>
+
+        <p>Mit den beiden letzten Operationen läßt sich also das Zerlegen eines Wertes in niederwertiges und höherwertiges Byte vermeiden. Sollten diese Bytes aber dennoch von Interesse sein, lassen sie sich mit folgenden zwei Funktionen leicht berechnen:</p>
+
+        <table class="plain">
+            <tr>
+                <td><code class="mono">LOW (Wert)</code></td>
+                <td><code class="mono">niederwertiges Byte von Wert</code></td>
+            </tr>
+            <tr>
+                <td><code class="mono">HIGH (Wert)</code></td>
+                <td><code class="mono">höherwertiges Byte von Wert</code></td>
+            </tr>
+        </table>
+
+        <p>Beispiel:</p>
+
+        <pre><code>PRINT LOW(64000)
+PRINT HIGH(64000)
+</code></pre>
+
+        <p>Keiner langen Vorrede bedarf der Befehl</p>
+
+        <pre><code>OLD
+</code></pre>
+
+        <p>zum Wiederherstellen eines mit NEW gelöschten Basic-Programms. Häufiger wird diese Anweisung jedoch dann angewendet, wenn nach Drücken des RESET-Knopfs das Programm wiederhergestellt werden soll. Da bei der Neuinitialisierung nach Drücken des RESET-Knopfs auch die Basic-Erweiterung inaktiviert wird, ist es in diesem Fall zunächst erforderlich, sie mit SYS DEC("1300") erneut zu aktivieren.</p>
+
+        <p>Vielseitiger als der OLD-Befehl ist der Befehl</p>
+
+        <pre><code>HIDE Nummer oder HIDE,
+</code></pre>
+
+        <p>der es ermöglicht, den Anfang des Basic-Textes vorübergehend zur angegebenen Zeile oder ganz ans Programmende zu legen, so daß der vordere Teil des Programms abgespalten bleibt, bis er mit dem Befehl</p>
+
+        <pre><code>UNITE
+</code></pre>
+
+        <p>wieder mit dem restlichen Programmtext verbunden wird.</p>
+
+        <h2>Manipulieren und Editieren des Programmtextes</h2>
+
+        <p>Die beiden letzten Befehle eröffnen interessante Anwendungen.</p>
+
+        <p>— schnelleres Editieren großer Programme:</p>
+
+        <p>Mit HIDE den vorderen Teil abtrennen. Dann läßt sich der Rest bequemer editieren, weil das Eingeben von Zeilen schneller erfolgt. Zum Schluß ist mit UNITE wieder alles zu verbinden.</p>
+
+        <p>— getrenntes Speichern eines hinteren Programmteils:</p>
+
+        <p>Mit HIDE an der gewünschten Stelle das Programm trennen, hinteren Teil wie gewohnt speichern, und dann entweder mit UNITE alles wieder verbinden oder aber mit NEW den gespeicherten Teil löschen und erst dann UNITE verwenden.</p>
+
+        <p>— Verbinden von Programmteilen:</p>
+
+        <p>Ersten Programmteil laden, mit HIDE verstecken, zweiten Programmteil normal laden, umnumerieren und dann mit UNITE anhängen.</p>
+
+        <p>— Programmteile während des Programmlaufs austauschen oder nachladen: Beispiel:</p>
+
+        <pre><code>1 HIDE 10
+2 BLOAD"ROUTINE 1",ON B0,P(VEC(45))
+3 UNITE:GOSUB 9
+4 HIDE 10
+5 BLOAD"ROUTINE 2",ON B0,P(VEC(45))
+6 UNITE:GOSUB 9
+7 HIDE 10:BANK 0:CHG VEC(45),0:UNITE
+8 END
+9 REM *** Aufrufadresse ***
+</code></pre>
+
+        <p>Dieses Beispiel setzt voraus, daß auf der Diskette die zwei Unterprogramme ROUTINE 1 und ROUTINE 2 stehen, die mit einer Zeilennummer beginnen. Ferner müssen die Routinen mit RETURN enden, da sie mit GOSUB aufgerufen werden.</p>
+
+        <p>Wie diesem Beispiel zu entnehmen ist, kann das Programm im versteckten Teil weiterlaufen. In diesem Teil werden jedoch keine Zeilennummern mehr gefunden, da der Basic-Interpreter mit der Suche erst beim restlichen Teil beginnt.</p>
+
+        <p>Nach so vielen Erläuterungen nun noch zu einem anderen Befehl, der weniger mit Programmzeigern, sondern viel mehr mit Programmzeilen hantiert:</p>
+
+        <pre><code>TRANS Nummer1a,Nummer1b,Nummer2
+</code></pre>
+
+        <p>Alle Zeilen des Zeilenbereichs von Nummer1a bis Nummer1b vor der Zeile mit Nummer2 einfügen.</p>
+
+        <h2>Aufruf des Z80-Prozessors von Basic aus</h2>
+
+        <p>Achtung: Die Nummern werden beim Kopieren nicht verändert. Daher sollten die Zeilen anschließend mit dem RENUMBER-Befehl neu durchnumeriert werden. Da das Neunumerieren nur dann durchgeführt wird, wenn alle Zeilenreferenzen aufgelöst werden können, sollte dies schon vorher sichergestellt sein, da die Korrektur des Programms nach dem Kopieren wegen der dann nicht streng steigenden Zeilennumerierung oft nicht mehr möglich ist.</p>
+
+        <p>Der letzte Befehl ist also zwar sehr nützlich, aber auch äußerst tückisch, wenn man nicht genügend aufpaßt. Vorsicht ist stets angebracht und nur geübte Benutzer sollten diesen Befehl bei ungesicherten Programmen anwenden.</p>
+
+        <p>In der Regel führt der Z80-Prozessor im C 128 ein stilles Dasein. Wer mit der Programmierung dieses Mikroprozessors vertraut ist, kann ihn jetzt vom Basic aus mit dem Befehl</p>
+
+        <pre><code>Z80CALL Adresse
+</code></pre>
+
+        <p>aufrufen. Die Unterroutine muß stets in der Speicherbank 0 stehen.</p>
+
+        <p>Die Verwendung dieses Prozessors kann mitunter sinnvoll sein, da er zum Beispiel einen mächtigen Kopierbefehl kennt.</p>
+
+        <p>Beispiele:</p>
+
+        <p>im Monitor einzugeben:</p>
+
+        <pre><code>&gt;0A000 01 00 20 11 00 80 21 00
+&gt;0A008 20 ED B0 C9
+$01 $00 $20 LD BC,2000H (Anzahl)
+$11 $00 $80 LD DE,8000H (Ziel)
+$21 $00 $20 LD HL,2000H (Quelle)
+$ED $B0 LDIR
+$C9 RET
+</code></pre>
+
+        <p>Aufruf vom Basic aus:</p>
+
+        <pre><code>Z80CALL DEC("A000")
+</code></pre>
+
+        <p>Diese kurze Routine kopiert 8 KByte von Adresse $2000 bis $3FFF nach Adresse $8000 bis $9FFF, und dies einiges schneller als der 8502-Prozessor.</p>
+
+        <p>Folgendes ist wieder im Monitor einzugeben:</p>
+
+        <pre><code>&gt;0B000 01 FF 1F 11 01 20 21 00
+&gt;0B008 20 36 01 ED B0 C9
+$01 $FF $1F LD BC,1FFFH (Anzahl)
+$11 $01 $20 LD DE,2001H (Ziel)
+$21 $00 $20 LD HL,2000H (Quelle)
+$36 $01 LD (HL),1 (Wert)
+$ED $B0 LDIR
+$C9 RET
+</code></pre>
+
+        <p>Aufruf vom Basic aus:</p>
+
+        <pre><code>Z80CALL DEC("B000")
+</code></pre>
+
+        <p>Bei dieser Routine wird ebenfalls der Blockkopierbefehl LDIR verwendet, hier jedoch dient er dazu, den Speicherbereich von $2000 bis $3FFF mit 1 zu füllen. Dies ist möglich, weil der Blockkopierbefehl von vorn nach hinten kopiert.</p>
+
+        <p>Anmerkung: Im Adreßbereich von $0000 bis $0FFF ist für den Z80 ein spezielles ROM eingeblendet, so daß er auf das RAM in diesem Adreßbereich leider nicht zugreifen kann.</p>
+
+        <h2>Flexible Erweiterungen</h2>
+
+        <p>Die bisher vorgestellten Erweiterungen sind alle möglichst allgemein gehalten und bilden in der Regel nur eine Basis dessen, was man sich vielleicht für seine persönlichen Problemstellungen wünschen würde. Um weitergehenden Wünschen entgegenzukommen, bietet BUTLER die Möglichkeit, die Tastatur- und vor allem die Basic-Erweiterungen einfach zu ergänzen oder umzudefinieren:</p>
+
+        <pre><code>NEWESC Wert,Adresse
+</code></pre>
+
+        <p>Neue Escape-Sequenz für das Zeichen mit ASCII-Code Wert definieren. Bei der Eingabe der zugehörigen Escape-Sequenz beziehungsweise ALT-Tastenkombination wird die Routine unter der angegebenen Adresse aufgerufen. Als Speicherbank wird die zuvor eingestellte verwendet. Beispiel:</p>
+
+        <pre><code>BANK 15
+NEWESC ASC("1"),DEC("CABC")
+NEWESC ASC("2"),DEC("CACA")
+</code></pre>
+
+        <p>&lt;ESC&gt; + &lt;1> beziehungsweise &lt;ALT+1&gt; scrollt danach den Bildschirm hoch. &lt;ESC&gt; + &lt;2> beziehungsweise &lt;ALT+2&gt; scrollt analog dazu abwärts.</p>
+
+        <p>NEWCMD Name,Adresse</p>
+
+        <p>Neuen Basic-Befehl definieren. Die Routine ab der angegebenen Adresse auf der eingestellten Bank muß eventuelle Parameter selbst einlesen und auswerten. Beispiel:</p>
+
+        <pre><code>BANK 15
+NEWCMD "BELL",DEC("C98E")
+BELL
+</code></pre>
+
+        <pre><code>NEWFN Name,Adresse
+</code></pre>
+
+        <p>Neue Basic-Funktion vereinbaren. Ein Funktionsparameter wird automatisch ausgewertet, die restlichen müssen selbst eingelesen werden. Beispiel:</p>
+
+        <pre><code>BANK 1
+POKE 30000,96:REM Code für RTS
+NEWFN "DUMMY",30000
+PRINT DUMMY(99)
+PRINT DUMMY("ABC")
+</code></pre>
+
+        <p>Anmerkung: Wie an diesem Beispiel erkennbar ist, muß die Typprüfung von der Funktionsroutine vorgenommen werden.</p>
+
+        <p>So schön die Möglichkeiten der drei letzten Befehle auch sind, so setzen sie doch einige Erfahrung mit der Programmierung geeigneter Routinen voraus. Die notwendige Erfahrung kann man durch Analyse entsprechender Betriebssystemroutinen erlangen.</p>
+
+        <h2>Codierung der neuen Befehle</h2>
+
+        <p>Sicherlich von Interesse dürfte noch sein, wie die neuen Befehle verschlüsselt werden. Das Betriebssystem ermöglicht es, Erweiterungen durch zwei Byte ($CE $xx bei Funktionen, $FE $xx bei Anweisungen) zu kodieren. Das Betriebssystem selbst verwendet bereits die Kodierungen bis $CE $0A, beziehungsweise $FE $26. Die neuen Funktionen und Befehle von BUTLER verwenden Kodierungen bis $CE $0E, beziehungsweise $FE $37. Für künftige Erweiterungen sind auch die Kodierungen bis $CE $1A, beziehungsweise $FE $56 reserviert. Somit werden die selbstdefinierten Erweiterungen ab $CE $1B oder $FE $57 durchnumeriert. Dies geschieht in der Reihenfolge der Vereinbarungen und kann nicht beeinflußt werden. Mit dem Befehl</p>
+
+        <pre><code>CLRNEWS
+</code></pre>
+
+        <p>kann lediglich sichergestellt werden, daß die Kodezuweisung stets ab den angegebenen Werten beginnt. Dabei werden alle zuvor definierten Erweiterungen inaktiviert. Programme, die sich Erweiterungen selbst definieren, sollten diesen Befehl verwenden, um eine definierte Startumgebung vorzufinden.</p>
+
+        <p>Die Wirkung des letzten Befehls, aber viel mehr noch eine gesamte Neuinitialisierung von BUTLER und einiger wichtiger Betriebssystemdaten werden durch den Befehl</p>
+
+        <pre><code>RESET
+</code></pre>
+
+        <p>erreicht. Dieser Befehl ist besonders dann sinnvoll, wenn Sprungvektoren zwischenzeitlich verändert wurden und nun wieder ihre alten Werte erhalten sollen.</p>
+
+        <h2>Schnittstelle zur Maschinenprogrammebene</h2>
+
+        <h3>Bankübergreifende Programmierung</h3>
+
+        <p>Beim C 128 verfügt man zwar über verschiedene Speicherbänke, die vom Basic aus relativ einfach zu handhaben sind, doch sobald Maschinenprogramme zu schreiben sind, die auf eine andere Bank zugreifen sollen, erweist sich das Speicherbankkonzept als umständlich. Schon bei der Verwendung von Betriebssystemroutinen zeigen sich die ersten Probleme. Um eine Routine direkt aufrufen zu können, muß das betreffende ROM bereits beim Aufruf eingeblendet sein. Dies schränkt die Lage und die Größe des Maschinenprogramms ein. Ferner ist nicht stets gewährleistet, daß beim Rücksprung aus der Betriebssystemroutine das aufrufende Programmstück noch (oder wieder) sichtbar ist. Um letzterem Problem aus dem Weg zu gehen, aber auch um Routinen »unter« das Betriebssystem legen zu können, verfügt BUTLER über eine spezielle Aufrufroutine, mit der Unterprogramme im ROM bequem aufgerufen werden können. Ebenso existiert eine Routine, die es gestattet, ein Unterprogramm in einer beliebigen Speicherbank aufzurufen. Die Verwendung sei an Beispielen erläutert:</p>
+
+        <pre><code>JSR $1396    ;ROM-Aufruf veranlassen
+.WORD Adr    ;ROM-Adresse low/high
+JSR $13C7    ;Bank-Aufruf veranlassen
+.BYTE Bank   ;Bank-Nr (0 bis 15)
+.WORD Adr    ;Adresse der Routine (low/high)
+</code></pre>
+
+
+        <p>Ungewöhnlich mag erscheinen, daß direkt hinter dem Aufrufbefehl Daten stehen. Diese Daten werden von den speziellen Aufrufroutinen gelesen und der Programmzähler korrigiert, so daß beim Rücksprung das Programm hinter den Daten fortgesetzt wird. Diese Übergabetechnik erlaubt es, alle Register normal verwenden zu können, setzt aber auch voraus, daß stets mit JSR aufgerufen wird, selbst wenn der nächste Befehl »nur« ein RTS ist.</p>
+
+        <p>Sprünge ins ROM oder auf eine andere Bank sind mit der letzten Routine nicht möglich. Ist dies doch einmal notwendig, dann kann man sich eventuell wie folgt helfen:</p>
+
+        <pre><code>LDA #Adr-1    ;höherwertiges Byte
+PHA           ;merken
+LDA #Adr-1    ;niederwertiges Byte
+PHA           ;merken
+LDA #Konfig   ;gewünschte Konfiguration
+JMP $02DF     ;umkonfigurieren und springen
+</code></pre>
+
+
+        <p>Bei diesem Beispiel darf die anzugebende Konfiguration nicht mit der Banknummer verwechselt werden. Welche Konfiguration für welche Speicherbank zu wählen ist, kann einer Tabelle entnommen werden, wobei die Banknummer als Index dient. Das Original dieser Tabelle steht im ROM ab $F7F0, eine Kopie aber auch in BANK 0 ab $1310, wenn BUTLER verwendet wird.</p>
+
+        <p>Wer sich bereits mit der bankübergreifenden Programmierung beschäftigt hat, wird sicherlich die vorhandenen Routinen ab $02CD und $02E3 kennen, doch deren Verwendung ist bisweilen recht umständlich und einschränkend, weil beim Aufruf Teile des ROMs aktiviert sein müssen.</p>
+
+        <h3>Einbinden von Erweiterungen</h3>
+
+        <p>Nicht nur direkt vom Basic aus, sondern auch auf Maschinenspracheebene lassen sich Erweiterungen definieren. Wie dies möglich ist, soll an kommentierten Beispielen erläutert werden.</p>
+
+        <h3>Tastaturerweiterungen</h3>
+
+        <p>Die notwendigen Daten für die Erweiterungen müssen in einer Liste abgelegt sein. Jeder Listeneintrag muß nachfolgende Struktur aufweisen:</p>
+
+        <p>Konfiguration, Aufrufadresse-1, ASCII-Code</p>
+
+        <p>Listeneinträge sind lückenlos aneinanderzuhängen, und das Ende der Liste ist nicht zu kennzeichnen. Statt dessen ist beim Aufruf die Anzahl der Listenelemente (im Akkumulator) zu übergeben. Da diese Liste nicht notwendigerweise in der Speicherbank 0 stehen muß, ist auch die Banknummer (im X-Register) anzugeben. Schließlich muß noch die Anfangsadresse der Liste in der Zeropage bei $24/$25 bereitgestellt werden. Beispiel:</p>
+
+        <pre><code>       LDA #Liste    ;Zeiger auf
+       LDY #Liste    ;Liste
+       STA $24       ;in der Zeropage
+       STY $25       ;ablegen
+       LDX #0        ;BankNr der Liste
+       LDA #2        ;Elementanzahl
+       JMP $F15D     ;Tastatur erweitern
+
+Liste  .BYTE $3F     ;Konfiguration
+       .WORD Beleg1-1 ;Adr-1 (low,high)
+       .BYTE '1'     ;ESC 1
+
+       .BYTE $3F     ;Konfiguration
+       .WORD Beleg2-1 ;Adr-1 (low,high)
+       .BYTE '2'     ;ESC 2
+
+Beleg1 LDA #Tab1     ;Zeiger auf
+       LDX #Tab1     ;erste Fkts-Tastenbelegung
+       LDY #TabLg1   ;und deren Länge
+       BNE DefBel
+
+Beleg2 LDA #Tab2      ;Zeiger auf
+       LDX #Tab2      ;zweite Fkts-Tastenbelegung
+       LDY #TabLg2    ;und deren Länge
+DefBel STA $24        ;Zeiger in
+       STX $25        ;Zeropage ablegen
+KopBel DEY            ;
+       LDA ($24),Y    ;neue Funktions-
+       STA $1000,Y    ;tastenbelegung
+       TYA            ;umkopieren
+       BNE KopBel     ;
+       RTS
+
+Tab1 .BLOCK 10,6,10,5,6,4,5,8,4,5        ;Stringlängen
+     .BLOCK 'PRINT DS$',13,'DLOAD"'   ;F1,F2
+     .BLOCK 'DIRECTORY',13,'BOOT"'    ;F3,F4
+     .BLOCK 'DSAVE"',         'RUN"'  ;F5,F6
+     .BLOCK 'LIST',13,        'MONITOR',13;F7,F8
+     .BLOCK 'RUN',13,         'HELP',13   ;RUN,HELP
+TabLg1 .EQU *-Tab1
+
+Tab2 .BLOCK 7,5,6,7,4,5,3,6,4,5          ;Stringlängen
+     .BLOCK 'GRAPHIC',    'COLOR'     ;F1,F2
+     .BLOCK 'LOCATE',     'SCNCLR',13 ;F3,F4
+     .BLOCK 'DRAW',       'PAINT'     ;F5,F6
+     .BLOCK 'BOX',        'CIRCLE'    ;F7,F8
+     .BLOCK 'RUN',13,     'HELP',13   ;RUN,HELP
+TabLg2 .EQU *-Tab2
+</code></pre>
+
+        <h3>Basic-Erweiterungen</h3>
+
+        <p>Ganz analog verläuft die Definition von Basic-Erweiterungen, nur die Struktur der Listenelemente ist etwas anders: Typ, BankNr, Aufrufadresse, Name, Null</p>
+
+        <p>Als Typen sind die Werte 0 (bei Funktionen) und 1 (bei Befehlen) zulässig. Der Name der Funktion beziehungsweise des Befehls ist direkt in die Liste einzutragen und muß durch eine Null abgeschlossen werden. Die Anfangsadresse der Liste muß in $5A/$5B bereitstehen. Beispiel:</p>
+
+        <pre><code>      LDA #Liste       ;Zeiger auf
+      LDY #Liste       ;Liste
+      STA $5A          ;in der Zeropage
+      STY $5B          ;ablegen
+      LDX #0           ;BankNr der Liste
+      LDA #2           ;Elementanzahl
+      JMP $F23E        ;Basic erweitern
+
+Liste .BYTE 0          ;Typ=Funktion
+      .BYTE 0          ;BankNr
+      .WORD LnAdr      ;Adr (low,high)
+      .BLOCK 'LNADR'   ;Name ('line adress')
+      .BYTE 0          ;Ende des Namens
+
+      .BYTE 1          ;Typ=Befehl
+      .BYTE 0          ;BankNr
+
+         .WORD ListLn   ;Adr (low,high)
+         .BLOCK 'LISTLN';Name ('list line')
+         .BYTE 0        ;Ende des Namens
+
+LnAdr    JSR $F0CF      ;Real nach Integer wandeln
+         JSR $16C6      ;zugehörige Zeile suchen
+         LDY $61        ;Adresse ins Y-Reg. und
+         LDA $62        ;Akku. (low/high Byte)
+         BCS AdrOk      ;falls Zeile gefunden
+         LDA #0         ;sonst Null
+         TAY            ;als Adresse
+AdrOk    JMP $F105      ;Y/A nach Real wandeln
+
+ListLn   JSR $F0DB      ;Integer-Wert einlesen
+         JSR $16C6      ;zugehörige Zeile suchen
+         BCC Ende       ;falls nicht gefunden: Ende
+         LDX $16        ;sonst Nummer
+         LDA $17        ;laden und
+         JSR $16D0      ;Zeile auflisten
+Ende     RTS
+</code></pre>
+
+        <p>Das angeführte Beispiel enthält eine Funktion zur Bestimmung der Anfangsadresse einer Basic-Zeile und einen Befehl zum Auflisten einer einzelnen Basic-Zeile. Hierbei werden mehrfach BUTLER-Routinen verwendet, die ihrerseits Routinen im ROM aufrufen. Diese ROM-Routinen könnte man auch direkt aufrufen, wenn man die speziellen Aufrufroutinen verwendet, die am Anfang des Kapitels vorgestellt wurden.</p>
+
+        <h2>Tips zur Speicherbelegung</h2>
+
+        <p>Die mit dem BANK-Befehl vorgewählte Speicherbank wird bekanntlich an der Adresse $03D5 abgelegt. Die mit dem neuen BANKS-Befehl vorwählbare zweite Speicherbank ist an der Adresse $03FD zu finden. Die Speicherstellen $03FE und $03FF sind für andere Anwendungen reserviert. Außerdem ist darauf zu achten, daß der Bereich von $03E4 bis $03EF intensiv verwendet wird und nicht anderweitig verwendet werden kann.</p>
+
+        <p>BUTLER selbst besteht aus zwei Teilen, die in BANK 0 in den Bereichen von $1300 bis $19FF und von $F000 bis $FCFF liegen. Ab $1A00 bis maximal $1BFF ist die Tabelle der Basic-Erweiterungen zu finden. Die zugehörige Sprungtabelle beginnt bei $FD00, gefolgt von der Tabelle für die neuen Escape-Sequenzen ab $FE00.</p>
+
+        <p>Abschließend bleibt noch anzuführen, daß temporär die RS232-Ein- und Ausgabepuffer ab $0C00 beziehungsweise $0D00 verwendet werden.</p>
+
+        <address class="author">(J.Blechinger/ah)</address>
+
+        <aside>
+            <h2>Eingabehinweise zum Programm »/BUTLER.$2000«</h2>
+
+            <p>Das Programm ist mit dem MSE im C 64-Modus einzugeben und zu speichern. Anschließend muß der C 128 aus- und wieder eingeschaltet werden. Laden Sie nun das Programm mit LOAD"/BUTLER.$2000",8,1 im C 128-Modus. Ist das geschehen, sind folgende Schritte erforderlich:</p>
+
+            <ol>
+                <li>Mit dem Befehl MONITOR &lt;RETURN&gt; in den eingebauten Monitor springen.</li>
+                <li>Mit »T 2000 2CEB F000« das Programm »/BUTLER.$2000« nach $F000 schieben.</li>
+                <li>Mit »S"/BUTLER.2",08,F000,FCEB« das Programm speichern.</li>
+            </ol>
+
+
+            <p><strong>Wenn Sie die Leserservice-Diskette haben, entfallen diese Hinweise.</strong></p>
+
+            <p>Von nun an kann das Programm mit »RUN "BUTLER"« geladen und gestartet werden.</p>
+        </aside>
+
+        <figure>
+            <pre data-filename="butler" data-name="Butler"></pre>
+            <figcaption>Listing 1. »Butler«-Ladeprogramm</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="_butler.1.prg" data-name="/Butler.1" data-mse=mse1></pre>
+            <figcaption>Listing 2. »/Butler.1«. Bitte geben Sie dieses Listing mit dem MSE im C 64-Modus ein.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="_butler.1.prg" data-name="/Butler.1"></div>
+        <figure>
+            <pre data-filename="_butler.2.prg" data-name="/Butler.2" data-mse=mse1></pre>
+            <figcaption>Listing 3. »/Butler.$2000« Auch dieses Listing ist mit dem MSE im C 64-Modus einzugeben. Beachten Sie bitte die Eingabehinweise im Text.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="_butler.2.prg" data-name="/Butler.2"></div>
+    </article>
+</body>
+
+</html>

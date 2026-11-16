@@ -1,0 +1,32 @@
+;sicheres input.prg ==1c01==
+;version=70
+  100 fast:printchr$(14)chr$(147)chr$(5);
+  110 print"Name          (1-30 Zeichen, a-Z)         :" : pa$="4400730000101" : gosub 200 : na$=in$
+  120 print"Strasse       (1-30 Zeichen, a-Z 0-9 . -) :" : pa$="4401730100102" : gosub 200 : st$=in$
+  130 char,0,2,"Wohnort       (1-30 Zeichen, a-Z 0-9)     :" : pa$="4402730200103" : gosub 200 : wo$=in$
+  140 char,0,3,"Telefonnummer (1-20 Zeichen, 0-9 - /)     :" : pa$="4403630300114" : gosub 200 : te$=in$
+  150 char,0,4,"Geburtsdatum  (6-10 Zeichen, 0-9 . ')     :" : pa$="4404530400615" : gosub 200 : ge$=in$
+  160 char,0,5,"Geburtsort    (1-20 Zeichen, a-Z)         :" : pa$="4405630500101" : gosub 200 : gt$=in$
+  170 char,0,8,"Ihre Daten:  "+na$ : char,13,9,st$ : char,13,10,wo$ : char,13,11,"Tel.:"+te$ : char,13,12,"Geb.: am "+ge$ : char,19,13,"in "+gt$+an$
+  180 end
+  190 rem **************************** "INPUT-Routine" ***************************
+  200 fast:e$=chr$(27):s1=val(left$(pa$,2)):z1=val(mid$(pa$,3,2)):s2=val(mid$(pa$,5,2)):z2=val(mid$(pa$,7,2)):mi=val(mid$(pa$,9,3)):co=val(right$(pa$,1)):au=32
+  210 sp=val(mid$(pa$,12,1)):windows1,z1,s2,z2:printchr$(28)e$"m"ue$chr$(19);:ma=(s2-s1+1)*(z2-z1+1):in$=ue$:po=1:ue$="":au$=e$+"u":an$=e$+"f"+e$+"u":cu=2603
+  220 printan$;:getkeyn$:n=asc(n$):pokecu,au:l=len(in$)
+  230 ifn=13thenbegin:ifei=0andl>=mithenprinte$e$e$"l"chr$(5)chr$(19)chr$(19)au$:pokecu,au:return:else220:bend
+  240 ifn=19thenbegin:ifpo<>1andei=0thenprinte$e$n$;:po=1:goto220:else220:bend
+  250 ifn=147thenei=0:po=1:in$="":printe$e$n$;:goto220
+  260 ifn=29thenbegin:ifei=0andpo<=landpo<mathenpo=po+1:printe$e$n$;:goto220:else220:bend
+  270 ifn=157thenbegin:ifei=0andpo>1thenpo=po-1:printe$e$n$;:goto220:else220:bend
+  280 ifn=17thenbegin:ifei=0andpo+s2-s1+1<=maandpo+s2-s1+1<l+2thenpo=po+s2-s1+1:printe$e$n$;:goto220:else220:bend
+  290 ifn=20thenbegin:ifpo>1thenin$=left$(in$,po-2)+right$(in$,l-po+1):l=l-1:po=po-1:printe$e$n$;:goto220:else220:bend
+  300 ifn=145thenbegin:ifei=0andpo-s2+s1-1>0thenpo=po-s2+s1-1:printe$e$n$;:goto220:else220:bend
+  310 ifn=148thenbegin:ifl<maandpo<=lthenl=l+1:in$=left$(in$,po-1)+" "+right$(in$,l-po):ei=ei+sp:printe$e$n$;:goto220:else220:bend
+  320 oncogosub350,360,370,380,390:iffl=1thenfl=0:goto 220
+  330 printe$e$n$;:ifpo=l+1thenin$=in$+n$:l=l+1:elsemid$(in$,po,1)=n$
+  340 po=po+1+(po=ma):ei=ei-1-(ei=0):goto 220
+  350 fl=1:if((n>64andn<91)or(n>192andn<219)orn=32)andpo<=mathenfl=0:return:elsereturn
+  360 fl=1:if((n>47andn<58)or(n>64andn<91)or(n>192andn<219)orn=45orn=32orn=46)andpo<=mathenfl=0:return:elsereturn
+  370 fl=1:if((n>47andn<58)or(n>64andn<91)or(n>192andn<219)orn=32)andpo<=mathenfl=0:return:elsereturn
+  380 fl=1:if((n>46andn<58)orn=45)andpo<=mathenfl=0:return:elsereturn
+  390 fl=1:if((n>47andn<58)orn=46orn=39)andpo<=mathenfl=0:return:elsereturn

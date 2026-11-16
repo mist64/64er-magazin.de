@@ -1,0 +1,238 @@
+;zeichen-fix.prg ==4001==
+;version=70
+   10 rem ********************************
+   20 rem *****     zeichen-fix      *****
+   30 rem *****     fuer den pc 128  *****
+   40 rem ***** von dirk koller      *****
+   50 rem *****     6305 buseck 1    *****
+   60 rem ********************************
+   70 ma=8192:mo=53248:adr=1533
+   80 rem *** zeichen i. ram kopieren ***
+   90 graphic1,1
+  100 graphic0
+  110 fast
+  120 bank 14
+  130 fori=.to2048
+  140 poke(ma+i),peek(mo+i)
+  150 next
+  160 slow
+  170 rem *** hauptmenu ****************
+  180 trap 2250
+  190 color 0,16:color 4,16:color 5,1
+  200 scnclr
+  210 char 1,10,2,"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  220 char 1,10,3,"{CBM-G}                    {CBM-M}"
+  230 char 1,10,4,"{CBM-G} zeichen-fix pc 128 {CBM-M}"
+  240 char 1,10,5,"{CBM-G}  von dirk koller   {CBM-M}"
+  250 char 1,10,6,"{CBM-G}                    {CBM-M}"
+  260 char 1,10,7,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  270 char 1,7,10,"1 : neue zeichen erstellen"
+  280 char 1,7,12,"2 : zeichensatz abspeichern"
+  290 char 1,7,14,"3 : zeichensatz laden"
+  300 char 1,7,16,"4 : zeichensatz aktivieren"
+  310 char 1,7,18,"5 : directory"
+  320 char 1,7,20,"6 : ende"
+  330 getkey nu$
+  340 nu=val(nu$)
+  350 if nu<1 or nu>6 then printchr$(7):goto 170
+  360 if nu=6 then end
+  370 on nu goto 380,2100,2160,2210,2320
+  380 rem *** neue zeichen erstellen ****
+  390 scnclr
+  400 char 1,10,3,"zeichen erstellen"
+  410 char 1,10,4,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  420 char 1,0,7,"befehle:"
+  430 char 1,0,8,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  440 char 1,0,9,"-home :cursor links oben   {CBM-K}          "
+  450 char 1,0,10,"-clr  :loescht matrix      {CBM-K} matrix: "
+  460 char 1,0,11,"-i    :invertiert matrix   {CBM-K} {CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}"
+  470 char 1,0,12,"-d    :dreht zeichen       {CBM-K}{CBM-N}        {CBM-H}"
+  480 char 1,0,13,"-*    :punkt setzen        {CBM-K}{CBM-M}        {CBM-G}"
+  490 char 1,0,14,"-space:punkt loeschen      {CBM-K}{CBM-N}        {CBM-H}"
+  500 char 1,0,15,"-pfeiltasten bewegen den   {CBM-K}{CBM-N}        {CBM-H}"
+  510 char 1,0,16," cursor ueber die matrix   {CBM-K}{CBM-N}        {CBM-H}"
+  520 char 1,0,17,"-return:sichert zeichen    {CBM-K}{CBM-N}        {CBM-H}"
+  530 char 1,0,18,"-_    :zurueck ins menu    {CBM-K}{CBM-N}        {CBM-H}"
+  540 char 1,27,19,"{CBM-K}{CBM-N}        {CBM-H}"
+  550 char 1,27,20,"  {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y} "
+  560 char 1,0,21,"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+  570 char 1,5,23,"welches zeichen soll veraendert",1
+  580 char 1,5,24,"werden ? ",1
+  590 getkey a$
+  600 te=asc(a$)
+  610 if te<33 or te>255 then print"{up}"chr$(7):goto 570
+  620 if te<160 and te>127 then print"{up}"chr$(7):goto 570
+  630 printa$;
+  640 char 1,5,23,"                                      "
+  650 char 1,5,24,"            "
+  660 if te and 128 then co=te and 127 or 64:goto 700
+  670 if not te and 64 then co=te:goto 700
+  680 if te and 32 then co=te and 95:goto 700
+  690 co=te and 63
+  700 rem *** zeichen in matrix ********
+  710 as=ma+co*8
+  720 for z=0 to 7
+  730 for s=0 to 7
+  740 by=peek(as+z)and 2^(7-s)
+  750 ze$=" "
+  760 if by<>0 then ze$="*"
+  770 char 1,29+s,12+z,ze$
+  780 next s
+  790 next z
+  800 rem *** zeichen veraendern *******
+  810 azei=peek(adr)
+  820 poke adr,81
+  830 getkey op$
+  840 if op$="{rght}"or op$="{left}"or op$="{up}"or op$="{down}" then 890
+  850 if op$="{home}"or op$="{clr}"or op$="i"or op$="d"then 1280
+  860 if op$=chr$(13)or op$="_"then 1670
+  870 if op$="*"or op$=" "then 1240
+  880 print chr$(7)"{up}":goto 830
+  890 rem *** cursor bewegen ***********
+  900 if op$="{rght}"then gosub 950
+  910 if op$="{left}"then gosub 1030
+  920 if op$="{up}"then gosub 1100
+  930 if op$="{down}"then gosub 1170
+  940 goto 830
+  950 rem *** cursor rechts ************
+  960 if peek(adr+1)=116 or peek(adr+1)=101 then return
+  970 poke adr,azei
+  980 adr=adr+1
+  990 azei=peek(adr)
+ 1000 poke adr,81
+ 1010 return
+ 1020 poke adr,81
+ 1030 rem *** cursor links ************
+ 1040 if peek(adr-1)=103 or peek(adr-1)=106 then return
+ 1050 poke adr,azei
+ 1060 adr=adr-1
+ 1070 azei=peek(adr)
+ 1080 poke adr,81
+ 1090 return
+ 1100 rem *** cursor hoch *************
+ 1110 if peek(adr-40)=111 then return
+ 1120 poke adr,azei
+ 1130 adr=adr-40
+ 1140 azei=peek(adr)
+ 1150 poke adr,81
+ 1160 return
+ 1170 rem *** cursor runter ***********
+ 1180 if peek(adr+40)=119 then return
+ 1190 poke adr,azei
+ 1200 adr=adr+40
+ 1210 azei=peek(adr)
+ 1220 poke adr,81
+ 1230 return
+ 1240 rem *** punkt setzen/loeschen ***
+ 1250 if op$="*"then azei=42
+ 1260 if op$=" "then azei=32
+ 1270 goto 830
+ 1280 rem *** clr,home,i & d **********
+ 1290 if op$="{home}"then gosub 1340
+ 1300 if op$="{clr}"then gosub 1400
+ 1310 if op$="i"then gosub 1520
+ 1320 if op$="d"then gosub 1900
+ 1330 goto 830
+ 1340 rem *** home ********************
+ 1350 poke adr,azei
+ 1360 adr=1533
+ 1370 azei=peek(adr)
+ 1380 poke adr,81
+ 1390 return
+ 1400 rem *** clear *******************
+ 1410 char 1,10,23,"einen moment bitte ..."
+ 1420 for zei =0 to 7
+ 1430 for spa =0 to 7
+ 1440 char 1,29+spa,12+zei," "
+ 1450 next spa
+ 1460 next zei
+ 1470 adr=1533
+ 1480 azei=peek(adr)
+ 1490 poke adr,81
+ 1500 char 1,10,23,"                                      "
+ 1510 return
+ 1520 rem *** matrix invertieren ******
+ 1530 char 1,10,23,"einen moment bitte ..."
+ 1540 poke adr,azei
+ 1550 for i=0 to 7
+ 1560 for b=0 to 7
+ 1570 inv=1533+(b+(i*40))
+ 1580 if peek(inv)=42 then poke inv,32:goto 1600
+ 1590 if peek(inv)=32 then poke inv,42
+ 1600 next b
+ 1610 next i
+ 1620 adr=1533
+ 1630 azei=peek(adr)
+ 1640 poke adr,81
+ 1650 char 1,10,23,"                                      "
+ 1660 return
+ 1670 rem *** return & _ **************
+ 1680 if op$=chr$(13) then gosub 1710
+ 1690 if op$="_"then 170
+ 1700 goto 830
+ 1710 rem *** zeichen in ram poken ****
+ 1720 for lo=0 to 7:we(lo)=0:next lo
+ 1730 char 1,10,23,"einen moment bitte ..."
+ 1740 poke adr,azei
+ 1750 for i=0 to 7
+ 1760 for b=0 to 7
+ 1770 inv=1533+(b+(i*40))
+ 1780 if peek(inv)=42 then we(i)=we(i)+(128/(2^b))
+ 1790 next b
+ 1800 next i
+ 1810 po=ma+co*8
+ 1820 for i=0 to 7
+ 1830 poke po+i,we(i)
+ 1840 next i
+ 1850 adr=1533
+ 1860 azei=peek(adr)
+ 1870 poke adr,81
+ 1880 char 1,10,23,"                                      "
+ 1890 return
+ 1900 rem *** zeichen drehen **********
+ 1910 char 1,10,23,"einen moment bitte ..."
+ 1920 for i=0 to 7:we(i)=0:nexti
+ 1930 poke adr,azei
+ 1940 for i=0 to 7
+ 1950 for b=0 to 7
+ 1960 inv=1533+(b+(i*40))
+ 1970 if peek(inv)=42 then we(i)=we(i)+(128/(2^b))
+ 1980 next b
+ 1990 next i
+ 2000 aush=we(0):we(0)=we(7):we(7)=aush
+ 2010 aush=we(1):we(1)=we(6):we(6)=aush
+ 2020 aush=we(2):we(2)=we(5):we(5)=aush
+ 2030 aush=we(3):we(3)=we(4):we(4)=aush
+ 2040 po=ma+co*8
+ 2050 for i=0 to 7
+ 2060 poke po+i,we(i)
+ 2070 next i
+ 2080 char 1,10,23,"                                      "
+ 2090 goto 700
+ 2100 rem *** zeichensatz speichern ***
+ 2110 char 1,0,22,"name des zeichensatzes      "
+ 2120 input" {left}{left}{left}{left}{left}";na$
+ 2130 bsave(na$),on b0,p8192 to p10240
+ 2140 char 1,0,22,"                                      "
+ 2150 goto 170
+ 2160 rem *** zeichensatz laden *******
+ 2170 char 1,0,22,"name des zeichensatzes "
+ 2180 input"      {left}{left}{left}{left}{left}{left}{left}";na$
+ 2190 bload(na$),on b0,p8192
+ 2200 goto 170
+ 2210 rem *** zeichensatz aktivieren **
+ 2220 poke792,98
+ 2230 poke 2604,(peek(2604)and240)or8
+ 2240 end
+ 2250 v=er
+ 2260 v$=err$(v)
+ 2270 char 1,0,22,"                                      "
+ 2280 char 1,5,22,v$
+ 2290 char 1,0,23,"     fehler beheben - taste druecken"
+ 2300 getkey wa$
+ 2310 resume 170
+ 2320 rem *** directory ***************
+ 2330 scnclr
+ 2340 catalog
+ 2350 getkey du$
+ 2360 goto 170

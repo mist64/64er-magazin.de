@@ -1,0 +1,52 @@
+;uhr 128.prg ==1c01==
+;version=70
+   10 rem **************************
+   20 rem **        u h r         **
+   30 rem **      h. tetens       **
+   40 rem **(c)************31.12.85*
+   50 :
+   60 graphic0,1:color0,6:color1,2
+   70 input"bitte uhrzeit (stunde.minute)";t$
+   80 input"und noch das heutige datum{rght}{rght}31.12.1985{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";d$
+   90 if len(d$)<>10 then 80:else gosub 440
+  100 if mid$(t$,2,1)="."then t$="0"+t$
+  110 ti$=left$(t$,2)+mid$(t$,4,2)+"00"
+  120 print chr$(27)"x"
+  130 graphic3,1:color0,10:color1,1:color2,3:color3,6:color4,1:color5,2
+  140 mx=93:my=69
+  150 box1,2,2,158,198:box1,4,4,156,196:              rem aussenrand
+  160 box1,12,120,53,142,,1:box1,12,158,112,183,,1:   rem ausmahl
+  170 box1,10,118,55,144:   box1,10,156,114,185:      rem ausmahlrand 1
+  180 box1,8,116,57,146:    box1,8,154,116,187:       rem ausmahlrand 2
+  190 char1,4,16,"oo:oo:oo",1
+  200 char1,4,21,d$,1
+  210 circle1,mx,my,56,56:circle1,mx,my,49,49:paint1,mx-51,my,1
+  220 circle1,mx,my,46,46:circle1,mx,my,6,6:paint1,mx,my-10,1
+  230 :dimx(60):dimy(60)
+  240 : for i=0 to 59:j=6*i*~/180:x(i)=sin(j):y(i)=cos(j)
+  250 :  draw 2,mx+y(i)*44,my+x(i)*44 to mx+y(i)*50,my+x(i)*50
+  260 :  if i/5=int(i/5) then draw3,mx+y(i)*44,my+x(i)*44 to mx+y(i)*54,my+x(i)*54
+  270 : next
+  280 :
+  290 h1=mx:h2=mx:h3=mx:k1=my:k2=my:k3=my
+  300 t2=val(mid$(ti$,3,2)):t=val(left$(ti$,2)):t1=(t-int(t/12)*12)*5+int(t2/15)
+  310 tt$=left$(ti$,2)+":"+mid$(ti$,3,2)+":"+right$(ti$,2): char1,4,16,tt$,1
+  320 ifti$="000000"thengosub450:char1,4,21,d$,1
+  330 if t1<>u1 then  box1,h1-1,k1-18,h1+1,k1+18,l1,1: h1=mx+x(t1)*10:k1=my-y(t1)*10:l1=t1*6
+  340 if t2<>u2 then  box1,h2-1,k2-25,h2+1,k2+25,l2,1: h2=mx+x(t2)*17:k2=my-y(t2)*17:l2=t2*6
+  350 draw1,mx+x(u3)*(-8),my-y(u3)*(-8) to mx+x(u3)*43,my-y(u3)*43
+  360 box3,h1-1,k1-18,h1+1,k1+18,l1,1
+  370 box3,h2-1,k2-25,h2+1,k2+25,l2,1
+  380 draw2,mx+x(t3)*(-8),my-y(t3)*(-8) to mx+x(t3)*43,my-y(t3)*43
+  390 ift1<>u1 then play"t9 o4 qafg hc qcga wf":ift1/5=int(t1/5)then for i=1 to t1/5:play"t9 o4 qge wc":next
+  400 u1=t1:u2=t2:u3=t3
+  410 t3=val(right$(ti$,2)):if t3=u3 then 410:else 300
+  420 :
+  430 rem      * * * wochentagberechnung und datumsformatierung * * *
+  440 dt=val(left$(d$,2)):dm=val(mid$(d$,4,2)):dj=val(right$(d$,4)):goto460
+  450 dt=dt+1:if(dt=29anddm=2)or(dt=31and(dm=4ordm=6ordm=9ordm=11))ordt=32thendt=1:dm=dm+1:ifdm=13thendm=1:dj=dj+1
+  460 wt=int(365.25*(dj+(dm<3)))+int(30.6*(dm+1-12*(dm<3)))+dt-621049
+  470 wu=int((wt/7-int(wt/7))*7+0.5):restore
+  480 data sonntag,montag,dienstag,mittwoch,donnerstag,freitag,samstag
+  490 for i=0 to wu:read dt$:next
+  500 d$=left$(dt$+"        ",13)+right$(str$(dt),2)+"."+right$(str$(dm),2)+"."+right$(str$(dj),4):return

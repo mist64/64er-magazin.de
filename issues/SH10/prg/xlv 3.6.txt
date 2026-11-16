@@ -1,0 +1,88 @@
+;xlv 3.6.prg ==1c01==
+;version=70
+    1 p$="xlv 3.6":rem 09.07.86 * r. vogel * ch-8887 mels
+    2 trap83:dclose:color0,1:color4,1:print"{home}{home}{clr}";:e$=chr$(27):cr$=chr$(13)
+    3 ifpeek(215)>0thenfast:char1,18,0,e$+"t"
+    4 t0$="     {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} "
+    5 print"{wht}variablen uebersicht    "p$cr$mid$(t0$,6,31)cr$"{pur}'$' = directory  'e'=ende{down}"
+    6 open3,0:dimta$(52,3):dimt$(3):goto12
+    7 rem #### sub read ####
+    8 get#1,x$:s%=st:x%=asc(x$):return
+    9 printcr$"{up}{up}{up}"e$"q{CTRL-G}'"f$"'ist kein basic pgm{down}":goto12
+   10 printcr$"{up}{up}{up}"e$"q{CTRL-G}pgm '"f$"' nicht gefunden{down}"
+   11 rem#### start pgm ####
+   12 dclose:print"pgm-name oder '$': ";:input#3,f$:iff$="e"then80
+   13 iff$="$"thenprint"{wht}":catalog"*=p":print"{pur}'ret' = weiter";:getkey y$:clr:goto1
+   14 dopen#1,(f$)+",p":ifds>0then10
+   15 gosub8:ifx%<>1then9
+   16 gosub8:ifx%<>28then9:elsee%=1:m%=1
+   17 printcr$"{down}bitte geduld"
+   18 rem #### loop pgm lesen ####
+   19 dountils%>0:gosub8:ife%then29
+   20 ifr%andx%>0then33
+   21 ifq%andx%<>34andx%>0then33
+   22 ifx%=34andq%=0thenq%=1:p%=1:m%=0:goto26
+   23 ifx%=34thenq%=0:m%=1:goto33
+   24 ifx$=":"thenm%=0:print"{lgrn}:";:goto26
+   25 if(x%<255andx%>127)orx%<32then:m%=0:ifx%=143thenr%=1:p%=1:print"{lred}rem";
+   26 gosub35:ifp%thenp%=0:goto33
+   27 ifx$=":"or(x%<255andx%>127)orx%<32thenm%=1
+   28 ifx%>0then33
+   29 e%=e%+1:one%goto33,33,33,30,31
+   30 z0$=chr$(x%):w%=x%:goto33
+   31 z1$=chr$(x%):w%=w%+256*x%:e%=0:q%=0:r%=0
+   32 char1,0,8,e$+"d":char1,0,22,"{lblu}":printusing"#####";w%;:print" ";
+   33 loop:dclose:goto60
+   34 rem#### variablen suchen ####
+   35 ifm%thenz%=z%+1:elsegoto46
+   36 ifz%=1and((x$=>"a"andx$=<"z")orx%=255)thenz$=x$:l%=1:return
+   37 ifz%=1thenz%=0:return
+   38 ifx$="("thenz$=z$+x$:goto46
+   39 ifx$="%"orx$="$"thenz$=z$+x$:l%=2:a%=1:return
+   40 if(x$>="0"andx$<="9")or(x$>="a"andx$<="z")then42
+   41 goto46
+   42 ifa%thengosub46:goto35
+   43 ifl%=1thenz$=z$+x$:l%=2
+   44 return
+   45 rem #### buffer schreiben ####
+   46 ifz%=0thenreturn
+   47 va$=":    ":mid$(va$,2)=z$:z%=0:a%=0:zl$=z1$+z0$
+   48 ifinstr(":ds  :ds$ :el  :er  :~   :st  :ti  :ti$ ",va$)>0thenprint"{yel}*";:v%=0:goto51
+   49 ifinstr(va$,"$")>0thenprint"{yel}$";:v%=3:goto51
+   50 ifinstr(va$,"%")>0thenprint"{yel}%";:v%=2:elseprint"{yel}#";:v%=1
+   51 t%=instr(t$(v%),va$):ift%=0thent$(v%)=t$(v%)+va$:goto51
+   52 i%=(t%-1)/5:ifright$(ta$(i%,v%),2)=zl$then54
+   53 ta$(i%,v%)=ta$(i%,v%)+zl$
+   54 return
+   55 rem #### drucker nicht ready ####
+   56 close4:char1,0,8,e$+"d"+e$+"d"
+   57 char1,0,21,"{pur}bitte drucker einschalten und"+cr$+"'ret' druecken.  (e=ende)"
+   58 getkeyy$:ify$="e"then79
+   59 rem #### buffer drucken ####
+   60 open4,4:print#4,"     programmname :   "f$:print#4,t0$
+   61 ifst<>0then56:elseprint#4
+   62 forv=0to3:ift$(v)=""then78
+   63 print#4,"     ";
+   64 ifv=0thenprint#4,"systemvariablen und konstanten";
+   65 ifv=1thenprint#4,"numerische gleitkomma variablen";
+   66 ifv=2thenprint#4,"numerische ganzzahl variablen";
+   67 ifv=3thenprint#4,"zeichenketten variablen";
+   68 print#4," :":print#4,t0$
+   69 fori=0tolen(t$(v))/5-1
+   70 y$="~~~~":fory=0tolen(t$(v))/5-1
+   71 ify$>mid$(t$(v),y*5+2,4)theny$=mid$(t$(v),y*5+2,4):y%=y
+   72 nexty:mid$(t$(v),y%*5+2,4)="~~~~":print#4,y$" -";
+   73 forj=0tolen(ta$(y%,v))/2-1
+   74 ifint(j/12)=j/12andj>0thenprint#4:print#4,"     -";
+   75 print#4,using"######";(asc(mid$(ta$(y%,v),j*2+1,1))*256)+asc(mid$(ta$(y%,v),j*2+2,1));
+   76 nextj:print#4:print#4
+   77 nexti:print#4:print#4
+   78 nextv:close4
+   79 printcr$"{pur}fertig! 'ret'=ende  'r'=restart":getkey y$:ify$="r"thenclr:goto1
+   80 ff$="menu":dopen#2,(ff$):dclose:ifds=0thenrun"menu"
+   81 print"{home}{home}{clr}{cyn}";:end
+   82 rem #### error ####
+   83 print"{clr}{pur}*** error *** "err$(er)" in linie "el;
+   84 help:print
+   85 print"'ret'=retry (resume), sonst = abbruch ";:getkey y$
+   86 ify$=chr$(13)thenresume:elseend

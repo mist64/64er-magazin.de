@@ -1,0 +1,150 @@
+# r325 reader C — SH10 article 28 "Durchblick mit dem TEDMON", pages 55 (foot) to 70 ONLY
+# (HTML from the paragraph "Da man von einem Maschinenprogramm jede Zwischenversion speichert ..." to the end.)
+# Locator: tesseract tsv (deu, psm 3) over masters600 055-070; crops are montages "page,x,y,w,h" (600 dpi px), cNN.
+# Second reading: truth/056-070 word-diffed against the HTML; every diff is settled below.
+# Disk witness: prg/l7.tedmon.txt (Versuchskaninchen). Memory layout computed from it:
+#   line 100 @1C01 (8F @1C05, space @1C06, quote @1C07, text 1C08-1C21, quote @1C22, 00 @1C23)
+#   line 110 @1C24 (num 1C26), line 120 @1C37 (num 1C39, 8F @1C3B, space @1C3C, 28 stars 1C3D-1C58, 00 @1C59)
+#   line 130 @1C5A (num 1C5C; E7 36 2C 31 00 = 1C5E-1C62), line 140 @1C63 (num 1C65), end link @1C69/1C6A.
+#   This reproduces every link pointer in the text (1C24,1C37,1C5A,1C63,1C69) and $1C00-$1C6A.
+
+## FIX
+FIX p56 'parallelen Disassemblieren sein -, aber' -> 'sein –, aber' — en dash on the page. c01 = 056,220,750,2140,180
+FIX p57 'ebenfalls im Low-High-Format unmittelbar' -> 'Low-High-Format – unmittelbar' — closing dash at line end. c01 = 057,2540,1690,2150,190
+FIX p57 '»100REM« einzugeben nach LIST' -> 'einzugeben – nach LIST' — dash at line end. c01 = 057,2540,4340,2150,280
+FIX p57 'ein Byte gespeichert als Nebeneffekt' -> 'gespeichert – als' — dash at line end. c01 = 057,2540,5950,2150,190
+
+## REJECT
+REJECT p57 'statt »100 REM« zum Beispiel »100 REM«' — truth/057 has '»100   REM«'; the page sets ONE ordinary gap: tsv gaps
+    100->REM = 33 px (statt-line), 30 px (Beispiel-line), 33 px (LIST-line). As printed. c01 (same)
+
+## PRINT-ERROR
+PRINT-ERROR p57 '— In Zeile 130 sind es genau 28 Sternchen' — the 28 stars are in line 120 (disk l7: '120 rem ****...', 28 stars;
+    1C3D-1C58 by the link arithmetic). Printed "130". Harmless (the listing shows where the stars are). c01 = 057,310,1020,1620,100
+REJECT p58 Bild 25 'TAB&lt;' / 'SPC&lt;' (for TAB( / SPC() — the page prints '<'. As printed. c02 = 058,290,5830,1100,370
+REJECT p58 Bild 25 'APPEND $FE $0e' — lower-case e on the page. As printed. c02 = 058,3400,3515,1100,100
+REJECT p58 Bild 25 'INPUT #' / 'PRINT #' — the page sets a narrow gap before '#'; kept. c02 = 058,290,3070,1100,110 + 058,290,4855,1100,110
+
+## FUTURETEUFELCHEN-CANDIDATE (recorded only; owner default is none)
+FT-CAND p58 'Ein-Byte-Token bestehen aus Werten kleiner $80.' — printed so (c02 = 058,230,840,2160,110); every one-byte
+    token in Bild 25 is $80-$FD, and the article itself later says tokens are "größere Werte als $7F" (p61). A reader is
+    told the opposite of the truth. Reasoned, not run.
+FT-CAND p58 'das Memory-Dump (Bild 25) zu erläutern' — printed so (c02 = 058,2470,1200,2160,100); the memory dump is Bild 24,
+    Bild 25 is the token table. Wrong cross-reference; a reader finds the token table instead. Reasoned.
+FIX p58 'wie +, -, /und * zählen' -> '/ und' — the page sets a space after the slash. c03 = 058,240,1650,2140,190
+FIX p59 '>01C00 00 01 1C... (das dritte Byte' -> '00 <u>01</u> <u>1C</u>...' — both bytes are underlined on the page (seen). c03 = 059,290,3810,2120,110
+FIX p59 '>01C01 63 1C...' -> '>01C01 <u>63</u> <u>1C</u>...' — both underlined on the page (seen). Arithmetic: link of line 100 -> $1C63. c03 = 059,2535,5500,700,110
+REJECT p59 '>01C00 45 46 47 48 49 <u>50</u> <u>54</u> <u>45</u> 53 <u>54</u>...' — underlines as on the page (6th-8th and 10th byte, as the text says). c03 = 059,280,1030,1720,120
+REJECT p59 '>01C60 2C 31 00 01 1C' — the page underlines nothing on this line (seen; crop reaches 25 px below the baseline). Kept without <u>.
+    Arithmetic: 1C60 2C, 1C61 31, 1C62 00 = end of line 130, 1C63/64 = its link -> 01 1C = $1C01. c03 = 059,2525,3275,1000,100
+REJECT p59 '1C01-1C24-1C37-1C5A-1C63-Endstation bei 1C69' / '1C01-1C63-Endstation bei 1C69' — as on the page (tesseract's 1024/1037/1C063 are its own). c03
+FIX p60 "Zeilennummern bis (2'%)-1 = $FFFF" -> '(2<sup>16</sup>)-1' — superscript 16 on the page (OCR garbage); <sup> as used
+    elsewhere in this article. 2^16-1 = 65535 = $FFFF. c04 = 060,240,840,2140,110
+REJECT p60 '>01C03 <u>E8</u> <u>FD</u>...', '>01C26 <u>F2</u> <u>FD</u>', '>01C39 <u>FC</u> <u>FD</u>', '>01C5C <u>06</u> <u>FE</u>',
+    '>01C65 <u>10</u> <u>FE</u>' and the five '<u>FF</u> <u>FF</u>' lines — underlines as on the page. Arithmetic: line-number
+    bytes sit at link+2 (1C03, 1C26, 1C39, 1C5C, 1C65); $FDE8=65000, $FDF2=65010, $FDFC=65020, $FE06=65030, $FE10=65040.
+    c04 = 060,240,1990,700,740 + 060,240,5240,700,540
+FIX p60 'die Anfangsadresse ist$1C01' -> 'ist $1C01' — space on the page. c04 = 060,2540,3000,2140,100
+FIX p60 'mit der – noch am Bildschirm stehenden geLISTeten' -> 'stehenden – geLISTeten' — closing dash at line end. c04 = 060,2470,4790,2140,100
+FIX p61 'aber die Zeilennummer diese steht' -> 'Zeilennummer – diese' — dash at line end. c04 = 061,280,575,2140,90
+PRINT-ERROR p61 'Wenn wir also $F3457 erhalten, dumpen wir »M F335A«.' — as printed (c04 = 061,280,930,1600,100);
+    $F3457-$F335A = $FD = 253 bytes, the text says "bis zu 250 Byte früher". Harmless (a few bytes more of dump).
+PRINT-ERROR p61 'so erscheint der Inhalt der ersten REM-Zeile (Zeile 10)' — printed "Zeile 10" (c04 = 061,290,4420,2140,100);
+    the first REM line is 100. Harmless, obvious from context.
+FIX p62 'Ein CR ($0D= # 13) bewirkt' -> '($0D= #13)' — the page sets '#13' closed, identical to p61's '($0D= #13)' which we
+    already render so; the gap '= #' (glyph sidebearing of '#') is kept as on both sites. c05 = 062,300,485,2140,110 + 061,2530,3780,2140,100
+REJECT p61 '>01C06 13 12' — no underline on the page; and the six '>1C06 ...' trial lines (1B 58, 07, 0D, 1F, 05, 1B 4A) as printed.
+    c05 = 061,290,3975,800,110 + 061,300,5400,800,550
+REJECT p61 'zum Beispiel über > 1C06 93' — truth has '>1C06'; the page shows a gap after the wide '>' glyph in a justified line;
+    no like-for-like comparison in prose (r325: never count across a wide glyph) -> kept. c05 = 061,2525,4320,2140,100
+REJECT p62 the CR and LF results '100 REM<br>"PROGRAMM VERSUCHSKANINCHEN"' — both printed with the second line flush left
+    (no LF indent shown); as printed. '>01C00 00 24 1C 64 00 8F <u>0D</u> 22 50 52 4F 47...' — underline as on the page;
+    arithmetic: 1C06 = the space after REM ($8F @1C05). c05 = 062,200,4600,2170,1420
+FIX p62 'Hintergrundfarbe erhält eher zur' -> 'erhält – eher' — closing dash at line end. c06 = 062,2470,4245,2140,110
+REJECT p62 '<u>0A</u>' (1C06), '<u>1F</u>' (1C07), '>01C20 45 4E <u>05</u> 00 37 1C 6E 00...' (1C22 = closing quote of line 100;
+    1C24/25 = link 37 1C, 1C26 = 6E 00 = 110), the colour list weiß $05/rot $1C/grün $1E/blau $1F (#05/#28/#30/#31) — all as on
+    the page. c06 = 062,200,6205,2170,200 + 062,2470,930,800,370 + 062,2470,2085,1960,200 + 062,2470,3250,1500,100
+REJECT p63 'den Sternchen »***«' — truth has »**«; the page prints three asterisks. c06 = 063,280,1100,2140,380
+REJECT p63 'HOME ($13= #19)' and '>01C38 1C 78 00 8F <u>13</u> 2A 2A...' — as on the page (1C38 = link high byte, 1C39 = 78 00 = 120,
+    1C3B = $8F, 1C3C = the space). c06 (same)
+REJECT p63 'Klingelzeichen (ASCII-Code: $07=#7,' — closed on the page. c07 = 063,280,2895,2150,100
+REJECT p63 'steht uns nur zur Verfügung -, aber' — truth has '–,'; the page prints a HYPHEN here (short, low; compare the en dashes
+    on p56/p62). As printed. c07 = 063,280,3255,2150,100
+REJECT p63 '01C38 1C 78 00 8F 13 <u>07</u> 2A...' — the page has NO '>' before 01C38 on this line, and 07 underlined. As printed.
+    Arithmetic: 1C3D = first star. c07 = 063,280,5300,2150,370
+FIX p63 '>01C38 1C 78 00 8F 13 07 09 2A...' -> '13 07 <u>09</u> 2A...' — 09 underlined on the page (seen); 1C3E = 2nd star. c07 = 063,280,6290,2150,200
+REJECT p63 '... 09 <u>0C</u>...' / '... 09 <u>0B</u>...' (1C3F) — as on the page. c07 = 063,2520,1465,1750,190 + 063,2520,2445,1750,190
+FIX p63 'den ASCII-Code $0E (# 14), und' -> '(#14)' — '#14' set like every other '#nn' on these pages ('#13' p61/62, '#17'/'#29' below),
+    all of which we render closed; the gap is the '#' sidebearing. c07 = 063,2520,3720,2150,380
+REJECT p63 '>01C40 <u>0E</u> 2A...' — as on the page. c07 (same)
+FIX p63 '>01C40 0E <u>0F</u> 2A...' -> '>01C40 0E 0F 2A...' — the page underlines NOTHING on this line (seen; crop reaches 70 px below the
+    baseline, the 0E line above shows its underline in the same crop geometry). Our <u> was placed by address arithmetic (step 190);
+    the page wins. (Magazine omission, harmless: the text gives '>1C41 0F' too.) c07 = 063,2520,5305,1100,190
+FIX p63 'Die Codes sind: CRSR DOWN = Cursor runter $11 = #17 CRSR RIGHT = Cursor rechts $1D = #29' -> line breaks restored:
+    'Die Codes sind:<br> CRSR DOWN = Cursor runter $11 = #17<br> CRSR RIGHT = Cursor rechts $1D = #29' — the page sets them as two
+    own lines (a small table), like the colour list on p62 which we already render with <br>. c07 = 063,2420,6200,2250,450
+REJECT p64 '>01C40 0E 0F <u>1D</u> 2A...', '... 0F <u>11</u> 2A...', '... 0F 11 <u>12</u> 2A...' (1C42, 1C42, 1C43), RVS ON '($12= #18)' —
+    as on the page. c08 = 064,220,550,1000,190 + 064,220,1175,1000,190 + 064,220,2440,2140,100 + 064,220,2715,1000,180
+REJECT p64 '... 11 12 2A...' — truth/tsv '2A..'; ink-column profile of the band below x-height at y 2760-2800 shows three dot blobs
+    at x 1195/1226/1257 (31 px apart) after the '2A'. Three dots, as we have. (measured, no extra crop)
+REJECT p64 '»H 0 0 'REVERSER KOMMENTAR !!«', '$0A80', '»M A80«', '>1C44 52 45 56 45 52 53 45 52 20 4B 4F 4D 4D 45 4E 54 41 52 20 21 21'
+    (one line; the page wraps it after 4E at the column edge — code, joined) — as printed; the 21 bytes spell REVERSER KOMMENTAR !!
+    and fill 1C44-1C58, ending on the 00 at 1C59. c08 = 064,220,4050,2140,180 + 064,220,4340,2140,280
+FIX p64 heading 'DELETE-Zeichen löschen' -> 'DELETE–Zeichen löschen' — the heading prints a DASH, not a hyphen: connected-component width
+    66 px x 23 px (064 @1040,5701), against the hyphens of the same heading face on p63 'Die CRSR-DOWN- und die CRSR-RIGHT-Bewegung'
+    at 36-37 px x 22-24 px. Match the page (r325: typos in print remain). c08 = 064,600,5580,1400,190 (+ measurement)
+REJECT p64 'DEL (ASCII-Code: $14= #20)', '>01C3C <u>14</u> x7 12 52...' (7 underlined), '»F 1C3C 1C42 14«' — as on the page.
+    Arithmetic: 1C3C..1C42 = 7 bytes = "120 REM" (7 chars); 1C43 = 12 (RVS ON), 1C44 = 52 'R'. c08 = 064,220,6450,2140,100 + 064,2460,1530,2150,290
+REJECT p64 'durch Drücken der ESC-Taste -, merkt' — a HYPHEN on the page; as printed. c09 = 064,2460,5300,2150,100
+REJECT p65 'Die Befehle N,R und U', '(DELETE aktuelle Bildschirmzeile löschen)' — as printed. c09 = 065,350,2540,1000,95 + 065,280,4685,1850,280
+REJECT p65 all fourteen ESC-section dump lines and their underlines (1C06 1B 44; 1C3C 1B 40; 1C3E 1B 50; 1C40 1B 58; 1C42 1B 56 / 1B 57;
+    1C44 1B 49 1B 49; 1C48 1B 4F; 1C4A 1B 52; 1C4D 1B 45 (with the unchanged 2A at 1C4C); 1C4F 1B 47; 1C51 07; 1C52 1B 54 09 1B 42)
+    — every <u> matches the page, and every start address is the previous one + the bytes before it. c09 (p65 rows)
+FIX p61 'zum Beispiel über > 1C06 93', p65 'oder einfach > 1C06 1B 44', p65 'oder > 1C4D 1B 45' -> '>1C06' / '>1C4D' — measured like
+    for like: ink gap '>'->'1' = 22 px (p61 @3021/3096), 23 px (p65 1C4D @2723/2798), 23 px (p65 1C52 @2725/2800, rendered closed),
+    23 px (p65 1C3C @491/567, rendered closed). Same construct, same gap -> closed like its neighbours. (no extra crop; c09 shows them)
+REJECT p65 '1B 54 entspricht ESC-T, 09 entspricht TAB und 1B 42 entspricht B.' — printed 'B' (not 'ESC-B'). As printed. c10 = 065,2510,6280,2150,220
+REJECT p68 Steuerzeichen table (27 rows incl. the split CRSR UP / $91, RVS OFF / $92, CLR / $93, INS / $94, CRSR LEFT / $9D rows) —
+    row for row as on the page, including the two-line layout of the five named controls. Self-check: all 21 '$xx = #nnn' pairs
+    in the table, and all 60 '$xx=#nn' pairs in pp56-70, agree hex = decimal (script, no failures). c10 = 068,300,1400,2030,2490
+REJECT p68 '>01C00 00 24 1C 64 00 8F <u>8E</u> 22 50...', 'oder >1C06 8E', '... 8F <u>22</u> <u>0D</u> <u>93</u> 2A 2A...',
+    '... 8F <u>22</u> <u>14</u> <u>0D</u> <u>93</u> 2A...' — as on the page. c11 = 068,250,4325,2150,190 + 068,2480,4110,1650,190 + 068,2500,5650,1650,190
+REJECT p68 'wovon die LIST-Routine fälschlicherweise ausgeht -, so' — HYPHEN on the page; as printed. c11 = 068,2480,2255,2150,100
+REJECT p69 '<u>0B</u>' (1C41), '<u>9E</u>' (1C42), '<u>8D</u> <u>8D</u>' (1C43/44), '<u>95</u>' (1C49), '<u>0F</u> <u>2A</u> <u>8F</u> <u>2A</u>' (1C4A-4D),
+    '<u>02</u> <u>2A</u> <u>82</u> <u>2A</u>' (1C4E-51), '<u>9F</u>' (1C52), and the 12-row colour table — as on the page. Underlines
+    measured too: ink in the 28-px band under the glyphs = 376/425/418/500 (0F 2A 8F 2A) and 442/462/382/375 (02 2A 82 2A), 0 for the
+    following 2A. c11 (p69 rows)
+FIX p69 '>01C44 8D <u>12</u> 2A <u>92</u> 2A 2A 2A...' -> '8D <u>12</u> 2A 92 2A ...' — the page underlines only 12: ink under 12 = 464 px,
+    under 92 = 0 (band y 1113-1141, x 3253-3344). Our <u> on 92 was arithmetic (step 190); the page wins. (Magazine omission;
+    the text says '>1C47 92 eingeben' anyway.) c11 = 069,2500,1040,1900,190
+FIX p69 four '2A..' line ends -> '2A...' (>01C40 <u>8E</u> 2A 2A 2A; ... <u>8D</u> <u>8D</u> 2A 2A; ... <u>8F</u> <u>2A</u> 2A 2A;
+    ... <u>82</u> <u>2A</u> 2A 2A) — three dots on the page at all four (seen 1:1). c12 = 069,1000,945,300,90 + 069,1300,5530,320,100
+    + 069,3750,2940,300,90 + 069,3630,4220,300,90 (and 069,3620,1040,300,90 = a known '2A...' as control)
+FIX p70 '2000 BANK 15:SYS DEC( "41BA"):REM "**********"' -> 'DEC("41BA")' — no space after '(' on the page (typewriter face), and the
+    ARITHMETIC decides it: line 2000 at 1C01 = link 1C01/02, number 1C03/04, BANK $FE $02 1C05/06, ' 15' 1C07-09, ':' 1C0A, SYS $9E 1C0B,
+    ' ' 1C0C, DEC $D1 1C0D, '(' 1C0E, '"' 1C0F, 41BA 1C10-13, '"' 1C14, ')' 1C15, ':' 1C16, REM $8F 1C17, ' ' 1C18, '"' 1C19 = the
+    printed search result 01C19. With the space it would be 01C1A. c13 = 070,230,500,2150,500
+REJECT p70 'H 1C01 5000 '"**********', 'und erhalten als Wert 01C19', '>01C19 <u>1B</u> ... <u>0A</u>' (12 underlined) and
+    '>01C19 <u>22</u> ... <u>91</u>' (12 underlined) — as on the page; 12 bytes = quote + 10 stars + quote = 1C19-1C24. c13
+REJECT p70 the three '<p>— …</p>' items (Kommentar / SYS-Befehl / Cursor auf RUN) — hyphen-set hanging list on the page; em dash per r190.
+PRINT-ERROR p70 'den Text »(C) 128« ausgibt' with bytes 28 43 29 31 32 38 = "(C)128" — the dump has no $20 between ')' and '1'; it cannot,
+    the 12 bytes exactly fill the quote+10 stars+quote. Prose and dump disagree by a space; harmless. c13 = 070,230,2000,2150,210
+REJECT p57 '(ändern Sie doch einmal im Dump das $00 in $40 ... dann sehen Sie den Effekt. Genaugenommen' — the parenthesis is never closed
+    on the page either; as printed. c14 = 057,300,3150,2150,280
+REJECT p57 'wenn wir $0064=$64 umrechnen lassen' — closed on the page (truth/057 spaces it). c14 = 057,2540,1955,2150,100
+REJECT p58 Bild 25 (token table, 169 entries) — checked as a SERIES, not by eye: one-byte tokens run $80..$FD in steps of 1, the only gap
+    being $CE (the prefix byte); $CE group $02..$0A continuous; $FE group $02..$26 with gaps at $20 and $22 (STASH $1F, FETCH $21,
+    SWAP $23) — the gaps agree with BASIC 7.0's token map as I know it (route 4, recalled not cited; no cell changed on that basis).
+    Cells seen by eye: only those in c02.
+
+## COVERAGE
+Read in full, for sense: every <p>, <h2>, <li>, <td>, <figcaption>, <pre><code> from "Da man von einem Maschinenprogramm ..." (p55 foot)
+to "(F. Müller/ks)" (p70). Word-diffed against truth/056-070 in full; every diff settled above or is markup/typography only
+(″ vs ", list numbering, Markdown fences, hyphenation). Dash-list items left as <p>— …</p> (r190).
+<u> underlines: every dump line in pp59-70 checked against the page (c03-c13) — 3 lines were MISSING underlines (p59 01 1C, p59 63 1C,
+    p63 09) and 2 had underlines the page does not print (p63 0F, p69 92); all others match. Every dump start address and every
+    'oder >1Cxx' short form checked by address arithmetic against the disk-derived layout of Versuchskaninchen (header) — no mismatch.
+Not read by eye: Bild 25 token cells other than those in c02 (series-checked instead); Bild 24 (placed crop 28-24, not text);
+    Listing 7 (<pre data-filename>, disk-owned). The ESC A-@ table (p64/65) was read for sense only (no crop): its letters are the
+    A..Z,@ series and every meaning fits its letter; no candidate arose.
+Crops read / seen: 14 / 14 (c01-c14; all loaded). Unseen: none.

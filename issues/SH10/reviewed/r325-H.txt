@@ -1,0 +1,145 @@
+# r325 reader H — SH10 articles 141, 148, 162
+# Locator: tesseract tsv (deu, psm 3) over masters600 pp 141-162 (word/line boxes, 600 dpi px).
+# Crops are montages of masters600 regions (page:x,y,w,h at 600 dpi, scale given), numbered cNN; each read once.
+
+## Article 141 "Kochrezepte: Kernel-Routinen für jeden Zweck" (pp 141-148)
+
+crop c01 (scale 0.6) = 141:2600,6285,2100,100 | 142:220,6020,2170,190 | 142:2450,4150,1600,100 |
+                       144:580,1115,1800,160 | 144:210,3160,2140,250 | 144:2450,3055,2150,100
+PRINT-ERROR p142 »pntr« ($SEC) als ffset — page prints "($SEC)" and "ffset" (c01). Kept.
+REJECT      p142 »pnt« ($E0/$E1) — truth/142 reads "$EO"; glyph round, series $E0/$E1 (zero page pointer pair) decides digit 0. Kept $E0.
+REJECT      p142 "Attributspeicher" (truth/142 "Attributsspeicher") — page "Attributspeicher" (c01). Kept.
+PRINT-ERROR p142 h3 "jsorg $C00F" (table + prose say jscorg) — page prints "jsorg" (c01). Kept.
+PRINT-ERROR p144 ESC R "Bilschirminhalt" / "Bilschirmrahmen" — page prints both (c01). Kept.
+PRINT-ERROR p144 "zum Beispiel den Adressen $FA bis $FF" (three addresses $FA-$FC are used) — page prints "$FF" (c01). Kept; harmless.
+PRINT-ERROR p144 jwind "Bei gesetzem Carry-Flag" — page prints "gesetzem" (c01; truth/144 normalised to gesetztem). Kept.
+REJECT      p141 jdsply "direkt auf den Bildschirm gebracht" (truth/141 "dem") — page "auf den Bild-" (c01). Kept.
+
+crop c02 (scale 0.5) = 141:2540,3995,2080,1360 (editor jump table) | 145:350,625,1950,2340 (kernal table kspio..kmembt)
+crop c03 (scale 0.5) = 145:350,2950,1950,2330 (kernal table kscnky..kiobas) | 144:195,4880,2030,960 (F-key table)
+SELF-CHECK  editor jump table: 16 rows $C000..$C02D, every step +3 — consistent. All 16 names + Funktion texts
+            compared by eye with c02: agree.
+SELF-CHECK  kernal jump table: 58 rows; $FF47..$FF7D step 3 (19 rows), gap $FF7D->$FF81 (4: the KERNAL's version
+            byte at $FF80 — the page prints $FF81, c02), $FF81..$FFF3 step 3 (39 rows). The ONLY break is
+            ktalk "$FB4" between $FFB1 and $FFB7.
+PRINT-ERROR p145 table ktalk "$FB4" — page prints "$FB4" (c03, three hex digits). Kept, like the decided "kplot $FF0".
+            The h3 on p147 prints "$FFB4" (tsv), so the reader has the right address beside it. Not misleading enough for FT.
+REJECT      p145 table kopen "$FFC0" / kplot "$FFF0" — page glyph is round "O"-like (tesseract $FFCO/$FFFO); series
+            $FFBD,$FFC0,$FFC3 / $FFED,$FFF0,$FFF3 decides digit 0. Kept.
+            All 58 kernal names + Funktion texts compared by eye (c02/c03): agree, incl. kspio, kstmsg, ktsksa, kunlsn,
+            kscror, "Vectoren", "Stop-Taste lesen".
+PRINT-ERROR p144 F-key table <F5> "DSVAVE"" — page prints "DSVAVE″" (c03). Kept.
+            Rest of F-key table (10 rows, DL"*" incl. asterisk, CHR$(13)) agrees with c03.
+
+crop c04 (scale 0.55) = 144:2455,6290,2140,270 | 146:2460,475,2020,95 | 146:2415,3140,2190,115 | 146:220,1005,2140,370 |
+                        146:220,1635,2140,95 | 147:300,1370,2150,460 | 147:2540,1480,2150,190 | 147:2540,2545,2150,90 | 147:310,4865,2140,100
+PRINT-ERROR p144 kclsal "können alle Daten gleichzeitig geschlossen werden" (sense: Dateien) — page "Daten" (c04). Kept.
+PRINT-ERROR p144 kclsal "Ein gesetzes Carry-Flag" — page "gesetzes" (c04). Kept.
+PRINT-ERROR p146 h3 "kstmg $FF90" (table: kstmsg) — page prints "kstmg" (c04). Kept.
+PRINT-ERROR p146 h3 "ktksa $FF96" (table: ktsksa) — page prints "ktksa" (c04). Kept.
+PRINT-ERROR p146 kifetv "Die Funtkion entspricht" — page "Funtkion" (c04). Kept.
+PRINT-ERROR p146 kistav "das aktuelle Progrmm" — page "Progrmm" (c04). Kept.
+REJECT      p147 "missing" kunlsn ($FFAE) section — page goes kuntlk paragraph -> klistn head with nothing between (c04).
+            The print has no kunlsn description; 73 h3 heads for 74 table rows is the page's. Nothing lost.
+REJECT      p147 kchkin "Bildschirm (#0)" vs kckout "(#3)" — page prints "#0" and "#3" respectively (c04); truth/147 "( 0)" was
+            the OCR losing the "#". Kept.
+FT-CANDIDATE p147 kchkin lists "Bildschirm (#0)" as an input device; device 0 is the keyboard, the screen is 3 (as
+            kckout says). Reasoned from the article's own kckout line, not run. Owner default: no FT.
+FT-CANDIDATE p146 kifetv text: "muß das Y-Register die Banknummer" while head and table say "von Bank in xr" (and the
+            kistav/kicmpv paragraphs say X-Register). Page prints "Y-Register" (c04). A reader following the prose loads the
+            wrong register. Reasoned, not run. Owner default: no FT.
+
+crop c05 (scale 0.5) = 142:220,930,2200,2090 (attribute-byte table) | 143:300,3935,2170,100 | 147:300,3330,2150,880 (status bits)
+REJECT      p142 attribute-byte table (both 16-colour columns, bits 4-7) — all 40 cells agree with the HTML (c05),
+            incl. 40-col "1000 = Hellbraun / 1001 = Braun" and 80-col "0001 = Grau ... 1111 = Weiß". Kept.
+REJECT      p143 »crsrof« ($CD9F) (tesseract "$CDIF") — page "$CD9F" (c05). Kept.
+REJECT      p147 kreads status-bit table, 8 rows — agrees (c05).
+SELF-CHECK  p143 cursor-form table vs the curmod bit table (bit 6 blink, bit 5 off/slow, bits 0-2 start row):
+            $00 $07 $20 $40 $47 $60 $67 all encode the form the table names — consistent; values agree with truth/143.
+SELF-CHECK  p148 ksttim: 10:05:20 = 36320 s x 60 = 2179200; 33*65536 + 64*256 + 128 = 2179200 — consistent.
+TEXT        curmod table, ESC table (27 rows), cursor-form table: word-identical with truth/143-144 (not separately cropped).
+
+COVERAGE 141: read in full — every <p>, all 73 <h3>, both <h2>, all 8 tables, intro, source line.
+  Word-diffed against truth/141-148; every diff taken to the page (c01-c05). Both jump tables checked by address
+  arithmetic over every row AND by eye. FIX: none.
+
+## Article 148 "Tips & Tricks zum C 128" (pp 148-161)
+Prose word-diffed against truth/148-161 (differences: <…> bracket stripping, C64/C 64 spacing, list dashes — all
+formatting); every prose diff and every hand-typed command <pre><code> taken to the page.
+
+crop c06 (scale 0.6) = 148:210,6185,720,85 | 148:210,6365,680,100 | 148:2445,4050,680,85 | 151:260,6025,400,85 |
+   151:260,6380,2140,90 | 153:300,5313,700,80 | 153:300,5475,1100,100 | 155:290,3445,850,80 | 156:2470,6298,690,80 |
+   156:2475,2085,1220,90 | 156:240,4838,2130,90 | 159:2520,2975,2140,90 | 160:2400,6490,1800,150 |
+   161:270,2665,830,80 | 161:270,2930,400,80 | 161:270,3190,1250,90 | 161:270,3370,1700,90 | 161:270,3555,1460,90
+FIX p155 <pre><code> 'BLOAD "MEMORY-RETTER"' -> 'BLOAD"MEMORY-RETTER"' — page closed (c06). Arithmetic: tesseract
+    span 300..1125 = 825 px at 41.5 px pitch = 20 cells = BLOAD"MEMORY-RETTER" (21 cells with a space = 871).
+FIX p156 <pre><code> 'RUN "DATAWANDLER"' -> 'RUN"DATAWANDLER"' — page closed (c06). Span 2478..3146 = 668 px =
+    16 cells = RUN"DATAWANDLER" (17 with a space = 705).
+FIX p160 <pre><code> '$13000 47 4F 36 34 0D 00 00 00 GO64m' -> '$13000  47 4F 36 34 0D 00 00 00  GO64m'
+    Ink-column profile of 160:2400,6560,1900,90, pitch 41.5 px from the hex pairs (2820,2942,3066,3191,3318,3440,3566,3691
+    = cols 8,11,14,17,20,23,26,29 from $ at 2489); GO64m at 3853 = col 32.9 -> 33. "$13000" ends col 5 -> two spaces;
+    last 00 ends col 30 -> two spaces before GO64m. (c06 seen: same.)
+FIX p161 <pre><code> '$000FB 00 30 01...' -> '$000FB  00 30 01 ...' — tsv: $000FB@277, 00@610 = col 8.02 (two
+    spaces), 30@730 col 10.9, "01 ..." ink 857..1088: ink end at col 19.5 (=1086) needs the space; without it 1045.
+    c06 shows the gap before the dots.
+REJECT p161 'LDA #$FB', 'LDX #$0A (…)', 'LDY #$05 (…)' look double-spaced in c06 — the '#' is the wide glyph: JMP line's
+    '$'@446 vs '#'@456/457 on LDA/LDX/LDY = same cell (col 4); '(für'@699 = col 10 after a ~1.93-cell '#'. One space. Kept.
+REJECT p161 "GO64" in LDY line / "GO64m" — letter O (the command GO64; language decides, glyph is the face's round O/0). Kept.
+REJECT p157 <code> 'T$=RIGHT$("000"+T$,3)' (tesseract 'RIGHT$( ”000”') — ink profile 157:2500,3060,1000,100:
+    '(' at 2924 = col 9, '″' at 2969 = col 10 (pitch 41.5 from T@2543). Closed, as the HTML has it. No crop.
+REJECT p148 BLOAD"LIST-HILFE", BANK 15:SYS 2816 (x2; 15:SYS@426 = col 5.0 from BANK@218), p151 RUN"XLV*",
+    p153 BOOT"VDCHC.0C00", BLOAD"VDCHC.0C00":SYS 3072, p156 PA$="S1Z1S2Z2MINSC":GOSUB 200 — all agree (c06).
+REJECT p151 »*« abkürzen (truth "» «") and p159 DLOAD"*" (truth DLOAD" ") — page prints the asterisk (c06). Kept.
+REJECT p156 "Tasten 74 und 75 (+ und -)" — page prints a short dash, the minus key; kept as ASCII hyphen-minus (c06).
+
+crop c07 (scale 0.55) = 155:2520,1278,2140,95 | 155:295,6020,2140,180 | 155:295,6555,2140,95 | 155:295,3352,1700,90 |
+                        155:365,1806,2060,95 | 155:295,2262,2130,180
+PRINT-ERROR p155 "kopiert den gesammten Zeichensatz" — page "gesammten" (c07). Kept.
+PRINT-ERROR p155 "(Common Aera)" — page "Aera" (c07). Kept.
+PRINT-ERROR p155 "zu Wirrwar im unteren" — page "Wirrwar" (c07). Kept.
+PRINT-ERROR p155 "Dieses Machinenprogramm" — page "Machinenprogramm" (c07). Kept.
+PRINT-ERROR p155 "Mit dem folgendem Befehl" — page (c07). Kept.
+PRINT-ERROR p155 "<(Startadr.alt>" (stray "(", no space) — page (c07). Kept.
+
+crop c08 (scale 0.5) = 156:2470,2360,2150,2070 (parameter table of »Sichere Input-Routine«)
+REJECT p156 parameter table, all 7 rows and the 5 "Wert =" lines — agree (c08).
+SELF-CHECK p156 field widths 2+2+2+2+3+1+1 = 13 = len("S1Z1S2Z2MINSC") — consistent.
+SELF-CHECK p160/161 PFKEY example: 47 4F 36 34 = "GO64", 0D = RETURN, LDY #$05 = 5 chars; $000FB 00 30 01 -> $3000
+    bank 1 = $13000; LDX #$0A = HELP (key 10 in article 141's table) — consistent.
+SELF-CHECK p155 Zeichensatz addresses 0..14336 step 2048 (8 values, bits 1-3 of 53272) — consistent; 70 s = 1000 x 0.07 s.
+
+Listing 2 (hand <pre>, 189 monitor rows $0B00-$0C8C): NOT read by eye; bytes verified against prg/list-hilfe.prg
+    (load $0B00, 415 bytes) by byte-for-byte comparison — 189 of 189 rows match, addresses contiguous (each row's
+    address = previous + byte count). Branch targets spot-checked by arithmetic (bne $0b9e, bcc $0b32). Comment column
+    (e.g. "$f50a0", "Cursosr up") has no disk witness and is a step-170 transcription: not re-read. r325_dump_crosscheck.py
+    reported "0 findings" for the issue and prints no parsed count — its silence is not coverage of this form.
+Listings 4, 6 (xlv 3.6), 14 (datawandler v3.5) hand <pre>: step-170 transcriptions, protected, not re-read here.
+    Their German comments untouched.
+
+COVERAGE 148: read in full — intro, all prose <p>, 7 <h3>, 16 <h2>, 16 author lines, all figcaptions, the p156 table,
+  every short <pre><code> command line (17). Hand listings as stated above.
+
+## Article 162 "Impressum" (p162)
+crop c09 (scale 0.75) = 162:3195,700,1430,1820 | c10 = 162:3195,2500,1430,1700 | c11 = 162:3195,4160,1430,2460
+  (the whole masthead column, every line seen)
+REJECT all names, initials and addresses: Herausgeber/Vorstand (Carl-Franz von Quadt, Otmar Weber), Scharfenberger,
+  Absmeier, Klinge; Redaktion Buckel (bj), Fieger (rf), Hübner (ah), Jungmann (nj), Knechtel (kn), Mayer (dm),
+  Meyer (hm), Ohnesorg (og), Schramm (ks); Jancke; Rauner; Eder (Ltg.), Kowalewski (Cheflayouterin), Raß, Milles;
+  Buck; Rauchfuss; Distl (398); Kollerstr. 3, CH-6300 Zug; 501 Galveston Drive, Redwood City, CA; Hörl (114);
+  Grünfeldt (189); Michaela Hörl; Frank (212); SOV St. Otto-Verlag, Laubanger 23, 8600 Bamberg; DM 14,–; Pegasus,
+  Hauptstätter Straße 96, 7000 Stuttgart 1; Spadacini (185); Fiebig; Pauly; Hans-Pinsel-Straße 2, 8013 Haar
+  — all agree with the page (c09-c11). Manuskript/Urheberrecht prose word-identical.
+  Key initials for step 180: 141's (ah) = Achim Hübner, 148's dm = Dieter Mayer — both in this masthead.
+REJECT phone/telex digit grouping (truth/162 closes them: 862329, 94063, (415) 366-3600, (089), 5-22052) — measured by
+  ink-column gaps on 162:3597..4380, y2213..2462: digit-to-digit gap 6-8 px; thin gaps 12-17 px at
+  "862|329" 14, "94|063" 12, "56|56" 15, "41|56" 24 (after a narrow 1), "(4|15)" 17, "3|66" 12, "36|00" 14.
+  So "862 329", "94 063", "042-41 56 56", "(4 15) 3 66-36 00" as the HTML has them. c11 shows the same thin gaps in
+  "(0 89) 46 13-249", "(07 11) 64 83-0", "46 13-0", "5-22 052". Kept.
+FIX: none.
+
+COVERAGE 162: read in full, every line against c09-c11.
+
+## Totals (reader H)
+FIX 4 (all in 148: p155, p156, p160, p161 command/hex lines) | REJECT 18 entries | PRINT-ERROR 19 | FT-CANDIDATE 2 | SELF-CHECK 8
+Crops read 11 / crops seen 11 (c01-c11). Unseen: none.
+List dashes (<p>— …</p>, r190) untouched. Verification 4 (generate.py) not run by this reader.

@@ -1,0 +1,78 @@
+r325 reader F — SH10 — articles 91, 93, 101, 105, 108, 109
+Crops are 600 dpi master coordinates (masters600/NNN.png, x y w h); "cNN" = image read once, by this reader.
+Locator: tesseract tsv on masters600 (word boxes only, never decisive) + truth/NNN.txt word-diff.
+
+== FIX ==
+was -> is | page | crop | evidence
+"Set lobyte" -> "Set Iobyte" | p97 (93, BDOS table, function 8) | c13 strip p97 x2770 y1000 700x90 | OPTICALLY UNDECIDABLE, settled by language + series: measured, the glyph's top is y=1020 and h=46, the same as the ascender of "b" in the same word (y=1020, h=47) and the cap S (y=1019, h=48) — in this face cap height = ascender height, so I/l cannot be told apart. "lobyte" is not a word; the CP/M term is IOBYTE (CP/M 2.2 BDOS function 8 = Set IOBYTE, function 7 = Get IOBYTE; the table's own function 7 neighbour is the I/O pair). truth/097 reads "Iobyte". Route 5 (language) + route 4 (named standard); recorded as linguistic, not optical.
+"Das BIOS — Schichtarbeit im Untergrund" -> "Das BIOS – Schichtarbeit im Untergrund" (h2) | p99 | c18 strips p99 x2600 y1000 and p93 x640 y2320 | MEASURED: the heading dash is 66 px wide (x=3082, h=23) against 64 px for the dash in the same face/size in p93's "Submit – oder so ähnlich..." (x=1031, h=22), which our HTML renders as "–". Same glyph -> same character. truth/099 also has "–".
+
+== REJECT (HTML already matches the page) ==
+candidate | page | crop | what the page prints
+"dem Befehl entsprechende Option »E:«" (91, missing article?) | p92 | c18 strip p92 x2470 y2345 | print exactly so — kept
+"angebene Datei" (93) | p94 | c14 | print "angebene" — print typo, kept (truth/094 "angegebene" is wrong)
+"In Ebene zwei haben Sie damit eine Datei Namens »TEST.TXT« erzeugt" (93; dBase runs in user 1) | p95 | c14 | print "Ebene zwei" — see FT-candidate
+"Die Anweisung »K« löscht innerhalb einer Zeile, während mit »D« ganze Zeilen" (93) | p97 | c14 | print exactly so — see FT-candidate
+"wennn" (93) | p99 | c14 | print "wennn" — typo kept
+"PROFILE.Sub" (93) | p94 | c14 | print "PROFILE.Sub" — kept
+"DIR *.ASM" / PIP block "<B:$2.SYM = A:$1.SYM" (93 hand-typed pre) | p93 | c14 (p93 x2500 y3430) | print matches line for line incl. bare "<" line; final "DIR" line located by tesseract at (2519,4250)
+"Flush Buffers ... Parameter: 31H" (93, function 48; self-check: every other function's hex = its number) | p98 | c13 strip p98 x2750 y2210 | print 31H — see FT-candidate. Also "Flag f. Puffer löschen Register: E" without "in": print the same — kept
+"Registerpaar DC" (93, BIOS 25) | p99 | c10 | print "DC" — see PRINT-ERROR
+"Directory in Block 18", "Sektor 15 oder 20", "#A", "Kentnisse", "Dateienkennung" (93) | p94/p96 | not cropped: HTML = truth = tesseract, three readings agree, no sense problem beyond print typos
+
+== PRINT-ERROR (kept as printed; LOG only, not an owner question) ==
+p104 (101) "36/212 inch" for 36/216 — c04
+p104 (101) "^PEW1^PE4....^PEWO^PE5" — letter O where Tabelle 1 has digit 0 (measured w58 vs digits w22-44) — c04
+p103 (101) "CP/M-Prompt >A" for A> — c06
+p102 (101) "Änderungn", "Nur Standdardrucker" (Bild 3), "das erste PY" (no ^) — c05/c06
+p104 (101) Tabelle 1 "Super-/Subscipt" — c07
+p99 (93) BIOS 25 "Anzahl der Byte in Registerpaar DC" (BC) — c10
+p94/p99 (93) "angebene", "wennn", "Kentnisse" — c14
+p104 (101) heading "Der Einsatz der Neuinstallation" printed twice (small run-in at y1295, large at y2140) — tesseract boxes; kept as is
+
+== FUTURETEUFELCHEN-CANDIDATE (recorded, NOT added; owner default is no FT) ==
+1. p98 (93) BDOS function 48 Flush Buffers "Parameter: 31H" — every other entry's hex equals its function number (61 of 62 self-consistent); 48 = 30H, and 31H is function 49 (Get/Set SCB), printed directly below. A reader who codes 31H gets SCB access instead of a buffer flush. Impact REASONED, not run. c13.
+2. p95 (93) "In Ebene zwei haben Sie damit eine Datei Namens »TEST.TXT« erzeugt" — dBase runs in user 1 per Bild 1 and the next sentences ("Löschung ... im Benutzerbereich eins"). Misleads mildly. Reasoned. c14.
+3. p97 (93) ED: "»K« löscht innerhalb einer Zeile, während mit »D« ganze Zeilen" — in CP/M ED, K kills lines and D deletes characters (route 4, recalled, not cited — low confidence). c14.
+4. p104 (101) "^PWN^PR^PEjLUN" -> "Ergebnis ... »Nun«": as printed the rest prints "UN", not "un". Reasoned. c04.
+5. p104 (101) 36/212 (should be /216, the article's own unit everywhere else). c04.
+
+== COVERAGE ==
+Read in full for sense (every <p>, heading, caption, table cell, hand-typed <pre>):
+ 91 (pp91-92): prose word-diffed against truth/091-092 — agrees except machine-name spacing; read for sense; 1 crop (c18).
+ 93 (pp93-100): prose read; prose word-diff vs truth/093-100 agrees except the items above. BDOS table functions 0-105 word-diffed against truth/097-098 (agree except lobyte) AND hex self-check over all 62 "Parameter:" rows (61 OK, 48 = 31H printed); BDOS 106-152 (c08), BIOS table 0-29 (c09,c10), SCB Bild 5 all 47 rows (c11,c12), FCB Bild 3 and Bild 4 (c13), Bild 1 SUB file 20 lines (c17), Bild 2 DIR listing all three user blocks (c15,c16 — typeset in a PROPORTIONAL face as a table, so column-pitch arithmetic does not apply; values and dates read cell by cell, all match), small pres ED/SUBMIT/DIR[DATE..]/COPY TO (c17), SUB listing (c14).
+ 101 (pp101-104): prose word-diffed vs truth/101-104 and read; Bild 3 menu (c05), Bild 4 title screen (c06), the ^PQ.. table (c06), Tabelle 1 all rows (c07), glyph sites (c04). Bild 2 pin table: owner's ruling, wording not read. Bild 1 is an image.
+ 105 (pp105-107): prose read and word-diffed vs truth/105-106 — agrees; no crop needed. LIB.PAS listing (step-170, disk-checked) NOT read — protected. The two one-line pres "LIB LIB.PAS" / "LIB LIB.PAS B:GESAMT.LIB" match truth.
+ 108 (p108): Tabelle 1 all 42 rows (c01,c02), Bild 1 caption (c03), prose vs truth.
+ 109 (pp109-110): prose and MSE-Befehle box word-diffed vs truth/109-110 — agree; read for sense; no crop. MSE-Lader is data-filename (disk) — out of scope.
+Skimmed: none. Not reached: none.
+Crops read / actually seen: 18 / 18 (c01-c18, several are composites of strips). Unseen: none.
+Dump cross-checker: not applicable — no monitor/assembler dumps in these six articles.
+Verification 4 (generate.py --issues SH10 --future --join): NOT run — issues/SH10/title.png does not exist yet, and its default deploy mode is "local", which the brief forbids. Control to run it on a scratch copy.
+Edits: only "93 Tips &amp; Tricks zu CP_M.html", 2 substitutions; control-byte scan clean.
+
+== WORKING LOG ==
+
+
+[108] Tabelle 1 Steuerbefehle, all 42 rows (both halves) read against crops c01 (p108 x300 y4150 1800x2300) and c02 (p108 x2520 y4180 1400x1820): match, no change. Bild 1 caption read against c03 (p108 x240 y3010 2130x1030): matches. Prose agrees with truth/108.
+[101] c04 composite (p104 strips: x236 y1545; x238 y2800; x2470 y3170; x2470 y3795; x2470 y4515; x2550 y5850; x290 y5130):
+  REJECT  "36/212 inch"            p104  print sets 36/212 (HTML matches; see PRINT-ERROR)
+  REJECT  "<ESC>;"3";"6""          p104  print sets <ESC>;"3";"6" with the semicolon after <ESC> — matches
+  REJECT  "^E36"                   p104  print ^E36 — matches
+  REJECT  "^PWN^PR^PEjLUN"         p104  print capitals LUN — matches (see FT-candidate)
+  REJECT  "doppeltbreiten"         p104  print doppeltbreiten (truth/104's "doppelbreiten" is wrong) — matches
+  REJECT  "^PEW1^PE4....^PEWO^PE5" p104  MEASURED: the glyph after W is w58/h61 px against digits 1/4/5 on the same line at w22/44/41 — a capital O, not a zero. HTML matches print (truth/104's "PEW0" is wrong). Table row "Breitdruck aus ^PEW0 ↑EW0" in the same strip prints a narrow 0 — matches HTML.
+  Duplicate heading "Der Einsatz der Neuinstallation" (h3 then h2): the print has it twice — tesseract on p104 finds it at (2481,1295) small, and at (2750,2140) large, two separate lines. Kept (levels are r290's).
+c05 (p102 x270 y4860 2160x1560): Bild 3 menu <pre> read line by line — matches, incl. "Nur Standdardrucker" (print typo, kept). Footer line print "(A – Q/X)" shows a dash, HTML "-" in a proportional-face screen mock: not changed.
+c06 composite (p103 x2530 y2070; p103 x2530 y5195; p102 x2550 y5315; p103 x280 y620 Bild 4; p102 x2475 y5045):
+  REJECT  "00 1B 68 1 / 68 2 / 68 0" p103  print sets single digits 1, 2, 0 — matches
+  REJECT  "CP/M-Prompt >A"         p103  print ">A" — matches (print error for A>; kept)
+  REJECT  "das erste PY" (no ^)    p102  print "PY" — matches
+  REJECT  "Änderungn"              p102  print "Änderungn" — matches (print typo)
+  Bild 4 <pre> (WordStar title screen): all 6 lines match.
+c07 (p104 x230 y3410 2030x3080): Tabelle 1 (27 rows incl. "Zeilenabstand") read row by row — matches, incl. print "Super-/Subscipt" (typo kept).
+[101] prose pp101-104 word-diffed against truth/101-104: no disagreement other than those settled above. Bild 2 pin table: owner's ruling, not read for wording.
+
+[93] c08 (p99 x290 y560 2150x3100): BDOS table tail, functions 105 (last line) .. 152 and the caption "Übersicht BDOS-Funktionen (Schluß)" — every cell matches the HTML (6AH..6FH, DE/C/E/HL, FFFFH, 6-Byte-Feld, LST:).
+c09 (p99 x2520 y2230 2140x1880) + c10 (p99 x2520 y4060 2140x1900): BIOS table "Nr. Funktion" 0..29 and caption "Übersicht BIOS-Funktionen" — all 30 rows match the HTML. Row 25 prints "Registerpaar DC" (see PRINT-ERROR).
+c11 (p100 x2460 y440 2200x2200) + c12 (p100 x2460 y2600 2200x2220): Bild 5 SCB table, all 47 rows + caption — match the HTML (print breaks "3CH -/3DH" over two lines; HTML "3CH-3DH" is the join).

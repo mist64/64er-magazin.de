@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der C 128 geht eigene Wege</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="O. Mangold, ks">
+    <meta name="64er.issue" content="Sonderheft 10">
+    <meta name="64er.pages" content="121-122">
+    <meta name="64er.head1" content="Anwendung">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen">
+    <meta name="64er.index_title" content="Der C128 geht eigene Wege">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Floppy">
+    <meta name="64er.id" content="autostart">
+</head>
+
+<body>
+    <article>
+        <h1>Der C 128 geht eigene Wege</h1>
+        <p class="intro">Mit dem Aufbringen eines BOOT-Sektors auf eine Diskette kann man den C 128 dazu veranlassen, bestimmte Programme nach dem Einschalten automatisch zu laden und zu starten. Das folgende Programm ermöglicht Ihnen die Herstellung eines solchen BOOT-Sektors.</p>
+
+        <p>Wenn man die Floppy-Station und anschließend den C 128 einschaltet, dann fällt einem auf, daß das Diskettenlaufwerk anläuft und einen Zugriff durchführen will. Ist nun eine Diskette eingelegt, die einen speziellen BOOT-Sektor enthält, so wird automatisch ein bestimmtes Programm geladen und ausgeführt. Als Beispiel mag CP/M dienen.</p>
+
+        <p>Lag keine Diskette im Laufwerk, die einen solchen BOOT-Sektor enthält, so erfolgt der Start des Basic 7.0 des C 128 und das Laufwerk hört mit dem Zugriff auf.</p>
+
+        <p>Ein solcher BOOT-Sektor hat einen bestimmten Aufbau (Bild 1). Wenn Sie nun gerne Ihre Disketten mit einem solchen Sektor versehen wollen, beispielsweise um Programme zu laden, ohne auch nur einen Finger zu rühren, dann kommt das Programm »Boseco« (Listing 1) gerade recht. Es erlaubt die Herstellung eines BOOT-Sektors und das Aufbringen auf eine Diskette. Das Wort BOOT-Sektor kommt übrigens vom Basic-Befehl BOOT, der anhand eines solchen Sektors Programme laden und starten kann.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="2">Aufbau eines Boot-Sektors</th>
+                </tr>
+                <tr>
+                    <th>Byte:</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>$00-$02</td>
+                    <td>Identifizierung als Boot-Sektor (CBM)</td>
+                </tr>
+                <tr>
+                    <td>$03-$04</td>
+                    <td>Adresse, ab der die Folgesektoren eingelesen werden.</td>
+                </tr>
+                <tr>
+                    <td>$05</td>
+                    <td>Bank, in die die Folgesektoren eingelesen werden.</td>
+                </tr>
+                <tr>
+                    <td>$06</td>
+                    <td>Anzahl der Folgesektoren.</td>
+                </tr>
+                <tr>
+                    <td class="separator">$07 bis Endekennung ($00)</td>
+                    <td class="separator">Text, der beim Booten auf dem Bildschirm erscheint.</td>
+                </tr>
+                <tr>
+                    <td>bis Endekennung ($00)</td>
+                    <td>Dateinamen eines Programmes, das nachgeladen werden soll.</td>
+                </tr>
+                <tr>
+                    <td>bis Byte $FF</td>
+                    <td>Maschinenprogramm</td>
+                </tr>
+            </table>
+            <figcaption>Bild 1. So ist ein BOOT-Sektor aufgebaut</figcaption>
+        </figure>
+
+        <p>Der BOOT-Sektor ist auf jeder Diskette der Sektor 0 auf Spur 1. Er enthält eine spezielle Meldung, die während des BOOTens ausgegeben wird und dazu noch den Namen des Programms, das geladen werden soll. Schließlich ist in dem Block auch noch ein Maschinenprogramm enthalten, das nach dem Laden alle weiteren Vorgänge steuern soll.</p>
+
+        <p>Das Programm Boseco wird geladen und mit RUN gestartet. Es kann nun der Text eingegeben werden, der während des BOOTens auf dem Bildschirm erscheinen soll, zum Beispiel: »Der Rest wird geladen...«</p>
+
+        <p>Anschließend gibt man die Anzahl der Programme an, die in den BOOT-Sektor geladen und (wenn er nicht ausreicht) auf dem Rest von Spur 1 der Diskette untergebracht werden sollen. Jetzt erwartet Boseco noch die Namen der einzelnen Programme, wobei die Filenamen angegeben werden müssen, unter denen die Programme auf einer Diskette gespeichert sind.</p>
+
+        <p>Nach der Angabe jedes Namens sind außerdem wichtige Daten über die einzelnen Maschinenprogramme an Boseco zu übergeben. Das ist zuerst einmal die Startadresse des entsprechenden Maschinenprogramms im Speicher des Computers. Diese ist dezimal anzugeben. Danach benötigt Boseco noch die Länge des jeweiligen Programms in Bytes – ebenfalls dezimal.</p>
+
+        <p>Sind diese Eingaben abgeschlossen, so sind den Aufforderungen entsprechend die Disketten mit den erforderlichen Maschinenprogrammen einzulegen, wobei mit &lt;RETURN&gt; quittiert wird. Boseco lädt dabei die einzelnen Programme in den Speicher, um sie anschließend auf dem BOOT-Sektor unterzubringen und diesen auf eine beliebige, formatierte Diskette zu schreiben.</p>
+
+        <p>Achtung: Es empfiehlt sich, BOOT-Sektoren nur auf leere Disketten zu schreiben und erst anschließend Programme auf diese Disketten zu speichern, da unter Umständen ein BOOT-Sektor-Bereich schon belegt sein kann. Läßt sich das nachträgliche Aufbringen eines BOOT-Sektors nicht vermeiden, so sollte man sich vor dem Start von Boseco vergewissern, daß die Spur 1 der Zieldiskette noch leer ist.</p>
+
+        <address class="author">(O. Mangold/ks)</address>
+
+        <figure>
+            <pre data-filename="boseco" data-name="Boseco"></pre>
+            <figcaption>Listing 1. Das Programm »Boseco«</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

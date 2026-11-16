@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>80-Zeichen-Grafik</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Th. Rumbach, D. Winkler, ev, og">
+    <meta name="64er.issue" content="Sonderheft 10">
+    <meta name="64er.pages" content="129-131">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik">
+    <meta name="64er.id" content="80_zeichen">
+</head>
+
+<body>
+    <article>
+        <h1>80-Zeichen-Grafik</h1>
+        <p class="intro">Das Grafik-Paket, das die 640 x 200-Punkte-Auflösung auf dem C 128 unterstützt. Alle Grafikbefehle des Basic 7.0 stehen damit für den neuen HiRes-Modus zur Verfügung und können leicht programmiert werden.</p>
+
+        <p class="nachdruck"><strong>Teilweiser Nachdruck aus <a href="../8512/80_zeichen.html">64'er 12/85, S. 78</a> (nur Einleitung und die Abschnitte über die HiRes-Grafik-Register, den GRAPHIC-Befehl und die Befehle BOX, CIRCLE, DRAW und PAINT) in der erweiterten Fassung aus <a href="../SH8601/80_zeichen.html">64'er Sonderheft 1/86, S. 54</a>. Vorspann und Eingabehinweise sind für dieses Sonderheft neu geschrieben.</strong></p>
+
+        <p>Der neue Basic-Interpreter des Commodore 128 enthält 26 Befehle, mit deren Hilfe man einfach und schnell auch komplizierte Grafik-Programme erstellen kann. Diese Befehle wurden im Sonderheft 1/86 auf den 80-Zeichen-Bildschirm umgesetzt. Da im nachfolgenden Artikel auf »Graphik-80« zurückgegriffen wird, haben wir zum besseren Verständnis das Listing nochmal abgedruckt. Das abgedruckte Basic-Programm (Listing 1) baut ein Maschinenprogramm für den »User-RAM-Bereich« von $1300 bis $1bff auf. Nach dem Initialisieren dieses Maschinenprogramms mit »SYS DEC ("1303")« stehen die Befehle GRAFIK, BOX, CIRCLE, DRAW und PAINT auch für den VDC-Chip zur Verfügung. Die Befehle LOCATE, SCALE und SCNCLR und die Funktionen RCLR, RDOT und RGR können ohne Einschränkung im 640x200-Grafik-Modus benutzt werden. Beide Bildschirme können gleichzeitig im HiRes-Modus arbeiten, beim Aufruf eines Grafikbefehls prüft der Interpreter selbständig, welcher Video-Chip gerade angesprochen ist.</p>
+
+        <h2>Die HiRes-Grafik-Register</h2>
+
+        <p>Für die Grafikprogrammierung sind von den 36 Registern des VDC vor allem die Register 18, 19, 31, 25 und 26 interessant. Der Inhalt von Register 26 bestimmt (im Grafikmodus!) Vorder- und Hintergrundfarbe. Über Bit 0 bis 3 kann man 16 verschiedene Hintergrundfarben, über Bit 4 bis 7 16 verschiedene Vordergrundfarben anwählen.</p>
+
+        <p>Ein Beispiel: Die Befehlsfolge »POKE 54784,26:POKE 54785, (3*16+2)« bewirkt, daß im HiRes-Modus eine rote Zeichenfarbe auf weißem Grund erscheint. Im Textmodus wird mit diesem Befehl nur die Hintergrundfarbe verändert. Register 25 ist ein mehrfach belegtes Register. Über die Bits 0 bis 3 kann man den Bildschirm um maximal 16 Pixel horizontal nach links verschieben. Mit Bit 4 kann man zwischen einfacher (0) und doppelter (1) Pixelgröße wählen. Mit den Bits 5 bis 7 kann man zwischen den drei Betriebsarten Text (Bit 6=1), Semigrafik (Bit 5=1) und Grafik (Bit 7=1) wählen.</p>
+
+        <p>Für uns ist hier nur interessant, daß man durch Beschreiben von Register 25 mit dem Wert 128 den HiRes-Modus wählen und durch Beschreiben des Registers mit dem Wert 64 wieder in den Textmodus zurückkehren kann. Alle anderen Bits sind standardmäßig mit Null besetzt. Über die Register 18, 19 und 31 wird das Video-RAM angesprochen. Man besetzt in der beschriebenen Weise zunächst Register 18 mit dem High-Byte und Register 19 mit dem Low-Byte der gewünschten Bildschirmspeicheradresse.</p>
+
+        <p>Durch Schreiben in Register 31 kann man dann einen Wert in die gewählte Speicherstelle schreiben, durch Auslesen von Register 31 erhält man den Inhalt dieser Speicherstelle. Aber Vorsicht! Nach jeder Schreib- oder Leseoperation wird der RAM-Zeiger in Register 18/19 automatisch einen Schritt erhöht! Will man also einen Wert aus dem Video-RAM auslesen und anschließend (verändert) wieder zurückschreiben, so muß man die Zeiger 18/19 zweimal setzen. Das erscheint zwar sehr umständlich, doch hat diese Arbeitsweise einen überzeugenden Vorteil: 10mal »PEEK (Register 31)« ergibt die 10 Byte von Zeiger 18/19 bis Zeiger 18/19 + 9. Der Zeiger 18/19 muß nur einmal gesetzt werden. Das Auslesen oder Vorbesetzen größerer Speicherbereiche wird so erheblich beschleunigt.</p>
+
+        <h2>Der neue GRAPHIC-Befehl</h2>
+
+        <p>Der GRAPHIC-Befehl wurde um die Funktionen GRAPHIC 6,0 und GRAPHIC 6,1 erweitert. GRAPHIC 6 schaltet den 8563-HiRes-Modus ein. Folgt der »6« eine »1«, so wird der Bildschirm gelöscht, folgt eine »0«, so bleibt der Bildschirm, wie er ist. Der Befehl GRAPHIC 6,1 ersetzt auch den in dieser Implementation nicht vorgesehenen Befehl SCNCLR 6. Alle übrigen Informationen zur Implementation dieses Befehls sind im Sonderheft 1/86 als ausführlich kommentiertes Assemblerlisting abgedruckt.</p>
+
+        <p>Die »Originalroutine« im ROM befindet sich im Speicherbereich ab $6b5a.</p>
+
+        <h2>Die Befehle BOX, CIRCLE, DRAW und PAINT</h2>
+
+        <p>Diese Befehle funktionieren im 8563-Modus genauso, wie es im Bedienungshandbuch für die VIC-Grafik beschrieben ist. Einzige Änderung: Die x-Koordinaten dürfen nun im Bereich von 0 bis 639 liegen. Auch die Implementierung dieser Befehle ist denkbar einfach: Nacheinander werden die Programmteile PAINT ($61a8 bis $62b6), BOX ($62b7 bis $6388), DRAW ($6797 bis $67d6) und CIRCLE ($668e bis $674c) in den RAM-Bereich ab $1672 kopiert (Basic-Programm Zeile 5000 bis 5340). Darunter, in den RAM-Bereich ab $1952, wird der Programmteil »Strecke zeichnen« aus ROM $9b30 bis $9c18 kopiert. Als nächstes werden die neuen Adressen für Unterprogrammaufrufe eingesetzt (WHILE-DO-Schleife). Es folgt schließlich der neue GRAPHIC-Befehl. Im Basic-Programm ist er in Form von DATA-Zeilen abgelegt. Ebenfalls in Form von DATA-Zeilen sind die schon besprochene Routine »setpoint« (RAM $1400 bis $1671) und die Erweiterung der Interpreterschleife im Basic-Text enthalten.</p>
+
+        <p><strong>Eingabehinweise:</strong> Geben Sie Graphik-80 ein und speichern Sie das Programm. Dann brauchen Sie nur noch als erste (!) Programmzeile »bload "graphik-80.m": sys dec ("1303")« einzugeben und das Grafik-Paket ist aktiviert. Alle Grafikbefehle beziehen sich jetzt auf den 80-Zeichen-Schirm.</p>
+
+        <address class="author">(Th. Rumbach/D. Winkler/ev/og)</address>
+
+        <figure>
+            <pre data-filename="graphik-80" data-name="Graphik-80"></pre>
+            <figcaption>Listing 1. »Grafik-80«, 640 x 200-Punkte-Auflösung</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="graphik-80.m.prg" data-name="Graphik-80.m"></div>
+
+        <aside class="futureteufelchen" id="futureteufelchen">
+            <h2>Futureteufelchen</h2>
+
+            <p>Die Datei »graphik-80.m« zum Herunterladen stammt von der Programmservice-Diskette. Sie ist nicht das Programm, das das abgedruckte Listing 1 erzeugt: Das Listing speichert den Bereich von $1300 bis $1AB6, die Datei reicht bis $1BFF. Sie weicht bei $135B und $1367 um je ein Byte ab und enthält zusätzlichen Code von $1399 bis $13FF und von $1AB7 bis $1BFF.</p>
+
+            <p>Das sind die Änderungen, die der Artikel »Character 80« in diesem Heft beschreibt: Die beiden Bytes sind die Zahlen 183 und 26, die dort in den Zeilen 10100 und 10120 eingesetzt werden, und ab $1AB7 liegt die neue CHAR-Routine. Wer das abgedruckte Listing 1 eingibt, erhält das Grafikpaket ohne diese Erweiterung; es stimmt Byte für Byte mit »graphik-80.m« aus dem Sonderheft 1/86 überein.</p>
+        </aside>
+    </article>
+</body>
+
+</html>

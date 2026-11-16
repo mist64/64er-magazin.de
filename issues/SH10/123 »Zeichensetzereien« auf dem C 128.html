@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>»Zeichensetzereien« auf dem C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="D. Koller, ks">
+    <meta name="64er.issue" content="Sonderheft 10">
+    <meta name="64er.pages" content="123,125-126">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Listings zum Abtippen">
+    <meta name="64er.index_title" content="Zeichensetzereien auf dem C128">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik">
+    <meta name="64er.id" content="zeichen-fix">
+</head>
+
+<body>
+    <article>
+        <h1>»Zeichensetzereien« auf dem C 128</h1>
+        <p class="intro">Mit »Zeichen-Fix« läßt sich der Zeichensatz des C 128 beliebig ändern. Somit sind internationale Zeichen kein Problem mehr. Die Tasten können wie bei professionellen Spielprogrammen mit kleinen Grafiken belegt werden, die dann später zusammen eine große Grafik ergeben.</p>
+
+        <p>Bei dem Programm »Zeichen-Fix« handelt es sich um einen Zeichensatz-Generator für den C 128. Mit diesem Programm ist es möglich, neben dem Zeichensatz des Computers auch eigene Zeichen zu kreieren, um damit entweder Sonderzeichen oder Grafiken behandeln zu können.</p>
+
+        <p>Nach dem Start von Zeichen-Fix muß man 15 Sekunden warten, bis der Original-Zeichensatz ins RAM (Startadresse: 8192) kopiert worden ist. Im Hauptmenü sind anschließend folgende Optionen verfügbar:</p>
+
+        <h3>1. Zeichen verändern</h3>
+
+        <p>Dies ist der wichtigste Teil des Programms. Hier können die neuen Zeichen erstellt werden.</p>
+
+        <p>Man wird aufgefordert das Zeichen einzutippen, das verändert werden soll (auch SHIFT-Kombinationen sind möglich). Daraufhin erscheint das Zeichen in einer 8x8-Matrix. Mit der &lt;CLR/HOME&gt;-Taste wird der Cursor in die linke obere Ecke gesetzt. Mit &lt;SHIFT+CLR/HOME&gt; wird die Matrix gelöscht. Beim Drücken von &lt;I&gt; wird die Matrix invertiert. Die &lt;D&gt;-Taste dreht das Zeichen um 180 Grad. Bewegt wird der Cursor mit den Cursor-Tasten. Punkte werden nach Druck auf die &lt;*&gt;-Taste gesetzt, gelöscht werden sie mit der Leertaste. Um ins Hauptmenü zu kommen, muß die Taste &lt;←&gt; gedrückt werden. Ist ein Zeichen fertiggestellt, muß es mit der &lt;RETURN&gt;-Taste in den neuen Zeichensatz aufgenommen werden.</p>
+
+        <p>Eine Übersicht dieser Befehle finden Sie auch auf dem Bildschirm links neben der Matrix.</p>
+
+        <h3>2. Zeichensatz speichern</h3>
+
+        <p>Unter diesem Menüpunkt können fertige Zeichensätze auf Diskette gespeichert werden. Ein Zeichensatz belegt neun Blöcke auf der Diskette.</p>
+
+        <h3>3. Zeichensatz laden</h3>
+
+        <p>Das Laden von Zeichensätzen ist mit diesem Menüpunkt möglich. Der Zeichensatz kann dann weiter bearbeitet oder mit Menüpunkt 4 aktiviert werden.</p>
+
+        <h3>4. Zeichensatz aktivieren</h3>
+
+        <p>Der erstellte Zeichensatz wird aktiviert, das heißt gestartet, und das Programm verlassen. Vorher wird die &lt;RESTORE&gt;-Taste außer Funktion gesetzt, weil nach Drücken von &lt;RUN/STOP+RESTORE&gt; ansonsten der Original-Zeichensatz aktiviert würde.</p>
+
+        <p>Die &lt;RESTORE&gt;-Taste kann mit POKE 792,64 wieder eingeschaltet werden.</p>
+
+        <h3>5. Directory</h3>
+
+        <p>Bei dieser Funktion wird das Directory der eingelegten Diskette auf den Bildschirm gebracht. Mit einem Tastendruck kommt man wieder ins Hauptmenü.</p>
+
+        <h3>6. Ende</h3>
+
+        <p>Das Programm wird beendet.</p>
+
+        <p>Erstellte Zeichensätze können auch ohne Zeichen-Fix verwendet werden:</p>
+
+        <p>Zuerst muß man die Grafikseite mit GRAPHIC 1,1:GRAPHIC 0 löschen. Danach ist der Zeichensatz mit BLOAD"NAME",ON B0,P8192 zu laden. Aktiviert wird er mit POKE 2604, (PEEK(2604) AND 240) OR 8. Ein Deaktivieren ist mit POKE 2604, (PEEK(2604) AND 240) OR 4 möglich.</p>
+
+        <p>Beim Abtippen des Programms (Listing 1) ist zu beachten, daß in der Zeile 550 die Grafikzeichen einzusetzen sind, die mit &lt;CBM+Y&gt; erreicht und in der Zeile 460 die, die mit &lt;CBM+P&gt; erreicht werden.</p>
+
+        <p>In den Zeilen 470 bis 540 müssen jeweils die zweiten Grafikzeichen mit &lt;CBM+N&gt; und die dritten Grafikzeichen mit &lt;CBM+H&gt; eingetippt werden. Außerdem sollte man darauf achten, daß in Programmen, in denen der neue Zeichensatz benutzt wird, nicht zusätzlich hochauflösende Grafik verwendet wird, da beim Löschen des Grafikspeichers auch der Zeichensatz gelöscht wird.</p>
+
+        <h3>Programmbeschreibung:</h3>
+
+        <p>In den Zeilen 80 bis 160 wird der Original-Zeichensatz ins RAM kopiert.</p>
+
+        <p>Die Zeilen 170 bis 690 erstellen das Hauptmenü und die Matrix zum Erstellen von Zeichen. Außerdem wird in der Zeile 370 festgelegt, wohin je nach Wahl aus dem Hauptmenü gesprungen werden soll.</p>
+
+        <p>Die Zeilen 700 bis 790 holen das vorher gewählte Zeichen in die Matrix.</p>
+
+        <p>Ab der Zeile 800 beginnt dann die Routine zum Verändern der Zeichen.</p>
+
+        <p>In den Zeilen 810 bis 940 erfolgt die Abfrage, in welches Unterprogramm, je nach Tastendruck, gesprungen werden soll.</p>
+
+        <p>Die Zeilen 890 bis 1230 übernehmen die Steuerung des Cursors.</p>
+
+        <p>Ab 1240 folgen dann Sonderfunktionen, wie Punkte setzen und löschen, Cursor in die obere linke Ecke (HOME), Matrix löschen (CLR), Matrix invertieren, Zeichen in Zeichensatz übernehmen (RETURN), ins Hauptmenü wechseln (←) und Zeichen drehen.</p>
+
+        <p>Danach folgen in den Zeilen 2100 bis 2200 die Diskettenfunktionen Laden und Speichern und von 2210 bis 2240 die Aktivierungsroutine für die Zeichensätze.</p>
+
+        <p>Zum Schluß folgt ab 2250 eine Fehlerabfang-Routine. Diese Routine fängt alle Fehler, auch Diskettenfehler, ab.</p>
+
+        <address class="author">(D. Koller/ks)</address>
+
+        <figure>
+            <pre data-filename="zeichen-fix" data-name="Zeichen-Fix"></pre>
+            <figcaption>Listing 1. Der »Zeichen-Fix«-Editor für den C 128</figcaption>
+        </figure>
+        <div style="display: none;">
+            <pre data-filename="zeichens.1 datas" data-name="zeichens.1 datas"></pre>
+        </div>
+        <div style="display: none;">
+            <pre data-filename="zeichens.2 datas" data-name="zeichens.2 datas"></pre>
+        </div>
+        <div style="display: none;">
+            <pre data-filename="zeichens.3 datas" data-name="zeichens.3 datas"></pre>
+        </div>
+    </article>
+</body>
+
+</html>

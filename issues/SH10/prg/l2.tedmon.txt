@@ -1,0 +1,37 @@
+;l2.tedmon.prg ==1c01==
+;version=70
+  100 rem *********************
+  110 rem *                   *
+  120 rem *  ascii - tabelle  *
+  130 rem *                   *
+  140 rem *********************
+  150 rem *                   *
+  160 rem *  florian mueller  *
+  170 rem *                   *
+  180 rem *********************
+  190 :
+  200 do:input "drucker (d) oder bildschirm (b)";a$:loop while a$<>"d" and a$<>"b"
+  210 if a$="d" then begin
+  220 input"geraetenummer";g:input"sekundaeradresse";s
+  230 open 4,g,s:cmd 4
+  240 bend
+  250 :
+  260 le$=chr$(32):rem leerzeichen
+  270 z$="0123456789abcdef":rem ziffern fuer hex-zahlen
+  280 printspc(2);
+  290 :
+  300 for j = 1 to 16
+  310 :print mid$(z$,j,1);le$;
+  320 next j
+  330 print
+  340 :
+  350 for j = 0 to 15
+  360 :print mid$(z$,j+1,1);spc(5)
+  370 :for k = 2 to 15:if k>7 and k<10 then 400
+  380 ::print chr$(j+(k*16));le$;
+  390 ::if k=7 then print le$;le$;le$;le$;
+  400 :next k
+  410 :print
+  420 next j
+  430 :
+  440 if a$="d" then print# 4:close 4

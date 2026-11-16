@@ -1,0 +1,33 @@
+;l1.tedmon.prg ==1c01==
+;version=70
+  100 rem *****************************
+  110 rem *                           *
+  120 rem * simulation des monitorbe- *
+  130 rem *                           *
+  140 rem *  fehls 'm' mittels basic  *
+  150 rem *                           *
+  160 rem *****************************
+  170 rem *                           *
+  180 rem *  1986 by florian mueller  *
+  190 rem *                           *
+  200 rem *****************************
+  210 :
+  220 zl=8 - 8*(peek(215)=128):rem anzahl der zeichen pro zeile (8 oder 16) bestimmen
+  230 printchr$(13)chr$(13)"memory dump mittels basic{down}"chr$(7)
+  240 input "speicherbank (0,1,2,3 oder 15)";ba
+  250 input "anfangsadresse";an$:an=dec(an$)
+  260 input "endadresse    ";en$:en=dec(en$)
+  270 printchr$(13)"memory dump $";an$;" - $";en$;" in bank"ba
+  280 ad=an:bank ba
+  290 do until ad>en
+  300 :print chr$(13)">";right$(hex$(ba),1);hex$(ad);
+  310 :for l=1 to zl
+  320 ::print" ";right$(hex$(peek(ad)),2);:ad=ad+1
+  330 :next l
+  340 :print":"chr$(18);
+  350 :for l=ad-zl to ad-1
+  360 ::i=peek(l)
+  370 ::if i<32 or (i>127 and i<160) then print".";:else printchr$(i);
+  380 :next l
+  390 loop
+  400 run

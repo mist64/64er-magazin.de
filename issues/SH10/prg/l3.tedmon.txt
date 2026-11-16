@@ -1,0 +1,46 @@
+;l3.tedmon.prg ==1c01==
+;version=70
+  100 rem *****************************
+  110 rem *                           *
+  120 rem * simulation des monitorbe- *
+  130 rem *                           *
+  140 rem *  fehls 't' mittels basic  *
+  150 rem *                           *
+  160 rem *****************************
+  170 rem *                           *
+  180 rem *  1986 by florian mueller  *
+  190 rem *                           *
+  200 rem *****************************
+  210 :
+  220 printchr$(13)chr$(13)"verschieben mittels basic"chr$(7)chr$(13)
+  230 input "speicherbank des quellbereichs";bq
+  240 input "anfangsadresse d.quellbereichs";aq$:aq=dec(aq$)
+  250 input "endadresse   des quellbereichs";eq$:eq=dec(eq$)
+  260 input "speicherbank des  zielbereichs";bz
+  270 input "anfangsadresse d. zielbereichs";az$:az=dec(az$)
+  280 ez=az+(eq-aq):rem ende des zielbereichs berechnen
+  290 print"=> endadresse des zielbereichs = $";hex$(ez)
+  300 :
+  310 if aq>az then 440:rem gegebenenfalls zweite schleife anspringen
+  320 :
+  330 q=eq:z=ez:rem q = quelladresse; z = zieladresse
+  340 :
+  350 do until q<aq
+  360 :bank bq:quell=peek(q):rem quellbereich auslesen
+  370 :bank bz:poke z, quell:rem zielbereich beschreiben
+  380 :if peek(z)<>quell then print right$(hex$(bq),1);hex$(q),
+  390 :q=q-1:z=z-1:rem quell- und zieladresse erniedrigen
+  400 loop
+  410 :
+  420 run
+  430 :
+  440 q=aq:z=eq:rem q=quell-,z=zieladresse
+  450 :
+  460 do until q>eq
+  470 :bank bq:quell=peek(q):rem quellbereich auslesen
+  480 :bank bz:poke z, quell:rem zielbereich beschreiben
+  490 :if peek(z)<>quell then print right$(hex$(bq),1);hex$(q),
+  500 :q=q+1:z=z+1:rem quell- und zieladresse erhoehen
+  510 loop
+  520 :
+  530 run

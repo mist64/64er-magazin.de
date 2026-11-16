@@ -1,0 +1,132 @@
+# r325 reader B — SH10 article 28 "Durchblick mit dem TEDMON", pages 41-55 ONLY
+# (HTML from the paragraph "Wir errechnen den hexadezimalen Wert über den Ausdruck ?HEX$(..." (first text of p41)
+#  up to and including the paragraph "Dieser Abschnitt ist für diejenigen besonders interessant ... den TEDMON einsetzen."
+#  — the last COMPLETE paragraph of p55. The next paragraph "Da man von einem Maschinenprogramm jede Zwischenversion
+#  speichert (zumindest sollte man dies tun, wenn man" starts at the foot of p55 and continues on p56 = reader C.)
+# Locator: tesseract tsv (deu, psm 3) over masters600 pages 041-055; crops are montages "page,x,y,w,h" (600 dpi px), cNN.
+# Second reading: truth/041-055 word-diffed against the HTML; every diff is settled below.
+# Monospace pitch: the typewriter face of the hand-set code lines measures ~41.3 px/cell at 600 dpi
+#   (p41 ?HEX$ line: 42 cells over 1734 px; POKE line: 51 cells over 2108 px).
+
+## FIX
+FIX p41 '?HEX$(DEC( "20F5 ")-DEC( "1001")+DEC( "A000"))' -> '?HEX$(DEC("20F5")-DEC("1C01")+DEC("A000"))'
+    "1001" is our misread of "1C01" (seen); the spaces are not cells: 42 cells x 41.3 px = 1734 px = the measured ink width,
+    the spaced form would be 46 cells. Arithmetic: $20F5-$1C01+$A000 = $A4F4, the printed result. c01 = 041,270,1110,1760,110
+FIX p41 'POKE45,DEC( "00") :POKE46,DEC( "A0") :POKE DEC( "A000")-1,0: POKE4624 ,DEC( "F4") :POKE4625,DEC( "A4")'
+    -> 'POKE45,DEC("00"):POKE46,DEC("A0"):POKE DEC("A000")-1,0:POKE4624,DEC("F4"):POKE4625,DEC("A4")'
+    51 cells over 2108 px = 41.3 (closed); line wrap after "-" joined without space (code). c01 = 041,270,4260,2140,210
+FIX p41 'BANK15 :SYS20303' -> 'BANK15:SYS20303' — 15 cells over 614 px. c01 = 041,2500,590,700,100
+FIX p41 'die der Adreßangabe nach höhere enthält' -> 'nach höhere – enthält' — closing dash at line end. c01 = 041,270,3470,2140,110
+REJECT p41 'T 1C01 20F5 A000' — as printed. c01 = 041,270,5550,800,100
+FIX p41 'POKE 45, DEC("LB der neuen Anfangsadresse "):' -> '...Anfangsadresse"):' — the e->quote gap is the same as on
+    'DEC("neue Anfangsadresse")-1' two lines below, which we already render closed. c02 = 041,270,3740,2150,450
+PRINT-ERROR p41 'POKE 4625, DEC("HB der neuen Endadresse gemäß II"' — no closing parenthesis on the page. c02 (same)
+REJECT p42 Bild 11 'Syntax: C Anfang 1 Ende1 Anfang2' — the page sets a gap in "Anfang 1" and none in "Ende1"; as printed
+    (print inconsistency, harmless). c02 = 042,290,3990,2000,110
+FIX p42 'die Endmarkierung eines Monitor-Befehls ist hier haben Sie' -> 'ist – hier' — dash at line end. c02 = 042,2480,2195,2150,180
+FIX p43 '»@,$:* =PRG«' (p43 line 6401), 'Monitor-Kommando: @,$:* =PRG.', 'warum »@,$:* =PRG« alle' -> '$:*=PRG' — the page
+    sets the identical "$:*=PRG" (small raised asterisk with the same side gaps) at all five sites, and our HTML already
+    renders two of them closed (DIRECTORY"$:*=PRG", »$:*=PRG«). c02 = 043,320,6390,1980,100 + 043,2540,2740,1950,180 + 043,2540,5585,2150,190
+FIX p43 'Erst CATALOG" $: FILENAME " ist' -> 'CATALOG"$:FILENAME" ist' — no spaces; the code is broken at line end after "$:". c02 = 043,2540,4160,2160,190
+REJECT p43 'b) mit »F 8004 8008« die Markierung löschen' — printed so (no fill byte). c02 = 043,310,2635,2150,90
+REJECT p44 '»$1F05+1«' — as printed. c03 = 044,240,3005,2150,95
+FIX p44 '»I/O ERROR # 5«' -> '»I/O ERROR #5«' — the page's "#5" has the same #-sidebearing as "#X" two lines above and
+    "#1=Datasette" in Bild 16, both of which we render closed. c03 = 044,240,5235,2150,180
+FIX p44 'Dieser speichert wie BSAVE oder der Monitor-Befehl S – auch' -> 'speichert – wie' — opening dash at line end. c03 = 044,240,5860,2150,180
+REJECT p44 Bild 14 'Save (retten=> speichern)' — the page's gap between = and > is the glyph sidebearing; kept as is. c03 = 044,2560,1095,1700,95
+REJECT p44 the two '<p>— über die Basic-Befehle ...' / '<p>— die Zeiger ...' items — the page sets them as hanging-indent
+    dash-list items; em dash per house rule r190. c03 = 044,2470,4075,2150,370
+REJECT p44 'BLOAD"BEISPIEL",D0,U8,ON B1,P(DEC("C000"))' — as printed. c03 = 044,2470,6295,1800,100
+FIX p45 'selbst bestimmen muß -, sondern' -> 'muß –, sondern' — en dash on the page (mid-sentence dash follows the page). c03 = 045,300,4160,2150,180
+REJECT p45 Bild 16 '#1=Datasette ... oder – falls angegeben – an die' — as printed. c03 = 045,300,4950,1950,380
+PRINT-ERROR p46 '»VERIFYING ERROR»' — the page closes with ». c03 = 046,220,925,2120,100
+FIX p47 memory scheme A)-F): every line -> "X) *** text ***" (B: "B) *** Programmbeginn (im Beispiel $4000)***").
+    Seen c04 = 047,300,5110,1750,650: identical three-asterisk runs left and right on every line. Then MEASURED by ink runs
+    (no further image): asterisk ink 27 px at a 52-53 px pitch (gap 25 px) on both sides of all six lines (left 438/491/543;
+    right e.g. A 1849/1902/1954, F 1147/1199/1252), against a word space of 42-44 px on the same lines ("A)"->first * 44 px,
+    last *->"S" 43 px). A closed Helvetica asterisk advances ~0.39 em (~41 px here), a spaced one ~70 px: 52.5 is the closed
+    run. B's ")"->"*" gap is 18 px (D's "Byte)"->"*" is 42 px = word space), so B is "$4000)***". Was: A/C/D/E "*** ... * * *",
+    B "* ** ...$4000)* * *", F "*** Speicherende ** *" — inconsistent with itself where the page is uniform.
+FIX p47 'der Wert des Füll-Bytes wenn auch nur selten – sicher' -> 'Füll-Bytes – wenn auch' — dash at line end. c04 = 047,2540,1200,2150,180
+REJECT p47 'Endadresse. Bitmap = $2000 + #8000 = $3F40 = #16192' — the period after "Endadresse" is printed; arithmetic correct. c04 = 047,2540,4570,2150,110
+REJECT p48 'PRINT#4: CLOSE4' — as printed. c04 = 048,230,1470,700,90
+FIX p48 register display <pre>:
+    '  PC SR AC XR YR SP – Erklärungszeile' -> '   PC  SR AC XR YR SP - Erklärungszeile'
+    ';FBOOO 00 00 00 00 F8 – Werte der Register' -> ';FB000 00 00 00 00 F8 - Werte der Register'
+    Seen c04 = 048,240,4940,1800,200: "FB000" with digit zeros (same narrow oval as the "00" register values), the dash is the
+    typewriter face's one-cell hyphen. Columns MEASURED: register "00"s at x 545/669/792/918/1043 = 3-cell steps of 41.5 px,
+    cell 0 at 254.5 (";" ink 259); header SR 544 = col 7, PC 374 = col 2.9 -> col 3, "-" 1167 = col 22, text 1246 = col 24.
+    So 3 spaces before PC and 2 between PC and SR (was 2 and 1).
+REJECT p48 '$FB000' in prose and the AC/XR/YR table — as HTML. c04 = 048,240,5495,2150,90 + 048,2470,670,1300,280
+FIX p49 'sieht »LDA # $20« folgendermaßen' -> '»LDA #$20«' and p50 'Nach unserem Beispiel »A 01D00 LDA # $0D«' -> '#$0D' —
+    the page sets "#" with the same side gap at all eight sites in c05 (LDA #$20 x4, #$0D x3, #$21, #13), and our HTML
+    renders six of them closed; the two spaced ones were outliers. c05 = 049,310,1265,2150,190 + 050,2460,3970,2150,180
+REJECT p50 '$0D = #13 = ASCII-Code von CR' — closed like the other #-sites; also checked $0D = 13. c05 = 050,2460,5480,2150,100
+PRINT-ERROR p49 'Assembler in Primitivstform eingebaut' — printed so (truth/049 normalised to Primitivform). c05 = 049,310,6365,2150,100
+FIX p51 'TOP-ASS von Markt& Technik' -> 'Markt&Technik' — closed on the page. c05 = 051,310,3415,2150,110
+FIX p51 'nach dem Start des Monitors -, ist' -> 'Monitors –, ist' — en dash on the page. c05 = 051,2540,2415,2150,100
+REJECT p50 '»A 01D00 LDA #$0D«', '»A 01D02«', '»A 01D05«', '»LDA #$21«' — as printed; A 01D00 + 2 = 01D02, + 3 (JSR) = 01D05. c05
+REJECT p52 Bild 23 rows A C D F G H L M R S T V — as HTML (incl. H's 'Z1 Z2 ... ZZ oder H BXXXX BYYYY "TEXT'). c06 = 052,2560,560,2000,1350
+    NOT SEEN: the rows X, > and @ below V (crop ended at V); truth/052 agrees with the HTML there.
+PRINT-ERROR p52 Bild 23 'L ("NAME")(,XX),(BYYY)' and 'S "NAME",XX,BYYY BZZZZ' — four-letter BYYY printed in both rows
+    (every other address is five letters). Harmless. c06 (same)
+FIX p52 'eine möglichst knappe – aber präzise Form' -> 'knappe – aber präzise – Form' — closing dash at line end. c06 = 052,220,1620,2150,120
+FIX p52 '%00000000 bis % 11111111' -> '%11111111' — closed on the page like "%00000000". c06 = 052,220,2600,1700,190
+FIX p53 '(im Speicherformat von LDA #$2C - $A9 $2C ist zum Beispiel' -> 'LDA #$2C – $A9 $2C – ist' — en dash, and the
+    closing dash at line end was lost. c06 = 053,410,840,2050,190
+FIX p53 'eines kommentierten ROM-Listings näher durchleuchten' -> 'ROM-Listings – näher' — dash at line end. c06 = 053,310,3605,2150,100
+FIX p55 'PRINT # 4:CLOSE4 (Ein-/Ausgabe initialisieren)' -> 'PRINT#4:CLOSE4' — closed on the page. c06 = 055,290,1630,1750,100
+REJECT p51/p54 the dash-list items '— Sie verwenden ...', '— Sie überschreiten ...', '— Bildschirm mit ...', '— einmal ...' —
+    hanging-indent list items on the page; em dash per r190. c06 = 051,300,570,2150,370 + 054,220,4830,1900,190
+REJECT p42 Bild 11 lines Befehl/Syntax/Wirkung (3 lines) and Bild 12 whole box; p43 Bild 13 from "Befehl:" to
+    "sichtigung der Optionen, falls Disk-" — text, line breaks and the two indented "oder" lines as HTML.
+    c07 = 042,280,3890,2050,470 + 042,2520,5880,2080,720 + 043,2580,540,2080,1000
+REJECT p42 Bild 11 'englisches Wort: Compare (vergleichen)'; p43 Bild 13 'Befehl mit "$" beginnt.' / 'englisches Wort: –'
+    — as HTML. c08 = 042,280,4330,2050,200 + 043,2580,1520,2080,330
+REJECT p41 'Endadresse des Zielbereichs = Endadresse - Anfangsadresse + Zieladresse.' — the page's dash is the face's
+    en dash used as a minus; PROTECTED as a formula minus by reviewed/070-hand-fixes.txt (line 1159), left. c08 = 041,2500,4430,2150,200
+REJECT p44 Bild 14 whole box and Bild 15 (header + rows 0-9) — as HTML. c08 = 044,2520,550,2050,660 + 044,2520,1430,2050,1150
+REJECT p45 Bild 16 whole box; Bild 17 Befehl..."gelassen: 1)."; p50 Bild 18 whole box — as HTML.
+    c09 = 045,360,4500,2050,900 + 045,360,5660,2050,720 + 050,280,3600,2050,900
+REJECT p46 Bild 17 'englisches Wort: Verify (überprüfen)'; p50 Bild 20, p51 Bild 21, p52 Bild 22 (all lines down to Wirkung;
+    the "englisches Wort" lines of 20/21/22 only seen as cut tops, consistent with the HTML); p52 Bild 23 rows X, >, @ — as HTML.
+    c10 = 045,360,6370,2050,110 + 050,280,6030,2050,400 + 051,360,5870,2050,560 + 052,280,6020,2050,400 + 052,2560,1900,2000,330
+REJECT p52 LDA opcode list (8 rows; opcodes AD A5 A9 BD B9 A1 B1 B5 also correct for 6502) and the 8 "H 4000 5000 xx" lines;
+    p53 the LDA $15 / ... / CLD example lists — as HTML. c11 = 052,2430,2440,2100,900 + 052,2430,3600,2100,720 + 053,2540,575,2150,1120
+REJECT p54 'A 400 JSR $FFD2', 'A 00400 20 D2 FF JSR $FFD2', 'A 00403 (...)', 'H F4000 F4500 20 D2 FF', the ROM map table
+    4000-4297, and p55's OPEN4,4:CMD4:MONITOR ... X command list — as HTML (JSR = 3 bytes so 00400 -> 00403 checks).
+    c12 = 054,220,5920,1950,460 + 054,2430,645,1150,110 + 054,2460,4575,1900,630 + 055,290,780,1880,880
+
+## FUTURETEUFELCHEN-CANDIDATE (recorded only; owner default is no FT)
+FT-CANDIDATE p43 'b) mit »F 8004 8008« die Markierung löschen' — printed without the fill byte (c02 = 043,310,2635,2150,90).
+    The F syntax given two pages earlier (and Bild 12) requires one ("F Anfangsadresse Endadresse Füll-Byte"); a reader who
+    types the line as printed gets the monitor's "?" and the C 64 reset protection stays. Reasoned, not run. Magazine's.
+FT-CANDIDATE (low) p47 'Endadresse. Bitmap = $2000 + #8000 = $3F40' then 'S "BITMAP",08,2000 3F41' / 'P8192 TO P16193' —
+    $2000 + 8000 is already the end+1 ($3F3F is the last bitmap byte), so the +1 is added twice and one extra byte ($3F40)
+    is saved. Harmless (one byte too many). Reasoned, not run. c04 = 047,2540,4570,2150,110
+
+## Checks done without crops
+- Arithmetic: $20F5-$1C01+$A000 = $A4F4 (p41 table agrees); POKE 4624/4625 = $1210/$1211; SYS7424 = $1D00; A9 = %10101001
+  = "ein aus ein aus ein aus aus ein"; A 01D00 -> 01D02 -> 01D05; $0D = 13; $2000 + 8000 = 16192 = $3F40; 16193 = $3F41;
+  JMP $4567 = 4C 67 45; branch range 128 back / 127 forward = 256; LDA opcode table vs the 6502 opcode set.
+- Monospace columns of the p48 register display measured from tesseract word boxes (no extra image).
+- The p47 asterisk runs measured from ink-column runs (no extra image).
+- No disk-backed <pre data-filename> (Listings 4, 5, 6) was read — out of scope; Bild 19 is a placed PNG (protected).
+- The r325 dump cross-checker was NOT run: the only dump-like rows in pp 41-55 are the 2-line register display and the
+  A/H command lines, none in the monitor-dump byte+mnemonic form it parses (0 parseable rows).
+- Verification 4 (generate.py --future --join) NOT run: issues/SH10/title.png does not exist and the script's default
+  deploy mode is "local", which the brief forbids; left to control.
+
+## COVERAGE
+Read in full, for sense, HTML of pp 41-55: from "Wir errechnen den hexadezimalen Wert über den Ausdruck ?HEX$(…"
+(first text of p41) through the paragraph "Dieser Abschnitt ist für diejenigen besonders interessant, … wird man aber
+doch manchmal den TEDMON einsetzen." (last complete paragraph of p55, just under the heading "Vergleich verschiedener
+Versionen von Maschinenprogrammen"). STOPPED THERE. The next paragraph, "Da man von einem Maschinenprogramm jede
+Zwischenversion speichert (zumindest sollte man dies tun, wenn man | nicht die Programmierarbeit …" begins in the last
+lines of p55 and runs onto p56 — it is READER C's (not read by me; note its "Disassemblieren sein -," hyphen, which the
+truth reads as an en dash, is unchecked).
+Every truth/041-055 word difference was settled (fixed, rejected with a crop, or accounted for as a placement/list-marker
+difference: truth omits the boxes or places Bild 21 elsewhere, and numbers the <ol> items that the HTML renders as lists).
+Skimmed: none. Not seen by eye: the hand-set prose that truth and HTML agree on and that raised no doubt in reading.
+Crops: 12 read / 12 actually seen (c01-c12, every one loaded). Unseen regions named inside the entries: Bild 20/21/22
+"englisches Wort" lines (only the tops visible). No [media removed].

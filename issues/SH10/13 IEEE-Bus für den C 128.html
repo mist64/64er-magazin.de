@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>IEEE-Bus für den C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="K. Mandelatz, kn">
+    <meta name="64er.issue" content="Sonderheft 10">
+    <meta name="64er.pages" content="13-17,19">
+    <meta name="64er.head1" content="Hardware">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Hardware">
+    <meta name="64er.index_title" content="IEEE-Bus für den C128">
+    <meta name="64er.index_category" content="Hardware Tips&amp;Tricks|IEEE-BUS">
+    <meta name="64er.id" content="ieee">
+</head>
+
+<body>
+    <article>
+        <h1>IEEE-Bus für den C 128</h1>
+        <p class="intro">Wollen Sie professionelle Peripheriegeräte an Ihren Computer anschließen? Hier finden Sie die notwendige Bauanleitung dafür. Zusätzlich werden eine ganze Menge Extras geboten.</p>
+
+        <p>Wozu braucht man überhaupt einen IEEE-488-Bus am C 128? Nun, die Antwort ist sehr einfach. Über ein paralleles IEEE-Bus-Modul können Sie die Drucker und die Diskettenlaufwerke mit erheblich höherer Speicherkapazität aus der Commodore 4000er- und 8000er-Serie anschließen. Interessant ist vor allem das Einzellaufwerk SFD 1001 mit einer Speicherkapazität von 1 MByte und die Doppelfloppy CBM 8250 LP mit 2 x 1 MByte Speicherkapazität. Besonders bei den Laufwerken findet man häufig günstige Angebote (siehe Anzeigenteil).</p>
+
+        <h2>Schnellere Floppy</h2>
+
+        <p>Besonders das Floppylaufwerk SFD 1001 weist etliche Vorzüge gegenüber den Laufwerken 1571 und 1541 auf. Im einzelnen sind diese:</p>
+
+        <ol>
+            <li>Das Laufwerk 1571 emuliert im C 64-Modus des C 128 die Floppystation 1541 – zumindest, was die Geschwindigkeit angeht. Eine SFD 1001 ist beim Lesen aber fast sechsmal schneller, beim Schreiben etwa dreimal so schnell wie die 1541 und doppelt so schnell wie die 1571 im C 128-Modus. Auch sequentielle und relative Dateien werden entsprechend schneller bearbeitet. Angenehm bemerkbar macht sich die Geschwindigkeitssteigerung auch im CP/M-Betrieb, bei dem häufig auf Diskette zugegriffen wird.</li>
+            <li>Die Speicherkapazität der SFD 1001 ist gegenüber der 1541 sechsmal größer. Gegenüber der 1571 beträgt sie immer noch das dreifache. Es treten auch keine Probleme mit den Diskettenformaten 1541/einseitig und 1571/doppelseitig mehr auf.</li>
+        </ol>
+
+
+        <p>Wenn Sie eine 1541 am C 128 betreiben, können Sie diese mit Hilfe der in Ausgabe 1/86 vorgestellten IEEE-Platine auf den parallelen Übertragungsstandard umrüsten. Die Vorteile der höheren Übertragungsge schwindigkeit können Sie im C 64-Modus, im C 128-Modus und unter CP/M nutzen.</p>
+
+        <h2>Ein Modul und zwei EPROMs</h2>
+
+        <p>Um den IEEE-488-Bus an Ihrem C 128 betreiben zu können, benötigen Sie ein Hardware-Modul (Bild 1) und zwei Betriebssystem-EPROMs.</p>
+
+        <figure>
+            <img src="13-1.png" alt="Farbfoto: bestückte Steckplatine mit Platinenstecker, einem großen IC und Sockeln">
+            <figcaption>Bild 1. Das IEEE-488-Modul</figcaption>
+        </figure>
+
+        <p>Das eine EPROM des Typs 27128 beinhaltet das Basic V2 und das modifizierte Betriebssystem für den C 64-Modus. Auf der Programmservice-Diskette zu dieser Ausgabe ist das zum Brennen des EPROMs notwendige Programm enthalten. Sie finden es dort unter dem Namen »IEEE KERN 64«. Im Bild 2 sehen Sie den Platinenausschnitt mit den beiden Betriebssystem-ROMs. Dieses EPROM können Sie direkt an Stelle des mit »2« gekennzeichneten ROMs einsetzen. Ein Adaptersockel ist dabei nicht notwendig.</p>
+
+        <figure>
+            <img src="13-2.png" alt="Farbfoto: Ausschnitt der C 128-Platine; Markierungen 1 und 2 zeigen auf die Sockel mit dem C 128-Betriebssystem und dem C 64-Betriebssystem">
+            <figcaption>Bild 2. Platinenausschnitt vom C 128</figcaption>
+        </figure>
+
+        <aside>
+            <p>Um den IEEE-488-Bus betreiben zu können, müssen Sie die beiden Betriebssysteme herausnehmen und EPROMs mit neuen Betriebssystemen einsetzen. Die Kerben der EPROMs müssen jeweils nach unten zeigen.</p>
+        </aside>
+
+        <p>Das zweite EPROM, ebenfalls ein 27128-Typ mit einer Zugriffszeile von 250 ns, ersetzt das mit »1« gekennzeichnete ROM (Bild 2). Es beinhaltet das neue Betriebssystem für den C 128-Modus. Das notwendige Programm finden Sie ebenfalls auf der Programmservice-Diskette unter »IEEE KERN 128«.</p>
+
+        <p>Die beiden EPROMs für die Betriebssysteme sind auf der Stückliste (Tabelle 1) nicht mit aufgeführt. Sie enthält nur die Bauteile für das Hardware-Modul. Auf dieses Modul wollen wir jetzt auch näher eingehen.</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Stückliste</th>
+                </tr>
+                <tr>
+                    <th>Integrierte Schaltkreise</th>
+                </tr>
+                <tr>
+                    <td>1 74LS00; IC 1</td>
+                </tr>
+                <tr>
+                    <td>1 µPD 8255 AC; IC 2</td>
+                </tr>
+                <tr>
+                    <td>1 SN75160; IC 3</td>
+                </tr>
+                <tr>
+                    <td>1 SN75161; IC 4</td>
+                </tr>
+                <tr>
+                    <th>Kondensatoren</th>
+                </tr>
+                <tr>
+                    <td>1 x 15 µF, Tantal; C1</td>
+                </tr>
+                <tr>
+                    <td>2 x 100 nF; C2, C3</td>
+                </tr>
+                <tr>
+                    <th>Widerstände</th>
+                </tr>
+                <tr>
+                    <td>1 Array 8 x 10 K; RN 1</td>
+                </tr>
+                <tr>
+                    <th>Sonstiges</th>
+                </tr>
+                <tr>
+                    <td>1 8fach DIP-Schalter; S1—S8</td>
+                </tr>
+                <tr>
+                    <td>1 IC-Fassung 40polig</td>
+                </tr>
+                <tr>
+                    <td>2 IC-Fassung 20polig</td>
+                </tr>
+                <tr>
+                    <td>1 IC-Fassung 14polig</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die notwendigen Teile für das IEEE-488-Modul</figcaption>
+        </figure>
+
+        <h2>Die Schaltung</h2>
+
+        <p>Für eine parallele Datenübertragung nach der IEEE-Norm benötigen Sie eine kleine Platine für den Expansion-Port (Bild 1). Die Schaltung finden Sie im Bild 3.</p>
+
+        <figure>
+            <img src="13-3.png" alt="Schaltplan des IEEE-488-Moduls">
+            <figcaption>Bild 3. Schaltplan für das IEEE-488-Modul</figcaption>
+        </figure>
+
+        <p>Der wichtigste Baustein (IC2) ist ein »Programmable Peripheral Interface«, abgekürzt PPI. Dieser Baustein des Typs µPD8255AC kann ohne weiteres mit 2 Megahertz betrieben werden. Geschwindigkeitsprobleme wird es also keine geben. Da IC2 jedoch nicht zur Familie der 65xx-Bausteine gehört, ist eine Anpassung der Steuersignale notwendig. Dies erfolgt über die vier Gatter des 74LS00 (IC1).</p>
+
+        <p>Die beiden ICs SN75160 (IC3) und SN75161 (IC4) sind Treiber-Bausteine mit integriertem Widerstandsnetzwerk, wie es nach der IEEE-Norm verlangt wird.</p>
+
+        <p>Mit dem 8fach DIL-Schalter wird die Schnittstelle auf Ihre Gerätekonfiguration angepaßt.</p>
+
+        <p>Kommen wir aber nochmals zum I/O-Baustein µPD8255. Er wird über den für die Erweiterungen I/O 1 vorgesehenen Adreßbereich $DE00 bis $DEFF angesprochen. Sie können das Modul aber auch auf den Erweiterungsbereich I/O 2 ($DF00 bis $DFFF) verlegen, indem Sie die Brückenverbindung rechts neben den DIP-Schaltern (Bild 4) auftrennen und umlöten.</p>
+
+        <figure>
+            <img src="13-4.png" alt="Bestückungsplan in Blau und Schwarz: IC 1 74 LS 00, IC 2 µPD 8255, IC 3 SN 75160, IC 4 SN 75161, DIP-Schalter S1 bis S8">
+            <figcaption>Bild 4. Bestückungsplan für das IEEE-488-Modul</figcaption>
+        </figure>
+
+        <p>Von dem neuen Betriebssystem wird allerdings der Bereich I/O 1 angesprochen. Die Software spricht die Register von $DE40 bis $DE43 für Read-Funktionen und die Register von $DE48 bis $DE4B für Write-Funktionen an.</p>
+
+        <p>Der µPD8255 besitzt insgesamt drei 8 Bit breite Ports (PA, PB, PC). Im Bild 5 ist der µPD8255 nochmals mit allen Pin-Belegungen abgebildet. Welche der I/O-Anschlüsse als Daten- oder Steuerleitungen verwendet werden und welche mit den DIP-Schaltern geschaltet werden, das finden Sie in der Tabelle 2.</p>
+
+        <figure>
+            <img src="13-5.png" alt="Anschlussbild des µPD 8255 mit 40 Pins">
+            <figcaption>Bild 5. Die Anschlüsse des Bausteins µPD 8255</figcaption>
+        </figure>
+
+        <aside>
+            <p>Dieses IC ist das Herz der Schaltung. Es ist ein programmierbarer Interface-Baustein, der mit 2 MHz betrieben werden kann. Geschwindigkeitsprobleme wird es daher nicht geben.</p>
+        </aside>
+
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="4">Zuordnung der I/O-Leitungen</th>
+                </tr>
+                <tr>
+                    <th>Port A</th>
+                    <th>IEEE-488-Datenleitung</th>
+                    <th>Port C</th>
+                    <th>Steuerleitung/Schalter</th>
+                </tr>
+                <tr>
+                    <td>PA0</td>
+                    <td>DIO1</td>
+                    <td>PC0</td>
+                    <td>SW 8</td>
+                </tr>
+                <tr>
+                    <td>PA1</td>
+                    <td>DIO2</td>
+                    <td>PC1</td>
+                    <td>SRQ</td>
+                </tr>
+                <tr>
+                    <td>PA2</td>
+                    <td>DIO3</td>
+                    <td>PC2</td>
+                    <td>DAV</td>
+                </tr>
+                <tr>
+                    <td>PA3</td>
+                    <td>DIO4</td>
+                    <td>PC3</td>
+                    <td>EOI</td>
+                </tr>
+                <tr>
+                    <td>PA4</td>
+                    <td>DIO5</td>
+                    <td>PC4</td>
+                    <td>SW 7</td>
+                </tr>
+                <tr>
+                    <td>PA5</td>
+                    <td>DIO6</td>
+                    <td>PC5</td>
+                    <td>SW 6</td>
+                </tr>
+                <tr>
+                    <td>PA6</td>
+                    <td>DIO7</td>
+                    <td>PC6</td>
+                    <td>NRFD</td>
+                </tr>
+                <tr>
+                    <td>PA7</td>
+                    <td>DIO8</td>
+                    <td>PC7</td>
+                    <td>NDAC</td>
+                </tr>
+                <tr>
+                    <th>Port B</th>
+                    <th>Steuerleitung/Schalter</th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>PB0</td>
+                    <td>ATN</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>PB1</td>
+                    <td>DC</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>PB2</td>
+                    <td>TE</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>PB3</td>
+                    <td>SW 1</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>PB4</td>
+                    <td>SW 2</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>PB5</td>
+                    <td>SW 3</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>PB6</td>
+                    <td>SW 4</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>PB7</td>
+                    <td>SW 5</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Die Schalter und die Steuerleitungen an den Ports des µPD 8255</figcaption>
+        </figure>
+
+        <p>Mit den Leitungen TE und DC der Bus-Treiber (IC3, IC4) wird die Datenrichtung und der Zustand des Computers (Controller/Talker/Listener) festgelegt.</p>
+
+        <h2>Tips für den Aufbau</h2>
+
+        <p>Um die Schaltung aufzubauen, brauchen Sie eine doppelseitige Platine. Die Platinenlayouts für beide Seiten finden Sie in den Bildern 6 und 7. Die Abmessungen der Platine betragen 59 x 75 mm. Für die Herstellung doppelseitiger Platinen empfiehlt es sich, Folien vom Layout herzustellen, die beiden Folien genau übereinander zu legen und mit Tesa-Film zu einer Art Tasche zusammenzukleben. Stecken Sie dann eine Platine mit Fotoschichten in diese Tasche, lassen Sie diese auf der offenen Taschenseite überstehen und kleben Sie die Platine mit Tesa-Film an der Tasche fest. Nun können Sie die Platine auf beiden Seiten belichten.</p>
+
+        <figure>
+            <img src="13-6.png" alt="Platinenlayout der Bestückungsseite, schwarz auf weiß">
+            <figcaption>Bild 6. Das Layout der Bestückungsseite</figcaption>
+        </figure>
+
+        <figure>
+            <img src="13-7.png" alt="Platinenlayout der Lötseite, schwarz auf weiß">
+            <figcaption>Bild 7. Das Layout der Lötseite</figcaption>
+        </figure>
+
+        <p>An der IEEE-Bus-Seite muß die Platine später auf die Maße des 24poligen Platinensteckers zurechtgesägt werden. Achten Sie auch auf die notwendigen Schlitze. Sie liegen anders als am User-Port! Im Layout (Bestückungsseite) sind kleine, halbkreisförmige Markierungen vorhanden, wo die Schlitze gesägt werden müssen.</p>
+
+        <p>Die Durchkontaktierung erfolgt durch doppelseitiges Verlöten der IC-Sockel. Gedrehte Sockelbeinchen ohne Kunststoffrahmen (Carrier-Fassungen), wie sie auf dem Bild 1 zu sehen sind, erleichtern das Löten auf der Bestückungsseite. Sie werden mit einem »Blech-IC« als Träger verkauft. Weitere Durchkontaktierungen sind nicht notwendig.</p>
+
+        <h2>So schließen Sie Geräte an</h2>
+
+        <p>An der Platine sind zwei Anschlüsse vorhanden. Mit der 44poligen Seite wird die Platine direkt in den Expansion-Port gesteckt. Die Bestückungsseite zeigt dabei nach oben. Den Commodore-IEEE-488-Bus bildet der 24polige Anschluß mit den beiden Schlitzen (siehe Bild 1). Über ein Commodore-IEEE-488-Bus-Kabel können Sie die Peripheriegeräte der Serien 4000 und 8000 anschließen. Eine Gegenüberstellung der Pinbelegung des Commodore-IEEE-488-Anschlusses und des 24poligen IEEE-488-Normsteckers finden Sie in der Tabelle 3.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="3">Steckerbelegung CBM-IEEE und Standard-IEEE</th>
+                </tr>
+                <tr>
+                    <th>Kontaktbenennung CBM</th>
+                    <th>Standard-IEEE</th>
+                    <th>Bezeichnung des Pins</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>DIO1</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>2</td>
+                    <td>DIO2</td>
+                </tr>
+                <tr>
+                    <td>Schlitz</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>3</td>
+                    <td>DIO3</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>4</td>
+                    <td>DIO4</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>EOI</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>6</td>
+                    <td>DAV</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>7</td>
+                    <td>NRFD</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>8</td>
+                    <td>NDAC</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>9</td>
+                    <td>IFC</td>
+                </tr>
+                <tr>
+                    <td>Schlitz</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>10</td>
+                    <td>SRQ</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>11</td>
+                    <td>ATN</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>12</td>
+                    <td>GND</td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td>13</td>
+                    <td>DIO5</td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td>14</td>
+                    <td>DIO6</td>
+                </tr>
+                <tr>
+                    <td>Schlitz</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>15</td>
+                    <td>DIO7</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>16</td>
+                    <td>DIO8</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>17</td>
+                    <td>REN</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>18</td>
+                    <td>GND (DAV)</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>19</td>
+                    <td>GND (NRFD)</td>
+                </tr>
+                <tr>
+                    <td>J</td>
+                    <td>20</td>
+                    <td>GND (NDAC)</td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>21</td>
+                    <td>GND (IFC)</td>
+                </tr>
+                <tr>
+                    <td>Schlitz</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>22</td>
+                    <td>GND (SRQ)</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>23</td>
+                    <td>GND (ATN)</td>
+                </tr>
+                <tr>
+                    <td>N</td>
+                    <td>24</td>
+                    <td>GND (DIO1-8)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Vergleich der Steckerbelegung zwischen Commodore-IEEE und Standard-IEEE</figcaption>
+        </figure>
+
+        <h2>Daten seriell und parallel</h2>
+
+        <p>Der Datenverkehr mit den Peripheriegeräten kann seriell und parallel erfolgen. Unter der gleichen Gerätenummer kann ein Gerät seriell angesprochen werden und ein zweites parallel. Auf diese Weise ist es möglich, zwei Floppylaufwerke zu betreiben, ohne die Gerätenummer zu ändern.</p>
+
+        <p>Die Art des Zugriffs (seriell oder parallel) können Sie entweder softwaremäßig über ein Register oder mit den DIP-Schaltern bestimmen. Mit dem DIP-Schalter 8 wird eine der beiden Varianten vorgegeben. Ein Wechsel der Zugriffsart ist auch während dem Betrieb möglich.</p>
+
+        <p>Die Übersicht, was mit welchem Schalter eingestellt wird, finden Sie in der Tabelle 4 unter »Switch«. In der Mitte ist eine gängige Schalterkombination abgebildet. Die Bedeutung der einzelnen Schalter wollen wir Ihnen aber auch noch genauer erklären.</p>
+
+        <figure>
+            <img src="13-t4.png" alt="Tabelle »C= 128 IEEE-488 Reference« mit den Bits von $DD0C und den Stellungen der DIP-Schalter">
+            <figcaption>Tabelle 4. Die Belegung des Steuerregisters und der DIP-Schalter</figcaption>
+        </figure>
+
+        <p>Schalter 1 invertiert die Funktion der Taste &lt;CBM&gt; nach dem Einschalten und nach einem Reset. Setzen Sie Schalter 1 auf »ON«, so gelangen Sie nach dem Einschalten in den C 64-Modus, ohne die Taste &lt;CBM&gt; zu drücken. Haben Sie diese Taste gedrückt, meldet sich der Computer im C 128-Modus.</p>
+
+        <p>Schalter 2 legt die Farben des 40-Zeichen-Bildschirms fest. Im C 128-Modus können Sie zwischen schwarz/weiß und blau/weiß wählen. Im C 64-Modus stehen die Kombinationen schwarz/grau oder blau/grau zur Verfügung.</p>
+
+        <p>Ist Schalter 3 auf »ON« gestellt, erfolgt die Datenausgabe für die Gerätenummer 4 (Drucker) über eine Centronics-Schnittstelle am User-Port. Die FLAG-Leitung wird dabei als »Acknowledge« und die PA2-Leitung als »Strobe« verwendet. Wenn Sie im OPEN-Befehl die Sekundäradresse 0 wählen, werden alle Zeichen im »CBM-ASCII-Code« ohne eine Codewandlung ausgegeben. Mit der Sekundäradresse 7 wird eine Wandlung der Klein-/Großschrift durchgeführt. Die Codewandlung erfolgt bis zum Zeichen CHR$(95).</p>
+
+        <p>Steht der Schalter 3 auf »OFF«, so wird über die Gerätenummer 4 nicht der User-Port angesprochen, sondern der serielle oder parallele Bus.</p>
+
+        <p>Die Schalter 4 bis 7 bestimmen die Art des Zugriffs für die Gerätenummern 4, 5, 8 und 9. Dabei bedeutet »OFF« seriell und »ON« parallel.</p>
+
+        <p>Der Schalter 8 trägt die Bezeichnung »Request Switches?« (Schalter abfragen?). Im Zustand »ON« werden die übrigen Schalter im Betrieb abgefragt. Im Zustand »OFF« werden die entsprechenden Bits des Registers $DD0C abgefragt.</p>
+
+        <h2>Einstellung per Software</h2>
+
+        <p>Um eine softwaremäßige Einstellung zu erreichen, wird das serielle Schieberegister ($DD0C) des CIA-Bausteins 2 benutzt. Die Bedeutung der einzelnen Bits finden Sie als Übersicht ebenfalls in der Tabelle 4. In der Mitte dieses Tabellenabschnittes ist wiederum die gängigste Bit-Kombination angegeben. Wie bei den Schaltern wollen wir Ihnen auch hier die einzelnen Bits noch einmal genau erklären.</p>
+
+        <p>Die Bits 0, 1 und 2 bestimmen die Art des Zugriffs für die Gerätenummern 4, 8 und 9. Bei gelöschtem Bit wird der serielle Bus, bei gesetztem Bit der parallele Bus verwendet.</p>
+
+        <p>Bit 3 bestimmt, ob die Gerätenummer 4, die Centronics-Schnittstelle, angesprochen wird. Bei gesetztem Bit läuft die Datenausgabe über den User-Port (Centronics). Bei gelöschtem Bit 3 entscheidet das Bit 0 über die Art der Ausgabe. Bit 3 hat also Vorrang vor Bit 0.</p>
+
+        <p>Mit Bit 4 können Sie das Modul als »nicht vorhanden« (Bus not available) schalten. Dazu braucht nur Bit 4 gelöscht werden. Im Normalfall ist das Bit bei eingestecktem Modul gesetzt. Nach dem Einschalten wird dieses Bit überprüft, bevor die Schalter abgefragt werden. Es hat also die höchste Priorität. Fehlt das Modul nach dem Einschalten, so werden die Bits 0 bis 3 vom Betriebssystem gelöscht. Bit 4 kann auch benutzt werden, um eine Schalterabfrage softwaremäßig zu unterdrücken.</p>
+
+        <p>Die Bits 5 bis 7 dürfen Sie nicht benutzen, da sie vom Betriebssystem verwendet werden. Aus diesem Grund sollten Sie die einzelnen Bits (0 bis 4) von Basic aus mit folgendem Befehl setzen:</p>
+
+        <p>POKE56588, (PEEK(56588) OR X)</p>
+
+        <p>Anstelle X werden je nach Bit die Werte 1, 2, 4, 8 oder 16 eingesetzt.</p>
+
+        <p>Die Bedeutung von Bit 5 wollen wir Ihnen aber auch erläutern. Das Floppylaufwerk SFD 1001 reagiert beim Befehl »I« (Initialisierung der Diskette) mit einer Fehlermeldung: READ ERROR auf Drive 1. Dies liegt daran, daß für die SFD 1001 das DOS 2.7 der Doppelfloppy 8250 nahezu unverändert übernommen wurde. Die 8250 initialisiert bei dem Befehl »I« beide Laufwerke (Drive 0 und 1). Will man ein einzelnes Laufwerk initialisieren, so ist der entsprechende Befehl »I0« oder »I1«. Nur bei dem korrekten Befehl »I0« gibt die SFD 1001 keine Fehlermeldung aus. Viele Programme verwenden aber den Sparbefehl »I« anstatt »I0« und fragen daraufhin den Fehlerkanal ab. Aus diesem Grund sendet das Betriebssystem bei dem Befehl »I« auch die dazugehörige »0« hinterher. Ein »Abstürzen« eines Programms aufgrund dieses Fehlers wird so vermieden. Wollen Sie dennoch beide Laufwerke gleichzeitig initialisieren, dann verwenden Sie dazu bitte den Befehl »I:«.</p>
+
+        <p>Am meisten wird wohl die Umschaltung der Zugriffsart seriell/parallel für die Gerätenummer 8 benötigt. Hier existiert neben dem Einstellen des Schalters 4 oder dem Setzen und Löschen des zweiten Bits eine dritte Möglichkeit. Durch gleichzeitiges Drücken der Tasten &lt;CTRL + RETURN&gt; wird das Bit 4 auf Null gesetzt und Bit 2 umgekehrt. Dies hat folgende Wirkung: Ein gelöschtes Bit 4 erlaubt die Abfrage der internen Bits anstelle der Schalter. Das Bit 2 (zuständig für die Gerätenummer 8) wird umgekehrt und damit der Zugriff von seriell auf parallel (oder umgekehrt) umgeschaltet. Diese Abfrage ist in der INPUT-Routine eingebunden. Sie können also während eines INPUT-Befehls die Übertragungsart für die Gerätenummer 8 ändern. Eine nützliche Hilfe.</p>
+
+        <p>Die Geräteadressen 10 und 11 bewirken übrigens stets eine serielle Übertragung, während 12 bis 15 eine parallele Übertragung bewirken.</p>
+
+        <h2>Betriebssystem verbessert</h2>
+
+        <p>Die Treibersoftware für den IEEE-488-Bus ist sowohl im C 64- wie im C 128-Betriebssystem eingebunden. Zu diesem Zweck mußten die Kassettenroutinen entfernt werden. Die RS232-Treiberroutinen unter der Gerätenummer 2 bleiben erhalten.</p>
+
+        <p>Sie sollten allerdings nicht mit Übertragungsraten über 1200 Bit/s arbeiten, wenn Sie gleichzeitig den parallelen Bus benutzen.</p>
+
+        <p>Im einzelnen sind im C 64-Modus folgende Verbesserungen implementiert:</p>
+
+        <ol>
+            <li>&lt;CTRL+*&gt; bewirkt ein »OLD« für ein Basic-Programm nach einem NEW oder Reset.</li>
+            <li>&lt;CTRL+DEL&gt; löscht von der aktuellen Cursor-Position den Rest der Zeile.</li>
+            <li>Die linke &lt;SHIFT&gt;-Taste oder die Taste &lt;SHIFT LOCK&gt; bewirken eine Pausenfunktion für das Bildschirm-Scrolling. Die Ausgabe wird gestoppt, wenn eine neue Zeile am unteren Rand aufgebaut werden soll.</li>
+            <li>Die im Betriebssystem voreingestellte Gerätenummer für »LOAD« und »SAVE« ist von 1,1 (Kassette) auf 8,1 (Floppy) umgestellt worden. Davon unabhängig wird das Inhaltsverzeichnis mit 8,0 geladen.</li>
+            <li>Die Programmkennzeichnung »PRG« in einem Directory-Listing auf dem Bildschirm muß bei einem LOAD-Befehl nicht mehr beachtet werden. Es genügt, vor den Programmnamen ein »LOAD« zu schreiben und &lt;RETURN&gt; zu drücken.</li>
+            <li>Die Default-Nummer für den OPEN-Befehl ist auf x,8,15 gesetzt. Zum Öffnen des Befehlkanals der Floppystation genügt jetzt ein »OPEN1«.</li>
+            <li>Die Repeat-Funktion für die Tastatur ist eingeschaltet.</li>
+            <li>Die Tastenkombination &lt;CTRL+←&gt; schaltet den Quote-Mode (Gänsefüßchenmodus) ab. So können Sie dem Quote-Mode entkommen, ohne die Cursor-Position zu ändern.</li>
+            <li>Die Tastenfolge &lt;CBM+RUN/STOP&gt; ergibt ein »RUN:«</li>
+            <li>&lt;SHIFT+RUN/STOP&gt; bewirkt das Laden und Starten des ersten Programms vom Diskettenlaufwerk (LOAD"0:* ":RUN).</li>
+            <li>Die Tastenkombination &lt;F1+F3+DEL&gt; unterdrückt die Ausführung des Autostart-Codes »cbm80« beim Reset oder Einschalten. Reset-feste Programme können Sie so verlassen.</li>
+            <li>&lt;F1+DEL&gt; wandelt beim Reset den Autostart-Code »cbm80« im RAM bei $8004 bis $8008 in »ibm80« um. Im Gegensatz zur Methode &lt;F1+F3+DEL&gt; ist danach ein NMI-Warmstart des Computers (&lt;RUN/STOP+RESTORE&gt;) möglich.</li>
+            <li>Die neuen Cursor-Steuertasten der C 128-Tastatur funktionieren auch im C 64-Modus.</li>
+            <li>Der Zehnerblock des C 128 ist auch im C 64-Modus zugänglich. Die Tasten liefern den gleichen Code wie die entsprechenden Tasten der normalen C 64-Tastatur. Dies gilt auch im SHIFT-Modus.</li>
+            <li>Die Funktion der zusätzlichen Tasten des C 128 für den C 64-Modus können Sie der Tabelle 5 entnehmen. Die übrigen Zusatztasten bleiben ohne Funktion.</li>
+        </ol>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th colspan="3">Tastencodes im C 64-Modus</th>
+                </tr>
+                <tr>
+                    <td>ESC</td>
+                    <td>liefert</td>
+                    <td>CHR$(27)</td>
+                </tr>
+                <tr>
+                    <td>TAB</td>
+                    <td>liefert</td>
+                    <td>CHR$(09)</td>
+                </tr>
+                <tr>
+                    <td>ALT</td>
+                    <td>liefert</td>
+                    <td>CHR$(14)</td>
+                </tr>
+                <tr>
+                    <td>HELP</td>
+                    <td>liefert</td>
+                    <td>CHR$(08)</td>
+                </tr>
+                <tr>
+                    <td>LINE-FEED</td>
+                    <td>liefert</td>
+                    <td>CHR$(10)</td>
+                </tr>
+                <tr>
+                    <td>NO SCROLL</td>
+                    <td>liefert</td>
+                    <td>CHR$(03)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 5. Die Belegung der C 128-Tasten im C 64-Modus</figcaption>
+        </figure>
+
+
+        <p>In Bild 8 sehen Sie den C 128 D gemeinsam mit einem Doppellaufwerk 8250 LP im Einsatz. Alle, die sich den Selbstbau nicht zutrauen, können das fertige IEEE-Interface auch bei Roßmöller, Maxstraße 50 - 52, 5300 Bonn 1, für 198 Mark erhalten.</p>
+
+        <address class="author">(K. Mandelatz/kn)</address>
+
+        <figure>
+            <img src="13-8.png" alt="Farbfoto: Commodore 128 D mit Monitor und daneben ein Doppellaufwerk auf einem Tisch">
+            <figcaption>Bild 8. Der Commodore 128 D mit einem Doppellaufwerk 8250 LP</figcaption>
+        </figure>
+
+        <div class="binary_download" data-filename="ieee kern 64.prg" data-name="IEEE KERN 64"></div>
+        <div class="binary_download" data-filename="ieee kern 128.prg" data-name="IEEE KERN 128"></div>
+    </article>
+</body>
+
+</html>
