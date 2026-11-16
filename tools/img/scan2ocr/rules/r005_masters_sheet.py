@@ -375,13 +375,26 @@ BED_OUTSIDE_FRAC = 0.5
 # fit cannot follow a torn edge, and that error is a millimetre or two.  So a
 # doomed component may delete pixels only within BED_REACH_MM of the traced
 # line.  Deeper than that the pixels are page, whatever the vote said.
-# MEASURED on SH10, 2026-11-15, over all 168 pages and 1,493 lost regions: the
-# deepest genuine bed inside the page box is 3.4 mm (p147), then 3.1 (151), 2.7
-# (143), 2.6 (145), 2.5 (149/088/001) -- and the depth is measured from the
-# axis-aligned box, which lies at or outside the traced line, so true depth past
-# the line is no greater.  The losses this cap is for sit at 7.5 mm (p167) and
-# 30.7 mm (p031).  5 mm separates them with 1.6 mm below and 2.5 mm above.
-BED_REACH_MM = 5.0
+# MEASURED on SH10, 2026-11-16, by a fit-residual pass over all 168 pages
+# (depth past the TRACED LINE, not past the axis-aligned box -- an earlier
+# box-based proxy said 5.0 and was wrong, because a page traced at a slant puts
+# millimetres between the two and nine page-edges are as steep as p031's):
+#
+#   141 of 168 pages have doomed components with ZERO pixels inside the line.
+#   22 more have only jitter at the line: <= 473 px, none deeper than 0.34 mm.
+#   Four pages go deeper -- 031, 023, 001, 163 -- and 023 is masked by its hand
+#   box, 001 ships as title.png.
+#
+# So on an ordinary page the doomed-component drop does NOTHING inside the page:
+# CLEAN_INSET_MM has already put the bed outside `keep` before it runs.  The cap
+# is therefore the trace's own jitter plus margin, and nothing more.
+#
+# VALIDATED ON SH10 ONLY.  SH10 contains no extrapolated-corner wedge -- the
+# p092 case this block was written for -- which is why nothing on an ordinary
+# page reaches past 0.34 mm.  This issue cannot test whether 0.5 mm still clears
+# that case.  The next issue that HAS one is the test, and if a wedge survives
+# it, the answer is a better rule for extrapolated corners, not a bigger D.
+BED_REACH_MM = 0.5
 
 # --- the page, and the canvas it is placed on ------------------------------
 # The traced page must come out one of the sizes THIS ISSUE ACTUALLY HAS.  A
