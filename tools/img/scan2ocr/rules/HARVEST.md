@@ -3352,3 +3352,58 @@ the same direction: they measured the mechanism rather than the page. The
 builder refused the gate, disproved the sweep twice, and supplied the
 measurement that worked. **A supervisor's condition is not evidence, and
 "non-optional" is not a reason to run a check that cannot pass.**
+
+## SH10, 2026-11-16: the finished PDF carried one page from before its repair, and the owner found it by eye
+
+The chain was through. Step 340 was signed off, r325's site build passed, the
+squash manifest was verified at 202 files, and the PDF was waiting on
+permission to commit. The owner opened it and wrote: **"p2 still cropped as
+before"**.
+
+Page 2 had shipped as it stood before `regrade_002.py` restored the top of the
+black ground and the word "Profi-". The repair was real and had worked —
+`a4600/002.png` carries it — but the assembly reused
+`.ocrcache/guetzli-q97/002.jpg`, encoded at 19:27 the previous evening for a
+page that was re-cut at 03:49 the next morning. The delivered page's embedded
+JPEG is byte-identical to that cache entry; that is how it was pinned, not
+inferred.
+
+### A LIST OF WHAT TO DROP IS NOT A CHECK → r006
+
+r006 already held the full table of which cache a repair invalidates, already
+said all of them are keyed on existence, and already warned that a re-cut
+invalidates none by itself. **All of that is an instruction to a person**, and
+it was followed for page 1 and for page 23 — the first two repairs — and missed
+on page 2, the third. Nothing downstream compares a cache entry with the page
+it claims to be. r006 now carries that comparison, in the build's own reduction,
+to be run before the assembly and again after.
+
+The gap was not knowledge. It was that every record of the repair — the
+override table, the stamp, the LOG — records the repair, and none of them
+records whether the deliverable received it.
+
+### THREE WRONG TESTS, AND THEY ALL HAD THE SAME TELL → r006, r000
+
+Control ran three checks before the one that answered:
+
+- **mtime**: 160 of 168 pages "newer than their cache", because r005b had
+  re-cut every page four minutes apart. The real finding was in that list,
+  indistinguishable.
+- **a PIL LANCZOS reduction** instead of `magick -resize 25%`: all 168 pages
+  differed, ~300,000 px each, over the whole page.
+- **`case "$ae" in 0)`** against `magick compare -metric AE`, which prints
+  `0 (0)`: every page reported as differing, with the true AE three characters
+  away in the same string, unread.
+
+Reported as findings, these would have been 160, then 168, then 168 defects in
+a finished issue. **"Everything failed" and "almost everything failed" are the
+same tell**, and it is visible in the COUNT, before any row is read. The right
+check found 166 pages at AE 0, page 2 at 36,649 px, and page 1 differing by
+design because it ships from `title.png`.
+
+### THE SHAPE OF THIS ENTRY
+
+The defect was in the build and the rule gap was in control's file. The owner
+caught it by opening the artefact and looking at it, after four sign-offs that
+each examined a record instead. **Every verification in the chain ran on
+something other than the thing being delivered.**

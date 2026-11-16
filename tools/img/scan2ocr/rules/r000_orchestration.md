@@ -1859,6 +1859,28 @@ rises 44,329 → 47,177, the opposite direction.
 touch.** A window defined by the altered quantity reports the change as
 improving whatever it worsened, and the sign of the error is the convenient
 one.
+### AND READ THE COUNT BEFORE THE ROWS — A CHECK CAN MEASURE ITSELF
+
+SH10, 2026-11-16. Hunting for pages whose PDF cache predated their repair,
+control ran three checks before the one that answered. The first reported
+**160 of 168** pages stale; the second and third reported **168 of 168**.
+
+All three were wrong, and none of the three was wrong about the pages. mtime
+was reading r005b's whole-issue re-cut. A PIL `LANCZOS` reduction is simply a
+different image from `magick -resize 25%`. And `case "$ae" in 0)` never matched
+because `magick compare -metric AE` prints `0 (0)`. The right check found
+**166 at AE 0**, one page genuinely stale, and one differing by design.
+
+The tell was available in each case before a single row was read: a finished
+issue that has passed every step does not have 168 broken pages. **When a check
+fires on its whole population, or on all but a handful, the first hypothesis is
+the check, not the corpus** — and the cost of testing that hypothesis is one
+page compared by hand against a known-good answer.
+
+This is the same family as a check that cannot fail, seen from the other end:
+one that cannot pass tells you nothing for the same reason, and both are
+diagnosed by the SHAPE of the output rather than its content.
+
 ### AND A NEGATIVE CLAIM NEEDS THE SWEEP THAT WOULD HAVE FOUND A POSITIVE
 
 "None of X" is the easiest sentence to write and the hardest to support. Twice

@@ -1151,6 +1151,60 @@ may share inodes with the delivery's (`stat -f%l` reports the link count):
 writing into one then silently rewrites the other. Unlink before regenerating —
 `rm` the entry and make a new file, never edit in place.
 
+### AND REMEMBERING TO DROP THEM IS NOT A CHECK — COMPARE THE CACHE WITH THE PAGE
+
+MEASURED on SH10, 2026-11-16. The owner opened the finished PDF and said "p2
+still cropped as before". He was right. Page 2 shipped as it stood BEFORE
+`regrade_002.py` restored the top of the black ground and the word "Profi-":
+the delivered page's embedded JPEG was byte-identical to
+`.ocrcache/guetzli-q97/002.jpg`, encoded at 19:27 for an `a4600/002.png` that
+was re-cut at 03:49 the next morning. Pages 1 and 23 had had their entries
+refreshed by hand after their own repairs; page 2's were missed.
+
+Every step above had been followed. The table was read, the repair was recorded
+in `reviewed/a4600-overrides.txt`, the stamp carried OVERRIDE, the rule's own
+Verification passed, and r325's site build passed. None of them compares the
+cache with the page. **A list of what to drop is an instruction to a person. It
+is not a check, and it fails exactly where a person's attention fails — on the
+third repair, not the first.**
+
+The check is one line per page, and it must use the build's own reduction:
+
+```bash
+# make_issue_pdf.sh:155 is the ONLY correct reduction.  AE 0, or the cache is stale.
+T=$(mktemp -d)
+for p in "$A4"/[0-9][0-9][0-9].png; do
+  n=$(basename "$p" .png)
+  magick "$p" -resize 25% +repage -strip "$T/$n.png"
+  ae=$(magick compare -metric AE "$T/$n.png" "$CACHE/${n}_150.png" null: 2>&1)
+  [[ "${ae%% *}" == 0 ]] || echo "$n STALE $ae"
+done
+```
+
+Page 1 is the one legitimate exception: it ships from the owner's `title.png`,
+so its cache is deliberately NOT a reduction of `a4600/001.png`. Compare it
+against `title.png`, as the mixed script's own MAE check at line 181 does.
+Run this **before** the assembly, where it costs a minute, and again after.
+
+**Three tests that look like this one and answer a different question. All
+three were run here before the right one:**
+
+- **mtime.** r005b had re-cut all 168 pages at 03:49-03:53, so 160 were newer
+  than their cache entry while being byte-identical reductions. The one real
+  finding sat in that list, indistinguishable from 159 false ones.
+- **a PIL reduction.** `Image.resize((w // 4, h // 4), LANCZOS)` is not
+  `magick -resize 25%`. Compared against it, all 168 pages differed, by
+  ~300,000 px each, over the whole page.
+- **`case "$ae" in 0)`.** `magick compare -metric AE` prints `0 (0)`, not `0`,
+  so the arm never matched and every page was reported as DIFFERING — with the
+  true AE sitting in the output, unread, three characters away. Hence
+  `${ae%% *}` above.
+
+The tell in all three is the SHAPE of the result, before any of its content:
+**"everything failed" and "almost everything failed" are the same tell.** A
+check that fails for every member of its population has not found 168 defects;
+it has measured itself. Read the count first, and only then the rows.
+
 ### DROPPING THE CACHES IS HALF THE INSTRUCTION — the script now refuses on the other half
 
 MEASURED on SH8607, 2026-10-30. Five cover pages were re-cut, their cache
