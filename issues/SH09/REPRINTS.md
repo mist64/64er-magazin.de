@@ -43,3 +43,22 @@ Per-block attribution, 8-word shingles, a block of ours counted when at least ha
 - `92 ← SH8603/52`: 2 blocks, both also in the confirmed monthly Bücher pages. Sibling, no diff.
 - `140 ← SH8603/160`: 6 blocks; 5 are also in 8510/34. The sixth, »Zum Schluß soll noch darauf hingewiesen werden, daß selbst bei Commodore-Datasetten …«, is in SH8603/160 and in ours but not in 8510/34's HTML. Sibling reprint of 8510/34, no diff of its own; whether 8510 prints that paragraph is settled on 8510's scan inside the pair `140 ← 8510/34` (PRINT or THEIRS).
 - `142 ← SH8608/146, 8512/100, 8502/72`: 10 blocks match SH8608/146; 9 of them also match 8512/100 or 8502/72 at 0.5 or more, and the tenth (the FIND line of the SMON command summary) is in 8502/72 and 8512/100 at a lower share. SH8608/146 is itself 8512/100's reprint, so it is a sibling. **Open**: whether 142's SMON command summary is a PARTIAL reprint of 8502/72 (the SMON series) or of 8512/100, and whether it is reprinted text at all or a command list re-told. That needs both printed pages; held for the orchestrator's ruling on the merged pairs.
+
+## Credit added after publication (2026-11-16)
+
+`94 Fragen und Antworten` shipped without a reprint credit, while SH8605/155 —
+a collection of the same shape, from overlapping monthly pages — carries one.
+Found while building SH10, whose own `6 Fragen und Antworten zum C 128` was
+credited in SH8605/155's form; reported to the owner, who ruled the credit in.
+
+The credit names the fourteen confirmed pairs of `reprints.txt` above, in print
+order, each linking to the article that holds that page: 4/84 S. 14, 5/84 S. 10,
+6/84 S. 18, 7/84 S. 10, 9/84 S. 11, 10/84 S. 16, 3/85 S. 16, 4/85 S. 12,
+5/85 S. 11, 5/85 S. 13, 6/85 S. 12, 7/85 S. 14, 8/85 S. 18, 9/85 S. 14. Two of
+the fourteen are not Leserforum pages — 5/85 S. 13 is »Leser fragen – Willi
+Brechtl antwortet« and 9/85 S. 14 is »Fragen und Antworten zum C 128« — so the
+closing parenthesis reads »(jeweils einzelne Fragen und Antworten)« and drops
+SH8605/155's »aus dem Leserforum«, which would not be true of all fourteen.
+
+The sibling reprints stay uncredited, per r330: SH8605/155 is an earlier
+Sonderheft collection of the same monthly letters, not this article's source.
