@@ -258,12 +258,47 @@ page edge — on p002 the bottom line sits at −0.09°, so the two disagree by
 2.86°. Refuse the outlier and fall back to the scan edge, or to the opposite
 edge's angle.
 
-WHAT HAS TO BE MEASURED FIRST, corpus-wide: the distribution of (top angle −
-bottom angle) over every page of every issue with a working tree. The guard's
-threshold has to sit above the honest disagreement a real paste-up produces —
-r005 already records that **two printed straights that agree are a scan
-rotation, two groups that disagree are the paste-up** (SH10 001/002 and
-167/168), so some disagreement is real and must survive.
+**MEASURED, SH10, 2026-11-16 — and the cause is not slant, it is bleed.** A
+fit-residual pass over all 168 pages (`tmp/fitres/`) counted, per page per
+edge, the samples lying more than 5 mm off the fitted line. Seven pages carry
+essentially all of it:
+
+| page | samples > 5 mm off | worst edges |
+|---|---|---|
+| 023 | 4,677 | L 4,651 |
+| 002 | 3,292 | L 1,330, T 1,959 |
+| 001 | 3,160 | R 1,430, B 1,725 |
+| 008 | 1,620 | L 810, R 808 |
+| 031 | 1,173 | R 1,044 |
+| 163 | 849 | T 708 |
+| 022 | 729 | R 729 |
+
+After those it falls to ≤ 133 a page, 20-40 per edge almost everywhere — the
+corner rows, which is background.
+
+**Every one of the seven is a 2400 dpi colour or full-bleed page.** That is the
+causal story for this whole family: **boundary detection fails exactly where
+print runs to the trim**, because there is no paper-to-bed transition left for
+the tracer to find. It is looking for an edge the page does not present.
+
+**The slant hypothesis is dead.** Angle data from the same run: |angle| medians
+0.00-0.19°, p90 0.20-0.51°, max 0.72° (147 B) — with 002's top at −2.95° the
+lone outlier. p031's right edge at −0.64° is in the top ten, but nine other
+page-edges are as steep (147, 151, 148, 001, 088, 143) and trace correctly. So
+steepness does not predict failure; bleed does.
+
+This also means the guard cannot be a pure angle test. A rule that refuses a
+line for being steep would reject six good page-edges to catch 002. The guard
+has to key on the EVIDENCE the line stands on — how many samples support it,
+and how far they scatter — with the angle disagreement as corroboration, not as
+the trigger.
+
+STILL TO BE MEASURED, on other issues: the same `fail_gt5` count and angle
+spread over every issue with a working tree, to see whether seven-in-168 is
+typical and whether the bleed correlation holds. r005 already records that
+**two printed straights that agree are a scan rotation, two groups that
+disagree are the paste-up** (SH10 001/002 and 167/168), so some angle
+disagreement is real and must survive any guard.
 
 **Deliberately NOT bundled with `BED_REACH_MM`.** Both change `t.keep`, and
 one 3 h re-derive that moves two things cannot say which one moved the result.
