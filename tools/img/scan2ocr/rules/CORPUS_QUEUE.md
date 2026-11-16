@@ -304,3 +304,20 @@ disagreement is real and must survive any guard.
 one 3 h re-derive that moves two things cannot say which one moved the result.
 Land this on its own, with its own before-and-after ink sweep. When it lands,
 p002's override should become redundant; its record says so.
+
+**WHAT SH10 SHIPPED WITH THIS STILL OPEN, measured 2026-11-16.** The
+`BED_REACH_MM` cap landed first and fixed the depth, not the line, so the
+residue this item describes went into SH10's PDF. Named here so the next issue
+can check whether it moved:
+
+| page | residue | where |
+|---|---|---|
+| 031 | ~384 mm² light strip | between the traced right line and the true paper edge, beside the slate panel the cap restored |
+| 008 | 149,657 px | L/R, 810/808 failed boundary samples |
+| 022 | 61,012 px | R, 729 failed samples |
+
+031 is the useful one to re-measure: the cap moved its deep loss from 5 mm to
+0.5 mm and left this strip untouched, so the two defects are now cleanly
+separated on a single page. `tmp/fitres/gain_031_look.png` shows both at once —
+magenta is what the cap gave back, and the lighter strip to its right is what
+this item still owes.

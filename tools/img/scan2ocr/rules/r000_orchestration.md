@@ -1740,6 +1740,82 @@ about the machinery, not about the output. Metadata identity is not output
 identity; a log line saying a step ran is not the step's result; a row count
 matching is not the rows matching.
 
+### AND A SIXTH: A GATE WHOSE ANSWER THE CHANGE ITSELF ALREADY FIXES
+
+The fifth answers a neighbouring question. This one asks the right question in
+a form the change has already settled, so the measurement is real, the number
+is correct, and it carries no information at all. It is "cannot pass" from the
+table above, but arrived at by reasoning rather than by a bug, which is why
+exercising it in the failing direction would not have caught it — there is no
+input that makes it go green.
+
+MEASURED, SH10, 2026-11-16. Control made one condition non-optional before the
+PDF: after cutting `BED_REACH_MM` from 5.0 to 0.5, **no page may gain retained
+bed**, split by which side of the traced line the gained pixels fall on. Bed
+kept OUTSIDE the line is cropped at the a4 window and costs the reader nothing;
+bed kept INSIDE it is damage.
+
+The builder refused the split and was right. Read `r005_masters_sheet.py`: the
+cap only withdraws the drop from pixels between D and 5 mm **inside** the line
+— `near` is true outside the page as well, so a bed sliver still goes whole at
+either cap. **Every pixel a smaller cap restores is inside the line by
+construction.** The split could only ever return 100 % inside / 0 % outside,
+and it did, on all three moved pages: 031 112,847 px, 163 5,823 px, 001
+2,566 px, all inside, all at depth 0.5–5.0 mm, with `keep(0.5) ⊇ keep(5)`
+holding everywhere. A gate that returns the same answer whether the change
+repaired the page or ruined it is not a gate.
+
+**So before making a check a gate, state what a PASS would look like and
+check that the change can produce one.** If the mechanism forces the answer,
+the question is about the mechanism, not the output — ask a different one.
+
+**THE QUESTION THAT DID WORK WAS NOT GEOMETRIC.** The restored pixels are
+inside the line either way; what matters is whether they are print or bed. That
+is a colour question, and it separated instantly against each page's own bed
+(luminance, and blue-minus-red, measured on bed > 1 mm outside the line):
+
+| page | restored | that page's bed | verdict |
+|---|---|---|---|
+| 031 | 54.9 / −10.4 | 39.8 / −0.3 | the slate panel — PRINT |
+| 163 | 49.7 / −25.0 | 33.9 / +1.3 | the olive field's own dots — PRINT |
+| 001 | 41.6 / −3.4 | 32.3 / +2.6 | too close to call on colour |
+
+001 is the instructive row: nine luminance apart and six on B−R is not a
+separation, and colour alone would not have cleared it. It was cleared by
+geometry after all — its 2,559 px lie at sheet x 19–361 and its a4 window
+starts at x 383, so none of them ship. **Two different questions were needed
+for three pages, and neither one answered all three.**
+
+And both were confirmed by eye on `gain_{031,163}_look.png` before the gate was
+called satisfied. The crop settles in a second what the statistics argue: on
+031 the magenta carries the panel's halftone grain while the bed is flat and
+plainly separate beside it.
+
+### AND A DETECTOR'S POSITIVE CLASS CAN SWALLOW THE THING IT PROTECTS
+
+The sweep built to guard this change classed bed as **dark and neutral**. So
+does a slate halftone panel. On 031 the sweep therefore reported 35,605 px of
+"retained bed" that were the panel itself — it called the repair the damage.
+
+**A detector is measured against the page's own print before it is trusted, not
+only against the page's own bed.** Plant print in the positive class and see
+whether it is rejected. If the test for X also accepts not-X, a page that
+"gains X" may have gained not-X, and the sweep will argue confidently for
+reverting a fix.
+
+### AND A BEFORE/AFTER WINDOW MUST NOT BE DERIVED FROM WHAT CHANGED
+
+The same sweep measured bed-coloured pixels **within 2 mm of the bed the drop
+removed**. The smaller cap removes far less bed, so the window shrank with the
+change it was measuring, and 163 read 8,312 px BETTER — a page cannot be
+cleaner for having cleaned less, and that impossibility is the only reason it
+was questioned. Re-anchored to the traced line, which does not move, 163
+rises 44,329 → 47,177, the opposite direction.
+
+**So both runs are measured in a frame fixed by something the change cannot
+touch.** A window defined by the altered quantity reports the change as
+improving whatever it worsened, and the sign of the error is the convenient
+one.
 ### AND A NEGATIVE CLAIM NEEDS THE SWEEP THAT WOULD HAVE FOUND A POSITIVE
 
 "None of X" is the easiest sentence to write and the hardest to support. Twice

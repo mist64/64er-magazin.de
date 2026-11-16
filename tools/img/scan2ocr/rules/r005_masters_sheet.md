@@ -876,6 +876,36 @@ print to the scan's edge with no bed column at all.
 builder ran it BEFORE, which is the same work and prevents the defect instead
 of detecting it.
 
+**AND THE SAME TEST IS WHAT CLEARED THE 0.5 mm CAP.** Cutting `BED_REACH_MM`
+widens `keep` on every page at once, so the question "what exactly does this
+newly keep" is the whole of the verification. MEASURED, 2026-11-16, by running
+`level_and_trace` at 5.0 and 0.5 in the same frame with the trace asserted
+identical (`tmp/fitres/gain.py`):
+
+| page | newly kept | depth | restored lum / B−R | that page's bed | what it is |
+|---|---|---|---|---|---|
+| 031 | 112,847 px | 0.5–5.0 mm | 54.9 / −10.4 | 39.8 / −0.3 | the slate panel |
+| 163 | 5,823 px | 0.5–4.97 mm | 49.7 / −25.0 | 33.9 / +1.3 | the olive field's dots |
+| 001 | 2,566 px | 0.5–1.14 mm | 41.6 / −3.4 | 32.3 / +2.6 | **colour cannot say** |
+| all other 165 | 0 px | — | — | — | byte-identical by sha256 |
+
+Three things this says that the p002 measurement above does not:
+
+**The reference is the page's own bed, not a constant.** Bed luminance runs
+32.3 to 39.8 across three pages of one issue. A fixed threshold would have
+called 001's restored pixels bed and 031's panel bed as well.
+
+**Colour does not always separate, and the failure is quiet.** 001 is nine
+luminance and six B−R from its own bed — not a separation. It was cleared
+instead by the window: the pixels lie at sheet x 19–361 and r005b's window for
+001 starts at x 383, so none of them ship. **Have the second question ready;
+the first one will fail on some page.**
+
+**Look at the crop before calling it.** `gain_031_look.png` settles in one
+second what the table argues: the magenta carries the panel's halftone grain,
+and the flat bed is plainly separate beside it. The before-half shows the
+panel truncated at a straight edge, which is the defect in one picture.
+
 ### TWO PRINTED STRAIGHTS THAT AGREE ARE A SCAN ROTATION; TWO GROUPS THAT DISAGREE ARE THE PASTE-UP
 
 The measurement that decides whether to level a page is not one angle, it is

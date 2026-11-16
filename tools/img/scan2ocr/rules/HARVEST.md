@@ -3294,3 +3294,61 @@ the ink sweep ran only after he asked for it. The skewed title and the
 mis-classed colour pages, earlier the same night, passed the same way. **A
 sweep over our artefacts cannot see what is missing from them.** The plate is
 the only check that can, and the owner is currently the fastest reader of it.
+
+## SH10, 2026-11-16: the gate control made non-optional could not pass, and the sweep behind it called the repair the damage
+
+The 0.5 mm `BED_REACH_MM` cap was built, swept both ways and held back from the
+PDF by one condition control declared non-optional: **no page may gain retained
+bed.** All three parts of that condition turned out to be wrong, and the
+builder found all three. Nothing in the cap itself changed.
+
+### THE GATE COULD NOT PASS, AND THE REASON WAS GEOMETRY, NOT A BUG → r000
+
+Control asked for the gained pixels split by which side of the traced line they
+fell on — outside is cropped at the window and harmless, inside is damage. But
+the cap only withdraws the drop from pixels between D and 5 mm **inside** the
+line; `near` is true outside the page too, so a sliver still goes whole at
+either cap. **Every pixel a smaller cap restores is inside by construction.**
+The split returned 100 / 0 on all three moved pages, as it would have for any
+change of this kind, correct or catastrophic.
+
+This is "cannot pass" from r000's table, reached by reasoning rather than by a
+defect, so the standing remedy — exercise it in the failing direction — would
+not have caught it: no input makes it green. The new remedy is the mirror of
+the old one: **state what a PASS would look like and check the change can
+produce one.** → r000, sixth way a check misleads.
+
+### THE SWEEP'S POSITIVE CLASS INCLUDED THE THING IT WAS GUARDING → r000
+
+The bed-retained sweep defined bed as dark and neutral. So is a slate halftone
+panel. On 031 it reported 35,605 px of "retained bed" that were the panel —
+**it counted the repair as the damage** and would have argued for reverting the
+fix. A detector is now measured against the page's own print before it is
+trusted, not only against the page's own bed.
+
+### AND ITS WINDOW WAS DERIVED FROM WHAT THE CHANGE ALTERED → r000
+
+It measured within 2 mm of **the bed the drop removed**. The smaller cap
+removes less, so the window shrank with the change, and 163 read 8,312 px
+better. A page cannot be cleaner for having cleaned less, and that
+impossibility is the only reason anyone looked; re-anchored to the traced line,
+163 rises 44,329 → 47,177, the other way. Both runs are now measured in a frame
+the change cannot touch.
+
+### WHAT ACTUALLY DECIDED IT WAS COLOUR, AND IT FAILED ON ONE PAGE OF THREE → r005
+
+Restored vs that page's own bed: 031 54.9 / −10.4 against 39.8 / −0.3, 163
+49.7 / −25.0 against 33.9 / +1.3 — both plainly print. 001 reads 41.6 / −3.4
+against 32.3 / +2.6, which is not a separation. It was cleared by a second
+question: its 2,559 px lie at sheet x 19–361 and its window starts at x 383, so
+none ship. **Two questions were needed for three pages and neither answered all
+three** — the record now says to have the second ready. Both verdicts were
+confirmed on the crop before the gate was called satisfied.
+
+### THE SHAPE OF THIS ENTRY
+
+Control wrote the gate, the sweep was built to serve it, and both were wrong in
+the same direction: they measured the mechanism rather than the page. The
+builder refused the gate, disproved the sweep twice, and supplied the
+measurement that worked. **A supervisor's condition is not evidence, and
+"non-optional" is not a reason to run a check that cannot pass.**
