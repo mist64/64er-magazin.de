@@ -968,6 +968,28 @@ above is correct only for `SH8501`–`SH8608`. The two shapes do not overlap:
 there was never a *Sonderheft 9* of 1986 in the old numbering, because 1986's
 ninth is this one.
 
+**AND THE CORRECTION REACHED THIS PROSE AND NONE OF THE COMMANDS — FOR TWO
+DAYS.** SH10, 2026-11-16: the build stamped `Sonderheft 10/86` and had to be
+re-stamped after delivery. The paragraph above had said otherwise since the
+14th, and so had the table at the top of this rule. But **all three copyable
+places still carried `NN/YY`**: the Verification's expected `Title`, the
+`make_issue_pdf_mixed.sh` invocation, and step 5's `T=` line. Nobody builds
+from a paragraph. They build from the block they can paste.
+
+So when an owner correction lands on a value this rule also shows in a command:
+**grep the rule for the OLD value and fix every hit, then grep for the new one
+and confirm it appears in each command, not only in the explanation.** A rule
+that contradicts itself is worse than one that is simply wrong, because the
+reader who checks finds agreement at whichever site they happen to open.
+
+The same sweep found the second defect in the same recipe: `exiftool -Author=`
+writes DocInfo `/Author` **and** XMP `pdf:Author`, a key the pdf: namespace does
+not define and that no other issue in the archive carries — `dc:creator` is the
+right home and the mixed build already sets it. Step 5 now clears it with
+`-XMP-pdf:Author=` in the same call. SH10 was re-stamped to match the other
+eighteen Sonderhefte; the fix cost 47 bytes and no re-encode, with all 336
+image and content streams sha-identical.
+
 The reason the shape matters: `64'er ` + issue tag is the only string a reader,
 a library catalogue or a file manager ever sees for the document, and it is the
 one place a monthly and a Sonderheft of the same month are told apart. `64'er
@@ -1046,8 +1068,9 @@ writes them, set them by hand with the file's own mtime.
 pdfinfo "$PDF" | grep -E '^(Title|Author|Subject|Keywords|CreationDate|ModDate):'
 ```
 
-- `Title` is `64'er Sonderheft NN/YY` (Sonderheft) or `64'er MM/YY` (monthly),
-  and `pdfinfo -meta` shows the same string in `dc:title`
+- `Title` is `64'er Sonderheft N` (Sonderheft **from SH09**), `64'er Sonderheft
+  NN/YY` (Sonderheft **to SH8608**) or `64'er MM/YY` (monthly), and
+  `pdfinfo -meta` shows the same string in `dc:title`
 - `Author` is `Markt & Technik`
 - no `Subject`, no `Keywords`
 - `CreationDate` and `ModDate` present and equal
@@ -1308,7 +1331,8 @@ let the search run for a first build or after a grading change:
 ```sh
 TITLE_PNG=<repo>/issues/<ID>/title.png QMIN=95 QMAX=95 \
   FORCE_CONTONE="007 031" FORCE_BILEVEL="003 004 …" JOBS=28 \
-  tools/img/issue_pdf/make_issue_pdf_mixed.sh <A4> <tmp>/<name>.pdf "Sonderheft NN/YY"
+  tools/img/issue_pdf/make_issue_pdf_mixed.sh <A4> <tmp>/<name>.pdf "Sonderheft N"
+# "Sonderheft N" from SH09 on; "Sonderheft NN/YY" only for SH8501-SH8608; "MM/YY" monthly
 ```
 
 **EVERY PAGE DECIDED COLOUR AGAINST THE CLASSIFIER GOES IN `FORCE_CONTONE`,
@@ -1357,9 +1381,11 @@ incremental update — no re-encode, ~4 KB):
 
 ```sh
 D=$(date -r <tmp>/<name>.pdf "+%Y:%m:%d %H:%M:%S%z" | sed 's/\(..\)$/:\1/')
-T="64'er Sonderheft NN/YY"          # or "64'er MM/YY" for a monthly
+T="64'er Sonderheft N"              # from SH09 on -- no year, no zero padding.
+                                    # "64'er Sonderheft NN/YY" only for SH8501-SH8608;
+                                    # "64'er MM/YY" for a monthly.
 exiftool -overwrite_original -Title="$T" -XMP-dc:Title="$T" \
-  -Author="Markt & Technik" \
+  -Author="Markt & Technik" -XMP-pdf:Author= \
   -PDF:CreateDate="$D" -PDF:ModifyDate="$D" \
   -XMP-xmp:CreateDate="$D" -XMP-xmp:ModifyDate="$D" <tmp>/<name>.pdf
 ```
