@@ -158,6 +158,56 @@ EDGE_TOP_MAX_MM = 3.0        # traced top further below the frame's top than thi
 EDGE_BOT_MAX_MM = 12.0       # traced bottom further above the frame's foot than this: ink
 EDGE_OUTER_MAX_MM = 8.0      # traced outer edge further into the frame than this: ink
 EDGE_TILT_MAX = 1.0          # deg; a levelled page's trim is level
+# AND 8 mm IS 8610'S FRAME, NOT EVERY FRAME.  MEASURED on 8702, 2026-11-16:
+# the operator split each A3 at H/2-360, so every ODD half carries +720 px --
+# 7.6 mm at 2400 dpi -- and its outer trim sits 4.5-6.8 mm in where an even
+# page's sits 0.0-0.3.  On 4 of 12 odd sample pages the correct paper trace ran
+# 9.0-12.7 mm in, over the limit, and was overruled as "ink to the trim": the
+# frame column was used and 1.3-2.3 mm of textured neutral bed went into the
+# master.  About 30 pages of the issue would have shipped that way.
+#
+# The limit STAYS -- an edge that deep usually is ink, and 8610's p149 is a
+# black column 13.5 mm in.  What changes is that crossing it is no longer the
+# end of the question.  ASK WHAT IS IN THE BAND: beyond a trim lies bed, which
+# is neutral, dark and runs to the frame edge, and beyond an ink edge lies more
+# page.  That is the same discrimination backing_outer() already makes for a
+# narrow leaf, with the same three parts -- how much of the band is backing,
+# how neutral it is, and whether what sits just INSIDE the traced line is paper.
+# A trim is paper-white ending in neutral black; ink to the trim is not.
+OUTER_BED_FRAC = 0.70        # the overruled band is at least this much backing...
+OUTER_BED_CHROMA = 18.0      # ...and this neutral: 8702's p141 green ad art reads
+                             # RGB 24 32 27 (chroma 8 per px but 24+ in the mean
+                             # over its halftone) against a neutral bed
+OUTER_BED_PAPER_LUM = 150.0  # ...and the strip just inside the trace is paper
+                             # (NARROW_STEP_LUM, the same test and the same number)
+
+
+def outer_band_is_bed(rgb, par, line, depth_mm):
+    """True when what lies BEYOND the traced outer edge is bed, not ink.
+
+    None when it cannot be read, which the caller treats as "no" -- the frame
+    column is the documented fallback and stays the default on any doubt.
+    """
+    h, w = rgb.shape[:2]
+    x = int(np.polyval(line, h / 2.0))
+    y0, y1 = int(h * .1), int(h * .9)
+    band = rgb[y0:y1, :x] if par == "even" else rgb[y0:y1, x + 1:]
+    if band.size == 0:
+        return None
+    bed = float(backing_mask(band).mean())
+    chroma = float((band.max(2).astype(int) - band.min(2)).mean())
+    i0, i1 = ((x + int(MM), x + int(3 * MM)) if par == "even"
+              else (x - int(3 * MM), x - int(MM)))
+    i0, i1 = max(i0, 0), min(i1, w)
+    if i1 <= i0:
+        return None
+    inside = float(rgb[int(h * .2):int(h * .8), i0:i1].mean())
+    ok = (bed >= OUTER_BED_FRAC and chroma <= OUTER_BED_CHROMA
+          and inside >= OUTER_BED_PAPER_LUM)
+    print("  outer edge %.2f mm in (over %.1f): band %.0f%% backing, chroma %.1f, "
+          "paper inside %.0f -> %s" % (depth_mm, EDGE_OUTER_MAX_MM, 100 * bed,
+          chroma, inside, "BED, trace KEPT" if ok else "ink, frame used"), flush=True)
+    return bool(ok)
 PROP_FOOT_MM = 15.0          # the backing's top is looked for this far up
 PROP_AT_FOOT_MM = 2.0        # ...in columns whose backing starts within this of it
 # THE FOOT UNDER THE SHEET IS NOT ALWAYS THE YELLOW PROP.  MEASURED on the
@@ -296,7 +346,8 @@ def outer_edges(rgb, par):
             e = {"top": trace(tops, cols, CLEAN_PCT, MM),
                  "bot": trace(bots, cols, CLEAN_PCT, MM),
                  "outer": trace(starts if par == "even" else ends, rows, CLEAN_PCT, MM),
-                 "source": "paper", "body": body, "replaced": []}
+                 "source": "paper", "body": body, "replaced": [],
+                 "kept_bed": []}
             # each edge against the frame: how far in, and how tilted
             top_in = np.polyval(e["top"], w / 2) / MM
             bot_in = (h - 1 - np.polyval(e["bot"], w / 2)) / MM
@@ -307,6 +358,14 @@ def outer_edges(rgb, par):
                                       ("outer", outer_in, EDGE_OUTER_MAX_MM)):
                 t = tilt(e[key])
                 if depth > limit or abs(t) > EDGE_TILT_MAX:
+                    # Over the depth limit on the OUTER edge, and level: the
+                    # band beyond it decides.  Bed there means the trace was
+                    # right and this frame is simply wider than 8610's.
+                    if (key == "outer" and depth > limit
+                            and abs(t) <= EDGE_TILT_MAX
+                            and outer_band_is_bed(rgb, par, e["outer"], depth)):
+                        e["kept_bed"].append([key, float(depth), float(t)])
+                        continue
                     e["replaced"].append([key, float(depth), float(t)])
                     if key == "bot":
                         pt = backing_top(rgb)
@@ -322,7 +381,7 @@ def outer_edges(rgb, par):
             "bot": np.array([0.0, h - 1.0]) if bot is None else bot,
             "outer": frame["outer"] if narrow is None else narrow,
             "source": "fullbleed" if narrow is None else "narrow",
-            "body": body, "replaced": []}
+            "body": body, "replaced": [], "kept_bed": []}
 
 
 # --- the fold: the clip holes --------------------------------------------
@@ -849,6 +908,9 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
                      f"of bed from the outer frame edge -- a leaf printed NARROWER "
                      f"than A4 (a bound-in card); the bed is fabricated white, so "
                      f"`unknown` is large BY DESIGN. LOOK AT, not a failure")
+    for key, depth, t in edges.get("kept_bed", []):
+        notes.append(f"EDGES {key} kept at {depth:.2f} mm (over "
+                     f"{EDGE_OUTER_MAX_MM:.0f}): the band beyond it is bed, not ink")
     for key, depth, t in edges["replaced"]:
         notes.append(f"EDGES {key} from the {'prop' if key == 'bot' else 'frame'}: "
                      f"the paper trace ran {depth:.1f} mm in at {t:+.2f} deg -- ink to the trim")
@@ -876,7 +938,8 @@ def measure_geometry(rgb, page, angle, residual, notes, tmpl):
         "skew": {"angle": angle, "residual": residual},
         "edges": {**{k: [float(v) for v in edges[k]] for k in ("top", "bot", "outer")},
                   "source": edges["source"], "body": edges["body"],
-                  "replaced": edges["replaced"]},
+                  "replaced": edges["replaced"],
+                  "kept_bed": edges.get("kept_bed", [])},
         "fold": {"source": source,
                  "poly": None if fold is None else [float(v) for v in fold["poly"]],
                  "n": 0 if fold is None else fold["n"],

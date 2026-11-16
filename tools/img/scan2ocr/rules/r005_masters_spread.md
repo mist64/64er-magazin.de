@@ -750,6 +750,32 @@ margin, and never lose ink.
 The **inner** side is not traced. The neighbour half of the sheet is paper
 too, and the paper mask cannot see the fold.
 
+### THE OUTER LIMIT IS ONE FRAME'S SLACK, SO THE BAND BEYOND IT DECIDES
+
+`EDGE_OUTER_MAX_MM` is 8 because 8610's frame has at most 8 mm of slack over A4
+beyond the fold. **A frame is not a constant.** MEASURED on 8702: the operator
+split each A3 at `H/2-360`, so every odd half carries +720 px — 7.6 mm at 2400
+dpi — and its outer trim sits 4.5–6.8 mm in where an even page's sits 0.0–0.3.
+On 4 of 12 odd sample pages the correct paper trace ran 9.0–12.7 mm in, crossed
+the 8 mm limit, was overruled as "ink to the trim", and the frame column put
+1.3–2.3 mm of textured neutral bed into the master. About 30 pages would have
+shipped that way.
+
+The limit stays — an edge that deep usually *is* ink, and 8610's p149 is a black
+column 13.5 mm in. What changed is that crossing it is no longer the end of the
+question. **Beyond a trim lies bed; beyond an ink edge lies more page**, and
+`outer_band_is_bed()` asks which, with the three parts `backing_outer()` already
+uses for a narrow leaf: how much of the band is backing (`OUTER_BED_FRAC` 0.70),
+how neutral it is (`OUTER_BED_CHROMA` 18 — 8702's p141 green ad art is dark but
+not neutral), and whether the strip just INSIDE the traced line is paper
+(`OUTER_BED_PAPER_LUM` 150, the same number as `NARROW_STEP_LUM`). A trim is
+paper-white ending in neutral black. Anything it cannot read falls back to the
+frame column, which stays the default on any doubt.
+
+A kept edge is recorded: `kept_bed` in `geometry/NNN.json` beside `replaced`,
+and a NOTE naming the depth and why it was kept. **Read that list on every
+sweep** — it is the list of pages where a measurement overruled a constant.
+
 ### The fold — a line through the clip holes
 
 The clip's punches left dark teardrops on the fold, on the **same line as the
