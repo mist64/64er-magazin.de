@@ -468,7 +468,7 @@ issues/<ID>/field_high.txt       ...beside that class's colors.txt  (r005_field.
 
 ## HAND THE OWNER THEIR TWO FILES NOW — and do not stop
 
-Two of the three owner inputs are ready the moment this step is, and both
+Two of the four owner inputs are ready the moment this step is, and both
 are work the owner does **by hand**. Owner, 2026-10-05: **as soon as either is
 available, tell me and `open` it — and do not stop.** See r000, *An OWNER
 DELIVERABLE is handed over the MOMENT it exists*.

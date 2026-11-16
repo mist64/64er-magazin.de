@@ -216,7 +216,7 @@ rule's header to make a particular build go through. A rule that turns out to
 apply to both kinds is re-classified `all` **with the evidence in the commit
 message**, permanently, for every issue after it too.
 
-## THE SHAPE OF A BUILD: THREE OWNER INPUTS, EACH BLOCKING ONE THING
+## THE SHAPE OF A BUILD: FOUR OWNER INPUTS, EACH BLOCKING ONE THING
 
 **There are no pauses.** Owner, 2026-11-06: *"pause 1 isn't a pause any more...
 pause 2 isn't a pause, it just blocks progress on two things."* The word is gone
@@ -229,22 +229,35 @@ on owner input, and they are independent of one another.**
 | 1 | the cover source, `<tmp>/title_source_150.png` | `title.png`, retouched by hand | **the PDF** |
 | 2 | the crop worklist, and `<tmp>/sheets600/` to cut from | the cut figures | **the HTML** |
 | 3 | the marks census, each mark with a magnified crop | `dirt` / `a previous hand` / `the plate` for each, and a repainted master for the first two | **the PDF** |
+| 4 | every Futureteufelchen candidate, each with the page, our divergence and the question in one sentence | `yes` / `no` for each, one at a time | **the HTML** |
 
-**The PDF is blocked on TWO owner inputs, 1 and 3. The HTML is blocked on ONE,
-input 2.** Neither artefact waits for the other: the PDF can be finished while
+**The PDF is blocked on TWO owner inputs, 1 and 3. The HTML is blocked on TWO,
+2 and 4.** Neither artefact waits for the other: the PDF can be finished while
 the figures are still being cut, and the HTML can be finished while the marks
 are still being ruled on. The issue is done when both are.
 
 So there is no single moment the owner is "at" the build, and no moment the
-chain is idle. There are three deliveries out and three answers back, each one
+chain is idle. There are four deliveries out and four answers back, each one
 unblocking exactly what the table says and nothing else.
+
+**Input 4 is the one that is usually EMPTY, and that is not the same as absent.**
+Owner, 2026-11-15, verbatim: *"they ALWAYS need to be OKed by me"* — so a
+Futureteufelchen never ships on the chain's own judgement, and r300 is where the
+candidate list is built and filtered. Its default answer is no: of the six put
+to the owner on 8701 he took **none**. Two consequences, and they pull in
+opposite directions on purpose. A build with no candidates still reports "0
+Futureteufelchen candidates" rather than saying nothing, because silence does
+not distinguish none-found from not-looked. And a build with candidates asks
+them **one at a time, with the page and the divergence**, never as a batch to
+be waved through. The list travels with input 2's hand-over rather than as a
+fourth delivery of its own; it is a fourth ANSWER, not a fourth parcel.
 
 **Binding and paper are NOT owner inputs.** The chain derives both from the scan
 and records them — binding on 2026-10-08, paper on 2026-11-02. What this file
 called "PAUSE 1" ceased to exist then; the heading here still announced it for a
 month afterwards, and the 8701 build read that as licence to ask.
 
-Apart from those three, the chain runs unattended -- it does not ask, it does
+Apart from those four, the chain runs unattended -- it does not ask, it does
 not wait, and it does not experiment. Everything it needs is either in these
 files or derivable from the scan; where it is not, that is a **defect in these
 files** and fixing it is part of the work (see *THE SCAN IS THE ONLY INPUT*).
@@ -996,7 +1009,7 @@ Several steps turn up something only the owner can settle:
 
 | step | what it finds |
 |---|---|
-| 300 | a Futureteufelchen -- our own correction to the printed page. **Each one needs the owner's authorisation**, every time |
+| 300 | a Futureteufelchen -- our own correction to the printed page. **Each one needs the owner's authorisation**, every time: it is OWNER INPUT 4 above, and it blocks the HTML |
 | 325 | a passage that reads wrong and may be the scan or may be the print |
 | any | a reader-visible defect the rule cannot resolve from the page |
 

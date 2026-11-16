@@ -11,6 +11,13 @@
 >
 > This applies to BOTH allowed cases — our own repair or divergence, and a
 > reprint missing its original's erratum. Neither is self-approving.
+> 
+> **This is OWNER INPUT 4** (r000, *THE SHAPE OF A BUILD*): the candidate
+> list goes out with the crop worklist, each candidate carries its page, our
+> divergence and the question in one sentence, they are asked ONE AT A TIME,
+> and the HTML is blocked until every answer is back. A build that found none
+> says so -- "0 Futureteufelchen candidates" -- because silence does not
+> distinguish none-found from not-looked.
 
 **Applies to:** all — **this is a correction to the spec's first pass.** The rule does not build a Fehlerteufelchen rubric — it applies errata printed in LATER monthlies to THIS issue's articles, and later monthlies corrected Sonderheft articles too. 26 articles across `SH8501`-`SH8508` already carry `<aside class="fehlerteufelchen">`, and the rule's own step 1 already routes `Sonderheft N/YY → issues/SH<YY><NN>/`.
 
