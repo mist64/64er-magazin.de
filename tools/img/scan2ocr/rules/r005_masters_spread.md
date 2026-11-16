@@ -766,11 +766,31 @@ column 13.5 mm in. What changed is that crossing it is no longer the end of the
 question. **Beyond a trim lies bed; beyond an ink edge lies more page**, and
 `outer_band_is_bed()` asks which, with the three parts `backing_outer()` already
 uses for a narrow leaf: how much of the band is backing (`OUTER_BED_FRAC` 0.70),
-how neutral it is (`OUTER_BED_CHROMA` 18 — 8702's p141 green ad art is dark but
-not neutral), and whether the strip just INSIDE the traced line is paper
-(`OUTER_BED_PAPER_LUM` 150, the same number as `NARROW_STEP_LUM`). A trim is
-paper-white ending in neutral black. Anything it cannot read falls back to the
-frame column, which stays the default on any doubt.
+how neutral it is (`OUTER_BED_CHROMA` 18), and whether the strip just INSIDE
+the traced line is paper (`OUTER_BED_PAPER_LUM` 150, the same number as
+`NARROW_STEP_LUM`). A trim is paper-white ending in neutral black. Anything it
+cannot read falls back to the frame column, which stays the default on any doubt.
+
+**The two tests reject different things, and only one of them rejects dark art.**
+VALIDATED on 8702's 25-page sample; the first version of this rule guessed that
+p141's green ad would be caught by chroma and it is not.
+
+| | chroma | paper inside | |
+|---|---|---|---|
+| real bed — 067/081/091/121 | 2.0–2.9 | 178–196 | **trace kept** |
+| dark art — p141, green ad | 4.5–11.0 | 32–36 | frame |
+| saturated — p051, yellow prop | 27–53 | 137–130 | frame |
+
+`OUTER_BED_PAPER_LUM` does the real work: inside a trim is paper, inside an ink
+edge is more art. The chroma test earns its place on the *other* case, a
+saturated prop or ground, refused before the inside strip is read. Neither alone
+is the test.
+
+**And the whole check is only reached on the traced path.** A full-bleed page
+returns from `outer_edges()` before the limit loop, so p141 and p051 are silent
+because they are never asked, not because they were tested and refused — their
+figures above were measured by hand for exactly that reason. A test that is
+never called on the hard case has not passed it.
 
 A kept edge is recorded: `kept_bed` in `geometry/NNN.json` beside `replaced`,
 and a NOTE naming the depth and why it was kept. **Read that list on every

@@ -3483,3 +3483,25 @@ Note which way the empty set could have gone: `np.median([])` returns `nan`
 with a warning, and `nan` would have flowed into the window placement and cut
 the whole issue wrong. The IndexError three characters further on is the only
 reason this was a stop rather than a silent miscut.
+
+### AND THE COMMENT THAT CARRIED THE FIX ASSERTED A NUMBER NOBODY HAD MEASURED → r005 spread
+
+Control wrote the outer-edge fix with three tests and a comment explaining what
+each was for. The chroma threshold's justification — that 8702's p141 green ad
+art "reads chroma 8 per px but 24+ in the mean over its halftone" — was
+**reasoned, not measured.** The builder measured it at 9, 12, 15 and 20 mm in,
+on the ungraded thumbs and again on the 600 dpi raw: **4.5 to 11.0**. The art
+never comes near 18, and the test credited with rejecting it rejects nothing of
+the sort. What actually rejects p141 is the paper-inside test.
+
+The fix was right and the reasoning under it was invented. That is the more
+dangerous shape, because a wrong constant fails loudly on the next issue while a
+wrong REASON gets copied forward into the next test someone writes from it. A
+number in a comment is a claim with the same standing as a number in a report:
+it carries the command that produced it, or it says "estimated".
+
+**And the hard cases were never put to the test at all.** p141 and p051 are
+full-bleed, so `outer_edges()` returns before the limit loop and the check is
+never called on them; they were silent because they were not asked. The builder
+saw that and ran the three statistics by hand rather than reporting a pass.
+Silence from a branch that does not execute is not evidence.

@@ -174,12 +174,28 @@ EDGE_TILT_MAX = 1.0          # deg; a levelled page's trim is level
 # narrow leaf, with the same three parts -- how much of the band is backing,
 # how neutral it is, and whether what sits just INSIDE the traced line is paper.
 # A trim is paper-white ending in neutral black; ink to the trim is not.
+# THE TWO TESTS REJECT DIFFERENT THINGS, AND ONLY ONE OF THEM REJECTS DARK ART.
+# VALIDATED on 8702's 25-page sample, 2026-11-16, and the first version of this
+# comment was wrong: it said p141's green ad art would read "24+ in the mean
+# over its halftone", which was reasoned and not measured.  MEASURED, at 9, 12,
+# 15 and 20 mm in, on the ungraded thumbs and again on the 600 dpi raw: chroma
+# 4.5-11.0, band median RGB 34 34 35.  So p141 passes the chroma test easily
+# and OUTER_BED_CHROMA does not separate it at any resolution.
+#
+#   real bed   (067/081/091/121)  chroma 2.0-2.9   paper inside 178-196  -> KEPT
+#   dark art   (p141, green)      chroma 4.5-11.0  paper inside  32-36   -> frame
+#   saturated  (p051, yellow)     chroma 27-53     paper inside 137-130  -> frame
+#
+# **OUTER_BED_PAPER_LUM is the discriminator**: what sits just inside the traced
+# line is paper where the line is a trim, and more art where it is not. The
+# chroma test earns its place on the OTHER case -- a saturated prop or ground,
+# which is bright enough in chroma to be refused before the inside strip is even
+# read. Each rejects what the other cannot. Neither alone is the test.
 OUTER_BED_FRAC = 0.70        # the overruled band is at least this much backing...
-OUTER_BED_CHROMA = 18.0      # ...and this neutral: 8702's p141 green ad art reads
-                             # RGB 24 32 27 (chroma 8 per px but 24+ in the mean
-                             # over its halftone) against a neutral bed
-OUTER_BED_PAPER_LUM = 150.0  # ...and the strip just inside the trace is paper
-                             # (NARROW_STEP_LUM, the same test and the same number)
+OUTER_BED_CHROMA = 18.0      # ...this neutral (rejects a saturated prop/ground)...
+OUTER_BED_PAPER_LUM = 150.0  # ...and the strip just inside the trace is PAPER --
+                             # the test that does the real work here.
+                             # NARROW_STEP_LUM, the same test and the same number.
 
 
 def outer_band_is_bed(rgb, par, line, depth_mm):
@@ -187,6 +203,12 @@ def outer_band_is_bed(rgb, par, line, depth_mm):
 
     None when it cannot be read, which the caller treats as "no" -- the frame
     column is the documented fallback and stays the default on any doubt.
+
+    ONLY REACHED ON THE TRACED PATH.  A full-bleed page (body < FULLBLEED_BODY_FRAC)
+    never gets here at all: outer_edges() returns before the limit loop, so
+    p141 and p051 are silent because they are not asked, not because they were
+    tested and refused.  Their numbers above were measured by hand for exactly
+    that reason -- a test that is never called on the hard case has not passed it.
     """
     h, w = rgb.shape[:2]
     x = int(np.polyval(line, h / 2.0))
