@@ -23,10 +23,27 @@ from collections import defaultdict
 
 
 def sonderheft_key(issue_code):
-    """SH8602 -> '2/86'.  The Sonderheft CSV keys on the magazine's running
-    Sonderheft number and the year, not on the directory name."""
+    """SH8602 -> '2/86'; SH09 -> '9'.  The Sonderheft CSV keys on the magazine's
+    running Sonderheft number, not on the directory name -- and it keys it the
+    way the magazine itself printed it, which CHANGES AT SH09.
+
+    MEASURED on the CSV, 2026-11-16: its issue column holds '1/85' through
+    '8/86' for the sixteen year-form Sonderhefte, then bare '9', '10', '11',
+    '12' and '13'.  That is the same break the titles take (r006 step 5, owner
+    2026-11-16: "no leading zero only for 9+").
+
+    This matched only the four-digit form until now and returned None for
+    SH09 and up, which made r220 apply ZERO rows and say nothing: SH09
+    shipped with no index metadata at all while 30 rows sat in the CSV under
+    key '9', and SH10's 40 were applied through a hand-written wrapper.  A
+    key function that returns None on a valid issue is a silent no-op, which
+    is the one failure a caller cannot see.
+    """
     m = re.match(r'^SH(\d{2})(\d{2})$', issue_code)
-    return f"{int(m.group(2))}/{m.group(1)}" if m else None
+    if m:
+        return f"{int(m.group(2))}/{m.group(1)}"
+    m = re.match(r'^SH(\d{2,})$', issue_code)
+    return str(int(m.group(1))) if m else None
 
 
 def parse_sonderheft_csv(csv_path, issue_code):
@@ -43,6 +60,10 @@ def parse_sonderheft_csv(csv_path, issue_code):
     """
     key = sonderheft_key(issue_code)
     if not key:
+        if issue_code.upper().startswith("SH"):
+            print(f"r220: {issue_code} is a Sonderheft but no CSV key could be formed "
+                  f"from it -- applying 0 rows.  THAT IS A DEFECT in sonderheft_key(), "
+                  f"not an issue without an index.", file=sys.stderr)
         return []
     entries = []
     with open(csv_path, encoding="utf-8") as f:
@@ -57,6 +78,14 @@ def parse_sonderheft_csv(csv_path, issue_code):
                     'subcategory': parts[1].strip(),
                     'title': parts[2].strip(),
                 })
+    # ZERO ROWS IS SAID OUT LOUD.  An empty return is indistinguishable from an
+    # issue the index genuinely does not cover, and that silence is how SH09
+    # shipped with no index metadata while 30 rows sat in the CSV under key '9'.
+    if not entries:
+        print(f"r220: Sonderheft key {key!r} matched 0 rows in {csv_path} -- either "
+              f"the index does not reach this issue yet, or the key is wrong. "
+              f"Check it before accepting an issue with no index metadata.",
+              file=sys.stderr)
     return entries
 
 

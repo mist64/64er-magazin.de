@@ -3505,3 +3505,35 @@ full-bleed, so `outer_edges()` returns before the limit loop and the check is
 never called on them; they were silent because they were not asked. The builder
 saw that and ran the three statistics by hand rather than reporting a pass.
 Silence from a branch that does not execute is not evidence.
+
+## SH09/SH10, 2026-11-16: a key function that returned None on a valid issue, and said nothing
+
+Closed while 8702's sweep ran. `r220_index_meta_apply.sonderheft_key()` matched
+only `^SH(\d{2})(\d{2})$` — the year form — so every counted Sonderheft from
+SH09 on returned `None`, `parse_sonderheft_csv` returned `[]`, and r220 applied
+**zero rows without a word**. SH09 shipped with no index metadata at all while
+30 rows sat in the CSV under key `9`; SH10's 40 were applied through a
+hand-written wrapper, which is how the defect was noticed and not fixed.
+
+### THE CSV KEYS THE WAY THE MAGAZINE PRINTED IT, AND THAT CHANGES AT SH09 → r220
+
+MEASURED on the CSV: its issue column holds `1/85` … `8/86`, then bare `9`,
+`10`, `11`, `12`, `13`. The same break the titles take, and the same one the
+owner ruled on the same day for the PDF titles — *"no leading zero only for 9+"*.
+One break, three places: the PDF title, the site label, the index key. The first
+two were found by the owner's eye; this one was found by a wrapper someone had
+to write to get around it.
+
+### AND ZERO ROWS IS NOW SAID OUT LOUD → r220
+
+The regex was the bug; **the silence was the reason it survived a whole issue.**
+An empty return is indistinguishable from an issue the index does not cover, so
+r220 now prints when a Sonderheft forms no key (a defect) and when a key matches
+no rows (either the index does not reach that issue yet, or the key is wrong).
+Verified across all 33 Sonderheft directories: 21 resolve to a key the CSV
+holds, SH14-SH25 resolve to keys the CSV does not reach yet and say so, and a
+monthly still returns None without a warning.
+
+**What is NOT fixed by this.** SH09 is published and still carries no index
+metadata; applying its 30 rows is an edit to a published issue and waits on the
+owner.
