@@ -2206,13 +2206,21 @@ cannot see, so all six were re-gated rather than moved.
 
 ### AND A RENUMBER MUST REACH EVERY PER-PAGE INPUT, NOT JUST THE RAWS
 
-`REQUIRED_KEYS` names **two** directories of `NNN`-keyed files, and a page-number
-permutation has to reach both:
+A page-number permutation has to reach **every `NNN`-keyed store, whether or
+not the descriptor names it** — and the descriptor plainly does not name them
+all:
 
-| key | what it holds |
-|---|---|
-| `scan_dir` | the raw 2400/600 dpi scans — THE input |
-| `thumb_150` | 150 dpi thumbs the chain derived from them, under `tmp` |
+| store | what it holds | named in descriptor? |
+|---|---|---|
+| `scan_dir` | the raw 2400/600 dpi scans — THE input | yes |
+| `thumb_150` | 150 dpi thumbs the chain derived from them, under `tmp` | yes |
+| `<tmp>/a4win/measured.json` + `NNN.npz` | r005b's own cache of per-page window measurements | **no** |
+
+The third was found the same night as the first two, by the same silent
+failure: r005b kept the pre-rename entries and the cards unified to **3518 px
+instead of 3500**, with nothing missing and nothing raising. So do not work
+from the descriptor's key list — work from "what on disk is named by page
+number", and expect to find stores no key mentions.
 
 MEASURED, SH10, 2026-11-16. The rename reached `scan_dir` and
 `/Volumes/S/png/SH10/thumb/`. It did not reach `thumb_150`
