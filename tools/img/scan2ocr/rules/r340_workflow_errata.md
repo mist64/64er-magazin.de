@@ -178,6 +178,22 @@ last=$(git log -1 --format=%H -- "issues/$ID/")
   && echo "OK: first written at $first, before the final commit" \
   || echo "WARN: written in a single commit -- was it kept as you worked?"
 
+# 2a. AND UNDER SQUASH-ONLY DELIVERY, CHECK 2 CANNOT PASS AT ALL -- this is
+#     structural, not a mid-build accident, and it is the normal case now.
+#     The house rule is ONE squashed commit per finished issue, and nothing
+#     under issues/<ID>/ is committed before it. So at sign-off the file has
+#     ZERO adds, and after the squash `first` and `last` are the SAME commit
+#     by construction. There is no input that makes this check green.
+#     MEASURED on SH10, 2026-11-16: `git log --diff-filter=A -- #     issues/SH10/WORKFLOW_ERRATA.md` returned 0 lines at sign-off.
+#
+#     Do not report this as a failure and do not "fix" it by committing the
+#     file early just to satisfy the check -- that games the evidence this
+#     rule exists to protect. Treat 2b's procedure below as the PRIMARY
+#     record under squash-only, not as a fallback: the per-entry LIVE /
+#     SAME SESSION / LATER classification IS the answer to "was it written
+#     during the build", and it is a better answer than a commit timestamp,
+#     because it is the author saying which of the three each entry was.
+#
 # 2b. AFTER A MID-BUILD HARVEST, CHECK 2 IS NOT EVIDENCE EITHER WAY. Say so
 #     rather than reading its verdict. A reopened file is ADDED late by
 #     construction, so:
