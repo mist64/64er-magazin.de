@@ -2276,6 +2276,30 @@ because a wrong `pHYs` would rescale every millimetre constant in silence.
 A 2400 dpi master runs to about 900 MB, so an issue is
 ~180 GB and nothing about it is cheap to re-make.
 
+**AND THE RULE IS THE SCANNER'S, NOT AN ACCIDENT.** Owner, 2026-11-16, asked
+directly: *"main magazine is scanned at 2400. Sonderhefte are scanned at
+600/2400 depending on bw/color."* So a monthly is 2400 dpi throughout, and a
+Sonderheft is 600 on its black-and-white pages and 2400 on its colour ones —
+which is why SH09 shows 20 pages at 2400 of 168 and SH10 shows 25, exactly the
+colour section and the wrapper. **Nothing has ever been reduced to save space,
+and a 600 dpi page has no 2400 dpi original anywhere.** Still read each page's
+`pHYs`: the policy says what to expect, the chunk says what is there.
+
+**`/Volumes/S` IS NOT TOUCHED WITHOUT THE OWNER SAYING SO, EVERY TIME.** Not
+the raws, not a `thumb/`, not a `tmp/` on that volume, not to free space. It
+holds the only copy of the scans, it has no snapshots and it is excluded from
+Time Machine. A working set goes under `~/DNB/<ID>/tmp`.
+
+MEASURED, and the reason this paragraph exists: on 2026-11-16 control read the
+file sizes of SH09's and SH10's raws against 8701's, saw 24 and 27 GB against
+154, and inferred that published issues' raws had been *reduced* after
+publication — then recommended doing the same to 8701 to free 125 GB. The
+inference was wrong in every part. **The two paragraphs above it already said
+one issue can be both resolutions, and named SH8602's and SH10's colour
+sections page by page.** A measurement of sizes is not a measurement of cause,
+and a corpus-wide practice is the owner's to state, never control's to deduce.
+
+
 ### AND THE OPERATOR'S NOTE BESIDE THE SCANS IS A HINT, NOT A MEASUREMENT
 
 Some scan directories carry a note from whoever made them —
