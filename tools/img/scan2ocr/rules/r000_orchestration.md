@@ -2179,6 +2179,47 @@ earlier, weaker gate assigned is not carried across a reorder: SH10's four
 cards are a flat blue halftone, exactly what the three-column colour gate
 cannot see, so all six were re-gated rather than moved.
 
+### AND A RENUMBER MUST REACH EVERY PER-PAGE INPUT, NOT JUST THE RAWS
+
+`REQUIRED_KEYS` names **two** directories of `NNN`-keyed files, and a page-number
+permutation has to reach both:
+
+| key | what it holds |
+|---|---|
+| `scan_dir` | the raw 2400/600 dpi scans — THE input |
+| `thumb_150` | 150 dpi thumbs the chain derived from them, under `tmp` |
+
+MEASURED, SH10, 2026-11-16. The rename reached `scan_dir` and
+`/Volumes/S/png/SH10/thumb/`. It did not reach `thumb_150`
+(`~/DNB/SH10/tmp/thumb150`) — and **r005 measures skew AND chooses the edge
+finder on the 150 dpi thumb**, not on the raw. So four of the six moved pages
+traced differently from the same raw: new 163 lost 254 px of width (box x0 7 →
+265) and the edge finder flipped, 163/164 going to paper/bed and 167/168 to
+ink/bed.
+
+**Control's own stale list named `thumb150`** — as one of eleven derived
+directories to permute. That was the wrong category and is why neither side
+caught it: it is derived from `scan_dir`, and then it **feeds back in as an
+input to the trace**. Derived does not mean inert. Anything the chain made and
+then reads again is an input from the moment it is read.
+
+**AN INPUT KEYED BY NUMBER FAILS SILENTLY.** This is the whole danger. A stale
+thumb at the right number exists, opens, and yields a perfectly good trace — of
+the wrong page. Nothing is missing, nothing raises, no gate fires. Compare the
+raws, where a permutation that misses a file gives you an immediate error.
+
+**THE CHECK THAT FINDS IT: a moved page's measurements must follow its PIXELS,
+not its NUMBER.** The builder caught this because each page's paper fraction
+tracked its new number — new 163 read 0.147, which is old 163's value, a card's.
+After any renumber, assert for every moved page that its stamp geometry equals
+**its old mapped page's**, and that re-derived thumbs equal their old mapped
+counterparts pixel for pixel (SH10: mean |d| 0.0 on all six, which proved both
+the permutation and the cause at once).
+
+Re-derive the thumbs from the renamed raws rather than permute them — the
+generator is read-only on the scan volume and the equality check above then
+doubles as proof that the raw rename itself was right.
+
 ### A `thumb/` you FIND beside the scans is NOT an input — re-derive it
 
 `/Volumes/S/png/<ID>/thumb/` is **derived data sitting in the input directory**,
