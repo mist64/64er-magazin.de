@@ -1518,6 +1518,51 @@ Every master is **4961 × 7016 px, exactly A4 at 600 dpi, every page**, so
 odd-sized 2400 window; one pixel is 0.04 mm and `r010`'s geometry is
 fractional, so the two issues share a coordinate system to within that.
 
+## A FIGURE'S TILT IS NOT THE PAGE'S SKEW — THE TEXT IS THE PAGE'S REFERENCE
+
+A figure's printed edge is square to the page, so the angle of that edge in a
+LEVELLED master looks like a free, independent measurement of residual page
+skew — independent of the fold, the holes and the trim that r005 actually used.
+It is a good instrument and it is **not** sufficient, because a figure can be
+pasted crooked.
+
+MEASURED on 8702, which is why this section exists. Control proposed
+re-levelling page 148 on this evidence:
+
+```
+page 148   4 figures   +0.265 +0.238 +0.321 +0.194   mean +0.254, spread 0.127
+page 149   4 figures   -0.037 +0.048 +0.053 +0.004   mean +0.017
+```
+
+Four independent figures on one page agreeing to within 0.13°, and the facing
+page square — which reads overwhelmingly like a page-level residual. **It is
+not.** Page 148's TEXT measures **+0.00°**, and 149's +0.00° as well: both
+pages are levelled correctly, and 148's four pictures are tilted **on the
+plate**. They were pasted as a group, crooked, in 1987.
+
+So the tilt stays. *We publish the plate, not this copy* — and a de-rotation
+would have resampled four photographs to paper over a defect that is not ours.
+
+**THE TRAP IS THAT FIGURES CAN AGREE WITH EACH OTHER AND STILL DISAGREE WITH
+THE PAGE.** Control's test was "do several figures on one page agree", which
+treats the figures as their own reference. The page's reference is its TEXT.
+Measure it by projection-profile variance over a text-only band, ±0.8° in 0.02°
+steps, taking the angle of maximum variance.
+
+| text | figures | verdict |
+|---|---|---|
+| tilted | tilted the same way | **page skew — ours.** Re-level, and the figures follow |
+| **level** | **tilted** | **paste-up — the plate's. LEAVE IT**, however many figures agree |
+| level | level | correct |
+| tilted | level | re-level; expect the figures to come out tilted, and leave them |
+
+Run the figure-edge fit as a cheap *screen* — it costs nothing and it finds the
+pages worth looking at — but **never act on it without the text witness**. On
+8702 the screen flagged 093 (+0.330), 148 (+0.254), 066 (−0.182) and 076
+(+0.156); the text witness cleared 148 outright and showed 093 carrying a
+genuine +0.12° of its own, which is a different and much smaller number than
+its figure's.
+
 ## Verification
 
 ```bash

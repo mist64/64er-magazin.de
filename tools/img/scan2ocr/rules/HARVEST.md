@@ -4517,3 +4517,33 @@ Two things worth keeping:
 
 **The builder flagged three; the measurement found ninety.** A report of where
 something is visible is not a measurement of where it is not.
+
+### AND I USED THE FIGURES AS THEIR OWN REFERENCE → r005_masters_spread
+
+The owner, looking at a photograph with white wedges in its corners: *"rotated:
+we could fix the slant too <3"*. I measured before answering, and measured the
+wrong thing.
+
+I fitted every figure's top-edge angle in its levelled master and found page
+148's four figures agreeing at +0.254° (spread 0.127) while page 149's four sat
+at +0.017°. Four independent witnesses on one page, the facing page square: I
+called it page skew, ours, and proposed re-levelling. The builder measured the
+page's TEXT instead — **+0.00°** — so page 148 is levelled correctly and its
+four pictures are tilted **on the plate**, pasted crooked as a group in 1987.
+
+**Figures can agree with each other and still disagree with the page.** My test
+treated the figures as their own reference; the page's reference is its text.
+Had it gone through, four photographs would have been resampled to paper over a
+defect that was never ours — against *we publish the plate* — and the stamp
+would have recorded a correction that made the page worse.
+
+The instrument is still worth having as a SCREEN: it is independent of the
+fold, holes and trim that r005 actually fits on, it costs nothing, and it found
+four pages worth looking at. What it cannot do is reach a verdict alone. The
+rule now carries the four-way table and the requirement that the text witness
+decides.
+
+**Twice in two days I have proposed a repair for something that turned out to
+be the plate** — the clip-punch grow that ate printed ink, and this. Both times
+the artefact looked like ours because it was ugly. *Ugly is not evidence of
+ownership.*
