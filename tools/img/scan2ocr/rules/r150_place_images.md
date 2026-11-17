@@ -1332,7 +1332,7 @@ For **every row of the worklist**, two files in `<tmp>/crops_v1/`:
 |---|---|
 | `<name>.png` | the proposal: the region, cut to the artwork's own boundary |
 | `<name>_1cm.png` | the same region grown **1 cm on all four sides**, for judging the boundary without opening the master |
-| `<name>_1cm_box.png` | the `_1cm` image with a **1 px yellow (`#FFFF00`) rectangle 1 px OUTSIDE** the proposal's boundary, so the cut is visible against its surroundings |
+| `<name>_1cm_box.png` | the `_1cm` image with a **1 px black/white striped rectangle 1 px OUTSIDE** the proposal's boundary, so the cut is visible against its surroundings |
 
 The third file is where the review actually happens: it shows the proposed edge
 in its context without painting over a single pixel of the picture being
@@ -1344,15 +1344,37 @@ occupies `(L, T)` to `(L+w, T+h)`, so the rectangle is the columns `L-1` and
 `L+w` and the rows `T-1` and `T+h`. Covering the proposal's own edge pixel
 would hide the thing being judged.
 
+**And a marker colour must work on EVERY ground the corpus has**, not on the
+one in front of you. Measure the band just outside the drawn line across the
+whole set before choosing one; if a single colour can be defeated by any common
+ground, use a pattern instead of arguing about the colour.
+
 **Where a side is clamped to 0 there is no outside pixel — leave that side
 open** and say so. Do not close the rectangle by drawing inside. An open edge
 is also the truth: the crop runs to the sheet edge there. MEASURED on 8702:
 `28-0a` and `28-0b`, two halves of one picture printed to the trim.
 
+**THE LINE IS BLACK/WHITE ALTERNATING, STRIPE LENGTH 1, PHASED ON GLOBAL
+PARITY** — `black if (x + y) % 2 == 0 else white`, x and y in the `_1cm` frame.
+Owner, 2026-11-17: *"box line: make is 1px black/white striped with stripe len
+1"*.
+
+It began as a plain yellow line, on his instruction, and that was measurably
+wrong: **90 of 8702's 92 crops sit on a surround that is over 50 % near-white,
+87 of them on pure white**, because what lies just outside a figure is the page
+margin — and `#FFFF00` differs from `#FFFFFF` in the blue channel alone. A
+stripe needs no lucky ground: the black half carries it on paper, the white
+half carries it on a dark photograph. **The parity phase is not decoration** —
+it alternates along horizontal and vertical runs alike, so the four corners
+join without a doubled or dropped pixel, which a per-side counter would not
+manage.
+
 **Verify the third file against the second**: it must differ ONLY on the
-rectangle's own pixels, and the count of differing pixels must equal the
-perimeter drawn. That is what catches a line one pixel in, which would make
-every crop in the set look tighter than it is.
+rectangle's own pixels, every rectangle pixel must equal the parity rule
+exactly, and the crop's own area must be byte-identical. The striped line makes
+this check stronger than the solid one was — the old form could only ask "is it
+yellow", this one asks "is it the RIGHT pixel", so a line drawn one pixel in or
+one pixel out of phase is caught.
 
 ### NO CROP MAY BEGIN OR END WITH A LINE OF BARE PAPER
 

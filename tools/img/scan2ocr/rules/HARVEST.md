@@ -4488,3 +4488,32 @@ figure and a wrong keep costs a look.
 
 **A builder that re-measures a number control handed it, and reports the
 difference instead of adopting it, is the only reason this surfaced.**
+
+### AND A MARKER COLOUR MUST SURVIVE EVERY GROUND, SO USE A PATTERN → r150
+
+The crop-review box started as a 1 px yellow line, on the owner's instruction.
+The builder flagged three crops where it was hard to see; I measured the band
+just outside the line on all 92 and found the real number: **90 of 92 sit on a
+surround that is over 50 % near-white, 87 of them on pure white.** Obvious once
+said — what lies just outside a figure is the page margin — and `#FFFF00`
+differs from `#FFFFFF` in the blue channel alone, so the instrument was faint
+on almost the whole set.
+
+Owner's fix, once he had the number: *"box line: make is 1px black/white
+striped with stripe len 1"*. **A stripe needs no lucky ground.** The black half
+carries it on paper, the white half on a dark photograph; nothing in the corpus
+can defeat both.
+
+Two things worth keeping:
+
+- **Phase the stripe on global parity**, `(x + y) % 2`, not on a per-side
+  counter — it alternates along horizontal and vertical runs alike, so the four
+  corners join without a doubled or dropped pixel.
+- **The pattern made the CHECK stronger, not just the line.** A solid line can
+  only be verified as "is it the marker colour". A deterministic pattern is
+  verified as "is it the RIGHT pixel", which catches a rectangle drawn one
+  pixel in or one pixel out of phase. A more legible instrument turned out to
+  be a more checkable one.
+
+**The builder flagged three; the measurement found ninety.** A report of where
+something is visible is not a measurement of where it is not.
