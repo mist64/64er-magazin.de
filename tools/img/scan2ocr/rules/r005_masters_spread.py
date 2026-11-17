@@ -1160,6 +1160,48 @@ def unknown_mask(geom, scale=1):
     return u
 
 
+def punch_remnants(geom, sheet600, u):
+    """The BED still showing around each filled punch, grown from its disc.
+
+    A punch is recorded as a centre and a diameter and filled with a disc. A
+    clip hole in 40-year-old paper is not a disc: it tears, and the tear shows
+    the bed. MEASURED on 8702's marks census -- which is the only reason any of
+    this is known -- 33 punch remnants survived into the delivered PDF on 21
+    pages, and on most of them the hole WAS recorded and its disc WAS painted:
+    p092's c9499 is 3.77 x 6.27 mm against a 2.4 mm disc.
+
+    So the disc is the seed and the bed is the extent: backing-coloured pixels
+    (`backing_mask`, the same test the BED check uses) connected to the disc,
+    inside a PUNCH_GROW_MAX_MM window around the hole. Nothing else grows --
+    not ink, not a dark photo that merely touches the gutter, because those are
+    not backing-coloured -- and a growth that runs away is refused rather than
+    allowed to eat the page: over PUNCH_GROW_AREA_MAX times the disc's own
+    area the component is dropped and the disc stands alone.
+    """
+    h, w = u.shape
+    out = np.zeros_like(u)
+    for cx, cy, dm in geom["fold"]["holes"]:
+        r = (dm / 2 + HOLE_FILL_R_MM) * MM
+        g = PUNCH_GROW_MAX_MM * MM
+        y0, y1 = int(max(cy - g, 0)), int(min(cy + g, h))
+        x0, x1 = int(max(cx - g, 0)), int(min(cx + g, w))
+        if y1 - y0 < 3 or x1 - x0 < 3:
+            continue
+        win = sheet600[y0:y1, x0:x1]
+        bed = backing_mask(win)
+        yy, xx = np.mgrid[y0:y1, x0:x1]
+        disc = (yy - cy) ** 2 + (xx - cx) ** 2 <= r * r
+        lab, _ = ND.label(bed)
+        keep = {int(v) for v in np.unique(lab[disc & bed]) if v}
+        if not keep:
+            continue
+        comp = np.isin(lab, list(keep))
+        if comp.sum() > PUNCH_GROW_AREA_MAX * max(disc.sum(), 1):
+            continue                                   # runs away: leave the disc
+        out[y0:y1, x0:x1] |= comp
+    return out
+
+
 def anchor_of(geom):
     """("logo", ax, ay) -- the wordmark, placed through the parity's (S, B) --
     or ("edges", x0, y0) -- the window's own top-left, placed directly on the
@@ -1329,6 +1371,14 @@ PUNCH_FOLD_TOL_MM = 1.0      # ...and on the fold line, where that line came
                              # FROM THE HOLES.  See fill_punches: on a page
                              # whose fold is a fallback placement this test
                              # rejects the very punches that would correct it.
+PUNCH_GROW_MAX_MM = 4.0      # how far a torn punch may be grown from its centre
+PUNCH_GROW_AREA_MAX = 6.0    # ...and how much bigger than its own disc it may get
+PUNCH_PLACED_SLACK_MM = 2.0  # extra search reach where the fold line was PLACED
+                             # rather than derived from the holes
+PUNCH_FOLD_MARGIN_MM = 0.5   # how far past the fold the search may look: the
+                             # fold line is where the page ends, and beyond it
+                             # the bed makes every punch invisible (see
+                             # fill_punches)
 PUNCH_FILL_MIN_MM = 2.0      # fill at least this diameter: r = max(d/2, 1.0) + 0.4
 # ACCEPT ON THE ROW, THEN SIZE TO COVER.  MEASURED in the 8701 dry run: on p192
 # the found blob was the punch and the disc was too small; on p179 the found
@@ -1481,13 +1531,23 @@ def fill_punches(g, gray, priors):
     w, h = g["sheet_px"]
     f = g["fold"]
     dist_mm, shift_mm = priors[0], priors[1]
+    # HOW FAR TO LOOK DEPENDS ON HOW WELL THE FOLD IS KNOWN, and only a fold
+    # FROM THE HOLES is known well.  A placed line -- p5, a colour boundary,
+    # an ink stop -- is a couple of millimetres out by construction, and the
+    # punches sit wherever the clip put them.  MEASURED on 8702 p092, fold
+    # re-placed p5: its six punch remnants sit 3.0-4.5 mm inside the placed
+    # line, so a +-3 mm window saw NOTHING on all six rows while the census
+    # found every one of them in the delivered PDF.  The same slack the
+    # no-fold case has always used is the right slack for a placed one.
+    from_holes = bool(f["poly"]) and f.get("source") == "holes"
+    slack = 0.0 if from_holes else PUNCH_PLACED_SLACK_MM
     if f["poly"]:
         fold_x = lambda y: float(np.polyval(f["poly"], y))
-        win_x = PUNCH_WIN_X_MM
     else:
         x = (w - 1 - dist_mm * MM) if g["parity"] == "even" else dist_mm * MM
-        fold_x = lambda y: x
-        win_x = PUNCH_WIN_X_MM + 2.0                    # the median, not this page's line
+        fold_x = lambda y: x                            # the median, not this page's line
+    win_x = PUNCH_WIN_X_MM + slack
+    fold_margin = PUNCH_FOLD_MARGIN_MM + slack
     own = [c for c in f["holes"]]
     if own:
         _, _, sh = template_score([c[1] for c in own])
@@ -1506,7 +1566,23 @@ def fill_punches(g, gray, priors):
             cands[j] = None
             continue
         tx = fold_x(ty)
+        # THE WINDOW STOPS AT THE FOLD, ON THE PAGE'S SIDE OF IT.  Beyond the
+        # fold is the neighbour half and the scanner bed, and a punch at the
+        # gutter edge merges with that darkness: the local surround is as dark
+        # as the blob, there is no dip, and NOTHING is detected -- 8702 p092
+        # reported "nothing" in all six windows while the census found six
+        # punch remnants on that page.  Looking only at the page side puts the
+        # blob back on paper, where it is a dip again.
         x0, x1 = int(max(tx - win_x * MM, 0)), int(min(tx + win_x * MM, w))
+        # ...AND ONLY WHERE THE FOLD LINE IS THE PAGE'S OWN.  A placed line is
+        # as likely to sit INSIDE the page as outside it -- 8702 p092's p5
+        # placement is 4.7 mm from where its colour boundary had the fold --
+        # so clamping to it would exclude the punches it is meant to find.
+        if from_holes:
+            if g["parity"] == "even":
+                x1 = int(min(x1, tx + fold_margin * MM))
+            else:
+                x0 = int(max(x0, tx - fold_margin * MM))
         y0, y1 = int(max(ty - win_y * MM, 0)), int(min(ty + win_y * MM, h))
         cands[j] = []
         if x1 - x0 < 10 or y1 - y0 < 10:
@@ -1518,7 +1594,16 @@ def fill_punches(g, gray, priors):
         for i, sl in enumerate(ND.find_objects(lab), 1):
             if sl is None:
                 continue
-            if sl[0].start == 0 or sl[1].start == 0 or sl[0].stop == win.shape[0] or sl[1].stop == win.shape[1]:
+            # A BLOB THAT RUNS OUT OF THE WINDOW IS INK -- EXCEPT AT THE FOLD
+            # EDGE, WHERE EVERY PUNCH DOES.  The window now ends at the fold,
+            # so a remnant at the gutter touches that edge by construction:
+            # 8702 p084 row 0 is a 48x94 px blob rejected as ink for exactly
+            # this reason.  The other three edges still mean ink.
+            touch_fold = (sl[1].stop == win.shape[1] if g["parity"] == "even"
+                          else sl[1].start == 0)
+            if sl[0].start == 0 or sl[0].stop == win.shape[0] \
+                    or (sl[1].start == 0 and not touch_fold) \
+                    or (sl[1].stop == win.shape[1] and not touch_fold):
                 continue                                 # runs out of the window: ink
             hh, ww = sl[0].stop - sl[0].start, sl[1].stop - sl[1].start
             d = max(hh, ww) / MM
@@ -1765,6 +1850,7 @@ def cut_page(geom, fit, sheet600, halves=None, n_pages=N_PAGES):
     # SPREAD issue the field the rules name was simply absent (8702).
     geom["_box"] = (x0, y0, x0 + MASTER_W_PX, y0 + MASTER_H_PX)
     u = unknown_mask(geom)
+    u |= punch_remnants(geom, sheet600, u)
     painted = sheet600[:h, :w].copy()
     painted[u] = 255
     master = np.full((MASTER_H_PX, MASTER_W_PX, 3), 255, np.uint8)
