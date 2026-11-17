@@ -111,6 +111,19 @@ def keep_hyphen(L, R):
 def is_suspect(L, R):
     return bool(_re.match(r'\s*\d', R)) or ('\xbb' in L[-40:] and '\xab' in R[:40])
 
+# WHICH DASH THIS ISSUE SETS IS MEASURED ON THE FILE, NOT ASSUMED.
+# The rule's "en dash is house style" was measured as "4,864 en/em against 755
+# hyphen" -- the two dashes added together.  Counted apart, 2026-11-17, over
+# every published issue (spaced forms only): the MONTHLIES are em (8610 0 en /
+# 171 em, 8701 0/90, 8702 0/120, 5,099 em corpus-wide) and the recent
+# SONDERHEFTE are en (SH8604 296/0, SH8606 220/0, SH09 131/0, SH10 298/1).
+# Writing en into a monthly therefore puts a SECOND dash character into a file
+# that already has one -- 8702 would have shipped 5 en among 120 em.
+# Whether the corpus should be one or the other is the owner's ruling and is
+# open; until it comes, this pass follows the issue it is editing and says so.
+EN, EM = '\u2013', '\u2014'
+n_en, n_em = s.count(' ' + EN + ' '), s.count(' ' + EM + ' ')
+DASH = EM if n_em > n_en else EN
 out, conv, skipped, suspects = [], 0, [], []
 for m in _re.finditer(r' - ', s):
     if in_hole(m.start()):
@@ -124,10 +137,12 @@ for m in _re.finditer(r' - ', s):
     out.append((m.start(), m.end()))
     conv += 1
 for a, b in reversed(out):
-    s = s[:a] + ' \u2013 ' + s[b:]
+    s = s[:a] + ' ' + DASH + ' ' + s[b:]
 
 open(fp, 'w', encoding='utf-8').write(s)
-# report
+# report (the hole offsets were computed before the substitution; recompute
+# them against the text as written, which is what the residue count reads)
+holes = [(m.start(), m.end()) for m in PRE.finditer(s)]
 import subprocess
 counts = {
     '<blockquote':       s.count('<blockquote'),
@@ -135,8 +150,18 @@ counts = {
     '<br/>':             s.count('<br/>'),
     '<br>':              s.count('<br>'),
     'curly remaining':   sum(s.count(c) for c in '‘’“”„'),
-    'en dashes written':  conv,
+    'dashes written':     conv,
+    'dash used':          ('em' if DASH == EM else 'en') +
+                          f" (file had {n_en} en, {n_em} em)",
     'hyphens kept':       len(skipped),
+    # THE INVARIANT IS THE RESIDUE, NOT THE COUNT OF CONVERSIONS.  "zero en
+    # dashes is a failure" cannot distinguish a pass that did not run from an
+    # issue that needed no conversion, and it read 0 on 8702, which is correct.
+    # What must be zero is a SPACED HYPHEN still standing in prose.
+    'spaced hyphens left': sum(1 for m in _re.finditer(r' - ', s)
+                               if not in_hole(m.start())
+                               and not keep_hyphen(s[max(0, m.start() - 40):m.start()],
+                                                   s[m.end():m.end() + 40])),
 }
 print(f"{fp}: " + ', '.join(f"{k}={v}" for k,v in counts.items()))
 # EVERY KEPT HYPHEN IS PRINTED, because the flank test is a good default and not
@@ -168,4 +193,10 @@ if low9:
     for x in low9:
         print(f"    {x}")
 PY
+# Staging what this step rewrote is the chain's convention -- r060, r080 and
+# r100 do the same, and r100 spells out why it stages its own files and never
+# `git add -u <dir>`.  What made it wrong here was not the staging: it was that
+# the rule required a dash pass the script did not perform, so the file went
+# into the index with half the step done (SH8603 and SH8604 both wrote that
+# pass by hand afterwards).  The pass is in the script now.
 git add "$1" 2>/dev/null || true

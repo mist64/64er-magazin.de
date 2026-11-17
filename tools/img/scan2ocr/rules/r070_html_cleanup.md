@@ -90,10 +90,38 @@ In-place rewrite, idempotent (re-running on a cleaned file is a no-op).
 
 ## A SPACED DASH IN BODY TEXT IS AN EN DASH
 
-` - ` becomes ` – `. MEASURED across the corpus: the monthlies run **4,864
-en/em against 755 hyphen**, so the en dash is house style; the hyphen form is
-drift confined to the chain-built Sonderhefte (SH8507 323/15, SH8601 224/16,
-SH8602 259/14 before this ruling). Owner, 2026-10-04.
+` - ` becomes a spaced dash. MEASURED across the corpus: the monthlies run
+**4,864 en/em against 755 hyphen**, so a dash is house style and the hyphen
+form is drift confined to the chain-built Sonderhefte (SH8507 323/15, SH8601
+224/16, SH8602 259/14 before this ruling). Owner, 2026-10-04.
+
+### ...AND WHICH DASH IS THE ISSUE'S OWN, BECAUSE THE CORPUS HAS BOTH
+
+That measurement counted **en and em together**. Counted apart, 2026-11-17,
+over every published issue (spaced forms only):
+
+| | en | em |
+|---|---|---|
+| monthlies 8404–8702 | 581 | 4,836 |
+| 8610 / 8701 / 8702 | 0 / 0 / 0 | 171 / 90 / 120 |
+| Sonderhefte SH8604, SH8606, SH09, SH10 | 296 / 220 / 131 / 298 | 0 / 0 / 0 / 1 |
+| corpus | 2,649 | 5,099 |
+
+**The monthlies are em and the recent Sonderhefte are en**, and the split
+follows the lineage of the builds, not the printing. Writing en into a monthly
+therefore adds a SECOND dash character to a file that already has one: 8702
+would have shipped 5 en among 120 em.
+
+So the pass writes the dash **the file itself already sets** — em if the file
+holds more spaced em dashes than en, en otherwise, and en when it holds
+neither, which is the ruling's default. The report names the choice and the
+counts it was made from.
+
+**Which one the corpus should settle on is the owner's ruling, and it is
+open.** It is a visible typographic change across fifty published issues, so
+nothing sweeps it until he says so. German practice is the spaced
+Halbgeviertstrich (en); the monthlies' em dashes come from the OCR and the
+model, not from a decision.
 
 **This is in the script now.** It was not: the rule has required the pass
 since the SH8602 harvest, `r070_html_cleanup.sh` had no dash substitution and
@@ -293,13 +321,21 @@ for c in '‘’“”„':
 
 # THE DASH CHECK, which this block did not have -- so a script with no dash
 # pass at all passed 070 clean on two issues running.
-grep -c ' – '              issues/8607/8607.html   # >0
+#
+# THE INVARIANT IS THE RESIDUE, NOT THE COUNT OF CONVERSIONS.  The script's
+# own report line `spaced hyphens left` must read 0: a spaced hyphen still
+# standing in prose is the defect, and it is visible whether the pass ran or
+# not.  `dashes written` is information, never a gate -- see below.
 grep -c '‚'                issues/8607/8607.html   # 0 once resolved
 ```
 
-The en-dash count has no fixed expectation — it depends on the issue — but
-**zero is a failure**, and the pass printing `en dashes written=0` on an
-issue with body prose means it did not run.
+**`dashes written=0` is NOT a failure**, and reading it as one is a check that
+cannot pass. It said "zero en dashes is a failure" because, on the two issues
+where the pass was missing entirely, 0 was the symptom. But an issue whose
+prose sets its dashes correctly in the OCR needs no conversion at all, and
+8702 is exactly that issue: 0 was the right answer and the gate called it a
+failure. What distinguishes "did not run" from "nothing to do" is the residue,
+which the script now counts and prints.
 
 ## Notes
 
@@ -329,3 +365,16 @@ Two more from the same build:
   or match the run.
 - **r050's planted test writes to `/tmp/t50.md`**, against r000's scope rule.
   Write it into the step's own scratch directory.
+
+## THE SELF-`git add` IS NOT THE DEFECT — THE HALF STEP WAS
+
+The script stages the file it rewrote, and that is the chain's convention:
+r060, r080 and r100 all do it, and r100 spells out why it stages its own files
+and never `git add -u <dir>`. What made it wrong on SH8603 and SH8604 was that
+the rule required a dash pass **the script did not perform**, so the file
+entered the index with half the step done and the hand pass had to follow it.
+That pass is in the script now, so the step stages a finished file.
+
+What remains true, and is r000's law rather than this rule's: while a sibling
+session shares the tree, commit by pathspec. A staged file is swept up by a
+bare `git commit` whoever staged it.
