@@ -3534,9 +3534,92 @@ Verified across all 33 Sonderheft directories: 21 resolve to a key the CSV
 holds, SH14-SH25 resolve to keys the CSV does not reach yet and say so, and a
 monthly still returns None without a warning.
 
-**What is NOT fixed by this.** SH09 is published and still carries no index
-metadata; applying its 30 rows is an edit to a published issue and waits on the
-owner.
+**What was NOT fixed by this, and then was.** SH09 was published with no index
+metadata, and applying its 30 rows is an edit to a published issue. The owner
+ruled on the same day ("do all missing ones then"): 254 rows went into 245
+files across SH8501-SH8601, SH8603 and SH09 as `928412c9`, pushed alone as
+`1a88738a`.
+
+
+## The published corpus, 2026-11-17: the check that only ever looked forward
+
+The owner, told that nine published Sonderhefte had no index metadata, asked
+two questions: *"how did it happen?"* and *"make sure it cant happen again!"*.
+The first was answered by the two defects above. This is the second, and the
+answer is not another per-issue check.
+
+**Every gate r220 owns is run once, at build time, by the session building that
+issue.** Both defects were introduced later, by a different session, on a
+different issue. A builder who runs every check faithfully still ships an issue
+that was correct when it was built and is not correct now, and nothing in the
+chain ever looks at it again. The same is true of the orphan-row clause, which
+would have caught the foreign keys below: it arrived in October, and the issues
+it would have caught were built in the spring.
+
+### SO THE COUNT NOW SWEEPS THE WHOLE CORPUS → `r220_index_meta_sweep.py` (new)
+
+One second, 43 issues, one line each: CSV rows against applied
+`index_category` metas, non-zero exit on any disagreement, and a `KNOWN` table
+that records a legitimate difference with its exact size and its reason rather
+than waiving it. MEASURED on the first run: **9 of 25 monthlies disagreed**,
+and they were five different defects, not one —
+
+- **four foreign issue keys** in `Jahresinhaltsverzeichnis 1986.csv`. The
+  printed 1986 index (8701 pp97-98) settles all four: Digi-Controller and
+  Vokabel-Trainer are `08/86`, transcribed as 06; "Module für Hypra-Basic
+  (Ft.: 06/86 73)" is `05/86`, and the `06/86` inside its own TITLE is what
+  pulled it to 8606; and "1000 Mark zu gewinnen! … Haushaltsb." is printed
+  `02/86 168` by the magazine itself while the article is 12/86 p169 — the
+  only one of the four where the print, not our transcription, is wrong.
+- **two rows never applied**: 8511 p19 (a file with no index metadata at all)
+  and 8601 p13 (a second entry on a file that already carried its first).
+- **two rows applied TWICE**, to a lettered sibling page as well as to their
+  own article: 8506 `9 Aktuell` beside `9 Schule braucht Computer`, 8507
+  `48 Trends und Flops` beside `48 Master Of The Lamps`. **A surplus is a
+  defect class nothing else looks for** — every other check asks whether a row
+  arrived, none asks whether it arrived twice.
+- **one row with no article by design**: 8701 p95, the printed 1986 index at
+  pp95-98, which we hold as the CSV itself. Recorded in `KNOWN`.
+- **two issues whose metadata never came from this CSV**: 8502 and 8503, in
+  different wording, a different and partly three-level taxonomy, and with
+  items the CSV does not list. Pinned at their exact sizes (+5, +3) with the
+  owner's ruling noted as open.
+
+### A WRONG KEY IS NOT A TYPO → r220
+
+The rule said "CSV typos are common — fix them on application rather than
+modifying the source CSV", and that line is about SPELLING, which only touches
+the issue being applied. A wrong issue key is routing: left in place it sends
+the row into the wrong issue on every run anyone makes, forever, and the row's
+own issue reports a deficit forever. The owner has now ruled that way three
+times (`954aec8e`, `2375c39f`, and the four above); the distinction is written
+into the rule so the next reader does not have to find a commit from two months
+ago to learn it.
+
+### AND TWO DEFECTS IN THE APPLY SCRIPT, BOTH LATENT → r220_index_meta_apply.py
+
+Found while making the sweep's findings applicable, neither visible in any
+output:
+
+- **The insertion point was four literal spaces.** `re.search(r'(    <meta
+  name="64er\.id")')` — a head indented with two, or with none, was not found,
+  the file was skipped, and its rows were dropped behind one `NO ID:` line in a
+  report nobody diffs. MEASURED: **65 files in 9 issues** are indented
+  otherwise (8404 32, 8405 25, 8406, 8408 ×2, 8411, 8506, 8512, 8601, SH8504);
+  every one would be skipped today. The indent is now read from the match and
+  used for the inserted lines, and a skip exits non-zero, because *a dropped
+  row is a defect in this script, not a property of the issue*.
+- **The page cell is not always a number or a range.** `8602,33;167` — one
+  article printed on p33 and continued on p167, the only such cell in the three
+  annual CSVs — split on dashes only, came through as the string `'33;167'`,
+  and crashed `find_file_for_entry` on `int()`. The row is applied in 8602 by
+  hand, so the crash is latent, not historical: it fires on the next run. The
+  parser now takes the first integer in the cell, whatever separates it.
+
+**The shape of all of this.** Four of the five corpus defects were invisible to
+a check that was run and passed. What found them was a cheap invariant applied
+to the whole population at once — and the population is what a per-issue chain
+never has.
 
 
 ## 8702, 2026-11-17: the half split was the size of the set being cut

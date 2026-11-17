@@ -467,8 +467,16 @@ fi
 applied=$(grep -c '64er.index_category' "$dir"/*.html | \
           awk -F: '{s+=$2} END {print s}')
 echo "  csv rows: $csv_rows  applied: $applied"
-[ "$csv_rows" = "$applied" ] || \
-  echo "  WARN: mismatch (expected csv_rows = applied unless skips/manual)"
+# NOT A WARNING.  "unless skips/manual" excused every value, so this line
+# could not fail and never did -- while nine published Sonderhefte carried no
+# index metadata at all.  There is no legitimate skip: a row with no article
+# is a foreign key or a deliberate omission, and both are RECORDED (in the
+# CSV, or in the sweep's KNOWN), not waived in a verification message.
+if [ "$csv_rows" != "$applied" ]; then
+  echo "  FAIL: $csv_rows CSV rows, $applied applied.  Find the difference"
+  echo "        before going on -- orphan rows below, then the corpus sweep:"
+  echo "        .venv/bin/python tools/img/scan2ocr/rules/r220_index_meta_sweep.py $ISSUE"
+fi
 
 # 2. articles without index_category — must all be recurring
 #    rubrics or other legitimate omissions
@@ -545,6 +553,37 @@ mis-routing is a known failure mode (the 8607 CP/M-Ecke case).
   modifying the source CSV (the CSV is shared across multiple
   issues' apply runs, and per-issue fixes are lower-risk than
   rewriting the CSV).
+
+  **A WRONG ISSUE KEY OR PAGE IS NOT A TYPO, AND IT IS FIXED IN THE CSV.**
+  The line above is about SPELLING, which only ever affects the issue being
+  applied. A key is routing: left alone it sends the row into the wrong issue
+  on every run anyone ever makes, and the row's own issue reports a deficit
+  forever. The owner has ruled this way three times — `954aec8e`
+  ("Sprite+Grafik-Basic" keyed 4/86, belongs to 4/85), `2375c39f` ("Super
+  Assembler" keyed 3/85, belongs to 3/86), and four 1986 rows on 2026-11-17 —
+  and the fix is always the same: correct the key in the CSV, then apply.
+
+  The four of 2026-11-17 are worth reading as a set, because the printed index
+  in 8701 pp97-98 settles each one and they fail in three different ways:
+
+  | CSV said | printed index says | belongs to | why it went wrong |
+  |---|---|---|---|
+  | `8606,50—65` Digi-Controller | `08/86 50—65` | 8608 p50 | 08 transcribed as 06 |
+  | `8606,52—58` Vokabel-Trainer | `08/86 52—58` | 8608 p52 | 08 transcribed as 06 |
+  | `8606,103—106` Module für Hypra-Basic **(Ft.: 06/86 73)** | `05/86 103—106` | 8605 p103 | the `06/86` inside the TITLE was taken for the key |
+  | `8602,168` 1000 Mark zu gewinnen! … Haushaltsb. | `02/86 168` | **8612 p169** | the MAGAZINE's own index is wrong; the article is 12/86's |
+
+  The last one is the interesting case: the print is the source of the error,
+  not our transcription. We still fix the CSV, because the CSV is OUR routing
+  data and not a reproduction of the plate — "leave it as printed" governs the
+  published page, never the index we build the site from. Note it in the
+  commit message so the next reader does not "correct" it back.
+
+  **How to tell which it is, in one command:** take a distinctive word from the
+  row's title and `grep -ril` it over `issues/`. A row whose article is in
+  ANOTHER issue carries the wrong key. If the article is nowhere, the row may
+  be an item the build never split out — check the published PDF before
+  deciding, as `pdftotext -f N -l N <pdf> -` settles the page in seconds.
 
 ## THE 1987 CSV: TWO SOURCES, AND 35 ROWS WITH NO CATEGORY ON PURPOSE
 
@@ -631,3 +670,46 @@ themes had received nothing. **Run it on any index assembled this way.**
 were read off the page by hand; the rest were matched by script, and spot
 checks found errors in that portion — concentrated where a run of entries had
 to be split because a heading was unreadable. See HARVEST.md, 2026-10-31.
+
+
+## THE PER-ISSUE CHECK ONLY EVER LOOKS FORWARD — SWEEP THE CORPUS
+
+The Verification above, and the orphan-row clause, are run ONCE, at build
+time, by the session building that issue. Both defects that cost us nine
+Sonderhefte were introduced LATER, by a different session, on a different
+issue: r220 was pointed at the annual CSVs until SH8602 and never back-applied,
+and `sonderheft_key()` could not form a key for SH09 and up. **A check that
+only runs forwards cannot find damage done behind it**, and neither can a
+builder who runs it faithfully.
+
+```bash
+.venv/bin/python tools/img/scan2ocr/rules/r220_index_meta_sweep.py
+```
+
+One second, the whole corpus, one line per issue: CSV rows against applied
+`index_category` metas, non-zero exit on any disagreement. Run it after any
+change to this rule, to either CSV, or to a published issue's metadata — and
+once before accepting an issue, where it also serves as this rule's step 1.
+
+MEASURED on its first run, 2026-11-17: 9 of 25 monthlies disagreed. They were
+not one defect but five, and only the count saw all of them —
+
+- **four foreign issue keys** (the table above), which took rows away from
+  8605, 8608 and 8612 and gave 8606 and 8602 rows no article could hold;
+- **two rows never applied at all** — 8511's p19 Joystick row, to a file with
+  no index metadata whatever, and 8601's p13 Chaos Communication Congress row,
+  the second entry on a file that already carried its first;
+- **two rows applied TWICE**, to a lettered sibling page as well as to their
+  own article (8506 `9 Aktuell` beside `9 Schule braucht Computer`, 8507
+  `48 Trends und Flops` beside `48 Master Of The Lamps`) — a surplus, which
+  nothing in a per-issue run looks for;
+- **one row with no article by design** (8701 p95, the printed 1986 index at
+  pp95-98), now a recorded difference in the sweep's `KNOWN`;
+- **two issues whose metadata never came from the CSV at all** (8502, 8503).
+
+The last is a reminder that the count is an invariant, not a verdict: it tells
+you the two sets are the same SIZE. For 8502 and 8503 they are a different
+shape — different wording, a different and partly three-level taxonomy, and
+items the CSV does not list. The sweep pins their exact difference with the
+reason, so that a new divergence in those issues still fails while the open
+question stays visible.

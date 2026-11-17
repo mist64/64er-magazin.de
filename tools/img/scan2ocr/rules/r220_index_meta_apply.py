@@ -103,8 +103,21 @@ def parse_csv(csv_path, issue_code):
             for parts in reader:
                 if len(parts) >= 5:
                     pages = parts[1]
-                    # Extract start page (before em-dash or regular dash)
-                    start = re.split(r'[—\u2014-]', pages)[0].strip()
+                    # THE PAGE CELL IS NOT ALWAYS A NUMBER OR A RANGE.  This
+                    # split on dashes only, so `8602,33;167` -- one article
+                    # printed on p33 and continued on p167, the only such cell
+                    # in the three annual CSVs -- came through as the string
+                    # '33;167' and crashed find_file_for_entry() on int().
+                    # MEASURED 2026-11-17: the row is applied in 8602 (by
+                    # hand, as `64er.pages content="33,167"`), so the crash is
+                    # latent, not historical -- it fires on the next run.
+                    # Take the FIRST integer, whatever separates it.
+                    m_start = re.search(r'\d+', pages)
+                    if not m_start:
+                        print(f"r220: no page number in {pages!r} for "
+                              f"'{parts[4]}' -- row SKIPPED", file=sys.stderr)
+                        continue
+                    start = m_start.group(0)
                     entries.append({
                         'start': start,
                         'category': parts[2],
@@ -259,6 +272,7 @@ def main():
             print(f"NO FILE for p{entry['start']}: '{entry['title']}'")
 
     # Apply entries
+    dropped = []
     for fn in sorted(file_entries):
         text = open(fn).read()
         article_title = get_title(text)
@@ -266,10 +280,21 @@ def main():
         m_toc = re.search(r'<meta name="64er\.toc_title" content="([^"]*)"', text)
         toc_title = m_toc.group(1) if m_toc else None
 
-        m_id = re.search(r'(    <meta name="64er\.id")', text)
+        # THE INSERTION POINT IS THE `64er.id` META AT WHATEVER INDENT IT SITS.
+        # This matched four literal spaces, so a head indented with two -- or
+        # with none -- was not found, the file was skipped, and its CSV rows
+        # were dropped with one quiet `NO ID:` line in a report nobody diffed.
+        # MEASURED on the published corpus, 2026-11-17: 65 files in 9 issues
+        # (8404 32, 8405 25, 8406/8408 x2/8411/8506/8512/8601/SH8504) carry a
+        # head that is not four-space indented.  Every one of them would be
+        # skipped by this script today.  The indent is now READ, not assumed,
+        # and a skip is fatal -- see `dropped` below.
+        m_id = re.search(r'^([ \t]*)<meta name="64er\.id"', text, re.M)
         if not m_id:
-            print(f"NO ID: {fn}")
+            dropped.append((fn, len(file_entries[fn])))
+            print(f"NO ID: {fn} -- {len(file_entries[fn])} CSV row(s) NOT applied")
             continue
+        ind = m_id.group(1)
 
         insert = ""
         for entry in file_entries[fn]:
@@ -309,9 +334,9 @@ def main():
             # printed name and reported it MISSING.
             shown = H.unescape(toc_title or article_title or '')
             if idx_title != shown:
-                insert += f'    <meta name="64er.index_title" content="{attr(idx_title)}">\n'
+                insert += f'{ind}<meta name="64er.index_title" content="{attr(idx_title)}">\n'
             if idx_cat is not None:
-                insert += f'    <meta name="64er.index_category" content="{attr(idx_cat)}">\n'
+                insert += f'{ind}<meta name="64er.index_category" content="{attr(idx_cat)}">\n'
 
         text = text[:m_id.start()] + insert + text[m_id.start():]
         open(fn, 'w').write(text)
@@ -327,6 +352,21 @@ def main():
         text = open(fn).read()
         if 'index_category' not in text:
             print(f"  {fn}")
+
+    # A DROPPED FILE IS A DEFECT IN THIS SCRIPT, NOT A RESULT -- SAY SO, LOUDLY.
+    # The rows were matched to a file and then thrown away because the file's
+    # head did not look the way this script expected.  Printed as one `NO ID:`
+    # line among a hundred OK lines it reads like an omission the issue is
+    # entitled to; it is not.  Exit non-zero so the step cannot be reported
+    # green, and so the Verification's count check is not the first to notice.
+    if dropped:
+        n = sum(k for _, k in dropped)
+        print(f"\n*** {n} CSV row(s) in {len(dropped)} file(s) WERE NOT APPLIED ***")
+        for fn, k in dropped:
+            print(f"    {fn}: {k} row(s)")
+        print("That is a DEFECT in this script's insertion-point search, not a")
+        print("property of the issue.  Fix the search; do not hand-patch the files.")
+        sys.exit(1)
 
 
 if __name__ == '__main__':
