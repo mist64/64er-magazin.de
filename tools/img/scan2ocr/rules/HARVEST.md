@@ -4392,3 +4392,46 @@ trim, and no measurement distinguishes the two. Flagging costs a look.
 **And the `_1cm_box` file earned its place on its first day** — the defect had
 survived a contact-sheet approval and was invisible until the boundary was
 drawn beside the picture at full resolution.
+
+### AND THE ROOT CAUSE WAS A CLEANUP THAT REMOVED WHAT IT HAD NOT CHECKED → r150
+
+The owner asked why the white sliver happened and whether the method had been
+fixed. The builder re-derived the answer from its own session transcript and
+**re-ran the command to an AE of 0 against the old file**, which is what makes
+this a finding and not a reconstruction:
+
+```
+magick NNN.png -crop WxH+X+Y +repage \
+  -bordercolor white -border 1 -fuzz 6% -trim +repage -shave 1x1 +repage
+```
+
+Two defects, compounding, on opposite edges of the same crop.
+
+- **`-trim`'s predicate is "every pixel in the line is within fuzz of white".**
+  A dust speck 4 px outside the photograph — two pixels, min 216 — held the
+  left edge. The trim was correct by its own definition and was stopped by
+  dirt.
+- **`-shave 1x1` assumed the border it was removing still existed.** The border
+  was added so a flush picture would not be eaten; `-trim` removes that border
+  itself, so the shave lands on the image and takes **one line of real picture
+  off every side**. MEASURED on `10-x2`: 80 ink px on the right, 34 at the
+  bottom, 2 at the top. On the left it removed the speck's own column, leaving
+  three columns of bare paper with nothing visible to explain them.
+
+**The white sliver was the harmless half.** A crop one pixel too TIGHT looks
+like a crop; nothing could see that plate had been thrown away. Control's first
+fix repaired only the left edge, which is the half the owner could see.
+
+**The general lesson is not the fuzz value: a cleanup step removed something it
+had not checked was still there.** `-shave` is a blind positional operation
+that assumed the state its own earlier step had destroyed. Remove a guard by
+measuring it, or arrange that it cannot be consumed — never by position alone.
+
+**And the two predicates fail in OPPOSITE directions**, which is why the
+pure-paper flag committed in 0584c11c is one of a pair and not a solution:
+"any pixel" under-trims (dust holds the edge), "a fraction of the line"
+over-trims (a pale ground or thin frame rule falls under the threshold — which
+is why the 83's eye review GREW 56 boxes). Both flags, always.
+
+All nine of the frozen crops are being re-cut with the instrument the 83 used,
+because every argument for keeping them separate died with this finding.

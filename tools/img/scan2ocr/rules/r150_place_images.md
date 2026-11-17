@@ -1371,6 +1371,52 @@ flag = pure.all(axis=0)[0] or pure.all(axis=0)[-1] or pure.all(axis=1)[0] or pur
 frame would be damaged by an automatic trim, and nothing in the measurement can
 tell the two apart. Flagging costs a look; trimming costs a figure.
 
+**AND IT IS ONE OF A PAIR, BECAUSE THE TWO TRIM PREDICATES FAIL IN OPPOSITE
+DIRECTIONS.** This was written as if it were sufficient. It is not:
+
+| predicate | how it fails | what catches it |
+|---|---|---|
+| **any pixel** within fuzz of white holds the line (ImageMagick `-trim`) | **under-trims** — one dust speck anywhere in a column holds the whole edge | the pure-paper flag above |
+| **a fraction** of the line is darker than a threshold | **over-trims** — a faint edge, a pale ground or a thin frame rule falls under the fraction and is eaten | a band test on the OUTSIDE of each edge |
+
+MEASURED on 8702: the 83 crops of the main pass used the fraction predicate
+(>3 % of the line darker than 235) and its eye review grew **56** boxes, which
+is the over-trim showing up. The nine used `-trim` at 6 % fuzz and `10-x2` kept
+three columns of bare paper, which is the under-trim showing up. **Run both
+flags. Neither predicate is safe alone.**
+
+### `-trim` FOLLOWED BY `-shave` IS BROKEN BY CONSTRUCTION — AND IT ATE PLATE
+
+The command that cut 8702's first nine:
+
+```
+magick NNN.png -crop WxH+X+Y +repage   -bordercolor white -border 1 -fuzz 6% -trim +repage -shave 1x1 +repage
+```
+
+The 1 px border is added so a picture lying flush to the crop edge is not eaten
+by the trim. **But `-trim` removes that border itself** — it is background by
+construction — so by the time `-shave 1x1` runs there is nothing left of it,
+and the shave takes **one line of real image off every side**. MEASURED on
+`10-x2`: the shaved lines held 80 ink pixels on the right, 34 at the bottom, 2
+at the top. That is plate, thrown away, and no check saw it because a crop one
+pixel too TIGHT looks like a crop.
+
+On the left the same command did the opposite: a dust speck 4 px outside the
+photograph (two pixels, min 216) held the trim, the shave then removed the
+speck's own column, and three columns of pure paper were left standing with
+nothing visible to explain them. **One command, both failure directions, on one
+edge each.**
+
+**The general defect is not the fuzz value. It is that a cleanup step removed
+something it had not checked was still there.** `-shave 1x1` is a blind
+positional operation that assumed the state its own earlier step had destroyed.
+Where you add a guard and then remove it, remove it by measuring what you
+added, or arrange that it cannot be consumed — never by position alone.
+
+So: **do not pair `-trim` with `-shave`.** Trim on a fraction-of-line
+predicate, with no shave after it, and let the two flags above police the
+result.
+
 MEASURED on 8702, which is also why this is here: of 92 crops exactly **one**
 tripped it — `10-x2`, three pure-white columns on the left, so its edge sat
 0.13 mm outside a near-black photograph, where a white sliver is as visible as
