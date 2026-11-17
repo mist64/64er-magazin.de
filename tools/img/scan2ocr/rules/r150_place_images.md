@@ -312,6 +312,31 @@ frame, so the page shows the caption twice — once as pixels, once as the
 accessible and searchable copy. Report it to the owner as a re-cut (SH8603's
 `31-3` is the precedent), and leave the figure in place meanwhile.
 
+**THE REMEDY ASSUMES A RE-CUT EXISTS, AND SOMETIMES IT DOES NOT.** This section
+and *PROSE PRINTED INSIDE A CUT FRAME GOES WITH THE CROP* were written for the
+same shape from opposite sides and met a case neither covers: a caption SET
+INSIDE the figure's own frame, as part of its composition. MEASURED on 8702's
+`22-4` — "**Bild 4.** Aufbau- und Zugriffsschema einer Index-sequentiellen
+Datei" is printed in bold in the lower-left of the yellow panel, inside the
+frame rule, with the diagram laid out around it. There is no cut that removes
+it and leaves the figure.
+
+**The test is whether the caption can be removed without cutting into the
+figure's frame or its artwork:**
+
+- **It can** — it sits below the bottom rule, or beside the frame, and a loose
+  cut swept it in. Re-cut at the rule, caption out, `<figcaption>` as usual.
+  8702's `83-1` is this case and was cut correctly.
+- **It cannot** — it is inside the frame, part of the composition. **The crop
+  keeps it, AND the `<figcaption>` is still written.** This section's own
+  reason decides it: the figcaption is the accessible and searchable copy, and
+  dropping it to avoid showing the words twice trades a real loss for a
+  cosmetic one. r130's figure grammar expects one regardless.
+
+So *prose inside a cut frame goes with the crop* governs the PIXELS, and it
+does not license dropping the figcaption — that sentence is about prose the
+HTML would otherwise carry as a `<p>`, not about the caption.
+
 **AND THE OPPOSITE EDGE MATTERS TOO: A LEAD CROP THAT STOPS JUST ABOVE A BAND
 OF DISPLAY TYPE.** A crop cut tight to the artwork's frame excludes whatever
 is set beneath it, and what is set beneath an opening illustration is often

@@ -4306,3 +4306,28 @@ What the two days of evidence put in the rule, beyond the inversion:
 **The builder flagged three readings instead of asking three questions**, which
 is why nine crops came back in one pass and why the owner could answer all of
 it in one line. That is the shape to keep at ninety-three.
+
+### AND A CAPTION SET INSIDE THE FIGURE'S OWN FRAME HAS NO RE-CUT → r150
+
+8702's builder flagged `22-4`: "Bild 4. Aufbau- und Zugriffsschema einer
+Index-sequentiellen Datei" is printed in bold inside the yellow panel's
+lower-left, within the frame rule, with the diagram laid out around it.
+
+Two r150 sections had been written for this shape from opposite sides and
+neither covered it. *A CROP THAT CONTAINS ITS OWN PRINTED CAPTION GOES BACK FOR
+A RE-CUT* prescribes a re-cut — but there is no cut that removes this caption
+and leaves the figure. *PROSE PRINTED INSIDE A CUT FRAME GOES WITH THE CROP*
+says the pixels win — but that was written about prose the HTML would otherwise
+carry as a `<p>`, not about a caption, and read loosely it licenses dropping
+the `<figcaption>`.
+
+The test now in the rule: **can the caption be removed without cutting into the
+figure's frame or artwork?** If yes, re-cut at the rule — 8702's `83-1`, whose
+caption sits below the bottom rule, and the builder cut it out correctly. If
+no, the crop keeps it AND the figcaption is still written, because the
+figcaption is the accessible and searchable copy and dropping it trades a real
+loss for a cosmetic one.
+
+**The builder distinguished the two cases itself, on the same page-set, before
+either was in the rule** — which is the evidence that this is the right test
+and not a rationalisation of one crop.
