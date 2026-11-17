@@ -122,6 +122,23 @@ def split_html(input_file, issue):
         #     and a link's URL;
         #   - not a single ALL-CAPS token: 0 of the 1,355 is one, and a key name
         #     or a monitor keyword always is.
+        # ...AND A PARENTHESIS WITH A FINITE VERB IN IT IS A SENTENCE, NOT A
+        # NAME.  The three tests above are about SHAPE, and a lowercase
+        # parenthetical sentence has the shape of a byline: no digit, no '=',
+        # not all-caps.  8702 published "(dieses Programm ist nur bei der
+        # geringeren Auflösung verfügbar)" as an author.  MEASURED over the
+        # 1,599 distinct bylines in the published corpus, this list matches
+        # exactly ONE -- "Näheres siehe Plotter-Anleitung.", which is itself a
+        # false byline already shipped -- and rejects none of the real ones:
+        # not the initials ("gk", "aa/gk/rg/M. Kohlen"), not the name chains
+        # ("Josef Heid/Michael Janke/ Jürgen F. Hoffmann/bj"), not "Die 64'er
+        # Redaktion", and not the nine "X und Y" pairs, because the list holds
+        # VERBS and not the conjunctions and prepositions a name can contain.
+        VERB = (r"\b(ist|sind|war|waren|wird|werden|wurde|wurden|kann|können|"
+                r"hat|haben|hatte|muß|muss|müssen|soll|sollen|darf|dürfen|"
+                r"gibt|geht|liegt|steht|bleibt|lässt|läßt|erfolgt|dient|zeigt|"
+                r"siehe|beachten|enthält|benötigt)\b")
+
         def is_byline(a):
             if '\n' in a or not (1 <= len(a) <= 80):          return False
             t = re.sub(r'&[a-z]+;', '', a)
@@ -130,14 +147,24 @@ def split_html(input_file, issue):
             d = re.sub(r"(?:64|128)['\u2019]er", '', d)
             if re.search(r'\d', d):                            return False
             if t.isupper() and not re.search(r'[\s/.]', t):    return False
+            if re.search(VERB, d, re.I):                       return False
             return True
 
-        authors = set()
+        # THE AUTHOR META IS A LIST OF NAMES, NOT A SET OF BYLINE STRINGS.
+        # Collected as whole strings with '/' turned into ', ', an article
+        # with two bylines that share an editor -- "(Udo Dreier/hm)" and
+        # "(hm)" -- produced `content="Udo Dreier, hm, hm"`.  The tokens are
+        # what repeat, so the tokens are what is deduplicated, in the order
+        # the page prints them.
+        authors = []
         for a in re.findall(r'<p>\(([^)]*?)\)</p>', body, re.DOTALL):
             if not is_byline(a.strip()):
                 print(f"  not a byline, left as a paragraph: ({a.strip()[:60]})")
                 continue
-            authors.add(a.strip().replace('/', ', '))
+            for tok in re.split(r'\s*/\s*', a.strip()):
+                tok = tok.strip()
+                if tok and tok not in authors:
+                    authors.append(tok)
             body = body.replace(f'<p>({a})</p>', f'<address class="author">({a})</address>', 1)
         out = tpl_start.format(issue=issue)
         out += f"        <h1>{h1_clean}</h1>\n"
@@ -151,7 +178,7 @@ def split_html(input_file, issue):
         idx += 1
         if authors:
             out = re.sub(r'<meta name="author" content="XXX">',
-                         f'<meta name="author" content="{", ".join(sorted(authors))}">', out)
+                         f'<meta name="author" content="{", ".join(authors)}">', out)
         open(out_name, 'w', encoding='utf-8').write(out)
         written.append(out_name)
     print(f"wrote {len(written)} files")

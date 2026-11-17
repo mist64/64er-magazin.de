@@ -57,7 +57,35 @@ For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
   shape (`issue_key.endswith("/84")`, and the regular/special split on
   `k[0].isdigit()`). Corrected across SH8601 on 2026-10-04.
 - **bylines** `<p>(name1/name2)</p>` → `<address class="author">(name1/name2)</address>`
-  AND collected into `<meta name="author" content="name1, name2, …">`
+  AND collected into `<meta name="author" content="name1, name2, …">` —
+  **by TOKEN, deduplicated, in print order.** Collected as whole strings with
+  `/` turned into `, `, an article with two bylines sharing an editor —
+  `(Udo Dreier/hm)` and `(hm)` — wrote `content="Udo Dreier, hm, hm"`. The
+  tokens are what repeat, so the tokens are what is deduplicated (8702).
+- **a parenthesis with a finite VERB in it is a sentence, not a name.** The
+  shape tests (no digit, no `=`, not a single all-caps token) describe a
+  lowercase parenthetical sentence just as well as a byline, and 8702
+  published `(dieses Programm ist nur bei der geringeren Auflösung verfügbar)`
+  as an author. MEASURED over the 1,599 distinct bylines in the published
+  corpus, the verb list matches exactly **one** — `Näheres siehe
+  Plotter-Anleitung.`, itself a false byline already shipped — and rejects
+  none of the real ones: not `gk`, not `aa/gk/rg/M. Kohlen`, not `Die 64'er
+  Redaktion`, and not the nine `X und Y` name pairs, because the list holds
+  verbs and not the conjunctions and prepositions a name can contain.
+
+  **Two gaps this does NOT close**, both measured on 8702 and both needing a
+  reader rather than a test:
+
+  - **a Q&A asker is not the article's author.** In a Leserforum the name in
+    parentheses after a question belongs to the person who asked it. It has a
+    name's shape, and nothing here can tell the two apart; r200 owns the
+    rubric and is where the distinction belongs.
+  - **an unbracketed signature is never collected.** The collector reads
+    `<p>(…)</p>` only, so `Michael Scharfenberger, Chefredakteur` set without
+    parentheses is left as prose. Accepting a bare final paragraph as a byline
+    would publish a wrong author on every article whose last paragraph happens
+    to look like a name; until there is evidence that separates them, this is
+    a known gap and the orchestrator adds the author by hand.
 - **`64er.id` meta** = a unique placeholder `XXX<N>` per article, where `<N>`
   starts at `0` and increments in the order the `<h1>` sections are walked
   (first article → `XXX0`, second → `XXX1`, …). The sequence resets per
