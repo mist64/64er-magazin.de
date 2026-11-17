@@ -186,6 +186,42 @@ WORDS back into page space and the line sorter runs bottom-to-top, which is the
 same defect in a tidier form — every line correct, the lines in reverse. The
 block's own text is built in the frame the type reads in.
 
+### THE ID BANDS ARE A SHARED NUMBER SPACE, AND NOW SOMETHING ENFORCES IT
+
+Five passes write blocks onto one page and each takes a band: the main pass
+from 0, `BAR_BLOCK_ID` 1000, `RESCUE_BLOCK_ID` 2000, `SPLIT_BLOCK_ID` 3000,
+`ROT180_BLOCK_ID` 4000. **A new pass takes the next free band and is listed in
+that comment.**
+
+MEASURED on 8702 p039, 2026-11-17: the rotated pass was first given 2000, which
+is the rescue pass's. The page was written with 58 blocks and 47 distinct ids,
+and 020's reading order — chosen for the Umweltdynamik box at the foot of the
+previous article — resolved to the rotated blocks that had taken the same
+numbers. The page opened on an adventure tip, the boxed article vanished from
+the corpus, and the evaluation reported recall 0.06 on a page whose OCR was
+perfect.
+
+**Nothing objected, and the reason is worth more than the fix.** 010 wrote it,
+the block index took it, and 020's cache check passed because it compares id
+**sets** — a set cannot show you a duplicate. `drop_superseded` also reads
+`id >= RESCUE_BLOCK_ID` as "this came from the rescue pass", which a 2000-based
+rotated block answers falsely. `assert_unique_ids()` now runs before the page
+JSON is written and refuses the page by name: every later step addresses a
+block by its id, so a duplicate does not corrupt a block, it silently
+**redirects text**.
+
+### AND READ WHAT THE UPRIGHT PASS KEPT ON SUCH A PAGE
+
+On a page that is mostly inverted, tesseract's layout analysis can orient a
+block by the page's majority and hand back a genuinely upright one REVERSED.
+MEASURED on the same page: the header came back `uou1g] yw 434ndwoy` (*Lernen
+mit Computer*) and the footer `oqeßsny tenıqag/g 1861` (*Ausgabe 2/Februar
+1987*) — harmless there, both outside the corpus, both read correctly by
+another pass, and neither inside a declared region. It would not be harmless in
+body text, and no score would show it: **reversed German scores like German.**
+r010 prints the count of upright blocks kept outside the declared regions as a
+LOOK AT, and the eye is the check.
+
 **And the HTML reads the right way up.** The site's HTML is text in reading
 order — it already undoes printed line breaks and column order — so the column
 reads normally there, a figure cut from it is placed the way it reads, and one

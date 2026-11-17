@@ -3716,3 +3716,29 @@ refuses a malformed line, an inverted region and one outside 0…1; the mirror
 maps a block at (0.2, 0.3) of the rotated frame to the page's (0.5…1.0, 0.5…1.0)
 region; with no declaration file the module's behaviour is unchanged for every
 other page and issue. The builder verifies it on p039.
+
+### AND THE ROTATED PASS TOOK AN OCCUPIED BAND → r010
+
+Same page, the next hour, found by the builder reading the JSON: I gave the
+rotated pass `ROT180_BLOCK_ID = 2000`, which is `RESCUE_BLOCK_ID`. p039 was
+written with **58 blocks and 47 distinct ids**, and 020's reading order —
+chosen for the Umweltdynamik box at the foot of the previous article — resolved
+to the rotated blocks that had taken the same numbers. The page opened on an
+adventure tip, the boxed article disappeared from the corpus, and r020_evaluate
+reported recall 0.06 on a page whose OCR was perfect.
+
+**Three checks saw it and none could speak.** 010 wrote the file; the block
+index took it; 020's cache check compares id **sets**, and a set cannot show a
+duplicate. `drop_superseded` reads `id >= RESCUE_BLOCK_ID` as "from the rescue
+pass", which a 2000-based rotated block answers falsely. The bands were real
+and documented nowhere — four constants in four parts of one file.
+
+Now: the bands are listed in one comment, a new pass takes the next free one,
+and `assert_unique_ids()` refuses the page before it is written. A duplicate id
+does not corrupt a block, it **redirects text** — every later step addresses a
+block by its id.
+
+**My code, their finding, twice in one night.** The pixel diff found the half
+split; reading the JSON found this. Both were invisible to every check the
+chain owns, and both were caught because the builder compares artefacts instead
+of trusting a green run.

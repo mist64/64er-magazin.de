@@ -1572,9 +1572,28 @@ def write_digest(page, blocks, dest):
 # A COLUMN PRINTED UPSIDE DOWN
 # ---------------------------------------------------------------------------
 
-# Fresh block ids for the rotated pass, for the reason BAR_BLOCK_ID exists: so
-# its words cannot merge into an upright block.
-ROT180_BLOCK_ID = 2000
+# THE ID BANDS OF THIS FILE, IN ONE PLACE, BECAUSE THEY ARE A SHARED NUMBER
+# SPACE AND NOTHING ENFORCED IT:
+#
+#       0+  the main full-page pass (tesseract's own block_num)
+#    1000+  BAR_BLOCK_ID     the inverted section-bar pass
+#    2000+  RESCUE_BLOCK_ID  rescue_uncovered(), one id per rescued region
+#    3000+  SPLIT_BLOCK_ID   the column splitter
+#    4000+  ROT180_BLOCK_ID  the 180-degree pass, below
+#
+# MEASURED on 8702 p039, 2026-11-17: this constant was first written as 2000,
+# which is RESCUE_BLOCK_ID.  The page got 58 blocks with 47 distinct ids; 020
+# then resolved its reading order -- [2023, 2024, 2031, 2032, ...], chosen for
+# the Umweltdynamik box at the foot of the previous article -- to the rotated
+# blocks that had taken the same numbers, so the page opened on an adventure
+# tip and the box vanished from the corpus.  Nothing objected: 010 wrote it,
+# the block index took it, and 020's cache check compares id SETS, where a
+# duplicate cannot be seen.  `drop_superseded` also reads `id >= 
+# RESCUE_BLOCK_ID` as "this came from the rescue pass", which a 2000-based
+# rotated block would have answered falsely.
+#
+# Any new pass takes the next free band AND is listed above.
+ROT180_BLOCK_ID = 4000
 
 
 def rot180_regions():
@@ -1675,6 +1694,18 @@ def read_rot180(png, stem, boxes, W, H):
     return kept
 
 
+def assert_unique_ids(blocks, stem):
+    """Every block on a page has its own id. Nothing else checked this."""
+    ids = [b["id"] for b in blocks]
+    if len(set(ids)) == len(ids):
+        return
+    dupes = sorted({i for i in ids if ids.count(i) > 1})
+    sys.exit(f"r010 p{stem}: {len(ids) - len(set(ids))} DUPLICATE block id(s) "
+             f"{dupes} -- two passes are sharing a band (see the id bands at "
+             f"ROT180_BLOCK_ID). Nothing downstream can tell the blocks apart; "
+             f"the page is NOT written.")
+
+
 def process(page):
     stem = f"{page:03d}"
     png = os.path.join(SRC_DIR, stem + ".png")
@@ -1708,8 +1739,28 @@ def process(page):
         rot = read_rot180(png, stem, boxes, W, H)
         print(f"p{stem}: {len(blocks) - len(upright)} block(s) read upside down "
               f"replaced by {len(rot)} from the rotated pass", flush=True)
+        # AND READ WHAT THE UPRIGHT PASS KEPT ON THIS PAGE.  On a page that is
+        # mostly inverted, tesseract's layout analysis can orient a block by
+        # the page's majority and hand back a genuinely upright one REVERSED.
+        # MEASURED on 8702 p039: the header came back "uou1g] yw 434ndwoy"
+        # (Lernen mit Computer) and the footer "oqeßsny tenıqag/g 1861"
+        # (Ausgabe 2/Februar 1987) -- harmless there, both outside the corpus,
+        # and both read correctly by another pass. It is not harmless on body
+        # text, and no score shows it: reversed German scores like German.
+        print(f"p{stem}: {len(upright)} upright block(s) kept outside the "
+              f"declared region(s) -- LOOK AT their text. A reversed block "
+              f"reads as plausible German and no check here can see it.",
+              flush=True)
         blocks = upright + rot
     merge_listings(blocks, W, H)
+
+    # THE PAGE'S BLOCK IDS ARE UNIQUE, AND THAT IS ASSERTED HERE, ONCE, FOR
+    # EVERY PASS.  Every later step addresses a block by its id -- 020's
+    # reading order, the block index, the figure steps -- so a duplicate is
+    # not a cosmetic defect: it silently redirects text.  It cost 8702 p039 an
+    # entire boxed article (see ROT180_BLOCK_ID).  The cheapest check in the
+    # chain, and it did not exist.
+    assert_unique_ids(blocks, stem)
 
     rec = {"page": page, "ocr_size": [W, H], "ocr_dpi": OCR_DPI, "blocks": blocks,
            # tesseract's own layout verdict, carried through for step 145
