@@ -166,13 +166,20 @@ def main(d):
 
         # --- HARD: markup shape ---------------------------------------------
         if st := unbalanced(s): H('unbalanced tags', f, str(st[:3]))
-        # A PARAGRAPH THAT ENDS MID-WORD HAS LOST ITS CONTINUATION, and no
-        # other check in the chain can see it: the text is well-formed, the
-        # coverage is complete, the counts all agree -- a tail simply went into
-        # the block below it (a listing, a figure, the next column) and the
-        # paragraph stops at a hyphen.  MEASURED on 8702 p067
-        # (Kurvendiskussionen) where the last line was lost into the listing
-        # under it and the article ended "...viel Freude berei-".
+        # A PARAGRAPH THAT ENDS MID-WORD IS BROKEN MID-WORD, and no other
+        # check in the chain can see it: the text is well-formed, the coverage
+        # is complete, the counts all agree.  MEASURED on 8702, where all
+        # EIGHT were found by this test and repaired from the plate -- and
+        # they were THREE different faults wearing one face:
+        #   * the tail fell into the block below (a listing, a figure, a
+        #     rating table): 36 ("einzuset-|zen."), 79 ("Ein-|stellung" plus
+        #     its byline), 162 ("be-|fassen." plus "(bs)"), 174;
+        #   * the continuation was glued somewhere ELSE -- 52's p067 tail sat
+        #     inside the Checksummer box, after that box's own byline;
+        #   * the paragraph was split where the print does not break it: 31,
+        #     "diese gut er-" / "reichbar an der Gehäuserückseite", one word.
+        # No text was lost in the last two, and the test finds them anyway,
+        # because it asks about the WORD and not about where the rest went.
         #
         # The test is a LETTER before the hyphen, which is what makes it exact.
         # MEASURED over all 50 published issues plus the 8702 build: 16 prose
@@ -185,7 +192,7 @@ def main(d):
         for mm in re.finditer(r'<p[^>]*>(.*?)</p>', prose, re.S):
             tail = html.unescape(re.sub(r'<[^>]+>', '', mm.group(1))).strip()
             if re.search(r'[A-Za-zÄÖÜäöüß][-\u00ac\u2010]$', tail):
-                H('paragraph ends mid-word (lost continuation)', f, '...' + tail[-38:])
+                H('paragraph ends mid-word', f, '...' + tail[-38:])
         for _ in re.finditer(r'<ol[^>]*type=', body):  H('<ol type=> (Discount alpha-list bug, r060)', f)
         for _ in re.finditer(r'<p>\s*<pre', body):     H('<p><pre> (Discount fenced-code bug, r060)', f)
         for _ in re.finditer(r'<li>\s*<p>', body):     H('<li> wraps <p>', f)
