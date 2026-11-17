@@ -4234,3 +4234,36 @@ decimal, ~4.9 MB stricter. Recorded in r006 and deliberately NOT put to the
 owner: on 8702 the next step up, q96, is 101.58 MiB, over on either reading, so
 q95 is the answer whichever unit is meant. A question that decides nothing yet
 is not worth one of his answers.
+
+### AND THE OWNER NARROWED "ALWAYS ASK ME" A THIRD TIME → r300
+
+Owner, 2026-11-17, on 8702's module box printing `RESUME 49345-49381,0` while
+`prg/55modul.prg` says 49382 and the closing `JMP $A7AE` occupies 49380-49382:
+**"the correct version (i.e. disk iiuc) wins. no comments"**.
+
+So the page now reads 49382, with nothing said. Control had proposed leaving
+the print and adding a German comment; that is case **(d)** in r300 now — the
+page prints a fact the reader must TYPE OR LOAD, it is wrong, our disk holds
+the right one, and the right one is published silently.
+
+Applied in the same ruling to p050's »DRUCKER« and »SEE FILE«, where the prose
+sends the reader to the diskette and the disk holds `drucken` and `see film` —
+the article's own captions already said DRUCKEN and SEE FILM. **This reversed
+control's own call of the day before**, which had put a German comment at each.
+
+**The boundary is not "is the magazine wrong".** It is *do we ship a file that
+proves the other reading, and must the reader act on it.* 8702 keeps
+`Speicherzelle 53270 das Register 38`, `Bit 0 bis 3 … vertikal`, a `CLOSE 2`
+after an `OPEN 1` and `525 möglichen Farben` exactly as printed: nothing we
+ship contradicts them, so there is no correct version for the disk to win with.
+Those mislead a reader who is READING; the module box breaks a reader who is
+TYPING.
+
+An erratum's own text is a quotation and is untouched by this — 8612/52's aside
+still says "Seite 57 Bild 2" though the fault is in Bild 1.
+
+**Three narrowings now, all from the same 2026-10-04 absolute** (*"difference
+between the printed listing and the disk — always ask me"*): the print-error
+default, the German comment for an unimportant divergence, and this. An
+absolute in a rule is a promise to be narrowed later; what survives is the
+TEST, and the test here took three rounds to find.

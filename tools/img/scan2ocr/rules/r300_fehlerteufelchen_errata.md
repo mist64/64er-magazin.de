@@ -1070,6 +1070,9 @@ The two rulings, and the corpus that matches them:
 - **An unimportant difference gets a German HTML comment and nothing else.**
   The corpus has shipped `<!-- Disk-Version bereits korrigiert -->` 12 times
   and `<!-- Korrektur im Programm angewendet -->` 8 times.
+- **Where the page prints a MACHINE-READABLE FACT and our disk holds the right
+  one, the disk wins and nothing is said.** Owner, 2026-11-17, verbatim: *"the
+  correct version (i.e. disk iiuc) wins. no comments"*.
 
 So decide these three yourself, in this order:
 
@@ -1086,6 +1089,38 @@ So decide these three yourself, in this order:
   *Korrektur im Programm angewendet*, which would be a false claim about what
   the file contains.
 
+- **(d) The page prints a fact the reader must TYPE OR LOAD, and it is wrong;
+  our disk holds the right one.** Publish the right one, in the text, silently
+  — no comment, no aside, no Futureteufelchen. Owner, 2026-11-17: *"the correct
+  version (i.e. disk iiuc) wins. no comments"*.
+
+  MEASURED on 8702 p087, the module box for Modul 55: the page prints `4)
+  RESUME 49345-49381,0`; `prg/55modul.prg` reads `RESUME 49345 49382 0`, the
+  four module ranges abut exactly, and the closing `JMP $A7AE` — `4c ae a7` —
+  occupies 49380, 49381, 49382. A reader typing the printed number into the
+  Modul-Schreiber loses the high byte and builds a half-written jump. The page
+  now reads 49382.
+
+  Applied in the same ruling to p050's prose, which sends the reader to the
+  diskette for »DRUCKER« and »SEE FILE« while the disk holds `drucken` and
+  `see film` — and the article's own captions already say DRUCKEN and SEE FILM.
+  Both now read as the disk does. Control had ruled a German comment on each;
+  the owner's answer removed them.
+
+**THE BOUNDARY, AND IT IS NOT "IS THE MAGAZINE WRONG".** It is **do we ship a
+file that proves the other reading, and must the reader act on it.** With no
+file of ours behind it there is no correct version for the disk to win with, so
+*print errors stay as printed* is untouched: 8702 keeps `Speicherzelle 53270
+das Register 38` (53270 is register 22), `Bit 0 bis 3 … vertikal` (bits 0-2,
+and horizontal), a `CLOSE 2` after an `OPEN 1`, and `525 möglichen Farben`
+where 5⁴ is 625. Those mislead a reader who is reading; they do not break a
+reader who is typing, and nothing we ship contradicts them.
+
+An erratum's own text is a QUOTATION and is never touched by this — 8612/52's
+aside keeps "Seite 57 Bild 2" though the fault is in Bild 1 (see *AN ERRATUM
+WHOSE OWN REFERENCE IS WRONG*). The ruling is about OUR sentences, not the
+magazine's.
+
 **AND AN ERRATUM'S LINE SET IS THE LINES IT NAMES**, not every line that
 matches the pattern. SH8606's MPS 802 erratum changes `,2` to `,1` at disk
 lines 1040 and 1070. The same file carries `sys50442,1` at 6040 and
@@ -1095,7 +1130,7 @@ the bug. A blanket substitution would have corrupted three working lines. Name
 the set, then check the thing you are about to change is IN it (r000).
 
 **What still goes to the owner:** a difference that changes what the program
-DOES, with no erratum to lean on and none of (a)-(c) to fall back on — the
+DOES, with no erratum to lean on and none of (a)-(d) to fall back on — the
 *Hyper-Graphics* shape below, where 12 instructions differ and nothing
 anywhere explains why. Report it on the owner decision list, with the evidence.
 
