@@ -4682,3 +4682,54 @@ complete table instead of a filtered subset.
 
 **A screen that decides what gets measured is a measurement.** Set its
 threshold at zero unless the measurement is expensive, and this one was not.
+
+### WHAT IN 8702's CROP WORK IS A RULE, AND WHAT IS STILL A READING
+
+Owner: *"was everything done with proper rules, or anything with special cases
+for specific images?! we need generic rules for next time! be honest"*. Audited
+against the scripts, not from memory.
+
+**GENERIC — a measured predicate swept over all 92, and re-measured after every
+change:** the bare-paper edge flag (fraction below 250 on the per-channel
+minimum, counted as a run inward); the inward edge cut (90 % of the way from
+the edge line's mean luminance to the interior plateau, 50 % on a slanted
+figure); frame detection (continuity of the longest unbroken run + a relative
+step inside the band + framed decided per FIGURE); the frame cut (deepest band
+along the whole side, ground measured); the `_1cm` companion and its clamping;
+the dashed box's parity formula; the rotation criterion (|figure − page text| ≥
+0.10 **and** |figure| ≥ 0.10); caption detection by the KNOWN text with the
+words required consecutive from "Bild"; crop-vs-paint by whether ink lies
+beyond the caption; and the whole-margin frame sweep.
+
+**NOT GENERIC — still a reading, and it will need making again next issue:**
+
+1. **"Is it a standalone box?"** The big one. I tried three measures and none
+   separates `83-1` (keep, step 0.39–0.88) from `156-1` (cut, step 0.50–0.53).
+   Continuity screens out a dashed grid, spokes catch a table, and neither
+   catches a screenshot's own border. **This is a human call**, and the rule
+   says so rather than pretending otherwise.
+2. **`22-2`'s 50-line peak window**, widened for that one crop because its rule
+   sits under 28 paper rows. A per-image parameter. **Fixable now** — derive
+   the window from the paper run instead of fixing it.
+3. **`171-xa`'s top edge**, cut by matching the relation the other three sides
+   had, because the rule fades into a grey header rather than meeting ground.
+4. **`8-0` cut inside the keyline** — a per-crop instruction carried in the
+   worklist row.
+5. **The 11 crops held from the luminance edge cut.** The guard is generic
+   (>10 px, or >3 px on a pale interior); every accept/reject within it was by
+   eye.
+6. **`171-xa`/`171-xb`'s border removal** — the owner's explicit one-off,
+   marked *not a precedent*.
+7. **`crops_v1_cut.py`'s `done={...}` skip list** of the first nine. Run
+   bookkeeping rather than different logic — but it is exactly the mechanism
+   that froze those nine outside the instrument built after them, and it cost
+   `10-x2` a white sliver the owner found by eye.
+
+**And one rule rests on n=2:** crop-vs-paint was derived from the only two
+captions inside a figure in the whole issue. It is measured and it is right for
+both, but it has not been tested against a third.
+
+**The honest shape of the day: the predicates got generic, the TAXONOMY did
+not.** Deciding what a thing IS — a frame, a table, a window, a grid — stayed
+human, and every measure that tried to replace that judgement failed on a case
+the eye got right immediately.
