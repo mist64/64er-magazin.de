@@ -669,6 +669,54 @@ sweep said -3.06 and the levelled page reported -0.02, confirming itself. The
 eye caught it. See HARVEST (8701) — this is one of four checks in the chain
 found to be keyed on the belief they were meant to question.
 
+**AND A SECOND PASS THAT MOVES AWAY FROM ZERO REFUSES BOTH PASSES.**
+Correcting by the residual must REDUCE it. When it grows instead, the
+projection is not measuring the sheet: it is following artwork printed at an
+angle, and each pass follows it further. The page is levelled to **0**, NOTED
+`SKEW diverged`, and LOOKED AT; its residual is the measurement on the
+unrotated page and is exempt, exactly as for a refused skew.
+
+MEASURED on 8702 p137, a Star NG-10 ad whose banners are printed at an angle:
+-0.36 → residual -0.76 → corrected -1.12 → residual **-1.60**, and the master
+carried ~30 px of the neighbour top-left and ~60 px of bed bottom-right.
+p139, the only other re-levelled page in the issue, went +0.12 → 0.00. Neither
+existing guard could see it — `SKEW_PEAK_MIN` does not fire, because the
+profile HAS a peak, the banners' own.
+
+### THE PAPER IS NOT SQUARE TO ITS OWN PRINT, SO THE FOLD IS NOT THE REFERENCE
+
+The obvious remedy for p137 — level by the certified fold, which is physical
+evidence — is **wrong**, and the census that proves it is worth keeping.
+MEASURED on 8702, 184 pages, 152 certified folds:
+
+| | |
+|---|---|
+| `fold.tilt_deg` against the applied angle | slope -1.03 against `-angle`, r -0.86, scatter 0.15° (n 152); over the 87 pages with \|angle\| > 0.05: slope -1.00, r -0.92 |
+| the fold BEFORE levelling (`fold.tilt_deg - angle`) | median -0.05°, sd 0.15, p1/p99 -0.47/+0.38, max 0.56 |
+| \|angle\| on certified pages | median 0.14°, p95 0.48, largest 0.66 — and p137's -1.12 |
+| certified folds with \|fold.tilt\| > 0.30 on the levelled sheet | **43 of 152** |
+
+Read in order: the clip holds the sheet square to about 0.15°, the projection
+then rotates each page by its own PRINT-to-paper angle, and that angle is real
+— up to 0.7°. p008 is the proof: angle -0.66, fold -0.53, both trims +0.6, and
+the master's type is dead level. **We level to the type, and the paper is off
+its own print.** A fold reference would tilt the type on all 43.
+
+Two consequences, both used above: the fold cannot be the levelling reference,
+and an UNROTATED page is within ~0.15° of its sheet's geometry — which is why
+`levelled to 0` is a measured fallback here and not a shrug. The bottom trim
+tracks the same rotation with twice the fold's noise (slope +0.86 against the
+angle, r 0.51, scatter 0.34), so a fold-vs-trim disagreement of a few tenths
+is the trim's noise, not two witnesses contradicting each other — on a
+full-bleed page the trim comes from the prop, not from paper at all.
+
+**Why the trigger is the divergence and not the size of the angle.** The
+census offers both: p137 is the only certified page past the issue's envelope
+(\|angle\| ≤ 0.66), and the only page whose second pass diverged. The envelope
+is an issue-specific number that would have to be calibrated per issue and
+would move with the printing; the divergence is the instrument contradicting
+itself, which needs no constant at all.
+
 The grade is the sheet variant's too: the whole levelled 2400 dpi sheet goes
 through `cmyk_reconstruction`, its GCR is undone (`c = c_final + k`), the
 result is ICC-rendered once to AdobeRGB with no curve, and the 600 dpi sheet
@@ -1099,6 +1147,7 @@ the page line), the stamp's `notes` field, the overlay's text and the JSON's
 |---|---|
 | `SKEW re-levelled: residual was ±n.nn, corrected to ±n.nn deg, now ±n.nn` | the first residual was over `SKEW_RESIDUAL_MAX` and a second pass ran |
 | `SKEW still ±n.nn deg after a second pass (allowed 0.1) -- published anyway` | the second pass did not bring it under |
+| `SKEW diverged: ... correcting by it gave ±n.nn deg and a LARGER residual ±n.nn -- the projection is following artwork, not the sheet.  Both passes refused, levelled to 0. LOOK AT the page` | the second pass moved AWAY from zero; the page is published unrotated and its residual is exempt (8702 p137) |
 | `EDGES fullbleed: paper body n.nn -- top/outer at the frame, bottom from the prop` | the paper body fraction was under `FULLBLEED_BODY_FRAC` (or the trace raised) |
 | `EDGES top|bot|outer from the frame|prop: the paper trace ran n.n mm in at ±n.nn deg -- ink to the trim` | a traced edge was beyond `EDGE_*_MAX_MM` or tilted over `EDGE_TILT_MAX`; that edge is the frame's (the prop's, for the bottom) |
 | `FOLD from the neighbour's colour boundary (n bands, residual n.nn mm) -- n hole candidates did not fit a line` | no hole line; the fallback found the neighbour's boundary |
@@ -1281,6 +1330,29 @@ found) had gutter margins of 12.2 / 11.6 mm against the back half's 8.7 under
 the plain fit; corrected, 8.5 / 7.9. Front-half pages move by under 0.8 mm. An
 edges-anchored page is placed on its fold as before (*Pages without a
 wordmark*).
+
+#### AND `N/2` IS THE ISSUE'S N, NOT THE SIZE OF THE SET BEING CUT
+
+`half_of` took `len(geoms)` — the number of geometry JSONs `cut` found. On a
+full sweep that IS the issue's page count; on a sample or a gate cut it is
+not, and a page then takes the other half's offset, which is the ~4 mm above.
+
+MEASURED on 8702, 2026-11-17, by a pixel diff of 25 sample masters against the
+full-sweep ones: 040, 044 and 090 came out **dx +50 px (2.12 mm)**, 0 px
+residual after the shift — on a 25-page sample `len(geoms)//2` is 12, so all
+three fell in the "back" half. It is now `N_PAGES = ISS.pages`, from the
+descriptor, in `half_offsets`, `cut_page` and `gutter_verdicts` alike.
+
+**A sample cut is a sample of medians, not a smaller cut.** The window fit, the
+half offsets, the punch priors and the gutter baseline are all medians over the
+geometry on disk, so every one of them is the sample's on a partial run. `cut`
+now says so in a PARTIAL banner naming the four. Look at such masters; never
+publish one.
+
+**And note what a pure translation does to the checks.** A master shifted 2 mm
+sideways reads the same on the window fit, the fold gate, the gutter margin and
+the unknown fraction. Nothing in this rule would have found it — the pixel diff
+against masters cut the other way did.
 
 ### The fold gate — the gutter edge, tested on the RESULT
 

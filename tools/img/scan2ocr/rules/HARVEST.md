@@ -3537,3 +3537,59 @@ monthly still returns None without a warning.
 **What is NOT fixed by this.** SH09 is published and still carries no index
 metadata; applying its 30 rows is an edit to a published issue and waits on the
 owner.
+
+
+## 8702, 2026-11-17: the half split was the size of the set being cut
+
+`half_of(geom, n_pages)` decides whether a page takes the front or the back
+half's wordmark-to-fold offset, and `cut` was passing `len(geoms)` for
+`n_pages` — the number of geometry JSONs it happened to find. On a full sweep
+that is the issue's page count; on a SAMPLE or a GATE cut it is not.
+
+MEASURED by the 8702 builder with a pixel diff of 25 sample masters against the
+full-sweep ones: 040, 044 and 090 came out **dx +50 px (2.12 mm)** off, with 0
+px residual after the shift. On a 25-page sample `len(geoms)//2` is 12, so
+those three pages fell in the "back" half and took the back-half offset.
+
+### N_PAGES COMES FROM THE DESCRIPTOR → r005_masters_spread
+
+`N_PAGES = ISS.pages`, used by `half_offsets`, `cut_page` and
+`gutter_verdicts`. `cut` also prints a PARTIAL banner when it has fewer
+geometry JSONs than the issue has pages, naming the four numbers that are then
+a sample's medians rather than the issue's: the window fit, the half offsets,
+the punch priors, the gutter baseline. **The half split was the visible one of
+four, and the only one a pixel diff could catch.**
+
+**And note what found it.** A pure translation with 0 px residual passes every
+check in r005 — the window fit, the fold gate, the gutter margin, the unknown
+fraction all read the same on a master shifted 2 mm sideways. The builder ran
+the diff against masters cut the other way because the rule asks for a sample
+comparison, not because anything was suspected.
+
+### AND p137: THE SECOND PASS MOVED AWAY FROM ZERO → r005_masters_spread
+
+Same build, same night. p137 is a Star NG-10 ad whose banners are printed at an
+angle; the projection followed them. -0.36 → residual -0.76 → corrected -1.12 →
+residual **-1.60**, NOTED `still -1.60, published anyway`, and the master
+carried ~30 px of the neighbour top-left and ~60 px of bed bottom-right.
+
+Both existing guards were keyed on the instrument they were meant to question.
+`SKEW_PEAK_MIN` did not fire: the profile HAS a peak — the banners' own. The
+residual re-measures with the same projection, so it confirmed the error and
+then doubled it. **The new trigger is the instrument contradicting itself:
+correcting by the residual must reduce it; when it grows, both passes are
+refused and the page is levelled to 0, NOTED and looked at.**
+
+The remedy that looked obvious — level by the certified fold, which is physical
+evidence of the sheet — is wrong, and the builder's census is what settled it.
+Over 8702's 152 certified folds, `fold.tilt_deg` ≈ +1.00 × the applied angle
+(slope -1.03 against `-angle`, r -0.86): **we level to the TYPE, and the paper
+is up to 0.7° off its own print** (p008: angle -0.66, fold -0.53, type dead
+level). A fold reference would tilt the type on 43 of the 152. What the census
+does establish is the fallback: the fold BEFORE levelling has median -0.05°,
+sd 0.15, so an unrotated page sits within ~0.15° of its sheet's geometry, and
+`levelled to 0` is a measured answer rather than a shrug.
+
+**Ask for the census before moving a constant.** One page's evidence can only
+tell you that something is wrong; 184 pages' told us which of two plausible
+remedies would have broken 43 pages to fix one.

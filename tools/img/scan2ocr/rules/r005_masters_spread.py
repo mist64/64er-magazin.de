@@ -91,6 +91,19 @@ if ISS.binding != BINDING:
         f"This issue belongs to r005_masters_sheet. Record this variant in its "
         f"LOG.md as not applicable rather than forcing it.")
 
+# THE HALF SPLIT IS THE ISSUE'S PAGE COUNT, NEVER THE SIZE OF THE SET BEING
+# CUT.  Which half a page is in decides which wordmark-to-fold offset it is
+# placed by (front and back differ by ~4 mm, 8701 p110/p112), and `cut` was
+# asking `len(geoms)` for it -- the number of geometry JSONs it happened to
+# find.  On a full sweep that is the same number; on a SAMPLE or a GATE cut it
+# is not.  MEASURED by the 8702 build, 2026-11-17: on a 25-page sample
+# len(geoms)//2 = 12, so pages 040, 044 and 090 took the BACK-half offset and
+# came out dx +50 px (2.12 mm) from their full-sweep masters, 0 px residual
+# after the shift -- a pure translation, invisible in anything but a pixel
+# diff against a master cut the other way.  The descriptor knows the real
+# number and is validated against the scans at load.
+N_PAGES = ISS.pages
+
 SCAN_DIR = Path(ISS.scan_dir)
 THUMB_DIR = Path(ISS.thumb_150)
 OUT_MASTER = Path(ISS.masters600)
@@ -881,6 +894,44 @@ def level_page(page):
                          f"and the re-level pass added the rest. This is almost "
                          f"always ARTWORK printed tilted, not a tilted sheet "
                          f"(8612 p183: -6.60 applied). LOOK AT the page")
+        # A SECOND PASS THAT MOVES AWAY FROM ZERO IS THE INSTRUMENT REFUTING
+        # ITSELF, AND NEITHER PASS SURVIVES IT.  Correcting by the residual
+        # must REDUCE it; when it grows instead, the projection is not
+        # measuring the sheet at all -- it is following artwork that is
+        # printed at an angle, and each pass follows it further.  Nothing in
+        # the chain could see this: SKEW_PEAK_MIN does not fire (the profile
+        # HAS a peak, the banners' own), and the residual check re-measures
+        # with the same instrument, which is why it confirmed itself.
+        #
+        # MEASURED on 8702, 2026-11-17 (census over 184 pages, 152 certified
+        # folds): p137, a Star NG-10 ad whose banners are printed at an angle,
+        # went -0.36 -> residual -0.76 -> corrected -1.12 -> residual -1.60,
+        # and its master carried ~30 px of the neighbour at the top-left and
+        # ~60 px of bed at the bottom-right.  p139, the only other re-levelled
+        # page in the issue, went +0.12 -> 0.00.  No paper-levelled page
+        # diverges.
+        #
+        # LEVELLED TO 0, NOT TO THE FIRST PASS, AND NOT TO THE FOLD.  The clip
+        # holds the sheet square: over those 152 certified folds the fold's
+        # tilt BEFORE levelling (fold.tilt_deg - angle) has median -0.05 deg,
+        # sd 0.15, p1/p99 -0.47/+0.38.  So an unrotated page is within ~0.15
+        # deg of the sheet's own geometry, and that -- not a pass from an
+        # instrument that has just contradicted itself -- is the honest
+        # fallback.  The FOLD is not the reference either: the same census
+        # shows fold.tilt ~= +1.00 x angle (slope -1.03 against -angle,
+        # r -0.86), i.e. we level to the TYPE and the paper is up to 0.7 deg
+        # off its own print (p008: angle -0.66, fold -0.53, type dead level).
+        # Levelling to the fold would tilt the type on 43 of the 152.
+        if abs(residual) > abs(first):
+            notes.append(f"SKEW diverged: the first residual was {first:+.2f}, "
+                         f"correcting by it gave {angle:+.2f} deg and a LARGER "
+                         f"residual {residual:+.2f} -- the projection is "
+                         f"following artwork, not the sheet.  Both passes "
+                         f"refused, levelled to 0. LOOK AT the page")
+            angle = 0.0
+            full, img = levelled(angle)
+            residual = residual_of(img)
+            return angle, residual, full, img, notes
     if abs(residual) > SKEW_RESIDUAL_MAX:
         notes.append(f"SKEW still {residual:+.2f} deg after a second pass "
                      f"(allowed {SKEW_RESIDUAL_MAX}) -- published anyway")
@@ -1639,11 +1690,11 @@ def half_offsets(geoms, fit):
         fx = fold_mid_x(g)
         lx = g["anchor"]["x"] - fit[g["parity"]][0]
         f0 = fx - MASTER_W_PX if g["parity"] == "even" else fx
-        acc.setdefault((half_of(g, len(geoms)), g["parity"]), []).append(lx - f0)
+        acc.setdefault((half_of(g, N_PAGES), g["parity"]), []).append(lx - f0)
     return {k: float(np.median(v)) for k, v in acc.items()}
 
 
-def cut_page(geom, fit, sheet600, halves=None, n_pages=None):
+def cut_page(geom, fit, sheet600, halves=None, n_pages=N_PAGES):
     """The master: sheet600 with the unknown painted white, cut to the window."""
     notes = list(geom["notes"])
     w, h = geom["sheet_px"]
@@ -1716,6 +1767,16 @@ def cut():
     geoms = [json.loads(p.read_text()) for p in sorted(OUT_GEOM.glob("[0-9][0-9][0-9].json"))]
     if not geoms:
         raise SystemExit(f"{VARIANT} cut: no geometry in {OUT_GEOM} -- run measure first")
+    # A PARTIAL CUT SAYS SO.  Every issue-wide fit below -- the window, the
+    # half offsets, the punch priors, the gutter baseline -- is a median over
+    # the geometry on disk, so a sample's numbers are a sample's.  They are
+    # legitimate for looking, never for publishing.
+    if len(geoms) != N_PAGES:
+        print(f"{VARIANT} cut: PARTIAL -- {len(geoms)} of {ISSUE}'s {N_PAGES} "
+              f"pages have geometry.  The window fit, half offsets, punch "
+              f"priors and gutter baseline are medians over THESE pages only; "
+              f"the half split is still the issue's {N_PAGES}.  Re-cut the "
+              f"whole issue before publishing any of these masters.", flush=True)
     foot_med, foot_replaced, foot_out = fit_foot(geoms)
     print(f"foot: issue median {foot_med:.2f} mm; frame-row feet replaced: "
           f"{['%03d' % p for p in foot_replaced] or 'none'}; LOOK AT (> "
@@ -1748,7 +1809,7 @@ def cut():
                 f"PUNCHES: {kept} detected, {found} more found at the clip "
                 f"template's rows and filled, {none} not visible")
             (OUT_GEOM / f"{stem}.json").write_text(json.dumps(g, indent=1))
-        master, frac, notes = cut_page(g, fit, sheet, halves, len(geoms))
+        master, frac, notes = cut_page(g, fit, sheet, halves, N_PAGES)
         source, ax, ay = anchor_of(g)
         stamp = stamp_text(VARIANT, **{
             "page": f"{stem} of {ISSUE}", "phase": "cut",
@@ -1787,7 +1848,7 @@ def cut():
               f"unknown {frac:.2%}" + "".join(f"\n      NOTE p{stem}: {n}" for n in notes),
               flush=True)
     certified = {s for s, v in report["pages"].items() if v["fold_gate"] == "PASS"}
-    gv, base = gutter_verdicts(margins, certified, len(geoms))
+    gv, base = gutter_verdicts(margins, certified, N_PAGES)
     for s, v in report["pages"].items():
         v["gutter_margin_mm"], v["gutter"] = margins.get(s), gv.get(s)
     report["gutter"] = {"baseline_mm": {k: {"median": a, "sd_mad": b} for k, (a, b) in base.items()},
