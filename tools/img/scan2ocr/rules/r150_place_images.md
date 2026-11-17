@@ -1354,6 +1354,40 @@ rectangle's own pixels, and the count of differing pixels must equal the
 perimeter drawn. That is what catches a line one pixel in, which would make
 every crop in the set look tighter than it is.
 
+### NO CROP MAY BEGIN OR END WITH A LINE OF BARE PAPER
+
+Before the folder is opened, flag every crop whose **outermost row or column is
+entirely pure paper** (255/255/255). It is a few lines of numpy and it is the
+cheapest true statement about a cut edge there is: a figure's own boundary is
+where its ink starts, so a full line of paper at the edge means the cut missed
+the picture.
+
+```python
+pure = (np.array(Image.open(f).convert('RGB')) == 255).all(axis=2)
+flag = pure.all(axis=0)[0] or pure.all(axis=0)[-1] or pure.all(axis=1)[0] or pure.all(axis=1)[-1]
+```
+
+**FLAG, NEVER AUTO-TRIM.** A figure that legitimately ends in white with no
+frame would be damaged by an automatic trim, and nothing in the measurement can
+tell the two apart. Flagging costs a look; trimming costs a figure.
+
+MEASURED on 8702, which is also why this is here: of 92 crops exactly **one**
+tripped it — `10-x2`, three pure-white columns on the left, so its edge sat
+0.13 mm outside a near-black photograph, where a white sliver is as visible as
+a defect gets. The owner found it in the `_1cm_box` file, which is precisely
+what that file is for. The other 91 measured zero on all four sides, so the
+trim was provably a no-op on every one of them — **including the panel crops,
+whose frame rule is ink at the outermost line.**
+
+**And the one that tripped it was the one that had skipped the measurement.**
+The 83 crops cut in the main pass went through an edge-ink check and an eye
+review that recut 56 of them; the first nine were cut before that instrument
+existed and were then frozen, on control's instruction, because the owner had
+approved them. Eight were tight by luck. **An approval is not a measurement**,
+and freezing a set puts it outside every check invented afterwards — so when a
+later pass builds an instrument, run it over the frozen set too and report the
+result, even when nothing is expected to change.
+
 - `<name>` is the **final r150 name** — `8-0`, `10-x1`, `22-3`, `67-2a` — so an
   accepted crop moves into `issues/<ID>/` unchanged. Never a lettered start
   page: Verification 1 matches `[0-9]+-[0-9a-z_]+\.png`, so page 8a's lead

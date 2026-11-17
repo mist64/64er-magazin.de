@@ -4359,3 +4359,36 @@ summary that distorts what it summarises is not a convenience.
 
 Both are in the rule now, with the verification that `_1cm_box` differs from
 `_1cm` only on the rectangle's own pixels.
+
+### AND AN APPROVED SET SKIPPED EVERY CHECK INVENTED AFTERWARDS → r150
+
+The owner opened `10-x2_1cm_box.png` and said the left side included too many
+white pixels. Measured: three columns of pure 255/255/255, the photograph's ink
+starting at the fourth — the crop's edge sat 0.13 mm outside a near-black
+picture, where a white sliver is as visible as a defect gets.
+
+**It was one crop in 92, and the cause was control's instruction.** The 83
+crops of the main pass went through an edge-ink measurement and an eye review
+that recut 56 of them. The first nine were cut before that instrument existed,
+and I then told the builder not to recut them because the owner had approved
+them on a contact sheet. Eight of the nine were tight by luck; `10-x2` was not,
+and nothing looked at it again.
+
+**An approval is not a measurement.** Freezing a set puts it outside every
+check invented afterwards, and the freeze was mine. When a later pass builds an
+instrument, run it over the frozen set and report the result even when nothing
+is expected to change.
+
+The fix was provably safe in a way worth copying: the pure-paper edge test over
+all 92 returned **one** flag and zero on the other 91, so the trim was a no-op
+on every crop but the broken one — the panel crops included, because their
+frame rule is ink at the outermost line. A fix whose risk you can measure to
+zero is not a judgement call.
+
+Now a standing check, in the FLAG form rather than auto-trim: a figure that
+legitimately ends in white with no frame would be destroyed by an automatic
+trim, and no measurement distinguishes the two. Flagging costs a look.
+
+**And the `_1cm_box` file earned its place on its first day** — the defect had
+survived a contact-sheet approval and was invisible until the boundary was
+drawn beside the picture at full resolution.
