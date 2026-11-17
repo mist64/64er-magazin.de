@@ -13,7 +13,7 @@ recurring mistake is "fixing" a product name, a German compound or a print typo.
 usage:  r310_issue_invariants.py [issues/<ID>] [--soft]
         With no path it uses r000_issue's selected issue (rules/ISSUE.txt).
 """
-import glob, io, os, re, sys
+import glob, html, io, os, re, sys
 from html.parser import HTMLParser
 
 
@@ -166,6 +166,26 @@ def main(d):
 
         # --- HARD: markup shape ---------------------------------------------
         if st := unbalanced(s): H('unbalanced tags', f, str(st[:3]))
+        # A PARAGRAPH THAT ENDS MID-WORD HAS LOST ITS CONTINUATION, and no
+        # other check in the chain can see it: the text is well-formed, the
+        # coverage is complete, the counts all agree -- a tail simply went into
+        # the block below it (a listing, a figure, the next column) and the
+        # paragraph stops at a hyphen.  MEASURED on 8702 p067
+        # (Kurvendiskussionen) where the last line was lost into the listing
+        # under it and the article ended "...viel Freude berei-".
+        #
+        # The test is a LETTER before the hyphen, which is what makes it exact.
+        # MEASURED over all 50 published issues plus the 8702 build: 16 prose
+        # paragraphs end in a hyphen, and the letter test keeps exactly the 8
+        # real ones (all in the live build) while dropping every published
+        # false positive -- German price notation ("Preis: 129,-", "DM 14,-"),
+        # a BASIC line in prose ("240 REM - FORMELBERECHNUNG -") and a section
+        # number ("(1.2) -").  Each of those has a comma or a space before the
+        # hyphen; a lost word does not.
+        for mm in re.finditer(r'<p[^>]*>(.*?)</p>', prose, re.S):
+            tail = html.unescape(re.sub(r'<[^>]+>', '', mm.group(1))).strip()
+            if re.search(r'[A-Za-zÄÖÜäöüß][-\u00ac\u2010]$', tail):
+                H('paragraph ends mid-word (lost continuation)', f, '...' + tail[-38:])
         for _ in re.finditer(r'<ol[^>]*type=', body):  H('<ol type=> (Discount alpha-list bug, r060)', f)
         for _ in re.finditer(r'<p>\s*<pre', body):     H('<p><pre> (Discount fenced-code bug, r060)', f)
         for _ in re.finditer(r'<li>\s*<p>', body):     H('<li> wraps <p>', f)
