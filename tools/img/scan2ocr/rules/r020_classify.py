@@ -503,6 +503,35 @@ VALID_ROLES = set(ROLE_PREFIX) | {"body", "code", "source", "row"}
 # clustering at 0.66-0.67; the 0.85-0.95 band is ordinary body, including
 # 26- and 28-line body blocks on p145. The ratio is per page because type size
 # varies between pages, and taken from the median so one odd block cannot move it.
+# WHERE ONE BLOCK ENDS AND THE NEXT BEGINS, THE PAGE SAYS WHETHER THAT IS A
+# PARAGRAPH BREAK -- AND THE INDENT IS NOT THE ONLY THING IT SAYS.
+#
+# join_runons used to decide a block boundary on the first-line indent alone:
+# a continuation is flush, a new paragraph is indented.  True wherever the
+# magazine indents paragraph openings.  MEASURED on 8702, where it does not:
+# p153's 50-line block starts flush and so does every block around it (every
+# line within +/-2 px of its own median), and p039's adventure tips are set
+# flush AND justified to the full measure on the last line (last-line fill
+# 0.997-1.000 over 41 tips).  With indent 0 everywhere the test said "join"
+# every time: p153's eight body blocks became one 4234-char paragraph and
+# p039's tips one per GAME, 1570 chars for THE PAWN.
+#
+# What the page still says is LEADING, which is the same evidence paragraphs()
+# already uses INSIDE a block -- it simply stopped at the block edge.  MEASURED
+# on the two pages, as the gap between the blocks' bboxes over the earlier
+# block's own line pitch:
+#
+#       true continuation (p153 7->8, 8->9)        0.20  0.30
+#       new paragraph, same column (p153 3->4)     1.46
+#       new paragraph, tip to tip (p039)           1.53-1.87
+#       new paragraph after a figure (p153 9->21)  14.7  15.1
+#
+# Nothing sits between 0.30 and 1.46, and the same separation holds on the
+# rotated column, where the reading order runs UP the page -- hence the
+# orientation-free gap below.
+BLOCK_GAP_RUN_MAX = 0.60     # x the earlier block's line pitch
+BLOCK_SAME_COL_FRAC = 0.60   # x the narrower block's width, of horizontal overlap
+
 SOURCE_LINE_RATIO = 0.85
 SOURCE_MIN_BODY_BLOCKS = 2      # too few to take a median from
 SOURCE_HTML = '<p class="source">%s</p>'
@@ -514,8 +543,34 @@ SOURCE_HTML = '<p class="source">%s</p>'
 SOURCE_JOIN = "<br>\n"
 
 
+def block_follows(prev, b):
+    """How block `b` sits under the block read before it: "column", "run" or "gap".
+
+    "column"  the two are in different columns -- the classic break, where the
+              text may run on and only the indent and the sentence can say.
+    "run"     same column, one line pitch apart: consecutive lines that were
+              split into two blocks for some other reason (a tint, an inline
+              figure, a rescue pass).
+    "gap"     same column, extra leading: the compositor left space, and space
+              is a paragraph break in any typography.
+
+    The vertical distance is taken in both directions so that a column read
+    upwards -- r010's rot180 pass -- measures the same as one read downwards.
+    """
+    if prev is None:
+        return None
+    ax0, ay0, ax1, ay1 = prev["bbox"]
+    bx0, by0, bx1, by1 = b["bbox"]
+    overlap = min(ax1, bx1) - max(ax0, bx0)
+    if overlap <= BLOCK_SAME_COL_FRAC * min(ax1 - ax0, bx1 - bx0):
+        return "column"
+    gap = max(by0 - ay1, ay0 - by1)
+    pitch = (ay1 - ay0) / max(1, prev["n_lines"])
+    return "run" if gap < BLOCK_GAP_RUN_MAX * pitch else "gap"
+
+
 def join_runons(paras):
-    """paras is a list of (role, text, starts_block, indent).  Only ordinary prose
+    """paras is a list of (role, text, starts_block, indent, follows).  Only prose
     is ever joined: a heading must never be absorbed into the paragraph before
     it, however the sentence happens to end.
 
@@ -524,7 +579,7 @@ def join_runons(paras):
     decided by ITS first-line indent, and after a continuation splice the
     paragraph being joined is not the first one on its page."""
     out = []
-    for role, p, starts_block, indent in paras:
+    for role, p, starts_block, indent, follows in paras:
         # A marker is never joined to its neighbour, in either direction.  It
         # ends on a page number, not a full stop, so the unfinished-sentence
         # tests below read it as dangling and weld the text it introduces onto
@@ -534,22 +589,33 @@ def join_runons(paras):
         # paragraph was lost, and r030's loss count, which counts a marker
         # paragraph as accounted for, read 0.
         if is_marker_text(p) or (out and is_marker_text(out[-1][1])):
-            out.append((role, p, starts_block, indent))
+            out.append((role, p, starts_block, indent, follows))
             continue
         # A paragraph running over the foot of one column into the next is the
         # normal case, and its continuation is NOT indented.  So the first
         # paragraph of a block joins the previous one when it is flush, and
         # stands alone when it is indented -- the page states which it is.
+        prev_txt = out[-1][1].rstrip() if out else ""
+        # The compositor's own space outranks the indent.  A block that opens
+        # after EXTRA LEADING in the same column is a new paragraph even though
+        # it is flush -- unless the sentence before it is unfinished, which is
+        # what an inline figure or a tint break looks like and is the one case
+        # where leading does not mean a paragraph.
+        broken_by_leading = (follows == "gap" and prev_txt
+                             and prev_txt[-1] in SENTENCE_END)
         if (out and starts_block and role == "body" and out[-1][0] == "body"
+                and not broken_by_leading
                 and (indent < PARA_INDENT_MIN_PX
                      or ends_dangling(out[-1][1]))):
-            out[-1] = (role, join_text(out[-1][1], p), out[-1][2], out[-1][3])
+            out[-1] = (role, join_text(out[-1][1], p), out[-1][2], out[-1][3],
+                       out[-1][4])
             continue
         # A standfirst is never printed twice in a row, so two consecutive ones
         # are always one that OCR split.  Unconditional, unlike the heading rule
         # below, because a standfirst legitimately ends on a full stop.
         if out and role == "intro" and out[-1][0] == "intro":
-            out[-1] = (role, join_text(out[-1][1], p), out[-1][2], out[-1][3])
+            out[-1] = (role, join_text(out[-1][1], p), out[-1][2], out[-1][3],
+                       out[-1][4])
             continue
         # A headline set over two lines arrives as two blocks, and rendering them
         # separately produces two "# " lines where a reader sees one headline --
@@ -561,7 +627,8 @@ def join_runons(paras):
         if out and role in ROLE_PREFIX and out[-1][0] == role:
             prev = out[-1][1].rstrip()
             if prev and prev[-1] not in SENTENCE_END:
-                out[-1] = (role, join_text(prev, p), out[-1][2], out[-1][3])
+                out[-1] = (role, join_text(prev, p), out[-1][2], out[-1][3],
+                           out[-1][4])
                 continue
         if out and role == "body" and out[-1][0] == "body":
             prev = out[-1][1].rstrip()
@@ -574,9 +641,9 @@ def join_runons(paras):
             # lives at the block boundary above, where the ambiguity actually is.
             if prev and prev[-1] not in SENTENCE_END and head[:1].islower():
                 out[-1] = (role, join_text(prev, head),      # word split across the break
-                              out[-1][2], out[-1][3])
+                              out[-1][2], out[-1][3], out[-1][4])
                 continue
-        out.append((role, p, starts_block, indent))
+        out.append((role, p, starts_block, indent, follows))
     return out
 
 
@@ -691,7 +758,7 @@ def process(page):
 
 def page_paragraphs(rec, stem=""):
     """One page's classified blocks -> the paragraph list join_runons expects:
-    (role, text, starts_block, first_indent_px).
+    (role, text, starts_block, first_indent_px, follows).
 
     Stage D reassembles articles out of these across page boundaries, which is
     why the build lives in its own function: defined twice, the per-page corpus
@@ -747,7 +814,10 @@ def page_paragraphs(rec, stem=""):
     roles = {str(k): v for k, v in (rec.get("roles") or {}).items()}
     reads = {str(k): v for k, v in (rec.get("reads") or {}).items()}
     paras = []
+    prev_block = None
     for b in ordered:
+        follows = block_follows(prev_block, b)
+        prev_block = b
         role = roles.get(str(b["id"]), "body")
         if role not in VALID_ROLES:
             role = "body"
@@ -768,7 +838,7 @@ def page_paragraphs(rec, stem=""):
                 and b["line_h_frac"] < SOURCE_LINE_RATIO * body_median):
             role = "source"
         if role == "code":
-            paras.append((role, b["text"].strip(), True, indent))
+            paras.append((role, b["text"].strip(), True, indent, follows))
         else:
             # a block may hold several paragraphs; the role applies to each,
             # except paragraphs stage A measured as bold subheads -- those are
@@ -783,9 +853,11 @@ def page_paragraphs(rec, stem=""):
                     # section heading: "Tips für Maschinenprogrammierer" is set
                     # on its own line above a section, while "Ursprungsblock" and
                     # "Zielblock" open a paragraph inside one.
-                    paras.append(("subsection", para, starts_block, indent))
+                    paras.append(("subsection", para, starts_block, indent,
+                                  follows if starts_block else None))
                 else:
-                    paras.append((role, para, starts_block, indent))
+                    paras.append((role, para, starts_block, indent,
+                                  follows if starts_block else None))
     return paras
 
 

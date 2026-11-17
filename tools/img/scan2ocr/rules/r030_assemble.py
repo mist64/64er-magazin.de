@@ -322,7 +322,7 @@ def page_stream():
         # the page's first indent: after a continuation splice the paragraph
         # being joined is not the first one on its page, and reading the page's
         # instead welded the assembler course onto an unrelated notice on p140.
-        for role, text, _starts, indent in join_runons(paras):
+        for role, text, _starts, indent, _follows in join_runons(paras):
             if text.strip():
                 stream.append({"page": page, "role": role,
                                "text": text.strip(), "indent": indent})

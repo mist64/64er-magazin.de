@@ -3742,3 +3742,34 @@ block by its id.
 split; reading the JSON found this. Both were invisible to every check the
 chain owns, and both were caught because the builder compares artefacts instead
 of trusting a green run.
+
+### AND THE PARAGRAPH MERGE BEHIND BOTH p039 AND p153 → r020
+
+The builder reported the same symptom on two unrelated pages — an adventure
+column rendered one paragraph per game, and an ordinary software review
+rendered as one 4234-character wall — and asked whether it was one defect. It
+was.
+
+`join_runons` joined a block to the one before it whenever the new block's
+first line was flush, on the rule that *a paragraph running over a column foot
+is not indented, a new paragraph is*. That rule reads the page correctly in
+every issue that indents paragraph openings. **8702 does not indent them**, so
+the test had nothing to measure and joined everything. MEASURED: p153's block
+starts are flush within ±2 px at 600 dpi, and p039's tips are justified to the
+full measure on their LAST line too (0.997–1.000 over 41 tips), so the ragged
+last line — the other obvious witness — is silent as well.
+
+The witness that was still speaking is LEADING, and `paragraphs()` already uses
+it INSIDE a block. It simply stopped at the block edge. Over the earlier
+block's own pitch: 0.20 and 0.30 for a true continuation, 1.46–1.87 for a
+paragraph break in the same column, 14.7 across a figure. Nothing between.
+
+**Validated against the issue's own 184 truth pages before it landed**: the sum
+of |paragraphs − truth| falls 754 → 703, 14 pages improve, 167 are untouched, 3
+move away (two of them ad pages whose truth is `NO_ARTICLE_TEXT`), and no page
+gains or loses a single character with whitespace removed. p039 8 → 41, p153
+1 → 4.
+
+**Two pages, one defect, and the right question was the builder's.** Reported
+as two symptoms it would have been two workarounds; asked as "is this the same
+thing twice?", it was one rule reading a page that does not speak its language.

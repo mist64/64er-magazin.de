@@ -272,6 +272,54 @@ small and `Print Shop Companion`, which finishes that sentence, large. Two
 blocks, one standfirst. Size and weight say what a block is only when it starts
 something new.
 
+## A BLOCK BOUNDARY IS NOT A PARAGRAPH BREAK, AND THE INDENT IS NOT THE ONLY WITNESS
+
+`join_runons` decided a block boundary on the first-line indent alone: a
+paragraph running over the foot of a column is flush, a new paragraph is
+indented, *the page states which it is*. True — wherever the magazine indents
+paragraph openings. **8702 does not**, and the test then says "join" every
+time, with nothing to say otherwise.
+
+MEASURED on 8702, 2026-11-17: p153's 50-line block starts flush and so does
+every block around it (every line within ±2 px of its own median at 600 dpi),
+and p039's adventure tips are set flush AND justified to the full measure on
+the last line — last-line fill 0.997–1.000 over all 41 tips, so neither the
+indent nor the ragged last line carries anything. p153's eight body blocks
+became **one 4234-character paragraph** against the truth's five, and p039's
+tips became one paragraph per GAME, 1570 characters for THE PAWN.
+
+What the page does still say is **leading**, which is the evidence
+`paragraphs()` already uses inside a block — it simply stopped at the block
+edge. The gap between two blocks, over the earlier block's own line pitch:
+
+| | |
+|---|---|
+| true continuation (p153 7→8, 8→9) | 0.20, 0.30 |
+| new paragraph, same column (p153 3→4) | 1.46 |
+| new paragraph, tip to tip (p039, 41 of them) | 1.53–1.87 |
+| new paragraph across a figure (p153 9→21, 21→31) | 14.7, 15.1 |
+
+Nothing lies between 0.30 and 1.46. `block_follows()` returns `column` (the
+two blocks do not share a column — the classic break, where only the indent and
+the sentence can speak), `run` (same column, under `BLOCK_GAP_RUN_MAX` = 0.60
+of the pitch — consecutive lines split for some other reason: a tint, an inline
+figure, a rescue pass) or `gap` (same column, extra leading). **Space is a
+paragraph break in any typography**, so `gap` vetoes the join — unless the
+sentence before it is unfinished, which is exactly what an inline figure looks
+like and the one case where leading does not mean a new paragraph.
+
+The distance is measured in both directions, so a column read UPWARDS — r010's
+`rot180` pass — measures the same as one read downwards.
+
+**VALIDATED over the whole issue against its 184 truth pages**: the sum of
+|paragraphs − truth| falls 754 → 703; 14 pages come closer, 167 are untouched,
+and 3 move away — two of them `NO_ARTICLE_TEXT` ad pages where the count means
+nothing, and p174, where the new break puts "Schicken Sie Ihre Erfahrungen an:"
+on its own line above the address. p039 goes 8 → 41 paragraphs (truth 64), p153
+1 → 4 (truth 5). **And not one page gains or loses a character**: whitespace
+removed, every page's text is identical before and after. This moves where
+paragraphs break and nothing else.
+
 ## Verification
 
 ### The Impressum must survive stage B
