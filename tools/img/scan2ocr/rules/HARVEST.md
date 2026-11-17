@@ -4466,3 +4466,25 @@ should have kept. The paper flag was blinded by a speck it should have seen
 past. **Write the next edge predicate expecting it to be wrong, and pair it
 with one that fails the other way** — which is why the pure-paper flag and the
 outside-band test are specified together and neither is allowed to cut.
+
+### AND THE PREDICATE DID NOT SAY WHICH CHANNEL → r150
+
+Control measured 8702's `10-x3` right edge as a 2-line paper run; the builder
+measured 1 and said so rather than taking the number. Both were right: control
+used luminance, the builder used the per-channel minimum, and the rule's
+`(l < thr)` had never said which.
+
+MEASURED over all 92 with both: they disagree on **exactly one crop**, and only
+at the boundary — the column holds 13 pixels below the threshold where 1 % of
+1426 rows is 14.26. So this is a specification gap, not a crisis; but it is the
+fourth time an edge predicate in this chain has been wrong, and the first time
+the wrongness was in what the rule failed to say rather than in what it said.
+
+Pinned to the **per-channel minimum**: a pixel is ink if ANY channel is dark.
+Right for a magazine of pale tints, where a cyan or yellow ground can sit above
+a luminance threshold while plainly not being paper — and it errs toward
+calling a line CONTENT, which is the safe direction, since a wrong trim costs a
+figure and a wrong keep costs a look.
+
+**A builder that re-measures a number control handed it, and reports the
+difference instead of adopting it, is the only reason this surfaced.**

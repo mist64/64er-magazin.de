@@ -1363,13 +1363,29 @@ where its ink starts, so a full line of paper at the edge means the cut missed
 the picture.
 
 ```python
-def paper_run(lines, frac=0.01, thr=250):   # lines: from the edge INWARD
+# `a` is the crop as RGB; the PER-CHANNEL MINIMUM is the ink measure.
+ink = np.array(img.convert('RGB')).min(axis=2)
+
+def paper_run(lines, frac=0.01, thr=250):   # lines of `ink`, from the edge INWARD
     k = 0
     for l in lines:
         if (l < thr).mean() < frac: k += 1
         else: break
     return k                                 # flag any side with k > 0
 ```
+
+**SAY WHICH CHANNEL. An unpinned predicate gives two answers.** Written as
+`(l < thr)` with no statement of what `l` is, this reads equally as luminance
+or as the per-channel minimum, and control and the builder duly measured
+8702's `10-x3` right edge as 2 and as 1. MEASURED over all 92 with both: they
+disagree on **exactly one crop, at the boundary** — that column has 13 pixels
+below the threshold where 1 % of 1426 rows is 14.26.
+
+Use the **per-channel minimum**: a pixel is ink if ANY channel is dark. It is
+the right measure for a magazine full of pale tints, where a cyan or yellow
+ground can sit above a luminance threshold while being plainly not paper — and
+it errs toward calling a line CONTENT, which is the safe direction here, since
+a wrong trim costs a figure and a wrong keep costs a look.
 
 **THE OBVIOUS VERSION OF THIS CHECK HAS THE `-trim` BUG IN IT.** The first
 version written here was `(pixels == 255).all()` on the OUTERMOST LINE ONLY.
