@@ -4609,3 +4609,35 @@ both my correction of 22-2's bottom and the builder's own by-eye reading of
 **Naming the two leftovers instead of waiting for him to find them is what
 produced both criteria.** He had already caught 143-2 and 93-0 himself, one at
 a time, with "etc etc".
+
+### AND A HAND-CUT IS HOW A BLIND SPOT SURVIVES → r150
+
+Owner, after the whole crop set had been passed: *"156-1.png also has black
+box, needs to go. dont special case this one, update the process!"*
+
+`156-1` has a textbook rule — coverage 1.00, 7–8 px thick, 1–2 px in, four
+sides. The detector rejected it on a clause demanding the lines just inside the
+band be under 0.25 dark. **That clause assumes a figure is paler than its own
+frame.** This one is a dense hardcopy halftone running flush to the rule, 0.39–
+0.45 just inside; its left side is solid dark, so the saturated band never ends
+and the thickness test discarded it at 59 px.
+
+**`83-1` had already failed in exactly this way, and I hand-cut it.** The
+builder told me plainly at the time — *"the other sides fail the 'lighter
+inside' test because the dark screens run flush to the rule"* — and I took the
+hand reading and moved on. One crop later the same blind spot cost a figure
+that nobody caught until the owner looked.
+
+Fixed with a RELATIVE step (band mean exceeds the inside mean by ≥0.30), an
+explicit `indeterminate` verdict where the saturated band runs past 15 px, and
+**framed decided per FIGURE rather than per side** — two resolved sides frame
+the figure and the indeterminate sides take their offset. The same unit-of-
+judgement error as the slant, two hours apart.
+
+**The test of the fix is what else it moves: nothing.** Over the 92 it catches
+156-1 alone; 39-0 is still rejected by the continuity test, and every dark
+photograph produces indeterminate sides and no rule.
+
+**When a builder tells you a check cannot see something and you answer with a
+hand measurement, you have accepted the defect.** Fix the instrument or record
+it as a known gap — never quietly route around it.

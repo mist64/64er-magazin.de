@@ -1652,6 +1652,43 @@ white and tint are kept by construction. **Do not apply the edge policy to a
 crop you have just cut to its rule**; shrinking to content afterwards is the
 thing this forbids.
 
+### FINDING THE RULE: A RELATIVE STEP, NOT "IS THE INSIDE LIGHT?"
+
+The detector's first form demanded that the 10 lines just inside the band be
+under 0.25 dark — *"lighter inside"*. **That clause assumes a figure is paler
+than its own frame, and a dark one is not.**
+
+MEASURED on 8702's `156-1`, which the owner found by eye after the whole set
+had been passed: a textbook rule, coverage **1.00**, 7–8 px thick, 1–2 px in,
+on all four sides — rejected, because the hardcopy's dense halftone runs flush
+to the rule and reads 0.39–0.45 just inside it. Its LEFT side is worse: the
+content is solid dark, the saturated band never ends, and the thickness test
+threw it out at 59 px. `83-1` had failed the same way and was hand-cut around
+the problem instead of fixing it. **A hand-cut is how a blind spot survives.**
+
+So:
+
+1. **A rule is a band at ≥0.95 coverage, ≤15 px thick, starting within 12 px,
+   whose mean coverage exceeds the mean of the 10 lines just inside it by
+   ≥0.30.** A relative step, not an absolute level. A dark figure steps 1.00 →
+   0.45 and passes; content that merely darkens inward has no step and is
+   still rejected.
+2. **A side whose saturated band runs past 15 px is `indeterminate`, not
+   "no rule".** Say so. The rule may be there and inseparable from the content.
+3. **FRAMED IS DECIDED PER FIGURE, NOT PER SIDE.** Two or more sides reading
+   `rule` with continuity ≥0.8 make the figure framed, and the indeterminate
+   sides are then cut at the inner offset the resolved sides agree on. Same
+   lesson as the skew: **the figure is the unit of judgement.**
+
+MEASURED over all 92 with the corrected test, which is the only reason to
+trust it: it catches `156-1` (B/R/T rule at continuity 1.00, L indeterminate)
+and **changes nothing else**. `39-0` now reads `rule` on four sides and is
+still rejected by the continuity test at 0.09–0.17, so the tests compose.
+Every dark photograph in the issue — `10-x3`, `30-1`, `27-x1`, `50-0`,
+`135-0`, `160-x1/x2`, `162-x2` — produces only indeterminate sides and no
+`rule`, so none is falsely framed. **A repair that finds exactly the case that
+prompted it and nothing else is the one to ship.**
+
 ### TWO TESTS BEFORE YOU CUT, BOTH THE OWNER'S
 
 **1. Is it a continuous line?** *"39-0 isnt a durchgehende linie. not a full
