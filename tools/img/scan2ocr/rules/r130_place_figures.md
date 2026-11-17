@@ -418,7 +418,11 @@ for f in sorted(os.listdir(d)):
 PY
 
 # 5. Build the issue and confirm no listing-related errors:
-"$PY" generate.py --issues "$ID" --future local 2>&1 | grep -iE 'listing|prg|figure|binary_download'
+# --build-only: the site is built and the command EXITS.  Without it this
+# serves forever (the default) or opens a browser tab (--join), and r130's
+# check 5 hung until whoever ran it noticed -- it only ever "passed" when port
+# 8000 happened to be busy.
+"$PY" generate.py --issues "$ID" --future --build-only local 2>&1 | grep -iE 'listing|prg|figure|binary_download'
 
 # 6. Every <figcaption>Listing N…</figcaption> must have a description
 #    after "Listing N.". Bare `<figcaption>Listing N</figcaption>` is

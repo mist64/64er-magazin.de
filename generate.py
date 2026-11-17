@@ -49,6 +49,7 @@ class BuildConfig():
     deploy: bool = False # set via cli argument "upload": upload to server
     build_future: bool = False # set via cli flag "--future": helper for disabling unfinished categories
     start_local_server: bool = True # set via cli flag "--join": helper for not starting a local server every time
+    open_browser: bool = True # cleared by "--build-only": build the site and stop, for the chain's gates
     lang: str = "de" # set via cli flag "--lang": change language between english and german
 
     # git status
@@ -110,6 +111,14 @@ def parse_cli_into_config():
     parser.add_argument("--future", action='store_true', help="also build issues with release dates in the future")
     parser.add_argument("--lang", choices=['de', 'en'], nargs='?', const='de', default='de', help="[WIP] build a different language version (default: %(default)s)")
     parser.add_argument("--join", action='store_true', help="open page locally without starting a server ")
+    # BUILD AND STOP.  The step chain's gates run this to prove the site
+    # builds, and both existing modes do something else afterwards: the
+    # default serves forever (r130's check 5 and r000's end gate hang unless
+    # port 8000 happens to be busy, which is how the hang stayed hidden), and
+    # --join calls `open` on the URL, which pops a browser tab per run and
+    # fails the whole command on a machine where `open` is not there.
+    parser.add_argument("--build-only", action='store_true',
+                        help="build the site and exit: no server, no browser")
 
     # parsing command line arguments
     args = parser.parse_args()
@@ -119,7 +128,8 @@ def parse_cli_into_config():
     config.build_issues = args.issues
     config.build_future = args.future
     config.lang = args.lang
-    config.start_local_server = not args.join
+    config.start_local_server = not (args.join or args.build_only)
+    config.open_browser = not args.build_only
 
     # get git status
     f = os.popen(f'git ls-files -m | wc -l')
@@ -2651,10 +2661,12 @@ if __name__ == '__main__':
                 subprocess.run(f"open {url}", check=True, text=True,
                                shell=True)
                 httpd.serve_forever()
-    else:
+    elif CONFIG.open_browser:
       port = 8000
       url = f"http://localhost:{port}/{CONFIG.base_dir}"
       print(url)
       subprocess.run(f"open {url}", check=True, text=True, shell=True)
+    else:
+      print(f"build complete: {OUT_DIRECTORY}")
 
 

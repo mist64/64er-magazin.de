@@ -3887,10 +3887,19 @@ CUT YET IS NOT A FAILURE* tried to, and did not go far enough.
 ## End-of-issue gate: the issue must BUILD
 
 ```bash
-.venv/bin/python generate.py --issues <ID> --future local
+.venv/bin/python generate.py --issues <ID> --future --build-only local
 ```
 
-**`port <N> busy — build complete, not serving` IS A PASS.** The site is
+**`--build-only` BUILDS THE SITE AND EXITS.** Without it the gate serves
+forever and the run never returns — unless port 8000 happens to be busy, which
+is the only reason this gate ever appeared to terminate; `--join` instead calls
+`open` on the URL, which pops a browser tab per run and fails the command where
+`open` is not there. MEASURED 2026-11-17: a nine-issue gate run sat in
+`serve_forever()` for twenty minutes before it was killed, with its output
+buffered and empty, so it looked like a slow build.
+
+**`port <N> busy — build complete, not serving` IS A PASS**, and still is for
+anyone running the serving form by hand. The site is
 written before the server is started, so a port held by something else says
 nothing about the build. Before the fix this ended every rebuild in an
 `OSError` traceback and a non-zero exit, and completion had to be proved by
