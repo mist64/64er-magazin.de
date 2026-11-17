@@ -3677,6 +3677,18 @@ sd 0.15, so an unrotated page sits within ~0.15° of its sheet's geometry, and
 tell you that something is wrong; 184 pages' told us which of two plausible
 remedies would have broken 43 pages to fix one.
 
+**CONFIRMED on the issue, 2026-11-17 02:04.** p137 re-measured: angle 0.00,
+`SKEW diverged` NOTE, fold tilt **-0.16** against the -0.14 the census
+predicted (the difference is the fold fit's own noise, sd 0.15; an unrotated
+page also matched one more clip row, template 6 for 5), and the master carries
+no neighbour at the top-left and no bed at the bottom-right. Fold gate pass
+-0.01 mm. The issue was then re-cut whole, as the fits are medians over the
+set: **183 of 184 masters byte-identical to the pre-fix sweep, only 137
+differs**, and the 25-page pixel diff that found the half-split defect now
+reports 0 px on all 25, 040/044/090 included. One fit moved — odd S 4412 →
+4408 — and moved no master, because every odd page with a certified fold is
+placed on its fold.
+
 ### AND A COLUMN PRINTED UPSIDE DOWN → r010
 
 8702 p039, *Abenteuer leicht gemacht*: the tips are set at 180° on purpose, so
