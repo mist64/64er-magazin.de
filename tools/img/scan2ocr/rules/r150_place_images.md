@@ -1644,6 +1644,25 @@ table shape, i.e. line inside that touch the border. all others black box
 goes"*, and *"when losing the box, crop JUST INSIDE the box, dont find the
 minimal bounding box of the content"*.
 
+**CUT AT THE DEEPEST THE RULE REACHES ALONG THE SIDE, NOT THE TYPICAL.** A
+printed panel is rarely square to the crop, so its rule crosses the boundary
+diagonally: a cut taken at one measuring point leaves the rule standing wherever
+it runs deeper. Owner, 2026-11-17, on a crop that had already been cut: *"31-2
+still has black in the outer edges. when we avoid a box, we need to do it all
+the way"*. Measure the band in overlapping chunks across the **whole** side and
+take the maximum, discarding chunks more than ~5 px past the side's median
+(that is content touching the rule, not the rule). On 8702 this cost 1–4 px
+more per side and removed every remnant.
+
+Three defects found in 8702's own cutter are worth naming, because each is easy
+to write again:
+
+- **the chunk loop skipped each side's last partial chunk** — which is exactly
+  the far corner, and exactly where a tilted rule's residue sits;
+- **the band was found with a `<128` threshold**, which misses the rule's
+  antialiased fringe at 128–200 and leaves a grey line;
+- **it cut at the typical depth rather than the deepest.**
+
 **The cut is a fixed distance from the rule, never a search for content.** Find
 the band's peak within 45 lines, then cut at the first line past it whose dark
 fraction has fallen 75 % of the way back to the ground INSIDE the box — the

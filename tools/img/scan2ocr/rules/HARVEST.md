@@ -4641,3 +4641,44 @@ photograph produces indeterminate sides and no rule.
 **When a builder tells you a check cannot see something and you answer with a
 hand measurement, you have accepted the defect.** Fix the instrument or record
 it as a known gap — never quietly route around it.
+
+### AND A TILTED RULE SURVIVES A STRAIGHT CUT → r150
+
+Owner, on a crop already cut: *"31-2 still has black in the outer edges. when
+we avoid a box, we need to do it all the way"*.
+
+A printed panel is rarely square to the crop, so its rule crosses the boundary
+diagonally and a cut taken at one measuring point leaves it standing where it
+runs deeper. The fix is to measure the band across the WHOLE side in
+overlapping chunks and cut at the deepest — 1–4 px more per side on 8702, and
+every remnant gone.
+
+The builder found three defects in its own cutter, each easy to write again:
+the chunk loop **skipped every side's last partial chunk**, which is exactly
+the far corner where a tilted rule's residue sits; the band was found at `<128`,
+missing the antialiased fringe at 128–200; and it cut at the typical depth
+rather than the deepest.
+
+**AND MY VISUAL SPOT-CHECK WAS WRONG.** I rendered one 900-px strip of 22-1's
+top, called it the yellow tint's halftone and dismissed the flag. It was the
+rule's fringe. A strip is a sample, not a check of a side — and I used it to
+overrule a measurement that was right. The honest form is what the builder did:
+look at every flagged position, then report the rejections as well as the
+confirmations, because the rejections are what tell you where the measure lies.
+
+### AND THE THRESHOLD HID A PAGE FROM THE SKEW CHECK → r005_masters_spread
+
+Owner: *"30-4 has a slant, why was it not detected?"* It WAS, by the edge
+policy, which classed it slanted and gave it the gentle cut. What missed it was
+my page-skew screen, which only sent a page for a text measurement when its
+figures averaged ≥0.15°. Page 031 came in at −0.14 and was never checked.
+
+**The text measurement is cheap and exact, so the threshold bought nothing and
+cost coverage.** Re-run without one over all 49 figure pages: text is within
+±0.10° on EVERY page, our residual skew is ≤0.09° where it exists — about 3 px
+across a 2000-px figure — and 30-4 sits ~0.21° off its own page's text, so it
+is tilted on the plate like 148's four. *Re-level nothing* stands, now on the
+complete table instead of a filtered subset.
+
+**A screen that decides what gets measured is a measurement.** Set its
+threshold at zero unless the measurement is expensive, and this one was not.
