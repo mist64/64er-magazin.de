@@ -3786,3 +3786,64 @@ The LLM is given paragraphs; where they end is decided upstream, by the page's
 own leading, or not at all. The same reasoning retires the idea of asking the
 model to re-paragraph a wall of text: it would be inventing breaks, not reading
 them.
+
+## 8702's errata, 2026-11-17: six rules, and three checks that could not fail
+
+The builder filed `issues/8702/WORKFLOW_ERRATA.md` as it went. What the batch
+has in common is worth more than the individual fixes: **three of the six are
+checks keyed on something that cannot go wrong, and two more are rules reading
+a page that does not speak their language.**
+
+### A CHECK THAT CANNOT FAIL → r070, r120
+
+- **r070's "zero en dashes is a failure".** It was written when two issues
+  shipped with no dash pass at all, where 0 was the symptom. It cannot tell
+  that from an issue whose prose needs no conversion — which 8702 is. The
+  invariant is the RESIDUE: a spaced hyphen still standing in prose. Counted
+  and printed now; the conversion count is information.
+- **r120 check 4's trailing-bytes branch has no upper bound**, so a BASIC stub
+  in front of 7.6 KB of machine code passed green at "7630 trailing bytes".
+  Open: the threshold needs measuring across the corpus first.
+- **r120 check 5 demands a printed extent for a SEQ file**, which has no load
+  address and no span. An answer written to satisfy it would be a fiction.
+  Listed with the reason now, not counted.
+
+### A RULE READING A PAGE THAT DOES NOT SPEAK ITS LANGUAGE → r070, r080
+
+- **The dash.** The owner's "a spaced dash is an en dash" was measured as
+  "4,864 en/em" — the two counted together. Apart: the monthlies are em (8702
+  0 en / 120 em) and the recent Sonderhefte are en (SH10 298/1). Writing en
+  into a monthly adds a second dash character to a file that already has one.
+  The pass follows the issue; the corpus-wide question is the owner's.
+- **The byline.** `is_byline` tests shape — no digit, no `=`, not all-caps —
+  and a lowercase parenthetical SENTENCE has that shape. 8702 published
+  "(dieses Programm ist nur bei der geringeren Auflösung verfügbar)" as an
+  author. A finite verb rejects it, and matches exactly 1 of the corpus's
+  1,599 bylines: "Näheres siehe Plotter-Anleitung.", a false byline already
+  shipped.
+
+### AND ONE DEFECT THE CHAIN COULD NOT SEE AT ALL → r310
+
+A paragraph that ends mid-word. The HTML is well-formed, coverage is complete,
+every count agrees, and a tail has gone into the block below. MEASURED: 16
+prose paragraphs in the whole corpus end in a hyphen; the test — **a LETTER
+before the hyphen** — keeps the 8 real ones, all in the live 8702 build, and
+drops every published false positive (price notation "129,-" / "DM 14,-", a
+BASIC line "240 REM - FORMELBERECHNUNG -", a section number "(1.2) -").
+
+The builder repaired all eight from the plate and reported what they were:
+**three different faults wearing one face.** Four were tails lost into the
+block below; one was a continuation glued inside another article's box, after
+that box's byline; one was no loss at all but a false paragraph break one word
+wide. A check that asks about the WORD finds all three. A check that asked
+about the block below would have found four.
+
+### AND ONE CORRECTION OF MY OWN → r080
+
+I deduplicated the author tokens on the builder's report that they repeat.
+They repeat on purpose: r180's DEFAULT is one entry per byline in body order,
+INCLUDING repeats, and 68 of the corpus's 1,967 author metas do ("rf, rf, rf,
+rf, rf, rf, rf"). The real defects were a `set` of byline STRINGS, which
+collapses two identical bylines the rule wants twice, and `sorted()`, which
+alphabetises what should be body order. **A report of a symptom is not a
+diagnosis — read the rule that owns the field before fixing the field.**
