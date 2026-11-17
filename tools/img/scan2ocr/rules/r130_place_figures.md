@@ -296,8 +296,34 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
   single file the reader LOADs; with 101 names in the directory, nothing else
   does.
 - **`data-checksummer` exists and this rule never mentioned it.** SH8602 uses
-  it 9 times; 8611 and 8612 never do. Look at how the issue you are on prints
-  its checksums before deciding.
+  it 9 times; 8611 and 8612 never do.
+
+  **THE PRINT DECIDES, NOT THE ISSUE'S HABIT.** A listing whose print carries
+  Checksummer sums gets `data-checksummer="<1|2|3>"`, whichever version the
+  article names; a listing printed without sums does not. The attribute adds
+  the reader's toggle between the petcat text and the Checksummer rendering,
+  which is the form the page printed and the form a reader typed from — so
+  leaving it off a listing the magazine printed WITH sums drops a printed
+  element from the page, and putting it on one printed without them invents
+  one.
+
+  **AND IT IS AN ASSERTION, SO IT IS CHECKED.** The sums are recomputed from
+  the DISK binary, not read from the page: if the disk file and the printed
+  listing differ anywhere, the rendering silently shows sums the page does not
+  have. Before adding it to a 130-placed listing, compare the rendering
+  against the printed sums — the first, the last, and two in between per
+  listing. A disagreement means the file and the print disagree, which is a
+  listing/disk difference for the usual default (r120), NOT a reason to
+  suppress the attribute quietly.
+
+  MEASURED on the corpus, 2026-11-17: 408 listings carry the attribute (87
+  V1, 117 V2, 204 V3), heavily in the 1985 monthlies and the Sonderhefte —
+  SH8501 27 files, SH8503 21, SH8604 12 — and **8610, 8701 and 8702 carry
+  exactly one each.** That is not those issues printing fewer checksums; it is
+  the attribute being applied by the step that RECREATES a listing (r170) and
+  not by the step that PLACES one from the disk. 8702 showed it plainly: one
+  article's Listing 14, recreated from the print, offered the toggle while its
+  thirteen neighbours, all captioned "Checksummer V3", did not.
 - **The evidence requirement assumes the body says "Listing".** 6 of SH8604's
   11 placement articles never use the word, and 4 have no separate byline to
   place an end block after. Where there is no "Listing N" mention, the evidence
