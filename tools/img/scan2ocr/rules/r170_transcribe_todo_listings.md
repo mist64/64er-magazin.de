@@ -537,7 +537,21 @@ for f in sorted(os.listdir(d)):
             # issue that has disk listings at all -- 35 times on 8611 -- which
             # is the r040 all-zero case again: a check that reports the normal
             # state as a fault gets ignored, and then it is not a check.
+            # ...BUT AN EMPTY <pre> MUST NAME A FILE THAT EXISTS.  Skipping
+            # the data-filename case outright meant a missing prg/<name>.txt
+            # passed this check in silence (8702) and surfaced only at the end
+            # gate, as a KeyError out of generate.py's listings_bin lookup --
+            # the one place nobody is looking for a transcription defect.
+            # generate.py keys a .txt by its BASENAME and a binary by its full
+            # filename, so the name resolves to prg/<name>.txt, prg/<name> or
+            # prg/<name>.prg; anything else is a listing that will render
+            # empty or stop the build.
             if 'data-filename' in pre_m.group(1):
+                fn = re.search(r'data-filename="([^"]*)"', pre_m.group(1)).group(1)
+                if not any(os.path.exists(os.path.join(d, 'prg', c))
+                           for c in (fn + '.txt', fn, fn + '.prg')):
+                    print(f"  {f}: data-filename={fn!r} names no file in prg/")
+                    bad += 1
                 continue
             inner = pre_m.group(2).strip()
             if inner in ('', 'TODO'):
@@ -545,6 +559,46 @@ for f in sorted(os.listdir(d)):
 sys.exit(1 if bad else 0)
 PY
 )" "$dir"
+
+# 3b. THE EVIDENCE THIS STEP EXISTS FOR: rows, and the sums it claims.
+#     r170 recreates a listing from the PAGE, and its Verification checked
+#     only that the <pre> was not empty -- neither the number of rows against
+#     the print nor a single checksum, which is the whole content of the claim
+#     (8702).  Nothing here can read the page, so this prints the evidence to
+#     compare against it, in the rule's own "no verifier output, no claimed
+#     action" style: paste it into the report beside the printed listing.
+"$PY" - "$dir" <<'PY'
+import os, re, sys
+d = sys.argv[1]
+# generate.py PARSES sys.argv AT IMPORT (CONFIG = parse_cli_into_config(),
+# generate.py:185), so importing it for petcat2prg with the issue path still
+# on argv dies in argparse: "invalid choice: 'issues/8702'".  Take the
+# argument first, then hand argparse a valid one.
+sys.argv = [sys.argv[0], "local"]
+sys.path.insert(0, os.getcwd())
+from tools import checksummer                      # the generator's own module
+from generate import petcat2prg
+for f in sorted(os.listdir(d)):
+    if not f.endswith('.html'): continue
+    s = open(os.path.join(d, f), encoding='utf-8').read()
+    for m in re.finditer(r'<pre([^>]*)>', s):
+        at = m.group(1)
+        fn = re.search(r'data-filename="([^"]*)"', at)
+        if not fn: continue
+        txt = os.path.join(d, 'prg', fn.group(1) + '.txt')
+        if not os.path.exists(txt): continue        # a binary listing: check 3
+        rows = [l for l in open(txt, encoding='latin-1').read().splitlines()
+                if l.strip() and not l.lstrip().startswith(';')]
+        cs = re.search(r'data-checksummer="(\d)"', at)
+        out = f"  {fn.group(1)}: {len(rows)} rows"
+        if cs:
+            blob, ver = petcat2prg(open(txt, encoding='latin-1').read())
+            # parse() -> [(line number, text, sum), ...]
+            sums = checksummer.parse(blob, int(cs.group(1)), ver)
+            ends = [(r[0], r[-1]) for r in (sums[:1] + sums[-1:])]
+            out += f", V{cs.group(1)} first/last line+sum: {ends}"
+        print(out)
+PY
 
 # 4. spot-check: every transcribed BASIC listing has line numbers at
 #    the start of MOST lines. A block that is CLEARLY BASIC (a majority
@@ -627,9 +681,15 @@ canonical anti-memory violation.
   steps and resolve to different shapes.
 - `js-beautify` is well-behaved with `<pre>` by default but worth
   checking once after the run.
-- 300 dpi is the right target resolution for listing OCR. The
-  150 dpi figure-placement scans are too coarse for column-aligned
-  asm code.
+- **300 dpi is the right target resolution for listing OCR — and it is
+  reached by REDUCING the 600 dpi master, not by finding a 300 dpi scan.**
+  This note used to contrast it with "the 150 dpi figure-placement scans",
+  which no longer exist in the chain: since 005 there is one page artefact,
+  `<tmp>/masters600/NNN.png` at 600 dpi, and the only 150 dpi images are the
+  skew thumbs. Crop the listing out of the master and halve it — which is
+  exactly what r010 does for its own OCR (`SCALE`, tesseract's sweet spot:
+  below it small type falls apart, above it the halftone screen starts
+  aliasing into the binarizer).
 - The "Listing N body references without a `<figure>`" check this
   step's sub-agent can produce is useful follow-up data — sometimes
   the OCR pipeline dropped a whole listing, not just left a TODO
