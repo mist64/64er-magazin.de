@@ -1332,7 +1332,7 @@ For **every row of the worklist**, two files in `<tmp>/crops_v1/`:
 |---|---|
 | `<name>.png` | the proposal: the region, cut to the artwork's own boundary |
 | `<name>_1cm.png` | the same region grown **1 cm on all four sides**, for judging the boundary without opening the master |
-| `<name>_1cm_box.png` | the `_1cm` image with a **1 px black/white striped rectangle 1 px OUTSIDE** the proposal's boundary, so the cut is visible against its surroundings |
+| `<name>_1cm_box.png` | the `_1cm` image with a **1 px black/white DASHED rectangle 1 px OUTSIDE** the proposal's boundary, so the cut is visible against its surroundings |
 
 The third file is where the review actually happens: it shows the proposed edge
 in its context without painting over a single pixel of the picture being
@@ -1354,10 +1354,17 @@ open** and say so. Do not close the rectangle by drawing inside. An open edge
 is also the truth: the crop runs to the sheet edge there. MEASURED on 8702:
 `28-0a` and `28-0b`, two halves of one picture printed to the trim.
 
-**THE LINE IS BLACK/WHITE ALTERNATING, STRIPE LENGTH 1, PHASED ON GLOBAL
-PARITY** — `black if (x + y) % 2 == 0 else white`, x and y in the `_1cm` frame.
-Owner, 2026-11-17: *"box line: make is 1px black/white striped with stripe len
-1"*.
+**THE LINE IS BLACK/WHITE DASHED, DASH LENGTH 20 px, PHASED ON A 20 px CELL
+GRID** — `black if ((x // 20) + (y // 20)) % 2 == 0 else white`, x and y in the
+`_1cm` frame. Owner, 2026-11-17: first *"1px black/white striped with stripe
+len 1"*, then **"from now on: black/white dashed with 20px dash length"**. 20 px
+at 600 dpi is 0.85 mm, so it reads as a dash at 100 %.
+
+**Phase it on the grid, not on a walk around the perimeter.** The grid keeps
+all four sides in phase with each other, and — the part that matters — it stays
+verifiable PER PIXEL. A perimeter walk depends on where you started and cannot
+be checked without re-walking it. A dash cut short where a corner falls
+mid-cell is correct; leave it.
 
 It began as a plain yellow line, on his instruction, and that was measurably
 wrong: **90 of 8702's 92 crops sit on a surround that is over 50 % near-white,
