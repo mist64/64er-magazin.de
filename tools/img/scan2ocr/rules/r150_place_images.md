@@ -1637,6 +1637,52 @@ that is exactly the error that survives by looking like a rough number. SH8608's
 worklist quoted the master frame and said nothing; its tmp is gone, so how far
 that reached cannot be recovered.
 
+## A BLACK BOX ROUND A FIGURE GOES — BUT FIRST, IS IT A BOX?
+
+Owner, 2026-11-17: *"22-* black box goes. 46-4 stays because its really in a
+table shape, i.e. line inside that touch the border. all others black box
+goes"*, and *"when losing the box, crop JUST INSIDE the box, dont find the
+minimal bounding box of the content"*.
+
+**The cut is a fixed distance from the rule, never a search for content.** Find
+the band's peak within 45 lines, then cut at the first line past it whose dark
+fraction has fallen 75 % of the way back to the ground INSIDE the box — the
+ground measured as the median of the lines 8–28 px past the peak. The inside
+white and tint are kept by construction. **Do not apply the edge policy to a
+crop you have just cut to its rule**; shrinking to content afterwards is the
+thing this forbids.
+
+### TWO TESTS BEFORE YOU CUT, BOTH THE OWNER'S
+
+**1. Is it a continuous line?** *"39-0 isnt a durchgehende linie. not a full
+box."* Measure the **longest unbroken dark run along the side, as a share of
+the side** — not the dark fraction, which a dashed line passes easily.
+
+**2. Do hard lines inside touch it?** *"46-4 stays because its really in a
+table shape"*; *"156-3 … its like a table, because there are clear hard lines
+inside that touch the border."* Count lines running ≥80 px inward from just
+inside the rule. **Two per side is the baseline — those are the frame's own
+corners.** More than two means internal structure meets the border, and cutting
+the border would leave those lines hanging in air.
+
+MEASURED on 8702:
+
+| crop | coverage | longest unbroken run | spokes | verdict |
+|---|---|---|---|---|
+| `39-0` ABENTEUER grid | 0.95–0.96 | **0.09–0.17** | 12–21 | not a box — dashed, and the grid's own edge |
+| `156-3` Giga-CAD screen | 0.95–1.00 | 1.00 | **3–5** | a box, but a table: the window's hard lines meet it |
+| `46-4` pin table | 0.98–1.00 | 0.24–1.00 | **6** | a table |
+| the 18 that were cut | 0.85+ | ~1.00 | 2 | a frame: cut it |
+
+**Coverage alone would have cut the crossword.** `39-0`'s outer line is 96 %
+dark and 0.09 continuous — the cell boundaries with gaps where white cells meet
+the edge. That is the single sharpest discriminator found here.
+
+**Be honest about the second test's strength.** Continuity separates cleanly
+(0.09 against 1.00). Spokes separate `46-4` clearly at 6, but `156-3` only at
+3–5 against a baseline of 2 — that one still needs the eye. **Flag, never
+auto-cut**, as everywhere else in this step.
+
 ## `crops.txt` — WHAT WAS CUT, AND FROM WHERE
 
 Every issue writes `issues/<ID>/crops.txt` at placement, one row per figure.

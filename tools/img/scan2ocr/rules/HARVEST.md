@@ -4577,3 +4577,35 @@ the page.**
 Third sequencing error of the day, after twice queueing things the owner was
 looking at behind long jobs. The pattern in all three: I batched for the
 build's convenience and the cost landed on him.
+
+### AND "IS IT A BOX?" IS TWO TESTS, BOTH THE OWNER'S → r150
+
+I put the two remaining boxed crops to him by name rather than letting him find
+them. He answered with two criteria sharper than my reasoning:
+
+- *"39-0 isnt a durchgehende linie. not a full box."*
+- *"156-3 is a screenshot/hardcopy of a screenshot, also its like a table,
+  because there are clear hard lines inside that touch the border."*
+
+Both are computable, and I measured them before writing them down.
+**Continuity — the longest unbroken dark run along a side, as a share of the
+side — is the sharpest discriminator found in this whole step**: `39-0`'s outer
+line is 96 % dark and only **0.09–0.17 continuous**, because it is the
+crossword's cell boundaries with gaps where white cells meet the edge. Dark
+FRACTION, which is what my detector used, passes it easily. Coverage alone
+would have cut the crossword.
+
+The second test, lines running inward from the rule, has a baseline of 2 per
+side — the frame's own corners. `46-4` scores 6, `156-3` 3–5, the eighteen
+genuine frames exactly 2. It separates the table he named, but only weakly for
+156-3, and that is written down as a limit rather than glossed.
+
+**He also tightened the cut itself**: *"crop JUST INSIDE the box, dont find the
+minimal bounding box of the content"*. Two of the first seventeen had drifted
+into content-finding; redone from one measured definition, which reproduced
+both my correction of 22-2's bottom and the builder's own by-eye reading of
+83-1 — a general rule arriving at the hand judgements it replaced.
+
+**Naming the two leftovers instead of waiting for him to find them is what
+produced both criteria.** He had already caught 143-2 and 93-0 himself, one at
+a time, with "etc etc".
