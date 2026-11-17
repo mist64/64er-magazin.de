@@ -534,6 +534,19 @@ BLOCK_SAME_COL_FRAC = 0.60   # x the narrower block's width, of horizontal overl
 
 SOURCE_LINE_RATIO = 0.85
 SOURCE_MIN_BODY_BLOCKS = 2      # too few to take a median from
+# ...AND A SOURCE NOTE IS SHORT.  Smaller type alone also describes a BOXED
+# PANEL -- the review box the magazine sets beside an article, "Was kostet
+# ...?", "Gesamturteil:", "Preis und Bezugsquelle:" -- which is body text, and
+# a great deal of it.  MEASURED over 8702's 184 pages, every body block under
+# 0.90 of its page's body median (45 of them): every genuine note is 1-5 lines
+# (the longest, p043's Bezugsquelle, is 5), while the false ones are the
+# panels on p036 and p039 at 33, 14, 14, 11 and 8 lines.  A multi-line address
+# is not an exception: p10's vendor list and p146's arrive as ten and
+# twenty-one SEPARATE blocks of one or two lines each, which SOURCE_JOIN then
+# puts back together.  The longest genuine note in the issue is p012's
+# 7-line Bezugsadresse, which carries two addresses in one block; the shortest
+# false one is 8 lines.  The line falls between them, where the data put it.
+SOURCE_MAX_LINES = 7
 SOURCE_HTML = '<p class="source">%s</p>'
 # Consecutive source notes are ONE note the page set as several blocks: p10's
 # vendor list arrives as ten lines ("MVG: Moderne Verlagsgesellschaft," /
@@ -835,6 +848,7 @@ def page_paragraphs(rec, stem=""):
             role = "code"                     # the label already settled this
         indent = b.get("first_indent_px", 0)
         if (role == "body" and body_median
+                and b["n_lines"] <= SOURCE_MAX_LINES
                 and b["line_h_frac"] < SOURCE_LINE_RATIO * body_median):
             role = "source"
         if role == "code":

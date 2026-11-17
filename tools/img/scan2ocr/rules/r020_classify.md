@@ -272,6 +272,37 @@ small and `Print Shop Companion`, which finishes that sentence, large. Two
 blocks, one standfirst. Size and weight say what a block is only when it starts
 something new.
 
+### A SOURCE NOTE IS SMALLER THAN THE BODY **AND SHORT** — A PANEL IS ONLY SMALLER
+
+`source` is assigned by measurement: a body block whose line height is under
+`SOURCE_LINE_RATIO` (0.85) of its page's body median is a note — "Info: …",
+"Bezugsquelle: …", a publisher's address, "Fortsetzung von Seite 32". Smaller
+type alone, though, also describes the **boxed review panel** the magazine sets
+beside an article ("Was kostet …?", "Gesamturteil:", "Preis und
+Bezugsquelle:"), which is body text and a lot of it.
+
+MEASURED over 8702's 184 pages — every body block under 0.90 of its page's
+median, 45 of them: **every genuine note is 1–7 lines** (the longest, p012's
+Bezugsadresse, carries two addresses in one block), and **every false one is 8
+lines or more** — the panels on p036 and p039 at 8, 11, 14, 14 and 33. The
+ratio alone cannot separate them: genuine notes run from 0.672 to 0.856 and the
+panels sit at 0.724–0.810, inside that range. `SOURCE_MAX_LINES` = 7 falls
+between the two populations, where the data put it. Issue-wide the change moves
+20 paragraphs on two pages: p036 16 → 4 source paragraphs, p039 14 → 6.
+
+A long address is not an exception to the ceiling: p10's vendor list arrives as
+ten separate blocks of one or two lines and p146's as twenty-one, which
+`SOURCE_JOIN` puts back together afterwards.
+
+**What this does NOT fix**, recorded because it is one block and will come
+back: 8702 p039's two-line tip id4023 measures 0.846 of the page's median
+against its own column's 1.00, and is demoted. `line_h_frac` is the median word
+height over the block's lines, and two lines are a small sample of a noisy
+statistic. The line PITCH is the stable quantity and r010 measures it already
+inside `paragraphs()` without recording it; emitting it per block is the fix,
+on the next issue that re-runs 010 — re-running it here would invalidate the
+whole LLM pass for one block.
+
 ## A BLOCK BOUNDARY IS NOT A PARAGRAPH BREAK, AND THE INDENT IS NOT THE ONLY WITNESS
 
 `join_runons` decided a block boundary on the first-line indent alone: a
