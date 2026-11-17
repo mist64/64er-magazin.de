@@ -4267,3 +4267,42 @@ between the printed listing and the disk — always ask me"*): the print-error
 default, the German comment for an unimportant divergence, and this. An
 absolute in a rule is a promise to be narrowed later; what survives is the
 TEST, and the test here took three rounds to find.
+
+### AND OWNER INPUT 2 IS INVERTED: THE BUILD CUTS, THE OWNER REVIEWS → r150, r000
+
+Owner, 2026-11-17, after seeing nine agent-cut crops of his marked worklist:
+*"crops are great, they will need another pass by me, but will make everything
+WAY easier. make it a formal rule, and create all crops with the proper naming,
+plus the 1cm versions."*
+
+The worklist used to be ninety-odd rows of `WxH+X+Y` that he opened `sheets600`
+to cut by hand, one at a time. 8702 has **93 rows**. Now the build cuts all of
+them, named as they will ship, each with a `_1cm` companion grown 236 px on
+every side, and he passes over the result. Nothing downstream changes: still
+raw 600 dpi RGB, still unbucketed, still classified and converted by the build,
+and *owner-crop-wins* still decides any crop he re-cuts.
+
+What the two days of evidence put in the rule, beyond the inversion:
+
+- **The boundary is the artwork's, never the pen stroke's.** His box says
+  WHICH; the master says WHERE. A white sliver along one side means the box was
+  followed instead of the picture.
+- **A framed or tinted panel is part of the figure.** 8702's Bild 1-3 are set
+  as panels with a frame rule; 22-1's yellow tint is unarguably its own, so
+  cutting 22-2 and 22-3 to the bare drawing would have left three siblings
+  inconsistent. The white inside 22-2's panel is the point the diagram makes.
+- **Clamp at the sheet and say so.** The masters are 4961 x 7016, exactly A4 at
+  600 dpi, and `22-1_1cm` clears the left edge by 17 px — 0.7 mm. A wide crop
+  that is quietly not wide is worse than none, because it reads as context that
+  is not there.
+- **Verify the PAIR, not the dimensions.** The wide crop's centre must be
+  byte-identical to the tight one; that is what proves the growth was centred
+  and nothing was resampled. All nine of 8702's passed.
+- **Apply the survival gate before flagging a MARK.** `11-x` carried faint
+  purple dashes in a cyan corner at 600 dpi; bucket `c` ships at 150 dpi, and
+  at 150 the corner is clean. No census row, no owner question. *Surface every
+  mark with a crop* stands — the gate decides which ones reach him.
+
+**The builder flagged three readings instead of asking three questions**, which
+is why nine crops came back in one pass and why the owner could answer all of
+it in one line. That is the shape to keep at ninety-three.

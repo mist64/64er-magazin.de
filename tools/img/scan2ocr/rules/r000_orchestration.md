@@ -227,7 +227,7 @@ on owner input, and they are independent of one another.**
 | # | the build hands over | the owner returns | **what is blocked until it comes back** |
 |---|---|---|---|
 | 1 | the cover source, `<tmp>/title_source_150.png` | `title.png`, retouched by hand | **the PDF** |
-| 2 | the crop worklist, and `<tmp>/sheets600/` to cut from | the cut figures | **the HTML** |
+| 2 | the build's cut crops in `<tmp>/crops_v1/` (`<name>.png` + `<name>_1cm.png`), the worklist, and `<tmp>/sheets600/` to re-cut from | his pass over them; a re-cut where he wants one | **the HTML** |
 | 3 | the marks census, each mark with a magnified crop | `dirt` / `a previous hand` / `the plate` for each, and a repainted master for the first two | **the PDF** |
 | 4 | every Futureteufelchen candidate, each with the page, our divergence and the question in one sentence | `yes` / `no` for each, one at a time | **the HTML** |
 
@@ -860,7 +860,7 @@ questions; they are work only the owner can do:
 | # | deliverable | ready after | what the owner does |
 |---|---|---|---|
 | 1 | the **cover source**, `<tmp>/title_source_150.png` | 005, or 005b on a `sheet` binding | makes `title.png` by hand |
-| 2 | the **crop worklist** | the HTML is complete but for figures | cuts the figures from the graded pages |
+| 2 | the **cut crops** + the worklist | the HTML is complete but for figures | passes over the build's cuts, re-cutting what he wants |
 | — | `<tmp>/sheets600/`, the graded pages themselves | **005** | looks them over; cuts from them once 2 arrives |
 | 3 | the **marks**, each with a crop at magnification — **ours already removed, not listed** | the mark census, before the PDF ships | rules each `dirt` / `a previous hand` / `the plate`, and repaints the master for the first two |
 
@@ -899,8 +899,17 @@ and **carries on with the PDF side**. What it delivers:
 
 1. `issues/<ID>/*.html` complete in every respect that does not need a figure --
    text, tables, listings, metadata, headings, errata, the lot;
-2. the **crop worklist**: every figure the pages call for, with page and caption,
-   so the owner can cut them;
+2. **the cut figures themselves**, with the crop worklist behind them: for
+   every row, `<name>.png` and `<name>_1cm.png` in `<tmp>/crops_v1/`, raw 600
+   dpi RGB, named as they will ship, with a paired contact sheet and the
+   directory opened. Owner, 2026-11-17: *"crops are great, they will need
+   another pass by me, but will make everything WAY easier. make it a formal
+   rule, and create all crops with the proper naming, plus the 1cm versions."*
+   **The build cuts the first version; the owner passes over it** and his
+   re-cut wins where he makes one. The procedure is r150, *THE BUILD CUTS THE
+   FIRST VERSION OF EVERY CROP*. Input 2 is still what blocks the HTML — what
+   changed is that it now starts from cut pictures instead of ninety-odd rows
+   of `WxH+X+Y`;
 3. the **cover source** for `title.png` -- step 006 blocks on a hand-made 150 dpi
    `title.png` and the owner makes it from the scan. **This is handed over at
    005, not here** -- see *An OWNER DELIVERABLE is handed over the MOMENT it
@@ -998,7 +1007,7 @@ all four, and it has a second half:
 | input | what is `open`ed |
 |---|---|
 | 1 the cover source | `<tmp>/title_source_150.png` |
-| 2 the crop worklist | `<tmp>/sheets600/` **and** the worklist file itself |
+| 2 the crops | `<tmp>/crops_v1/` **and** `<tmp>/sheets600/` **and** the worklist file itself |
 | 3 the marks census | `<tmp>/marks/` — the magnified panels and their INDEX |
 | 4 the Futureteufelchen candidates | the candidate list file |
 

@@ -1280,6 +1280,120 @@ it is the plate (r000, *WHAT WE PUBLISH IS THE ORIGINAL PRINTING PLATE*) and
 there is nothing to fix. A claim that the conversion destroyed content must
 name the content the master still has.
 
+## THE BUILD CUTS THE FIRST VERSION OF EVERY CROP. THE OWNER REVIEWS IT
+
+**Owner, 2026-11-17, after seeing nine agent-cut crops:** *"crops are great,
+they will need another pass by me, but will make everything WAY easier. make it
+a formal rule, and create all crops with the proper naming, plus the 1cm
+versions."*
+
+This inverts OWNER INPUT 2 and it is the biggest change this step has had. The
+worklist used to be a list of coordinates the owner opened `sheets600` to cut by
+hand, one row at a time, for an issue with ninety-odd figures. **Now the build
+cuts all of them and he passes over the result.** Everything downstream is
+unchanged: the crops are still raw 600 dpi RGB, still unbucketed, still
+classified and run through `convert-scans.sh` by the build before placement.
+
+What the owner's pass is for has not changed either — *owner-crop-wins*: a crop
+he re-cuts or delivers replaces ours, and ours was never more than a proposal.
+What changed is that his pass starts from ninety-three cut pictures instead of
+ninety-three rows of `WxH+X+Y`.
+
+### What the build produces
+
+For **every row of the worklist**, two files in `<tmp>/crops_v1/`:
+
+| file | what it is |
+|---|---|
+| `<name>.png` | the proposal: the region, cut to the artwork's own boundary |
+| `<name>_1cm.png` | the same region grown **1 cm on all four sides**, for judging the boundary without opening the master |
+
+- `<name>` is the **final r150 name** — `8-0`, `10-x1`, `22-3`, `67-2a` — so an
+  accepted crop moves into `issues/<ID>/` unchanged. Never a lettered start
+  page: Verification 1 matches `[0-9]+-[0-9a-z_]+\.png`, so page 8a's lead
+  image is `8-0.png`.
+- **1 cm at 600 dpi is 236 px** (600 / 2.54 = 236.22), so each `_1cm` file is
+  exactly **+472 px in each axis** over its tight twin.
+- `_1cm` and not `-1cm`: a `-` suffix reads as the figure-numbering grammar.
+
+### Cut from `masters600`, not from `sheets600`
+
+The worklist's rows are in the `sheets600` frame because that is the file the
+OWNER opens (see the section below, which still stands for his re-cuts). **Our
+own cuts come from `masters600`**, where every other step looks, translated by
+each page's `sheet-box`. Find the translation by exact pixel match, not by
+arithmetic alone, and say in the README that you did.
+
+### The boundary is the artwork's, never the pen stroke's
+
+A box on a worklist — his or ours — says WHICH artwork. The master says WHERE.
+Cut to the photograph's own edge, the diagram's ruled frame, the illustration's
+extent; a white sliver along one side means the box was followed instead of the
+picture.
+
+**A framed or tinted panel is part of the figure.** MEASURED on 8702's `22-1`,
+`22-2`, `22-3`: the magazine sets Bild 1-3 as panels with a thin frame rule,
+and 22-1's yellow tint is unarguably the figure's own. Cutting the other two to
+the bare drawing would have left three siblings of one article inconsistent
+with each other. Keep the panel, keep the frame, and keep the white inside the
+panel — on 22-2 that white is the point the diagram is making.
+
+**Captions are never in the crop.** They become `<figcaption>` text and are
+re-read from the print at placement.
+
+### Clamp at the sheet, and say so
+
+A `_1cm` box can run off the sheet. Clamp it to the master's own bounds, **pad
+with nothing**, and name every crop that could not get its full centimetre,
+with how much it got on which side. MEASURED on 8702: the masters are 4961 x
+7016 — exactly A4 at 600 dpi — and `22-1_1cm` at 4841 px wide clears the left
+edge by 17 px, 0.7 mm. The full-width figures have no room for a second
+centimetre. **A wide crop that is quietly not wide is worse than no wide crop**,
+because it is read as context that is not there.
+
+### Verification — the pair, not the dimensions
+
+A dimensions line cannot tell you the growth was centred, or that nothing was
+resampled on the way. Compare the pixels:
+
+```python
+# every pair, before the folder is opened
+t = Image.open(f'{d}/{n}.png').convert('RGB')
+w = Image.open(f'{d}/{n}_1cm.png').convert('RGB')
+assert (w.width - t.width, w.height - t.height) == (472, 472)   # unless clamped
+assert w.crop((236, 236, 236 + t.width, 236 + t.height)).tobytes() == t.tobytes()
+```
+
+The centre of the wide crop must be **byte-identical** to the tight one. That
+proves the two files are provably the same region of the same master, which is
+the only thing that makes the comparison worth his time.
+
+### Hand it over
+
+- A `README.txt` in the folder: what the two kinds of file are, which master
+  set they came from, that they are raw and unclassified, the clamping notes,
+  and the questions you want his eye on.
+- A **paired contact sheet** — tight beside wide, labelled with the file name
+  and dimensions — not two separate sheets.
+- `open` the directory.
+- They stay in `crops_v1/`. Nothing enters `issues/<ID>/` until he has passed
+  over it, and nothing is classified, converted or placed before then.
+
+### Flag a reading, do not ask a question
+
+Where a boundary is genuinely ambiguous, cut your best reading and name it in
+the README. A flagged guess he can correct in the picture beats a question that
+stops ninety-three crops while it waits for an answer.
+
+**And apply the survival gate before you flag a MARK.** MEASURED on 8702's
+`11-x`: faint purple dashes crossed the cyan corner of a Sonderheft cover at
+600 dpi, correctly left untouched and raised. But the crop is a colour figure,
+`convert-scans.sh` resizes bucket `c` to 25 %, and at the delivered 150 dpi the
+corner is clean — nothing survives that reads as a dash. No census row, no
+crop to the owner, nothing repainted. *Surface every mark with a crop* still
+stands; what the gate adds is that the arithmetic answers first, and his
+attention is spent only on what a reader could see.
+
 ## THE WORKLIST'S GEOMETRY IS IN THE `sheets600` FRAME — SAY SO IN ITS HEADER
 
 **You look at `masters600`, the owner cuts from `sheets600`, AND THEY ARE NOT
