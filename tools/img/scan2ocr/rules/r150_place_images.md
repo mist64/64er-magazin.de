@@ -1637,6 +1637,54 @@ that is exactly the error that survives by looking like a rough number. SH8608's
 worklist quoted the master frame and said nothing; its tmp is gone, so how far
 that reached cannot be recovered.
 
+## `crops.txt` — WHAT WAS CUT, AND FROM WHERE
+
+Every issue writes `issues/<ID>/crops.txt` at placement, one row per figure.
+Owner, 2026-11-17, approving the format: *"cool format. crops.txt: commit it
+too at the end"* — so it is **tracked, and it goes into the issue's squash
+commit** with the articles.
+
+```
+# 8702 — crops.txt: every figure in this issue, as cut. Written at step 150.
+#
+#   file    the PNG in issues/8702/
+#   type    resolution bucket (tools/convert-scans.sh):
+#             bw   600 dpi bilevel        dots  600 dpi bilevel, screen removed
+#             gray 150 dpi grayscale      c     150 dpi colour
+#   origin  page and position of the cut in the 600 dpi master: NNN +X+Y
+#   size    the cut, in 600 dpi pixels (c and gray ship at a quarter of this)
+#   rot     de-skew WE applied to the page before cutting, degrees, + clockwise
+#           a figure printed crooked on the plate keeps its tilt — by design
+#
+file        type  origin          size       rot
+8-0.png     c     008 +736+784    1351x1121  +0.00
+10-x1.png   c     010 +1779+1360  1536x1784  +0.00
+22-1.png    dots  023 +253+510    4369x533   +0.00
+148-5.png   c     148 +391+4875   2135x1529  +0.25
+151-1.png   bw    151 +2555+3396  2034x2141  +0.00
+```
+
+Columns are space-aligned to the widest cell, with a two-space gap. The three
+decisions inside it, each of which is a rule and not a layout preference:
+
+- **`origin` is the page AND the position in the master**, so any crop can be
+  re-cut exactly, audited against the plate, or re-derived after a re-level.
+  A crop whose origin is not recorded cannot be checked against anything.
+- **`rot` records only the skew WE corrected**, never the figure's own tilt.
+  That is *we publish the plate* in a column: our scan error is fixed, the
+  magazine's crooked paste-up stays crooked. Distinguishing the two is a
+  measurement, not a judgement — see *THE FIGURES ARE AN INDEPENDENT WITNESS
+  OF PAGE SKEW*.
+- **`size` is the cut, not what ships.** `c` and `gray` go out at a quarter.
+  Two sizes in one table invites reading the wrong one, so the delivered size
+  is derivable from `type` and stated in the header rather than given a column.
+
+**Write it at 150, not at cut time** — `type` is not known until the crop is
+classified, and a column that is blank on the first pass is a column nobody
+trusts. It lives beside the articles rather than in `<tmp>` for the same reason
+`figure_captions.txt` does: `<tmp>` is swept and this is the only durable
+record of where each figure came from.
+
 ## Alt text — describe only what is visible
 
 - **No identity claims** unless caption explicitly names the
