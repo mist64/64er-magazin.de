@@ -4331,3 +4331,31 @@ loss for a cosmetic one.
 **The builder distinguished the two cases itself, on the same page-set, before
 either was in the rule** — which is the evidence that this is the right test
 and not a rationalisation of one crop.
+
+### AND THE REVIEW IS THREE FILES PER CROP, WITH NO OVERVIEW → r150
+
+Owner, 2026-11-17, twice in an hour, refining the crop review he had just asked
+to be made a rule:
+
+- *"we need 3 for each crop. in addition: 1cm version with a 1px yellow line 1
+  px outside of the crop position."*
+- *"dont show me downscales or contact sheets, just 3 files per crop that i
+  asked for"* — said while a set of 16 paired contact sheets was being built
+  for him, on my instruction.
+
+The third file is where the review happens: the proposed edge drawn in its
+surroundings without covering a pixel of the picture being judged. The line
+goes OUTSIDE the boundary for that reason, and where a side is clamped to 0 —
+`28-0a`, `28-0b`, two halves of one picture printed to the trim — the side
+stays open rather than being closed by drawing inside.
+
+**The contact sheets were my addition, not his, and they were wrong twice
+over.** An overview is the build's convenience; he is judging a boundary at the
+pixel and a reduced sheet cannot show him one. Worse, it broke the instrument:
+a 1 px line at 600 dpi is 0.042 mm and survives no downscale, so I had just
+told the builder to THICKEN the line on the sheets — that is, to make the one
+thing under review less accurate in the artefact he would actually look at. A
+summary that distorts what it summarises is not a convenience.
+
+Both are in the rule now, with the verification that `_1cm_box` differs from
+`_1cm` only on the rectangle's own pixels.

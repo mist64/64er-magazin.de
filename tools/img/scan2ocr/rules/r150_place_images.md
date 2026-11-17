@@ -1332,6 +1332,27 @@ For **every row of the worklist**, two files in `<tmp>/crops_v1/`:
 |---|---|
 | `<name>.png` | the proposal: the region, cut to the artwork's own boundary |
 | `<name>_1cm.png` | the same region grown **1 cm on all four sides**, for judging the boundary without opening the master |
+| `<name>_1cm_box.png` | the `_1cm` image with a **1 px yellow (`#FFFF00`) rectangle 1 px OUTSIDE** the proposal's boundary, so the cut is visible against its surroundings |
+
+The third file is where the review actually happens: it shows the proposed edge
+in its context without painting over a single pixel of the picture being
+judged. Owner, 2026-11-17: *"we need 3 for each crop. in addition: 1cm version
+with a 1px yellow line 1 px outside of the crop position."*
+
+**The line goes outside, never on the crop.** In the `_1cm` frame the proposal
+occupies `(L, T)` to `(L+w, T+h)`, so the rectangle is the columns `L-1` and
+`L+w` and the rows `T-1` and `T+h`. Covering the proposal's own edge pixel
+would hide the thing being judged.
+
+**Where a side is clamped to 0 there is no outside pixel — leave that side
+open** and say so. Do not close the rectangle by drawing inside. An open edge
+is also the truth: the crop runs to the sheet edge there. MEASURED on 8702:
+`28-0a` and `28-0b`, two halves of one picture printed to the trim.
+
+**Verify the third file against the second**: it must differ ONLY on the
+rectangle's own pixels, and the count of differing pixels must equal the
+perimeter drawn. That is what catches a line one pixel in, which would make
+every crop in the set look tighter than it is.
 
 - `<name>` is the **final r150 name** — `8-0`, `10-x1`, `22-3`, `67-2a` — so an
   accepted crop moves into `issues/<ID>/` unchanged. Never a lettered start
@@ -1395,11 +1416,18 @@ the only thing that makes the comparison worth his time.
 
 ### Hand it over
 
-- A `README.txt` in the folder: what the two kinds of file are, which master
-  set they came from, that they are raw and unclassified, the clamping notes,
-  and the questions you want his eye on.
-- A **paired contact sheet** — tight beside wide, labelled with the file name
-  and dimensions — not two separate sheets.
+- A `README.txt` in the folder: what the three kinds of file are, which master
+  set they came from, that they are raw and unclassified, the clamping and
+  open-edge notes, and the readings you want his eye on. Text, and short.
+- **NO CONTACT SHEETS AND NO DOWNSCALES.** Owner, 2026-11-17, while a set of
+  paired sheets was being built for him: *"dont show me downscales or contact
+  sheets, just 3 files per crop that i asked for"*. The folder he opens holds
+  the three files per crop and the two text files, nothing else. A reduced
+  overview is the build's convenience, not his: he is judging a boundary at
+  the pixel, and an overview cannot show him one. It also quietly broke the
+  instrument — a 1 px line at 600 dpi is 0.042 mm and does not survive any
+  downscale, so a sheet would have had to thicken the very line whose position
+  is the thing under review.
 - `open` the directory.
 - They stay in `crops_v1/`. Nothing enters `issues/<ID>/` until he has passed
   over it, and nothing is classified, converted or placed before then.
