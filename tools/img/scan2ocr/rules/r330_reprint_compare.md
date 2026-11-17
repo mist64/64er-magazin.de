@@ -1046,8 +1046,18 @@ grep -l 'Nachdruck aus' "issues/$ID"/*.html | sed 's|.*/||' | sort -u > /tmp/cre
 # GETS NO CREDIT BOX" below.  `grep -v` into a temp file and move it back is
 # NOT safe here: when the removal empties the file grep exits 1, the `&&` short
 # -circuits, and the stale file survives.  Build the exclusion list, then filter.
-grep -lE '64er\.id" content="(mse|checksummer|abtippen)"' "issues/$ID"/*.html 2>/dev/null \
-  | sed 's|.*/||' | sort -u > /tmp/standing.txt
+# AND THE STANDING FURNITURE IS THE BOX, NOT THE ARTICLE.  Keyed on 64er.id
+# alone this misses every issue that EMBEDS the Checksummer/MSE box in an
+# ordinary article -- MEASURED over the corpus: of the 5 articles carrying the
+# box, 3 have ids the id-key cannot match (8609/46 `fsd`, 8612/74
+# `tips_profis`, 8702/52 `kurvendiskussion`).  Only 8508/54 (`mse`) and 8611/99
+# (`checksummer`) are whole articles.  So the check demanded a reprint credit
+# for standing furniture on three issues.  Union both keys: the id, for a page
+# that IS the furniture, and the box's own first sentence, for a page that
+# merely carries it.
+{ grep -lE '64er\.id" content="(mse|checksummer|abtippen)"' "issues/$ID"/*.html 2>/dev/null
+  grep -l 'Der Checksummer und der MSE' "issues/$ID"/*.html 2>/dev/null
+} | sed 's|.*/||' | sort -u > /tmp/standing.txt
 # AND THE DELIBERATELY UNCREDITED PARTIALS, which are a second, per-issue
 # exclusion.  Without it this check reports a correct record as broken: on
 # SH8605 it named 20, 77, 90 and 188 -- four rows that are correctly PARTIAL
@@ -1261,6 +1271,20 @@ rule the evidence form is, inline in the report, per disposition:
 Bare counts are not evidence. A report that says "37 differences, all editorial"
 is un-evidenced and gets re-dispatched.
 
+### `--partial` IS A REQUIRED READ FOR EVERY PARTIAL PAIR, NOT AN OPTION
+
+A MOVED block is paired on content and then diffed, and the word-level
+differences INSIDE it come out classified `EDITORIAL` — so a default run shows
+the pairing and not the words. MEASURED on 8702: `Modus`/`Modul`,
+`Program`/`Programm` and a whole extra sentence lived inside MOVED blocks and
+appeared only under `--partial`.
+
+Those are exactly the differences r330 exists to find: a one-letter divergence
+between two transcriptions of one printed text is an OCR error in one of them.
+So **run and READ `--partial` for every pair whose verdict is PARTIAL**, and
+say in the LOG that you did. A flag that has to be remembered is a check that
+is sometimes not run.
+
 ## A REGULARLY REPRINTED ARTICLE GETS NO CREDIT BOX
 
 **Owner, 2026-10-06:** *"mse and checksummer articles are reprinted regularly.
@@ -1273,7 +1297,16 @@ that issue's listings. Telling that reader the page is a reprint of another
 issue is noise — they are not reading it as an archival curiosity, they are
 reading it because they are about to type a program.
 
-So, for `64er.id` in **`mse`, `checksummer`, `abtippen`**:
+**THE STANDING THING IS THE BOX, NOT THE ARTICLE.** This rule said "for
+`64er.id` in mse, checksummer, abtippen", which is only true where the furniture
+is a whole page. MEASURED over the corpus: five articles carry the box, and
+**three of them embed it in an ordinary article** whose id matches nothing —
+8609/46 (`fsd`), 8612/74 (`tips_profis`), 8702/52 (`kurvendiskussion`). Match
+EITHER the id or the box's own opening, `Der Checksummer und der MSE`, which is
+the first sentence of all five including 8508's older wording.
+
+So, for an article that IS one of `mse`, `checksummer`, `abtippen` **or carries
+the box**:
 
 - **run the comparison** — it is the point of r330 here. Two transcriptions of
   one printed text disagreeing names an OCR error in one of them, and these

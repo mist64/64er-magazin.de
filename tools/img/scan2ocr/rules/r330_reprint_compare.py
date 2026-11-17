@@ -708,16 +708,22 @@ def write_record(path, a_path, b_path, rows):
         counts[cls] = counts.get(cls, 0) + 1
         disp = "" if cls == "CANDIDATE" else cls
         lines.append(f"{record_key(ta, tb)}\t{cls}\t{sub}\tD-{n:03d}\t{disp}\t"
-                     f"{_flat(ta)[:120]}\t{_flat(tb)[:120]}")
+                     f"{_flat(ta)[:120]}\t{_flat(tb)[:120]}\t")
     with open(path, "w", encoding="utf-8") as fh:
         print(f"# r330 record: {a_path}", file=fh)
         print(f"#          vs: {b_path}", file=fh)
-        print(f"# key\tclass\tsubclass\tD\tdisposition\tours\ttheirs", file=fh)
+        print(f"# key\tclass\tsubclass\tD\tdisposition\tours\ttheirs\tevidence", file=fh)
         print(f"# The key is a content hash: an edit elsewhere does not renumber it.",
               file=fh)
         print(f"# Every CANDIDATE needs a disposition from "
               f"{sorted(DISPOSITIONS)}; MECHANICAL and EDITORIAL carry their class.",
               file=fh)
+        print(f"# EVIDENCE (8th cell) is REQUIRED for OURS and THEIRS -- the two "
+              f"dispositions that", file=fh)
+        print(f"# assert something the row does not show: a crop, a page and "
+              f"column, a prg line.", file=fh)
+        print(f"# The other dispositions are readable from the ours/theirs cells "
+              f"themselves.", file=fh)
         for ln in lines:
             print(ln, file=fh)
     return counts
@@ -769,7 +775,7 @@ def load_records(issue_dir):
     out, unreadable = {}, []
     for path in sorted(glob.glob(os.path.join(issue_dir, "reviewed", "r330-*.txt"))):
         a = b = None
-        counts, undone = {}, []
+        counts, undone, no_ev = {}, [], []
         with open(path, encoding="utf-8") as fh:
             for line in fh:
                 if line.startswith("#"):
@@ -784,6 +790,18 @@ def load_records(issue_dir):
                 if len(cells) < 5:
                     continue
                 key, cls, _sub, dnum, disp = cells[0], cells[1], cells[2], cells[3], cells[4]
+                # THE RECORD HAD NO COLUMN FOR WHY.  Seven cells say WHAT a
+                # difference is and nothing says what was LOOKED AT to decide
+                # -- the same hole r320's disposition file had, and the reason
+                # is the point of a record.  The 8th cell is optional for the
+                # dispositions a reader can check from the ours/theirs cells in
+                # the same row, and REQUIRED for the two that assert something
+                # those cells cannot show: OURS (our edition diverges) and
+                # THEIRS (the magazine itself changed between printings).
+                # MEASURED on 8702: 757 PRINT, 10 MOVED, 0 OURS, 0 THEIRS -- so
+                # the requirement costs nothing today and bites exactly on the
+                # claims that carry weight.  Old 7-cell records keep loading.
+                ev = cells[7].strip() if len(cells) > 7 else ""
                 counts[cls] = counts.get(cls, 0) + 1
                 if disp.strip() == "THEIRS":
                     counts["_theirs"] = counts.get("_theirs", 0) + 1
@@ -792,8 +810,10 @@ def load_records(issue_dir):
                 elif cls == "CANDIDATE" and disp.strip() not in DISPOSITIONS:
                     undone.append(f"{key} ({dnum}) disposition {disp.strip()!r} "
                                   f"not one of {sorted(DISPOSITIONS)}")
+                if disp.strip() in ("OURS", "THEIRS") and not ev:
+                    no_ev.append(f"{key} ({dnum}) {disp.strip()}")
         if a and b:
-            out[(os.path.normpath(a), os.path.normpath(b))] = (path, counts, undone)
+            out[(os.path.normpath(a), os.path.normpath(b))] = (path, counts, undone, no_ev)
         else:
             # NOT silently: a record this cannot read is a record nobody checks.
             # The hand-written shape from before `--record` existed lands here,
@@ -891,6 +911,76 @@ def verify(repo, issue_dir):
             return section[m.end():end]
         return None
 
+    def check_resolution(lead, key, page, cands, cand_paths, monthly, sh_file, verdict):
+        """Did this row pick the right ORIGINAL? True if the row may stand.
+
+        A GATE THAT SKIPS ITS OWN CHECK WHEN IT HAS A RECORD.  These checks
+        used to live BELOW the `rec_key in records` branch, which ends in
+        `continue` -- so a pair with a `diff --record` file never had its
+        resolution questioned at all.  MEASURED on 8702: all NINE pairs are
+        record-backed, so the ambiguity and REJECTED checks ran on NONE of
+        them.  The two things are independent and were treated as one: a
+        record proves every DIFFERENCE was dispositioned; it says nothing
+        about whether the article being diffed is the right original.  A page
+        number is not a key -- 8601/47 resolves to two articles and the wrong
+        one sorts first -- so the row that names one file proves nothing
+        either way.
+
+        This is the third guard in this chain found keyed on the belief it was
+        meant to question; see HARVEST, *a test whose reference is derived
+        from the thing under test*.
+        """
+        if not cands:
+            problems.append(f"{lead}: resolves to no article, so it cannot be {verdict}")
+            return False
+        if os.path.abspath(os.path.join(repo, monthly)) not in cand_paths:
+            problems.append(f"{lead}: the monthly file in the table is not one of the "
+                            f"{len(cands)} article(s) covering page {page}: {monthly}")
+            return False
+        if len(cands) > 1:
+            chunk = subsection(key, lead, True) or subsection(key, lead, False)
+            rejected = set()
+            if chunk:
+                for line in chunk.splitlines():
+                    m = CAND_LINE.match(line)
+                    if m and m.group(1) == "REJECTED":
+                        rejected.add(os.path.abspath(os.path.join(repo, m.group(2))))
+            others = cand_paths - {os.path.abspath(os.path.join(repo, monthly))}
+            missing_rej = others - rejected
+            if missing_rej:
+                problems.append(
+                    f"{lead}: page {page} is shared by {len(cands)} articles; the other "
+                    f"candidate(s) must be named on a '- REJECTED `…` — why' line: "
+                    + ", ".join(sorted(os.path.relpath(x, repo) for x in missing_rej)))
+                return False
+            # A rejection line proves a choice was WRITTEN DOWN, not that it was
+            # right.  So cross-check it the one way a script honestly can: if a
+            # rejected candidate shares far more text with this issue's article
+            # than the chosen one does, the recorded decision contradicts the
+            # text and a human has to look again.  The scores do not decide
+            # which article is the original -- they only refuse to let a
+            # first-hit pick wear a rejection line as cover.
+            try:
+                _, sh_blocks = extract(os.path.join(repo, sh_file))
+                chosen_score = content_match(sh_blocks, extract(os.path.join(repo, monthly))[1])
+                for other in sorted(others):
+                    o = content_match(sh_blocks, extract(other)[1])
+                    if chosen_score[0] * 2 <= o[0] and chosen_score[1] < o[1]:
+                        problems.append(
+                            f"{lead}: the REJECTED `{os.path.relpath(other, repo)}` shares far "
+                            f"more text with {key} ({o[0]}% blocks / {o[1]}% words) than the "
+                            f"chosen `{monthly}` does ({chosen_score[0]}% / {chosen_score[1]}%). "
+                            "Re-read both printed pages before this row stands.")
+            except OSError as e:
+                problems.append(f"{lead}: could not score the candidates: {e}")
+                return False
+            print(f"NOTE: {lead} was ambiguous ({len(cands)} candidates); "
+                  f"{len(others)} explicitly rejected")
+        for pth in (sh_file, monthly):
+            if not os.path.isfile(os.path.join(repo, pth)):
+                problems.append(f"{lead}: file named in the LOG table does not exist: {pth}")
+        return True
+
     # A PAIR IS (lead x OUR FILE), NOT A LEAD.  A Sonderheft drawing two
     # articles from one monthly is ordinary -- SH8605's 77 and 90 both compare
     # against 8404/119 -- and the skip below used to test whether the LEAD
@@ -956,13 +1046,27 @@ def verify(repo, issue_dir):
                 print(f"OK: {key} ← {lead} — UNRESOLVED, {len(cands)} candidate(s) reported")
             continue
 
+        # THE RESOLUTION IS CHECKED FOR EVERY CONFIRMED/PARTIAL ROW, record or
+        # not -- see check_resolution's docstring for what skipping it cost.
+        if verdict in ("CONFIRMED", "PARTIAL"):
+            if not check_resolution(lead, key, page, cands, cand_paths,
+                                    monthly, sh_file, verdict):
+                continue
+
         # A PAIR WITH A reviewed/ RECORD IS VERIFIED FROM IT, NOT FROM LOG.md.
         rec_key = (os.path.normpath(sh_file), os.path.normpath(monthly))
         if rec_key in records:
-            path, counts, undone = records[rec_key]
+            path, counts, undone, no_ev = records[rec_key]
             if undone:
                 problems.append(f"{lead}: {path} has {len(undone)} CANDIDATE(s) "
                                 f"without a valid disposition: " + ", ".join(undone[:6]))
+            elif no_ev:
+                problems.append(
+                    f"{lead}: {path} has {len(no_ev)} OURS/THEIRS row(s) with an "
+                    f"empty evidence cell -- those two dispositions assert "
+                    f"something the row does not show, so each names what was "
+                    f"looked at (a crop, a page and column, a prg line): "
+                    + ", ".join(no_ev[:6]))
             elif counts.get("_theirs") and not CODE_SWEEP.search(
                     theirs_text.replace("\n", " ")
                     if os.path.basename(path) in theirs_text else ""):
@@ -994,57 +1098,7 @@ def verify(repo, issue_dir):
             print(f"OK: {key} ← {lead} — NOT-A-REPRINT, no diff by verdict")
             continue
 
-        # CONFIRMED / PARTIAL: the named monthly must be one the page actually
-        # resolves to, and every other candidate must be explicitly rejected.
-        if not cands:
-            problems.append(f"{lead}: resolves to no article, so it cannot be {verdict}")
-            continue
-        if os.path.abspath(os.path.join(repo, monthly)) not in cand_paths:
-            problems.append(f"{lead}: the monthly file in the table is not one of the "
-                            f"{len(cands)} article(s) covering page {page}: {monthly}")
-            continue
-        if len(cands) > 1:
-            chunk = subsection(key, lead, True) or subsection(key, lead, False)
-            rejected = set()
-            if chunk:
-                for line in chunk.splitlines():
-                    m = CAND_LINE.match(line)
-                    if m and m.group(1) == "REJECTED":
-                        rejected.add(os.path.abspath(os.path.join(repo, m.group(2))))
-            others = cand_paths - {os.path.abspath(os.path.join(repo, monthly))}
-            missing_rej = others - rejected
-            if missing_rej:
-                problems.append(
-                    f"{lead}: page {page} is shared by {len(cands)} articles; the other "
-                    f"candidate(s) must be named on a '- REJECTED `…` — why' line: "
-                    + ", ".join(sorted(os.path.relpath(x, repo) for x in missing_rej)))
-                continue
-            # A rejection line proves a choice was WRITTEN DOWN, not that it was
-            # right.  So cross-check it the one way a script honestly can: if a
-            # rejected candidate shares far more text with this issue's article
-            # than the chosen one does, the recorded decision contradicts the
-            # text and a human has to look again.  The scores do not decide
-            # which article is the original -- they only refuse to let a
-            # first-hit pick wear a rejection line as cover.
-            try:
-                _, sh_blocks = extract(os.path.join(repo, sh_file))
-                chosen_score = content_match(sh_blocks, extract(os.path.join(repo, monthly))[1])
-                for other in sorted(others):
-                    o = content_match(sh_blocks, extract(other)[1])
-                    if chosen_score[0] * 2 <= o[0] and chosen_score[1] < o[1]:
-                        problems.append(
-                            f"{lead}: the REJECTED `{os.path.relpath(other, repo)}` shares far "
-                            f"more text with {key} ({o[0]}% blocks / {o[1]}% words) than the "
-                            f"chosen `{monthly}` does ({chosen_score[0]}% / {chosen_score[1]}%). "
-                            "Re-read both printed pages before this row stands.")
-            except OSError as e:
-                problems.append(f"{lead}: could not score the candidates: {e}")
-                continue
-            print(f"NOTE: {lead} was ambiguous ({len(cands)} candidates); "
-                  f"{len(others)} explicitly rejected")
-        for p in (sh_file, monthly):
-            if not os.path.isfile(os.path.join(repo, p)):
-                problems.append(f"{lead}: file named in the LOG table does not exist: {p}")
+        # CONFIRMED / PARTIAL: resolution was checked above, for every row.
         if len(problems) > mark:
             continue
         buf = io.StringIO()

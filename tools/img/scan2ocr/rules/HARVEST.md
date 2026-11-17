@@ -4170,3 +4170,45 @@ Both reported by 8702's builder, both fixed and measured.
 Still missing, recorded not built: nothing compares the captions the OCR read
 against the figcaptions the article ships. The agent's ad-hoc pass is what
 found the two dropped MSE sentences above.
+
+### AND r330's GATE SKIPPED ITS OWN AMBIGUITY CHECK FOR RECORD-BACKED PAIRS → r330
+
+Reported by 8702's builder among four 330 tool defects, all four fixed.
+
+**The resolution check was below the record branch**, which ends in `continue`
+— so a pair with a `reviewed/r330-*.txt` record never had its ORIGINAL
+questioned. MEASURED on 8702: all NINE pairs are record-backed, so the
+ambiguity and REJECTED checks ran on none of them. Two independent things were
+treated as one: a record proves every DIFFERENCE was dispositioned; it says
+nothing about whether the article being diffed is the right original — and a
+page number is not a key, since 8601/47 resolves to two articles and the wrong
+one sorts first. Lifted above the branch and verified: 8611/99 now reports
+"ambiguous (3 candidates); 2 explicitly rejected" where it was silent, and
+hiding the REJECTED lines makes it FAIL. **This is the fourth guard in this
+chain found keyed on the belief it was meant to question.**
+
+**The record had no column for WHY.** Seven cells said what each difference IS
+and none said what was LOOKED AT — the same hole r320's dispositions had. The
+builder had already added an 8th evidence column BY HAND and documented it in
+its own file header; the tool writes it now, and the gate requires it for the
+two dispositions that assert something the row cannot show: OURS (our edition
+diverges) and THEIRS (the magazine changed between printings). MEASURED on
+8702: 757 PRINT, 10 MOVED, 1 MECHANICAL, 0 OURS, 0 THEIRS — so the requirement
+costs nothing today and bites exactly on the claims that carry weight. Old
+7-cell records keep loading.
+
+**The standing-reprint exclusion was keyed on `64er.id`.** The Checksummer/MSE
+box is standing furniture wherever it sits, and keying on the article's id only
+works where the furniture IS the page. MEASURED: five corpus articles carry the
+box and **three embed it** — 8609/46 `fsd`, 8612/74 `tips_profis`, 8702/52
+`kurvendiskussion`. The check demanded a reprint credit for standing furniture
+on three issues. Keyed on the id OR the box's own first sentence now.
+
+**Differences inside a MOVED block come out as EDITORIAL**, so a default run
+shows the pairing and not the words; 8702's `Modus`/`Modul`,
+`Program`/`Programm` and a whole extra sentence appeared only under
+`--partial`. Those are precisely what r330 exists to find — a one-letter
+divergence between two transcriptions of one printed text is an OCR error in
+one of them. `--partial` is a required read for every PARTIAL pair now, declared
+in the LOG. **A flag that has to be remembered is a check that is sometimes not
+run.**
