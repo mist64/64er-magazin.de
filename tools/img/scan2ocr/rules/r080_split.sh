@@ -150,12 +150,19 @@ def split_html(input_file, issue):
             if re.search(VERB, d, re.I):                       return False
             return True
 
-        # THE AUTHOR META IS A LIST OF NAMES, NOT A SET OF BYLINE STRINGS.
-        # Collected as whole strings with '/' turned into ', ', an article
-        # with two bylines that share an editor -- "(Udo Dreier/hm)" and
-        # "(hm)" -- produced `content="Udo Dreier, hm, hm"`.  The tokens are
-        # what repeat, so the tokens are what is deduplicated, in the order
-        # the page prints them.
+        # THE AUTHOR META IS PER-BYLINE EXPANSION IN BODY ORDER, REPEATS AND
+        # ALL.  That is r180's DEFAULT, stated there: one entry per
+        # <address class="author">, in the order the page prints them,
+        # INCLUDING repeats -- "bs, bs, hm, ev, hm" for a news roundup whose
+        # five items are written by four editors.  MEASURED: 68 of the 1,967
+        # author metas in the published corpus repeat a token, and they are
+        # the roundups and the per-book columns ("rf, rf, rf, rf, rf, rf, rf").
+        # Deduping is r180's EXCEPTION, for tip columns, applied by a reader
+        # who can see the sub-sections -- not here.
+        #
+        # This was a `set` of whole byline STRINGS joined with sorted(), which
+        # gets both halves wrong: it collapses two identical bylines the rule
+        # wants twice, and it alphabetises what should be body order.
         authors = []
         for a in re.findall(r'<p>\(([^)]*?)\)</p>', body, re.DOTALL):
             if not is_byline(a.strip()):
@@ -163,7 +170,7 @@ def split_html(input_file, issue):
                 continue
             for tok in re.split(r'\s*/\s*', a.strip()):
                 tok = tok.strip()
-                if tok and tok not in authors:
+                if tok:
                     authors.append(tok)
             body = body.replace(f'<p>({a})</p>', f'<address class="author">({a})</address>', 1)
         out = tpl_start.format(issue=issue)

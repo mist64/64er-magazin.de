@@ -58,10 +58,15 @@ For every `<h1>` block (each `<h1>` text ends with `[page-numbers]`):
   `k[0].isdigit()`). Corrected across SH8601 on 2026-10-04.
 - **bylines** `<p>(name1/name2)</p>` → `<address class="author">(name1/name2)</address>`
   AND collected into `<meta name="author" content="name1, name2, …">` —
-  **by TOKEN, deduplicated, in print order.** Collected as whole strings with
-  `/` turned into `, `, an article with two bylines sharing an editor —
-  `(Udo Dreier/hm)` and `(hm)` — wrote `content="Udo Dreier, hm, hm"`. The
-  tokens are what repeat, so the tokens are what is deduplicated (8702).
+  **by TOKEN, in body order, REPEATS AND ALL** — r180's DEFAULT: one entry per
+  `<address class="author">`, in the order the page prints them, including
+  repeats (`bs, bs, hm, ev, hm` for a roundup whose five items are written by
+  four editors). MEASURED: 68 of the 1,967 author metas in the published
+  corpus repeat a token. Deduping is r180's EXCEPTION for tip columns and
+  belongs to a reader who can see the sub-sections, never here. This was a
+  `set` of whole byline strings joined with `sorted()`, which gets both halves
+  wrong: it collapses two identical bylines the rule wants twice, and it
+  alphabetises what should be body order.
 - **a parenthesis with a finite VERB in it is a sentence, not a name.** The
   shape tests (no digit, no `=`, not a single all-caps token) describe a
   lowercase parenthetical sentence just as well as a byline, and 8702
