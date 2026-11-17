@@ -577,6 +577,15 @@ PY
 #    PRINT AT ALL -- not 120, not 130, not 190.
 $PY tools/img/scan2ocr/rules/r120_binary_extent.py issues/<ID> <tmp>/scratch_120/extent.txt
 
+#    ...EXCEPT A SEQ FILE, WHICH HAS NO LOAD ADDRESS AND THEREFORE NO SPAN.
+#    The check reads the first two bytes of every binary as a load address; a
+#    sequential file is pure data -- a text, a table, a screen -- and its first
+#    two bytes are the first two bytes of that data.  Asked for a printed
+#    extent it demanded one that does not exist (8702), and an answer written
+#    to satisfy it would be a fiction.  `.seq` files are now LISTED with the
+#    reason and not counted against the gate; 20 of the corpus's 1,792
+#    downloads are of this kind.
+
 #    MEASURED, SH09 p119 `turbotapecopy.prg`: the disk file loads at $C700 and
 #    carries 273 bytes of code, while the printed listing starts at $C350.  The
 #    disk holds the last fifth of the program and does not run alone.  It was

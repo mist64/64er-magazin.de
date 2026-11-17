@@ -146,10 +146,27 @@ def read_answers(path):
     return answers
 
 
+# A SEQ FILE HAS NO LOAD ADDRESS, SO IT HAS NO SPAN TO COMPARE.  This check
+# reads the first two bytes of every binary as a load address; a sequential
+# file is pure data -- a text, a table, a screen -- and its first two bytes are
+# the first two bytes of that data.  Asked for a printed extent it demands one
+# that does not exist, and an answer written to satisfy it would be a fiction.
+# MEASURED: 20 of the 1,792 downloads in the published corpus are `.seq`.
+# They are LISTED, with the reason, and not counted against the gate: silence
+# would make the omission indistinguishable from a file nobody looked at.
+def is_seq(name):
+    return name.lower().endswith(".seq")
+
+
 def main(root, answers_path):
     files = binaries(root)
     answers = read_answers(answers_path)
     rows, bad, missing = [], [], []
+    seq = [n for n in files if is_seq(n)]
+    files = [n for n in files if not is_seq(n)]
+    if seq:
+        print(f"  SEQ, no load address and therefore no span to check "
+              f"({len(seq)}): " + ", ".join(seq))
 
     for name in files:
         p = os.path.join(root, "prg", name)

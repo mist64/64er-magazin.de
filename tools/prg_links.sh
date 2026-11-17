@@ -2,6 +2,13 @@
 
 # Get script directory (before any cd commands)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# THE REPO VENV, NOT BARE python3 (CLAUDE.md, r000).  hypra-ass-decode.py was
+# invoked as `python3`, so it ran on whichever python PATH offered -- and when
+# that python cannot import what the script needs, the decode silently fails
+# and every Hypra-Ass source on the disk is reported as a raw PRG instead.
+# A decode that fails by exiting non-zero is indistinguishable here from a file
+# that is not Hypra-Ass.
+PY="${PYTHON:-$SCRIPT_DIR/../.venv/bin/python}"
 
 # Check arguments
 if [ $# -lt 1 ]; then
@@ -145,7 +152,7 @@ for D64_FILE in "${D64_FILES[@]}"; do
         else
             mv "$txtfile" "../del/"
             # Try hypra-ass-decode
-            if python3 "$SCRIPT_DIR/hypra-ass-decode.py" "$prgfile" > "$txtfile" 2>/dev/null; then
+            if "$PY" "$SCRIPT_DIR/hypra-ass-decode.py" "$prgfile" > "$txtfile" 2>/dev/null; then
                 # Check if output looks valid (has line numbers AND contains Hypra-Ass keywords)
                 if head -1 "$txtfile" | grep -qE '^[0-9]+  -' && grep -qE '\.(LI|BA|GL|TX|BY|MA|RT) ' "$txtfile"; then
                     mv "$txtfile" "../del/"
