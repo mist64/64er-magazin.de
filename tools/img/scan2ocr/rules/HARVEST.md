@@ -3871,7 +3871,7 @@ are one column through the sheet, a speck that happens to land on a row is
 not. MEASURED over all 184 pages: **18 pages, 67 punches** that the old code
 filled none of, and **not one page with a holes-derived fold changes**.
 
-### AND THREE REMEDIES LATER, 27 PUNCHES STAY IN THE GUTTER — ON PURPOSE
+### AND THREE REMEDIES LATER, 24 PUNCHES STAY IN THE GUTTER — ON PURPOSE
 
 The first fix was right and shipped. The next three were not, and the shape of
 each failure is worth more than the punches:
@@ -3896,7 +3896,11 @@ each failure is worth more than the punches:
   bed.
 
 So the tolerances are back where each individual fill has strong evidence, and
-**27 punches ship in the gutter, recorded in the census as OURS.** That is the
+**24 punches ship in the gutter, recorded in the census as OURS.** (24 of the
+48 were repaired by the structural fixes' fills; the split was re-gated against
+the FINAL masters, which is the only count that means anything — the 51 and 33
+and 27 along the way were each measured against a master set that then
+changed.) That is the
 right trade: they are our own damage, sub-millimetre to 5 mm, at the gutter,
 and the owner is never asked about them — while a white disc on printed colour
 is visible, wrong, and ours too.
