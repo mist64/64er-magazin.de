@@ -28,6 +28,48 @@ it to the affected article here: an `<aside class="fehlerteufelchen">` at
 the end of the article, an in-text link to it, and — for code errata — a
 matching fix in the `prg/*.txt` listing.
 
+## THE RULE RUNS IN TWO DIRECTIONS AND HAD NO WORDS FOR THEM
+
+**INBOUND** — errata printed in LATER issues that correct THIS issue's
+articles. Everything lands in `issues/<this issue>/`.
+
+**OUTBOUND** — the Fehlerteufelchen rubric printed in THIS issue, which
+corrects EARLIER issues' articles. Everything lands in
+`issues/<earlier issue>/` — its HTML, its `prg/*.txt`, its
+`reviewed/errata_status.txt`. **This is authorised, it is the point of the
+step, and you do not need to ask.** Both directions are already in this
+file — outbound as a subordinate clause under *Run order* ("re-run over old
+issues whenever a new issue is imported") and as `issues/<source-issue>/prg/`
+in step 4 — but neither had a NAME, and the same words meant different issues
+in the two directions ("this issue", "the source issue", "the FT-source
+article"). 8702's builder had to invent INBOUND/OUTBOUND to report its own
+work and then asked permission for an edit this rule already told it to make.
+**A builder that invents a word to describe what it just did has found a hole
+in the rule, not a lapse in itself** — the words are the rule's now.
+
+**The two directions produce the SAME edit, reached from opposite sides** —
+issue N's inbound pass over issue N+k's rubric, and issue N+k's outbound pass,
+both end with the aside on the same article. That is why a skipped inbound
+usually costs nothing: the later build repairs it. MEASURED on 8612, whose
+step 300 was excused as a no-op and which today carries all four of its
+errata — one applied outbound from 8701, three from 8702.
+
+**It breaks at the NEWEST issue, which is exactly where the rule excused
+it.** 8702's six inbound errata are printed in 3-8/87. Those issues are not
+scanned and may not be built for years, so nothing will come from the other
+side; the inbound pass is the only pass they will ever get. **The newer the
+issue, the more its inbound pass is worth, and the rule had the slope
+backwards.**
+
+Two things do NOT follow from the outbound licence:
+
+- **Only what this issue's rubric names.** The licence is to carry THIS
+  issue's errata to the articles they name. It is not a licence to fix
+  anything else noticed in the other issue on the way past.
+- **A reprint is still not an edit of the original.** See *A REPRINT of a
+  corrected page needs a Futureteufelchen* below: there the correction is
+  OURS, made now, about the reprint in front of us.
+
 ## HOW OFTEN: essentially never. Count before you argue
 
 **19 asides in 1,825 articles.** 31 of the 44 issues have NONE; 8 have one; 4
@@ -257,7 +299,14 @@ Seite 43 und 44`, so step 1 sends it to the monthly and stops. After routing an
 erratum, check `REPRINTS.md` and the r330 verdicts for an article in THIS issue
 that reprints the cited pages.
 
-Do not edit the other issue — r000, *the issue you are working on is the scope*.
+Do not edit the other issue *for this* — r000, *the issue you are working on
+is the scope*. **Read that narrowly: it is about the REPRINT case.** The
+original printing already carries its own erratum and needs nothing; what is
+wrong is the copy in front of us, so the entry goes here. It does **not**
+countermand the OUTBOUND licence above, where carrying this issue's rubric
+into the earlier issue's files is the whole job. Written flat, the sentence
+sits four screens from that licence and contradicts it, which is how 8702's
+builder came to ask whether it could write the records its own step requires.
 The monthly already has its own aside; what is missing is the reprint's.
 
 This is why prior issues carry 2–7 of these asides each (8601–8607) while a
@@ -463,6 +512,64 @@ it is under-measured. **Do not stretch an existing word to fit — a status
 comment is read as a claim, and a false claim here tells a future build that
 nothing needs checking.**
 
+## AN ERRATUM WHOSE OWN REFERENCE IS WRONG, OR COLLIDES WITH THE ARTICLE'S
+
+The erratum is a printed text and **it is reproduced verbatim** — r000, *print
+errors: leave as printed*; the owner, 2026-10-08. But an erratum points at
+something, and the pointer can be wrong or can mean something else over here.
+Two states, both met on 8702's outbound pass, and ONE answer shape for both:
+**the TEXT stays wrong, the LINK carries what we know, and a German HTML
+comment states the mismatch.** Never repair the pointer inside the quotation —
+a reader comparing our page with the print must find them identical.
+
+### The erratum cites the wrong figure
+
+MEASURED on 8702's 2/87 rubric → `issues/8612/52 Bauanleitung: Centronics-
+Interface`: *"Weiterhin ist auf Seite 57 Bild 2 Vcc mit 50 Volt bezeichnet
+worden."* The article's Bild 2 is a 1:1 PCB layout and carries no voltages at
+all; **Bild 1**, the Programmiergerät schematic, prints `V_CC = V_DD = +50
+volts typical` in its legend — verified by reading `issues/8612/52-1.png`. The
+page number is right and the figure number is wrong.
+
+So: wrap **Bild 1's** figcaption, because the link's job is to take the reader
+to the thing the erratum is about, and leave the sentence alone.
+
+```html
+<!-- Das Fehlerteufelchen nennt Bild 2; die Angabe »+50 volts« steht in Bild 1. -->
+<!-- Reiner Druckfehler -->
+<!-- 64'er 2/1987 -->
+```
+
+The precedent for the comment is `issues/8611/50`, which already carries
+`<!-- Das Ladeprogramm auf der Diskette ist anders numeriert: … -->` beside its
+status comment: a short German statement of fact about a reference that does
+not line up, next to the disposition and before the source trailer.
+
+### The erratum prints its OWN listing, and "Listing 1" then means two things
+
+An erratum that supplies a program refers to it by its own number, which
+collides with the host article's numbering. MEASURED on 8702's 2/87 rubric →
+`issues/8611/52 Das Ende aller Tippfehler`: the erratum says the patch *"(Listing
+1)"* is to be typed in with the MSE — while the host article's **Listing 1 is
+SPELL CHECK V1.0 itself**, the program being patched. Left as it stands, the
+reader is told to run `NEW` and `SYS 49152` over the very program the patch is
+meant to fix.
+
+The corpus settled this in 8407/24, where the 8/84 erratum supplied two missing
+programs: they are placed **inside the aside as ordinary figures, captioned by
+NAME and never by number** — `»Wandler«`, `»Wandler 2«`. A caption with no
+number cannot collide with one.
+
+So, when an erratum prints a program:
+
+1. It is **not optional**. The erratum is unusable without it, and the aside
+   would be quoting a listing the reader cannot see.
+2. The program goes into the **target** issue's `prg/`, and the figure inside
+   the aside, captioned by its NAME in guillemets.
+3. The host article's own Listing-N numbering is untouched.
+4. The erratum's prose keeps its own "(Listing 1)" verbatim; the figure
+   standing directly under it is what resolves the reference.
+
 ## Verification
 
 ```bash
@@ -550,6 +657,15 @@ grep -rl '<!-- Fehlerteufelchen' "$dir"/*.html
 # generate.py renders `prg/*.txt` as a listing, so an invented text file would
 # ship to readers as a program.
 $PY tools/img/scan2ocr/rules/r300_status_pairs.py "$dir"
+
+# ...AND ON EVERY ISSUE THE OUTBOUND PASS TOUCHED.  This whole block reads
+# `$dir`, the issue being BUILT -- and an outbound pass puts its asides, its
+# status comments and its records in OTHER issues, where nothing then checks
+# them.  MEASURED on 8702: six asides were applied to 8701, 8612 and 8611, and
+# the check on `issues/8702` is blind to all six.  Run it once per target:
+for t in <the issues your rubric corrected>; do
+  $PY tools/img/scan2ocr/rules/r300_status_pairs.py "issues/$t"
+done
 ```
 
 Cross-check against the full checklist in
@@ -585,25 +701,85 @@ The "Fehlerteufelchen" rubric was 64'er-Magazin's errata column. Each monthly is
 ### 0. If this issue is the NEWEST in the corpus, this step is a no-op
 
 This rule applies errata printed in **later** monthlies to **this** issue's
-articles. A later monthly that has not been scanned cannot correct anything, so
-for the newest issue in `/Volumes/S/png/` there is nothing to find and nothing to
-apply: record that in `LOG.md` and go on. Say it, do not leave it implied -- an
-agent that finds no source for step 1 will otherwise assume the source is
-missing and go looking for it. MEASURED 2026-10-01: 8612 is the newest scan, so
-8612's step 300 has no input by construction.
+articles. If there is no later issue AT ALL, there is nothing to find and
+nothing to apply: record that in `LOG.md` and go on.
+
+**"NEWEST" MEANS NEWEST ANYWHERE, NOT NEWEST SCANNED.** This paragraph used to
+say *"a later monthly that has not been scanned cannot correct anything, so for
+the newest issue in `/Volumes/S/png/` there is nothing to find"*, which was
+true only while `~/DNB/64er_OCR/` was believed gone. It is not (see *THE
+`64er_OCR` SET IS NOT GONE*), and it holds every monthly to 1997. MEASURED on
+8702: `Fehlerteufelchen.md` names six later errata for 2/87, in 3, 4, 5, 6 and
+8/87 — all five issues are in that directory, none is scanned, and this
+paragraph had already excused the step. **Being the newest SCAN is not being
+the newest ISSUE**, and the three-source list above is the test.
+
+Whatever you conclude, say it, do not leave it implied -- an agent that finds
+no source for step 1 will otherwise assume the source is missing and go
+looking for it. (The 2026-10-01 note here read *"8612 is the newest scan, so
+8612's step 300 has no input by construction"*. The construction was the
+belief about `64er_OCR`; 8612 has later issues like any other.)
 
 ### 1. Find the Fehlerteufelchen page in each candidate issue
 
-**Where the later issue comes from.** It is one of two things and never a third:
+**Where the later issue comes from.** It is one of three things and never a
+fourth, in this order of preference:
 
 - **already imported** -> the repo has it, `issues/<YYMM>/` (32 issues as of
   2026-10-01, each with its HTML and its own `64er_19XX-XX.pdf`). Grep the HTML;
   it is this project's own transcription and better than any OCR of a PDF.
 - **scanned but not imported** -> `/Volumes/S/png/<YYMM>/`, the 2400 dpi masters.
+- **neither** -> `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf`, which is the
+  only way to read an issue this project does not have. See below.
 
-This rule used to name `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf`. **Those
-files are gone and are not coming back** -- they were a separately-OCR'd set from
-before this chain existed. See `r000`, *THE SCAN IS THE ONLY INPUT*.
+### THE `64er_OCR` SET IS NOT GONE. THIS RULE SAID IT WAS, FOR SIX WEEKS
+
+This rule and `r000`'s dead-paths table both said **"gone and not coming
+back"**, recorded 2026-10-01. MEASURED 2026-11-17, because 8702's builder
+looked and said so: `~/DNB/64er_OCR/` holds **275 PDFs, 17 GB, 1984_04 through
+SH97**, including every 1987 monthly. `pdftotext` yields a searchable (poor,
+but searchable) layer, and `pdftoppm -r 200` renders a page that reads
+cleanly — the 3/87 rubric on magazine page 72 was found and read that way,
+cartoon devil and all, in two commands.
+
+**What it cost.** 8702's INBOUND pass reported *"none applicable — the six
+2/87 items are printed in 3/87-8/87, which aren't built yet, so they stay in
+the ledger"*, which was correct reasoning from a false premise: all five
+source issues (3, 4, 5, 6 and 8/87) are in that directory. Six errata
+correcting 8702 would have been deferred to a build years away. **A rule that
+declares an input dead removes it from every future build silently** — nobody
+looks for what the rule says is not there, so the error cannot surface except
+by accident, and here the accident was a builder reporting a directory listing
+as an aside.
+
+**What it is, and the limits.** It is a separately-OCR'd third-party set from
+before this chain existed; its pages carry another site's watermark
+(`64er-online.de`). So:
+
+- it is a **FINDING AID and a READING source for a FOREIGN issue** — one this
+  project neither publishes nor has scanned. That is the same standing the
+  repo's own `issues/<YYMM>/64er_19XX-XX.pdf` already has here.
+- it is **NEVER an input to the issue being built**, and nothing from it is
+  ever published as an image. `r000`, *THE SCAN IS THE ONLY INPUT*, is
+  untouched: the 2400 dpi masters remain the only source for OUR pages.
+- the Anti-memory rule applies unchanged: render the page, **Read it
+  multimodally**, and transcribe from what you see. The OCR layer locates the
+  rubric; it never writes a word of the erratum.
+
+Preference order for reading a later issue's rubric is therefore: the repo's
+own transcription (best — it is this project's own work), then the issue's
+scans, then this set.
+
+So when you need a later issue the repo does not have:
+
+```bash
+pdftotext ~/DNB/64er_OCR/OCR-1987_03_64er_HIRES.pdf - | grep -n Fehlerteufelchen
+pdftoppm -r 200 -f <pdf page> -l <pdf page> -png ~/DNB/64er_OCR/OCR-1987_03_64er_HIRES.pdf <tmp>/ft
+```
+
+`Fehlerteufelchen.md` already names the rubric's MAGAZINE page for every
+indexed issue, and PDF page = magazine page − 2 in this set (verified on
+3/87: rubric page 72 is PDF page 70). Confirm visually; the offset varies.
 
 Heuristics, in priority order:
 
@@ -772,6 +948,17 @@ For each erratum:
 - [ ] And the erratum named in a FILE: the listing's own `;Fehlerteufelchen M/YYYY …` header, or `reviewed/errata_status.txt` when the program is a raw binary (`r300_status_pairs.py` checks exactly this)
 - [ ] If listing in `prg/<name>.txt`: header annotation + per-line markers in Style A or B (or disk-already-correct note)
 - [ ] No duplicate erratum (e.g. both a placeholder comment AND an aside)
+- [ ] If the erratum's own reference is wrong or collides (wrong Bild N, its own
+      Listing N): text verbatim, link on the real element, German comment
+      stating the mismatch
+- [ ] If the erratum prints a program: it is in the target issue's `prg/`, and
+      inside the aside as a figure captioned by NAME, not by number
+
+For the issue as a whole:
+- [ ] INBOUND: every later issue was actually READ, not assumed unavailable —
+      the repo, then `/Volumes/S/png/`, then `~/DNB/64er_OCR/`
+- [ ] OUTBOUND: `r300_status_pairs.py` run on EVERY issue this one's rubric
+      touched, not only on the issue being built
 
 ## Anti-memory rule
 

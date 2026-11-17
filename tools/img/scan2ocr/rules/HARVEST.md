@@ -3916,3 +3916,137 @@ meant to question** — the skew residual re-measuring with the same projection,
 020's cache check comparing id SETS where a duplicate cannot exist, and this.
 The shape to look for: a test whose reference is derived from the thing under
 test.
+
+### AND AN <aside> BLINDED A CHECK IN BOTH DIRECTIONS → r310
+
+8702's builder reported that applying its 2/87 errata outbound took 8612 from 7
+HARD to 6, with nothing on 8612 repaired: *"a fehlerteufelchen aside HIDES
+`<table> splits the closing run`."* It is right that the gate went quiet
+because the page grew, which is the worst way to pass.
+
+The mechanism: the check finds the TRAILING run of `source`/`author` blocks and
+looks at what floats between it and the last body `<p>`. An aside appended
+after the byline ends the article with an unclassed `<p>`, so there is no
+trailing run any more and the check does not run at all.
+
+MEASURED over the 2,274 published articles, 508 of which carry an aside:
+scanning asides reports 45 findings, stripping them 49.
+
+- **7 the aside HID**: 8405/109, 8504/153, 8507/85, 8604/83, 8605/168,
+  8606/32, 8608/12 — all in published issues, all needing a human's
+  adjudication, none the current build's business. **Control's backlog.**
+- **3 the aside INVENTED**: 8607/33, 8611/74, SH8504/123 — a `<table>` or
+  `<figure>` inside a Kasten before the byline, read as a float splitting the
+  run. 8607/33's monitor pinout table is inside its own aside.
+
+Fixed by stripping `<aside>…</aside>` before the scan, for this check only: an
+aside is self-contained, and its paragraphs, figures and tables belong to it
+and not to the article's flow.
+
+**On 8612/40 specifically the hidden finding was FALSE** — its Info block is an
+`<aside>` holding a `<p class="source">`, which the old scan read as the
+article's closing run, with the comparison table before it as the splitter. So
+8612 stays at 6 either way. The builder reported a symptom accurately and
+inferred a defect underneath it that was not there; the mechanism it found was
+real and cost 10 findings elsewhere. **Report the symptom, and let the measure
+say what is under it** — this is the same shape as 190's author tokens, where
+a true report of repeated tokens led me to a wrong fix.
+
+**A check whose number moves when an UNRELATED element is appended is not
+measuring what it is named for.**
+
+### AND A RULE DECLARED AN INPUT DEAD, SO NOBODY LOOKED FOR SIX WEEKS → r300, r000
+
+8702's builder mentioned in an FYI line that `~/DNB/64er_OCR/` exists, 275
+files, 1984-88, *"while r000/r300 say the old OCR PDFs are gone"*.
+
+It does exist: **275 PDFs, 17 GB, `OCR-1984_04` through `OCR-SH97`**, every
+1987 monthly among them. `pdftotext` gives a poor but searchable layer and
+`pdftoppm -r 200` renders a page that reads cleanly — the 3/87 rubric on
+magazine page 72 was located and read in two commands, cartoon devil and all.
+Both rules said *"gone and not coming back"*, recorded 2026-10-01.
+
+**What it cost.** 8702's INBOUND pass reported *"none applicable — the six
+2/87 items are printed in 3/87-8/87, which aren't built yet"*: correct
+reasoning from a false premise. All five source issues are in that directory.
+`Fehlerteufelchen.md` already names the rubric page of each. Six errata
+correcting a 184-page issue three weeks from publication were deferred to
+builds years away.
+
+**And the damage is silent by construction.** Nobody goes looking for what the
+rule says is not there, so a false tombstone cannot surface its own error —
+here it surfaced because a builder listed a directory and said so in an aside.
+The two rules that excused the work both had to go:
+
+- r300's step 0, *"a later monthly that has not been scanned cannot correct
+  anything, so for the newest issue in `/Volumes/S/png/` there is nothing to
+  find"* — being the newest SCAN is not being the newest ISSUE.
+- r000's dead-paths table row, which is where the claim was durable.
+
+**A rule that says an input is gone needs a date and a one-command re-check,
+not a tombstone.** `ls` costs nothing and the claim is one `ls` wide.
+
+**What the set is, and is not.** A separately-OCR'd third-party scan carrying
+another site's watermark: a FINDING AID and a reading source for a FOREIGN
+issue — one this project neither publishes nor has scanned — ranked below the
+repo's own transcription and below the scans. Never an input to the issue being
+built, never published as an image, and the Anti-memory rule is untouched: the
+OCR layer locates the rubric, the rendered page is read, nothing is composed.
+
+**The two directions are symmetric, except at the newest issue.** Issue N's
+inbound pass and issue N+k's outbound pass end with the same aside on the same
+article, so a skipped inbound is usually repaired by the later build — 8612's
+step 300 was excused as a no-op and it carries all four of its errata today,
+one from 8701's outbound pass and three from 8702's. It breaks exactly where
+the rule excused it: for the NEWEST issue nothing is coming from the other
+side. **The newer the issue, the more its inbound pass is worth, and the rule
+had the slope backwards.**
+
+### AND THE RULE HAD NO WORDS FOR ITS OWN TWO DIRECTIONS → r300
+
+The same builder invented INBOUND and OUTBOUND to report this step, then asked
+permission to edit 8701, 8612 and 8611 — the edits its own step requires. It
+asked because r300 authorised them only in a subordinate clause under *Run
+order* ("re-run over old issues whenever a new issue is imported"), while four
+screens away the reprint section said flatly **"Do not edit the other issue"**,
+which is about the reprint case and reads as a general prohibition. The same
+words also meant different issues in the two directions: "this issue", "the
+source issue", "the FT-source article".
+
+**A builder that invents a word to describe what it just did has found a hole
+in the rule, not a lapse in itself.** Both words are in the rule now, with the
+prohibition scoped to the case it belongs to.
+
+### AND AN ERRATUM WHOSE OWN REFERENCE IS WRONG → r300
+
+8702's rubric produced two of these on one outbound pass, and the rule covered
+neither. Both are answered the same way: **the TEXT stays verbatim, the LINK
+carries what we know, and a German HTML comment states the mismatch.**
+
+- **Wrong figure.** *"auf Seite 57 Bild 2 Vcc mit 50 Volt bezeichnet"* →
+  8612/52's Bild 2 is a 1:1 PCB layout with no voltages on it; `52-1.png`,
+  **Bild 1**, prints `V_CC = V_DD = +50 volts typical` in its legend. The page
+  is right, the figure number is wrong. The builder had already wrapped Bild 1
+  and asked — the right call, made for the right reason, with no rule behind
+  it.
+- **Colliding number.** 8611/52's erratum says to type in the patch *"(Listing
+  1)"* — while that article's own Listing 1 is SPELL CHECK V1.0, the program
+  being patched. Left alone, the reader is told to run `SYS 49152` over the
+  very program the patch is meant to fix. The corpus settled this in 8407/24:
+  the erratum's programs go INSIDE the aside as figures captioned by NAME
+  (`»Wandler«`, `»Wandler 2«`), never by number. A caption with no number
+  cannot collide with one — so copying the program in is not optional, it is
+  what makes the quotation readable.
+
+The comment's form has a precedent in the same issue: 8611/50 already carries
+`<!-- Das Ladeprogramm auf der Diskette ist anders numeriert: … -->` beside its
+status comment.
+
+### AND THE OUTBOUND PASS'S OWN RECORDS WERE UNCHECKED → r300
+
+`r300_status_pairs.py` reads the issue being BUILT. An outbound pass puts its
+asides, its status comments and its records in OTHER issues, where nothing
+then checks them. MEASURED: 8702 applied six asides to 8701, 8612 and 8611,
+and the check on `issues/8702` is blind to all six — all three target issues
+report OK only because nothing in them claims anything yet. The Verification
+block now runs it once per target, and the checklist asks for it.

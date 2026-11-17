@@ -2628,7 +2628,18 @@ did not. Found 2026-10-01, all dead:
 | r150, r160 | `/tmp/64er_<YYMM>_pages/`, `/tmp/64er_<YYMM>_full.txt` | `<tmp>/masters600/NNN.png` and this issue's own OCR |
 | r160 | `~/DNB/<YYMM>/<YYMM>-cmyk/600_cropped/<NNN>.tiff` | `<tmp>/masters600/NNN.png` — same page, already deskewed and cut |
 | r130 | `issues/<YYMM>/64er_*.pdf`, `issues/<YYMM>/png/` | `<tmp>/masters600/NNN.png` and `<OUT_DIR>/blocks/pNNN.txt` / `NNN.labels.json`. Neither input exists during a build: the PDF is made at 006, late in the build, and there is no `png/` at all |
-| r300, r330 | `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf` | **gone.** For another issue use the repo's own `issues/<YYMM>/64er_19XX-XX.pdf`, or its scans |
+| r300, r330 | `~/DNB/64er_OCR/OCR-YYYY_MM_64er[_HIRES].pdf` | ~~gone~~ **WRONG — THE ROW WAS THE DEAD ONE.** MEASURED 2026-11-17: 275 PDFs, 17 GB, 1984_04 to SH97, every 1987 monthly among them. Prefer the repo's own `issues/<YYMM>/64er_19XX-XX.pdf` or the scans; use this set for an issue that has NEITHER. Limits and commands: r300, *THE `64er_OCR` SET IS NOT GONE* |
+
+**AND A ROW IN THIS TABLE IS A CLAIM THAT CAN ROT TOO.** The `64er_OCR` row
+said "gone" from 2026-10-01 until 8702's builder listed the directory on
+2026-11-17 and found 275 files. For six weeks no build looked, because this
+table told them not to -- and a declared-dead input cannot surface its own
+error: nobody goes looking for what the rule says is not there. It cost 8702's
+INBOUND pass six applicable errata, deferred to builds years away on correct
+reasoning from a false premise. **When a rule says an input is gone, that
+sentence needs a date and a one-command re-check, not a tombstone** -- `ls`
+costs nothing and the claim is one `ls` wide. Re-check every "gone" here
+before you rely on it, and put the date you looked beside what you found.
 
 **What to do when a path in a rule does not exist.** Do not hunt for it and do
 not invent a replacement. Ask which of these it is:
