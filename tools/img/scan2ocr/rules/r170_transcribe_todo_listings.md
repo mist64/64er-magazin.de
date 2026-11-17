@@ -643,6 +643,105 @@ PY
 )" "$dir"
 ```
 
+## THE COMMANDS, AS RUN — 8702, 2026-11-17
+
+The Evidence-in-report section below asks for "the first and last 2 lines of
+the splice output" and this rule named a head/cat/tail splice without ever
+giving one. Here is the whole method as it was actually run, on an issue with
+two recreated listings. Read the traps first: both of them fail SILENTLY.
+
+**There was no OCR call.** Both listings were typed BY EYE from a 600 dpi crop.
+Step 010's block index only located the boxes. That is the method for a
+listing: tesseract on column-aligned code invents plausible digits, and a
+plausible digit in a BASIC line is a defect no checksum catches until it does.
+
+```bash
+M=~/DNB/<ID>/tmp/masters600 ; S=<scratch>
+# 1. LOCATE the box.  grep the page's own block index first --
+cd ~/DNB/<ID>/tmp/ocr/out/blocks; grep -i "listing 14\|zsatz" p05*.txt
+#    -- and when it is not there, look on the NEIGHBOURING pages' indexes.
+#    8702's t3 is not in p091's blocks at all: it sits in p093 block 10, in a
+#    box shared with another listing.  A listing printed across a spread
+#    belongs to whichever page's analysis found the box, not to the page the
+#    article starts on.
+magick $M/093.png -crop 4466x2496+96+972 +repage -resize 30% $S/093-overview.png
+
+# 2. CROP, GENEROUSLY.  First try, 1350x520: it cut the sum column and every
+#    row from c260 on -- and nothing downstream could have told.  Used:
+magick $M/093.png -crop 1500x800+3080+2500 +repage -resize 80% $S/91-l2.png
+#    BEFORE typing a line, check the crop holds the header line AND the last
+#    printed row AND the sum column.  A crop that is too small does not fail;
+#    it produces a shorter listing that passes every check in this file.
+
+# 3. TYPE the listing into prg/<name>.txt with the house opener, and type the
+#    printed sums into a second file, from the page ONLY -- never from the
+#    tokenised output, which would be the same number twice.
+# 4. TOKENISE and PROVE:
+petcat -w2 -l 0801 -o $S/zg.prg -- $S/zsatz-generator.txt
+.venv/bin/python - <<'PY'
+import sys; sys.path.insert(0, '.')
+from tools import checksummer
+b = open('<S>/zg.prg','rb').read()
+pr = {int(l.split()[0]): int(l.split()[1]) for l in open('<S>/printed_sums.txt')}
+for ln, content, cs in checksummer.parse(b, 3, '2'):
+    print(ln, cs, pr.get(ln), 'OK' if cs == pr.get(ln) else 'MISMATCH')
+PY
+```
+
+**PROVE THE VERSION BY ELIMINATION, NOT FROM THE CAPTION.** Run the comparison
+for 1, 2 AND 3. On 8702's ZSATZ-GENERATOR the result is **0 / 0 / 19** — the
+right version matches every row and the wrong ones match nothing. That spread
+is what makes the 19 matches evidence: a single version that "works" could be
+a coincidence of one or two sums, and the caption can be misread.
+
+### Placing it: an empty body needs no splice, and the splice has a trap
+
+A recreated BASIC listing's `<pre>` is EMPTY — the generator renders it from
+`prg/<name>.txt` — so placing it is one line, anchored on a line number you
+looked up:
+
+```bash
+grep -n -B8 -A6 '<pre>TODO' *.html          # -> 50:197, 91:175
+sed -i '' '197s|<pre>TODO</pre>|<pre data-filename="zsatz-generator" data-name="ZSATZ-GENERATOR" data-checksummer="3"></pre>|' "50 Trickfilme mit dem C 64.html"
+```
+
+An INLINE listing (an MSE excerpt, a monitor dump: text that goes into the
+HTML itself) is the only case that needs the splice, and 8702 found two faults
+in the obvious form of it:
+
+```bash
+# WHAT FAILED, and how it failed:
+n=175; { head -n $((n-1)) "$F"; printf '            <pre>'; \
+         head -c -0 $S/t3.txt | sed '$ s/$/<\/pre>/'; \
+         tail -n +$((n+1)) "$F"; } > $S/f.html && mv $S/f.html "$F"
+```
+
+- **`head -c -0` is not portable.** BSD/macOS `head` answers `illegal byte
+  count -- -0`. GNU accepts it. Nothing in this chain needs `head -c` at all.
+- **A `{ … }` group's exit status is its LAST command's**, so the failing
+  piece in the middle did not stop the `&& mv`: the file was replaced by one
+  with an unclosed `<pre>` and the anchor line gone. **A splice that half-runs
+  destroys the line it was anchored on**, which is worse than not running.
+
+The portable form: close the block with `sed`, guard the anchor BEFORE
+writing, and chain every piece so nothing can reach the `mv` after a failure.
+
+```bash
+set -o pipefail
+n=175; F="91 ….html"
+sed -n ${n}p "$F" | grep -q '<pre>' || exit 1          # the anchor is where you think
+{ head -n $((n-1)) "$F" &&
+  printf '            <pre>' &&
+  sed '$ s/$/<\/pre>/' $S/t3.txt &&
+  sed -n ${n}p "$F" | sed 's/^ *<pre>//' &&
+  tail -n +$((n+1)) "$F"; } > $S/f.html && mv $S/f.html "$F"
+```
+
+And prove an inline MSE excerpt the same way as a BASIC one: recompute each
+row's sum from the disk binary at that address and compare with the page.
+8702's t3 — six printed rows of a 125-row program — came back `sum ok disk ok`
+on all six.
+
 ## Evidence-in-report requirement
 
 A previous sub-agent on a different rule claimed verification it never
