@@ -291,8 +291,30 @@ def main(d):
         # blocks), find the last body <p> before it, and look only at what lies
         # between the two.  A float there separates the body text from its own
         # byline, which is the defect this check is named for.
+        #
+        # AN <aside> IS NOT PART OF THE RUN, AND SCANNING IT BLINDED THE CHECK
+        # IN BOTH DIRECTIONS.  An aside is self-contained -- a Kasten, or a
+        # Fehlerteufelchen/Futureteufelchen appended AFTER the byline -- so its
+        # <p>, <figure>, <table> and <address> belong to it and not to the
+        # article's flow.  Scanning it:
+        #   - HID the defect, because a trailing aside's unclassed <p> is the
+        #     LAST element, so the closing run no longer ends the article and
+        #     `fc < len(seq)` is false.  MEASURED: applying 8702's 2/87 errata
+        #     outbound took 8612 from 7 HARD to 6 with nothing on the page
+        #     repaired -- the aside's <p> swallowed the finding, which is a
+        #     gate going quiet because the page grew, the worst way to pass.
+        #   - INVENTED the defect, because a <table> or <figure> inside a
+        #     Kasten that sits before the byline reads as a float splitting the
+        #     run.  8607/33's monitor pinout table is inside its aside.
+        # MEASURED over the 2,274 published articles, 508 of which carry an
+        # aside: scanning them reports 45 findings, stripping them 49 -- 7 that
+        # the aside hid (8405/109, 8504/153, 8507/85, 8604/83, 8605/168,
+        # 8606/32, 8608/12) and 3 that it invented (8607/33, 8611/74,
+        # SH8504/123).  A check whose number moves when an UNRELATED element is
+        # appended is not measuring what it is named for.
+        scan = re.sub(r'<aside\b.*?</aside>', '', body, flags=re.S)
         seq = []
-        for mm in re.finditer(r'<(figure|table|p|address)\b([^>]*)>', body):
+        for mm in re.finditer(r'<(figure|table|p|address)\b([^>]*)>', scan):
             tag, attr = mm.group(1), mm.group(2)
             cm = re.search(r'class="([^"]*)"', attr)
             cls = cm.group(1) if cm else ''
