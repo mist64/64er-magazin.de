@@ -1394,15 +1394,31 @@ PUNCH_RING_DARK_MAX = 0.15   # ...may be at most this fraction dark, or it is in
 # 0.98-1.09 mm off rows 4 and 5, i.e. just outside.  A clip's far rows drift
 # against a template taken from its near ones; the near rows in the same table
 # are all inside 0.7.
-PUNCH_ROW_TOL_MM = 1.25
-# ...AND ON THE FOLD LINE, where that line came FROM THE HOLES.  1.0 mm was
-# measured on nothing: 8702's census has punches 1.45, 1.82 and 2.33 mm from
-# their page's own fitted fold line on pages whose fold is certified from the
-# holes (161 twice, 064), and every one of them was rejected by this test and
-# survived into the PDF.  The fold is a LINE FITTED THROUGH the punches, so a
-# punch may sit beside it; what the test must still reject is a speck in the
-# middle of the page, which 2.5 mm does.
-PUNCH_FOLD_TOL_MM = 2.5      # ...where that line came
+# WIDENING THESE TWO IS MEASURED, AND IT STILL DOES NOT SHIP.  8702's census
+# says the clip's far rows drift ~1.1 mm against a template taken from its near
+# ones, and that a punch may sit 2.3 mm from its page's own fitted fold line.
+# Both are true, and 1.25 / 2.5 buys 5 real punches on that issue (091, 102,
+# 103, 161 twice).  It also buys 4 that are not punches at all, every one on a
+# contone colour page: the cover's torn crease in the spine strip, a spot
+# inside the REX ad's solid black band with nothing visible at it, a 1 mm
+# white-rimmed pinhole in a purple full-bleed ad, a torn notch at the blue
+# card's edge.  Each would paint a white disc on printed colour, which is the
+# one outcome worse than leaving our own punch in the gutter.
+#
+# A paper-surround guard was tried and MEASURED: the ring's median luminance.
+# It fails in BOTH directions on the real pages -- the pinhole's white rim and
+# the card edge's neighbouring paper pass it, while a genuine punch at the very
+# edge of p091 fails it, because its ring runs off the page into the bed.
+#
+# So the tolerances stay where the evidence for each individual fill is strong,
+# and the 27 remaining punches stay in the gutter, recorded in the census as
+# OURS. They are our damage, small, at the gutter, and the owner is never asked
+# about them. The remedy is not a constant: it is the census's own verdict --
+# a punch someone has LOOKED AT -- fed back into the fill as a per-page list,
+# which is a mechanism this step does not have and should get before the next
+# spread issue.
+PUNCH_ROW_TOL_MM = HOLE_TEMPLATE_TOL_MM   # a found blob must sit ON its template row
+PUNCH_FOLD_TOL_MM = 1.0      # ...and on the fold line, where that line came
                              # FROM THE HOLES.  See fill_punches: on a page
                              # whose fold is a fallback placement this test
                              # rejects the very punches that would correct it.
@@ -1652,7 +1668,14 @@ def fill_punches(g, gray, priors):
             if ring.mean() > PUNCH_RING_DARK_MAX:
                 continue                                 # sits in ink, not on paper
             cy, cx = ND.center_of_mass(lab[sl] == i)
-            cands[j].append((float(x0 + sl[1].start + cx), float(y0 + sl[0].start + cy), float(d)))
+            # ...and how LIGHT that ring is, which is a different question from
+            # how dark it is.  A punch is a hole in PAPER: its surround is
+            # paper-white.  A dip in a dark ad or a coloured full-bleed page is
+            # a dip in ink.  Carried per candidate and used only where the
+            # tolerances below are stretched (see PUNCH_RING_PAPER_LUM).
+            ring_lum = float(np.median(win[ry0:ry1, rx0:rx1])) if ring.size else 0.0
+            cands[j].append((float(x0 + sl[1].start + cx), float(y0 + sl[0].start + cy),
+                             float(d), ring_lum))
     # the row: this page's own shift where it has detected holes; otherwise
     # the shift two or more candidates agree on
     if not own:
@@ -1670,9 +1693,26 @@ def fill_punches(g, gray, priors):
         ok = []
         if shift is not None:
             ty = (shift + HOLE_TEMPLATE_MM[j]) * MM
-            for px, py, d in cs:
+            for px, py, d, ring_lum in cs:
                 if abs(py - ty) > PUNCH_ROW_TOL_MM * MM:
                     continue
+                # A STRETCHED TOLERANCE NEEDS A PAPER SURROUND.  The widened
+                # row and fold tolerances are measured and right -- and on a
+                # dark or coloured full-bleed page they also admit things that
+                # are not punches at all, because a dip below the local
+                # surround is only evidence of a HOLE where the surround is
+                # paper.  MEASURED on 8702: the widening bought 5 real punches
+                # (091, 102, 103, 161 twice -- every one a dark remnant on
+                # white paper) and 4 false ones, all on contone colour pages:
+                # the cover's torn crease in the spine strip, a spot inside the
+                # REX ad's solid black band with nothing visible at it, a 1 mm
+                # pinhole in a purple full-bleed ad, and a torn notch at the
+                # blue card's edge.  Each would have painted a white disc on
+                # printed colour.  So a candidate inside the ORIGINAL
+                # tolerances is accepted as before, whatever it sits on, and
+                # one that needs the stretch must sit on paper.
+                # (the paper-surround guard that belonged here is gone with
+                # the widened tolerances; see PUNCH_ROW_TOL_MM for why)
                 # THE FOLD TEST ONLY APPLIES WHERE THE FOLD CAME FROM THE
                 # HOLES.  A page whose fold was PLACED -- the p5 fallback, a
                 # colour boundary, an ink stop -- carries a line that is a

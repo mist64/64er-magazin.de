@@ -3871,6 +3871,42 @@ are one column through the sheet, a speck that happens to land on a row is
 not. MEASURED over all 184 pages: **18 pages, 67 punches** that the old code
 filled none of, and **not one page with a holes-derived fold changes**.
 
+### AND THREE REMEDIES LATER, 27 PUNCHES STAY IN THE GUTTER — ON PURPOSE
+
+The first fix was right and shipped. The next three were not, and the shape of
+each failure is worth more than the punches:
+
+- **The disc grow** (`punch_remnants`) painted 3.4 × 8 mm of WHITE over printed
+  ink on 8702 p104, a full-bleed dark ad. `backing_mask` cannot tell the bed
+  from dark plate ink at the trim, and the bounds did not catch it: a 1.5 mm
+  disc is ~7 mm², the 6× cap allowed 42, the ink it ate was 27. **A cap that
+  admits the failure is not a guard.** Withdrawn the same day; the function
+  stays uncalled with the failure in its docstring.
+- **Widening the two tolerances** (row 0.75 → 1.25, fold 1.0 → 2.5) is
+  MEASURED and correct about the clip — the far rows drift ~1.1 mm, and a
+  punch can sit 2.3 mm from its own page's fitted fold line. It bought 5 real
+  punches and **4 that are not punches at all**, every one on a contone colour
+  page: a torn crease in the cover's spine strip, a spot inside an ad's solid
+  black band with nothing visible at it, a 1 mm white-rimmed pinhole in a
+  purple full-bleed, a torn notch at the blue card's edge.
+- **A paper-surround guard** for the stretched band (the ring's median
+  luminance) fails in BOTH directions on those same pages: the pinhole's white
+  rim and the card edge's neighbouring paper pass it, while a genuine punch at
+  the very edge of p091 fails it because its ring runs off the page into the
+  bed.
+
+So the tolerances are back where each individual fill has strong evidence, and
+**27 punches ship in the gutter, recorded in the census as OURS.** That is the
+right trade: they are our own damage, sub-millimetre to 5 mm, at the gutter,
+and the owner is never asked about them — while a white disc on printed colour
+is visible, wrong, and ours too.
+
+**The remedy is not a constant.** It is the census's own verdict — a punch
+someone has LOOKED AT — fed back into the fill as a per-page list, which this
+step has no mechanism for and should get before the next spread issue. Every
+attempt above failed in the same place: inside r005 there is no way to tell a
+hole from a dark thing, and outside it there already is.
+
 **Three guards in this chain have now been found keyed on the belief they were
 meant to question** — the skew residual re-measuring with the same projection,
 020's cache check comparing id SETS where a duplicate cannot exist, and this.
