@@ -3773,3 +3773,16 @@ gains or loses a single character with whitespace removed. p039 8 → 41, p153
 **Two pages, one defect, and the right question was the builder's.** Reported
 as two symptoms it would have been two workarounds; asked as "is this the same
 thing twice?", it was one rule reading a page that does not speak its language.
+
+**CONFIRMED through 030, 2026-11-17 02:50.** The issue's mean recall rises
+0.920 → 0.930 and precision 0.967 → 0.970 over 184 pages; p039 goes 0.24 →
+0.87 and p153 0.20 → 0.80, both at precision 1.00 and order 1.00. r030's
+Verification: 1596 paragraphs, 1596 accounted, UNEXPLAINED LOSS 0.
+
+**And 030's model restored no break at all** — its per-page paragraph counts
+equal 020's, page by page. That is the general point, not a detail of this
+issue: **a text stage cannot restore a break that geometry erased before it.**
+The LLM is given paragraphs; where they end is decided upstream, by the page's
+own leading, or not at all. The same reasoning retires the idea of asking the
+model to re-paragraph a wall of text: it would be inventing breaks, not reading
+them.

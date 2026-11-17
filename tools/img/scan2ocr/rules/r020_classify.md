@@ -351,6 +351,13 @@ on its own line above the address. p039 goes 8 → 41 paragraphs (truth 64), p15
 removed, every page's text is identical before and after. This moves where
 paragraphs break and nothing else.
 
+Through 030 the issue's mean recall rose 0.920 → 0.930 and precision 0.967 →
+0.970; p039 went 0.24 → 0.87 and p153 0.20 → 0.80, both at precision and order
+1.00. **030's model restored no break** — its per-page paragraph counts equal
+020's — which is the rule to remember: a text stage cannot restore a break that
+geometry erased before it. Do not ask the model to re-paragraph a wall of text;
+it would be inventing breaks rather than reading them.
+
 ## Verification
 
 ### The Impressum must survive stage B
