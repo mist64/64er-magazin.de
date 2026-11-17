@@ -1161,7 +1161,28 @@ def unknown_mask(geom, scale=1):
 
 
 def punch_remnants(geom, sheet600, u):
-    """The BED still showing around each filled punch, grown from its disc.
+    """NOT CALLED -- it ate printed ink, and the record of that is the point.
+
+    WITHDRAWN 2026-11-17, same day, on 8702 p104: a full-bleed dark ad with ink
+    to the gutter.  The grow painted a white rectangle about 3.4 x 8 mm over
+    PRINTED INK around a punch disc -- 14,407 px, 2,079 of them outside the
+    gutter band the diff is allowed to touch.  `backing_mask` cannot tell the
+    bed from dark plate ink at the trim (the same blindness the BED-in-window
+    NOTE carries on 106/107/141/184), and the bounds did not save it: a 1.5 mm
+    disc is ~7 mm2, PUNCH_GROW_AREA_MAX 6x allows 42 mm2, and the ink it ate
+    was 27 mm2 -- inside the cap.  **A cap that admits the failure is not a
+    guard.**
+
+    What is still true is the finding that prompted it: a torn punch is not a
+    disc, and on several pages the hole is recorded, its disc painted, and the
+    remnant bigger than the disc.  The replacement has to separate bed from
+    ink by something other than darkness -- the hole is ENCLOSED by paper and
+    ink to the trim is not -- and that needs measuring on the pages where both
+    occur before it goes anywhere near a master.
+
+    The original docstring follows.
+
+    The BED still showing around each filled punch, grown from its disc.
 
     A punch is recorded as a centre and a diameter and filled with a disc. A
     clip hole in 40-year-old paper is not a disc: it tears, and the tear shows
@@ -1366,8 +1387,22 @@ PUNCH_MIN_MM = 0.3           # longest extent
 PUNCH_MAX_MM = 4.0           # longest extent (a torn teardrop runs to 2.84)
 PUNCH_RING_MM = 1.5          # the surround: this far beyond the blob's box...
 PUNCH_RING_DARK_MAX = 0.15   # ...may be at most this fraction dark, or it is ink
-PUNCH_ROW_TOL_MM = HOLE_TEMPLATE_TOL_MM   # a found blob must sit ON its template row
-PUNCH_FOLD_TOL_MM = 1.0      # ...and on the fold line, where that line came
+# A FOUND BLOB MUST SIT ON ITS TEMPLATE ROW -- and 0.75 mm was tighter than
+# the clip is.  MEASURED on 8702's census, per box, against the row the fill
+# would test it on: ten unfilled punches sit 0.98-6.3 mm off, and five of them
+# (083, 086, 097, 102, 103 -- all pages whose fold IS from the holes) sit
+# 0.98-1.09 mm off rows 4 and 5, i.e. just outside.  A clip's far rows drift
+# against a template taken from its near ones; the near rows in the same table
+# are all inside 0.7.
+PUNCH_ROW_TOL_MM = 1.25
+# ...AND ON THE FOLD LINE, where that line came FROM THE HOLES.  1.0 mm was
+# measured on nothing: 8702's census has punches 1.45, 1.82 and 2.33 mm from
+# their page's own fitted fold line on pages whose fold is certified from the
+# holes (161 twice, 064), and every one of them was rejected by this test and
+# survived into the PDF.  The fold is a LINE FITTED THROUGH the punches, so a
+# punch may sit beside it; what the test must still reject is a speck in the
+# middle of the page, which 2.5 mm does.
+PUNCH_FOLD_TOL_MM = 2.5      # ...where that line came
                              # FROM THE HOLES.  See fill_punches: on a page
                              # whose fold is a fallback placement this test
                              # rejects the very punches that would correct it.
@@ -1850,7 +1885,6 @@ def cut_page(geom, fit, sheet600, halves=None, n_pages=N_PAGES):
     # SPREAD issue the field the rules name was simply absent (8702).
     geom["_box"] = (x0, y0, x0 + MASTER_W_PX, y0 + MASTER_H_PX)
     u = unknown_mask(geom)
-    u |= punch_remnants(geom, sheet600, u)
     painted = sheet600[:h, :w].copy()
     painted[u] = 255
     master = np.full((MASTER_H_PX, MASTER_W_PX, 3), 255, np.uint8)
