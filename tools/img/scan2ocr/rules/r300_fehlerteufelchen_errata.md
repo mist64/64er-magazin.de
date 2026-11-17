@@ -615,6 +615,18 @@ One aside, one `id`, one `<p>` per rubric in issue order. The disposition is
 judged once for the article, not once per paragraph — here all five lines are
 already right on the disk, so `<!-- Disk-Version bereits korrigiert -->`.
 
+**In the listing's header, give each rubric its own line.**
+`r300_status_pairs.py` matches `Fehlerteufelchen M/YYYY`, so a combined
+`;inkl. Fehlerteufelchen 3/1987 und 4/1987` records only the first — the second
+rubric then has no file naming it and the check cannot see the difference
+between that and a missing record. Three lines, one per issue:
+
+```
+;inkl. Fehlerteufelchen 3/1987 (Zeile 30020; Disk-Version bereits korrigiert)
+;inkl. Fehlerteufelchen 4/1987 (Zeilen 1, 141, 660, 1170, 30020; dito)
+;inkl. Fehlerteufelchen 8/1987 (dieselben Zeilen, dort vollständig; dito)
+```
+
 ## `Fehlerteufelchen.md` IS A FINDING AID, NOT AN AUTHORITY
 
 It was built by sweeping rubric pages, and the sweep made mistakes. MEASURED on
