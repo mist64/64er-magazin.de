@@ -1363,13 +1363,40 @@ where its ink starts, so a full line of paper at the edge means the cut missed
 the picture.
 
 ```python
-pure = (np.array(Image.open(f).convert('RGB')) == 255).all(axis=2)
-flag = pure.all(axis=0)[0] or pure.all(axis=0)[-1] or pure.all(axis=1)[0] or pure.all(axis=1)[-1]
+def paper_run(lines, frac=0.01, thr=250):   # lines: from the edge INWARD
+    k = 0
+    for l in lines:
+        if (l < thr).mean() < frac: k += 1
+        else: break
+    return k                                 # flag any side with k > 0
 ```
+
+**THE OBVIOUS VERSION OF THIS CHECK HAS THE `-trim` BUG IN IT.** The first
+version written here was `(pixels == 255).all()` on the OUTERMOST LINE ONLY.
+It fails the same two ways:
+
+- **"all 255" is an any-pixel predicate**, so scan noise defeats it — a paper
+  line reads 254, not 255.
+- **One line is not a run.** A single dark pixel in line 0 hides whatever is
+  behind it. MEASURED on 8702's `10-x1`: its top row has min 246, **its second
+  row is literally all-255**, and the check reported nothing. That is dust
+  holding an edge, in the very check written to catch dust holding an edge.
+
+So: a FRACTION of the line, and count the RUN inward. MEASURED over 8702's 92
+crops with the corrected predicate: five carry a leading paper run and **all
+five are among the nine that were cut by the broken instrument** — `22-2` B28,
+`22-1` R3 B4, `10-x1` T3 B1, `10-x3` L1 R2, `14-0` T1. The 83 cut with the
+fraction instrument and reviewed by eye: zero.
 
 **FLAG, NEVER AUTO-TRIM.** A figure that legitimately ends in white with no
 frame would be damaged by an automatic trim, and nothing in the measurement can
 tell the two apart. Flagging costs a look; trimming costs a figure.
+
+**8702 supplied the case that proves it.** `22-2`'s bottom shows a paper run of
+**28 lines** — and those lines are the panel's own bottom frame rule, printed
+too pale to cross the threshold. An auto-trim would have eaten the frame it
+was meant to find. One measurement, two opposite meanings, and only a look
+separates them.
 
 **AND IT IS ONE OF A PAIR, BECAUSE THE TWO TRIM PREDICATES FAIL IN OPPOSITE
 DIRECTIONS.** This was written as if it were sufficient. It is not:

@@ -4435,3 +4435,34 @@ is why the 83's eye review GREW 56 boxes). Both flags, always.
 
 All nine of the frozen crops are being re-cut with the instrument the 83 used,
 because every argument for keeping them separate died with this finding.
+
+### AND I WROTE THE `-trim` BUG INTO THE CHECK MEANT TO CATCH IT → r150
+
+The pure-paper edge flag committed in 0584c11c was `(pixels == 255).all()` on
+the **outermost line only**. Both halves are wrong, and in the same two ways
+ImageMagick's `-trim` was wrong one commit earlier:
+
+- **"all 255" is an any-pixel predicate** — scan noise makes a paper line 254.
+- **One line is not a run** — a single dark pixel in line 0 hides whatever lies
+  behind it. MEASURED on 8702's `10-x1`: top row min 246, **second row literally
+  all-255**, flag silent. Dust holding an edge, inside the check written to
+  catch dust holding an edge.
+
+Corrected to a fraction (<1 % of the line below 250) counted as a run inward.
+MEASURED over the 92: five crops carry a leading paper run and **all five are
+among the nine cut by the broken instrument** — the 83 have none. The nine's
+recut had grown each side to the ink and then dropped *pure*-paper lines, so a
+near-paper line already inside the box could not be removed by either step.
+
+**And 22-2 settles flag-versus-auto-trim for good.** Its bottom paper run is 28
+lines, and those lines ARE the panel's bottom frame rule, printed too pale to
+cross the threshold. An auto-trim would have eaten the frame it was meant to
+find. One measurement, two opposite meanings; only a look separates them.
+
+**The pattern across three commits: every edge predicate in this chain has now
+failed, and each failed on the thing it was built to notice.** `-trim` was
+stopped by dust it should have ignored. The fraction trim ate pale edges it
+should have kept. The paper flag was blinded by a speck it should have seen
+past. **Write the next edge predicate expecting it to be wrong, and pair it
+with one that fails the other way** — which is why the pure-paper flag and the
+outside-band test are specified together and neither is allowed to cut.
