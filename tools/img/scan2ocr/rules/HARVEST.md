@@ -4050,3 +4050,65 @@ then checks them. MEASURED: 8702 applied six asides to 8701, 8612 and 8611,
 and the check on `issues/8702` is blind to all six — all three target issues
 report OK only because nothing in them claims anything yet. The Verification
 block now runs it once per target, and the checklist asks for it.
+
+### AND TWO READERS DISAGREED ABOUT THE PLATE → r325
+
+8702's builder cross-checks every r325 reader fix that reverses an earlier
+"kept as printed", and found one error in each direction from a single reader
+(G4): `prinzipell` → `prinzipiell` on p009, where 280 was right and the crop
+says `prinzipell`, reverted; and `Warenzeichens recht teuer`, where the reader
+was right and 280 was wrong — there is a word gap on the plate.
+
+**Neither pass is the authority.** Trusting 280 because it came first keeps a
+real defect; trusting the reader because it came last corrects the magazine.
+Only the crop separates the two, and it costs one crop per reversal — cheap
+because reversals are rare: two in 107 fixes across three readers. The builder
+invented this check; it is r325's now, including that reverts are recorded in
+LOG.md, since an unrecorded revert invites the next reader to make the same fix.
+
+### AND THE MAGAZINE PRINTED ONE CORRECTION THREE TIMES → r300
+
+8702's `164 Der Schlüssel zu Geos (Teil 1)` is corrected in 3/87 p72 (Zeile
+30020 only), 4/87 p73 (Zeilen 1, 141, 660, 1170, 30020) and 8/87 p47 (the same
+five, reworded, with 30020 given in full). The rule had no word for it.
+
+All three ship, in issue order, each with its own trailer. They are not
+redundant — 4/87 substitutes within the line, 8/87 gives the whole line
+`»AD=AD+1:B0=PEEK(AD) AND 191:SB=0«`, which is what the reader needs and what
+`prg/gdm v1.0.txt` line 30020 holds. Choosing between them is editing the
+magazine, and the three trailers tell the reader it kept coming back to this
+over six months.
+
+### AND THE ERRATA LEDGER WAS WRONG THREE TIMES IN TWO PAGES → Fehlerteufelchen.md
+
+Rendering two rubric pages to read six errata turned up three ledger defects:
+4/87 p73 was missing `Der Schlüssel zu Geos (2/87 S.164ff)` altogether — an
+erratum against the issue being built; its `Brigant` is `Der C 64 als
+Speichergigant`, hyphenated across a column break; and 8/87's rubric is on page
+47, not 48.
+
+`Fehlerteufelchen.md` was built by sweeping, and a sweep's MISSING row cannot
+be checked against anything — it is invisible until someone reads the page. So
+the rule now says: when you render a rubric page you have the whole page, read
+every item on it and correct the ledger in the same pass. The cross-check is
+free, and a missing row is the failure that costs an issue its erratum.
+
+### AND AN EXAMPLE STATED A CONCLUSION WITHOUT ITS TEST → r300
+
+I wrote the Centronics example with `<!-- Reiner Druckfehler -->` in it and no
+reason, four screens from step 2's rule that the status comment is omitted for
+non-code errata. The builder followed the example for Centronics and step 2 for
+the other two, got all three right, and asked which wins — the right question.
+
+Neither: step 2's TEST decides, *whether a reader with the disk would need to
+check anything*. 8612/52 ships eleven programs and a schematic error invites
+exactly that question; 8702/46 ships none. **An example that states a
+conclusion without its test will be copied where the test does not hold** — the
+same shape as a check keyed on the belief it was meant to question.
+
+And a third state the "closed" vocabulary cannot express turned up in the same
+pass: 8611/44's erratum ADDS a hardware condition (a 10 kOhm resistor), the
+article ships three programs, nothing was misprinted and no disk was patched.
+`Reiner Druckfehler` would assert an error that does not exist. Omit, and say
+so in LOG.md — do not stretch a word to fit, which this rule has now recorded
+three times.

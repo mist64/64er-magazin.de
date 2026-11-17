@@ -197,11 +197,12 @@ Seite 72
 Seite 73
 
 - **EPROM-Platine mit 256 KByte** (Sonderheft 13, Seite 111ff)
+- **Der Schlüssel zu Geos** (Ausgabe 2/87, Seite 164ff)
 - **Trickfilme mit dem C 64** (Ausgabe 2/87, Seite 53ff)
 - **Master-Text voll im Griff** (Ausgabe 3/87, Seite 83/84)
 - **Das Super-ROM für den MPS 802** (Ausgabe 1/87, Seite 55ff)
 - **IC-Tester** (Sonderheft 13, Seite 95ff)
-- **Brigant** (Ausgabe 3/87, Seite 47)
+- **Der C 64 als Speichergigant** (Ausgabe 3/87, Seite 47)
 - **Tips und Tricks für Profis** (Ausgabe 2/87, Seite 79)
 
 ## Ausgabe 5/87
@@ -239,7 +240,7 @@ Seite 69
 
 ## Ausgabe 8/87
 
-Seite 48
+Seite 47
 
 - **Master-Text** (Sonderheft 18, Seite 38)
 - **Der Schlüssel zu Geos (Teil 1)** (Ausgabe 2/87, Seite 169)

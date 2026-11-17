@@ -540,6 +540,24 @@ to the thing the erratum is about, and leave the sentence alone.
 <!-- 64'er 2/1987 -->
 ```
 
+The status comment here is NOT prescribed by this example — it comes from step
+2's test, *whether a reader with the disk would need to check anything*. 8612/52
+ships eleven programs and a schematic error invites exactly that question, so
+`Reiner Druckfehler` answers it ("disk was never wrong"); 8702's `46
+Anschlußprobleme` ships none and gets no comment at all. Read the test, not the
+example: 8702's builder took the example as a rule and then had to ask which of
+the two won. **An example that states a conclusion without its test will be
+copied where the test does not hold.**
+
+And where NONE of the vocabulary is true, omit. MEASURED on 8611/44 *Die Mäuse
+breiten sich aus*: the 2/87 erratum adds a hardware condition — a 10 kOhm
+resistor from Pin 9 to +5 V — and the article ships three programs. Nothing was
+misprinted, no disk was patched, no listing was changed, and the reader's fix is
+a soldering iron. `Reiner Druckfehler` would assert an error that does not
+exist. This is the THIRD state this "closed" vocabulary has failed to express;
+the answer is still to omit rather than to stretch a word, and to say so in
+LOG.md.
+
 The precedent for the comment is `issues/8611/50`, which already carries
 `<!-- Das Ladeprogramm auf der Diskette ist anders numeriert: … -->` beside its
 status comment: a short German statement of fact about a reference that does
@@ -569,6 +587,54 @@ So, when an erratum prints a program:
 3. The host article's own Listing-N numbering is untouched.
 4. The erratum's prose keeps its own "(Listing 1)" verbatim; the figure
    standing directly under it is what resolves the reference.
+
+## THE SAME CORRECTION PRINTED MORE THAN ONCE
+
+The magazine repeated itself. MEASURED on 8702's `164 Der Schlüssel zu Geos
+(Teil 1)`, which is corrected in THREE later rubrics:
+
+| rubric | cites | what it corrects |
+|---|---|---|
+| 3/87 p72 | 2/87 S.170 | Listing 3 Zeile 30020 only: `»B0=PEEK(AD)«` → `»B0=PEEK(AD) AND 191«` |
+| 4/87 p73 | 2/87 S.164ff | Listing 3 Zeilen 1, 141, 660, 1170, 30020 |
+| 8/87 p47 | 2/87 S.169 | the same five lines, reworded, and 30020 given IN FULL |
+
+**Print all of them, in issue order, each with its own `<!-- 64'er M/YYYY -->`
+trailer** — step 2's multiple-corrections shape, which already fits. Do not
+collapse them to the fullest one, and do not drop the "redundant" ones:
+
+- they are not redundant. 4/87 gives 30020 as a substitution within the line;
+  8/87 gives the whole corrected line, `»AD=AD+1:B0=PEEK(AD) AND 191:SB=0«`,
+  which is what a reader actually needs and what the disk holds (verified in
+  `issues/8702/prg/gdm v1.0.txt` line 30020).
+- choosing between them is editing the magazine. *We publish the plate*: it
+  really did print the correction three times, over six months, and the three
+  trailers tell the reader that.
+
+One aside, one `id`, one `<p>` per rubric in issue order. The disposition is
+judged once for the article, not once per paragraph — here all five lines are
+already right on the disk, so `<!-- Disk-Version bereits korrigiert -->`.
+
+## `Fehlerteufelchen.md` IS A FINDING AID, NOT AN AUTHORITY
+
+It was built by sweeping rubric pages, and the sweep made mistakes. MEASURED on
+two pages read in full on 2026-11-17:
+
+- **4/87 p73** was missing `Der Schlüssel zu Geos (Ausgabe 2/87, Seite 164ff)`
+  entirely — an erratum against the issue then being built.
+- **4/87 p73**'s `Brigant` is `Der C 64 als Speichergigant`, hyphenated across
+  a column break as `Speicher-/gigant`.
+- **8/87**'s rubric is on page **47**, not 48.
+
+Three errors in two pages. So: **when you render a rubric page, you have the
+whole page in front of you — read every item on it and correct the ledger.**
+That cross-check is free, it is the only thing that catches a MISSING row (a
+row that is not there cannot be checked against anything), and a missing row is
+the failure that costs an issue its erratum. Fix the ledger in the same pass,
+and say in LOG.md which rows you changed.
+
+`Fehlerteufelchen.md` is corpus reference, so it belongs to control, not to the
+build — hand the corrections over rather than making them.
 
 ## Verification
 

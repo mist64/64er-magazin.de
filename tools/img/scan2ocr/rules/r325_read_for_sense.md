@@ -275,6 +275,33 @@ make it a Futureteufelchen."*
 So "record them and stop" means record them IN THE LOG and stop. A candidate
 list is still a report — it is just not a report the owner is asked to read.
 
+### A READER FIX THAT REVERSES AN EARLIER "KEPT AS PRINTED" IS CHECKED, ALWAYS
+
+280 and the r325 readers both decide what the page says, days apart, and they
+will disagree. A reader arrives with no memory of 280's crop and sees a
+misspelling; "fixing" it silently overturns a decision that was made with the
+plate in front of it. **So every reader fix that reverses an earlier
+kept-as-printed goes back to the crop before it is applied — and the crop
+decides, not the seniority of the pass.**
+
+MEASURED on 8702, one in each direction, from a single reader (G4):
+
+- `prinzipell` → `prinzipiell` on p009. 280 had kept it; the crop says
+  `prinzipell`. The reader was wrong and the fix was reverted.
+- `Warenzeichens recht teuer`: the reader was RIGHT and 280 was wrong — there
+  is a word gap on the plate.
+
+**Neither pass is the authority.** Had the builder trusted 280 because it came
+first, it would have kept a real defect; had it trusted the reader because it
+came last, it would have corrected the magazine. The cross-check costs one
+crop per reversal and is the only thing that separates the two cases — note
+that it is cheap precisely because reversals are rare: two in 107 fixes across
+three readers.
+
+Run it for every reader, including the later waves, and record both outcomes
+in LOG.md — the reverts as well as the confirmations. A revert that is not
+recorded invites the next reader to make the same fix.
+
 **FIRST, RE-READ THE GLYPHS THE CLAIM RESTS ON. RUNNING IT PROVES NOTHING
 ABOUT THE PRINT.** SH8604's p71 `51103 IF 01<>0 AND 02<>0 …` was reported as
 printed with digit zeros, and "confirmed" by running the line as transcribed in
