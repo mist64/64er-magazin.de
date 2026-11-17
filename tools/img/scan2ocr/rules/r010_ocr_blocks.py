@@ -38,6 +38,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
 import r000_issue
+import r000_reviewed as R
 from r000_issue import ISSUE
 
 # ---------------------------------------------------------------------------
@@ -1567,6 +1568,113 @@ def write_digest(page, blocks, dest):
     open(dest, "w", encoding="utf-8").write("\n".join(out) + "\n")
 
 
+# ---------------------------------------------------------------------------
+# A COLUMN PRINTED UPSIDE DOWN
+# ---------------------------------------------------------------------------
+
+# Fresh block ids for the rotated pass, for the reason BAR_BLOCK_ID exists: so
+# its words cannot merge into an upright block.
+ROT180_BLOCK_ID = 2000
+
+
+def rot180_regions():
+    """What on this issue's pages is PRINTED UPSIDE DOWN, as page fractions.
+
+    `issues/<ISSUE>/reviewed/r010-rot180.txt`, one region per line, `#`
+    comments allowed:
+
+        039 0.50 0.07 0.98 0.55    # Abenteuer leicht gemacht -- the tips column
+        123                        # the whole page
+
+    MEASURED on 8702 p039: the adventure column's tips are set at 180 deg ON
+    PURPOSE, so a reader cannot take in a solution while reading the question.
+    Tesseract reads them as upright text and returns the words of each line in
+    reverse -- plausible German fragments, high confidence, no warning. **An
+    OCR engine does not refuse an upside-down line; it reads it backwards.**
+    Nothing downstream can recover that, because the damage is inside the
+    block's text.
+
+    Declared, not detected. Tesseract's OSD can report page orientation, but a
+    page that is upright except for one column is upright by its own measure,
+    and a per-block OSD vote on a 10-line box is not evidence anyone should
+    act on. One line in a reviewed file is cheap, is read by a person who has
+    the page in front of them, and leaves a record of WHY the page is unusual.
+    The region is in page fractions so it survives any resolution change.
+    """
+    out = {}
+    for item in R.recorded(ISS.issue_dir, "r010-rot180"):
+        f = item.split()
+        try:
+            page = int(f[0])
+            box = tuple(float(v) for v in f[1:5]) if len(f) >= 5 else (0.0, 0.0, 1.0, 1.0)
+        except ValueError:
+            sys.exit(f"r010: cannot read {item!r} in reviewed/r010-rot180.txt -- "
+                     f"expected `NNN` or `NNN x0 y0 x1 y1` as page fractions")
+        if len(box) != 4 or not all(0.0 <= v <= 1.0 for v in box) \
+                or box[0] >= box[2] or box[1] >= box[3]:
+            sys.exit(f"r010: bad region {item!r} in reviewed/r010-rot180.txt -- "
+                     f"x0 y0 x1 y1 must be fractions with x0 < x1 and y0 < y1")
+        out.setdefault(page, []).append(box)
+    return out
+
+
+ROT180 = rot180_regions()
+
+
+def _centre_in(b, boxes, W, H, mirrored=False):
+    x0, y0, x1, y1 = b["bbox"]
+    cx, cy = (x0 + x1) / 2 / W, (y0 + y1) / 2 / H
+    for bx0, by0, bx1, by1 in boxes:
+        if mirrored:
+            bx0, by0, bx1, by1 = 1 - bx1, 1 - by1, 1 - bx0, 1 - by0
+        if bx0 <= cx <= bx1 and by0 <= cy <= by1:
+            return True
+    return False
+
+
+def read_rot180(png, stem, boxes, W, H):
+    """The declared regions, OCR'd the way up they READ, mapped back to page space.
+
+    THE MASTER IS NEVER ROTATED. The page is the plate: the PDF must show the
+    column as the magazine printed it, and every bbox in this file stays in
+    master coordinates, so figure crops and text keep sharing one system. Only
+    the OCR looks at a turned copy, and only its TEXT comes back.
+
+    And the unit that comes back is the BLOCK, not the word. Mapping words into
+    page space and letting the line sorter run would put the lines in reverse
+    order -- bottom to top -- which is the same defect in a tidier form. The
+    rotated pass therefore builds its own blocks, with their text already in
+    reading order, and only the bbox is mirrored: (x, y) -> (W - x, H - y).
+    The label is the rotated frame's too: type size, indent and raggedness
+    only mean something in the frame the type reads in.
+    """
+    rot_png = os.path.join(OUT_DIR, stem + "_rot180.png")
+    Image.open(png).rotate(180).save(rot_png)
+    tsv, _txt, _alto, _bar, _origin, im, W2, H2 = run_tesseract(rot_png, stem + "_rot180")
+    if (W2, H2) != (W, H):
+        sys.exit(f"r010 p{stem}: the rotated pass came back {W2}x{H2}, not {W}x{H}")
+    words = rejoin_dropcap_lines(parse_words(tsv, block_offset=ROT180_BLOCK_ID))
+    blocks = block_features(words, W, H, np.asarray(im))
+    kept = []
+    for b in blocks:
+        if not _centre_in(b, boxes, W, H, mirrored=True):
+            continue
+        b["label"] = heuristic_label(b, W, H)
+        x0, y0, x1, y1 = b["bbox"]
+        b["bbox"] = [W - x1, H - y1, W - x0, H - y0]
+        b["bbox_frac"] = [round(v / d, 4) for v, d in
+                          zip(b["bbox"], (W, H, W, H))]
+        # Stated in the record, because a reader of the JSON cannot otherwise
+        # tell why this block's text does not match what the page shows.
+        b["rot180"] = True
+        kept.append(b)
+    if not kept:
+        sys.exit(f"r010 p{stem}: reviewed/r010-rot180.txt declares a region on "
+                 f"this page and the rotated pass found NO block in it. Either "
+                 f"the region is wrong or the page is not upside down there.")
+    return kept
+
+
 def process(page):
     stem = f"{page:03d}"
     png = os.path.join(SRC_DIR, stem + ".png")
@@ -1594,6 +1702,13 @@ def process(page):
             block_features(rejoin_dropcap_lines(words + extra), W, H, arr), arr)
     for b in blocks:
         b["label"] = heuristic_label(b, W, H)
+    boxes = ROT180.get(page)
+    if boxes:
+        upright = [b for b in blocks if not _centre_in(b, boxes, W, H)]
+        rot = read_rot180(png, stem, boxes, W, H)
+        print(f"p{stem}: {len(blocks) - len(upright)} block(s) read upside down "
+              f"replaced by {len(rot)} from the rotated pass", flush=True)
+        blocks = upright + rot
     merge_listings(blocks, W, H)
 
     rec = {"page": page, "ocr_size": [W, H], "ocr_dpi": OCR_DPI, "blocks": blocks,

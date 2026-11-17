@@ -144,6 +144,56 @@ PY
 A page with zero blocks is a failure unless it is genuinely blank — check its
 overlay before accepting it.
 
+## A COLUMN PRINTED UPSIDE DOWN IS DECLARED, AND RE-OCR'd — NEVER RE-CUT
+
+Adventure columns print their tips at 180° on purpose, so a reader cannot take
+in a solution while reading the question. **Tesseract does not refuse an
+upside-down line; it reads it backwards** — plausible German fragments, high
+confidence, no warning, and the damage sits inside the block's text where
+nothing downstream can reach it. MEASURED on 8702 p039 (*Abenteuer leicht
+gemacht*), the first page of this kind in the repo.
+
+Declare it, one line per region, in `issues/<ISSUE>/reviewed/r010-rot180.txt`:
+
+```
+039 0.50 0.07 0.98 0.55    # Abenteuer leicht gemacht -- the tips column
+123                        # the whole page
+```
+
+`NNN` alone means the whole page; otherwise `x0 y0 x1 y1` as **page
+fractions**, so the declaration survives any resolution change. r010 refuses a
+line it cannot read, a region outside 0…1 or inverted, and a declared region in
+which the rotated pass finds no block at all — a region that catches nothing is
+a wrong region, not a page without tips.
+
+Detection was considered and rejected: tesseract's OSD reports PAGE
+orientation, and a page that is upright except for one column is upright by its
+own measure; a per-block OSD vote on a ten-line box is not evidence to act on.
+A reviewed line is read by someone with the page in front of them and leaves a
+record of why the page is unusual.
+
+**What rotates and what does not:**
+
+| | |
+|---|---|
+| the 2400 dpi sheet, the 600 dpi master, the delivered PDF | **never.** The page is the plate; it is printed upside down and it ships upside down |
+| every `bbox` in the page JSON | **never.** Master coordinates, so text and figure crops keep one system |
+| the OCR | a 180° copy in `<out_dir>/NNN_rot180.png`, read and then discarded |
+| what comes back | the **block**, with its text already in reading order, its bbox mirrored `(x, y) -> (W - x, H - y)`, its label from the rotated frame, and `"rot180": true` in the record |
+
+The unit is the block and not the word for a reason worth keeping: map the
+WORDS back into page space and the line sorter runs bottom-to-top, which is the
+same defect in a tidier form — every line correct, the lines in reverse. The
+block's own text is built in the frame the type reads in.
+
+**And the HTML reads the right way up.** The site's HTML is text in reading
+order — it already undoes printed line breaks and column order — so the column
+reads normally there, a figure cut from it is placed the way it reads, and one
+German sentence in a comment records that the magazine printed it inverted,
+unless the printed text says so itself (these columns often tell the reader to
+turn the magazine, and then that line carries it). The PDF beside it still
+shows the plate.
+
 ## Notes
 
 - **Read `FINDINGS.md` before changing anything here.** It records what was

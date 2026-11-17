@@ -3676,3 +3676,31 @@ sd 0.15, so an unrotated page sits within ~0.15° of its sheet's geometry, and
 **Ask for the census before moving a constant.** One page's evidence can only
 tell you that something is wrong; 184 pages' told us which of two plausible
 remedies would have broken 43 pages to fix one.
+
+### AND A COLUMN PRINTED UPSIDE DOWN → r010
+
+8702 p039, *Abenteuer leicht gemacht*: the tips are set at 180° on purpose, so
+a reader cannot take in a solution while reading the question. The first page
+of its kind in the repo. **Tesseract does not refuse an upside-down line; it
+reads it backwards** — plausible German fragments at high confidence, no
+warning, and the damage is inside the block's text where no later step can
+reach it. r020 gave the page an ordinary recall score.
+
+The region is now DECLARED, in `reviewed/r010-rot180.txt`, as page fractions,
+and r010 OCRs a 180° copy, keeps the blocks whose centres fall in the region,
+and mirrors their bboxes back. Nothing else rotates: not the sheet, not the
+master, not the PDF, not one bbox. The site's HTML reads the right way up,
+because the HTML is text in reading order and always has been — a German
+comment records the inversion unless the printed text already tells the reader
+to turn the magazine.
+
+**The block, not the word, is what comes back.** Mapping the words into page
+space and letting the line sorter run gives every line correct and the lines in
+reverse — the same defect, tidier. A rotated frame's text must be built in the
+frame it reads in.
+
+Verified without the artefacts: the parser accepts `NNN` and `NNN x0 y0 x1 y1`,
+refuses a malformed line, an inverted region and one outside 0…1; the mirror
+maps a block at (0.2, 0.3) of the rotated frame to the page's (0.5…1.0, 0.5…1.0)
+region; with no declaration file the module's behaviour is unchanged for every
+other page and issue. The builder verifies it on p039.
