@@ -339,11 +339,23 @@ paths differ inside one issue:
 | where the mark sits | the test |
 |---|---|
 | a page the PDF ships **bilevel** | does it survive the PDF's threshold (35 %)? |
-| a page the PDF ships **contone** (covers, card, colour ads) | it survives — contone keeps everything |
+| a page the PDF ships **contone** (covers, card, colour ads) | does it survive the REDUCTION to the PDF's 150 dpi? Contone keeps every TONE — it does not keep every mark |
 | inside a **crop** | its bucket decides: `bw`/`dots` threshold it away or keep it, `gray` keeps it at 150 dpi |
 
-So the same speck is a finding on p181 (card, contone) and nothing at all on
-p123 (bilevel, pale brown, gone at 35 %). MEASURED on SH8607: of 26 marks
+**"CONTONE KEEPS EVERYTHING" WAS FALSE AT THE DELIVERED RESOLUTION**, and this
+table said it until 8702. A contone page is not thresholded, so no tone is
+clipped — but the PDF ships 150 dpi, and a sub-millimetre speck at 600 dpi is
+averaged into its surroundings by the reduction exactly as a bilevel one is
+clipped by the threshold. 8701's census already applied a 150 dpi contrast
+gate to contone pages for this reason, against a rule that says they need
+none. MEASURED on 8702: **71 marks** are read differently by the two — surfaced
+under "contone keeps everything", gone under the gate. The gate is the right
+reading, and the principle is one line: **the test is the DELIVERED artefact,
+on whatever path that page takes** — threshold on a bilevel page, reduction on
+a contone one, the bucket inside a crop.
+
+So the same speck is a finding on p181 (card, contone, and still visible at
+150 dpi) and nothing at all on p123 (bilevel, pale brown, gone at 35 %). MEASURED on SH8607: of 26 marks
 censused, `044c` (a purplish pen hairline, almost all of it paler than the
 cutoff) and `123x` (a pale-brown dash in the gutter) vanish outright, and
 `140x` mostly drops. Those three should never have reached the owner. On the
