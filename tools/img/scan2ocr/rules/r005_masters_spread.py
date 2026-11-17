@@ -1723,6 +1723,12 @@ def cut_page(geom, fit, sheet600, halves=None, n_pages=N_PAGES):
     verdict, gnote = fold_gate(geom, x0, logo_x0)
     notes.append(gnote)
     geom["_gate"] = (verdict, None if logo_x0 is None else (logo_x0 - x0) / MM)
+    # WHERE THE MASTER SITS IN ITS SHEET, FOR THE STAMP.  r150's worklist and
+    # r000 both say to read `sheet-box` from the stamp and add it to a master
+    # coordinate to reach sheets600 -- the sheet variant has written it since
+    # 8610, and this variant computed x0/y0 and threw them away, so on a
+    # SPREAD issue the field the rules name was simply absent (8702).
+    geom["_box"] = (x0, y0, x0 + MASTER_W_PX, y0 + MASTER_H_PX)
     u = unknown_mask(geom)
     painted = sheet600[:h, :w].copy()
     painted[u] = 255
@@ -1833,6 +1839,9 @@ def cut():
                          else " -- x from the certified fold, y from S B")
                       + ("" if source == "logo" else " -- not used: edges anchor"),
             "unknown": f"{frac:.2%} of the window is fabricated white",
+            # sheets600 = master + (x0, y0); same field and same order as the
+            # sheet variant writes, so one reader serves both bindings.
+            "sheet-box": " ".join(str(v) for v in g.pop("_box")),
             "notes": "; ".join(notes) or "(none)",
         })
         save_master(master, OUT_MASTER / f"{stem}.png", stamp)

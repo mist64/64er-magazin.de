@@ -194,6 +194,47 @@ is right — `t0` leaves `t1` free for the first table the print does actually
 number. A worklist header copied from a previous issue carries the wrong name
 with it; write the header from this rule, not from the last issue's file.
 
+### A SECOND PRINTED UNIT OF ONE ARTICLE RESTARTS AT BILD 1 — `<start>-00<n>`
+
+The magazine prints some articles in two units: a review, then its
+*Anwendung des Monats* or listing half later in the issue under an `<h2>`
+repeating the headline, with **its own Bild numbering starting again at 1**.
+One article, one `64er.pages`, two series — and the second one collides with
+the first file for file.
+
+It takes the `-00` marker, in front of the printed number:
+`52-001`, `52-002`, `52-003a`, `52-003b` for the second unit's Bild 1, 2, 3a
+and 3b (8702, *Nie wieder Probleme mit Kurvendiskussionen*, p52 + p64-71).
+
+Three reasons, in order:
+
+- **`-00` already means "the second thing at this prefix"** — the second
+  article sharing a start page, SH8605's second cartoon — and the table above
+  composes it with a series exactly this way for `-00t<n>`.
+- **The prefix must stay the article's start page.** Placement resolves a
+  figure by finding the article whose `64er.pages` STARTS with the major
+  number, so naming the second unit's figures for the page they are printed
+  on (`64-1`) leaves them unplaceable: no article starts on 64.
+- **The printed number stays visible.** Continuing the first series instead
+  (Bild 1 of the second unit as `52-8`) would make the file disagree with the
+  caption the page prints, and the caption is what a reader checks against.
+
+**It does not collide with the zero chain.** `-0`, `-00`, `-000` are all
+zeros; a name with a non-zero digit after the zeros is a numbered figure of
+the second unit. If a second unit ever reaches Bild 10, write `52-0010` and
+record it here — at which point the chain and the number do start to look
+alike, and the next rule will have to separate them.
+
+### A FORM PRINTED ACROSS TWO PAGES — offer `-xa`/`-xb`, accept one tall image
+
+An order form, a questionnaire or a coupon that runs over two pages is offered
+in the worklist as `<page>-xa` and `<page>-xb`, one region per page, because
+that is what the crop tool can cut. **The owner may return a single tall
+image** instead — 8701's did — and that is the better artefact where the form
+reads as one. It then takes the plain `<page>-x` name and the worklist row is
+annotated, because owner-crop-wins: a delivered crop replaces the plan, and
+the plan is not re-imposed on it.
+
 ### A crop that covers SEVERAL Bild numbers is ONE figure
 
 A single cut frame holding more than one numbered Bild is named for all of
@@ -1345,7 +1386,11 @@ dir=issues/<YYMM>
 
 # 1. every loose PNG (excluding title.png) is referenced by exactly
 #    one <img src=…> across the article HTMLs
-loose=$(ls "$dir"/*.png | grep -v '/title\.png$' | wc -l | tr -d ' ')
+# `find`, NOT `ls "$dir"/*.png`.  The glob is expanded by the SHELL, and zsh
+# -- which is what runs here -- aborts the line with "no matches found" when
+# the issue has no PNG yet, so the check died instead of reporting 0 (8702).
+# find prints nothing and exits 0 on an empty directory, in every shell.
+loose=$(find "$dir" -maxdepth 1 -name '*.png' ! -name 'title.png' | wc -l | tr -d ' ')
 # The class needs `_`: a single photo carrying two printed captions is cut as
 # one file named for both (SH8601's 26-5_9.png, Bild 9 and Bild 6 of the same
 # plug).  Without it the check reported 105 files against 104 references and
@@ -1354,7 +1399,8 @@ loose=$(ls "$dir"/*.png | grep -v '/title\.png$' | wc -l | tr -d ' ')
 # dangling reference plus an unreferenced file cancel out, and so does one
 # file referenced twice.  Both pass a count test and both were shown on plants.
 comm -3 \
-  <(ls "$dir"/*.png | xargs -n1 basename | grep -v '^title\.png$' | sort -u) \
+  <(find "$dir" -maxdepth 1 -name '*.png' ! -name 'title.png' \
+      -exec basename {} \; | sort -u) \
   <(grep -hoE 'src="[0-9]+-[0-9a-z_]+\.png"' "$dir"/*.html \
       | sed 's/^src="//; s/"$//' | sort -u) \
   | sed 's/^\t/  referenced but no file: /; s/^\([^ ]\)/  file never referenced: \1/'
