@@ -62,6 +62,7 @@ def main(issue_dir, ocr):
         return 2
 
     dropped = checkable = 0        # so "0 findings" can be told from "0 looked at"
+    bypage = {}                    # page -> dropped listing blocks, for the weak gate
     for lf in label_files:
         p = int(os.path.basename(lf)[:3])
         lab = json.load(open(lf))
@@ -71,6 +72,7 @@ def main(issue_dir, ocr):
             if not str(b.get('label', '')).startswith('listing'): continue
             t = str(b.get('text', ''))
             dropped += 1
+            bypage[p] = bypage.get(p, 0) + 1
             # ONLY SMON monitor dumps are checkable this way.  An issue whose
             # dropped listings are BASIC or MSE yields nothing here, and the
             # result is then "0 findings" from a check that examined nothing --
@@ -86,14 +88,39 @@ def main(issue_dir, ocr):
             if cov < 0.5:
                 bad.append((p, len(t.split()), round(cov, 2),
                             [os.path.basename(a)[:30] for a in arts], ' '.join(t.split()[:12])))
+    # --- THE WEAK GATE, for the blocks the strong one cannot read -----------
+    # "0 checkable" is honest but it leaves the whole population unexamined:
+    # MEASURED on 8702, 644 dropped listing blocks on 38 pages, not one of them
+    # a monitor dump, so the strong test looked at NOTHING and said 0. The
+    # weakest true statement that still covers them: a page whose OCR found
+    # listing blocks must belong to an article that places at least one listing
+    # figure. It cannot see a SINGLE missing listing among several placed ones
+    # -- say so rather than let a green here be read as coverage -- but it does
+    # catch a whole article's listings going missing, and it is the only thing
+    # standing between 644 blocks and no check at all.
+    weak = []
+    for p, n in sorted(bypage.items()):
+        arts = p2a.get(p, [])
+        if not arts:
+            weak.append((p, n, 'NO ARTICLE CLAIMS THIS PAGE'))
+            continue
+        html = ' '.join(io.open(a, encoding='utf-8').read() for a in arts)
+        if not re.search(r'<pre[^>]*data-filename', html):
+            weak.append((p, n, os.path.basename(arts[0])[:40] + ' — no listing figure'))
+
     print(f'dropped listing blocks: {dropped}   of those checkable as monitor '
           f'dumps: {checkable}   with no home in the article: {len(bad)}')
+    print(f'page-level check: {len(bypage)} page(s) with dropped listings, '
+          f'{len(weak)} whose article places no listing at all')
     if dropped and not checkable:
-        print('  NOTE: none of the dropped listings is a monitor dump, so this '
-              'check examined nothing. "0" here is not evidence of coverage.')
+        print('  NOTE: none of the dropped listings is a monitor dump, so the '
+              'ADDRESS check examined nothing. Only the page-level check below '
+              'covers them, and it cannot see one missing listing among several.')
     for p, n, c, a, t in bad:
         print(f'  p{p:<4} words={n:<4} addr-coverage={c}  {a}\n        {t}…')
-    return 1 if bad else 0
+    for p, n, why in weak:
+        print(f'  p{p:<4} {n:>3} dropped listing block(s)  {why}')
+    return 1 if (bad or weak) else 0
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1], sys.argv[2]))

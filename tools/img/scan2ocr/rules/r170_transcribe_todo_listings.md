@@ -794,10 +794,7 @@ canonical anti-memory violation.
   the OCR pipeline dropped a whole listing, not just left a TODO
   placeholder.
 
-## Listing captions: drop the "how to type this in" pointer
-
-The print appends a cross-reference to the MSE/Checksummer instructions, which
-live on a page that does not exist as such in the HTML:
+## Listing captions: the MSE cross-reference STAYS. This section said drop it
 
 ```
 Listing. Das Programm »fsd64.obj« bitte mit dem »MSE« abtippen. Hinweise siehe Seite 51
@@ -805,16 +802,44 @@ Listing 2. Demoprogramm zu »Shrinksprite«. Bitte die Eingabehinweise auf Seite
 Listing »Copy 1520« geben Sie bitte mit dem MSE (siehe Seite 51) ein
 ```
 
-Keep the instruction ("bitte mit dem MSE eingeben"), drop the page pointer
-(`Hinweise siehe Seite 51`, `… auf Seite 51 beachten`, `(siehe Seite 51)`).
+**These are kept, verbatim, page number and all.** This section used to say
+"keep the instruction, drop the page pointer", on the reasoning that page 51
+"does not exist as such in the HTML". That reasoning is wrong twice: the issue
+IS published as a PDF with that page in it and as an article covering it, and
+more importantly the owner ruled the opposite case explicitly.
 
-Same for standalone continuation pointers in the body — `Listing und
+Owner, 8612 review, 2026-10-03, on a paragraph that is ONLY a pointer: *"dont
+add this to the HTML! ever! … it's a hint for you where to continue only!"* —
+**and in the same breath, kept "page references that are the AUTHOR writing to
+the reader inside prose", his example being `beachten Sie bitte die
+Eingabehinweise auf Seite 78`.** That sentence is from 8612 itself, the issue
+he was reviewing, and its four Eingabehinweise captions survived that review
+and are in the published file today.
+
+MEASURED: **147 figcaptions in the corpus end with an "Eingabehinweise … auf
+Seite N" sentence**, across more than twenty issues, including 8611, 8612,
+8701, SH09 and SH10. 8702 dropped two on the strength of this section and stood
+alone against its own neighbours; its builder noticed the discrepancy and
+asked, which is the only reason this was caught.
+
+**The test is what is lost when the sentence goes.** Remove `Fortsetzung auf
+Seite 97` and nothing is lost — the continuation is the next element on the
+page. Remove `Beachten Sie bitte die Eingabehinweise auf Seite 78` and the
+reader is no longer told that MSE input instructions exist, or where to find
+them. The first is the layout talking to a print reader; the second is the
+author talking to any reader. Captions are verbatim (r130), so it stays as
+printed, trailing period and all.
+
+What IS dropped is a pointer that is the WHOLE sentence: standalone
+continuation pointers in the body — `Listing und
 Beschreibung ab Seite 54`, `Fortsetzung auf Seite …` — these are layout
 navigation and are omitted entirely.
 
 **A continuation caption can carry real content, and then only the pointer
 goes.** A listing running over two pages is captioned twice, and the second
 one — "… (Schluß)" — sometimes adds an instruction sentence that appears
-nowhere else. Drop `(Schluß)` and the page pointer, keep the sentence, and
-fold it into the ONE `<figcaption>` the one listing gets (r130, *a caption
+nowhere else. Drop `(Schluß)` and the CONTINUATION pointer — `(Fortsetzung auf
+Seite 97)`, which is navigation and nothing else — keep the sentence, keep any
+Eingabehinweise reference it carries, and fold it into the ONE `<figcaption>`
+the one listing gets (r130, *a caption
 repeated on every page*).

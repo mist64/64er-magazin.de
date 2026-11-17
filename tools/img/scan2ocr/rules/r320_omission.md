@@ -417,3 +417,69 @@ answer belongs here**, in the rule the next builder reads before running it.
 Not to be confused with 8610's `75 Österreich-Beilage.html` — an editorial
 article announcing the supplement, which is published. The notice beside the ad
 index is not that article.
+
+## WHERE A DISPOSITION IS WRITTEN DOWN — `reviewed/r320-disposed.txt`
+
+This gate reports three populations that each need a human's ruling —
+UNACCOUNTED, the noise sweep, and the vocabulary-only list — and for a long
+time it named **no file to write the ruling in**. MEASURED on 8702: 43 of them
+(3 + 26 + 14), every one disposed of in the build log, and every one of which
+would come back identical on the next run — of a step that is explicitly
+*re-run over old issues*. **A finding with nowhere to be answered is answered
+by being ignored**, and that is how a gate stops being read at all.
+
+So: `issues/<ID>/reviewed/r320-disposed.txt`, the convention every other step
+already uses (`r160-box-captions`, `r220-orphan-rows`, `r280-hyphen`). One line
+per block, the REASON on a `#` comment line above it:
+
+```
+# worklist figure — the owner's crop replaces the typeset form (r150)
+p171 die mit stern gekennzeichneten felder sind auszufuellen
+# p179's advertiser index, Inserentenverzeichnis precedent (below)
+p179 inserentenverzeichnis anzeigen seite
+```
+
+The key is the page plus the first **eight** normalised words, exactly as the
+script prints them. Three consequences, all deliberate:
+
+- **A disposed row is COUNTED in the verdict line**, never silently dropped —
+  `ALREADY DISPOSED n`, with a pointer to the file. The defect being fixed here
+  is a number that moves without a reason; replacing it with a different number
+  that moves without a reason would be no better.
+- **A row whose OCR has since CHANGED re-raises**, because it is not the same
+  block any more.
+- **A row that matches nothing is reported STALE.** It does not fail the run —
+  a legitimately repaired page leaves its row behind — but a file full of stale
+  rows is the quiet way this gate comes back, so it is visible. A malformed
+  line DOES fail: a disposition nobody can parse is not a disposition.
+
+## THE 644 BLOCKS THE DUMP CHECK CANNOT READ
+
+`r320_dropped_listings.py` matches a dropped listing by its hex ADDRESSES,
+which only works for a monitor dump. MEASURED on 8702: **644 dropped listing
+blocks across 38 pages, not one of them a dump** — so the strong check examined
+nothing and printed 0. It said so, which is the only reason this was noticed;
+but a population of 644 with no check at all is not covered by a correct NOTE.
+
+So the script now also runs **the weakest true statement that covers them**: a
+page whose OCR found listing blocks must belong to an article that places at
+least one listing figure. Its limits, stated because a green here is otherwise
+read as coverage:
+
+- it **cannot see one missing listing among several placed ones**, which is the
+  SH8601 failure this file opens with;
+- it is per PAGE, not per block, because a `<pre data-filename>` figure does
+  not say which page it was printed on.
+
+What it does catch is a whole article's listings going missing, and a page no
+article claims that nonetheless holds listing text. On 8702 it examines all 38
+pages and finds 0 — a zero with a denominator, which is the whole point.
+
+## STILL MISSING: a caption-vs-figcaption check
+
+Nothing in this chain compares the captions the OCR read on the page against
+the `<figcaption>`s the article ships. 8702's 320 agent found two dropped
+caption sentences by an ad-hoc pass of its own (r130/r170, *the MSE
+cross-reference stays*), which is the same shape as every other gap recorded
+here: the defect was found by a human looking, and the gate that should have
+seen it does not exist. Recorded, not yet built.

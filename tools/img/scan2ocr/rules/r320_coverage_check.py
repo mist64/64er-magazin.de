@@ -241,6 +241,71 @@ for p_, lab, w, hay in unordered:
                    ' '.join(w[:16])))
 scored.sort(reverse=True)
 
+# --- what a human has already ruled on ---------------------------------------
+# EVERY RE-RUN RE-RAISED THE SAME FINDINGS.  This script reports three
+# populations that each need a human's disposition -- UNACCOUNTED, the noise
+# sweep, and the vocabulary-only list -- and named no file to write the
+# disposition in.  MEASURED on 8702: 43 of them (3 + 26 + 14), all disposed in
+# the build log, all of which would come back identical on the next run of a
+# step that is explicitly "re-run over old issues".  A finding with nowhere to
+# be answered is answered by being ignored, which is how a gate stops being
+# read at all.
+#
+# So: `issues/<ID>/reviewed/r320-disposed.txt`, the convention every other step
+# already uses (r160-box-captions, r220-orphan-rows, r280-hyphen). One line per
+# block, `p<page> <the first words as this script prints them>`, with the
+# REASON on a `#` comment line above it -- the reason is the point of the file.
+# A disposed row is counted in the verdict, never silently dropped: the whole
+# defect being fixed is a number that moves without a reason.
+#
+# The key is the page plus the first DISPOSE_WORDS normalised words, so a row
+# whose OCR has since CHANGED re-raises on purpose -- it is not the same block
+# any more.
+DISPOSE_WORDS = 8
+DISPOSED_FILE = os.path.join(ISSUE_DIR, 'reviewed', 'r320-disposed.txt')
+
+
+def _dispose_key(page, txt):
+    return (int(page), ' '.join(norm(txt)[:DISPOSE_WORDS]))
+
+
+def read_disposed(path):
+    keys, bad = {}, []
+    if not os.path.exists(path):
+        return keys, bad
+    for n, ln in enumerate(io.open(path, encoding='utf-8'), 1):
+        if not ln.strip() or ln.lstrip().startswith('#'):
+            continue
+        m = re.match(r'\s*p(\d+)\s+(\S.*)$', ln.rstrip('\n'))
+        if not m:
+            bad.append(f'{os.path.basename(path)}:{n}: not `p<page> <words…>`: '
+                       f'{ln.strip()[:60]!r}')
+            continue
+        keys[_dispose_key(m.group(1), m.group(2))] = n
+    return keys, bad
+
+
+DISPOSED, DISPOSED_BAD = read_disposed(DISPOSED_FILE)
+_used = set()
+
+
+def _keep(page, txt):
+    """True if this row still needs a human; records the match either way."""
+    k = _dispose_key(page, txt)
+    if k in DISPOSED:
+        _used.add(k)
+        return False
+    return True
+
+
+n_missing_0, n_scored_0, n_vocab_0 = len(missing), len(scored), len(vocab_only)
+missing    = [r for r in missing    if _keep(r[0], r[4])]
+scored     = [r for r in scored     if _keep(r[1], r[7])]
+vocab_only = [r for r in vocab_only if _keep(r[0], r[5])]
+n_disposed = (n_missing_0 - len(missing)) + (n_scored_0 - len(scored)) \
+             + (n_vocab_0 - len(vocab_only))
+stale = sorted(set(DISPOSED) - _used, key=lambda k: DISPOSED[k])
+
 # A SWEPT <tmp> LOOKS EXACTLY LIKE A CLEAN ISSUE: every page raises
 # FileNotFoundError, kept_total stays 0, and the old summary printed
 # "UNACCOUNTED 0 (0.0%)" -- a pass, from a check that never ran. Say so and exit
@@ -265,7 +330,11 @@ if pages_read:
     # Both counts, because the verdict line is the one line that gets read --
     # and a vocabulary-only match is the quietest place a paragraph can hide.
     print(verdict + f'   NOISE NEEDING A DISPOSITION {len(scored)}'
-                    f'   FOUND BY VOCABULARY ONLY {len(vocab_only)}\n')
+                    f'   FOUND BY VOCABULARY ONLY {len(vocab_only)}'
+          + (f'   ALREADY DISPOSED {n_disposed}' if n_disposed else '') + '\n')
+    if n_disposed:
+        print(f'  {n_disposed} row(s) cleared by {DISPOSED_FILE} — read it, it '
+              f'carries the reasons\n')
     for p_, lab, frac, n, txt, arts in missing:
         print(f'p{p_:<4} {lab:<9} match={frac:<5} words={n:<4} {arts}')
         print(f'      "{txt}…"')
@@ -324,7 +393,24 @@ for p in unclaimed:
 # so it does not affect the status. So are the two sweeps above -- they are
 # read, not asserted (see their comment in the loop). What changed is that
 # `exit 0` no longer claims a coverage the script never attempted.
+# A DISPOSITION FILE THAT MATCHES NOTHING IS A CLAIM THAT WENT STALE.  A row
+# whose block is gone, or whose text has changed, no longer disposes of
+# anything -- and a file full of those is the quiet way this gate would come
+# back. Say so; it does not fail the run, because a legitimately repaired page
+# leaves its row behind.
+if DISPOSED_BAD:
+    print('\nMALFORMED LINES IN ' + DISPOSED_FILE)
+    for b in DISPOSED_BAD:
+        print('  *', b)
+if stale and pages_read:
+    print(f'\nSTALE in {os.path.basename(DISPOSED_FILE)}: {len(stale)} row(s) '
+          f'matched nothing this run — the block is gone or its OCR changed')
+    for pg, txt in stale:
+        print(f'  p{pg:<4} "{txt}…"')
+
 if pages_read == 0:
     sys.exit(2)      # could not run -- not a pass
+if DISPOSED_BAD:
+    sys.exit(1)      # a disposition nobody can read is not a disposition
 if missing:
     sys.exit(1)      # real findings

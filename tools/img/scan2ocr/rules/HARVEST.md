@@ -4112,3 +4112,61 @@ article ships three programs, nothing was misprinted and no disk was patched.
 `Reiner Druckfehler` would assert an error that does not exist. Omit, and say
 so in LOG.md — do not stretch a word to fit, which this rule has now recorded
 three times.
+
+### AND THE MSE CROSS-REFERENCE WAS BEING DROPPED AGAINST THE OWNER'S OWN RULING → r170, r130
+
+8702's 320 agent noticed that two captions — Listing 15 on p058 and 76's
+Listing 1 on p078 — lost their closing "Eingabehinweise … auf Seite 66", and
+that **132 corpus files keep exactly that sentence**, 8701 and 8612 among them.
+The builder asked rather than following either side.
+
+It stays. r170's section said "keep the instruction, drop the page pointer", on
+the reasoning that page 51 "does not exist as such in the HTML" — wrong twice,
+since the issue ships as a PDF with that page and as an article covering it,
+and since the owner ruled the opposite case by name. Owner, 8612 review,
+2026-10-03, dropping a standalone pointer: *"dont add this to the HTML! ever!
+… it's a hint for you where to continue only!"* — **and in the same breath
+keeping "page references that are the AUTHOR writing to the reader inside
+prose", his example being `beachten Sie bitte die Eingabehinweise auf Seite
+78`.** That sentence is from 8612, the issue he was reviewing; its four
+Eingabehinweise captions survived that review and are in the published file
+today. r130 then inherited the inversion and used the owner's keep-example as
+its drop-example.
+
+MEASURED over the published corpus: **147 figcaptions** end with such a
+sentence, across more than twenty issues including 8611, 8612, 8701, SH09 and
+SH10. 8702 stood alone against its own neighbours.
+
+The test is what is lost when the sentence goes. Remove "Fortsetzung auf Seite
+97" and nothing is: the continuation is the next element. Remove "Beachten Sie
+bitte die Eingabehinweise auf Seite 78" and the reader is no longer told that
+MSE input instructions exist, or where. **The first is the layout talking to a
+print reader; the second is the author talking to any reader.**
+
+Two rules carried this for months because the sentence that refuted them lived
+in a memory file and not in them. A ruling that only exists outside the rules
+will be contradicted inside them.
+
+### AND 320 HAD NOWHERE TO WRITE A DISPOSITION, AND A CHECK OVER 644 BLOCKS THAT READ NONE → r320
+
+Both reported by 8702's builder, both fixed and measured.
+
+- **No disposition file.** 320 reports three populations that each need a
+  human's ruling and named no file to record it in, so all 43 of 8702's (3
+  UNACCOUNTED + 26 noise + 14 vocabulary-only) would return identical on the
+  next run of a step that is explicitly re-run over old issues. A finding with
+  nowhere to be answered is answered by being ignored. Now
+  `reviewed/r320-disposed.txt`, with the count in the verdict line, stale rows
+  reported, and a malformed line failing the run.
+- **644 dropped listing blocks, 0 readable.** The address matcher only works on
+  monitor dumps; 8702 had none, so the check examined nothing and printed 0. It
+  said so — that NOTE was added after an earlier always-green — but a correct
+  NOTE is not a check. Added the weakest true statement that covers them: a
+  page with dropped listing blocks must belong to an article that places at
+  least one listing figure. 38 pages examined on 8702, 0 findings, and the
+  gate verified by planting the failure. Its blind spot (one missing listing
+  among several) is written beside it.
+
+Still missing, recorded not built: nothing compares the captions the OCR read
+against the figcaptions the article ships. The agent's ad-hoc pass is what
+found the two dropped MSE sentences above.

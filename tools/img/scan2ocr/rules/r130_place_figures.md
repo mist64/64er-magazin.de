@@ -189,12 +189,34 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
   rows carry the NEXT row's address in their first two data bytes — the address
   column bled into the data column — while the disk holds a coherent 8x8
   character set. That is a print error, left as printed with a German comment.
-- **Where this rule and r170 both touch a caption, r170 wins on page
-  pointers.** This rule says captions are verbatim; r170 says drop a standalone
-  "… auf Seite N" pointer. The same printed caption can be both ("Bitte
-  beachten Sie die Eingabehinweise auf Seite 76"), and no precedence was
-  stated. The pointer goes: it is a print navigation aid that means nothing on
-  a web page, and what remains of the caption is still verbatim.
+- **Where this rule and r170 both touch a caption, the question is WHAT THE
+  SENTENCE IS, not which rule wins.** This bullet used to say "r170 wins on
+  page pointers … the pointer goes", and gave as its example *"Bitte beachten
+  Sie die Eingabehinweise auf Seite 76"* — **which is the owner's own example
+  of a reference that STAYS.** Owner, 8612 review, 2026-10-03: a paragraph that
+  is ONLY a pointer ("Fortsetzung auf Seite 99", "Anleitung auf Seite 58") is
+  the layout telling a print reader where to turn and is dropped — *"dont add
+  this to the HTML! ever! … it's a hint for you where to continue only!"* — but
+  **"page references that are the AUTHOR writing to the reader inside prose
+  ('beachten Sie bitte die Eingabehinweise auf Seite 78') are KEPT."** This
+  bullet inverted the one example the owner spelled out.
+
+  MEASURED: **147 figcaptions in the published corpus end with an
+  "Eingabehinweise … auf Seite N" sentence**, across more than twenty issues
+  and including every recent build — 8611, 8612, 8701, SH09, SH10. 8702 dropped
+  two on the strength of this bullet and stood alone against its own
+  neighbours.
+
+  **The test is what is lost when the sentence goes.** Remove "Fortsetzung auf
+  Seite 97" and nothing is lost: the continuation is the next element on the
+  page. Remove "Beachten Sie bitte die Eingabehinweise auf Seite 78" and the
+  reader is no longer told that MSE input instructions exist, or where. The
+  first is navigation; the second is the author addressing the reader, and it
+  is part of the caption, which is verbatim.
+
+  So: a caption **whose whole content is a pointer** loses it (r170, and the
+  Odyssey "(Fortsetzung auf Seite 97)" case below); a caption that **says
+  something and ends with a reference** keeps it, period and all, as printed.
 - **Captions are verbatim.** Trailing dot after `Listing N`, German
   typography (`»…«`), exact punctuation. Read from the PDF text layer
   first; fall back to scan-visual only when the layer is broken.
