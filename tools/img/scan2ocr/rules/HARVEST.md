@@ -3847,3 +3847,32 @@ rf, rf, rf, rf"). The real defects were a `set` of byline STRINGS, which
 collapses two identical bylines the rule wants twice, and `sorted()`, which
 alphabetises what should be body order. **A report of a symptom is not a
 diagnosis — read the rule that owns the field before fixing the field.**
+
+### AND THE FOLD TOLERANCE REJECTED THE PUNCHES THAT WOULD HAVE CORRECTED THE FOLD → r005_masters_spread
+
+Found by 8702's marks census, in the "ours" column nobody is asked to rule on:
+**51 unfilled clip punches surviving into the delivered PDF.**
+
+`fill_punches` accepts a blob on a template row only if it also sits within
+`PUNCH_FOLD_TOL_MM` (1.0) of the page's fold line. On a page whose fold came
+FROM THE HOLES that is a good second opinion. On a page whose fold was
+**placed** — the p5 fallback, a colour boundary, an ink stop — the line is a
+couple of millimetres from the punches by construction, and the test then
+rejects the very holes that would have corrected it. Circular, and silent: the
+page reports `none` for all six rows and the punches go into the master.
+
+MEASURED on 8702 p046 and p056, both `FOLD re-placed (none -> p5)`: all six
+punches are found, pass the ring test, and sit **0.07–0.38 mm** from their
+template row — while every one is **1.46–2.24 mm** from the placed fold line.
+
+Fixed by applying the fold test only where `fold.source == "holes"`, and
+replacing it elsewhere with the candidates' own agreement in x: real punches
+are one column through the sheet, a speck that happens to land on a row is
+not. MEASURED over all 184 pages: **18 pages, 67 punches** that the old code
+filled none of, and **not one page with a holes-derived fold changes**.
+
+**Three guards in this chain have now been found keyed on the belief they were
+meant to question** — the skew residual re-measuring with the same projection,
+020's cache check comparing id SETS where a duplicate cannot exist, and this.
+The shape to look for: a test whose reference is derived from the thing under
+test.

@@ -1325,7 +1325,10 @@ PUNCH_MAX_MM = 4.0           # longest extent (a torn teardrop runs to 2.84)
 PUNCH_RING_MM = 1.5          # the surround: this far beyond the blob's box...
 PUNCH_RING_DARK_MAX = 0.15   # ...may be at most this fraction dark, or it is ink
 PUNCH_ROW_TOL_MM = HOLE_TEMPLATE_TOL_MM   # a found blob must sit ON its template row
-PUNCH_FOLD_TOL_MM = 1.0      # ...and on the fold line, where the page has one
+PUNCH_FOLD_TOL_MM = 1.0      # ...and on the fold line, where that line came
+                             # FROM THE HOLES.  See fill_punches: on a page
+                             # whose fold is a fallback placement this test
+                             # rejects the very punches that would correct it.
 PUNCH_FILL_MIN_MM = 2.0      # fill at least this diameter: r = max(d/2, 1.0) + 0.4
 # ACCEPT ON THE ROW, THEN SIZE TO COVER.  MEASURED in the 8701 dry run: on p192
 # the found blob was the punch and the disc was too small; on p179 the found
@@ -1494,6 +1497,7 @@ def fill_punches(g, gray, priors):
         shift = shift_mm
         win_y = PUNCH_WIN_Y_MM + HOLE_TEMPLATE_Y0_TOL_MM
     kept = found = none = 0
+    picked = []                                  # (row, px, py, d) accepted so far
     cands = {}                                   # row index -> [(px, py, d)]
     for j, t in enumerate(HOLE_TEMPLATE_MM):
         ty = (shift + t) * MM
@@ -1549,15 +1553,46 @@ def fill_punches(g, gray, priors):
             for px, py, d in cs:
                 if abs(py - ty) > PUNCH_ROW_TOL_MM * MM:
                     continue
-                if f["poly"] and abs(px - fold_x(py)) > PUNCH_FOLD_TOL_MM * MM:
+                # THE FOLD TEST ONLY APPLIES WHERE THE FOLD CAME FROM THE
+                # HOLES.  A page whose fold was PLACED -- the p5 fallback, a
+                # colour boundary, an ink stop -- carries a line that is a
+                # couple of millimetres from the punches by construction, and
+                # this test then rejects the punches that would have corrected
+                # it.  Circular, and silent: the page reports `none` for every
+                # row and the holes survive into the master.
+                #
+                # MEASURED on 8702 p046 and p056, both `FOLD re-placed (none
+                # -> p5)`: all SIX punches are found, pass the ring test and
+                # sit 0.07-0.38 mm from their template row -- and every one is
+                # 1.46-2.24 mm from the placed fold line, against a tolerance
+                # of 1.0.  Nothing was filled, and the census found them in
+                # the delivered PDF (51 unfilled punches over the issue).
+                #
+                # What replaces it on such a page is the candidates' own
+                # agreement in x: real punches are one column, ink specks are
+                # not.  The row match (six template rows, +-0.75 mm) is the
+                # strong evidence here and it has already been made.
+                if f["poly"] and f.get("source") == "holes" \
+                        and abs(px - fold_x(py)) > PUNCH_FOLD_TOL_MM * MM:
                     continue
                 ok.append((abs(py - ty), px, py, d))
         if ok:
             _, px, py, d = min(ok)
-            f["holes"].append([px, py, max(d, PUNCH_FILL_MIN_MM)])
-            found += 1
+            picked.append((j, px, py, d))
         else:
             none += 1
+    # ON A PLACED FOLD, THE COLUMN TEST: every picked punch within
+    # PUNCH_FOLD_TOL_MM of their own median x.  One speck that happens to sit
+    # on a template row cannot pass it, and the real punches -- which are a
+    # single line of holes through the sheet -- always do.
+    if picked and not (f["poly"] and f.get("source") == "holes"):
+        med = float(np.median([p[1] for p in picked]))
+        keep = [p for p in picked if abs(p[1] - med) <= PUNCH_FOLD_TOL_MM * MM]
+        none += len(picked) - len(keep)
+        picked = keep
+    for _j, px, py, d in picked:
+        f["holes"].append([px, py, max(d, PUNCH_FILL_MIN_MM)])
+        found += 1
     return kept, found, none
 
 
