@@ -1282,6 +1282,50 @@ bytes have to come from the bilevel pages instead. 8610 measured **118 of its
 200 pages colour-free**, 57.3 MB of the 99.1 MB JPEG payload -- which is the
 prize the mixed build collects.
 
+### DECIDING THE FINAL QUALITY WHEN ONE PAGE IS STILL MISSING
+
+The trial build runs on a stand-in cover, so its total is not the shipping
+total: page 1 is replaced when `title.png` arrives. **Do not assemble twice to
+find out whether the real cover still fits.** One page changed, so measure that
+page.
+
+MEASURED on 8702's trial: the whole PDF is 99.54 MB against a 100 MB ceiling —
+0.46 MB of margin — and **page 1 alone is 1150K** (`pdfimages -list`, object
+751, 1240x1754 rgb at 150 dpi). The cover is one of the largest objects in the
+file, two and a half times the margin, so whether q95 fits is decided entirely
+by how the real cover compresses.
+
+```bash
+# what the stand-in cost, per page, in the trial
+pdfimages -list "<tmp>/trial/<name>.pdf" | awk 'NR>2 {print $1, $(NF-1)}' | head
+```
+
+So: encode the real cover alone to the same raster at the chosen q, compare its
+bytes with the stand-in's, and add the difference to the trial total. If it
+still fits, assemble once at `QMIN=QMAX=<q>`; if it does not, drop a step and
+assemble once at that. One page encode is minutes; an assembly is not, and the
+quality search behind it is hours.
+
+### THE CEILING'S UNIT, AND WHY THE OLD CORPUS LOOKS LIKE IT BREAKS IT
+
+**Read "100 MB" as 100,000,000 bytes — decimal — and keep building to it.**
+That is what the recent chain does and what the table above is measured in:
+8609 shipped at exactly its 96.15 MB and 8610 at 97.53 MB.
+
+But MEASURED over the published corpus 2026-11-17, **eight PDFs are between
+103.93 and 104.68 MB** — 8501, 8510, 8511, 8601, 8603, 8605, 8606, 8607 — and
+every one of them lands just under **100 MiB** (99.12 to 99.83 MiB). They are
+from the older process, and they are published and served today. So the written
+ceiling is ~4.9 MB stricter than what this archive has actually shipped, and
+the rule records neither where the number came from nor which unit it is in.
+
+**This changes nothing in practice and has not been put to the owner**, because
+it has not yet decided anything: on 8702 the next quality step up, q96, is
+106.51 MB = 101.58 MiB, over the line on EITHER reading, so q95 is the answer
+whichever unit is meant. Raise it only when a build is genuinely caught between
+the two — and then as a question about the number's origin, not as a licence to
+exceed it.
+
 ### COPY THE FINISHED PDF OUT OF `<tmp>` THE MOMENT IT IS BUILT
 
 `<tmp>` is durable for INPUTS. It is not a safe home for a deliverable waiting

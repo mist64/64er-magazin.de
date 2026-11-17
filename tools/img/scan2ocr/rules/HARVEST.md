@@ -4212,3 +4212,25 @@ divergence between two transcriptions of one printed text is an OCR error in
 one of them. `--partial` is a required read for every PARTIAL pair now, declared
 in the LOG. **A flag that has to be remembered is a check that is sometimes not
 run.**
+
+### AND THE COVER IS 1.15 MB AGAINST A 0.46 MB MARGIN → r006
+
+8702's 006 trial assembles to 99.54 MB at q95 against the 100 MB ceiling, on a
+STAND-IN cover. The builder's plan was to assemble at q95 when the real
+`title.png` arrives and drop to q94 (95.05 MB) if it went over — sound, but it
+spends a whole assembly to learn which branch it is on.
+
+MEASURED on the trial PDF: **page 1 is 1150K**, one of the largest objects in
+the file and two and a half times the remaining margin. One page changed, so
+measure that page: encode the real cover to the same raster at the same q,
+compare with the stand-in's bytes, add the delta to the trial total, and
+assemble ONCE at whichever quality that says. Minutes against hours.
+
+**And the ceiling's unit is undocumented.** MEASURED over the published corpus:
+eight PDFs are 103.93-104.68 MB (8501, 8510, 8511, 8601, 8603, 8605, 8606,
+8607), every one just under **100 MiB** — the older process built to a
+different number, and they are served today. The recent chain builds to 100 MB
+decimal, ~4.9 MB stricter. Recorded in r006 and deliberately NOT put to the
+owner: on 8702 the next step up, q96, is 101.58 MiB, over on either reading, so
+q95 is the answer whichever unit is meant. A question that decides nothing yet
+is not worth one of his answers.
