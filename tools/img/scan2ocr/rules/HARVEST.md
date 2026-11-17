@@ -4547,3 +4547,33 @@ decides.
 be the plate** — the clip-punch grow that ate printed ink, and this. Both times
 the artefact looked like ours because it was ugly. *Ugly is not evidence of
 ownership.*
+
+### AND I SERIALISED TWO INDEPENDENT TRACKS AGAINST A RULE I HAD READ THAT DAY
+
+Owner: *"the crops are independent of the pages!"*
+
+I had told the builder *"do not build the PDF until the crops are placed — a
+final PDF without figures is not final."* That is wrong twice over. The issue
+PDF is the scanned PAGE IMAGES with an OCR layer; the figures are already
+printed on them. Crops exist for the HTML. And r000 says so in a table I read
+earlier the same day: *THE PDF DOES NOT WAIT FOR THE FIGURES — that sentence is
+an ORDER OF CONVENIENCE, not a dependency*, with the owner's *"PDFs don't need
+crops. PDFs only need title.png."*
+
+**The misreading was of one word.** He asked for the PDF to be "final" and I
+took final to mean complete-with-figures, which it can never mean for this
+artefact. A word from the owner does not redefine what a deliverable contains.
+
+It cost the PDF two hours of sitting behind crop work, while he had asked to
+see it.
+
+**And the general form, which the day had already proved empirically:** a page
+change reaches a crop only if it touches that crop's own rectangle. The
+eleven-page re-cut left 173 masters byte-identical, the window unmoved and all
+six crops on re-scanned pages unchanged — measured, reported, and then ignored
+by me when I went on holding one track for the other. **Check the region, not
+the page.**
+
+Third sequencing error of the day, after twice queueing things the owner was
+looking at behind long jobs. The pattern in all three: I batched for the
+build's convenience and the cost landed on him.
