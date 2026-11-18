@@ -227,7 +227,7 @@ on owner input, and they are independent of one another.**
 | # | the build hands over | the owner returns | **what is blocked until it comes back** |
 |---|---|---|---|
 | 1 | the cover source, `<tmp>/title_source_150.png` | `title.png`, retouched by hand | **the PDF** |
-| 2 | the build's cut crops in `<tmp>/crops_v1/` (three files each), `LOOK_AT.txt`, and `<tmp>/sheets600/` to re-cut from | **his GO**, a re-cut, or a ruling | **the HTML — the build STOPS here** |
+| 2 | the build's cut crops in `<tmp>/crops_v1/` (three files each), `LOOK_AT.txt`, and `<tmp>/sheets600/` to re-cut from | **his GO**, a re-cut, or a ruling | **the final HTML.** The build does not stop — it goes on with the PDF and everything else that needs no crop |
 | 3 | the marks census, each mark with a magnified crop | `dirt` / `a previous hand` / `the plate` for each, and a repainted master for the first two | **the PDF** |
 | 4 | every Futureteufelchen candidate, each with the page, our divergence and the question in one sentence | `yes` / `no` for each, one at a time | **the HTML** |
 

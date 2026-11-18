@@ -1324,15 +1324,22 @@ he re-cuts or delivers replaces ours, and ours was never more than a proposal.
 What changed is that his pass starts from ninety-three cut pictures instead of
 ninety-three rows of `WxH+X+Y`.
 
-### IT IS A BLOCKING GATE. THE BUILD STOPS UNTIL HE SAYS GO
+### IT GATES THE HTML, NOT THE BUILD
 
 Owner, 2026-11-17, after the first full round: *"from now on, you do the crop.
 make sure this is a rule from now on, and you present the crops to me as you
 did, as another point where you are blocked on my go."*
 
 So cutting the crops is the build's work and **presenting them is a hand-over
-that blocks**, exactly like `title.png` or the marks census. The build does not
-place, classify or convert a single figure until he has said go. What he gives
+that gates the FINAL HTML**, exactly like `title.png` gates the PDF. Owner, on
+an earlier draft of this section that said the build stops: *"stops there -
+doesnt STOP, but the final html is blocked on it"*.
+
+**Nothing is placed, classified or converted until he has said go — and the
+build carries straight on with everything that does not depend on a crop.**
+r000, *the chain does not stop*: the PDF needs the pages and `title.png` and
+never a crop, so it is built, checked and handed over while the crops wait.
+8702 shipped its PDF this way with the crop review still open. What he gives
 back is a go, a re-cut, or a ruling — and a ruling usually changes the RULE,
 not just that crop, which is how a day of them produced the predicates above.
 
@@ -1346,7 +1353,7 @@ not just that crop, which is how a day of them produced the predicates above.
   file, not the `_1cm_box`. **A crop that merely moved a few px by a measured
   policy does not go on the list** — 49 of those is noise; the list is for
   what he must judge or confirm;
-- `open` the directory, and stop.
+- `open` the directory, say what you are going on with, and go on with it.
 
 **Every open reading gets a line even if it was already raised in a message.**
 A question that exists only in a relayed message is a question he will lose.
