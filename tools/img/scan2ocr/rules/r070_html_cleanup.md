@@ -378,3 +378,25 @@ That pass is in the script now, so the step stages a finished file.
 What remains true, and is r000's law rather than this rule's: while a sibling
 session shares the tree, commit by pathspec. A staged file is swept up by a
 bare `git commit` whoever staged it.
+
+
+## THE SPACED DASH FOLLOWS THE ISSUE'S OWN PRINT — THERE IS NO HOUSE STYLE
+
+Delegated by the owner, 2026-11-18: *"dash, you decide."*
+
+**Ruled: each issue takes the dash its own pages print, measured per issue, and
+the corpus stays inconsistent because the magazine was.**
+
+MEASURED across the published corpus: the monthlies run **4,836 em against 581
+en**; the Sonderhefte run en. That is not drift in our transcription — it is
+two different typesetting practices at Markt & Technik, and flattening them to
+one character would be us editing the magazine's typography.
+
+So `DASH = EM if n_em > n_en else EN`, measured on the issue in hand, stays
+exactly as it is. The same reasoning as *print errors stay as printed* and as
+the plate tilt on 8702's page 148: **a corpus-wide inconsistency that the
+source really had is not a defect in the archive.**
+
+What WOULD be a defect is an issue whose dash disagrees with its own pages, so
+the per-issue measurement is the check and the report line (`dash used`) is how
+it is seen. Do not "harmonise" an issue toward its neighbours.
