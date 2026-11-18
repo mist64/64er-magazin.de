@@ -1793,15 +1793,15 @@ commit** with the articles.
 #             gray 150 dpi grayscale      c     150 dpi colour
 #   origin  page and position of the cut in the 600 dpi master: NNN +X+Y
 #   size    the cut, in 600 dpi pixels (c and gray ship at a quarter of this)
-#   rot     de-skew WE applied to the page before cutting, degrees, + clockwise
-#           a figure printed crooked on the plate keeps its tilt — by design
+#   rot     rotation applied to THIS CUT, degrees, + clockwise; the page was not re-levelled
+#   paint   rectangles painted white inside the cut, WxH+X+Y in the cut's frame; - none
 #
-file        type  origin          size       rot
-8-0.png     c     008 +736+784    1351x1121  +0.00
-10-x1.png   c     010 +1779+1360  1536x1784  +0.00
-22-1.png    dots  023 +253+510    4369x533   +0.00
-148-5.png   c     148 +391+4875   2135x1529  +0.25
-151-1.png   bw    151 +2555+3396  2034x2141  +0.00
+file         type  origin          size       rot    paint
+8-0.png      c     008 +740+787    1347x1118  +0.00  -
+10-x1.png    c     010 +1782+1363  1531x1776  +0.00  -
+22-4.png     bw    025 +277+4236   3232x2398  +0.00  948x282+104+2039
+148-5.png    c     148 +400+4883   2119x1513  -0.38  -
+151-1.png    bw    151 +2559+3399  2030x2138  +0.00  -
 ```
 
 Columns are space-aligned to the widest cell, with a two-space gap. The three
@@ -1810,11 +1810,18 @@ decisions inside it, each of which is a rule and not a layout preference:
 - **`origin` is the page AND the position in the master**, so any crop can be
   re-cut exactly, audited against the plate, or re-derived after a re-level.
   A crop whose origin is not recorded cannot be checked against anything.
-- **`rot` records only the skew WE corrected**, never the figure's own tilt.
-  That is *we publish the plate* in a column: our scan error is fixed, the
-  magazine's crooked paste-up stays crooked. Distinguishing the two is a
-  measurement, not a judgement — see *THE FIGURES ARE AN INDEPENDENT WITNESS
-  OF PAGE SKEW*.
+- **`rot` is the rotation applied to THIS CROP**, degrees, + clockwise — and
+  it is the whole audit trail for straightening, so it is never omitted.
+  **The page is never re-levelled**; only the crop turns. A figure tilted on
+  the PLATE is straightened here (owner, 2026-11-17, on 8702's four page-148
+  pictures), and this column is the only place that says so. Whether a tilt is
+  the plate's or our page's is a measurement — *A FIGURE'S TILT IS NOT THE
+  PAGE'S SKEW* in r005 — and the rotation applied is the figure's ABSOLUTE
+  angle, so the result is square on the website.
+- **`paint` lists every rectangle painted white inside the cut**, `WxH+X+Y` in
+  the cut's own frame, space-separated, `-` when there is none. It is the only
+  record that a figure's pixels were altered, so it is not optional. A caption
+  removed by CROPPING leaves no entry — the size and origin already say it.
 - **`size` is the cut, not what ships.** `c` and `gray` go out at a quarter.
   Two sizes in one table invites reading the wrong one, so the delivered size
   is derivable from `type` and stated in the header rather than given a column.
