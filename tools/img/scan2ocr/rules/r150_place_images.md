@@ -1324,6 +1324,37 @@ he re-cuts or delivers replaces ours, and ours was never more than a proposal.
 What changed is that his pass starts from ninety-three cut pictures instead of
 ninety-three rows of `WxH+X+Y`.
 
+### IT IS A BLOCKING GATE. THE BUILD STOPS UNTIL HE SAYS GO
+
+Owner, 2026-11-17, after the first full round: *"from now on, you do the crop.
+make sure this is a rule from now on, and you present the crops to me as you
+did, as another point where you are blocked on my go."*
+
+So cutting the crops is the build's work and **presenting them is a hand-over
+that blocks**, exactly like `title.png` or the marks census. The build does not
+place, classify or convert a single figure until he has said go. What he gives
+back is a go, a re-cut, or a ruling — and a ruling usually changes the RULE,
+not just that crop, which is how a day of them produced the predicates above.
+
+**The hand-over is:**
+
+- the three files per crop in `<tmp>/crops_v1/`, and nothing else in that
+  folder but `README.txt` and `dims.txt` — **no contact sheets, no downscales**;
+- **`LOOK_AT.txt`**, a short list of FILENAMES, grouped and shortest group
+  first: `NEEDS YOUR DECISION` (each line a question in one sentence), then
+  `CHANGED BY YOUR RULINGS`, then anything a sweep turned up. Name the tight
+  file, not the `_1cm_box`. **A crop that merely moved a few px by a measured
+  policy does not go on the list** — 49 of those is noise; the list is for
+  what he must judge or confirm;
+- `open` the directory, and stop.
+
+**Every open reading gets a line even if it was already raised in a message.**
+A question that exists only in a relayed message is a question he will lose.
+
+**Do not hand over with work still running behind it.** The sweeps, the
+re-cuts and the verification finish first; a list he reads while files are
+still being rewritten is worse than a later one.
+
 ### What the build produces
 
 For **every row of the worklist**, two files in `<tmp>/crops_v1/`:
