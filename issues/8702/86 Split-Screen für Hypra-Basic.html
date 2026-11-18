@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Split-Screen für Hypra-Basic</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M. Grap, M. Horneffer, M. Haverkamp, og">
+    <meta name="64er.issue" content="2/87">
+    <meta name="64er.pages" content="86-87">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Listings zum Abtippen">
+    <meta name="64er.toc_title" content="Neue Hypra-Basic-Module: Split-Screen für Hypra-Basic">
+    <meta name="64er.index_title" content="Split-Screen für Hypra-Basic">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik">
+    <meta name="64er.id" content="hypra-basic">
+</head>
+
+<body>
+    <article>
+        <h1>Split-Screen für Hypra-Basic</h1>
+        <p class="intro">Auch das geht bei Hypra-Basic: Im Raster-Interrupt wird der Bildschirm an beliebiger Stelle zwischen Grafik- und Textbildschirm geteilt. Premiere für das erste Programm, das Befehle des Hypra-Basic enthält: ein Utility zur Bearbeitung der Modul-Daten.</p>
+
+        <p>Diesmal sind es ein paar Leckerbissen, die wir Ihnen für Hypra-Basic präsentieren. In erster Linie ist damit Modul 54 (Listing 1) gemeint, das den Bildschirm in zwei Teile splittet. Zweiter Glanzpunkt ist eine komfortable Fehler-Abfang-Routine (Listing 2). Dazu kommt noch ein Modul, um Variablenfelder neu zu dimensionieren oder bei Bedarf zu löschen (Listing 3). Zu guter Letzt haben wir das Hilfsprogramm »Modul-Schreiber«, das die Bearbeitung der Modul-Daten wesentlich erleichtert (Listing 4). Damit der Modul-Schreiber funktioniert, müssen Sie eine Hypra-Basic-Erweiterung zusammenstellen, die das Modul Nummer 39 (WINP und WOUTP) enthält. Diese ist vor dem Start des Modulschreibers zu starten. Folgende Befehle stehen dann zur Verfügung:</p>
+
+        <p>Q (Quit): Verläßt den Modul-Schreiber.</p>
+
+        <p>S (Schreiben): Schreibt die Daten des Moduls auf Diskette. Eine Sicherheitsabfrage verhindert irrtümliches Überschreiben oder Beschreiben einer falschen Diskette.</p>
+
+        <p>N (Neu): Neues Modul auswählen.</p>
+
+        <p>E (Eingeben): Alle Befehle des Moduls werden neu eingegeben. Korrekte Angaben sind mit &lt;RETURN&gt; zu überspringen. Fehlerhafte Eingaben bemerkt das Programm.</p>
+
+        <p>I (Insert, Einfügen): Beim Auslösen des Menüpunktes »Insert« wird in der linken Spalte ein Eingabefeld geöffnet. Dort können Sie einen Stern »*« in die freie Spalte schreiben. Der einzufügende Befehl wird dann vor dem Stern eingesetzt. Vergessen Sie nicht, die Adressen gegebenenfalls mit &lt;E&gt; zu korrigieren.</p>
+
+        <p>D (Delete, Löschen): Wie bei Insert öffnet sich auf der linken Seite wieder eine Eingabespalte. In die zu löschende Zeile setzen Sie wieder einen Stern. Eine Sicherheitsabfrage besteht nicht, da, wenn kein Stern eingegeben wird, auch nichts gelöscht wird.</p>
+
+        <address class="author">(M. Grap/M. Horneffer/M. Haverkamp/og)</address>
+
+        <aside>
+            <p>Listing 1. Modulnummer: 54</p>
+            <p>1) SPLIT 49152-49416,0<br>Syntax: SPLIT Zeile 1, Zeile 2, Modus</p>
+            <p>Wenn für Modus 0 steht, dann werden HiRes-Zeilen in den Textbildschirm eingeblendet. Wenn für Modus 1 steht, so werden Textzeilen in den HiRes-Bildschirm eingeblendet. Die Parameter Zeile 1 und Zeile 2 müssen zwischen 1 und 25 gewählt werden, jeweils einschließlich. Außerdem muß Zeile 2 größer als Zeile 1 sein.</p>
+            <p>Beispiel: SPLIT 10,14,0</p>
+            <p>In den Textbildschirm werden die Zeilen 10 bis einschließlich 14 aus dem HiRes-Bildschirm eingeblendet.</p>
+            <p>2) NRM 49417-49462,0<br>Syntax: NRM</p>
+            <p>Zurückstellen des Interrupt-Vektors auf $EA31. Außerdem werden HiRes- und Textbildschirm wieder in Bank 0 verlegt.</p>
+            <p>3) MODE 49463-49512,0<br>Syntax: MODE Modus 1, Modus 2<br>Beispiel: MODE 0,1</p>
+            <p>Der Textbildschirm wird im Singlecolour-, der HiRes-Bildschirm im Multicolour-Modus dargestellt. Verallgemeinert heißt das: Ist Modus 1=0, dann wird der Textbildschirm im Singlecolour-Modus dargestellt. Ist Modus 1 0, so wird der Textbildschirm im Multicolour-Modus dargestellt. Genauso verhält es sich mit Modus 2 und dem HiRes-Bildschirm. Nach Verwendung dieses Befehls muß der SPLIT-Befehl benutzt werden, um die Modus-Veränderung auf dem Bildschirm sichtbar zu machen.</p>
+            <p>4) INIT 49513-49580,0<br>Syntax: INIT</p>
+            <p>HiRes- und Textbildschirm werden in Bank 3 verlegt, genauer Textbildschirm nach $C400 und den HiRes-Bildschirm nach $E000.<br>Außerdem wird der Zeichensatz nach $D000 kopiert.</p>
+        </aside>
+
+        <aside>
+            <p>Listing 2. Modulnummer: 55<br>Anzahl der Befehle: 4</p>
+            <p>1) ERRINIT 49152-49196,0<br>Funktion: abfangen von Fehlern in Basic-Programmen.<br>Syntax: ERRINIT: anweisung<br>Parameter: anweisung = Basic-Befehl, der im Fehlerfall ausgeführt wird.</p>
+            <p>Tritt im Programm ein Fehler auf, so wird nach diesem Befehl keine Fehlermeldung mehr ausgegeben, sondern es wird mit der »anweisung« fortgefahren. Die Zeilennummer, in der der Fehler auftrat, wird in »el« übergeben, die Nummer des Fehlers wird in »en« übergeben, Tabelle 1 gibt Auskunft über die Fehlernummern.</p>
+            <p>Beispiel: ERRINIT: GOTO 100<br>Im Fehlerfall wird in Zeile 100 fortgefahren.</p>
+            <p>2) ERROFF 49197-49325,0<br>Funktion: Rückgabe der Fehlerbehandlung an den Basic-Interpreter, Rückgängigmachen von ERRINIT<br>Syntax: ERROFF keine Parameter<br>Besonderheit: Dieser Befehl wird beim Verlassen eines Programmes automatisch ausgeführt. Die Fehlerabfrage ist also sehr absturzsicher (!), ähnlich merkwürdige Erscheinungen wie bei Simons Basic gibt es also nicht.</p>
+            <p>3) ERROUT 49326-49344,0<br>Funktion: Abbruch des Programmes mit Ausgabe der Fehlermeldung<br>Syntax: ERROUT<br>Anwendung:<br>Zum Beispiel bei Fehlerabfragen, wenn der Fehler nicht sinnvoll abgefangen werden kann.</p>
+            <p>4) RESUME 49345-49382,0<br>Funktion: Weiterführen des Programms nach dem letzten Fehler.<br>Syntax: RESUME<br>Beispiel: ERRINIT:RESUME</p>
+            <p>Mit dieser Zeile wird erreicht, daß alle Fehler ignoriert werden. Tritt ein Fehler auf, so wird einfach mit dem nächsten Befehl fortgefahren.</p>
+        </aside>
+
+        <aside>
+            <p>Listing 3. Modulnummer: 56<br>Anzahl der Befehle: 2</p>
+            <p>1) RED 49152-49153,1<br>Funktion: Redimensioniert eine bereits vorhandene Feldvariable neu unter Beibehaltung aller Daten, es sei denn, das neue Feld ist kleiner als das alte. Wenn eine unbekannte Feldvariable redimensioniert werden soll, so wird ein normaler DIM-Befehl ausgeführt.<br>Syntax: RED feldname1 (dim 1,...,dim n), feldname2 (...), ...<br>Parameter:</p>
+            <p>feldname:<br>Name des Feldes, das redimensioniert werden soll. Es können mehrere Felder mit einem Befehl bearbeitet werden, wie man es vom DIM-Befehl kennt.</p>
+            <p>dim 1:<br>Die Größe der Dimensionen im neuen Feld ist unabhängig vom alten. Die einzelne Dimension kann größer sein als vorher, aber auch kleiner, dann gehen die Daten, die dann keine erlaubten Indexes mehr haben, verloren.</p>
+            <p>dim n:<br>Die Anzahl der Dimensionen muß größer oder gleich der alten Anzahl der Dimensionen sein, aber höchstens 10.<br>Parameter ansonsten wie beim DIM-Befehl</p>
+            <p>2) KILLARRAY 49155-49513,42<br>Funktion: Löscht die angegebene Feldvariable.<br>Syntax: KILLARRAY feldname(dim 1,...dim n), feldname2....<br>Parameter:<br>feldname: siehe RED<br>dim 1,dim n:</p>
+            <p>Die Angabe der Dimensionen dient nur der Syntax. Es kommt nur auf den Feldnamen an; die Anzahl der angegebenen Dimensionen braucht nicht mit der tatsächlichen übereinstimmen. Es reicht also aus, wenn man immer nur eine angibt.<br>Beispiel:<br>Ein Feld wurde mit DIM A(10,10,10) dimensioniert. Um es zu löschen, braucht man nur KILLARRAY A(0) einzugeben.</p>
+        </aside>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>en</th>
+                    <th>:Fehlermeldung</th>
+                </tr>
+                <tr>
+                    <td class="right">1</td>
+                    <td>:too many files</td>
+                </tr>
+                <tr>
+                    <td class="right">2</td>
+                    <td>:file open</td>
+                </tr>
+                <tr>
+                    <td class="right">3</td>
+                    <td>:file not open</td>
+                </tr>
+                <tr>
+                    <td class="right">4</td>
+                    <td>:file not found</td>
+                </tr>
+                <tr>
+                    <td class="right">5</td>
+                    <td>:device not present</td>
+                </tr>
+                <tr>
+                    <td class="right">6</td>
+                    <td>:not input file</td>
+                </tr>
+                <tr>
+                    <td class="right">7</td>
+                    <td>:not output file</td>
+                </tr>
+                <tr>
+                    <td class="right">8</td>
+                    <td>:missing file name</td>
+                </tr>
+                <tr>
+                    <td class="right">9</td>
+                    <td>:illegal device number</td>
+                </tr>
+                <tr>
+                    <td class="right">10</td>
+                    <td>:next without for</td>
+                </tr>
+                <tr>
+                    <td class="right">11</td>
+                    <td>:syntax</td>
+                </tr>
+                <tr>
+                    <td class="right">12</td>
+                    <td>:return without gosub</td>
+                </tr>
+                <tr>
+                    <td class="right">13</td>
+                    <td>:out of data</td>
+                </tr>
+                <tr>
+                    <td class="right">14</td>
+                    <td>:illegal quantity</td>
+                </tr>
+                <tr>
+                    <td class="right">15</td>
+                    <td>:overflow</td>
+                </tr>
+                <tr>
+                    <td class="right">16</td>
+                    <td>:out of memory</td>
+                </tr>
+                <tr>
+                    <td class="right">17</td>
+                    <td>:undef'd statement</td>
+                </tr>
+                <tr>
+                    <td class="right">18</td>
+                    <td>:bad subscript</td>
+                </tr>
+                <tr>
+                    <td class="right">19</td>
+                    <td>:redim'd array</td>
+                </tr>
+                <tr>
+                    <td class="right">20</td>
+                    <td>:devision by zero</td>
+                </tr>
+                <tr>
+                    <td class="right">21</td>
+                    <td>:illegal direct</td>
+                </tr>
+                <tr>
+                    <td class="right">22</td>
+                    <td>:type mismatch</td>
+                </tr>
+                <tr>
+                    <td class="right">23</td>
+                    <td>:string too long</td>
+                </tr>
+                <tr>
+                    <td class="right">24</td>
+                    <td>:file data</td>
+                </tr>
+                <tr>
+                    <td class="right">25</td>
+                    <td>:formula too complex</td>
+                </tr>
+                <tr>
+                    <td class="right">26</td>
+                    <td>:can't continue</td>
+                </tr>
+                <tr>
+                    <td class="right">27</td>
+                    <td>:undef'd function</td>
+                </tr>
+                <tr>
+                    <td class="right">28</td>
+                    <td>:verify</td>
+                </tr>
+                <tr>
+                    <td class="right">29</td>
+                    <td>:load</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Fehlermeldungen für Modul 55 und deren Error-Codes</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="54erw .ass.prg" data-name="Split-Screen-Modul" data-mse=mse1></pre>
+            <figcaption>Listing 1. Das Split-Screen-Modul</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="54erw .ass.prg" data-name="Split-Screen-Modul"></div>
+        <div class="binary_download" data-filename="54modul.prg" data-name="Modul 54"></div>
+
+        <figure>
+            <pre data-filename="55erw .ass.prg" data-name="Fehler-Abfang-Routine" data-mse=mse1></pre>
+            <figcaption>Listing 2. Komfortables Abfangen von Fehlermeldungen in Basic-Programmen. Die Error-Codes entnehmen Sie bitte der Tabelle 1.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="55erw .ass.prg" data-name="Fehler-Abfang-Routine"></div>
+        <div class="binary_download" data-filename="55modul.prg" data-name="Modul 55"></div>
+
+        <figure>
+            <pre data-filename="56erw .ass.prg" data-name="Arrays redimensionieren" data-mse=mse1></pre>
+            <figcaption>Listing 3. Neues Dimensionieren oder Löschen von Arrays</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="56erw .ass.prg" data-name="Arrays redimensionieren"></div>
+        <div class="binary_download" data-filename="56modul.prg" data-name="Modul 56"></div>
+
+        <figure>
+            <pre data-filename="modul-schreiber" data-name="Modul-Schreiber" data-checksummer="3"></pre>
+            <figcaption>Listing 4. Der »Modul-Schreiber« erleichtert die Arbeit mit den Modul-Daten enorm. Zum Eingeben benutzen Sie bitte den Checksummer. Zum Betrieb benötigen Sie Modul 39 (Ausgabe 9/86).</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

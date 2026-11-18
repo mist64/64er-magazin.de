@@ -1,0 +1,56 @@
+
+
+;datamaker 128.prg ==1c01==
+;version=70
+   10 color4,6:color5,16:scnclr:ez$="0123456789abcdef$"
+   12 gosub99:printchr$(142)"{rvon}{CTRL-K}       d a t a m a k e r   1 2 8        "
+   14 gosub99:print"{rvon}  1986 by jochen bosmann  ":gosub99
+   16 print"{down} startadresse : ";:q1=5:gosub74
+   18 ifleft$(y2$,1)="$"thensa=dec(mid$(y2$,2)):elsesa=val(y2$)
+   20 print"{down} endadresse   : ";:gosub74:print
+   22 ifleft$(y2$,1)="$"thenea=dec(mid$(y2$,2)):elseea=val(y2$)
+   24 ifea<saorea>65535orsa>65535thenbegin
+   26 print"{down} {rvon}{CTRL-G}fehler in den bereichsgrenzen!":sleep3:run:bend
+   28 print" banknr.(0-15): ";:q1=2:ez$=left$(ez$,10):gosub74:ba=val(y2$):print
+   30 ifba>15thenprint"{down} {rvon}{CTRL-G}fehler bei banknummer!":gosub98:goto28
+   32 print" anfangszeile : ";:q1=5:gosub74:zn=val(y2$):print
+   34 ifzn<100orzn>63000thenbegin
+   36 print"{down} {rvon}{CTRL-G}zeilennummern nur von 100-63000!":gosub98:goto32:bend
+   38 print" schrittweite : ";:q1=4:gosub74:sw=val(y2$)
+   40 ifsw<1thenprint"{down}{down} {rvon}{CTRL-G}schrittweite muss mindestens 1 sein!":gosub98:goto38
+   42 if(ea-sa)/8*sw+zn>63000thenbegin
+   44 print"{down}{down}{CTRL-G} {rvon}zeilennr. werden groesser als 63000!":gosub98:goto38:bend
+   45 rem {rvon}dataloader erzeugen
+   46 bankba:scnclr:printzn"bank"mid$(str$(ba),2)":fori="mid$(str$(sa),2)"to";
+   48 printmid$(str$(ea),2)"step8:ck=0":zn=zn+sw
+   50 printzn"forj=itoi+7:readda$:pokej,dec(da$):ck=ck+dec(da$):next":zn=zn+sw
+   52 printzn"readch:ifch<>ckthenprint"chr$(34)"error in zeile";
+   54 printchr$(34)"peek(65)+256*peek(66):stop":zn=zn+sw
+   56 printzn"next:print"chr$(34)"ok!"chr$(34)":end":zn=zn+sw:printzn":"
+   58 print"zn="zn "sw="sw "ea="ea "sa="sa:goto62
+   60 poke842,19:fori=1to6:poke842+i,13:next:poke208,7:end
+   61 rem {rvon}datazeilen erzeugen
+   62 zn=zn+sw:scnclr:printzn"data ";:ch=0
+   64 fori=satosa+7:printright$(hex$(peek(i)),2)",";:ch=ch+peek(i):next
+   66 printright$("   "+str$(ch),5):print"zn="zn"{left}:sw="sw"{left}:sa="sa"{left}:ea="ea"{left}:gO70
+   68 poke842,19:poke843,13:poke844,13:poke208,4:end
+   70 sa=sa+8:ifsa<=eathen62
+   71 rem {rvon}datamaker loeschen
+   72 scnclr:print"delete-99":poke842,19:poke843,13:poke208,2:end
+   73 rem {rvon}inputroutine
+   74 bank15:q9=peek(2598):poke2598,0:q4=0:y2$="":poke2599,0:do
+   76 getkeyy1$:ify1$=chr$(13)thenexit
+   78 ify1$=chr$(20)goto92
+   80 ifq4=q1thenprintchr$(7);:goto76
+   82 q5=instr(ez$,y1$):ifq5=0thenprintchr$(7);:goto76
+   84 poke2600,2:dowhilepeek(2598):loop
+   86 printy1$;:y2$=y2$+y1$:q4=q4+1:loop
+   88 poke2600,2:dowhilepeek(2598):loop
+   90 poke2599,1:poke2598,q9:print:return
+   92 ifq4=0thenprintchr$(7);:goto76
+   94 poke2600,2:dowhilepeek(2598):loop
+   96 printchr$(20);:q4=q4-1:y2$=left$(y2$,q4):goto76
+   97 rem {rvon}unterprogramme
+   98 sleep3:print"{up}{up}{up}{up}"chr$(27)"@";:return
+   99 print"{rvon}                                        ":return
+

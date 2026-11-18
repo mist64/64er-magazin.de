@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 128</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="dm, Alexander Hoernigk, Ralf Friedrich, Jochen Bosmann">
+    <meta name="64er.issue" content="2/87">
+    <meta name="64er.pages" content="72,74-75">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 128">
+    <meta name="64er.toc_category" content="Tips & Tricks">
+    <meta name="64er.toc_title" content="Tips &amp; Tricks zum C 128: C 64-Modus beschleunigt / Automatische Feststellung des Diskettenspeicherplatzes / Bilder zwischen VIC und VDC transferieren / VDC als RAM-Floppy / Datamaker für den C 128-Modus">
+    <meta name="64er.index_title" content="Akzelerator 128">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.index_title" content="Automatische Feststellung des Diskettenspeicherplatzes">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.index_title" content="Bilder zwischen dem VIC und VDC transferieren">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.index_title" content="VDC als RAM-Floppy">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.index_title" content="VDC-Hardcopy">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.index_title" content="Datamaker für den C 128-Modus">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 128">
+    <meta name="64er.id" content="tips_c128">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 128</h1>
+        <p class="intro">Wußten Sie schon, daß bei 2 MHz im C 64-Modus der Bildschirm trotzdem sichtbar bleiben kann? Neben einem Programm, das dies ermöglicht, finden Sie noch weitere, die Video-Chips betreffende Tricks.</p>
+
+        <p>Wohl fast jeder C 128-Besitzer kennt die Befehle FAST und SLOW zur Umschaltung der Taktfrequenz (POKE 53296,1 beziehungsweise POKE 53296,0 im C 64-Modus). Nachteil des FAST-Modus: Der VIC macht nicht mehr mit und schaltet sich ab beziehungsweise veranstaltet nach dem POKE im C 64-Modus ein wüstes Geflimmer. Wie man jedoch nach POKE 53296,1 im C 64-Modus sehen kann, wird der Bildschirmrahmen auch bei 2 MHz normal dargestellt. Der VIC verbringt fast 50 Prozent seiner Zeit mit diesem Leerlauf. Während eines Bildzyklus baut er nämlich 380 Zeilen auf, von denen jedoch nur 200 mit Bildinformationen gefüllt sind und die er bei 2 MHz Taktfrequenz nicht mehr korrekt erhält. Es liegt also nahe, ihm beim Erreichen der ersten »1 MHz-relevanten« Bildschirmzeile den einwandfreien Zugriff auf »seine« Daten zu ermöglichen, also auf 1 MHz zu schalten, und beim Erreichen der letzten Zeile wieder auf 2 MHz umzuschalten. Genau dies tut das Programm »Akzelerator 128« (Listing 1).</p>
+
+        <p>Der so erzielte Zeitgewinn bei der Abarbeitung von Programmen liegt bei etwa 25 Prozent. Anwendungsmöglichkeiten sind neben zeitkritischen Programmen aller Art insbesondere solche, die in der Zeit zwischen dem Aufbau von Bildern zeitkritische Aufgaben durchführen (zum Beispiel Softscrolling in Farbe, Zeichentrickeffekte und andere).</p>
+
+        <h3>Programmbeschreibung</h3>
+
+        <p>Das Programm befindet sich im Kassettenpuffer und bindet sich nach SYS 828 in die IRQ-Routine ein. Bedingt durch die höhere IRQ-Rate (100 Hz) wird die Softwareuhr TI$ unbrauchbar. Vor dem Ansprechen von Peripheriegeräten sollte der Akzelerator mit SYS 870 ausgeschaltet werden.</p>
+
+        <p>Starten des Programms:</p>
+
+        <ol>
+            <li>GO 64</li>
+            <li>LOAD"AKZELERATOR.DTA",8</li>
+            <li>RUN (es erscheint eine Kurzanleitung)</li>
+            <li>SYS 828</li>
+        </ol>
+
+        <p>Einstell-/Modifikationsmöglichkeiten des Programms:</p>
+
+        <p>Speicherstelle 920: enthält das Low-Byte der Zieladresse nach einem der Umschaltvorgänge. Normalerweise steht in 920/921 die IRQ-Aussprungadresse des Betriebssystems. Durch POKE 920,49 werden Cursor- und Repeat-Geschwindigkeit verdoppelt (zurücksetzen mit POKE 920,126).</p>
+
+        <p>Speicherstelle 923: Nummer der Bildschirmzeile, bei der auf 2 MHz geschaltet wird (Startwert 250). Durch POKE 923, (WERT) kann die Startzeile herauf- und wieder herabgeschoben werden. Das Heraufsetzen bedeutet einen Geschwindigkeitsgewinn, unterhalb der Zeile erscheint das 2-MHz-Geflimmer.</p>
+
+        <p>Speicherstelle 915: Nummer der Bildschirmzeile, bei der auf 1 MHz geschaltet wird (Startwert 50). Durch POKE 915, (WERT) kann die Startzeile für 1 MHz herab- und wieder hinaufgeschoben werden. Das Herabsetzen bedeutet einen Geschwindigkeitsgewinn, oberhalb der Zeile erscheint das 2-MHz-Geflimmer.</p>
+
+        <address class="author">(Alexander Hoernigk/dm)</address>
+
+        <figure>
+            <pre data-filename="akzelerator.dta" data-name="Akzelerator 128"></pre>
+            <figcaption>Listing 1. »Akzelerator 128« beschleunigt den C 64-Modus</figcaption>
+        </figure>
+
+        <h2>Automatische Feststellung des Diskettenspeicherplatzes</h2>
+
+        <p>Ziemlich ärgerlich: Da schreibt man seitenweise Text und will ihn auf Diskette speichern. Plötzlich: Disk Full Error! Also leere Diskette nehmen, noch mal speichern und die belegten Blocks auf der ersten Diskette mit VALIDATE wieder freimachen. Insgesamt eine ziemlich umständliche Prozedur.</p>
+
+        <p>Baut man in ein selbstgeschriebenes Programm die Routine »DSPACE« (Listing 2) ein, so kann vor dem Speichern festgestellt werden, ob</p>
+
+        <p>— die Floppy-Station angeschlossen ist</p>
+
+        <p>— eine Diskette eingelegt ist</p>
+
+        <p>— auf der Diskette genug Platz ist (Voraussetzung ist natürlich, daß dem Programm vorher mitgeteilt wurde, wieviel Platz die zu speichernden Daten benötigen.)</p>
+
+        <p>Funktionsweise: Die Routine lädt ein »leeres« Directory an eine bestimmte Speicherstelle. Es enthält nur den Disknamen, die ID und die Anzahl der freien Blocks. Vorher wird aber die Speicherstelle, an der das High-Byte der »Blocks free« im Speicher steht, mit einem unsinnigen Wert belegt (wozu das gut ist, wird gleich klar). Nach dem Laden des »Short Directory« fragt die Routine die Speicherstellen, an denen die Anzahl der freien Blöcke steht, ab und übergibt den Wert an das Hauptprogramm.</p>
+
+        <p>Kann aus irgendeinem Grund (Floppy-Fehler, Device not present) das Directory nicht geladen werden, so steht an der »Blocks free«-Speicherstelle noch der vorher hineingeschriebene unsinnige Wert.</p>
+
+        <p>Die Routine ist in Assembler geschrieben und wird über die USR-Funktion aufgerufen: Variable=USR(0).</p>
+
+        <p>Starten des Programms:</p>
+
+        <ol>
+            <li>LOAD"DSPACE.DAT",8</li>
+            <li>RUN (es erscheint eine Kurzanleitung)</li>
+            <li>SYS 828</li>
+        </ol>
+
+        <p>Die Routine ist lauffähig im C 64-Modus des C 128 und auf dem C 64. Unter Berücksichtigung der in bezug auf den USR-Befehl anders belegten Zeropage kann sie einfach auf den VC 20, C 16 und C 128 umgeschrieben werden.</p>
+
+        <address class="author">(Alexander Hoernigk/dm)</address>
+
+        <figure>
+            <pre data-filename="dspace.data" data-name="DSPACE"></pre>
+            <figcaption>Listing 2. Eine Routine, die den freien Platz auf der Diskette prüft und anzeigt</figcaption>
+        </figure>
+
+        <h2>Bilder zwischen VIC und VDC transferieren</h2>
+
+        <p>Im C 128 sind zwei Video-Chips eingesetzt. Zum einen der schon vom C 64 her bekannte VIC, der auch von den Grafikbefehlen des Basic 7.0 unterstützt wird, und der VDC. Dieser Chip unterstützt die Ausgabe von 80 Zeichen pro Zeile und verfügt über 16 KByte RAM-Speicher. Leider unterstützt der C 128-Modus nicht den Bitmap-Modus dieses Bausteins. Abhilfe schafft das Programm »Swap« (Listing 3). Mit Hilfe dieses Programms können Sie Ihre Grafiken auf dem 40-Zeichen-Bildschirm entwickeln und an den VDC senden.</p>
+
+        <p>Eine weitere Anwendungsmöglichkeit wäre es, Bilder des VIC im RAM des VDC zu speichern und bei Bedarf wieder ins RAM zu laden.</p>
+
+        <p>Der Vorteil liegt darin, daß der VDC-Speicher außerhalb des C 128-Speichers liegt und damit bis zu zwei HiRes-Bilder abgelegt werden können, ohne den Speicher des C 128 einzuschränken.</p>
+
+        <p>Das Programm ist mit BLOAD"SWAP" zu laden. Anschließend erfolgt der Aufruf der Routine durch folgenden Befehl:</p>
+
+        <pre><code>BANK 15:SYS 4864,BILD,MODUS
+</code></pre>
+
+        <p>Dabei bedeuten die Parameter folgendes:</p>
+
+        <table class="plain">
+            <tr>
+                <td>BILD:</td>
+                <td>0</td>
+                <td>=</td>
+                <td>1. Teilbild</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>1</td>
+                <td>=</td>
+                <td>2. Teilbild</td>
+            </tr>
+            <tr>
+                <td>MODUS:</td>
+                <td>1</td>
+                <td>=</td>
+                <td>Bild in VIC holen</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>2</td>
+                <td>=</td>
+                <td>Bild in VDC speichern</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>3</td>
+                <td>=</td>
+                <td>VIC- mit VDC-Bild tauschen</td>
+            </tr>
+        </table>
+
+        <p>Ein anderes Programm ist die Routine »VDC-Tool« (Listing 4). Diese Routine ermöglicht es, ein auf dem VIC erstelltes HiRes-Bild für den VDC umzustellen. Die Umstellung wird erreicht, indem jedes Bit in der Horizontalen verdoppelt wird. Der Aufruf erfolgt durch: BANK 15:SYS 5900</p>
+
+        <address class="author">(Ralf Friedrich/dm)</address>
+
+        <figure>
+            <pre data-filename="swap.prg" data-name="Swap" data-mse=mse1></pre>
+            <figcaption>Listing 3. »Swap« tauscht Daten zwischen dem VIC und dem VDC aus (bitte mit dem MSE im C 64-Modus eingeben)</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="swap.prg" data-name="Swap"></div>
+
+        <figure>
+            <pre data-filename="vdc-tool.prg" data-name="VDC-Tool" data-mse=mse1></pre>
+            <figcaption>Listing 4. »VDC-Tool« bereitet VIC-Bilder für den VDC auf (bitte mit dem MSE im C 64-Modus eingeben)</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="vdc-tool.prg" data-name="VDC-Tool"></div>
+
+        <h2>VDC als RAM-Floppy</h2>
+
+        <p>Das Programm »RAM-Floppy« (Listing 5) nutzt eine Besonderheit des C 128 aus, den 16-KByte-Speicher des VDC-Chips. Dieser Chip verwaltet die 80-Zeichen-Darstellung. Wird dieser Modus nicht benutzt, so liegen seine 16 KByte Speicher brach und werden nicht genutzt. Das ändert sich durch dieses Programm.</p>
+
+        <p>Mit der Routine können Sie bis zu 16 KByte lange Speicherbereiche in den VDC-Chip übertragen und wieder zurückholen.</p>
+
+        <p>Der Aufruf der Routine erfolgt mit</p>
+
+        <pre><code>BANK 15:SYS 4864,MODUS,,,,ANF1,ANF2,LEN
+</code></pre>
+
+        <p>Dabei bedeuten die Parameter:</p>
+
+        <p>MODUS: 0 = SAVE; 1 = LOAD<br>
+            ANF1: Anfangsadresse im VDC-Speicher (0 bis 16383)<br>
+            ANF2: Anfangsadresse im C 128-RAM (0 bis 65535)<br>
+            LEN: Länge des zu übertragenden Bereiches (0 bis 16383)</p>
+
+        <address class="author">(Ralf Friedrich/dm)</address>
+
+        <figure>
+            <pre data-filename="ram-floppy.prg" data-name="RAM-Floppy" data-mse=mse1></pre>
+            <figcaption>Listing 5. Dieses Programm kann das RAM des VDC als RAM-Floppy nutzen (bitte mit dem MSE im C 64-Modus eingeben)</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="ram-floppy.prg" data-name="RAM-Floppy"></div>
+
+        <h2>VDC-Hardcopy</h2>
+
+        <p>Die kleine Routine »HC 128« (Listing 6) dient dazu, den Inhalt des VDC-Speichers auf einem Epson- oder dazu kompatiblen Drucker auszugeben. Das gewählte Format entspricht dabei etwa dem Bildschirmformat. Die Routine läßt sich mit BANK 15:SYS 5700,MODUS aktivieren. Dabei bedeutet MODUS=0 normal und MODUS =255 invers drucken.</p>
+
+        <address class="author">(Ralf Friedrich/dm)</address>
+
+        <figure>
+            <pre data-filename="hc 128.prg" data-name="HC 128" data-mse=mse1></pre>
+            <figcaption>Listing 6. Hardcopyroutine für den VDC (bitte mit dem MSE im C 64-Modus eingeben)</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="hc 128.prg" data-name="HC 128"></div>
+
+        <h2>DATAMAKER für den C 128-Modus</h2>
+
+        <p>Nichts ist so gut, daß es nicht noch verbessert werden könnte. Gemeint ist der DATAMAKER aus Sonderheft 7/86. So war es zum Beispiel möglich, als Zeilennummer 70000 oder als Speicherbereich 123456 einzugeben. Diese Verbesserung (Listing 7) prüft auf Fehleingaben und fängt sie ab. Durch eine INPUT-Routine, BANK-Auswahl und eine Prüfsummenroutine im späteren DATA-Lader wird es selbst Anfängern leichtgemacht, mit diesem Programm zu arbeiten.</p>
+
+        <p>Nach dem Laden und Starten erwartet das Programm die Eingabe der Start- und der Endadresse. Sie kann dezimal oder hexadezimal (mit $) erfolgen. Falsche Eingaben werden erkannt. Ausnahme: Eine hexadezimale Zahl wird ohne vorangestelltes »$« eingegeben.</p>
+
+        <p>Danach verlangt das Programm die BANK-Nummer. Auch hier erkennt das Programm Fehleingaben. Es folgt die Eingabe der ersten Zeilennummer und der Schrittweite. Die Zeilennummer muß größer als 99 sein, da sonst der DATAMAKER überschrieben wird. Fehleingaben sind aber ausgeschlossen, da das Programm auf korrekte Werte überprüft. Der DATAMAKER darf auch nicht RENUMBERt werden, da einige GOTO-Anweisungen in PRINT-Befehlen stehen.</p>
+
+        <p>Nach Eingabe aller Daten beginnt der DATAMAKER mit der Arbeit. Man sollte ihn nicht unterbrechen. Das Erzeugen der DATA-Zeilen dauert ein Weilchen.</p>
+
+        <address class="author">(Jochen Bosmann/dm)</address>
+
+        <figure>
+            <pre data-filename="datamaker 128" data-name="DATAMAKER 128"></pre>
+            <figcaption>Listing 7. Ein »DATAMAKER« für den C 128</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

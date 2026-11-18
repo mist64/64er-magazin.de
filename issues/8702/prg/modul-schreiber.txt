@@ -1,0 +1,73 @@
+
+
+;modul-schreiber.prg ==0801==
+  100 rem ** hb-modul-schreiber **
+  110 dim an$(16),as$(16),ae$(16),ad$(16):cr$=chr$(13)
+  120 input"{clr}{swlc}Modulnummer";mo
+  130 print"{down}Eingabe, Schreiben, Neu, Inst, Del, Quit
+  140 gosub 240:gosub300
+  150 gett$:ift$=""then150
+  160 ift$="q"thenprint"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":end
+  170 ift$="s"thengosub340:goto150
+  180 ift$="n"thenrun
+  190 ift$="e"thengosub600
+  200 ift$="i"thengosub430
+  210 ift$="d"thengosub690
+  220 goto150
+  230 end
+  240 na$=mid$(str$(mo),2,4)+"modul"
+  250 open15,8,15:open 1,8,3,na$+",s,r"
+  260 input#1,ab$:ab=val(ab$)
+  270 input#15,fe,un$,un$,un$:iffethenprint"{home}"tab(21)"Leer":close15:return
+  280 for k=1 to ab
+  290 input#1,an$(k),as$(k),ae$(k),ad$(k):next:close1:close15:return
+  300 print"{home}{down}{down}{down}{down}{rvon}Name               von     bis  Daten"
+  310 ifab=0thenprint"                                    ":return
+  320 fork=1toab
+  330 printan$(k)tab(18)as$(k)tab(26)ae$(k)tab(34)ad$(k):next:return
+  340 print"{home}"tab(21)"Schreiben?"
+  350 gett$:ift$="n"then420
+  360 ift$<>"j"then350
+  370 print"{home}"tab(21)"Diskette einlegen":poke198,0:wait198,1:poke198,0
+  380 open15,8,15:print#15,"s:"+na$:close15:open 1,8,3,na$+",s,w"
+  390 print#1,str$(ab)
+  400 for k=1 to ab
+  410 print#1,an$(k)cr$as$(k)cr$ae$(k)cr$ad$(k):next:close1
+  420 print"{home}"tab(21)"                 ":return
+  430 print"{home}"tab(21)"Einfuegen":ifab=0thenab=1:i=1:goto540
+  440 :ifab=16then590
+  450 winp 0,5,0,ab+5,"","*";i$
+  460 fori=1tolen(i$)
+  470 if mid$(i$,i,1)="*"then490
+  480 next:gosub300:return
+  490 ab=ab+1:fork=abtoistep-1
+  500 an$(k)=an$(k-1):as$(k)=as$(k-1):ae$(k)=ae$(k-1):ad$(k)=ad$(k-1):next
+  510 an$(i)="":as$(i)="":ae$(i)="":ad$(i)="":next
+  520 print"{home}{down}{down}{down}{down}":forj=1toab:print"                                      ":next
+  530 gosub300:i=i-1
+  540 winp 0,i+4,15,i+4,"","{f3}";i$:an$(i)=i$
+  550 winp 18,i+4,22,i+4,"","{f1}";i$:as$(i)=i$
+  560 winp 26,i+4,30,i+4,"","{f1}";i$:ae$(i)=i$
+  570 ifval(as$(i))>=val(ae$(i))then550
+  580 winp 34,i+4,36,i+4,"","{f1}";i$:ad$(i)=i$
+  590 print"{home}"tab(21)"         ":return
+  600 ifab=0thenreturn
+  610 fori=1toab:k=i+4
+  620 winp 0,k,15,k,an$(i),"{f3}";i$:an$(i)=i$
+  630 winp 18,k,22,k,as$(i),"{f1}";i$:as$(i)=i$
+  640 winp 26,k,30,k,ae$(i),"{f1}";i$:ae$(i)=i$
+  650 ifval(as$(i))>=val(ae$(i))then630
+  660 winp 34,k,36,k,ad$(i),"{f1}";i$:ad$(i)=i$
+  670 next
+  680 return
+  690 print"{home}"tab(21)"Loeschen":ifab=0then780
+  700 winp 0,5,0,ab+4,"","*";i$
+  710 fori=1tolen(i$)
+  720 if mid$(i$,i,1)="*"then740
+  730 next:gosub300:return
+  740 ab=ab-1:fork=itoab
+  750 an$(k)=an$(k+1):as$(k)=as$(k+1):ae$(k)=ae$(k+1):ad$(k)=ad$(k+1):next
+  760 print"{home}{down}{down}{down}{down}":forj=1toab+1:print"                                      "
+  770 next:gosub300
+  780 print"{home}"tab(21)"        ":return
+

@@ -1,0 +1,188 @@
+r325 read_for_sense -- issue 8702, reader G3
+Articles: 136 Von Basic zu Assembler (Teil 11); 14 Leserforum; 79 Tips & Tricks für Profis;
+72 Tips & Tricks zum C 128; 76 Tips & Tricks zum C 16 und Plus/4; 49 Fragen & Antworten zum C 16 und Plus/4;
+39 Abenteuer leicht gemacht; 176 Wir suchen die Anwendung des Monats.
+Crop dir: /private/tmp/claude-501/-Users-mist-Documents-git-64er-magazin-de/2af49e3b-1669-4458-88f2-c5327e63f4cf/scratchpad/r325/G3/
+(each vNN_*.png is one image read = several sub-crops stacked; locator = tesseract TSV of masters600, locator only)
+
+== READINGS (written immediately after each image) ==
+v01_p136_col1 (p136 col 1): prints "(ab $6010). Das Maschinenpro-" -> closing paren present, ours lost it.
+  prints "Adresse $8C03. Ihre Funktions-" (as ours). prints "USR(n), wobei / n ein beliebiges Argument sein" -> ours "nein" is lost space.
+  prints "Adresse $B248, wo die Ausgabe der Fehlermeldung »SYNTAX ERROR« ausgegeben" (as ours).
+
+v02_p138_sites (p138): "0.1, 0.2, 0.4, 0.8, / 0.16, 0.32, 0.64, 0.128" printed with full stops (as ours, keep).
+  "Reihenfolge MSB,LSB abgelegt" -> comma between MSB and LSB, ours lost it.
+  "TXA ;und ins X-Regi-" -> print says TXA (magazine error, should be TAX).
+  "Register fassen nur Zahlen von 0 / bis 255" -> digit zero (narrow, oval like the 0 in 255 line), ours has letter O.
+  "DEX/INDEX+1 die dafür ge-" -> closed, no space before +.
+  "Ende der Tabelle. Manchmal" -> full stop present, ours lost it.
+  "2) RTS vermindert dann den Stapelzeiger um 2" printed (magazine error: RTS increments S by 2).
+v03_p138_code_c2 (p138, the two page-wide INDEX/ZERO blocks): text as ours word for word ("2-Byte-/Werte)", "ZERO+1",
+  "(ZERO),Y;in", ";jetzt"). LAYOUT differs from ours: symbolic operands sit two cells after the mnemonic
+  ("LDA  INDEX", "BCC  KLEIN", "INC  ZERO+1", "STA  ..." in block 2) while "(ZERO),Y" and block-1 "..." sit one cell after.
+  Arithmetic (tesseract boxes, locator only): pitch 36.7 px from "(ZERO)"@1717 to ",Y;in"@1937 (6 cells); LDA@1566;
+  INDEX/KLEIN/ZERO+1 @1750-1751 = col 5.0; "("@1717, "..."@1713 = col 4. Block 1 ";" @2001-2019 = col 12 (as ours).
+  Block 2 ";" @2073-2092 = col 14, ";MSB"@2050 = col 13 (after INDEX+1). Continuations "Werte)" "eintrat" "erhöhen"
+  "der Tabelle" "geladen" @2049-2051 = col 13 = running comment-text column -> join (r325: no column-wrap). Block 2
+  "Werte)"@2122 = col 15 = running column -> join. ";und wir haben das LSB eines Elementes" @2017 is its own comment line (kept).
+  p138 c1 and c4 narrow blocks (no image, arithmetic only): c1 pitch 37 (LDA@392, TAB,X@540), ";"@772 = col 10 (as ours);
+  continuations @766-774 = ";" column -> join. c4 pitch 37 (LDA@3759, INDEX@3907), ";"@4122-4143 = col 10 (as ours);
+  continuations @4135-4142 -> join. "JMP (ZWSP) ;das" ";"@4147 = col 11 (as ours), continuations @4146-4147 -> join.
+v04_p136_code (p136 col 4): "LDA #$02 ;Basis in den Akku / laden, also 2", "ASL ;mal 2" x4 (as ours).
+  "LDX #$05  ;Das ist die / Hochzahl", "LDA TAB,X  ;und schon ist / 32 im Akku!" -> visibly TWO cells before ";".
+  Arithmetic: pitch 37 (LDA@3728 -> TAB,X@3876 = 4 cells); ";"@4145/4146 = col 11.3 -> col 11; ours col 10. ASL ";"@4101 =
+  col 10 (as ours); LDA #$02 ";"@4077 sits 24 px left of the ASL ";" (less than a cell, across a wide "#") -> undecidable, kept.
+  Continuations "laden,"@4131 (col 11) and "Hochzahl"@4174 (col 12) = comment-text column -> join.
+  "TAB 1,2,4,8,..." : crop cut at the baseline, comma tails not visible -> NOT SEEN; kept as ours (tesseract also reads commas).
+v05_p140_tab1 (p140 Tabelle 1, 24 rows + caption): every cell as ours (AEA8 ... E376, values, "Konstanten für die
+  Entwicklung von SIN,COS,...", "ln 2", "1/ln2"). No change.
+v06_p140_tab2 (p140 Tabelle 2, 27 rows + caption): every cell as ours, incl. "899C fone MFLPT 1" with the 1 printed in
+  the Format column and Inhalt empty (print layout, kept), "atnc11", "sinco0", "10 Grad-Schritten". No change.
+v07_p140_tab3_4_5 (p140 Tabellen 3, 4, 5 + captions): every cell as ours. No change.
+v08_p140_tab6a (p140 Tabelle 6 header + rows ayint..conupk, 32 rows): every cell as ours, incl. "fout FAC" in the label
+  column with "—> String, Adresse in A/Y" in Funktion (print layout), "givayv", "val1", empty Funktion for fpwr. No change.
+v09_p140_tab6b (p140 Tabelle 6 rows conupk..execln + caption, 25 rows): every cell as ours, incl. "lnlprg" (sic, print),
+  "$8C00 movmf", empty Funktion for fndlin/execln. No change.
+  Note: text p136 says C 128 MOVMF "ab Adresse $8C03", Tabelle 6 lists movmf at $8C00; the disk witness prg/flpt c128
+  line 170 calls "jsr $8c03", so text and listing agree; the table entry is a different entry point. Not a candidate.
+v10_p015_sites (p15): "St. Stephen Street, Boston, MA 02115, Tel. (617) 226-6160", "422 S.Clinton Ave., Rochester, NY
+  14620", "20 Roszel Road, Princton, NJ 08540," -- all as ours (Princton sic). Olympia question: "Olympia Carrera und
+  weiß," -- comma printed, as ours (r330 lead settled: 8702 prints the comma). "(Create Character-Programm)" printed, as
+  ours (r330 lead: 8702 differs from 8701 "Program" in print; ours right). "kann er mit LOAD"...",8,1« im Programm" --
+  no opening » printed (PRINT-ERROR, as ours). "»A=A+1:IF A=1 THEN LOAD"" end of line; next line cut off -> NOT SEEN.
+  "Bilder im C 128-Modus laden" printed, as ours (r330 lead: 8612 "Modul" vs 8702 "Modus"; ours matches 8702 print).
+  "»GRAPHIC 1,1: BLOAD"<Name>",P8200«" as ours. "(»Votex« parallel" as ours. "Tel. (020) 287-5100" as ours (sic).
+v11_p014_sites (p15 Nachladen + p14): "»A=A+1:IF A=1 THEN LOAD" / ..."« nachlädt" -- two quotes printed, as ours
+  (r330 lead: 8612 has one; 8702 print has both; ours right). p14 "ich ein Programm mit Fastload" printed, as ours (r330
+  lead: 8612 "Fast-Load"; ours matches 8702). "Hewlett&Packard" closed, as ours. "Am Wall 153/156, 2800 Bremen 1, Tel."
+  as ours. "Page-Pointers (Adresse $D50A)" as ours. "MARKUS KOMMANT" as ours. "10^2,82216807939999999 = 663,999999" as ours.
+v12_p079_080 (p79/p80, Tips & Tricks für Profis): "LOAD"$",8 <RETURN> POKE 808,0 <RETURN>", "LIST 10- A=1 TO 1",
+  "Nach 12maligem", "100 SYS 62391:X" -- as ours. "POKE 53269,1: POKE 53265,10" and "POKE 53269, PEEK (53269) AND
+  254: POKE 53265, 27" PRINTED with 53269 (= $D015, sprite enable) -> magazine error, see FUTURETEUFELCHEN-CANDIDATE.
+  "2 MHz statt bisher mit 0,94 MHz" as ours. Hypra-Ass block lines 20-90 (proportional face, comment column) as ours,
+  "90 -;" then "weiterer Assemblertext" in the comment column; line 10 cut at top and the "xx -.en" line below the crop
+  -> NOT SEEN here. "POKE 53207,51: POKE 53209,10", "LOAD "SEQUENZ",8,1 <RETURN> / NEW: <RETURN> / SYS 828 <RETURN>",
+  "$C000-$C0C0", "SEQ#n,(x,w:y,"d",....,z);" -- all as ours.
+v13_p072_074 (p72/p74, Tips & Tricks zum C 128): "fast 50 Prozent", "baut er nämlich 380 Zeilen auf" (sic, kept),
+  "1. LOAD"DSPACE.DAT",8", "BANK 15:SYS 4864,BILD,MODUS", BILD/MODUS table, "BANK 15:SYS 4864,MODUS,,,,ANF1,ANF2,LEN"
+  (four commas, counted on the crop: run of 4), MODUS/ANF1/ANF2/LEN lines, Akzelerator steps 2-4 -- all as ours.
+  "BANK 15:SYS 5700,MODUS" printed in the typewriter face with NO space after the comma; ours "5700, MODUS".
+  "MODUS=0 normal" printed closed (no word space either side of =); ours "MODUS =0". The following "MODUS =255"
+  is on the next line, outside the crop -> NOT SEEN, left as ours.
+v14_p049_076 (p49 + p76 + p74): p49 question heading "<RESTORE>-Taste" and answer "Sie die <RUN/STOP>-Taste" -- brackets
+  closed on the word and on the hyphen (the face sets < > with wide sidebearings; same gap as on every other bracket on
+  the page); ours had "<RESTORE > -Taste" and "<RUN/STOP >-Taste". "Aufzeichnungsformate. Ein" -- full stop printed,
+  ours lost it. "POKE 1331,246:POKE 1332,63: / SYS 32768" as ours. p76 "»3-PLUS-1 ON KEY F1« und bei einem C 16
+  nicht." as ours -- the ours-"beieinem" site is the NEXT sentence ("Doch werden beieinem Plus/4"), which this crop did
+  not reach: fixed on LINGUISTIC evidence (r325 route 5: "beieinem" is not German; tesseract reads "bei einem" there
+  too), not optical. p76 "»LDA #<(Marke)«" / "»#>(...)«": gaps between # and < / > are glyph sidebearings of
+  uncertain width at this scale -> undecidable, ours kept ("# <(Marke)", "# > (...)"). The p74 sub-crop meant for
+  "MODUS =255" hit "BILD: 0 = 1. Teilbild" instead -> MODUS =255 NOT SEEN.
+v15_p076_code (p76 both hand-typed <pre>, p78, p76): both blocks word for word as ours ("Marke1 SEI", "STA Merke1",
+  "LDA $0103,X", "JMP $FCB3 ;zur Interrupt-Routine.", "LDA # <(Marke1)" etc.; the "...  ;und weiter im Hauptprogramm"
+  line is below the crop -> NOT SEEN). Continuation "Routine" @1448 sits under the ";" @1456 of ";hier weiter nach
+  IRQ-" -> comment-column wrap -> join. Column layout NOT re-laid: this face is not on a whole-cell grid (mnemonic ->
+  operand advance 127 px = 3.5 cells at the 36.5 px glyph pitch of "Interrupt-Vektor"/"Merke1"), so pitch arithmetic
+  does not apply; ours kept. "# <(" / "# >(": wide glyphs, undecidable, kept. p78 "längeres Drücken der
+  <RUN/STOP>-Taste" -- closed, ours "<RUN/STOP >". p76 "Doch werden bei einem Plus/4" -- now SEEN: two words; the
+  linguistic fix above is confirmed optically.
+v16_misc: p176 "Uns ist die Anwendung des Monats 500 Mark" (500 in the display face), as ours. p74 next line starts
+  "=255 invers drucken." -- the line breaks between "MODUS" and "=255", so the space question there is undecidable;
+  ours "MODUS =255" kept. p80 "10 -.ob "name,p,w"  ;Objektcode auf Disk" and "xx -.en" -- as ours. p136
+  "TAB 1,2,4,8,16,32,64,128" -- commas, as ours.
+p39 (Abenteuer leicht gemacht): no image read. The page was rotated 180 and OCRed with tesseract as an independent
+  second reading; it agrees with ours word for word (game names THE PAWN, TASS TIMES IN TONETOWN, REDHAWK, BORROWED
+  TIME, TRANSSYLVANIA, PERRY MASON, NINE PRINCES IN AMBER; "Zeitung lesen informiert" and "kennt den »Editor« beim
+  Namen" without full stop in both readings). No candidate, so nothing to verify by eye.
+== FIX ==  (article | was -> is | page | evidence)
+136 | "FLPT-Zahl (ab $6010. Das" -> "FLPT-Zahl (ab $6010). Das" | p136 | v01
+136 | "wobei nein beliebiges" -> "wobei n ein beliebiges" | p136 | v01
+136 | "Reihenfolge MSBLSB" -> "Reihenfolge MSB,LSB" | p138 | v02
+136 | "Zahlen von O bis 255" -> "Zahlen von 0 bis 255" | p138 | v02
+136 | "INDEX/INDEX +1" -> "INDEX/INDEX+1" | p138 | v02
+136 | "Ende der Tabelle Manchmal" -> "Ende der Tabelle. Manchmal" | p138 | v02
+136 | <pre> "LDX #$05  ;" / "LDA TAB,X ;" -> ";" at col 11 (one more space) | p136 | v04 + arithmetic
+136 | <pre> page-wide block 1: "LDA INDEX"/"BCC KLEIN"/"INC ZERO+1" -> two cells before operand ("LDA  INDEX  ;" etc.), ";" stays col 12 | p138 | v03 + arithmetic
+136 | <pre> page-wide block 2: operands at col 5 ("LDA  INDEX", "LDA  INDEX+1", "ADC  ZERO+1", "STA  ZERO+1", "STA  ..."), ";" col 14 (col 13 after INDEX+1) | p138 | v03 + arithmetic
+136 | <pre> all seven hand-typed blocks: comment continuations joined to their comment (column-width wraps, continuation in the ;/comment column; "X-Regi-/ster" -> "X-Register", "Ziel-/adresse" -> "Zieladresse", "Indexregi-/ster" -> "Indexregister", "2-Byte-/Werte)" -> "2-Byte-Werte)") | p136, p138 | v03, v04 + arithmetic
+72 | "BANK 15:SYS 5700, MODUS aktivieren" -> "BANK 15:SYS 5700,MODUS aktivieren" | p74 | v13
+72 | "bedeutet MODUS =0 normal" -> "bedeutet MODUS=0 normal" | p74 | v13
+49 | "Ich vermisse die <RESTORE > -Taste" -> "<RESTORE>-Taste" | p49 | v14
+49 | "Drücken Sie die <RUN/STOP >-Taste" -> "<RUN/STOP>-Taste" | p49 | v14
+49 | "Aufzeichnungsformate Ein Laden" -> "Aufzeichnungsformate. Ein Laden" | p49 | v14
+76 | "Doch werden beieinem Plus/4" -> "bei einem Plus/4" | p76 | v15 (first applied on linguistic evidence, then seen)
+76 | <pre> ";hier weiter nach IRQ-" + "Routine" -> ";hier weiter nach IRQ-Routine" (comment wrap joined) | p76 | v15 + arithmetic
+76 | "längeres Drücken der <RUN/STOP >-Taste" -> "<RUN/STOP>-Taste" | p78 | v15
+
+== REJECT ==  (candidate | what the print shows | page | crop)
+136 | "$8C03" for C 128 MOVMF vs Tabelle 6 "$8C00 movmf" | printed $8C03; disk prg/flpt c128 line 170 "jsr $8c03" agrees | p136 | v01
+136 | "0.1, 0.2, ... 0.128" (full stops where MSB,LSB pairs would want commas) | printed with full stops | p138 | v02
+136 | "TAB 1,2,4,8,16,32,64,128" | commas | p136 | v16
+136 | Tabelle 2 "899C fone MFLPT 1" (value in Format column) | print layout | p140 | v06
+136 | Tabelle 6 "fout FAC" / "—> String, Adresse in A/Y" split | print layout | p140 | v08
+136 | "LDA #$02 ;" one cell left of the ASL ";" | 24 px, across wide "#", undecidable, kept | p136 | v04
+136 | "0.1, 0.2, 0.4, 0.8," / "0.16, ..." line break | not forced by the column (25 chars fit at 37 px pitch), kept as two lines | p138 | v02 + arithmetic
+14 | "C 128-Modus" (8612: "Modul") | Modus | p15 | v10
+14 | "Create Character-Programm" (8701: "Program") | Programm | p15 | v10
+14 | Nachladen »...LOAD"..."« (8612 one quote) | two quotes | p15 | v11
+14 | "Fastload" (8612 "Fast-Load") | Fastload | p14 | v11
+14 | Olympia question comma after "weiß" | comma printed | p15 | v10
+72 | "BANK 15:SYS 4864,MODUS,,,,ANF1" comma count | four commas | p74 | v13
+72 | "MODUS =255" | line break before "=255", undecidable, kept | p74 | v16
+76 | "»LDA # <(Marke)«", "»# > (...)«", "LDA # <(Marke2)" in <pre> | wide glyphs # < >, undecidable, kept | p76 | v14, v15
+76 | <pre> column layout (label / mnemonic / comment columns) | face is not on a whole-cell grid, not re-laid | p76 | v15 + arithmetic
+79 | Hypra-Ass block, "90 -;" + "weiterer Assemblertext", "xx -.en" | as ours | p80 | v12, v16
+
+== PRINT-ERROR ==  (kept as printed; not for the owner)
+14 | "Princton, NJ" (Princeton) | p15 | v10
+14 | "Tel. (020) 287-5100" for the Library of Congress (area code 202) | p15 | v10
+14 | "mit LOAD"...",8,1« im Programm" -- closing » without opening » | p15 | v10
+136 | Tabelle 6 "lnlprg" (label is lnkprg) | p140 | v09
+136 | "»SYNTAX ERROR«" for $B248 -- see FUTURETEUFELCHEN-CANDIDATE 4 | p136 | v01
+72 | "baut er nämlich 380 Zeilen auf" (a PAL frame has 312) | p72 | v13
+79 | "0,94 MHz" (PAL C 64 runs at 0,985 MHz) | p79 | v12
+39 | "Zeitung lesen informiert" / "kennt den »Editor« beim Namen" -- no full stop (both readings) | p39 | tesseract only
+
+== FUTURETEUFELCHEN-CANDIDATE ==  (recorded, not added; owner default is none)
+1. 79 Tips & Tricks für Profis, p79, "Turbo-POKE für den C 64/128". Print: "POKE 53269,1: POKE 53265,10" and
+   "POKE 53269, PEEK (53269) AND 254: POKE 53265, 27". Right: 53296 ($D030, the C 128 clock register in C 64 mode),
+   which the same issue prints itself on p72 ("POKE 53296,1 beziehungsweise POKE 53296,0 im C 64-Modus") -- the
+   evidence is on the page (route 2/3), not recalled. Misleads: 53269 is $D015, the VIC sprite-enable register; a
+   reader who types the tip switches sprite 0 on and blanks the screen (53265,10) but the CPU stays at 1 MHz.
+   Impact REASONED, not run. Crop v12.
+2. 136 Von Basic zu Assembler, p138, 16-bit table example. Print: "LDA #$05 / ASL / TXA ;und ins X-Register
+   schieben". Right: TAX. Misleads: TXA copies X into A, destroying the doubled index, and LDA TAB,X then indexes
+   with whatever X held; the comment says the opposite of what the opcode does. The p138 right-column example
+   prints TAX for the same step. Impact REASONED, not run. Crop v02.
+3. 136, p138, "2) RTS vermindert dann den Stapelzeiger um 2". Right: RTS INCREMENTS the stack pointer by 2 (pull
+   = increment on the 6502). Misleads a beginner about stack direction in the very passage meant to explain it.
+   Source: 6502 instruction semantics (MOS programming manual, recalled -- route 4, not cited from a document at
+   hand). Crop v02.
+4. 136, p136: "auf die Adresse $B248, wo die Ausgabe der Fehlermeldung »SYNTAX ERROR« ausgegeben ... wird".
+   On the C 64, $B248 is the ILLEGAL-QUANTITY error entry (FCERR), so USR without a vector gives ?ILLEGAL QUANTITY
+   ERROR; the article's own C 128 sentence says the same for $7D28. Disk witness: prg/flpt c64 line 530 restores
+   785,72/786,178 = $B248, confirming the address, not the message. The message claim rests on RECALLED ROM
+   knowledge, no ROM image on this machine -- lowest confidence; impact small (wrong error name). Crop v01.
+
+== COVERAGE ==
+Read for sense, word by word, in full: all eight articles -- every <p>, heading, list item, table cell (Tabellen 1-6
+of 136: all 139 table rows incl. headers seen on the page), figcaption, address and every hand-typed <pre> (136: 10 blocks; 76: 2;
+79: 2; 72: 2; 49: 1). <pre data-filename> blocks not read (disk-owned). r325_dump_crosscheck.py: not run -- none of
+my hand-typed blocks has a byte column (all are assembler source or BASIC/commands), so it would parse 0 rows.
+Verification by page: every candidate went to a crop except p39, where a rotated tesseract reading agreed with ours
+word for word and raised no candidate, and the Leserforum/Profis/C 128/C 16/49/136/176 prose outside the crops,
+which was compared word-by-word against an independent tesseract reading of masters600 (locator only): every
+disagreement was either a seen crop site, a table cell seen in v05-v09, or tesseract noise.
+Rows not read by eye: none of the 136 tables; p138 c1/c4 code-block column positions settled by arithmetic only
+(pitch 37 px, anchors recorded above), their text matched by v02 (TXA line) and the tesseract reading.
+Verification 4 (generate.py --issues 8702 --future --join): NOT RUN -- generate.py calls git rev-parse and the
+scratch-copy recipe needs git init; my brief forbids any git command. HTML of the four edited files parsed balanced;
+the end-gate hyphen grep ([a-zäöüß]-</p>) is empty on them.
+Side finding (not mine to fix): article 76's "Bild 1. Abschalten der internen 16 KByte für die Dela-
+Speichererweiterung" (p76) is not in the HTML; it is on the owner crop worklist as 76-1.png.
+
+== CROPS ==
+crops read / crops actually seen: 16 / 16 (v01-v16, each a stack of 1-10 line crops; no "[media removed]").
+Sites not seen (all left as ours): p138 "JSR-Anweisung in Zeile 1070" (tesseract agrees); p76 "...  ;und weiter im
+Hauptprogramm" line; the Leserforum club addresses and the first-column questions on p14 beyond v11 (tesseract
+agrees word for word); p75 DATAMAKER prose (tesseract agrees); p78 3D-Funktionen menu text (tesseract agrees).

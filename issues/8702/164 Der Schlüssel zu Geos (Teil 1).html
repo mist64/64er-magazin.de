@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der Schlüssel zu Geos (Teil 1)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thorsten Petrowski, sk">
+    <meta name="64er.issue" content="2/87">
+    <meta name="64er.pages" content="164,167-170">
+    <meta name="64er.head1" content="Software-Hilfe">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Software-Hilfen">
+    <meta name="64er.index_category" content="Software-Hilfen|Geos">
+    <meta name="64er.id" content="geos">
+</head>
+
+<body>
+    <article>
+        <h1>Der Schlüssel zu Geos (Teil 1)</h1>
+        <p class="intro">In der letzten Ausgabe haben wir begonnen, uns mit der internen Struktur von Geos zu beschäftigen. Diesmal geht es weiter in die Tiefen des Systems. Mit dem hier vorgestellten Geos-Disketten-Monitor geben wir Ihnen dazu ein wichtiges Werkzeug an die Hand.</p>
+
+        <p>Dieser Geos-Kurs gibt Ihnen Hilfestellungen und Einblick in die Systemebene. Hierzu sind Grundkenntnisse in Basic und über die Diskettenstruktur der Floppy 1541 notwendig. Leider ist das Programmieren von Geos im Moment nur in Maschinensprache möglich. Für die weiteren Folgen, die sich mit dieser Materie beschäftigen, wäre es deshalb hilfreich, wenn Sie über Grundwissen in 6510-Assembler verfügten. Da jedoch alle wichtigen Informationen durch Listings zum Abtippen ergänzt werden, kann auch der Einsteiger diesen Kurs voll nutzen.</p>
+
+        <p>Wenn Sie Geos geladen haben, so sind Sie jetzt bereit, in die interne Geos Welt vorzustoßen. Erstellen Sie sich zuerst mit dem BACKUP-Programm Sicherheitskopien (siehe Handbuch). Diese müssen verschiedene Namen haben, damit Geos sie unterscheiden kann. (RENAME-Befehl im DISK-Menü). Um gleich beim Thema Diskette zu bleiben: Das Geos-DOS (Disk Operating System) ist diesmal das Thema unseres Ausflugs in die Geos-Welt. Sehen Sie sich mal den Infoschirm der Dateien »BACKUP« und »Geos Kernel« an. Falls Sie nicht wissen, wie das geht: Das betreffende Icon der Datei einmal anklicken (es wird dann invertiert) und in der Menüzeile »FILE« und dann »INFO« anklicken.</p>
+
+        <p>Sie sehen jetzt bei »BACKUP« in der Rubrik »STRUCTURE« die Meldung »SEQ«, während beim Geos-Kernel »VLIR« erscheint. »SEQ« bedeutet, daß die Datei im normalen C 64-Modus gespeichert wurde. »SEQ« ist in diesem Zusammenhang vielleicht etwas mißverständlich. Hier ist keine sequentielle Datei gemeint, sondern nur das sequentielle Speicherverfahren, das auch bei Basic-Programmen angewandt wird.</p>
+
+        <p>Was ist nun der Unterschied bei VLIR-Dateien? VLIR ist ein neues Dateiformat. Es bedeutet »VARIABLE LENGTH INDEXED RECORD«, was eine Datei mit indizierten Sätzen variabler Länge bezeichnet.</p>
+
+        <h2>VLIR-Dateien</h2>
+
+        <p>Eine Datei wird nicht mehr in einem Stück geladen, sondern in verschiedene kleine, aber auch unterschiedlich lange Stücke unterteilt. VLIR ist sozusagen die Weiterentwicklung des Verfahrens der relativen Speicherung. Das hat den Vorteil, daß man Programmteile nur dann zu laden braucht, wenn sie auch wirklich gebraucht werden.</p>
+
+        <p>Ein gutes Beispiel ist Geopaint. Wenn Sie dort ein Werkzeug anklicken, wird die Diskette angesprochen. Es wird jetzt das entsprechende Werkzeug geladen. Dafür wird aber kein weiterer Dateieintrag im Directory benötigt (sonst würde »FILL«, »SPRAYDOSE« etc. im Directory stehen). Ein VLIR-Zeigerblock (das ist der erste Block einer VLIR-Datei) zeigt also auf die verschiedenen Programmteile, die nur bei Bedarf nachgeladen werden. VLIR-Dateien werden aber nicht nur bei Programmen, sondern auch bei Datenfiles angewandt. Zum Beispiel zeigt jeder VLIR-Zeiger der Notepad-Datei (Notizbuch) auf eine Seite des Notizbuches. Ein VLIR-Zeigerblock kann auf maximal 127 Records (Datensätze) zeigen. Dies ist durch die 256 Byte Länge eines Diskettenblocks bedingt.</p>
+
+        <p>Der größte Vorteil der VLIR-Dateien ist, daß man Programme schreiben kann, die insgesamt länger als der Speicher des C 64 sind. Man teilt sie einfach auf und die benötigten Programmteile werden mit dem Fastloader bei Bedarf nachgeladen. Um nun diese einzelnen Programmteil-Blöcke untersuchen zu können, brauchen Sie einen Diskettenmonitor. Dabei ergibt sich aber wieder das Problem, daß Geos beim Abspeichern die Zeichen anders kodiert als das Original CBM-DOS. Texte werden dadurch zwar nicht unbedingt unlesbar, beim Ändern ergeben sich aus Gründen der Kodierung jedoch Probleme.</p>
+
+        <p>Deswegen habe ich für Sie einen speziellen Diskmonitor für Geos, den »GDM V1.0« entwickelt. Wo liegt der Unterschied zu anderen Diskmonitoren? Der »GDM V1.0« hat einen Coder/Decoder eingebaut, der die Geos-Diskblöcke entschlüsseln kann. Um mit dem »GDM V1.0« arbeiten zu können, müssen Sie nun folgendes tun:</p>
+
+        <p>Listing 1 »GDM.MAKE« abtippen, speichern und mit RUN starten. Das Programm fordert Sie jetzt dazu auf, eine Diskette einzulegen, und eine Taste zu drücken. »GDM.MAKE« legt daraufhin eine Geos-Codetabelle auf der Diskette an. Nach einigen Sekunden meldet sich der C 64 mit »READY« zurück.</p>
+
+        <h2>Der Geos Disk Monitor</h2>
+
+        <p>Auf der Diskette wurde die Datei »GDM.CODES« erzeugt. Jetzt können Sie Listing 2 »GDM.OBJ« mit dem MSE eingeben und abspeichern. Schließlich müssen Sie noch Listing 3 »GDM V1.0« abtippen und unter diesem Namen abspeichern. Danach sollten sich folgende Dateien auf der Diskette befinden:</p>
+
+        <p>GDM.MAKE<br>
+            GDM.CODES<br>
+            GDM.OBJ<br>
+            GDM V1.0</p>
+
+        <p>Wenn Sie wollen, können Sie jetzt »GDM.MAKE« löschen. Es diente nur dazu, die Codetabelle anzulegen. Gestartet wird der »GDM V1.0« mit RUN. Es werden »GDM.CODES« und »GDM.OBJ« nachgeladen. Danach erscheint das Hauptmenü. Es stehen Ihnen per Funktionstaste folgende Funktionen zur Verfügung :</p>
+
+        <p>&lt;F1&gt;: Block lesen</p>
+
+        <p>In der Zeile »Track (00) Sektor (00)« erscheint ein Cursor. Die Startwerte sind »00«. Wenn Sie diese mit &lt;INST/DEL&gt; löschen, können Sie jetzt die Spur und den Sektor des Blocks eingeben, den Sie lesen wollen. Bei Vorausstellen eines »$« können auch Hexzahlen eingegeben werden. Beim Lesen blinkt der Bildschirmrand, da dort die ankommenden Daten mit abgelegt werden und Sie schon dadurch erkennen, ob auf dem Block überhaupt Daten sind.</p>
+
+        <p>&lt;F2&gt;: Nächster Block</p>
+
+        <p>In jeder Datei zeigen die ersten zwei Bytes jedes Blocks auf den nächsten Block. Mit &lt;F2&gt; wird Ihnen dieser Zeiger zum Block-Lesen angeboten.</p>
+
+        <p>&lt;F3&gt;: Rückschreiben</p>
+
+        <p>Es erscheint wieder der Cursor im Track/Sektor-Feld. Dort erscheinen jetzt wieder Spur/Sektor des gelesenen Blocks. Wenn Sie zweimal &lt;RETURN&gt; drücken, so wird der Block an die alte Stelle zurückgeschrieben.</p>
+
+        <p>&lt;F4&gt;: Byte-Edit</p>
+
+        <p>Damit können Sie ein einzelnes Byte im Block ändern. Es erscheint jetzt an der Ausgabeposition ein Cursor und Sie können das Byte ändern. Stellen Sie ein »$« vor den neuen Wert, so wird er hexadezimal interpretiert. Mit »%« können Sie auch Binärbytes eingeben. &lt;RETURN&gt; beendet den Blockedit-Modus, das Wort EDITING verschwindet. Im Blockedit-Modus funktionieren die anderen Funktionstasten bis auf &lt;F4&gt; nicht mehr.</p>
+
+        <p>&lt;F5&gt;: Directory</p>
+
+        <p>Diese Funktion listet den Disketteninhalt. Dabei wird die Geos-Textcodierung berücksichtigt und die Dateinamen erscheinen richtig geschrieben. Sie können übrigens jederzeit durch Drücken einer Taste das Listen anhalten und fortsetzen.</p>
+
+        <p>&lt;F6&gt;: Disk-Reset</p>
+
+        <p>Diese Funktion muß ausgeführt werden, wenn Sie eine andere Diskette einlegen. Die Diskette wird dann initialisiert. Erhalten Sie beim Arbeiten die Meldung »No channel«, so müssen Sie ebenfalls &lt;F6&gt; drücken.</p>
+
+        <p>&lt;F7&gt;: Ende</p>
+
+        <p>Verlassen des »GDM V1.0«</p>
+
+        <p>&lt;F8&gt;: Blockedit</p>
+
+        <p>Dies ist die mächtigste Funktion des »GDM V1.0«. Wenn Sie &lt;F8&gt; drücken, erscheint im Feld, in dem der Blockinhalt dargestellt wird, ein Cursor sowie das Wort »EDITING«. Den Cursor können Sie jetzt beliebig im Text bewegen. Sie können jetzt einfach durch Drücken der Buchstabentasten im Block schreiben. Unterhalb des Feldes wird noch die aktuelle Bytenummer, der dezimale, der hexadezimale und der Binärwert des Bytes ausgegeben. Links unten davon werden noch die nächsten 63 Byte des Blocks als Sprite dargestellt.</p>
+
+        <p>&lt;->: Drucker-Dump</p>
+
+        <p>Mit dieser Taste können Sie den aktuellen Blockinhalt ausdrucken. Sie haben dabei noch die Möglichkeit, mit &lt;S&gt; das Drucken zu unterbrechen. Mit &lt;D&gt; können Sie einen dezimalen Dump und mit &lt;H&gt; einen hexadezimalen Dump erzeugen.</p>
+
+        <p>&lt;H&gt;: Hexedit</p>
+
+        <p>Hiermit können Sie den Block wie mit einem normalen Diskmonitor bearbeiten. Es erscheint in der Bildschirmmitte ein Anzeigefeld, in dem sich der Ausschnitt des Blockes befindet. Links steht die Startadresse des Ausschnittes. Dann folgen 8 Hex-Bytes und schließlich 8 ASCII-Codes. Sie können jetzt mit &lt;+> und &lt;-> den Ausschnitt bestimmen, und ihn mit &lt;RETURN&gt; editieren. Im Editier-Modus können Sie mit dem Cursor über die Hex-Bytes fahren und sie ändern. Nochmaliges &lt;RETURN&gt; beendet den Editmodus. Mit &lt;Q&gt; können Sie dann den Hexmodus beenden.</p>
+
+        <h2>So arbeitet das Geos-DOS</h2>
+
+        <p>Wir wollten uns aber heute mit dem Geos-DOS-Format beschäftigen. Legen Sie also eine Kopie der Geos-Diskette ein. Dies ist notwendig, weil man mit dem »GDM V1.0« leicht ungewollt Daten zerstören kann, was sich auf der Original-Disk fatal auswirken würde. Drücken Sie jetzt &lt;F6&gt;. Die Diskette wird initialisiert. Lesen Sie jetzt mit &lt;F1&gt; und der Eingabe von »18 00« den BAM-Block der Diskette. Wenn Sie »Tips &amp; Tricks zu Geos« in der letzten Ausgabe gelesen haben, wissen Sie schon Bescheid: Hier vermerkt Geos in den Bytes 173 bis 188, ob die Diskette unter Geos formatiert wurde. Sicherlich wissen Sie, daß Geos eine sogenannte »Border« (Rand) verwaltet, auf der Dateien abgelegt werden können. Irgendwo muß Geos ja den Inhalt dieser Border speichern. Byte 171 und 172 der BAM enthalten einen Zeiger auf den Border-Block. Dieser Block (bei unserer Diskette ist es Block 19/08) ist genau wie ein Block der Directory aufgebaut. Wenn Sie eine Datei auf der Border ablegen, so wird deren Eintrag im eigentlichen Directory mit Nullen überschrieben. Legen Sie also nie das Geos-Ladeprogramm der Originaldiskette auf den Rand. Sie können Geos sonst nicht mehr booten!</p>
+
+        <p>Hier eine Zusammenfassung der wichtigen Bytes der BAM (Block 18/00):</p>
+
+        <table class="plain">
+            <tr>
+                <td>Byte 0/1 (18/01)</td>
+                <td>Zeiger auf den ersten Directory-Block</td>
+            </tr>
+            <tr>
+                <td>Byte 2 »A«</td>
+                <td>Formatkennzeichen VC1541</td>
+            </tr>
+            <tr>
+                <td>Byte 4-143</td>
+                <td>Bitmuster der belegten Blocks</td>
+            </tr>
+            <tr>
+                <td>Byte 144-161</td>
+                <td>Diskname mit 160 (SHIFT+SPACE) aufgefüllt.</td>
+            </tr>
+            <tr>
+                <td>Byte 162-163</td>
+                <td>Disk ID.</td>
+            </tr>
+            <tr>
+                <td>Byte 165-166</td>
+                <td>»2A«:DOS-Version.</td>
+            </tr>
+            <tr>
+                <td>Byte 171-172</td>
+                <td>Spur/Sektor der Border.</td>
+            </tr>
+            <tr>
+                <td>Byte 173-188</td>
+                <td>»Geos format V1.0« Geos-Dos-Formatkennzeichen.</td>
+            </tr>
+        </table>
+
+        <p>Nachdem Sie jetzt das Verfahren der Border-Verwaltung und des Geos-Formatzeichens kennen, wenden wir uns wieder dem Geos Dateiformat zu. Geos legt ja über jede Datei einen Infoschirm an. Auch dieser Infoschirm muß ja irgendwo gespeichert werden und, was noch wichtiger ist, mit der zugehörigen Datei in Beziehung gebracht werden. Dafür benutzt Geos die freien Stellen im Dateieintrag. Aus Tabelle 1 sind die Funktionen der einzelnen Bytes des Dateieintrags zu entnehmen.</p>
+
+        <p>Byte 19 und 20 enthalten also Spur und Sektor des Infoschirms. Wenn Sie mit dem »GDM V1.0« jetzt diesen Block laden, können Sie anhand Tabelle 2 die Struktur des Infoschirm-Blocks erkennen.</p>
+
+        <p>In einer anderen Veröffentlichung zu Geos sind Angaben enthalten, die von diesen hier abweichen. Diese sind falsch beziehungsweise unvollständig.</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Byte</th>
+                    <th>Funktion</th>
+                </tr>
+                <tr>
+                    <td>Byte 0</td>
+                    <td>Filetyp,mit eingeblendetem Bit 7 ($80).<br>
+                        0 = DELeted (Gelöscht)<br>
+                        1 = SEQuential (Sequentiell)<br>
+                        2 = PROgram (Programm)<br>
+                        3 = USerR (Benutzer)<br>
+                        5 = RELative (Relativ)<br>
+                        Wenn zusätzlich noch Bit 6 gesetzt ist, so ist die Datei gegen Löschen geschützt.</td>
+                </tr>
+                <tr>
+                    <td>Byte 1,2</td>
+                    <td>Spur und Sektor des ersten Blocks der Datei.</td>
+                </tr>
+                <tr>
+                    <td>Byte 3-18</td>
+                    <td>Dateiname, aufgefüllt mit #160 (SHIFT+SPACE)</td>
+                </tr>
+                <tr>
+                    <td>Byte 19-20</td>
+                    <td>Spur und Sektor des Info-Schirms.</td>
+                </tr>
+                <tr>
+                    <td>Byte 21</td>
+                    <td>File-Struktur:<br>
+                        0 = Sequentiell (CBM-DOS)<br>
+                        1 = VLIR (Geos-DOS)</td>
+                </tr>
+                <tr>
+                    <td>Byte 22</td>
+                    <td>Filetyp:<br>
+                        0 = Nicht Geos<br>
+                        1 = Basic<br>
+                        2 = Assembler<br>
+                        3 = Data File (Datenfile)<br>
+                        4 = System File (System-Datei)<br>
+                        5 = Desk Accessory (Hilfsmittel)<br>
+                        6 = Application (Anwendung)<br>
+                        7 = Application Data (Daten einer Anwendung)<br>
+                        8 = Font File (Zeichensatz)<br>
+                        9 = Druckertreiber<br>
+                        10 = Input Driver (Eingabetreiber, im Moment Joystick)<br>
+                        11 = Disk Device</td>
+                </tr>
+                <tr>
+                    <td>Byte 23-27</td>
+                    <td>Schreibdatum Zeit im Format Jahr/Monat/Tag/Stunde/Minute.</td>
+                </tr>
+                <tr>
+                    <td>Byte 28-29</td>
+                    <td>Blockanzahl der Datei im Format LO/HI.</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die Struktur eines Dateieintrags unter Geos-DOS.</figcaption>
+        </figure>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Byte</th>
+                    <th>Funktion</th>
+                </tr>
+                <tr>
+                    <td>0,1</td>
+                    <td>Endezeiger des Blockes, kein Folgeblock.</td>
+                </tr>
+                <tr>
+                    <td>2,3</td>
+                    <td>Höhe und Breite des Icons, das die Datei repräsentiert. Meistens 24/21, das Format eines C 64-Sprites.</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>HiRes Mode Flag, gibt die Anzahl der Bytes des Icons an. Normalerweise 63 Bytes.</td>
+                </tr>
+                <tr>
+                    <td>5-67</td>
+                    <td>Werte des Icons. Sie haben genau das Format eines Sprites</td>
+                </tr>
+                <tr>
+                    <td>68</td>
+                    <td>CBM-Filetyp<br>
+                        129 = Daten<br>
+                        130 = Programm</td>
+                </tr>
+                <tr>
+                    <td>69</td>
+                    <td>Geos-DOS Filetyp (Siehe Dateieintrag)</td>
+                </tr>
+                <tr>
+                    <td>70</td>
+                    <td>Filestruktur<br>
+                        0 = SEQ (CBM-DOS)<br>
+                        1 = VLIR (GeoDos)</td>
+                </tr>
+                <tr>
+                    <td>71,72</td>
+                    <td>Ladeadresse des Programms.</td>
+                </tr>
+                <tr>
+                    <td>73,74</td>
+                    <td>Bei Accessories wird hier das Ende des Programms im Format LO/HI angegeben.</td>
+                </tr>
+                <tr>
+                    <td>75,76</td>
+                    <td>Einsprung (SYS-) Adresse des Programms.</td>
+                </tr>
+                <tr>
+                    <td>77-96</td>
+                    <td>Programmtyp (CLASS)</td>
+                </tr>
+                <tr>
+                    <td>97-116</td>
+                    <td>Name des Programmierers, sofern es sich um eine Applikation handelt. Ist es ein Data File (Datendatei), so steht hier der Name der Diskette, auf der sich die Applikation befindet, die diese Datei erzeugt hat.</td>
+                </tr>
+                <tr>
+                    <td>117-136</td>
+                    <td>Handelt es sich um ein Data File, so wird hier der Name der Erzeugerapplikation eingetragen. Geos weiß dann, welche Applikation beim Doppelklicken der Datendatei geladen werden muß.</td>
+                </tr>
+                <tr>
+                    <td>137-159</td>
+                    <td>Platz für interne Daten der Applikation.</td>
+                </tr>
+                <tr>
+                    <td>160-255</td>
+                    <td>Infotext.</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Der Aufbau des Infoschirm-Blocks</figcaption>
+        </figure>
+
+        <p>Sie haben jetzt die wichtigsten Informationen zum Geos-DOS-Format und den Einträgen auf Diskette. Sehen Sie sich einfach mal mit dem »GDM V1.0« die einzelnen Geos-Dateien an. Experimentieren Sie nach Herzenslust (auf einer Backup-Disk wohlgemerkt) herum und sehen Sie, wie Geos seine Dateien verwaltet.</p>
+
+        <p>In der nächsten Ausgabe werden wir Ihnen unter anderem ein kleines Programm vorstellen, das Schluß macht mit der Ungenauigkeit der Geos-Uhr.</p>
+
+        <address class="author">(Thorsten Petrowski/sk)</address>
+
+        <figure>
+            <pre data-filename="gdm.make" data-name="GDM.MAKE" data-checksummer="3"></pre>
+            <figcaption>Listing 1. »GDM.MAKE« erzeugt eine Geos-Code-Tabelle</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="gdm.obj.prg" data-name="GDM.OBJ" data-mse=mse1></pre>
+            <figcaption>Listing 2. »GDM.OBJ« — Der Maschinensprache-Teil des »GDM«. Bitte mit dem MSE eingeben.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="gdm.obj.prg" data-name="GDM.OBJ"></div>
+
+        <figure>
+            <pre data-filename="gdm v1.0" data-name="GDM V1.0" data-checksummer="3"></pre>
+            <figcaption><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Listing 3. »Geos Disk Monitor«</a></figcaption>
+        </figure>
+
+        <!-- Die Codetabelle »GDM.CODES«, wie sie »GDM.MAKE« (Listing 1) auf der Diskette anlegt -->
+        <div class="binary_download" data-filename="gdm.codes.prg" data-name="gdm.codes"></div>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+
+            <p>Im Listing 3 in Zeile 30020 heißt es nicht »B0=PEEK(AD)« sondern »B0=PEEK(AD) AND 191«.</p>
+
+            <p>In Listing 3 sind folgende Zeilen zu ändern:<br>
+            Zeile 1: Statt »A=Q+1« heißt es »A=A+1«.<br>
+            Zeile 141: Bei dem ersten Zeichen innerhalb der Gänsefüßchen handelt es sich um die Tastenkombination &lt;CBM A&gt;.<br>
+            Zeile 660: Das letzte Zeichen dieser Zeile, die Null, ist ersatzlos zu streichen.<br>
+            Zeile 1170: Das gleiche gilt für die Null nach der IF-Anweisung.<br>
+            Zeile 30020: »B0=PEEK(AD):...« ist zu ersetzen durch »B0=PEEK(AD) AND 191:...«</p>
+
+            <p>Im Listing 3 »Geos Disk Monitor« haben sich einige Fehler eingeschlichen.<br>
+            Zeile 1: Statt »a=q+1« heißt es »a=a+1«<br>
+            Zeile 141: Das erste Zeichen hinter den Gänsefüßchen ist &lt;CBM + A&gt;<br>
+            Zeile 660: Die Null am Ende der Zeile darf nicht mit eingegeben werden.<br>
+            Zeile 1170: Die Null nach »IF« ist ersatzlos zu streichen.<br>
+            Zeile 30020 lautet:<br>
+            »AD=AD+1:B0=PEEK(AD) AND 191:SB=0«</p>
+
+            <!-- Disk-Version bereits korrigiert -->
+            <!-- 64'er 3/1987 -->
+            <!-- Disk-Version bereits korrigiert -->
+            <!-- 64'er 4/1987 -->
+            <!-- Disk-Version bereits korrigiert -->
+            <!-- 64'er 8/1987 -->
+        </aside>
+    </article>
+</body>
+
+</html>

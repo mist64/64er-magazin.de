@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Von Profi-Ass zu Hypra-Ass</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="O. Kaudelka, ah">
+    <meta name="64er.issue" content="2/87">
+    <meta name="64er.pages" content="88-90">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Listings zum Abtippen">
+    <meta name="64er.toc_title" content="Konvertierungsprogramm für Quelltexte: Von Profi-Ass zu Hypra-Ass">
+    <meta name="64er.index_title" content="Von Profi-Ass zu Hypra-Ass">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Assembler">
+    <meta name="64er.id" content="pth-trans">
+</head>
+
+<body>
+    <article>
+        <h1>Von Profi-Ass zu Hypra-Ass</h1>
+        <p class="intro">Sie haben Quelltexte im Profi-Ass-Format und wollen sie mit Hypra-Ass weiter bearbeiten? Dann brauchen Sie Pth-Trans, einen Konverter, der Quelltexte, die mit dem Profi-Ass erzeugt wurden, einfach und problemlos ins Hypra-Ass-Format wandelt.</p>
+
+        <p>Wer schon einmal versucht hat, ein Profi-Assembler-Quellisting von Hypra-Ass aus zu editieren, wird festgestellt haben, daß außer wilden Grafikzeichen, verschluckten Textteilen und seltsamen Farbeffekten nichts Sinnvolles am Bildschirm zu sehen ist. Die Begründung liegt in den völlig unterschiedlichen Quelltextformaten beider Assemblersysteme.</p>
+
+        <p>Während bei Data-Beckers Assembler im Prinzip ein Basic-Listing erzeugt wird, bei dem alle Basic-Schlüsselworte in Tokens umgewandelt werden, legt Hypra-Ass alle Zeichen vollständig im Speicher ab. Um diesen und einige andere Unterschiede beider Quellformate nicht von Hand anpassen zu müssen, dient das Maschinenprogramm (Listing 1).</p>
+
+        <p>Das Programm wird absolut geladen und befindet sich dann im Speicherbereich ab $C000. Nach NEW kann das zu transformierende Quellprogramm geladen werden. Wegen der erwähnten Basic-Eigenschaften ist man deshalb nicht auf ein bestimmtes Speichermedium angewiesen. Gestartet wird Pth-Trans mit SYS 49152. Daraufhin wird das Profi-Ass Quellisting in 10 Durchläufen sukzessiv auf Hypra-Ass-Format gebracht.</p>
+
+        <p>Die Vorgänge in den einzelnen Durchgängen werden nachfolgend näher erläutert.</p>
+
+        <h3>Pass 1:</h3>
+
+        <p>Im ersten Durchlauf werden alle Zeilen, die aufgrund der Profi-Ass-Möglichkeiten mehr als einen Assemblerbefehl enthalten und durch »:« getrennt sind, in einzelne Zeilen aufgespalten. Dabei wird die neue Zeilennummer aus der alten berechnet. Deshalb ist es sinnvoll, das Quellprogramm vorher anhand eines Toolkits in Zehnerschritten neu durchzunumerieren. Wurde dies übersehen, kann es sein, daß Zeilennummern doppelt auftreten. In diesem Fall kann immer noch, von Hypra-Ass aus, eine Neunumerierung erfolgen, die diesen Fehler korrigiert.</p>
+
+        <h3>Pass 2:</h3>
+
+        <p>In Pass 2 werden zeilenweise alle Tokenschlüssel in deren zugehörige Buchstabenkombinationen rückgewandelt und in den Quelltext eingefügt. In Strings werden grundsätzlich keine Codewandlungen durchgeführt.</p>
+
+        <h3>Pass 3 und Pass 7:</h3>
+
+        <p>Der dritte und siebte Durchlauf behandelt die Zuweisungsoperationen » = « und » ← «. Zuerst werden alle definierbaren Zuweisungen durch » = « ersetzt, da in Hypra-Ass grundsätzlich alle Zuweisungen redefinierbar gehalten sind. Danach wird Zeilen, die diesen Operator enthalten, der Pseudo-Opcode .EQ vorangestellt.</p>
+
+        <h3>Pass 4:</h3>
+
+        <p>Eine weitere Besonderheit des Hypra-Assemblers besteht in der Behandlung der Funktionsoperatoren Low-Byte »&lt;« beziehungsweise High-Byte »&gt;« einer Adreßangabe. Im Gegensatz zu Profi-Ass muß hier das Argument in Klammern stehen. Diese Anpassung wird in Pass 4 durchgeführt.</p>
+
+        <h3>Pass 5:</h3>
+
+        <p>Allgemein schwieriger wird es bei der Pseudoopcodewandlung im fünften Durchlauf. Außer den Standardopcodes ASC, BYTE, WORD und einigen, die eine direkte Entsprechung im Hypra-Assembler finden, wie MEN, END und GOTO bestehen mehr oder weniger gravierende inhaltliche oder syntaktische Unterschiede zwischen beiden Systemen. Aus diesem Grund sind Pseudoopcodes, die zum Beispiel die Makrodefinition, die File-Verkettung oder die Ausgabegerätedefinition betreffen, besser manuell anzupassen, zumal deren Häufigkeit in Quellprogrammen relativ begrenzt ist. Zum leichten Auffinden dieser Codes werden die entsprechenden Zeilen revers dargestellt. Als nächstes gilt es, das Profi-Ass Programcounter-Symbol »*« anzugleichen, denn Hypra-Ass bietet außer über den Pseudoopcode .BA keine Möglichkeit, direkt auf den PC zuzugreifen.</p>
+
+        <h3>Pass 6</h3>
+
+        <p>In Pass 6 werden deshalb alle PC-Zuweisungen durch .BA ersetzt. Danach tritt eine Scan-Funktion in Aktion, die verbotene Konstrukte wie »Table=*« oder »*=*+5« identifiziert und betreffende Zeilen durch »;« und Reversdarstellung vom Text abtrennt. Diese Textteile müssen später entsprechend angeglichen werden.</p>
+
+        <h3>Pass 8:</h3>
+
+        <p>Dasselbe Vorgehen wird im achten Durchlauf bei Auftreten von Basic-Schlüsselworten, die zum Start beziehungsweise zur Steuerung des Profi-Ass nötig sind, angewendet. Allerdings können dabei auch irrtümlich Fehlermeldungen ausgegeben werden, dann, wenn Label Basic-Worte enthalten. Diese Zeilen können später ganz gelöscht beziehungsweise nur das Semikolon am Zeilenanfang entfernt werden.</p>
+
+        <h3>Pass 9:</h3>
+
+        <p>Bei den akkumulatorbezogenen Assemblerbefehlen ROR, ROL, ASL und LSR muß bei Profi-Ass der Operand »A« angegeben werden, bei Hypra-Ass dagegen darf er nicht vorkommen. Deswegen werden in Pass 9 alle bei diesen Mnemonics vorkommenden Akkuoperanden aus dem Quelltext entfernt.</p>
+
+        <h3>Pass 10:</h3>
+
+        <p>Im zehnten Durchlauf müssen vor Mnemonics Leerstellen eingefügt werden, vor Label jedoch nicht, um eine einwandfreie Formatierung durch den Hypra-Editor zu erreichen. Dabei werden gleichzeitig auch alle überflüssigen Spaces aus dem Quelltext entfernt.</p>
+
+        <h3>Allgemeine Hinweise</h3>
+
+        <p>Während des Durchlaufs wird die jeweils bearbeitete Zeilennummer und der betreffende Pass angezeigt. Zusätzlich ist eine interruptgesteuerte Zeitanzeige vorhanden, um bei längeren Programmen zu signalisieren, daß der Computer noch arbeitet, und sich nicht vorzeitig verabschiedet hat. Es ist jederzeit möglich, das Programm mit der &lt;STOP&gt;-Taste zu unterbrechen und danach neu zu starten. Bei allen Korrekturen von Hypra-Ass aus können die reversen Zeilen, die Basic-Worte enthalten, ganz gelöscht werden. Bei Zeilen, die wieder in den Text eingegliedert werden sollen, genügt es, das führende Semikolon zu entfernen und &lt;RETURN&gt; zu drücken. Ein vollständig transformiertes Programm kann anschließend ganz normal gespeichert und über den Hypra-Befehl /l geladen werden.</p>
+
+        <address class="author">(O. Kaudelka/ah)</address>
+
+        <figure>
+            <pre data-filename="pth-trans.prg" data-name="PTH-TRANS" data-mse=mse1></pre>
+            <figcaption>Listing 1. »PTH-TRANS« ist mit dem MSE einzugeben. Nach dem Start mit SYS 49152 wird aus einem Profi-Ass-Quelltext ein Hypra-Ass-Quelltext erzeugt.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="pth-trans.prg" data-name="PTH-TRANS"></div>
+    </article>
+</body>
+
+</html>

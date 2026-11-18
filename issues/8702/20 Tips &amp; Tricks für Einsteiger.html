@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Einsteiger</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="tr, Bernd Wiedemann, Marcus Krechel, Michael Fabry, Kai Engert, Ralf Enz, Dr. L.Meyding, Urs Pfister, T. Schlabach">
+    <meta name="64er.issue" content="2/87">
+    <meta name="64er.pages" content="20-22">
+    <meta name="64er.head1" content="Einsteiger">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Einsteiger-Teil">
+    <meta name="64er.index_title" content="Doppel-PEEK">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Eingabegeräte">
+    <meta name="64er.index_title" content="Joystick-Test">
+    <meta name="64er.index_category" content="Hardware-Tests|Eingabegeräte">
+    <meta name="64er.index_title" content="Tip zum MSE">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Programmieren">
+    <meta name="64er.index_title" content="&lt;RUN/STOP&gt; abfangen">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Programmieren">
+    <meta name="64er.index_title" content="Der kleinste Sprite-Editor, Teil 2">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Grafik">
+    <meta name="64er.index_title" content="Disk full Error!">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Floppy &amp; Datasette">
+    <meta name="64er.index_title" content="Einfacher Directory-Listschutz">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Floppy &amp; Datasette">
+    <meta name="64er.index_title" content="Erklärung zum vibrierenden Bildschirm">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Grafik">
+    <meta name="64er.id" content="tips_einsteiger">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Einsteiger</h1>
+        <p class="intro">Heute erzählen wir Ihnen einiges über den MSE, zeigen Ihnen zwei nützliche Programmier-Tricks für Floppy-Besitzer, einen Tip, wie man die &lt;RUN/STOP&gt;-Taste von Basic-Programmen aus ohne Programmunterbrechung abfragen kann und vieles mehr.</p>
+
+        <p>Wir werden sehr häufig von Lesern auf einen »Fehler« in unserer Eintipphilfe MSE aufmerksam gemacht. Wenn man ein Programm eintippt, und es sich später mittels der CTRL-M-Funktion noch einmal anschaut, kann man folgenden Effekt beobachten: Die letzte Zeile hat fast jedesmal einen anderen Inhalt und eine andere Prüfsumme, obwohl man das Programm doch richtig eingegeben hat. Woran liegt das?</p>
+
+        <p>Dazu muß man etwas weiter ausholen. Zunächst: Es handelt sich hierbei nicht um einen Fehler im MSE.</p>
+
+        <p>Eine MSE-Zeile läßt sich nicht mit einer Basic-Programmzeile vergleichen. Der C 64 besteht aus insgesamt 65535 einzelnen Speicherstellen. Jede hat eine Nummer von 0 bis 65535, eben ihre Adresse. Diese Adresse schreibt man üblicherweise in einem anderen Zahlensystem, dem Hexadezimalsystem. Hier wird jede Stelle einer Zahl nicht von 0 bis 9 hochgezählt, sondern von 0 bis 9 und dann von A bis F. Unsere »normale« Zahl 10 hat zum Beispiel im Hexadezimalsystem den Wert A, 0F bedeutet 15 und so weiter. Die Zahl 65535 ist die größte, mit vier Ziffern darstellbare Hexadezimalzahl (kurz mit »Hexzahl« bezeichnet), nämlich $FFFF. Das »$« kennzeichnet die Zahl als Hexzahl.</p>
+
+        <p>Mit diesem Wissen ausgerüstet, können wir das Problem »letzte Zeile beim MSE« schon etwas näher angehen. Am Anfang jeder MSE-Zeile steht eine vierstellige Hexzahl, die die Adresse der ersten (!) zweistelligen Hexzahl in dieser Zeile angibt. Diese zweistellige Zahl ist der Inhalt der mit der Adresse angegebenen Speicherstelle und wird auch Byte genannt. Die nächste zweistellige Zahl ist dann der Inhalt der nächsten Speicherstelle und so weiter. In jeder MSE-Zeile wird also der Inhalt von acht aufeinanderfolgenden Speicherstellen dargestellt. Die neunte und letzte Hexzahl in jeder MSE-Zeile ist eine Prüfsumme, anhand derer der MSE feststellen kann, ob Sie die jeweilige Zeile richtig eingetippt haben.</p>
+
+        <p>Wenn ein abgedrucktes Programm nun zum Beispiel mit der dritten Speicherstelle in der letzten MSE-Zeile endet, ist der Rest der Zeile für das Programm unwichtig. Da aber die Prüfsumme (das letzte Byte in jeder Zeile) über alle acht Byte gebildet wird (auch über die in der letzten MSE-Zeile unwichtigen), kann sie sich nach jedem Laden ändern.</p>
+
+        <p>Also: Wenn Sie ein eingetipptes MSE-Programm mit der CTRL-M-Funktion überprüfen, achten Sie nur darauf, daß die vom Programm auch wirklich belegten Adressen mit dem Listing im 64'er-Magazin übereinstimmen. Doch welches ist das letzte Byte? Am Anfang jedes Listings finden Sie eine Kopfzeile, in der Name, Start- und Endadresse des Programms stehen. Wenn nun die Endadresse zum Beispiel $C01C lautet, und die letzte MSE-Zeile zum Beispiel mit der Adresse $C018 beginnt, finden Sie das letzte Byte so: Zählen Sie hexadezimal von $C018 bis $C01C ($C018 — $C019 — $C01A — $C01B — $C01C). Das Programm endet also bei der fünften zweistelligen Hexadezimalzahl. Bis zu dieser Zahl muß das Programm korrekt sein. Die restlichen drei Zahlen sind für das einwandfreie Funktionieren unwichtig.</p>
+
+        <p>Wenn Sie noch weitere Fragen zum MSE haben, schreiben Sie uns (Stichwort »Fragen zum MSE«). Wir werden Ihnen soweit wie möglich helfen.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>Doppel-PEEK</h2>
+
+        <p>Wenn man zum Beispiel feststellen möchte, wo ein Basic-Programm im Speicher endet, gibt man normalerweise ein:</p>
+
+        <pre><code>PRINT PEEK(45)+PEEK(46)*256</code></pre>
+
+        <p>Als Ergebnis erhält man die erste Adresse nach dem Programm. Die Speicherzellen 45 und 46 enthalten diese Adresse. Im Handbuch sind im Anhang noch weitere nützliche Speicherstellen beschrieben.</p>
+
+        <p>Wenn man die DEF FN-Funktion trickreich einsetzt, kann man die oben genannte Zeile wesentlich kürzer schreiben. Als erstes definieren wir uns eine DEEK-Funktion:</p>
+
+        <pre><code>DEF FN DEEK(X) = PEEK(X) + PEEK(X+1) * 256</code></pre>
+
+        <p>Um nun wieder die Endadresse des aktuellen Basic-Programms auszugeben, geben Sie ein:</p>
+
+        <!-- So im Heft gedruckt: die Programmzeile ist das letzte Element vor der Autorenzeile. -->
+        <pre><code>PRINT FN DEEK(45)</code></pre>
+
+        <address class="author">(Bernd Wiedemann/tr)</address>
+
+        <h2>Disketten-Check</h2>
+
+        <p>Bei vielen Programmen, die auf Diskette zugreifen, ist es wichtig, daß der Benutzer auch die richtige Diskette eingelegt hat. Am einfachsten ist es, den Namen der Diskette zu überprüfen. Das geht so:</p>
+
+        <pre><code>10 OPEN 1,8,15,"I":OPEN 2,8,2,"# ":PRINT#1,"M-R" CHR$(144) CHR$(7) CHR$(16)
+20 INPUT#1,A$:CLOSE 2:CLOSE 1</code></pre>
+
+        <p>Danach steht in der Variablen A$ der Name der Diskette (ohne ID). Er kann nun zum Beispiel auf dem Bildschirm ausgegeben oder mit einer IF-THEN-Abfrage bearbeitet werden. Achtung: Wenn der Name der Diskette weniger als 16 Zeichen lang ist, wird der Rest automatisch mit &lt;SHIFT-SPACE&gt;-Zeichen aufgefüllt. Darauf sollte man bei einer IF-Entscheidung achten.</p>
+
+        <address class="author">(Marcus Krechel/tr)</address>
+
+        <h2>Joystick-Test</h2>
+
+        <p>Mit dem Programm »JOYTEST« (siehe Listing 1) kann man die Bewegungen eines Joysticks am Port 2 testen. Das Programm zeigt die vier Richtungen und den Feuerknopf grafisch auf dem Bildschirm. Wird der Joystick in einer der Richtungen bewegt, ändert das entsprechende Symbol seine Farbe. In den Zeilen 140 bis 190 kann man sehen, wie so eine Abfrage programmiert wird.</p>
+
+        <address class="author">(Michael Fabry/tr)</address>
+
+        <figure>
+            <pre data-filename="joytest" data-name="JOYTEST" data-checksummer="3"></pre>
+            <figcaption>Listing 1. »JOYTEST«. So fragt man einen Joystick ab.</figcaption>
+        </figure>
+
+        <h2>Disk full Error!</h2>
+
+        <p>Haben Sie gewußt, daß Sie von einem Programm aus feststellen können, wie viele Blöcke auf einer Diskette noch frei sind? Wichtig vor allem, wenn man zum Beispiel eine Datei anlegen möchte, und schon vorher wissen muß, ob sie überhaupt noch auf die Diskette paßt. Das Ganze geht mit zwei Programmzeilen:</p>
+
+        <pre><code>10 OPEN1,8,15,"I":PRINT#1,"M-R"CHR$(250)CHR$(2)CHR$(3)
+20 GET#1,A$,B$,B$:A=ASC(A$+CHR$(0))+256*ASC(B$+CHR$(0)):CLOSE1</code></pre>
+
+        <p>Wenn diese beiden Zeilen durchlaufen wurden, steht in der Variablen A die Anzahl an freien Blöcken zur Weiterverarbeitung bereit.</p>
+
+        <address class="author">(Kai Engert/tr)</address>
+
+        <h2>Einfacher Directory-Listschutz</h2>
+
+        <p>Wer seine Disketten vor fremden Augen schützen möchte, sollte diese in Zukunft mit</p>
+
+        <pre><code>OPEN1,8,15,"N:Name,&lt;SHIFT+L&gt; ":CLOSE1</code></pre>
+
+        <p>formatieren. Durch das &lt;SHIFT+L&gt;-Zeichen bricht der C 64 beim Laden und Listen des Directorys mit einer Fehlermeldung ab. Programme lassen sich aber trotzdem speichern und laden.</p>
+
+        <address class="author">(Ralf Enz/tr)</address>
+
+        <h2>Der kleinste Sprite-Editor, Teil 2</h2>
+
+        <p>Im 64'er-Magazin, Ausgabe 11/86, wurde auf Seite 25 der »kleinste Sprite-Editor der Welt« vorgestellt. Der einzige Nachteil daran ist, daß das erstellte Sprite während der Datenberechnung vom Bildschirm verschwindet. Korrekturen lassen sich also nicht mehr durchführen. Die beiden untenstehenden Programmzeilen stellen denselben Editor wie in Ausgabe 11 dar, mit Ausnahme des genannten Nachteils.</p>
+
+        <pre><code>1 FOR I=0 TO 2:A=0:FOR N=0 TO 7:A=A-2↑(7-N)*(PEEK(1024+40*X+N+8*I)=42):NEXT:A(I+1)=A
+2 NEXT:PRINT TAB(25)A(1)A(2)A(3):X=X+1:IF X&lt;21 THEN 1</code></pre>
+
+        <p>Die errechneten Sprite-Werte werden rechts neben dem Sprite ausgegeben.</p>
+
+        <address class="author">(Dr. L.Meyding/tr)</address>
+
+        <h2>&lt;RUN/STOP&gt; abfangen</h2>
+
+        <p>Bei vielen professionellen Programmen möchte man aus Gründen der Bedienungssicherheit, daß das Programm nicht abgebrochen werden kann. Die untenstehenden Programmzeilen bewirken, daß das Programm bei der ersten Programmzeile fortgesetzt wird, wenn man &lt;RUN/STOP&gt; drückt.</p>
+
+        <pre><code>DATA 165,145,201,127,208,3,32,142,166,96
+FOR I=828 TO 837:READ A:POKE I,A:NEXT:SYS 828</code></pre>
+
+        <p>Zwei Dinge muß man aber beachten:</p>
+
+        <p>1) Die erste Zeile des Programms sollte eine Variable testen, von der man sicher weiß, daß sie innerhalb des Programms ständig gebraucht wird, also niemals gleich Null ist. Zum Beispiel:</p>
+
+        <pre><code>10 IF A&lt;&gt;0 THEN GOTO xxx</code></pre>
+
+        <p>Für xxx sollte man die Zeilennummer einsetzen, ab der das Programm nach dem Drücken der &lt;RUN/STOP&gt;-Taste fortgesetzt werden soll (zum Beispiel eine entsprechende Meldung).</p>
+
+        <p>Was bringt das? Auf diese Weise können Sie zum Beispiel von Programm aus auf das Drücken der &lt;RUN/STOP+RESTORE&gt;-Taste reagieren. Angenommen, Sie haben eine Dateiverwaltung programmiert und möchten, daß der Benutzer mit der genannten Taste ins Hauptmenü zurückspringen kann. Nehmen wir weiter an, daß Sie in Ihrem Programm laufend die Variable A verwenden und daß das Hauptmenü bei Zeile 100 beginnt. Die erste Programmzeile muß dann so aussehen:</p>
+
+        <pre><code>10 IF A&lt;&gt;0 THEN GOTO 100</code></pre>
+
+        <p>2) Obwohl das Programm wieder mit der ersten Zeile des Programms fortgesetzt wird, bleiben alle Variablen erhalten.</p>
+
+        <address class="author">(Urs Pfister/tr)</address>
+
+        <h2>Erklärung zum vibrierenden Bildschirm</h2>
+
+        <p>Im 64'er-Magazin, Ausgabe 11/86, wurde in dieser Rubrik ein Einzeiler veröffentlicht, der den Bildschirm vibrieren läßt. Er lautete:</p>
+
+        <pre><code>0 FOR A=0 TO 15:POKE 53270,A:NEXT:GOTO0</code></pre>
+
+        <p>Laut Commodore-Handbuch ist die Speicherzelle 53270 das Register 38 des VIC, also des Bausteins, der für die Bildaufbereitung im C 64 zuständig ist. Wir wollen dieses Register einmal näher untersuchen. Das Handbuch liefert hierzu folgende Erklärung:</p>
+
+        <p>] N.C.] N.C.] RST] MCM] CSEL] XSCL2] XSCL1] XSCL0]</p>
+
+        <p>Aufschlußreich, nicht wahr? Was bedeutet diese Darstellung? Als erstes einmal muß man wissen, daß jede Speicherzelle aus insgesamt 8 Bit besteht, die jeweils den Wert null oder eins annehmen können. Aus diesen 8 Bit wird dann der Wert (0 bis 255) zusammengesetzt, der den Inhalt dieses Registers darstellt. Jedes Bit wird durch eine Zweierpotenz berechnet. Wenn zum Beispiel nur Bit 4 gesetzt werden soll, muß man in diese Speicherstelle den Wert 24=16 schreiben. Wenn man Bit 0 und Bit 7 setzen möchte, lautet der dazugehörige Wert 2<sup>0</sup>+2<sup>7</sup>=129. Die Darstellung weiter oben repräsentiert also die Aufteilung des Registers in acht Bit. Jedes Bit hat eine eigene Funktion:</p>
+
+        <p>— Bit 0 bis 3: Diese Bits sind für die Funktion des erwähnten Einzeilers zuständig. Sie legen die X-Position des Bildschirms fest. Werden sie verändert, verschiebt er sich vertikal. Allerdings wird der Inhalt des Bildschirms nicht mitverschoben. Lediglich der Rand bewegt sich.</p>
+
+        <p>— Bit 3: Wird dieses Bit gelöscht, reduziert sich die Anzahl an Zeichen pro Zeile von 40 auf 38. Nur wird dabei nicht, wie man annehmen müßte, jeweils links und rechts eine Spalte »abgeschnitten«, sondern auf der linken Seite sieben Punkte und rechts neun Punkte (jedes Zeichen besteht aus 8 mal 8 Punkten) weggenommen.</p>
+
+        <p>— Bit 4: Dieses Bit schaltet den Mehrfarben- (Multicolor-) Modus ein. Es hat allerdings nur Wirkung, wenn die hochauflösende Grafik eingeschaltet wurde.</p>
+
+        <p>— Bit 5: Bei der Bedeutung dieses Bits scheiden sich die Geister. Laut Hersteller des VICs beendet der Baustein beim Setzen des Bits sämtliche Aktivitäten, also auch die Erzeugung des Bildes für den Fernseher oder Monitor. Beim Redaktions-C 64 und beim C 64 des Autors trat dieser Effekt jedoch nicht auf. Vielleicht hat irgendein Hardwarefreak eine Erklärung dafür.</p>
+
+        <p>Bit 6 und 7: werden nicht verwendet.</p>
+
+        <address class="author">(T. Schlabach/tr)</address>
+    </article>
+</body>
+
+</html>

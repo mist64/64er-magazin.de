@@ -1,0 +1,58 @@
+
+
+;flpt c128.prg ==1c01==
+;version=70
+   10 rem ************************************************
+   20 rem *                                              *
+   30 rem *   programm zum umwandeln von zahlen in die   *
+   40 rem *   c128-formate   mflpt  (ab $6000)           *
+   50 rem *                   flpt  (ab $6010)           *
+   60 rem *                                              *
+   70 rem *       heimo ponnath  hamburg  1986           *
+   80 rem *                                              *
+   90 rem ************************************************
+  100 rem
+  110 for i=0 to 17:rem einlesen des maschinenprogrammes
+  120 read d$:poke dec("1600")+i,dec(d$)
+  130 next i
+  140 rem -------- das maschinenprogramm ------------
+  150 data a2,00   :rem ldx #$00     ;lsb zieladresse
+  160 data a0,60   :rem ldy #$60     ;msb    -"-
+  170 data 20,03,8c:rem jsr $8c03    ;fac -> (x/y)
+  180 data a2,06   :rem ldx #$06     ;zaehler einrichten
+  190 data b5,62   :rem lda $62,x    ;fac auslesen
+  200 data 9d,0f,60:rem sta $600f,x  ;und uebertragen
+  210 data ca      :rem dex          ;zaehler -1
+  220 data d0,f8   :rem bne $1609    ;weiter bis fac uebertragen ist
+  230 data 60      :rem rts          ;zurueck ins basicprogramm
+  240 rem
+  250 rem -------- usr-vektor auf $1600 richten -----
+  260 rem
+  270 poke dec("1219"),0 :rem lsb des usr-vektors
+  280 poke dec("121a"),22:rem msb desselben
+  290 bank 15:rem sicherheitshalber
+  300 rem
+  310 rem -------- eingaben und usr-aufruf ----------
+  320 rem
+  330 print chr$(147):input"zahl eingeben";a
+  340 b=usr(a):rem b ist nur ein dummy
+  350 rem
+  360 rem ----- progr.direktmodus : monitoraufruf -----
+  370 printchr$(147)chr$(17)
+  380 print"monitor"chr$(17)chr$(17)chr$(17)chr$(17)
+  390 print"m 06000 06001"chr$(17):rem hier liegt die zahl im mflpt-format
+  400 print"m 06010 06011"chr$(17):rem und hier im flpt-format
+  410 print"x"chr$(17)
+  420 print"run480"
+  430 printchr$(19);
+  440 bank0:poke842,13:poke843,13:poke844,13:poke845,13:poke846,13
+  450 poke208,5:end
+  460 rem ---------------------------------------------
+  470 rem
+  480 print:print"ab $6000 mflpt-format"
+  490 print"ab $6010 flpt-format"
+  500 print:input"weitere zahlen (j/n)";a$
+  510 if a$="j" then 330
+  520 poke dec("1219"),40:poke dec("121a"),125:rem usr-vektor auf normalwert
+  530 end
+

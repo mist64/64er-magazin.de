@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Trickfilme mit dem C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="og, Helmut Burgemeister, og">
+    <meta name="64er.issue" content="2/87">
+    <meta name="64er.pages" content="50,53-61">
+    <meta name="64er.head1" content="Listing des Monats">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Listing des Monats">
+    <meta name="64er.toc_title" content="Listing des Monats: Film-Generator zum Abtippen">
+    <meta name="64er.index_title" content="Trickfilme mit dem C 64">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik">
+    <meta name="64er.id" content="trickfilme">
+</head>
+
+<body>
+    <article>
+        <h1>Trickfilme mit dem C 64</h1>
+        <p class="intro">Bildschirmfüllende Trickfilme flitzen mit einer Geschwindigkeit über den Bildschirm, daß man fast meint vor einem Fernseher zu sitzen. Mit 14 Bildern pro Sekunde sind die Filme nahezu flimmerfrei. Ein komfortabler Editor und die Möglichkeit, Sequenzen zu schneiden und zu mischen, runden das Programm ab.</p>
+
+        <figure>
+            <img src="50-0.png" alt="Bildschirmfoto: grob gerasterte rote Figur auf schwarzem Grund, mit Bewegungsunschärfe">
+        </figure>
+
+        <p>Wieder hat eine neue Idee die Fähigkeiten des C 64 unter Beweis gestellt. Die Umrechnung einer Hires-Grafik in Blockgrafik und das anschließende Aneinanderfügen der Bilder zu einem Film ist schon eine kleine Sensation. Die Trickfilme aus dem C 64 müssen Sie einfach gesehen haben!</p>
+
+        <p>Die bisher üblichen Lösungen basierten darauf, nur kleine Bildschirmausschnitte von einem Viertel der Gesamtgröße schnell nacheinander abzuspielen oder gar in die Vektorgrafik überzugehen. Beide Möglichkeiten waren entweder extrem speicherintensiv oder, je nach Anzahl der zu zeichnenden Linien, zu langsam. Konvertiert man dagegen die Hires-Bilder in den Blockzeichensatz des Textbildschirms, also 25x40 Zeichen, sind so schon 61 Bilder im C 64 unterzubringen. Im normalen Zeichensatz entspricht dies einer Auflösung von 50x80, bei geändertem Zeichensatz 100x80 Punkten. Gegenüber den 64000 Punkten der hochauflösenden Grafik besteht ein Bild nun nur noch aus 1000, beziehungsweise 2000 Punkten. Bei Hires sind dabei 8 KByte belegt, bei Lores nur jeweils 1 KByte. Durch die extrem kurzen Programmteile bleibt für die niedrig aufgelösten Grafiken 61 KByte Speicherplatz frei. Der für die 100x80-Grafiken nötige Zeichensatz verringert natürlich den freien Platz auf etwa 53 KByte.</p>
+
+        <p>Die Abspielgeschwindigkeit der Filme erreicht über die Hälfte der üblichen Filmgeschwindigkeit: Da pro Grafik nur 1000 Bytes zu übertragen sind, sind bis zu 14 Bilder pro Sekunde möglich. Der erzeugte Bewegungseffekt ist von einem normalen Film mit 24 Bildern pro Sekunde kaum noch zu unterscheiden.</p>
+
+        <p>Eigentlich sind es ja zwei Programme, da für die beiden Auflösungen einige Programmteile abgeändert wurden. Der gravierendste Unterschied besteht im geänderten Zeichensatz in der 100x80-Auflösung und im Editor, der beliebige Sequenzen (Cuts) schneidet und mischt.</p>
+
+        <p>Natürlich braucht man zum Konvertieren eine entsprechende Hires-Vorlage. Eine Möglichkeit, an fortlaufende Hires-Grafiken zu kommen, besteht im Digitalisieren von Filmausschnitten. Diese konvertiert man dann einfach, und schon steht der fertige Trickfilm bereit. Die Farbwerte der Hires-Bilder werden bei der Umrechnung in das Lores-Format berücksichtigt und entsprechend umgerechnet. Dazu stehen genügend Hilfsmittel zur Nachbearbeitung der Bilder bereit. Für die Auflösung 100x80 stehen ausführliche Editiermöglichkeiten zu Verfügung. Zum Beispiel lassen sich beliebige Sequenzen, sogenannte Cuts, herausschneiden und beliebig aneinanderreihen, um sie vor- und rückwärts abzuspielen.</p>
+
+        <p>Da die Filme auf Diskette bis zu 245 Blöcke lang sind, sorgt ein Schnellader für eine erträgliche Ladezeit. Die knapp 60 KByte füllen in etwa 30 Sekunden den Speicher des C 64. Dies entspricht der fünffachen Ladegeschwindigkeit des normalen Betriebssystems.</p>
+
+        <p>Das Programm selbst besteht aus mehreren Teilen, Basic und Maschinensprache gemischt. Alle zeitkritischen Teile sind in Maschinensprache gehalten. Lediglich Eingaben, Lade- und Steuerprogramme sind in Basic geschrieben. Die Programmteile sind insgesamt möglichst kurz und in Overlay-Technik programmiert, damit Platz für möglichst viele Bilder bleibt.</p>
+
+        <address class="author">(og)</address>
+
+        <aside>
+            <h2>Lebenslauf:</h2>
+
+            <img class="inline" src="50-00.png" alt="Porträt eines jungen Mannes mit Brille und heller Jacke">
+
+            <p>Helmut Burgemeister wurde am 12. 12. 1969 geboren. Über Volks- und Hauptschule gelangte er zur Handelsakademie, die mit dem Abitur abschließt.</p>
+
+            <p>Seit drei Jahren programmiert er den C 64, vorwiegend in Basic und Logo.</p>
+
+            <p>Weitere Interessen gelten der Musik, vor allem dem Klavier und dem Lesen von Büchern.</p>
+        </aside>
+
+        <h2>Trickfilme mit dem C 64</h2>
+
+        <p class="intro">Dia-Shows und Trickfilme, die mit einer Auflösung bis 100x80 Punkten über den Bildschirm flattern, sind das Ergebnis des Trickfilmgenerators. Grafiken aus der Hires-Bitmap, konvertiert in die niedrigere Auflösung des Textbildschirms, gestatten bis zu 63 Bilder gleichzeitig im Speicher des C 64.</p>
+
+        <p>Schnelles Abspielen von Filmen ist in der normalen Hires-Auflösung von 320x200 Punkten kaum möglich, da in diesem Format keine zehn Bilder in den C 64 passen. Konvertiert man dagegen die Hires-Bilder in den Blockzeichensatz des Textbildschirms, also 25x40 Zeichen, sind so schon 61 Bilder im C 64 unterzubringen. Im normalen Zeichensatz entspricht dies einer Auflösung von 50x80, bei geändertem Zeichensatz 100x80 Punkten. Auch die Abspielgeschwindigkeit kann sich sehen lassen: bis zu 14 Bilder pro Sekunde sind möglich.</p>
+
+        <p>Die zu verarbeitenden Bilder sollten das Koala-Format einhalten, das ist jedoch nicht zwingend. Zudem können Sie den Konverter aus Sonderheft 6/86 hernehmen, um Farbbilder ins Koala-Format zu bringen.</p>
+
+        <p>Eine Möglichkeit, um an fortlaufende Hires-Grafiken zu kommen, besteht natürlich im Digitalisieren von Filmausschnitten. Auf der Programmservice-Diskette befindet sich für jede Auflösung ein Beispiel-Film.</p>
+
+        <p>Die einzelnen Grafiken können Sie auch editieren, in der 100x80-Auflösung besteht die Möglichkeit, die Sequenzen herauszuschneiden, diese beliebig aneinanderzureihen und vor- oder rückwärts abzuspielen.</p>
+
+        <h3>Programmbeschreibung und Abtipphinweise:</h3>
+
+        <p>Das Programm besteht aus mehreren Teilen, von denen sich immer nur die gerade benötigten im Computer befinden. Für beide Auflösungen sind insgesamt 26 Programme (inklusive Ladeprogramme) erforderlich.</p>
+
+        <p>Die Listings 1 bis 14 geben Sie bitte mit dem Checksummer ein und speichern diese auf Diskette. Dann tippen Sie die Listings 15 bis 26 mit dem MSE ab und speichern sie auf die gleiche Diskette.</p>
+
+        <p>Listing Nummer 14 »ZSATZ-GENERATOR« nimmt eine Sonderstellung ein. Es generiert den Zeichensatz für die 100x80-Auflösung. Starten Sie Listing 14 als erstes. Der Generator schreibt selbständig den neuen Zeichensatz auf die Diskette. Danach können Sie den Generator auf eine andere Diskette sichern und auf der Trickfilmdiskette löschen. Er wird danach nicht mehr benötigt. Auf der Programmservice-Diskette ist deshalb nur der Zeichensatz und nicht das Generator-Programm enthalten.</p>
+
+        <!-- Überschrift mit Schlußpunkt: So im Heft gedruckt -->
+        <h3>1. Bilder erstellen.</h3>
+
+        <p>Laden Sie zuerst das Programm »PIXLER« und starten Sie es mit RUN. Daraufhin wird das Maschinenprogramm »MPPIXLER« nachgeladen.</p>
+
+        <p>Zuerst fragt das Programm, ob ein Bild geladen werden soll. Das sollte man tun, wenn es der erste Aufruf ist, oder kein Bild im Speicher ab $A000 liegt. Danach sieht man die Grafik, wie sie im Speicher liegt. Auf Tastendruck sucht der Pixler die dazugehörenden Farben, entsprechend der Koala-Bilder. Durch Eingabe von &lt;N&gt; wird kein Bild geladen, mit &lt;A&gt; (wie Ausstieg) kann das Programm abgebrochen werden.</p>
+
+        <p>Nun wird man gefragt, ob man die vom Computer gewählten Farben übernehmen will. Die Vorder- und Hintergrundfarbe kann gewählt werden.</p>
+
+        <p>Als nächstes ist der Kontrast an der Reihe. Eine 8 ist als Mittelwert vorgegeben. Doch es gibt von Bild zu Bild sehr große Abweichungen. Experimentieren ist hier angebracht.</p>
+
+        <p>Im nächsten Schritt kann das Bild gespeichert werden; am besten auf einer extra Bilder-Diskette. Der Filename ist frei wählbar. Wird dem Filenamen ein Punkt ».« angehängt, werden die Farben ebenfalls gespeichert. Wissen Sie noch nicht, wie die Grafik aussieht, und wollen auch noch nicht speichern, dann ist die Frage mit &lt;RETURN&gt; zu übergehen.</p>
+
+        <p>Mit &lt;SPACE&gt; kann zwischen der Hires-Darstellung und dem konvertierten Bild umgeschaltet werden. Jede andere Taste führt an den Anfang zurück.</p>
+
+        <p>Analog verläuft das Ganze, wenn mit der höheren Auflösung 100x80 gearbeitet wird. Unterschiede bestehen nur im zu ladenden Programm »SUPERPIXLER« und in der Voreinstellung des Kontrastes, der hier bei 4 liegt.</p>
+
+        <h3>2. Bilder drucken:</h3>
+
+        <p>(dieses Programm ist nur bei der geringeren Auflösung verfügbar)</p>
+
+        <p>Dazu laden Sie das File »DRUCKEN« von der Diskette und starten es. Sie werden nun aufgefordert, die Diskette mit Ihrem auszudruckenden Bild einzulegen und dessen Namen einzugeben. Außerdem wird noch gefragt, ob das Bild invertiert zu drucken ist. Das sollten Sie immer machen, wenn das Bild mit einer dunkleren Hintergrund- als Vordergrundfarbe gespeichert wurde. Dann startet der Druckvorgang.</p>
+
+        <h3>3. Film erstellen:</h3>
+
+        <p>Dazu laden Sie das File »FILM MAKER« von Diskette und geben LIST100- ein. In dieser DATA-Zeile müssen die Bildnamen, die zu einem Film zusammengehängt werden sollen, stehen. Wenn eine Zeile nicht reicht, können natürlich alle höheren Zeilennummern für weitere DATA-Zeilen verwendet werden. Als letzter Name ist ein »*« einzugeben. Es sind bis zu 61 Bilder erlaubt, bei der hohen Auflösung bis zu 53 Bilder.</p>
+
+        <p>Nach Eingabe von RUN fordert das Programm dazu auf, die Diskette mit den Bildern einzulegen. Nach Drücken der &lt;RETURN&gt;-Taste startet das Verketten. Danach muß die Trickfilm-Diskette eingelegt und nochmals &lt;RETURN&gt; gedrückt werden. Nach kurzem Nachladen wird nach dem Filmnamen gefragt, unter dem der Film auf Diskette gespeichert werden soll. Da das Programm hier wieder auf die &lt;RETURN&gt;-Taste »wartet«, kann eine spezielle »Film-Diskette« eingelegt werden. Sehr wichtig ist allerdings, daß auf der Diskette noch genügend freier Platz vorhanden ist. Für jedes Bild sind vier Blöcke zu berücksichtigen. Nach &lt;RETURN&gt; wird der Film gespeichert.</p>
+
+        <p>Nun muß nur noch das File »MPVIEWER« auf der Filmdiskette gespeichert werden.</p>
+
+        <h3>4. Film ansehen:</h3>
+
+        <p>Laden und starten Sie das Programm »SEE FILM«.</p>
+
+        <p>Das Programm lädt kurz nach und fragt nach dem Filmnamen. Jetzt muß die Film-Diskette eingelegt und der Filmname angegeben werden.</p>
+
+        <p>Der Film, der bis zu 245 Blöcke lang sein kann, wird mit Hilfe einer Schnelladeroutine mit 5facher Normalgeschwindigkeit in den Speicher geladen. Danach muß wieder die Trickfilm-Diskette eingelegt und &lt;F1&gt; gedrückt werden. Nach kurzem Nachladen wird nach Hintergrund- und Punktfarbe gefragt. Falls Sie sich in der höheren Auflösung befinden, lesen Sie unter Editor weiter.</p>
+
+        <p>Nun wird nach der Endadresse gefragt. Sie ergibt sich aus der Anzahl der Bilder mal 1000. Die wirkliche Endadresse wird vorgegeben. Dann startet der Film. Die Geschwindigkeit kann mit &lt;CRSR&gt;-rechts und &lt;CRSR&gt;-unten gesteuert werden. Zum Abbrechen dient &lt;RUN/STOP&gt;. Mit RUN wird erneut gestartet und neue Parameter können gewählt werden.</p>
+
+        <h3>Editor</h3>
+
+        <p>Bei der höheren Auflösung haben Sie jetzt einen Editor vor sich. Er enthält einige Menüpunkte, die sich von selbst erklären. Interessant ist der Punkt 4, »Sequenzen schneiden«. Zuerst können Cuts genommen werden. Es wird nach Anfangs- und Endbild gefragt (0 bis höchstens 53). Fehleingaben werden abgefangen. Danach wird die Sequenz durchgespielt. Es wird bei jedem Bild auf eine Taste gewartet, um eine genaue Einstellung zu ermöglichen. Am besten hält man &lt;SPACE&gt; gedrückt. Schließlich kommt die Abfrage, ob der Cut okay ist. Wenn nicht, kann er nochmals eingegeben werden. Falls keine Cuts mehr erstellt werden sollen, muß -1 eingegeben werden.</p>
+
+        <p>Jetzt wird nach der voraussichtlichen Anzahl der Sequenzen gefragt. Tippen Sie lieber zu viel als zu wenig ein. Dann können die Sequenzen mit Cuts belegt werden. Dazu fragt der Computer nach der Cut-Nummer (0 bis Anzahl der Cuts). Fehleingaben werden wieder abgefangen. Danach muß noch angegeben werden, ob der Cut vor- oder rückwärts gespielt werden soll: »0« für vor- oder »1« für rückwärts.</p>
+
+        <p>Soll der Menüpunkt abgebrochen werden, bevor alle Sequenzen belegt sind, muß als Cut-Nummer nur -1 eingegeben werden. Nach der Anzeige der Anzahl der Sequenzen befinden Sie sich dann wieder im Hauptmenü und können Ihre Sequenz mit Punkt 5 ansehen. Des weiteren ist Laden und Speichern, jeweils mit Angabe des File-Namens, erlaubt. Aus einem laufenden Film kommt man mit &lt;RETURN&gt; heraus.</p>
+
+        <h3>5. Dia-Show:</h3>
+
+        <p>Wenn Sie Ihren Gästen eine Dia-Vorführung präsentieren wollen, dann ist dieses Programm bestens geeignet. Laden Sie das Programm »DIA VIEWER« und geben »LIST 100-« ein. Dann verfährt man wie beim Film, und gibt die Bilder, die zu einer Dia-Show zusammengefügt werden sollen, ein. Als letzter Name muß immer ein »*« stehen. Das Programm wird wieder mit RUN gestartet. Daraufhin wird nach Vordergrund- und Hintergrundfarbe (0 bis 15) und ob Farbbilder gewünscht werden gefragt. Die Farb-Files müssen sich natürlich auf derselben Diskette befinden und sind durch einen angehängten ».« zu erkennen. Nach dem Einlegen der Diadiskette startet man mit &lt;RETURN&gt;. Nach kurzer Zeit beginnt die Show. Nach jedem Bild drücken Sie eine Taste zum Weitermachen.</p>
+
+        <h3>6. Editor</h3>
+
+        <p>Er wird wie gewohnt mit LOAD "EDITOR",8 geladen und mit RUN gestartet. Er lädt das Hauptprogramm nach. Der Editor enthält Menüpunkte zum Laden, Speichern, Editieren und Einfärben der Bilder. Das Editieren entfällt bei der höheren Auflösung.</p>
+
+        <p>Beim Laden und Speichern wird gefragt, ob Sie das mit oder ohne Farbe tun wollen. Wenn Sie ein Bild ohne Farbe haben, wird gefragt, ob die Farbe im Speicher zu übernehmen ist. Das ist nur sinnvoll, wenn zuerst ein Farbbild im Speicher war.</p>
+
+        <p>Die Editierfunktionen: Gesteuert wird ein blinkender Cursor mit dem Joystick im Control-Port 2. Mit &lt;F1&gt; und &lt;F5&gt; können Vorder- und Hintergrundfarbe geändert werden. Im Neutralmodus ist der Rahmen schwarz. Durch Druck auf den Feuerknopf wechselt er seine Farbe von Weiß über Rot nach Schwarz. Ist der Rahmen weiß, werden die unter dem Cursor liegenden Punkte gesetzt, ist er rot, werden sie gelöscht. Verlassen wird der Editmodus mit der &lt;RETURN&gt;-Taste. Im Färbemodus wird wieder mit dem Joystick gesteuert. Mit Feuer wird zwischen Färben und Cursor-Bewegen umgeschaltet. Beim Einfärben (Rahmen weiß, sonst schwarz kann mit &lt;F3&gt; die Farbe gewählt werden.</p>
+
+        <p>Mit &lt;F1&gt; und &lt;F5&gt; können die Vorder- und Hintergrundfarbe für den Gesamtbildschirm geändert werden. Wenn Sie ein Bild färben, verwenden Sie bitte nicht mehr die &lt;F5&gt;-Taste, es wird dann wieder der ganze Bildschirm auf eine Farbe gesetzt. Verlassen wird der Färbemodus wieder mit der &lt;RETURN&gt;-Taste.</p>
+
+        <p>Damit steht eine Dia-Show oder einer kleinen Filmvorführung nichts mehr im Weg.</p>
+
+        <address class="author">(Helmut Burgemeister/og)</address>
+
+        <figure>
+            <pre data-filename="pixler" data-name="PIXLER" data-checksummer="3"></pre>
+            <figcaption>Listing 1. Ladeprogramm »PIXLER«. Bitte verwenden Sie zur Eingabe der Listings 1 bis 14 den Checksummer V3.</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="drucken" data-name="DRUCKEN" data-checksummer="3"></pre>
+            <figcaption>Listing 2. Ladeprogramm »DRUCKEN« für die Druckroutine</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="film maker" data-name="FILM MAKER" data-checksummer="3"></pre>
+            <figcaption>Listing 3. Ladeprogramm »FILM MAKER«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="see film" data-name="SEE FILM" data-checksummer="3"></pre>
+            <figcaption>Listing 4. Ladeprogramm »SEE FILM«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="dia viewer" data-name="DIA VIEWER" data-checksummer="3"></pre>
+            <figcaption>Listing 5. »DIA VIEWER« für die Dia-Show</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="lores editor" data-name="LORES EDITOR" data-checksummer="3"></pre>
+            <figcaption>Listing 6. »LORES EDITOR« für 50x80-Auflösung. Bitte mit dem Checksummer V3 eingeben.</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="superpixler" data-name="SUPERPIXLER" data-checksummer="3"></pre>
+            <figcaption>Listing 7. Ladeprogramm »SUPERPIXLER«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="film maker100x80" data-name="FILM MAKER 100X80" data-checksummer="3"></pre>
+            <figcaption>Listing 8. Ladeprogramm »FILM MAKER 100X80«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="see film 100x80" data-name="SEE FILM 100X80" data-checksummer="3"></pre>
+            <figcaption>Listing 9. Ladeprogramm »SEE FILM 100X80«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="mpsee film" data-name="MP SEE FILM" data-checksummer="3"></pre>
+            <figcaption>Listing 10. Zusatzprogramm »MP SEE FILM«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="bamovie" data-name="BAMOVIE" data-checksummer="3"></pre>
+            <figcaption>Listing 11. Filmeditor »BAMOVIE« für 100x80-Auflösung</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="dia viewer100x80" data-name="DIA VIEWER 100X80" data-checksummer="3"></pre>
+            <figcaption>Listing 12. Dia-Show »DIA VIEWER 100X80«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="editor" data-name="EDITOR" data-checksummer="3"></pre>
+            <figcaption>Listing 13. »EDITOR« für 100x80-Auflösung</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="zsatz-generator" data-name="ZSATZ-GENERATOR" data-checksummer="3"></pre>
+            <figcaption>Listing 14. Der Generator für den Zeichensatz. Nachdem der Zeichensatz für die höhere Auflösung generiert wurde, kann das Programm gesichert und dann gelöscht werden.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="zsatz.prg" data-name="ZSATZ"></div>
+
+        <figure>
+            <pre data-filename="mppixler.prg" data-name="MPPIXLER" data-mse=mse1></pre>
+            <figcaption><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Listing 15. Maschinenprogramm »MPPIXLER« für PIXLER. Geben Sie bitte die Listings 15 bis 26 mit dem MSE ein. Eingabehinweise finden Sie auf Seite 66.</a></figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mppixler.prg" data-name="MPPIXLER"></div>
+
+        <figure>
+            <pre data-filename="mpprint.prg" data-name="MPPRINT" data-mse=mse1></pre>
+            <figcaption>Listing 16. Maschinenprogramm »MPPRINT« der Druckroutine</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mpprint.prg" data-name="MPPRINT"></div>
+
+        <figure>
+            <pre data-filename="mpsaver.prg" data-name="MPSAVER" data-mse=mse1></pre>
+            <figcaption>Listing 17. »MPSAVER« wird von beiden Auflösungen benötigt</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mpsaver.prg" data-name="MPSAVER"></div>
+
+        <figure>
+            <pre data-filename="mpmloader.prg" data-name="MPLOADER" data-mse=mse1></pre>
+            <figcaption>Listing 18. »MPLOADER« wird wie Listing 17 für beide Auflösungen gebraucht</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mpmloader.prg" data-name="MPLOADER"></div>
+
+        <figure>
+            <pre data-filename="mpmovie.prg" data-name="MPMOVIE" data-mse=mse1></pre>
+            <figcaption>Listing 19. »MPMOVIE«, die erste Filmroutine</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mpmovie.prg" data-name="MPMOVIE"></div>
+
+        <figure>
+            <pre data-filename="mprun film.prg" data-name="MPRUN FILM" data-mse=mse1></pre>
+            <figcaption>Listing 20. »MPRUN FILM«, zweiter Teil</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mprun film.prg" data-name="MPRUN FILM"></div>
+
+        <figure>
+            <pre data-filename="mpviewer.prg" data-name="MPVIEWER" data-mse=mse1></pre>
+            <figcaption>Listing 21. »MPVIEWER«, Hauptteil der Filmroutinen</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mpviewer.prg" data-name="MPVIEWER"></div>
+
+        <figure>
+            <pre data-filename="mpkopier.prg" data-name="MPKOPIER" data-mse=mse1></pre>
+            <figcaption>Listing 22. »MPKOPIER«, erster Teil des Editors</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mpkopier.prg" data-name="MPKOPIER"></div>
+
+        <figure>
+            <pre data-filename="lores.prg" data-name="LORES" data-mse=mse1></pre>
+            <figcaption>Listing 23. »LORES«, Hauptprogramm des Editors</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="lores.prg" data-name="LORES"></div>
+
+        <figure>
+            <pre data-filename="mpsuperpixler.prg" data-name="MPSUPERPIXLER" data-mse=mse1></pre>
+            <figcaption>Listing 24. »MPSUPERPIXLER«, zum Erstellen der 100x80-Bilder</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mpsuperpixler.prg" data-name="MPSUPERPIXLER"></div>
+
+        <figure>
+            <pre data-filename="mprun film..prg" data-name="MPRUN FILM 100X80" data-mse=mse1></pre>
+            <figcaption>Listing 25. »MPRUN FILM« für die höhere Auflösung. Bitte nicht zusammen mit der Routine für die 50x80-Auflösung speichern, da beide den gleichen Namen haben</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mprun film..prg" data-name="MPRUN FILM 100X80"></div>
+
+        <figure>
+            <pre data-filename="mpmovie..prg" data-name="MPMOVIE 100X80" data-mse=mse1></pre>
+            <figcaption>Listing 26. »MPMOVIE«, eine zusätzliche Routine der 100x80-Auflösung</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mpmovie..prg" data-name="MPMOVIE 100X80"></div>
+
+        <!-- Die Beispiel-Filme von der Programmservice-Diskette: »SKELETOR« für die 50x80-Auflösung und »2ACTION« für die 100x80-Auflösung -->
+        <div class="binary_download" data-filename="skeletor.prg" data-name="skeletor"></div>
+        <div class="binary_download" data-filename="2action.prg" data-name="2action"></div>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+
+            <p>Im Listing 15 ist beim Druck der Inhalt der Speicherzelle $9200 verschluckt worden. Hier nun die komplette Zeile:<br>
+                9200: 04 b1 fa a2 05 ca f0 09 6c</p>
+
+            <!-- Disk-Version bereits korrigiert -->
+            <!-- 64'er 4/1987 -->
+        </aside>
+    </article>
+</body>
+
+</html>

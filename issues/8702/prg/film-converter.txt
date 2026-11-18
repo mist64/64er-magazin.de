@@ -1,0 +1,125 @@
+
+
+;film-converter.prg ==0801==
+   10 rem **********************************
+   20 rem *         film-coverter:         *
+   30 rem *     giga-cad  <->  hi-eddi     *
+   40 rem * -------------------------------*
+   50 rem *       written in 1986 by       *
+   60 rem *        stefan vilsmeier &      *
+   70 rem *        stefan lippstreu        *
+   80 rem **********************************
+   90 :
+  100 :
+  110 a=peek(836)+1:poke836,a:ifa=1thenload"hicon.obj",8,1
+  120 poke53280,14:poke53281,15:poke646,11:open1,8,15,"u9":close1:printtchr$(14);chr$(8)
+  130 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  140 print" {rvon} Film-Converter: Giga-CAD <-> Hi-Eddi {rvof}"
+  150 fori=0to21:print" {CBM-H}                                    {CBM-N}":next
+  160 print" {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{home}"
+  170 fl=0:print"{home}{down}{down}{down}{down}{rght}{rght}{rght}{rght} {rght}A. - Giga-CAD --> Hi-Eddi"
+  180 print"{down}{rght}{rght}{rght}{rght} {rght}B. - Hi-Eddi  --> Giga-CAD"
+  190 print"{down}{rght}{rght}{rght}{rght} {rght}C. - Diskettenkommando senden"
+  200 print"{down}{rght}{rght}{rght}{rght} {rght}D. - Directory anzeigen"
+  210 print"{down}{rght}{rght}{rght}{rght} {rght}E. - Grafik ansehen"
+  220 fori=1to9:print" {CBM-H}                                    {CBM-N}":next
+  230 print" {CBM-H}         Written in 1986 by         {CBM-N}"
+  240 print" {CBM-H}Stefan Vilsmeier &  Stefan Lippstreu{CBM-N}"
+  250 geta$:ifa$<"a"ora$>"e"goto250
+  260 a=asc(a$):b=4+2*40+(a-64)*80:poke1024+b,122:poke55296+b,11
+  270 ona-64goto850,1060,450,340,1210
+  280 :
+  290 :
+  300 rem *********************************
+  310 rem *     directory anzeigen        *
+  320 rem *********************************
+  330 :
+  340 print"{clr} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  350 print" {rvon}          Directory anzeigen          ":print
+  360 open1,8,15:open2,8,0,"$0":gosub530:iffgoto100
+  370 sys50182:close2:gosub530:iff=0thengosub580
+  380 goto100
+  390 :
+  400 :
+  410 rem *********************************
+  420 rem *     diskettenkommando senden  *
+  430 rem *********************************
+  440 :
+  450 gosub600
+  460 poke631,34:poke198,1
+  470 input"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}Kommando ";c$:ifc$=""orc$="_"goto170
+  480 open1,8,15,c$:gosub530:iff=0thengosub550
+  490 goto170
+  500 getx$:ifx$=""goto500
+  510 return
+  520 sys50179,0:printchr$(14)chr$(8);:return
+  530 input#1,f,f$,t,s:iff=0thenreturn
+  540 ifflthengosub520
+  550 print:print"{down}{rght}{rght}{rght}{rght} {rvon}Diskettenstatus :"
+  560 print"{down}{rght}{rght}{rght}{rght}"f","f$","t","s
+  570 poke198,0
+  580 gosub500
+  590 close2:print#1,"u9":close1:return
+  600 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} {CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}"
+  610 fori=1to9:print"                                       ":next
+  620 return
+  630 :
+  640 :
+  650 rem *********************************
+  660 rem *     eingabe-routinen          *
+  670 rem *********************************
+  680 :
+  690 fori=1to4:n1$=n$(i-1):ifn1$="-"goto720
+  700 w=2:ifn1$<>""thenifmid$(n1$,len(n1$)-1,1)<>" "thenw=3
+  710 ifn1$<>""thenn$=left$(n1$,len(n1$)-w)+str$(val(right$(n1$,w))+1)
+  720 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}                 ";n$;"          "
+  730 input"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}Filmbild ";n$(i)
+  740 ifn$(i)="_"orn$(i)=""thenf=1:return
+  750 next:f=0:n$(0)=n$(4):return
+  760 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}                                    "
+  770 input"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}Grafik-Name ";n$:f=0:ifn$=""orn$="_"thenf=1
+  780 return
+  790 :
+  800 :
+  810 rem *********************************
+  820 rem *     giga-cad --> hi-eddi      *
+  830 rem *********************************
+  840 :
+  850 gosub600:gosub690:iffgoto170
+  860 fl=1:print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}Film-Diskette einlegen!":gosub500
+  870 print"{up}{rght}{rght}{rght}{rght}{rght}                             {up}{up}{up}"
+  880 sys50176,11,15:sys50179,1:fori=1to4:ifn$(i)="-"goto910
+  890 open1,8,15:open2,8,2,"fi."+n$(i)+",p,r":gosub530:iffgoto170
+  900 sys50185,i:gosub530:iffgoto170
+  910 close2:close1:next
+  920 gosub520
+  930 gosub760:iffgoto170
+  940 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}Ziel-Diskette einlegen!":gosub500
+  950 print"{up}{rght}{rght}{rght}{rght}{rght}                             {up}{up}{up}"
+  960 sys50179,1
+  970 open1,8,15:open2,8,2,"pi."+n$+",p,w":gosub530:iffgoto170
+  980 sys50194:gosub530:iffgoto170
+  990 close2:close1:gosub520:goto170
+ 1000 :
+ 1010 :
+ 1020 rem ********************************
+ 1030 rem *     hi-eddi  --> giga-cad    *
+ 1040 rem ********************************
+ 1050 :
+ 1060 gosub600:gosub760:iffgoto170
+ 1070 fl=1:print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}Grafik-Diskette einlegen!":gosub500
+ 1080 print"{up}{rght}{rght}{rght}{rght}{rght}                             {up}{up}{up}"
+ 1090 sys50176,11,15:sys50179,1
+ 1100 open1,8,15:open2,8,2,"pi."+n$+",p,r":gosub530:iffgoto170
+ 1110 sys50191:gosub530:iffgoto170
+ 1120 close2:close1:gosub520
+ 1130 gosub690:iffgoto170
+ 1140 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}Ziel-Diskette einlegen!":gosub500
+ 1150 print"{up}{rght}{rght}{rght}{rght}{rght}                             {up}{up}{up}"
+ 1160 sys50179,1:fori=1to4:ifn$(i)="-"goto910
+ 1170 open1,8,15:open2,8,2,"fi."+n$(i)+",p,w":gosub530:iffgoto170
+ 1180 sys50188,i:gosub530:iffgoto170
+ 1190 close2:close1:next
+ 1200 gosub520:goto170
+ 1210 sys50179,1:gosub500:sys50179,0:gosub520:goto170
+

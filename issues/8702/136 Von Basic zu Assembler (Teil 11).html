@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Von Basic zu Assembler (Teil 11)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heimo Ponnath, dm">
+    <meta name="64er.issue" content="2/87">
+    <meta name="64er.pages" content="136,138,140,142">
+    <meta name="64er.head1" content="Kurs">
+    <meta name="64er.head2" content="C 64/C 128">
+    <meta name="64er.toc_category" content="Kurse">
+    <meta name="64er.index_category" content="Kurse/Grundlagen|Programmieren">
+    <meta name="64er.id" content="assembler">
+</head>
+
+<body>
+    <article>
+        <h1>Von Basic zu Assembler (Teil 11)</h1>
+        <p class="intro">Tabellen können Assembler-Programme erheblich schneller machen! Wie man mit den verschiedenen Tabellensorten umgeht, zeigt Ihnen diese Folge. C 64- und C 128-Benutzer erhalten ein Programm, das Ihnen die Umwandlung beliebiger Zahlen in die beiden Computerformate FLPT und MFLPT abnimmt.</p>
+
+        <p>Nachdem wir in der letzten Folge die Fließkommazahlen kennengelernt und erfahren haben, wie unser Computer diese Zahlen speichert und verarbeitet, sollen Sie in dieser Folge zunächst einmal je ein Programm für den C 64 und den C 128 (in Basic) präsentiert bekommen, das Ihnen die aufwendige Arbeit des »zu Fuß«-Berechnens der FLPT- und MFLPT-Formate beliebiger Zahlen erspart:</p>
+
+        <p>Beide Programme (Listing 1 und 2) verwenden den sogenannten programmierten Direktmodus und steuern damit einen Maschinensprachemonitor an (für den C 64 muß man vor dem Start noch den SMON geladen haben!). Dabei läuft das C 128-Programm automatisch, beim C 64-Programm ist es noch nötig, nach der Monitormeldung viermal &lt;RETURN&gt; zu drücken (SMON scheint den Tastaturpuffer nicht in gewohnter Weise zu behandeln). Auf dem Bildschirm erscheint dann die Einschaltmeldung des Monitors. Nach Druck auf &lt;RETURN&gt; sehen Sie die Speicherbereiche ab $6000 und $6010. In diese Bereiche transportierte ein kleines Maschinenprogramm die zuvor eingegebene Zahl als MFLPT-(ab $6000) und als FLPT-Zahl (ab $6010). Das Maschinenprogramm findet sich in den DATA-Zeilen des Listings und ist dabei in REM-Zeilen als Quelltext dargestellt. Der Sprung in die Routine $BBD4 (genannt MOVMF) ist C 64-Benutzern schon aus den letzten Folgen vertraut: Die Register X und Y weisen als Zeiger auf eine Speicherstelle, in die durch MOVMF der Inhalt des FAC unter gleichzeitiger Umwandlung ins MFLPT-Format transportiert wird. C 128-Benutzer finden diese Routine ab Adresse $8C03. Ihre Funktionsweise unterscheidet sich nicht von der entsprechenden C 64-Routine.</p>
+
+        <h3>Fließkommazahlen per USR übergeben</h3>
+
+        <p>Wie haben wir die Zahlen übrigens in den FAC hineinbekommen? Da gibt es das — vom Basic-Programmierer gemiedene — Kommando USR(n), wobei n ein beliebiges Argument sein kann. Dieses n nun findet man nach dem USR-Kommando im FAC vor. Wie funktioniert USR? Stößt der Interpreter auf dieses Kommando, dann führt er einen Sprung in ein Maschinenprogramm aus, dessen Adresse als Vektor beim C 64 in den Speicherzellen $311/$312 (dezimal 785/786) gespeichert ist. Er weist im allgemeinen auf die Adresse $B248, wo die Ausgabe der Fehlermeldung »SYNTAX ERROR« ausgegeben und ein Programmabbruch ausgeführt wird. Der C 128 versteckt diesen Vektor in den Speicherstellen $1219/$121A (dezimal 4633/ 4634). Sein Inhalt zeigt normalerweise auf die Adresse $7D28, die den »ILLEGAL QUANTITY ERROR« behandelt.</p>
+
+        <p>In unseren beiden Programmen verbiegen wir einfach diese USR-Vektoren, so daß sie auf $1600 (C 128) oder $334 (C 64) zeigen, wohin wir unsere kleine Assembler-Routine gelegt haben. Der USR-Aufruf schaltet in dieses kleine Programm und transportiert das Argument n in den FAC. Wir könnten durch das M-Kommando des Monitors auch direkt in den FAC hineinsehen, würden dort aber nicht mehr unsere Zahl entdecken. Der FAC wird vom Zeitpunkt des USR-Aufrufes bis zur Ausführung des M-Kommandos verändert. Deshalb die Verschiebung des FAC-Inhaltes nach $6010.</p>
+
+        <p>Das USR-Kommando ist zweifellos die bequemste Methode, Fließkommazahlen von Basic aus an ein Assemblerprogramm zu übergeben. Leider ist das aber nur für einen Wert einfach. Werden es mehrere, dann steigt der Programmaufwand. Eine andere Methode haben wir in den letzten Folgen kennengelernt, nämlich die Übergabewerte durch FRMNUM aus dem Basic-Text zu lesen. Eine weitere Methode lernen wir in der kommenden Folge kennen: Variable werden vom Basic-Interpreter in einer Tabelle abgelegt, die man durchaus auch von Assemblerprogrammen her benutzen kann. Bevor wir uns aber diesen Möglichkeiten zuwenden, werden wir diesmal noch etwas mehr über Tabellen erfahren.</p>
+
+        <h3>Tabellen</h3>
+
+        <p>Zur Ausrüstung von Schülern und Studenten (und vielen anderen) gehörte früher auch ein ständig mitgeschlepptes Tabellenwerk, in dem sich dann beispielsweise die Logarithmen der Zahlen von 1 bis 1000 fanden oder die Sinuswerte der Winkel von 0 bis 90 Grad und vieles andere mehr. Dann kam die Revolution durch die Taschenrechner: Kein mühseliges Nachschlagen mehr, kein Interpolieren, hohe Genauigkeit! Der Computer hat die Tabellen verdrängt ... oder doch nicht?</p>
+
+        <p>Zwar werden solche Arbeiten wie das Berechnen eines Sinus oder von Logarithmen im Computer durch Entwicklung von Potenzreihen erledigt. Das dauert aber verhältnismäßig lange und für besonders zeitkritische Programme greift der Assembler-Programmierer auf Tabellen zurück! Wir finden Tabellen in unserem Computer in verschiedenen Erscheinungsformen: als Zahlentabellen mit Integer- oder Fließkommawerten, als Texttabellen, als Adressentabellen und als Sprungtabellen.</p>
+
+        <h3>Tabellen im ROM</h3>
+
+        <p>Falls Sie mal in der Situation sein sollten, beispielsweise den Wert 2*Pi in einem Programm benutzen zu müssen, dann können Sie sich viel Rechnerei ersparen, mit der Sie diese Zahl in das MFLPT-Format bringen: Im ROM befindet sich 2*Pi nämlich schon abrufbereit, genauso wie eine ganze Reihe weiterer Zahlen und Texte. Die ROM-Bereiche unseres Computers liefern uns also nicht nur Assembler-Routinen, die wir ansteuern. Sie sind auch eine Datenquelle. Damit Sie wissen, wo Sie was im Computer finden können, sehen Sie sich die auf Seite 140 abgedruckten Werte der Tabelle an.</p>
+
+        <p>Tabelle 1 listet die wichtigsten Zahlentabellen im ROM des C 64 auf.</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Startadresse($)</th>
+                    <th>Format</th>
+                    <th>Inhalt</th>
+                </tr>
+                <tr>
+                    <td>AEA8</td>
+                    <td>MFLPT</td>
+                    <td>Pi</td>
+                </tr>
+                <tr>
+                    <td>B1A5</td>
+                    <td>MFLPT</td>
+                    <td>-32768</td>
+                </tr>
+                <tr>
+                    <td>B9BC</td>
+                    <td>MFLPT</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>B9C2</td>
+                    <td>MFLPT</td>
+                    <td>Polynomkoeffizienten für LOG-Berechnung</td>
+                </tr>
+                <tr>
+                    <td>B9D6</td>
+                    <td>MFLPT</td>
+                    <td>SQR(1/2)</td>
+                </tr>
+                <tr>
+                    <td>B9DB</td>
+                    <td>MFLPT</td>
+                    <td>SQR(2)</td>
+                </tr>
+                <tr>
+                    <td>B9E0</td>
+                    <td>MFLPT</td>
+                    <td>-0.5</td>
+                </tr>
+                <tr>
+                    <td>B9E5</td>
+                    <td>MFLPT</td>
+                    <td>ln 2</td>
+                </tr>
+                <tr>
+                    <td>BAF9</td>
+                    <td>MFLPT</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>BDB3</td>
+                    <td>MFLPT</td>
+                    <td>99 999 999.9</td>
+                </tr>
+                <tr>
+                    <td>BDB8</td>
+                    <td>MFLPT</td>
+                    <td>999 999 999</td>
+                </tr>
+                <tr>
+                    <td>BDBD</td>
+                    <td>MFLPT</td>
+                    <td>1 000 000 000</td>
+                </tr>
+                <tr>
+                    <td>BF11</td>
+                    <td>MFLPT</td>
+                    <td>0.5</td>
+                </tr>
+                <tr>
+                    <td>BFBF</td>
+                    <td>MFLPT</td>
+                    <td>1/ln2</td>
+                </tr>
+                <tr>
+                    <td>BFC5</td>
+                    <td>MFLPT</td>
+                    <td>Polynomkoeffizienten für EXP-Berechnung</td>
+                </tr>
+                <tr>
+                    <td>BFE3</td>
+                    <td>MFLPT</td>
+                    <td>ln 2</td>
+                </tr>
+                <tr>
+                    <td>BFE8</td>
+                    <td>MFLPT</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>E2E0</td>
+                    <td>MFLPT</td>
+                    <td>Pi/2</td>
+                </tr>
+                <tr>
+                    <td>E2E5</td>
+                    <td>MFLPT</td>
+                    <td>2*Pi</td>
+                </tr>
+                <tr>
+                    <td>E2EA</td>
+                    <td>MFLPT</td>
+                    <td>0.25</td>
+                </tr>
+                <tr>
+                    <td>E2F0</td>
+                    <td>MFLPT</td>
+                    <td>Konstanten für die Entwicklung von SIN,COS,...</td>
+                </tr>
+                <tr>
+                    <td>E309</td>
+                    <td>MFLPT</td>
+                    <td>2*Pi</td>
+                </tr>
+                <tr>
+                    <td>E33F</td>
+                    <td>MFLPT</td>
+                    <td>Konstanten für die Entwicklung von ATN</td>
+                </tr>
+                <tr>
+                    <td>E376</td>
+                    <td>MFLPT</td>
+                    <td>1</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die wichtigsten Zahlentabellen im ROM des C 64</figcaption>
+        </figure>
+
+        <p>Die Tabelle 2 zeigt die Zahlentabellen des C 128.</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Startadresse($)</th>
+                    <th>Label</th>
+                    <th>Format</th>
+                    <th>Inhalt</th>
+                </tr>
+                <tr>
+                    <td>69D8</td>
+                    <td>n320</td>
+                    <td>MFLPT</td>
+                    <td>320*65535</td>
+                </tr>
+                <tr>
+                    <td>69DD</td>
+                    <td>n200</td>
+                    <td>MFLPT</td>
+                    <td>200*65535</td>
+                </tr>
+                <tr>
+                    <td>6FF9</td>
+                    <td>scalel</td>
+                    <td>1-Byte</td>
+                    <td>LSB der Frequenzen</td>
+                </tr>
+                <tr>
+                    <td>7005</td>
+                    <td>scaleh</td>
+                    <td>1-Byte</td>
+                    <td>MSB der Frequenzen danach weitere Tabellen mit Werten zur Musikprogrammierung</td>
+                </tr>
+                <tr>
+                    <td>849A</td>
+                    <td>n32768</td>
+                    <td>MFLPT</td>
+                    <td>-32768</td>
+                </tr>
+                <tr>
+                    <td>899C</td>
+                    <td>fone</td>
+                    <td>MFLPT 1</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>89A2</td>
+                    <td>logco3</td>
+                    <td>MFLPT</td>
+                    <td>Koeffizienten für LOG-Berechnung</td>
+                </tr>
+                <tr>
+                    <td>89B6</td>
+                    <td>sqr05</td>
+                    <td>MFLPT</td>
+                    <td>SQR(1/2)</td>
+                </tr>
+                <tr>
+                    <td>89BB</td>
+                    <td>sqr20</td>
+                    <td>MFLPT</td>
+                    <td>SQR(2)</td>
+                </tr>
+                <tr>
+                    <td>89C0</td>
+                    <td>neghlf</td>
+                    <td>MFLPT</td>
+                    <td>-0.5</td>
+                </tr>
+                <tr>
+                    <td>89C5</td>
+                    <td>log2</td>
+                    <td>MFLPT</td>
+                    <td>ln 2</td>
+                </tr>
+                <tr>
+                    <td>8B2E</td>
+                    <td>tenc</td>
+                    <td>MFLPT</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>8E17</td>
+                    <td>n0999</td>
+                    <td>MFLPT</td>
+                    <td>99 999 999.9</td>
+                </tr>
+                <tr>
+                    <td>8E1C</td>
+                    <td>n9999</td>
+                    <td>MFLPT</td>
+                    <td>999 999 999</td>
+                </tr>
+                <tr>
+                    <td>8E21</td>
+                    <td>nmil</td>
+                    <td>MFLPT</td>
+                    <td>1 000 000 000</td>
+                </tr>
+                <tr>
+                    <td>8F76</td>
+                    <td>fhalf</td>
+                    <td>MFLPT</td>
+                    <td>0.5</td>
+                </tr>
+                <tr>
+                    <td>9005</td>
+                    <td>logeb2</td>
+                    <td>MFLPT</td>
+                    <td>1/ln2</td>
+                </tr>
+                <tr>
+                    <td>900B</td>
+                    <td>expco7</td>
+                    <td>MFLPT</td>
+                    <td>Koeffizienten für EXP-Berechnung</td>
+                </tr>
+                <tr>
+                    <td>9485</td>
+                    <td>pi2</td>
+                    <td>MFLPT</td>
+                    <td>Pi/2</td>
+                </tr>
+                <tr>
+                    <td>948A</td>
+                    <td>twopi</td>
+                    <td>MFLPT</td>
+                    <td>2*Pi</td>
+                </tr>
+                <tr>
+                    <td>948F</td>
+                    <td>fr4</td>
+                    <td>MFLPT</td>
+                    <td>0.25</td>
+                </tr>
+                <tr>
+                    <td>9495</td>
+                    <td>sinco5</td>
+                    <td>MFLPT</td>
+                    <td>Koeffizienten für SIN,COS,...</td>
+                </tr>
+                <tr>
+                    <td>94AE</td>
+                    <td>sinco0</td>
+                    <td>MFLPT</td>
+                    <td>2*Pi</td>
+                </tr>
+                <tr>
+                    <td>94E4</td>
+                    <td>atnc11</td>
+                    <td>MFLPT</td>
+                    <td>Koeffizienten für ATN-Berechnung</td>
+                </tr>
+                <tr>
+                    <td>951B</td>
+                    <td>atnc00</td>
+                    <td>MFLPT</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>9F29</td>
+                    <td>angval</td>
+                    <td>2-Byte</td>
+                    <td>Sinuswerte 0 bis 90 Grad in 10 Grad-Schritten</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Die wichtigsten Zahlentabellen im C 128-ROM</figcaption>
+        </figure>
+
+        <p>Die Tabellen 3 und 4 beziehen sich auf die Texttabellen im ROM des C 64 und des C 128.</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Startadresse($)</th>
+                    <th>Inhalt</th>
+                </tr>
+                <tr>
+                    <td>A004</td>
+                    <td>CBMBASIC</td>
+                </tr>
+                <tr>
+                    <td>A09E</td>
+                    <td>Texte der Basic-Befehlsworte (im letzten Byte ist jeweils das Bit 7 gesetzt)</td>
+                </tr>
+                <tr>
+                    <td>A19E</td>
+                    <td>Texte der Basic-Fehler- und Systemmeldungen (im letzten Byte ist Bit 7 gesetzt)</td>
+                </tr>
+                <tr>
+                    <td>A364</td>
+                    <td>Weitere Systemmeldungen:OK,ERROR,... (das letzte Byte ist jeweils 0)</td>
+                </tr>
+                <tr>
+                    <td>ACFC</td>
+                    <td>Fehlermeldungen für INPUT (letztes Byte ist 0)</td>
+                </tr>
+                <tr>
+                    <td>E460</td>
+                    <td>BASIC BYTES FREE</td>
+                </tr>
+                <tr>
+                    <td>E473</td>
+                    <td>Einschaltmeldung</td>
+                </tr>
+                <tr>
+                    <td>ECE6</td>
+                    <td>LOAD &lt;RETURN&gt;,RUN &lt;RETURN&gt;</td>
+                </tr>
+                <tr>
+                    <td>F0BD</td>
+                    <td>Texte für Ein- und Ausgabe-Operationen</td>
+                </tr>
+                <tr>
+                    <td>FD10</td>
+                    <td>CBM80</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Die wichtigsten Texttabellen im C 64-ROM</figcaption>
+        </figure>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Startadresse($)</th>
+                    <th>Label</th>
+                    <th>Inhalt</th>
+                </tr>
+                <tr>
+                    <td>41BB</td>
+                    <td>sigmsg</td>
+                    <td>Systemmeldung bei Kaltstart</td>
+                </tr>
+                <tr>
+                    <td>4417</td>
+                    <td>reslst</td>
+                    <td>Liste der Basic-Befehlsworte (Bit 7 des letzten Byte ist jeweils gesetzt)</td>
+                </tr>
+                <tr>
+                    <td>484B</td>
+                    <td>errtab</td>
+                    <td>Liste der Fehlermeldungen (Bit 7 des letzten Byte ist jeweils gesetzt)</td>
+                </tr>
+                <tr>
+                    <td>63F5</td>
+                    <td></td>
+                    <td>Namen der Programmautoren</td>
+                </tr>
+                <tr>
+                    <td>A7E8</td>
+                    <td></td>
+                    <td>ARE YOU SURE?</td>
+                </tr>
+                <tr>
+                    <td>CEB2</td>
+                    <td>pky1</td>
+                    <td>Standardtexte der Funktionstasten</td>
+                </tr>
+                <tr>
+                    <td>F6B0</td>
+                    <td>msgtbl</td>
+                    <td>Kernel-Textmeldungen</td>
+                </tr>
+                <tr>
+                    <td>F90B</td>
+                    <td></td>
+                    <td>BOOTING</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4. Die wichtigsten Texttabellen im ROM des C 128</figcaption>
+        </figure>
+
+        <p>Einige weitere interessante Tabellen im ROM des C 128 listet Tabelle 5 auf.</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th>Startadresse($)</th>
+                    <th>Label</th>
+                    <th>Inhalt</th>
+                </tr>
+                <tr>
+                    <td>46FC</td>
+                    <td>stmdsp</td>
+                    <td>Adressentabelle der Basic-Befehle</td>
+                </tr>
+                <tr>
+                    <td>AE63</td>
+                    <td>kydmsg</td>
+                    <td>verschlüsselte Mitteilung der Programmautoren</td>
+                </tr>
+                <tr>
+                    <td>AF00</td>
+                    <td>jmptbl</td>
+                    <td>Sprungtabelle der Interpreter-Routinen</td>
+                </tr>
+                <tr>
+                    <td>C6DD</td>
+                    <td>funtab</td>
+                    <td>ASCII-Codes der Funktionstasten</td>
+                </tr>
+                <tr>
+                    <td>CE74</td>
+                    <td>loczp</td>
+                    <td>Tabelle der Default-Werte 40-Zeichen-Bildschirm</td>
+                </tr>
+                <tr>
+                    <td>CE8E</td>
+                    <td>locabs</td>
+                    <td>Tabelle der Default-Werte 80-Zeichen-Bildschirm</td>
+                </tr>
+                <tr>
+                    <td>F7F0</td>
+                    <td>config</td>
+                    <td>MMU-Konfigurationen für BANK 0 bis BANK 15</td>
+                </tr>
+                <tr>
+                    <td>FF47</td>
+                    <td>kspio</td>
+                    <td>Kernel-Sprungtabelle</td>
+                </tr>
+                <tr>
+                    <td>FFF8</td>
+                    <td>system</td>
+                    <td>Tabelle der Systemvektoren (Initialisierung, NMI, Reset und IRQ)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 5. Einige andere wichtige Tabellen im ROM des C 128</figcaption>
+        </figure>
+
+        <p>Schließlich finden Sie in Tabelle 6 noch die Sprungtabelle im C 128 und ihre Zuordnungen.</p>
+
+        <figure>
+            <table class="plain">
+                <tr>
+                    <th colspan="2">Inhalt</th>
+                    <th>Ziellabel</th>
+                    <th>Funktion</th>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$84B4</td>
+                    <td>ayint</td>
+                    <td>FAC —&gt; Integer mit Vorzeichen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$793C</td>
+                    <td>givayv</td>
+                    <td>Integer in Y/A zu FLPT in FAC</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8E42</td>
+                    <td>fout FAC</td>
+                    <td>—&gt; String, Adresse in A/Y</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8052</td>
+                    <td>val1</td>
+                    <td>String auswerten</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8815</td>
+                    <td>getadr</td>
+                    <td>FAC —&gt; Integer in Y/A</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8C75</td>
+                    <td>floatc</td>
+                    <td>Exponent in FAC, normalisieren</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$882E</td>
+                    <td>fsub</td>
+                    <td>FAC = FAC - (A/Y)</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8831</td>
+                    <td>fsubt</td>
+                    <td>Basic-Funktion Minus</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8845</td>
+                    <td>fadd</td>
+                    <td>FAC = FAC + (A/Y)</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8848</td>
+                    <td>faddt</td>
+                    <td>Basic-Funktion Plus</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8A24</td>
+                    <td>fmult</td>
+                    <td>FAC = FAC * (A/Y)</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8A27</td>
+                    <td>fmultt</td>
+                    <td>Basic-Funktion Mal</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8B49</td>
+                    <td>fdiv</td>
+                    <td>FAC = (A/Y) / FAC</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8B4C</td>
+                    <td>fdivt</td>
+                    <td>Basic-Funktion Division</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$89CA</td>
+                    <td>log</td>
+                    <td>Basic-Funktion LOG</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8CFB</td>
+                    <td>int</td>
+                    <td>Basic-Funktion INT</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8FB7</td>
+                    <td>sqr</td>
+                    <td>Basic-Funktion SQR</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8FFA</td>
+                    <td>negop</td>
+                    <td>Basic-Funktion negatives Vorzeichen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8FBE</td>
+                    <td>fpwr</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8FC1</td>
+                    <td>fpwrt</td>
+                    <td>Basic-Funktion Potenz</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$9033</td>
+                    <td>exp</td>
+                    <td>Basic-Funktion EXP</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$9409</td>
+                    <td>cos</td>
+                    <td>Basic-Funktion COS</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$9410</td>
+                    <td>sin</td>
+                    <td>Basic-Funktion SIN</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$9459</td>
+                    <td>tan</td>
+                    <td>Basic-Funktion TAN</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$94B3</td>
+                    <td>atn</td>
+                    <td>Basic-Funktion ATN</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8C47</td>
+                    <td>round</td>
+                    <td>FAC runden</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8C84</td>
+                    <td>abs</td>
+                    <td>Basic-Funktion ABS</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8C57</td>
+                    <td>sign</td>
+                    <td>Vorzeichenflag —&gt; Akku</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8C87</td>
+                    <td>fcomp</td>
+                    <td>FAC mit (A/Y) vergleichen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8437</td>
+                    <td>rnd0</td>
+                    <td>Zufallszahl holen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8AB4</td>
+                    <td>conupk</td>
+                    <td>(A/Y) —&gt; FAC</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8A89</td>
+                    <td>romupk</td>
+                    <td>(A/Y) —&gt; ARG</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$7A85</td>
+                    <td>movfrm</td>
+                    <td>(A/Y) —&gt; FAC</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8BD4</td>
+                    <td>movfm</td>
+                    <td>(A/Y) —&gt; FAC</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8C00</td>
+                    <td>movmf</td>
+                    <td>FAC —&gt; (X/Y)</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8C28</td>
+                    <td>movfa</td>
+                    <td>ARG —&gt; FAC</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$8C38</td>
+                    <td>movaf</td>
+                    <td>FAC —&gt; ARG</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$4828</td>
+                    <td>optab</td>
+                    <td>Tabelle der Prioritätsflags der mathematischen Routinen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$9B30</td>
+                    <td>drawln</td>
+                    <td>Strecke zeichnen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$9BFB</td>
+                    <td>gplot</td>
+                    <td>Punkt setzen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$6750</td>
+                    <td>cirsub</td>
+                    <td>Drehung ausführen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$5A9B</td>
+                    <td>run</td>
+                    <td>Basic-Statement RUN</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$51F3</td>
+                    <td>runc</td>
+                    <td>Basic-Zeiger initialisieren, CLR</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$51F8</td>
+                    <td>clear</td>
+                    <td>Basic-Statement CLR</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$51D6</td>
+                    <td>new</td>
+                    <td>Basic-Statement NEW</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$4F4F</td>
+                    <td>lnlprg</td>
+                    <td>berechnen der Linkadressen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$430A</td>
+                    <td>crunch</td>
+                    <td>Wandlung von Text in Tokens</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$5064</td>
+                    <td>fndlin</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$4AF6</td>
+                    <td>newstt</td>
+                    <td>Stoptaste abfragen, nächsten Basic-Befehl holen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$78D7</td>
+                    <td>eval</td>
+                    <td>Ausdruck auswerten</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$77EF</td>
+                    <td>frmevl</td>
+                    <td>folgenden Ausdruck auswerten</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$5AA6</td>
+                    <td>runprg</td>
+                    <td>aktives Programm starten</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$5A81</td>
+                    <td>setexc</td>
+                    <td>Programm-Modus setzen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$50A0</td>
+                    <td>linget</td>
+                    <td>Zeilennummer holen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$92EA</td>
+                    <td>garba2</td>
+                    <td>Garbage collection ausführen</td>
+                </tr>
+                <tr>
+                    <td>JMP</td>
+                    <td>$4DCD</td>
+                    <td>execln</td>
+                    <td></td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 6. Die C 128-Sprungtabelle der Interpreter-Routinen</figcaption>
+        </figure>
+
+        <p>Quelle: Schineis, Braun, Grellner, »C 128 ROM-Listing Basic 7.0-Betriebssystem«, Markt &amp; Technik Verlag, München 1986</p>
+
+        <p>Außer den hier vorgestellten Tabellen finden sich natürlich noch weitere in den ROM-Bausteinen: Da gibt es Tabellen zur Decodierung der Tastatur, Tabellen von Farbwerten, Tabellen zur Initialisierung des Systems, die Default-Werte (Einschaltwerte) enthalten und so weiter.</p>
+
+        <h3>Eigene Tabellen</h3>
+
+        <p>Interessanter als die eben behandelten ROM-Tabellen sind natürlich Tabellen in eigenen Programmen. Nehmen wir einmal an, Sie benötigen in einem Programm sehr häufig irgendwelche Potenzen von 2 (also 2 hoch 3, 2 hoch 4 und so weiter). Die dabei vorkommenden Hochzahlen bewegen sich zwischen 0 und 7. Nun können Sie natürlich jedesmal den Potenzwert ausrechnen, beispielsweise bei der Zahl 2 hoch 5:</p>
+
+        <pre><code>LDA #$02  ;Basis in den Akku laden, also 2
+ASL       ;mal 2
+ASL       ;mal 2
+ASL       ;mal 2
+ASL       ;mal 2
+</code></pre>
+
+        <p>Nun steht das Ergebnis im Akku und Sie können damit weiter operieren. Komplizierter wird das aber schon, wenn Sie nicht Potenzen von 2, sondern — sagen wir mal — von 3 oder 5 benötigen. Besser geht das und meist auch schneller mit Tabellen. Wir legen irgendwo eine Tabelle der Potenzen von 2 an:</p>
+
+        <pre><code>TAB 1,2,4,8,16,32,64,128
+</code></pre>
+
+        <p>Brauchen wir nun 2 hoch 5, dann schieben wir die Hochzahl in ein Indexregister und laden den Akku durch die indizierte Adressierung:</p>
+
+        <pre><code>LDX #$05   ;Das ist die Hochzahl
+LDA TAB,X  ;und schon ist 32 im Akku!
+</code></pre>
+
+        <p>Es spielt nun auch keine Rolle mehr, ob wir die Potenzen der Zahl 2, 3 oder irgendeiner anderen Basiszahl benötigen: Tabelle anlegen, Hochzahl als Index wählen und den Akku indiziert laden. Braucht man für andere Zwecke aufeinanderfolgende Elemente der Tabelle, dann genügt es nun, durch INX oder DEX den Index zu variieren.</p>
+
+        <h3>Komplexe Tabellen</h3>
+
+        <p>Diese einfachste Art der Ansteuerung einer Tabelle hat natürlich gewisse Einschränkungen zur Folge: Die Elemente dürfen nicht größer als 255 (also 1 Byte) sein, es dürfen nicht mehr als 256 Elemente verwendet werden.</p>
+
+        <p>Hätte unsere Potenztabelle nun immer 16-Bit-Werte aufgelistet, gehörten also zu jedem Element 2 Byte, dann müßte der Index vor dem Zugriff in die Tabelle jeweils verdoppelt werden. Dazu wieder unsere Tabelle der Zweierpotenzen als Beispiel:</p>
+
+        <pre><code>0.1, 0.2, 0.4, 0.8,
+0.16, 0.32, 0.64, 0.128
+</code></pre>
+
+        <p>Hier haben wir die Potenzwerte jeweils in der Reihenfolge MSB,LSB abgelegt. Suchen wir nun den Wert für 2 hoch 5, dann programmieren wir:</p>
+
+        <pre><code>LDA #$05  ;Das ist wieder die Hochzahl
+ASL       ;verdoppeln
+TXA       ;und ins X-Register schieben
+LDA TAB,X ;laden des MSB (10. Wert in der Tabelle)
+STA ...   ;und ablegen an der Stelle, an der es gebraucht wird
+INX       ;Index erhöhen
+LDA TAB,X ;laden des LSB
+</code></pre>
+
+        <p>Damit hätten wir dann die 16-Bit-Zahl aus der Tabelle gelesen. Anstelle der beiden letzten Zeilen hätte auch eine einzige genügt:</p>
+
+        <pre><code>LDA TAB+1,X ;laden des LSB
+</code></pre>
+
+        <p>Adressen sind solche 16-Bit-Werte und daher findet man diese Technik der Tabellenmanipulation auch sehr häufig bei Adressentabellen. Beispielsweise haben wir im ersten Modul des Programms 3 (Folge 7, Ausgabe 10/86, Seite 156) ab Zeile 970 auf diese Weise eine Sprungadresse aus der Tabelle SPRTAB gelesen.</p>
+
+        <p>Es gibt Tabellen, deren Elemente jeweils mehr als 2 Byte enthalten. In solchen Fällen genügen häufig zwei oder mehrere ASL des Index oder aber man führt jeweils eine Addition des entsprechenden Offset zum Index aus.</p>
+
+        <h3>Lange Tabellen</h3>
+
+        <p>Einige Tabellen, besonders Texttabellen, sind länger als 256 Byte. In dem Fall ist es nicht mehr möglich, die einzelnen Elemente (oder Teile der Elemente) mittels der bisher angewandten absolut X-indizierten (oder auch Y-indizierten) Adressierung anzusprechen, denn die Register fassen nur Zahlen von 0 bis 255. Wir greifen dann zur indirekt-indizierten Adressierung. Ein 16-Bit-Zeiger in der Zeropage wird mit der Startadresse der Tabelle geladen, das Y-Register dient als Index. Das Ansprechen der einzelnen Bytes geschieht dann beispielsweise wie folgt:</p>
+
+        <pre><code>LDA  INDEX  ;aktuellen Index laden
+ASL         ;und verdoppeln (Elemente sind 2-Byte-Werte)
+BCC  KLEIN  ;verzweigen, wenn dabei kein Überlauf eintrat
+INC  ZERO+1 ;bei Überlauf MSB der Tabellen-Startadresse erhöhen
+TAY         ;Offset ins Indexregister schieben
+LDA (ZERO),Y;in ZERO und ZERO+1 liegt die Startadresse der Tabelle
+            ;und wir haben das LSB eines Elementes geladen
+STA ...     ;an geeigneter Stelle speichern
+INY         ;Indexregister auf MSB richten
+LDA (ZERO),Y;MSB laden
+STA ...     ;und an geeigneter Stelle weiterverwenden
+</code></pre>
+
+        <p>Dabei war ZERO/ZERO+1 der Vektor in der Zeropage, der auf den Tabellenstart wies und INDEX eine Speicherstelle, die den gerade aktuellen Index enthielt, beispielsweise die Hochzahl bei einer Potenztabelle. Noch mehr Möglichkeiten bieten sich, wenn man für den Index einen 16-Bit-Wert reserviert. Im folgenden Beispiel seien INDEX/INDEX+1 die dafür gedachten Speicherstellen:</p>
+
+        <pre><code>LDA  INDEX    ;LSB des Index laden
+ASL           ;und verdoppeln (Elemente sind 2-Byte-Werte)
+TAY           ;Offset ins Indexregister schieben
+LDA  INDEX+1 ;MSB des Index laden
+ROL           ;Ebenfalls verdoppeln, aber mit Carry-Bit
+ADC  ZERO+1   ;dazu MSB der Tabellenadresse addieren
+STA  ZERO+1   ;und als neues MSB merken
+LDA (ZERO),Y  ;jetzt LSB des aktuellen Elementes laden
+STA  ...
+INY           ;Indexregister auf MSB richten
+LDA (ZERO),Y  ;und MSB des Elementes laden
+STA  ...
+</code></pre>
+
+        <p>Auf diese oder ähnliche Weise können Sie noch so ausgedehnte Tabellen beherrschen.</p>
+
+        <h3>Texttabellen</h3>
+
+        <p>Im Vergleich zu Zahlen- oder Adreßtabellen weisen Texttabellen meist die Besonderheit von Elementen variabler Bytezahl auf. Beim Lesen der einzelnen Bytes eines Elements fügt man hier immer eine Prüfung auf ein Textende-Merkmal ein. Solche Merkmale sind beispielsweise Nullbytes. Durch ein BEQ kann dann reagiert werden und zwei Nullbytes markieren das Ende der Tabelle. Manchmal verwendet man auch etwas platzsparendere Kennzeichen wie ein gesetztes Bit 7 eines Zeichens. Dann darf allerdings die Tabelle keine Zeichen enthalten, die von sich aus schon mit gesetzten Bit 7 aufwarten. Hier wird dann durch BMI oder BIT und nachfolgendes Abfragen der entsprechenden Flaggen geprüft, ob ein Textende-Merkmal vorliegt.</p>
+
+        <h3>Adressentabellen</h3>
+
+        <p>Das Lesen von Adressentabellen haben wir vorhin bei den Zahlentabellen schon mitbehandelt. Sie verhalten sich wie Tabellen mit 2-Byte-Elementen. Hier soll es nun darum gehen, wie man die so gefundenen Adressen weiterverwendet, um einen Sprung an die herausgesuchte Adresse zu vollziehen. Die Technik der selbstmodifizierenden Sprunganweisung haben wir im Programm 3 (Folge 7, Ausgabe 10/86, Seite 156) in Zeile 1070 gewählt. Die Zeilen 1000 bis 1030 lesen LSB und MSB der Zieladresse aus der Sprungtabelle und tragen sie hinter die JSR-Anweisung in Zeile 1070 ein. Dorthin gelangt danach das Programm und vollzieht den Sprung.</p>
+
+        <p>Der Nachteil dieser Technik ist, daß sie nur in RAM-Bereichen funktioniert, weil ins Programm geschrieben werden muß. Arbeitet man mit ROMs oder EPROMs, dann bieten sich zwei andere Möglichkeiten an, von denen wir zuerst die Verwendung eines indirekten Sprungs vorstellen wollen. Dazu speichert man die gelesenen Tabellenwerte in einen Vektor aus der Zeropage (beispielsweise ZWSP/ZWSP+1) und springt dann mit</p>
+
+        <pre><code>JMP (ZWSP) ;das ist der selten benutzte indirekte Sprung
+</code></pre>
+
+        <p>in die gesuchte Routine. Nebenbei bemerkt: ZWSP/ZWSP+1 muß nicht unbedingt in der Zeropage stehen: Man kann beliebige andere Speicherbereiche für diesen Vektor verwenden.</p>
+
+        <p>Auf den ersten Blick etwas irritierend wirkt die andere Technik, die sich des Stapels bedient. Hier ein Beispiel:</p>
+
+        <pre><code>LDA INDEX ;aktuellen Index laden
+ASL       ;und verdoppeln (Adresstabelle!)
+TAX       ;ins Indexregister schieben
+INX       ;Indexregister auf MSB richten
+LDA TAB,X ;MSB der Zieladresse laden
+PHA       ;und auf den Stapel schieben
+DEX       ;Indexregister auf LSB richten
+LDA TAB,X ;LSB der Zieladresse laden
+PHA       ;und auf den Stapel schieben
+RTS       ;!!!
+</code></pre>
+
+        <p>Die Frage ist: Was macht RTS? Hier die Antwort und gleichzeitig die Lösung des Rätsels:</p>
+
+        <ol>
+            <li>RTS holt die auf dem Stapel gespeicherte Adresse ab und schreibt sie in den Programmzähler. Damit die Reihenfolge LSB/MSB stimmt, muß als letztes das LSB im Stapel landen.</li>
+            <li>RTS vermindert dann den Stapelzeiger um 2. Das sei nur der Vollständigkeit halber gesagt.</li>
+            <li>RTS addiert zum Programmzähler eine 1 und dann läuft das Programm von dieser Adresse an weiter.</li>
+        </ol>
+
+        <p>Insgesamt ergibt sich daraus dann ein Sprung zum gewünschten Programm. Wegen des dritten Punktes der RTS-Tätigkeit muß man aber darauf achten, daß in der Adressentabelle nicht ZIELADRESSE, sondern immer ZIELADRESSE-1 steht!</p>
+
+        <p>Mir wird bei diesem Sprung über den Stapel immer etwas mulmig zumute. Allzu unklar ist der Gebrauch des RTS. Ich bin mir nie so ganz sicher, ob ich (oder ein anderer Benutzer) nach einigen Monaten ein Programm mit diesem Trick noch völlig durchschauen kann.</p>
+
+        <p>Ich verweise zum Schluß noch auf einen Artikel von Florian Müller: Effektives Programmieren in Assembler (erschienen im Sonderheft 8/85, Seite 74). In den Kapiteln 5 und 6 werden dort einige Beispiele zur Tabellenverwendung gezeigt.</p>
+
+        <address class="author">(Heimo Ponnath/dm)</address>
+
+        <figure>
+            <pre data-filename="flpt c64" data-name="FLPT C 64" data-checksummer="3"></pre>
+            <figcaption>Listing 1. Berechnung von FLPT- und MFLPT-Format für den C 64</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="flpt c128" data-name="FLPT C 128"></pre>
+            <figcaption>Listing 2. Und dasselbe für den C 128</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

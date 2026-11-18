@@ -1,0 +1,112 @@
+
+
+;lores editor.prg ==0801==
+   10 a=a+1:ifa=1thenload"lores",8,8
+   15 ifa=2thenload"mpkopier",8,8
+   20 poke53281,0:poke2,6
+   21 print"{clr}{lblu}lores editor
+   30 print"{down}by helmut burgemeister
+   40 print"{down}{down}1. bild laden
+   50 print"{down}2. bild speichern
+   60 print"{down}3. bild editieren
+   70 print"{down}4. bild einfaerben
+   80 print"{down}5. dos kommandos
+  100 poke198,0:wait198,1:geta$
+  110 a=val(a$)
+  120 ifa$<"1"oraa$>"5"then100
+  130 onagoto1000,2000,3000,4000,5000
+ 1000 print"{clr}bild laden"
+ 1010 input"{down}{down}bildname";b$
+ 1020 print"{down}{down}mit farbe laden (j/n)
+ 1030 gosub9000
+ 1040 ifa$<>"j"anda$<>"n"then1030
+ 1050 ifa$="j"thenfa=1:goto1100
+ 1060 fa=0
+ 1100 poke2,6:sys828+6:open2,8,2,b$+",p,r":gosub8000:close2:ifa<>0then20
+ 1105 open2,8,2,b$+",p,r"
+ 1110 get#2,a$:get#2,a$
+ 1120 fort=0to999
+ 1130 get#2,a$:ifa$=""thena$=" "
+ 1140 poke1024+t,asc(a$)
+ 1150 next
+ 1160 close2:sys828
+ 1170 iffa=0thengoto20
+ 1180 open2,8,2,b$+".,p,r":gosub8000:close2:ifa<>0then20
+ 1185 open2,8,2,b$+".,p,r"
+ 1190 get#2,a$:get#2,a$
+ 1200 fort=0to999
+ 1210 get#2,a$:ifa$=""thena$=" "
+ 1220 poke55296+t,asc(a$):next:close2
+ 1230 sys828+12:goto20
+ 2000 print"{clr}bild sichern
+ 2010 input"{down}{down}bildname";b$
+ 2020 print"{down}{down}mit farbe sichern (j/n)
+ 2030 gosub9000
+ 2040 ifa$<>"j"anda$<>"n"then2030
+ 2050 ifa$="j"thenfa=1:goto2100
+ 2060 fa=0
+ 2100 sys828+3:open2,8,2,b$+",p,w":gosub8000:close2:ifa<>0then20
+ 2105 open2,8,2,"@:"+b$+",p,w"
+ 2110 print#2,chr$(0);:print#2,chr$(4);
+ 2120 fort=0to999
+ 2140 print#2,chr$(peek(1024+t));
+ 2150 next:print#2,chr$(13)
+ 2160 close2
+ 2170 iffa=0thengoto20
+ 2175 sys828+9
+ 2180 open2,8,2,b$+".,p,w":gosub8000:close2:ifa<>0then20
+ 2185 open2,8,2,"@:"+b$+".,p,w"
+ 2190 print#2,chr$(0);:print#2,chr$(216);
+ 2200 fort=0to999
+ 2220 print#2,chr$(peek(55296+t));:next:close2
+ 2230 goto20
+ 3000 poke2,6:sys828+3:sys828+6
+ 3010 x=40:y=24:c=6:poke53280,p
+ 3020 ify/2<>int(y/2)thenz=y-1:goto3022
+ 3021 z=y
+ 3022 h=peek(1024+((x/2)+(40*(z/2))))
+ 3025 ifp=0orp=1thensys49152,x,y,1,c
+ 3027 ifp=0orp=2thensys49152,x,y,0,c
+ 3030 ifp=0thenpoke1024+((x/2)+(40*(z/2))),h
+ 3040 j=peek(56320)
+ 3050 if(jand1)=0theny=y-1:ify=-1theny=0
+ 3060 if(jand2)=0theny=y+1:ify=50theny=49
+ 3070 if(jand4)=0thenx=x-1:ifx=-1thenx=0
+ 3080 if(jand8)=0thenx=x+1:ifx=80thenx=79
+ 3090 if(jand16)=0thenp=p+1:poke53280,p:ifp=3thenp=0:poke53280,p
+ 3095 ifpeek(203)=1thensys828:goto20
+ 3097 ifpeek(203)=6thenpoke2,peek(55296)+1:sys828+6:c=peek(2)
+ 3098 ifpeek(2)>253thenpoke2,0
+ 3099 ifpeek(203)=4thenpoke53281,peek(53281)-1
+ 3100 goto3020
+ 4000 iffa=0thenprint"{clr}{down}farbe im speicher uebernehmen (j/n)
+ 4002 iffa=0thengosub9000:ifa$="j"thenfa=1
+ 4010 sys828+3:poke2,6:sys828+6:p=0:f=0
+ 4015 iffa=1thensys828+9
+ 4017 x=20:y=12:c=6:poke53280,p
+ 4020 h=peek(55296+x+40*y)
+ 4030 ifp=0thenpoke55296+x+40*y,h-1
+ 4040 ifp=0thenpoke55296+x+40*y,h
+ 4050 ifp=1thenpoke55296+x+40*y,f
+ 4053 j=peek(56320)
+ 4055 if(jand1)=0theny=y-1:ify=-1theny=0
+ 4060 if(jand2)=0theny=y+1:ify=25theny=24
+ 4070 if(jand4)=0thenx=x-1:ifx=-1thenx=0
+ 4080 if(jand8)=0thenx=x+1:ifx=40thenx=39
+ 4090 if(jand16)=0thenp=1-p:poke53280,p
+ 4100 ifpeek(203)=5thenf=f+1
+ 4110 ifpeek(203)=1thensys828+12:goto20
+ 4120 ifpeek(203)=4thenpoke53281,peek(53281)-1
+ 4130 ifpeek(203)=6thenpoke2,peek(55296)-1:sys828+6:h=peek(2)
+ 4140 ifh>254thenpoke2,0:h=0
+ 4150 goto4020
+ 5000 print"{clr}dos kommandos
+ 5010 print"{down}{down}command:  ";:poke631,34:poke198,1:inputa$
+ 5020 open1,8,15:print#1,a$:close1:gosub8000:goto20
+ 8000 open1,8,15:input#1,a,a$,b,c
+ 8010 ifa<>0thenprint"{down}{blu}status: "a" "a$" "b" "c
+ 8020 close1:ifa<>0thengosub9000
+ 8030 return
+ 9000 poke198,0:wait198,1:geta$:return
+10000 printpeek(203);:goto10000
+

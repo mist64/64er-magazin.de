@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks für Profis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="sk, Bernhard Wannke, Florian Müller, M. Kühlewein, M. Koch, Lars Jedinski, Jörg Meyer, J. Hauke, Alexander Lazarevic, Stefan Tandecki, Andreas Gorzinski">
+    <meta name="64er.issue" content="2/87">
+    <meta name="64er.pages" content="79-80,82">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Tips & Tricks">
+    <meta name="64er.toc_title" content="Tips &amp; Tricks für Profis: Fehler im LIST-Befehl umgangen / Turbo-POKE für den C 64/C 128 / Absturz auf gekonnte Weise / Flackern beim Rasterzeilen-Interrupt / Spindizzy-Trainer / Basic-Programm-Start in Assembler / Mikro-Hardcopy mit dem NL-10 / Vier Bildschirme auf dem C 64 / Steuersequenzen per Basic / »Hardmaker« mit Print-Shop / Printfox mit dem MPS 802">
+    <meta name="64er.index_title" content="Absturz auf gekonnte Weise">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Programmieren">
+    <meta name="64er.index_title" content="Basic-Programmstart in Assembler">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Assembler">
+    <meta name="64er.index_title" content="Fehler im LIST-Befehl umgangen">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Spiele">
+    <meta name="64er.index_title" content="Flackern beim Rasterzeilen-Interrupt">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Grafik">
+    <meta name="64er.index_title" content="Spindizzy-Trainer">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Spiele">
+    <meta name="64er.index_title" content="Turbo-POKE für den C 64/C 128">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Programmieren">
+    <meta name="64er.index_title" content="Mikro-Hardcopy mit dem NL-10">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Drucker">
+    <meta name="64er.index_title" content="Steuersequenzen per Basic-Erweiterung">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Drucker">
+    <meta name="64er.index_title" content="Vier Bildschirme auf dem C 64">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Grafik">
+    <meta name="64er.index_title" content="&gt;&gt;Hardmaker&lt;&lt;-Grafiken mit Print Shop weiterbearbeiten">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Grafik">
+    <meta name="64er.index_title" content="Printfox mit dem MPS 802">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|Drucker">
+    <meta name="64er.id" content="tips_profis">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks für Profis</h1>
+        <p class="intro">In dieser Folge unserer Tips &amp; Tricks stellen wir Ihnen unter anderem den ultimaten Turbo-POKE für den C 128 im C 64-Modus und den lange erwarteten Spindizzy-Trainer vor. Außerdem wird dem leidigen Flackern beim Rasterzeilen-Interrupt auf einfache Weise das Handwerk gelegt.</p>
+
+        <p>Zunächst jedoch noch etwas zum Knobeln für die Maschinensprache-Freaks. Geben Sie ein:</p>
+
+        <p>LOAD"$",8 &lt;RETURN&gt; POKE 808,0 &lt;RETURN&gt; LIST &lt;RETURN&gt;</p>
+
+        <p>Das Ergebnis ist verblüffend. Woher kommt außerdem die Zahl, die noch mit ausgegeben wird? Durchforsten Sie die ROM-Routinen, so findet sich auch hier die Erklärung. Schreiben Sie uns die Lösung und falls Sie ähnliche Tricks entdeckt haben, so können Sie uns diese unter dem Stichwort »Tips &amp; Tricks« gerne zusenden.</p>
+
+        <address class="author">(sk)</address>
+
+        <h2>Fehler im LIST-Befehl umgangen</h2>
+
+        <p>Bleiben wir gleich beim LIST-Befehl. In der Oktober-Ausgabe wurde schon darauf eingegangen: Stößt der Computer beim LISTen auf ein &lt;SHIFT+L&gt;, so bricht er mit einem »SYNTAX ERROR« ab, da er durch diesen Code irrtümlich in die FOR-NEXT-Routine des Interpreters verzweigt. Da beim LISTen für gewöhnlich keine FOR-NEXT-Parameter angegeben werden, ist dieses Verhalten durchaus verständlich. Mit einem kleinen Trick jedoch kann der Syntax Error umgangen werden. Man braucht nur beliebige FOR-NEXT-Parameter nach dem LIST-Befehl anzugeben! Das klappt allerdings nur, wenn vor den Parametern der Bindestrich aus dem Befehl »LIST a - b« steht. Die Befehlsfolge sieht dann so aus:</p>
+
+        <p>LIST 10- A=1 TO 1</p>
+
+        <p>Nach 12maligem LISTen erscheint allerdings ein OUT OF MEMORY ERROR, da zu viele FOR-NEXT-Schleifen ineinander verschachtelt und nicht geschlossen wurden. Hängt man also noch ein NEXT an obige Befehlsfolge, so kann dies vermieden werden.</p>
+
+        <address class="author">(Bernhard Wannke/sk)</address>
+
+        <h2>Turbo-POKE für den C 64/128</h2>
+
+        <p>Besitzen Sie einen C 128, mit dem Sie vorwiegend im C 64-Modus arbeiten? Wenn ja, können Sie sich freuen. Nach langem Wühlen in den Tiefen des Speichers können wir Ihnen den POKE vorstellen, der den C 64-Modus um bis zu 55 Prozent beschleunigt. Geben Sie ein:</p>
+
+        <p><a href="#fehlerteufelchen" class="fehlerteufelchen_link">POKE 53269,1: POKE 53265,10</a></p>
+
+        <p>Der Bildschirm wird abgeschaltet und der Prozessor wird nun mit 2 MHz statt bisher mit 0,94 MHz getaktet.</p>
+
+        <p>Mit:</p>
+
+        <p>POKE 53269, PEEK (53269) AND 254: POKE 53265, 27 wird der Ausgangszustand wiederhergestellt. Einige Einschränkungen sind allerdings zu machen: Es sind während des schnellen Modus keine Floppy-Zugriffe möglich. Die Tastatur wird jedoch noch abgefragt und auch Ausgaben auf dem Drucker sind möglich. Diese POKEs eignen sich besonders für langwierige Berechnungen in Programmen und andere zeitkritische Routinen, bei denen eine Bildschirmausgabe nicht notwendig ist.</p>
+
+        <address class="author">(Florian Müller/sk)</address>
+
+        <h2>Absturz auf gekonnte Weise</h2>
+
+        <p>Wollen Sie Ihren C 64 einmal richtig durcheinanderbringen? Wenn ja, dann geben Sie zuerst SYS 62391 ein. Danach wird jede mit &lt;RETURN&gt; bestätigte Eingabe, so richtig sie auch sein mag, mit »?SYNTAX ERROR« quittiert. Durch Betätigen der Tastenkombination &lt;SHIFT + CLR/HOME&gt; wird es sogar noch schlimmer. Der Cursor flackert hektisch in der linken oberen Ecke des Bildschirms. Nur noch einige wenige Tasten, zum Beispiel »E« sind überhaupt noch ansprechbar. Ansonsten stellt der Computer sich tot. Dies ist ganz interessant, wenn man zu Kopierschutzzwecken ein Programm auf diese Weise beenden möchte. Dazu verwendet man folgende Zeile:</p>
+
+        <pre><code>100 SYS 62391:X
+</code></pre>
+
+
+        <p>Probieren Sie es aus, aber Vorsicht! Das im Speicher befindliche Programm geht verloren.</p>
+
+        <address class="author">(Florian Müller/sk)</address>
+
+        <h2>Flackern beim Rasterzeilen-Interrupt</h2>
+
+        <p>Wer schon einmal mit dem Rasterzeilen-Interrupt gearbeitet hat, wird festgestellt haben, daß manche Zeilen flackern. Der Grund dafür ist, daß der VIC bei manchen Rasterzeilen länger braucht, als bei anderen, da er die Daten für die neue Bildschirmzeile aufbereiten muß. Dies geschieht ab Rasterzeile 51 alle acht Zeilen. Vermeiden kann man dies, indem man die Rasterzeilen nicht benutzt, die folgender Bedingung genügen:</p>
+
+        <p>Z = 51 + n * 8.</p>
+
+        <p>»Z« steht für die Zeilennummer und »n« ist eine Variable im Bereich von 0 bis 30, damit auch der Bildschirmbereich außerhalb des Textfeldes erfaßt wird. Alle anderen Zeilen können uneingeschränkt benutzt werden.</p>
+
+        <address class="author">(M. Kühlewein, M. Koch/sk)</address>
+
+        <h2>Spindizzy-Trainer</h2>
+
+        <p>Hier ist er, der versprochene Spiele-Trainer für Spindizzy. Er stammt von Paul Shirley, dem Programmierer höchstpersönlich. Tippen Sie das kleine Programm (Listing 1) ab, speichern Sie es, legen dann die Original-Diskette ein und starten mit RUN. Spindizzy wird geladen, alles funktioniert normal, nur die Zeit läuft nicht mehr ab und Sie können in Ruhe spielen. Besitzen Sie die Kassettenversion, so ändern Sie Zeile 80 um in: »80 LOAD«.</p>
+
+        <p>Der Trick läuft mit allen Originalen.</p>
+
+        <figure>
+            <pre data-filename="spindizzy train." data-name="Spindizzy-Trainer" data-checksummer="3"></pre>
+            <figcaption>Listing 1. Der Spindizzy-Trainer</figcaption>
+        </figure>
+
+        <h2>Basic-Programm-Start in Assembler</h2>
+
+        <p>Es wurde schon oft gefragt, wie man in Assembler ein Programm schreiben kann, das mit LOAD"name",8 und RUN gestartet werden kann. Hier ist die Lösung im Hypra-Ass-Format:</p>
+
+        <!-- So im Heft gedruckt: der Assemblertext ist das letzte Element vor der Autorenzeile. -->
+        <pre><code>10 -.ob "name,p,w"  ;Objektcode auf Disk
+20 -.ba $0801       ;Startadresse $0801
+30 -.wo NZ          ;Adresse nächste Basic Zeile
+40 -.wo ZN          ;Zeilennummer (beliebig)
+50 -.by $9e         ;Interpretercode »SYS«
+60 -.tx"2062"
+70 -.by 0           ;Null für Zeilenende
+80 -.wo 0           ;Basic-Programm-Ende
+90 -;               weiterer Assemblertext
+xx -.en
+</code></pre>
+
+        <address class="author">(Lars Jedinski/sk)</address>
+
+
+        <h2>Mikro-Hardcopy mit dem NL-10</h2>
+
+        <p>Durch zwei POKEs kann man die Mikro-Hardcopy-Routine für Epson-kompatible Drucker aus Ausgabe 10/86, Seite 94 an den Star NL-10 anpassen. Zuerst »MHC64« laden. Die Routine steht von $CF08 bis $CFF6 im Speicher. Folgende POKEs eingeben:</p>
+
+        <p>POKE 53207,51: POKE 53209,10</p>
+
+        <p>Danach die Routine mittels eines Monitors wieder abspeichern.</p>
+
+        <address class="author">(Jörg Meyer/sk)</address>
+
+        <h2>Vier Bildschirme auf dem C 64</h2>
+
+        <p>Mit diesem Programm (Listing 2) ist es möglich, auf vier Bildschirmen gleichzeitig zu arbeiten, ohne daß Daten durch eventuelles Scrollen verloren gehen. So kann man zum Beispiel auf Bildschirm drei und vier Notizen zum Programm auf Bildschirm eins machen. Ein im Speicher befindliches Programm ist jedoch auf allen vier Bildschirmen editierfähig. Ein Druck auf eine der Funktionstasten genügt, um zwischen den Bildschirmen umzuschalten. &lt;F1&gt; steht für Bildschirm 1, &lt;F3&gt; für Bildschirm 2 etc.</p>
+
+        <p>Für die Bildschirmspeicher wurde der Bereich $8000 bis $8FFF gewählt. Für einen geübten Maschinensprache-Programmierer dürfte es jedoch kein Problem sein, das Programm so abzuändern, daß der Bildschirmspeicher unter das Basic-ROM geschoben wird. Für die Abfrage der Funktionstasten wurde die Interrupt-Routine verwendet.</p>
+
+        <address class="author">(J. Hauke/sk)</address>
+
+        <figure>
+            <pre data-filename="4bildschirme" data-name="Vier Bildschirme" data-checksummer="3"></pre>
+            <figcaption>Listing 2. Vier Bildschirme mit dem C 64</figcaption>
+        </figure>
+
+        <h2>Steuersequenzen per Basic-Erweiterung</h2>
+
+        <p>Es ist wahrscheinlich jedem C 64-Besitzer bekannt, wie lästig es ist, diverse Steuercodes mittels CHR$-Befehl an Floppy oder Drucker zu schicken. Dieser Befehl sendet jeweils ein Zeichen, was bei längeren Steuersequenzen, auch bei Verwendung einer FOR-NEXT-Schleife recht langsam vonstatten geht und den Druckkopf oftmals zu wilden Zuckungen bringt. Dem kann abgeholfen werden. Nach dem Eintippen von »SEQUENZ« mit dem MSE und Abspeichern kann der geplagte Drucker- oder Floppy-Programmierer mittels dieses kleinen Programms (Listing 3) sein spartanisches Basic durch SYS 828 um den Befehl »SEQ #« erweitern. Man geht folgendermaßen vor:<br>
+            LOAD "SEQUENZ",8,1 &lt;RETURN&gt;<br>
+            NEW: &lt;RETURN&gt;<br>
+            SYS 828 &lt;RETURN&gt;</p>
+
+        <p>In diesem Fall steht die Routine im Kassetten-Puffer. Wer darauf nicht verzichten möchte, sollte das Programm »SEQUENZ II« (Listing 4) eintippen, das im Bereich $C000-$C0C0 steht und entsprechend mit SYS 49152 initialisiert wird. Die vollständige Syntax des neuen Befehls lautet:</p>
+
+        <pre><code>SEQ#n,(x,w:y,"d",....,z);
+</code></pre>
+
+        <p>Vor der Benutzung des Befehls muß mit dem entsprechenden OPEN-Kommando ein Kanal zum gewünschten Gerät (Drucker,Floppy,Bildschirm) geöffnet werden. Zum Beispiel »OPEN 1,8,15«, um Befehle zur Floppy-Station zu senden. Das »n« steht für die Filenummer, »x,y,z« stehen für die jeweiligen ASCII-Codes, die gesendet werden sollen. Getrennt werden die Codes durch Kommata. Den Zeichen kann noch der Wiederholungsfaktor »w« im Bereich von 1 bis 255 vorangestellt werden, dem ein Doppelpunkt folgen muß. Das danach folgende Zeichen wird »w«-mal gesendet. Es können auch Strings wie »"d"« gesendet werden, die allerdings nicht wiederholt werden können. Das »;« am Ende der Befehlssequenz verhält sich wie bei einem PRINT-Befehl. Fehlt es, wird ein Carriage Return mit ausgegeben und bei Filenummern über 128 (n) wird noch ein Linefeed mit angehängt. Zur besseren Verständlichkeit der Syntax zeigt das Beispiel (Listing 5) einige Anwendungen des SEQ #-Befehls. Zuerst werden einige Zeichen am Bildschirm ausgegeben, danach wird Spur 35 einer Diskette in der Floppy-Station mit »00« beschrieben (Vorsicht, wichtige Disks entfernen!) Anschließend werden über den Linearkanal des Druckers ein Balken und verschiedene Sonderzeichen ausgegeben. Mit Hilfe dieses Beispiels dürfte es ein Einfaches sein, die »SEQUENZ«-Routine für eigene Programme zu verwenden.</p>
+
+        <address class="author">(Alexander Lazarevic/sk)</address>
+
+        <figure>
+            <pre data-filename="sequenz.prg" data-name="SEQUENZ" data-mse=mse1></pre>
+            <figcaption><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Listing 3. »SEQUENZ« im Bereich ab $033C</a></figcaption>
+        </figure>
+        <div class="binary_download" data-filename="sequenz.prg" data-name="SEQUENZ"></div>
+
+        <figure>
+            <pre data-filename="sequenz ii.prg" data-name="SEQUENZ II" data-mse=mse1></pre>
+            <figcaption>Listing 4. »SEQUENZ« im Bereich ab $C000</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="sequenz ii.prg" data-name="SEQUENZ II"></div>
+
+        <figure>
+            <pre data-filename="beispiel" data-name="Beispiel zu SEQUENZ" data-checksummer="3"></pre>
+            <figcaption>Listing 5. Beispielprogramm zu »SEQUENZ«</figcaption>
+        </figure>
+
+        <h2>Printfox mit dem MPS 802</h2>
+
+        <p>Der »Printfox« ist ein Programm, das vielfältige Möglichkeiten bietet. Leider arbeitet es normalerweise nicht mit dem MPS 802 zusammen. Mit dieser Ergänzung zum Programm »SETUP« für die Druckerinstallation bei »Printfox« und einer eigenen Hardcopy-Routine für den MPS 802 (Listing 6) ist ein Ausdruck ohne weiteres möglich. Laden Sie also zunächst »SETUP« und fügen dann die in Listing 7 angegebenen Zeilen hinzu. Nach dem Abtippen mit dem MSE speichern Sie die Druckroutine auf der »Printfox«-Diskette. Wenn Sie, nach dem Speichern versteht sich, das Programm starten, ist im Menü eine Installation für den MPS 802 vorgesehen. Wählen Sie diesen Punkt an, wird automatisch die entsprechende Einstellung vorgenommen.</p>
+
+        <address class="author">(Stefan Tandecki/sk)</address>
+
+        <figure>
+            <pre data-filename="mps802.prg" data-name="Printfox-Druckroutine MPS 802" data-mse=mse1></pre>
+            <figcaption>Listing 6. Die Printfox-Druckroutine für den MPS 802</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="mps802.prg" data-name="Printfox-Druckroutine MPS 802"></div>
+
+        <figure>
+            <pre data-filename="erg. setup" data-name="SETUP-Ergänzung" data-checksummer="3"></pre>
+            <figcaption>Listing 7. Zuerst »SETUP«-Programm von Printfox laden, dann diese Ergänzungen eingeben.</figcaption>
+        </figure>
+
+        <h2>»Hardmaker«-Grafiken mit Print Shop weiterbearbeiten</h2>
+
+        <p>Grafikbilder aus Action-Spielen oder anderen Programmen, die mit dem »Hardmaker« aus Ausgabe 4/86 gespeichert wurden, lassen sich mit dem »Print Shop« im Screen-Magic-Modus weiterbearbeiten und auch ausdrucken. Dabei ist der Ausdruck von Print Shop erheblich größer als der des Hardmakers.</p>
+
+        <address class="author">(Andreas Gorzinski/sk)</address>
+
+        <p>Sollten Sie ähnliche kurze Tricks entdeckt haben, wie man Programme effektiver nutzen kann, so lassen Sie diese nicht bei sich zu Hause in der Schublade verstauben, sondern senden Sie uns diese unter dem Stichwort »Tips &amp; Tricks« zu. Denn oft sind es die einfachsten Dinge als Lösung eines Problems, die manchem unserer Leser Stunden des Grübelns und Experimentierens ersparen.</p>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+
+            <p>Unter dem Titel »Turbo-POKE für den C 64/128« steht häufiger der Befehl POKE 53269,..., oder PEEK (53269 ...). In diesen Befehlen ist die Adresse durch »53296« zu ersetzen.</p>
+
+            <p>Im Programm »Sequenz« hat sich an der Adresse $0358 ein Druckfehler eingeschlichen. Dort muß der Wert »ff« durch »b1« ersetzt werden. Die Prüfsumme ändert sich dann in »1a«.</p>
+
+            <!-- Reiner Druckfehler -->
+            <!-- 64'er 4/1987 -->
+            <!-- Disk-Version bereits korrigiert -->
+            <!-- 64'er 6/1987 -->
+        </aside>
+    </article>
+</body>
+
+</html>

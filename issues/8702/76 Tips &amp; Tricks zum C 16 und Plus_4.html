@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks zum C 16 und Plus/4</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="tr, Christoph Richard, Dela-Elektronik, Hartwig Alte, Mirko Pepa">
+    <meta name="64er.issue" content="2/87">
+    <meta name="64er.pages" content="76,78">
+    <meta name="64er.head1" content="Tips &amp; Tricks">
+    <meta name="64er.head2" content="C 16, Plus/4">
+    <meta name="64er.toc_category" content="Tips & Tricks">
+    <meta name="64er.toc_title" content="Tips &amp; Tricks zum C 16 und Plus/4: RAM-/ROM-Umschaltung / Tip zur Dela-Speichererweiterung / Nützliche Kernel-Routine / Tolle 3D-Grafiken">
+    <meta name="64er.index_title" content="RAM/ROM-Umschaltung">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 16 &amp; Plus/4">
+    <meta name="64er.index_title" content="Tip zur Dela-Speichererweiterung">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 16 &amp; Plus/4">
+    <meta name="64er.index_title" content="Nützliche Kernel-Routine">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 16 &amp; Plus/4">
+    <meta name="64er.index_title" content="Tolle 3D-Grafiken">
+    <meta name="64er.index_category" content="Tips &amp; Tricks|C 16 &amp; Plus/4">
+    <meta name="64er.id" content="tips_c16">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks zum C 16 und Plus/4</h1>
+        <p class="intro">Haben Sie Ärger mit Ihrer C 16-Speichererweiterung? Wir geben Ihnen dazu wichtige Hinweise. Außerdem bringen wir zwei interessante Tricks für Maschinensprache-Profis und ein Programm zum Zeichnen von erstaunlichen dreidimensionalen Funktionen.</p>
+
+        <p>Kürzlich entbrannte in der 64'er-Redaktion ein heftiger Streit darüber, wie kompatibel zueinander ein C 16 mit 64-KByte-Erweiterung und ein Plus/4 denn nun wirklich seien. Das Betriebssystem ist bei beiden Computern absolut identisch, wie durch Vergleiche nachgewiesen werden konnte. Trotzdem erscheint beim Einschalten eines Plus/4 die Meldung »3-PLUS-1 ON KEY F1« und bei einem C 16 nicht. Auch die Belegung der &lt;F1&gt;-Taste ist verschieden. Es muß also vom Computer eine Unterscheidung vorgenommen worden sein. Doch werden bei einem Plus/4 außer der Belegung von &lt;F1&gt; noch andere Speicherstellen gegenüber dem C 16 geändert? Wenn ja, welche?</p>
+
+        <p>An dieser Stelle sind Sie als Tüftler aufgerufen, der Sache einmal näher auf den Grund zu gehen. Welche Routine ist für die Unterscheidung zuständig? Anhand welchen Kriteriums wird unterschieden? Welche Auswirkungen auf Programme hat das? Schreiben Sie uns! Stichwort »Aktion C 16, Plus/4«. Den besten Beitrag werden wir in dieser Rubrik veröffentlichen. Viel Spaß beim Knobeln.</p>
+
+        <address class="author">(tr)</address>
+
+        <h2>RAM-ROM-Umschaltung</h2>
+
+        <p>Laut Handbuch kann man beim C 16 und Plus/4 das RAM ab $8000 durch Schreiben von $80 in die Adresse $07F8 vom Monitor aus einschalten. Leider funktioniert dies nicht innerhalb von Maschinenprogrammen. Dazu gibt es eine andere Möglichkeit: Durch Ansprechen der Adressen $FF3E (ROM) und $FF3F (RAM) wird das Betriebssystem ein- und wieder ausgeblendet. Das kann zum Beispiel durch »STA $FF3F« geschehen, wobei der Inhalt vom Akku in diesem Moment unwichtig ist.</p>
+
+        <p>Da das Betriebssystem komplett ausgeblendet wird, stürzt spätestens beim ersten IRQ der Computer ab. Er springt ja dann ins RAM. Eine kleine Routine sorgt dafür, daß bei jedem Interrupt zuerst auf das ROM umgeschaltet wird:</p>
+
+        <pre><code>Marke1  SEI                 ;Interrupt ausschalten
+        STA Merke1          ;Register retten
+        STX Merke2
+        STA $FF3E           ;ROM einblenden
+        LDA #&lt;(Marke2)      ;neuer Rücksprungvektor
+        PHA                 ;auf Stack legen
+        LDA #&gt;(Marke2)
+        PHA
+        TSX                 ;Stackpointer
+        LDA $0103,X         ;für den späteren RTI
+        PHA                 ;auf Stack
+        LDA Merke1          ;Register wieder holen
+        LDX Merke2
+        JMP $FCB3           ;zur Interrupt-Routine.
+Marke2  SEI                 ;hier weiter nach IRQ-Routine
+        STA $FF3F           ;RAM ein
+        RTI                 ;Ende.
+</code></pre>
+
+
+        <p>Dieser neue Teil der Interrupt-Routine, der an jeder beliebigen Adresse liegen kann, muß von Ihrem Hauptprogramm noch aktiviert werden. Ihr Programm sollte also so beginnen:</p>
+
+        <pre><code>SEI                 ;IRQ aus
+STA $FF3F           ;RAM ein
+LDA #&lt;(Marke1)      ;Interrupt-Vektor auf
+STA $FFFE           ;neue Routine richten
+LDA #&gt;(Marke1)
+STA $FFFF
+CLI                 ;IRQ wieder freigeben
+...                 ;und weiter im Hauptprogramm
+</code></pre>
+
+
+        <p>Beim Anpassen auf einen beliebigen Speicherbereich beachten Sie bitte die Schreibweise »LDA # &lt;(Marke)«. Dies bedeutet: »LDA mit Low-Byte von der Adresse, an der »Marke« steht«. »# > (...)« bedeutet High-Byte.</p>
+
+        <address class="author">(Christoph Richard/tr)</address>
+
+        <h2>Tip zur Dela-Speichererweiterung</h2>
+
+        <p>Da es vom C 16 verschiedene Hardware-Versionen (Platinen-Layouts) gibt, kann es zu einer Fehlfunktion der 64-KByte-Erweiterung von Dela kommen. Diese äußert sich meist so:</p>
+
+        <p>— Bildschirm füllt sich mit wirren Zeichen</p>
+
+        <p>— Andere Einschaltmeldung als »60671 Bytes free«</p>
+
+        <p>— Programme stürzen unkontrolliert ab</p>
+
+        <p>Bei diesen Computern ist es erforderlich, die eingebauten 16 KByte RAM des C 16 abzuschalten. Die Erweiterung enthält nämlich nicht 48 KByte, sondern 64 KByte. Das bedeutet, daß der erste 16-KByte-Block zweimal vorhanden ist, wodurch die beschriebenen Fehler auftreten können.</p>
+
+        <p>Im folgenden soll beschrieben werden, wie Sie sich einfach einen Schalter zum Abschalten der internen 16 KByte einbauen können. Vergessen Sie aber nicht, daß durch so einen Eingriff die Garantieansprüche für den Computer verloren gehen!</p>
+
+        <p>Schrauben Sie zuerst das Gehäuse auf. Trennen Sie die Leiterbahn zwischen den ICs U14 und U8 (siehe Bild 1!) mit einem Messer oder Schraubenzieher. An der Trennstelle, die zu U8 führt, wird nun ein 10 kΩ-Widerstand als Pull-up-Widerstand gegen +5 Volt geschaltet (zum Beispiel am Pin 16 von U8).</p>
+
+        <figure>
+            <img src="76-1.png" alt="Schaltskizze: die ICs »U 14« und »U8«, eine mit einem Kreuz markierte Leiterbahn (»Leiterbahn trennen!«), ein »Schalter« und ein »10 KΩ Widerstand«">
+            <figcaption>Bild 1. Abschalten der internen 16 KByte für die Dela-Speichererweiterung</figcaption>
+        </figure>
+
+        <p>Wenn Sie für immer auf das eingebaute RAM verzichten wollen, sind Sie jetzt bereits fertig. Allerdings dürfen Sie dann die Erweiterung nicht mehr aus dem Expansion-Port herausziehen.</p>
+
+        <p>Anderenfalls bauen Sie sich einen Schalter zum Aus- und Einschalten der internen 16 KByte ein. Bild 1 zeigt Ihnen, wo Sie den Schalter anschließen müssen.</p>
+
+        <p>Für den Fall, daß Sie den Schalter nicht selbst einbauen möchten, bietet Dela-Elektronik (Adresse im Anzeigenteil) einen kostenlosen Einbauservice an. Schicken Sie Ihren C 16 an Dela und Sie bekommen ihn umgebaut wieder zurück. Der Garantieanspruch geht dabei natürlich genauso verloren.</p>
+
+        <address class="author">(Dela-Elektronik/tr)</address>
+
+        <h2>Nützliche Kernel-Routine</h2>
+
+        <p>Maschinensprache-Programmierer werden folgende Routine zu schätzen wissen: Sie hat die Startadresse $FF4F und ist noch namenlos. Wird sie durch JSR $FF4F aufgerufen, gibt sie den Text, der direkt (!) nach dem JSR-Befehl im ASCII-Format folgt, auf dem Bildschirm aus. Am Ende des Textes muß ein Null-Byte ($00) stehen. Das Programm wird dann nach diesem Null-Byte fortgesetzt!</p>
+
+        <address class="author">(Hartwig Alte/tr)</address>
+
+        <h2>Tolle 3D-Grafiken</h2>
+
+        <p>Dreidimensionale Grafiken faszinieren immer wieder. Das vorliegende Programm in Listing 1 erzeugt aus mathematischen Formeln 3D-Funktionsgraphen. Als erstes müssen Sie das Programm abtippen und speichern. Wenn Sie es mit RUN starten, sehen Sie zunächst ein Auswahlmenü mit sieben Punkten vor sich. Drücken Sie die jeweilige Zahlen-Taste, um die Funktion auszuführen.</p>
+
+        <p>&lt;1&gt; Funktionen zeichnen: Das Programm »merkt« sich gleichzeitig fünf Funktionen. Im Listing 1 sind bereits fünf Formeln zum Ausprobieren enthalten. Sie werden gefragt, welche der fünf Funktionen Sie zeichnen möchten (Anwahl wieder mit Tasten &lt;1> bis &lt;5>). Der Grafikbildschirm wird vorher nicht gelöscht. Sie können also mehrere Funktionen übereinander zeichnen lassen. Ansonsten vorher Punkt &lt;7> ausführen.</p>
+
+        <p>&lt;2> Funktion ändern: Zuerst erfolgt wieder eine Anwahl, welche der fünf mathematischen Funktionen Sie verändern möchten. Wenn Sie über keine mathematischen Kenntnisse verfügen, schauen Sie sich am besten die bereits gespeicherten Funktionen mit Menüpunkt &lt;3> an und ändern dann die Zahlen in kleinen Grenzen. Zur Eingabe der Funktionen: Auf dem Bildschirm sehen Sie oben alle fünf Formeln aufgelistet und unten steht der Cursor nun neben dem »=« Zeichen. Geben Sie die neue Funktion nun ein und drücken Sie zweimal &lt;RETURN&gt;. Danach befinden Sie sich wieder im Hauptmenü.</p>
+
+        <p>&lt;3> Funktionen zeigen: Die Programmzeilen 530 bis 620, die die Funktionen enthalten, werden auf dem Bildschirm aufgelistet. Durch Drücken einer beliebigen Taste gelangen Sie wieder ins Hauptmenü zurück.</p>
+
+        <p>&lt;4> Anzahl Linien ändern, und</p>
+
+        <p>&lt;5> Anzahl Punkte ändern: Sie können wählen, wie genau die Grafik gezeichnet werden soll. Um den Effekt zu verdeutlichen, experimentieren Sie ein wenig mit den vorgegebenen Werten.</p>
+
+        <p>&lt;6> Grafik zeigen: Die zuletzt gezeichnete Grafik wird auf dem Bildschirm dargestellt. Durch beliebigen Tastendruck kommen Sie ins Hauptmenü zurück.</p>
+
+        <p>&lt;7> Grafik löschen: Die zuletzt gezeichnete Grafik wird gelöscht. Es erfolgt keine Bestätigung auf dem Bildschirm.</p>
+
+        <p>Sie können die Zeichenroutine jederzeit durch längeres Drücken der &lt;RUN/STOP&gt;-Taste abbrechen. Sie befinden sich dann wieder im Hauptmenü.</p>
+
+        <address class="author">(Mirko Pepa/tr)</address>
+
+        <figure>
+            <pre data-filename="3d-funktionen" data-name="3D-FUNKTIONEN"></pre>
+            <figcaption>Listing 1. »3D-FUNKTIONEN«. Damit können Sie auf Ihrem Computer erstaunliche dreidimensionale Grafiken erzeugen. Eingabehinweise auf Seite 66.</figcaption>
+        </figure>
+    </article>
+</body>
+
+</html>

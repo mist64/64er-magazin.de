@@ -1,0 +1,252 @@
+
+
+;gdm v1.0.prg ==0801==
+;inkl. Fehlerteufelchen 3/1987 (Zeile 30020; Disk-Version bereits korrigiert)
+;inkl. Fehlerteufelchen 4/1987 (Zeilen 1, 141, 660, 1170, 30020; Disk-Version bereits korrigiert)
+;inkl. Fehlerteufelchen 8/1987 (Zeilen 1, 141, 660, 1170, 30020; Disk-Version bereits korrigiert)
+    1 a=a+1:if a=1 then load"gdm.obj",8,1
+    2 b=b+1:if b=1 then load"gdm.codes",8,1
+    3 :
+   14 rem ------------------------------
+   15 rem - gdm geos disketten monitor -
+   45 rem -    (c) markt & technik     -
+   50 rem ------------------------------
+   51 :
+   55 :
+   60 he$="-0123456789ABCDEF"
+   65 h2$="-0123456789abcdef"
+   75 :
+   85 close 15:open 15,8,15,"i":close 2:open 2,8,2,"#"
+   90 poke 53280,0:poke 53281,0:poke 53272,23:poke 657,128:poke 646,1
+   91 poke 53248,32:poke 53249,219:poke 53288,1:poke 53269,1:poke 52264,0
+   92 poke 2040,13
+   95 :
+  100 rem    --- hauptmenue ---
+  105 print"{clr}GDM{$a0}Geos Diskmonitor V2                ";:poke 53269,1
+  106 print"   by Thorsten Petrowski   (c) 64'er"
+  107 print"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}";
+  115 print"  {rvon}f1{rvof} Lesen  {rvon}f2{rvof} Naechster  {rvon}f3{rvof} schreiben"
+  120 print:print"  {rvon}f4{rvof} Byte edit  {rvon}f5{rvof} Directory  {rvon}f6{rvof} Reset"
+  125 print:print" {rvon}f7{rvof} Ende {rvon}f8{rvof} Block edit {rvon}_{rvof} Dump {rvon}h{rvof} HEX-Edit";
+  126 print"{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}";
+  130 print"{rvon}     {rvof}Spur [    ] {rvon} {rvof} Sektor [    ]{rvon}        {rvof}";
+  131 print"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}";
+  135 print"{down}{down}{down}{down}{down}{down}{down}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{rvon}{up}{left}                        {rvof}";
+  140 print "{down}Byte#   :DEZ #    HEX $   BIN %        "
+  141 print"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}                          76543210"
+  142 print"{SHIFT--}   {SHIFT--} Sprite"
+  143 print"{SHIFT--}   {SHIFT--}"
+  144 print"{SHIFT--}   {SHIFT--}"
+  145 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{home}";
+  146 gosub 575
+  150 :
+  155 :
+  160 rem   --- auswahl menue ---
+  165 md$="> WAITING{$a0}<":gosub 2000
+  166 get key$:if key$="" then 165
+  170 if key$="{f1}" then gosub 590
+  175 if key$="{f5}" then print"{clr}":gosub 460:goto 105
+  176 if key$="h" then 1000
+  180 if key$="{f8}" then gosub 575:goto 225
+  185 if key$="{f6}" then 85
+  190 if key$="{f3}" then gosub 650
+  195 if key$="{f7}" then close 2:close 15:end
+  200 if key$="{f2}" then t=peek(49664):s=peek(49665):key$="{f1}":goto 170
+  205 if key$="{f4}" then gosub 630
+  210 if key$="_" then gosub 340:goto 105
+  215 goto 165
+  220 :
+  225 rem     --- editieren ---
+  230 cr=1464+nr:ro=cr
+  235 x=29:y=0:gosub 675:print"> EDITING <"
+  240 if nr>255 or nr<0 then nr=no:cr=ro
+  245 gosub 605
+  250 poke ro,peek(ro) and 127
+  255 poke cr,peek(cr) or 128
+  260 ro=cr:no=nr
+  265 get mo$:if mo$="" then 265
+  270 mo=asc(mo$):po=mo
+  275 if mo=29 then nr=nr+1:cr=cr+1:goto 240
+  280 if mo=17 then nr=nr+40:cr=cr+40:goto 240
+  285 if mo=138 then gosub 630:goto 240
+  290 if mo=145 then nr=nr-40:cr=cr-40:goto 240
+  295 if mo=157 then nr=nr-1:cr=cr-1:goto 240
+  300 if mo=13 then poke ro,peek(ro) and 127:goto 150
+  305 if mo>=65 and mo<=90 then po=po+32:goto 315
+  310 if mo>=193 and mo<=218 then po=po-128
+  315 y=int(nr/40):x=nr-y*40:y=y+11:gosub 675:print chr$(mo);
+  320 poke 49664+nr,po
+  325 if nr<255 then nr=nr+1:cr=cr+1
+  330 goto 240
+  335 :
+  340 rem      --- hardcopy ---
+  341 print"{clr}":x=0:y=12:gosub 675:print"Drucker-Dump ...":poke 53269,0
+  342 print tab(10)"(D)ezimal"
+  343 print tab(10)"(H)exadezimal"
+  344 print tab(10)"(S)TOP{$a0}!"
+  345 get mo$:if mo$="" then 345
+  346 if mo$="s" then return
+  347 if mo$="h" or mo$="d" then 353
+  348 goto 345
+  353 open 4,4,7:rem mps-801 ggf.aendern
+  354 poke768,61:print#4,:close4:poke 768,139
+  355 if st<>-128 then 359
+  356 x=5:y=20:gosub675:print"DRUCKER{$a0}NICHT{$a0}ANGESCHALTET{$a0}!-Taste "
+  357 fort=0 to 255:poke 53280,t:next:get a$:if a$="" then 357
+  358 goto 353
+  359 open 4,4,7:gosub 675:print"                                      "
+  360 for out =0 to 31
+  361 :print#4,"[";
+  362 :if mo$="d" then print#4,right$(str$(out*8+1000),3);"] :";
+  363 :if mo$="h" then by=out*8:gosub 35000:print#4,hi$;"] ";
+  365 :for yb =0 to 7
+  369 ::if mo$="h" then by=peek(49664+out*8+yb):gosub 35000:print#4,hi$;
+  370 ::if mo$="d" then print#4,right$(str$(peek(49664+out*8+yb)+1000),3);
+  371 :print#4," ";
+  375 :next yb
+  380 :sys 49259,49664+out*8,8,pr$
+  385 :print#4,pr$
+  390 next out
+  395 print#4:print#4,"GDM Geos Disk Monitor von T.Petrowski (C) 64'er":print#4
+  400 close 4:poke 53269,1:return
+  405 :
+  410 rem    --- disk-status ---
+  415 input#15,en,er$,et,es:poke 212,0
+  420 x=6:y=24:gosub 675:print"                                ";
+  425 x=6:y=24:gosub 675:poke 212,0
+  430 print"Disk :";er$;"{home}"
+  435 return
+  440 :
+  445 rem      --- strich ---
+  450 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}";:return
+  455 :
+  460 rem    --- directory ---
+  465 close 1:open 1,8,0,"$0":poke 53269,0
+  470 get#1,a$,a$:d=0:poke 198,0
+  475 d=d+1:if d=2 then print:gosub 445
+  480 print:print"     ";:if (st and 64)=64 then goto 500
+  485 if peek(198)=0 then 495
+  490 poke 198,0:wait 198,1:poke 198,0
+  495 sys 49215:goto 475
+  500 print"{down}  --- Taste druecken ---":poke 198,0:wait 198,1
+  505 poke 53269,1:return
+  510 :
+  515 rem --- spur/sektor eingabe ---
+  520 x=11:y=9:gosub 675:in=t:gosub 700:t=in
+  535 x=27:y=9:gosub 675:in=s:gosub 700:s=in
+  545 return
+  550 :
+  555 rem     --- block lesen ---
+  560 poke 53269,0:print#15,"u1: 2 0 "t;s
+  565 sys 49152:nr=0:poke 53269,1:return
+  570 :
+  575 rem       --- anzeigen ---
+  580 x=0:y=11:gosub 675:sys 49177:poke 53280,0:return
+  585 :
+  590 rem        --- lesen ---
+  595 gosub 515:gosub 555:gosub 410:gosub 575:return
+  600 :
+  605 rem    --- wert ausgeben ---
+  610 x=5:y=19:gosub675:printright$(str$(nr+1000),3);
+  614 poke 211,14:printright$(str$(peek(49664+nr)+1000),3);
+  615 poke 211,23:printmid$(hex$,(((peek(49664+nr) and 240)+16)/16)+1,1);
+  616 printmid$(hex$,(peek(49664+nr)and 15)+2,1);
+  617 sys 49446,nr:poke 211,31:sys 49407,peek(49664+nr)
+  620 return
+  625 :
+  630 rem      --- byte edit ---
+  635 gosub 605:x=18:y=22:gosub 675:print"Neuer Wert:";
+  636 open 3,0,0:input#3,by$:close 3
+  637 mo$=left$(by$,1)
+  638 if mo$<>"$" then 641
+  639 in$=mid$(by$,2):gosub41000
+  640 by=in:goto 649
+  641 if mo$<>"%" then 645
+  642 by=0:for bi=0 to 7
+  643 if mid$(by$,9-bi,1)="1" then by=by+2^bi
+  644 next bi:goto 649
+  645 iu=1:if mo$="#" then iu=2
+  646 by=val(mid$(by$,iu,3))
+  649 poke 49664+nr,by:gosub 575:return
+  650 rem      --- schreiben ---
+  655 gosub 515:print#15,"b-p 2 0":sys 49193
+  660 print#15,"u2: 2 0 ";t;s
+  665 gosub 410:return
+  670 :
+  675 rem    --- cursor setzen ---
+  680 poke 211,x:poke 214,y:sys 58732:return
+  690 :
+  700 rem --- eingabe (auch hex)
+  701 in$=right$(str$(in+1000),2):gosub 800
+  715 if left$(in$,1)="$" then in$=right$(in$,2):gosub 41000:return
+  716 in=val(in$)
+  720 return
+  800 print in$;
+  801 print"{rvon} {rvof}{left}";
+  805 get a$:if a$="" then 805
+  810 ll=len(in$):ifa$=chr$(20) andll>0 thenin$=left$(in$,ll-1):print"{left}  {left}{left}";
+  811 if a$=chr$(20) then 801
+  812 if a$=chr$(13) then print" ";:return
+  815 if(a$>="0"anda$<="9")or(a$>="a"anda$<="f")or(a$>="A"anda$<="F")then 825
+  816 if a$="$" then 825
+  820 goto 805
+  825 if len(in$)<3 then in$=in$+a$:print a$;:goto 801
+  830 goto 805
+ 1000 rem --- hex edit ---
+ 1005 eb=0
+ 1010 x=0:y=12:gosub 675
+ 1011 print" Nr   +0 +1 +2 +3 +4 +5 +6 +7 ASCII     ";
+ 1012 gosub 445:print"                                        ";:gosub 445
+ 1013 print"   + Vorw. - Zur. RETURN{$a0}Eingeben q Ende"
+ 1030 x=0:y=14:gosub 675:print"[";:by=eb:gosub 35000:print hi$;"]  ";
+ 1035 fort=0 to 7:by=peek(49664+eb+t):gosub 35000:print hi$" ";:next t
+ 1036 fort=0 to 7:printchr$(peek(peek(49664+eb+t)+49920));:next
+ 1040 get k$:if k$="" then 1040
+ 1045 if k$="q" then gosub 575:goto 160
+ 1050 ob=eb:if k$="+" then eb=eb+8:if eb=256 then eb=0
+ 1060 if k$="-" then eb=eb-8:if eb<0 then eb=248
+ 1065 if k$=chr$(13) then 1080
+ 1070 if ob<>eb then 1030
+ 1071 goto 1040
+ 1080 pb=1590:op=1589
+ 1081 x=0:y=16:gosub 675:print"  0-f / 0-F Eingabe , RETURN = Fertig   ";
+ 1090 poke op,peek(op) and 127
+ 1100 poke pb,peek(pb) or 128
+ 1120 get k$:if k$="" then 1120
+ 1125 op=pb
+ 1130 if k$="{rght}" then pb=pb+1
+ 1140 if k$="{left}" then pb=pb-1:goto 1179
+ 1145 :
+ 1150 if k$>="0" and k$<="9" then poke pb,asc(k$) or 128:pb=pb+1
+ 1160 if k$>="a" and k$<="f" then poke pb,(asc(k$)-64) or 128:pb=pb+1
+ 1170 if k$>="A" and k$<="F"then poke pb,(asc(k$)-128) or 128:pb=pb+1
+ 1179 if ((pb-1589)/3)<>int((pb-1589)/3)    then 1185
+ 1180 if k$="{left}" then pb=pb-1:goto 1185
+ 1181 pb=pb+1
+ 1185 if k$=chr$(13) then poke op,peek(op) and 127:goto 1220
+ 1190 if pb>1612 then pb=1590
+ 1200 if pb<1590 then pb=1612
+ 1210 goto 1090
+ 1220 ad=1589:for cn=0 to 7
+ 1230 gosub 30000:poke (49664+eb+cn),by
+ 1240 next cn:goto 1010
+ 2000 rem --- modus anzeigen ---
+ 2010 x=29:y=0:gosub 675:print "           ";:gosub 675:print md$:return
+30000 rem --- umrechnen hex-dez bildnibbles
+30010 by=0:gosub 30020:by=by+16*sb:gosub 30020:by=by+sb:ad=ad+1:return
+30020 ad=ad+1:b0=peek(ad)and191:sb=0
+30030 if b0>47 and b0<58 then sb=b0-48:return
+30031 if b0>0 and b0<8 then sb=b0+9:return
+30032 if b0>65 and b0<71 then sb=(b0-65)+9:return
+30033 return
+35000 rem --- umrechnen dez-hex
+35010 hi$="":in=int((by and 240)/16):gosub 35030
+35020 in=(by and 15):gosub 35030:return
+35030 hi$=hi$+mid$(he$,in+2,1):return
+41000 rem --- umrechnen hex-dez 1 nibble ---
+41001 in=0:i$=mid$(in$,2,1):gosub41010:in=sb:i$=mid$(in$,1,1):gosub 41010
+41002 in=in+16*sb:return
+41010 sb=0:for c=2 to 17
+41020 if i$=mid$(hex$,c,1) or i$=mid$(h2$,c,1) then sb=c-2:c=17
+41030 next c:return
+

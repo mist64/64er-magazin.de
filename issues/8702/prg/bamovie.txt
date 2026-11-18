@@ -1,0 +1,104 @@
+
+
+;bamovie.prg ==0801==
+   20 poke52,29:poke56,29:poke51,115:poke55,115:clr
+   30 poke255,0:poke254,15:poke2,30
+   40 an=12300:en=(peek(704)+peek(705)*256)
+  100 poke646,peek(53281)-1
+  105 print"{clr}film editor"chr$(13)"{down}{down}   1. film abspielen":ze=2
+  110 print"{down}   2. adressen setzen
+  120 print"{down}   3. farben setzen
+  130 print"   ------------------------
+  140 print"   4. sequenzen schneiden
+  150 print"{down}   5. sequenzen anschauen
+  160 print"{down}   6. sequenzen laden
+  170 print"{down}   7. sequenzen speichern
+  180 print"   ------------------------
+  190 print"   8. directory
+  200 print"{down}   9. dos-commands":print"{home}{down}{down}{down}>
+  210 ifze>18thenprint"{down} ":ze=0:goto230
+  212 ifze<2thenprint"{up}{up}{up} ":ze=20:goto230
+  215 poke198,0:wait198,1:geta$
+  220 if(a$<"1"ora$>"9")and(a$<>"{down}"anda$<>"{up}")anda$<>chr$(13)then210
+  230 ifa$="{down}"thenze=ze+2:print"{home}":poke214,ze:print:print">":print"{up}{up}{up} ":goto210
+  240 ifa$="{up}"thenze=ze-2:print"{home}":poke214,ze:print:print">":print"{down} ":goto210
+  245 ifa$=chr$(13)thena=ze/2:goto260
+  250 a=val(a$)
+  260 onagoto1000,2000,3000,4000,5000,6000,8000,7000,8500
+ 1000 sys7540:poke251,int(an/256):poke250,an-peek(251)*256
+ 1010 poke253,int(en/256):poke252,en-peek(253)*256:poke53272,24
+ 1020 sys7543:poke53272,21
+ 1030 goto100
+ 2000 print"{clr}{down}{down}{rght}bilder im speicher: "int(((peek(704)+peek(705)*256)-12300)/1000)
+ 2010 print"{down} anfangsbild nr.    "int((an-12300)/1000)"{left}{left}{left}{left}{left}";
+ 2015 inputa:an=a*1000+12300:ifa>52thenprint"{up}{up}{up}":goto2010
+ 2020 print"{down} endbild nr.    "int((en-12300)/1000)"{left}{left}{left}{left}{left}";
+ 2025 inputa:en=a*1000+12300
+ 2030 ifen<=anora>53or(peek(704)+peek(705)*256)<enthenprint"{up}{up}{up}":goto2020
+ 2040 print"{down} speed (geschw.)      "peek(2)"{left}{left}{left}{left}{left}{left}";
+ 2045 inputa:ifa<256thenpoke2,a:goto100
+ 2050 print"{up}{up}{up}":goto2040
+ 3000 a=0:input"{clr}{down}{rght}hintergrund";a:ifa<256thenpoke255,a:goto3020
+ 3010 goto3000
+ 3020 a=15:input"{down}{rght}vorderggrund";a:ifa<256thenpoke254,a:goto100
+ 3030 print"{up}{up}";:goto3020
+ 4000 print"{clr}{down}":clr:gosub20000
+ 4010 print"{down}{down}"x".ter cut"
+ 4020 input"{down}start bild";s(x):ifs(x)<0then4100
+ 4025 if(s(x)*1000)+12300>enthenprint"{up}{up}{up}":goto4020
+ 4027 ifs(x)>52thenprint"{up}{up}{up}":goto4020
+ 4030 input"{down}end bild";e(x)
+ 4035 if(e(x)*1000)+12300>=enthenprint"{up}{up}{up}":goto4030
+ 4037 ifs(x)=>e(x)thenprint"{up}{up}{up}":goto4030
+ 4040 poke53272,24:fore=s(x)toe(x):s=e*1000+12300
+ 4050 poke253,int(s/256):poke252,s-peek(253)*256:sys7540:sys7546
+ 4060 poke198,0:wait198,1:poke198,0:next:poke53272,21:poke646,peek(53281)-1
+ 4070 a$="j":input"{clr}{down}{down}in ordnung (j/n)";a$:ifa$="n"then4010
+ 4080 x=x+1:ifx<11then4010
+ 4100 print"{clr}{down}{down}"x"cuts !":rem gosub9000:goto100
+ 4105 input"{down}{down}zirca wieviele sequenzen";q:dimf(q),g(q)
+ 4110 print"{down}reihenfolge der cuts{down}
+ 4120 e=1
+ 4130 a=0:print"{down}"e". sequenz / cut nr.";:inputa:f(e)=a:ifa>x-1thenprint"{up}{up}{up}":goto4130
+ 4135 ifa<0then4150
+ 4136 input"vor- oder rueckwaerts (0 oder 1)";g(e)
+ 4140 e=e+1:ife-1<qthen4130
+ 4150 e=e-1
+ 4200 print"{clr}{down}{down}"e" sequenzen":q=e:gosub9000:goto100
+ 5000 ifq=0then100
+ 5005 poke53272,24:sys7540:fore=1toq:s=s(f(e))*1000+12300:a=e(f(e))*1000+12300
+ 5010 poke251,int(s/256):poke250,s-peek(251)*256
+ 5020 poke253,int(a/256):poke252,a-peek(253)*256
+ 5025 ifpeek(203)=1thenpoke53272,21:goto100
+ 5030 ifg(e)=1thensys7552:next:goto5005
+ 5040 sys7549:next
+ 5100 goto5005
+ 6000 print"{clr}sequenz laden":clr:gosub20000
+ 6010 a$="":input"{down}{down}{rght}filename";a$:ifa$=""then100
+ 6020 open2,8,2,a$+",s,r"
+ 6030 input#2,q:input#2,x:dim f(q),g(q):ifst<>0thenclose2:goto6000
+ 6040 fore=0toq:input#2,f(e),g(e):next
+ 6050 fore=0tox:input#2,s(e),e(e):next
+ 6060 close2:goto100
+ 7000 print"{clr}":open1,8,0,"$":get#1,a$,a$
+ 7010 ifpeek(203)<>64thenclose1:goto100
+ 7015 get#1,a$,a$:ifst=64thenclose1:gosub9000:goto100
+ 7020 get#1,a$,b$:printasc(a$+chr$(0))+256*asc(b$+chr$(0));
+ 7030 get#1,a$:printa$;:ifa$<>""then7030
+ 7040 print:goto7010
+ 8000 ifq=0then100
+ 8005 print"{clr}sequenz sichern"
+ 8010 a$="":input"{down}{down}{rght}filename";a$:ifa$=""then100
+ 8020 open2,8,2,a$+",s,w"
+ 8030 print#2,q:print#2,x:ifst<>0thenclose2:goto8005
+ 8040 fore=0toq:print#2,f(e):print#2,g(e):next
+ 8050 fore=0tox:print#2,s(e):print#2,e(e):next
+ 8060 close2:goto100
+ 8500 a$="":poke631,34:poke198,1:input"{clr}{down}{rght}kommando";a$
+ 8510 open1,8,15,a$:close1
+ 8520 open1,8,15:input#1,a,a$,b,c:close1
+ 8530 print"{down}{down}"a" "a$" "b" "c:ifa=0then100
+ 8540 gosub9000:goto8500
+ 9000 print"{down}bitte taste":poke198,0:wait198,1:poke198,0:return
+20000 an=12300:en=(peek(704)+peek(705)*256):return
+

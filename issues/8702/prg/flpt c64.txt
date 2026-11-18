@@ -1,0 +1,58 @@
+
+
+;flpt c64.prg ==0801==
+   10 rem ************************************************
+   20 rem *                                              *
+   30 rem *   programm zum umwandeln von zahlen in die   *
+   40 rem *   c 64-formate   mflpt  (ab $6000)           *
+   50 rem *                   flpt  (ab $6010)           *
+   60 rem *                                              *
+   70 rem *       heimo ponnath  hamburg  1986           *
+   80 rem *                                              *
+   90 rem ************************************************
+  100 rem
+  110 printchr$(147)"ist der smon ab $c000 schon eingeladen  (j/n)";:inputa$
+  120 if a$<>"j" then print"wuensche guten absturz...oder smon laden!":end
+  130 for i=0 to 17:rem einlesen des maschinenprogrammes
+  140 read d:poke 828+i,d
+  150 next i
+  160 rem -------- das maschinenprogramm ------------
+  170 data 162,000    :rem ldx #$00     ;lsb zieladresse
+  180 data 160,096    :rem ldy #$60     ;msb    -"-
+  190 data 032,212,187:rem jsr $bbd4    ;fac -> (x/y)
+  200 data 162,006    :rem ldx #$06     ;zaehler einrichten
+  210 data 181,096    :rem lda $60,x    ;fac auslesen
+  220 data 157,015,096:rem sta $600f,x  ;und uebertragen
+  230 data 202        :rem dex          ;zaehler -1
+  240 data 208,248    :rem bne $033d    ;weiter bis fac uebertragen ist
+  250 data 096        :rem rts          ;zurueck ins basicprogramm
+  260 rem
+  270 rem -------- usr-vektor auf $828 richten -----
+  280 rem
+  290 poke 785,60 :rem lsb des usr-vektors
+  300 poke 786,3  :rem msb desselben
+  310 rem
+  320 rem -------- eingaben und usr-aufruf ----------
+  330 rem
+  340 print chr$(147):input"zahl eingeben";a
+  350 b=usr(a):rem b ist nur ein dummy
+  360 rem
+  370 rem ----- progr.direktmodus : monitoraufruf -----
+  380 printchr$(147)chr$(17)
+  390 print"sys49152"chr$(17)chr$(17)chr$(17)chr$(17)
+  400 print" m 6000 6001"chr$(17):rem hier liegt die zahl im mflpt-format
+  410 print" m 6010 6011"chr$(17):rem und hier im flpt-format
+  420 print" x"chr$(17)
+  430 print"run490"
+  440 printchr$(19);
+  450 poke631,13
+  460 poke198,1:end
+  470 rem ---------------------------------------------
+  480 rem
+  490 print:print"ab $6000 mflpt-format"
+  500 print"ab $6010 flpt-format"
+  510 print:input"weitere zahlen (j/n)";a$
+  520 if a$="j" then 340
+  530 poke 785,72:poke 786,178:rem usr-vektor auf normalwert
+  540 end
+
