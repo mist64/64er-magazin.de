@@ -4733,3 +4733,49 @@ both, but it has not been tested against a third.
 not.** Deciding what a thing IS — a frame, a table, a window, a grid — stayed
 human, and every measure that tried to replace that judgement failed on a case
 the eye got right immediately.
+
+### AND THE WINDOW TOOK A SLICE OF THE FACING PAGE → r005_masters_spread
+
+Owner: *"pdf: 78 and 79 edges contain yellow parts of the facing page on the
+sheet. find the issue, fix. dont do one off fixes"*.
+
+The window's gutter edge sits at the fold, and past the fold the facing leaf
+curves into frame. Zooming both edges settled what it was: a solid yellow band
+with **the clip punch holes' white ellipses in it**, which proves it is
+physical paper and not a scanner artefact. 078 carried 28 columns of it, 079
+about 66.
+
+**r005 HAD ALREADY FLAGGED BOTH PAGES AND THE FLAG COULD NOT BE ACTED ON.**
+The stamps said *"BED in the window: … bed, or ink to the trim. LOOK AT"* —
+**11 of 184 pages carry that note** and not one was ever read. Two defects, and
+the second is the worse: **the note's vocabulary had two answers when the truth
+was a third.** A flag that cannot name the thing it found is how this reached a
+finished PDF.
+
+**The detector took two tries, and the first would have cut an advertisement.**
+Control's triplet — ink at the gutter trim, none at the outer trim, high
+chroma — flags 078, 079 **and 106**. 106 is one yellow ad printed ACROSS the
+spread, its own type running to the fold; trimming it would have destroyed it.
+The builder caught that by eye and proposed structure density as the separator.
+**That does not work either**: measured, 106 scores 0.0209 against the bleeds'
+0.0199 and 0.0205 — the ad is MORE structured than the thing it had to be told
+apart from.
+
+What the builder had actually seen was measurable as something else: **the
+facing-page band ends in a cliff onto white paper, because that is where the
+neighbouring sheet stops.** Past the band, 40 columns at 0.01 ink for 078 and
+079; 106 and 107 have no cliff within 140 columns because the ad continues
+inward. So the test is four parts and needs all four — gutter ink, no outer
+ink, chroma, and the cliff. 080's grey crease line fails on chroma.
+
+Implemented in `cut_page`, applied after the window is placed so it cannot move
+the parity fit, with the pull-in per page in `reviewed/r005-gutter-pull.txt`.
+MEASURED after: 173 masters byte-identical, 9 differing only in embedded stamp
+text at AE 0, and 078/079 clean at the gutter trim — **ink 0.0000**. Both
+dropped from colour JPEG to 600-dpi JBIG2 once the yellow was gone, taking the
+PDF from 99.10 to **98.00 MB**.
+
+**The eye named the right feature and the wrong statistic.** Twice today a
+reading that was correct came with a measure that was not — this, and 83-1's
+"flush against the screens". Take the observation, then find what it is a
+measurement OF.

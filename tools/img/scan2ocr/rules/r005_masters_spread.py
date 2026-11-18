@@ -1889,6 +1889,54 @@ def half_offsets(geoms, fit):
     return {k: float(np.median(v)) for k, v in acc.items()}
 
 
+FACING_GUTTER_INK = 0.30     # ink fraction in the 10 columns at the gutter trim
+FACING_OUTER_INK = 0.05      # ... and at most this at the outer trim (else full-bleed)
+FACING_CHROMA = 80           # median max-min channel of that ink: colour, not bed/shadow
+FACING_CLIFF_COLS = 100      # the band must end within this many columns ...
+FACING_CLIFF_INK = 0.05      # ... onto white: ink fraction of the 40 columns past it
+
+
+def edge_ink(master, parity):
+    """(gutter, outer) ink fraction of the 10 columns at each trim, ink = min channel < 200."""
+    left, right = master[:, :10], master[:, -10:]
+    gut, out = (right, left) if parity == "even" else (left, right)
+    return float((gut.min(2) < 200).mean()), float((out.min(2) < 200).mean())
+
+
+def facing_page(master, parity):
+    """The four-part facing-page test.  Returns its numbers when ALL FOUR hold, else None."""
+    gi, oi = edge_ink(master, parity)
+    if gi < FACING_GUTTER_INK or oi > FACING_OUTER_INK:
+        return None
+    gut = master[:, -10:] if parity == "even" else master[:, :10]
+    gut = gut.astype(np.int16)
+    m = gut.min(2) < 200
+    ch = float(np.median((gut.max(2) - gut.min(2))[m]))
+    if ch < FACING_CHROMA:
+        return None
+    cols = (master.min(2) < 200).mean(0)
+    cols = cols[::-1] if parity == "even" else cols
+    band = 0
+    while band < FACING_CLIFF_COLS and cols[band] > 0.30:
+        band += 1
+    if band >= FACING_CLIFF_COLS or cols[band:band + 40].mean() > FACING_CLIFF_INK:
+        return None
+    return {"gi": gi, "oi": oi, "ch": ch, "band": band}
+
+
+def gutter_pull():
+    """issues/<ID>/reviewed/r005-gutter-pull.txt: `NNN  px  # reason` -- an owner-reviewed
+    pull-in of the gutter edge, in master pixels, for a facing page in the window."""
+    f = Path(__file__).resolve().parents[4] / "issues" / ISSUE / "reviewed" / "r005-gutter-pull.txt"
+    out = {}
+    if f.exists():
+        for line in f.read_text(encoding="utf-8").splitlines():
+            line = line.split("#", 1)[0].split()
+            if len(line) >= 2:
+                out[int(line[0])] = int(line[1])
+    return out
+
+
 def cut_page(geom, fit, sheet600, halves=None, n_pages=N_PAGES):
     """The master: sheet600 with the unknown painted white, cut to the window."""
     notes = list(geom["notes"])
@@ -1953,11 +2001,44 @@ def cut_page(geom, fit, sheet600, halves=None, n_pages=N_PAGES):
     col = bed.mean(0)
     bed_mm = {"left": edge_run(col), "right": edge_run(col[::-1]),
               "foot": edge_run(bed.mean(1)[::-1])}
+    # THE FACING PAGE PAST THE FOLD (8702 p078/p079).  The sheet curves away at
+    # the crease and the neighbour's paper is in frame: a band of its ink at the
+    # GUTTER trim, punch holes in it, then this page's own white margin.  The
+    # BED note above saw it and could only offer "bed, or ink to the trim", so
+    # nobody could act.  Four parts, all needed (measured over 8702's 184):
+    # ink at the gutter trim, none at the outer trim, HIGH CHROMA (a grey or
+    # black band is the bed or a crease shadow -- 080), and a CLIFF onto white
+    # within ~100 columns (a spread ad printed across the fold continues
+    # inward -- 106/107 pass the first three and would have been trimmed).
+    facing = facing_page(master, geom["parity"])
+    pull = gutter_pull().get(geom["page"], 0)
+    if facing and not pull:
+        notes.append("FACING PAGE in the window: gutter ink {gi:.2f}, outer ink {oi:.2f}, "
+                     "chroma {ch:.0f}, band {band} px then white -- the facing page's "
+                     "paper past the fold; pull the gutter edge in by the band "
+                     "(issues/<ID>/reviewed/r005-gutter-pull.txt). LOOK AT".format(**facing))
+    if pull:
+        # Applied AFTER the window is placed, so it cannot move the parity's
+        # fit.  A straight band from the gutter trim, as deep as the facing
+        # page reaches anywhere along the side (+ safety), painted as unknown.
+        if geom["parity"] == "even":
+            master[:, MASTER_W_PX - pull:] = 255
+        else:
+            master[:, :pull] = 255
+        notes.append(f"GUTTER pulled in {pull} px: the facing page past the fold "
+                     "(reviewed/r005-gutter-pull.txt)")
     if max(bed_mm.values()) > BED_RUN_LOOK_MM:
+        gutter_side = "right" if geom["parity"] == "even" else "left"
+        if facing and bed_mm.get(gutter_side, 0) > BED_RUN_LOOK_MM:
+            says = "the facing page (see FACING PAGE)"
+        elif facing is None and edge_ink(master, geom["parity"])[1] > 0.5:
+            says = "ink to the trim (the outer trim carries ink too)"
+        else:
+            says = "unresolved -- bed if grey and ending in a cliff, ink to the trim if it continues inward"
         notes.append("BED in the window: " + ", ".join(
             f"{k} {v:.1f} mm" for k, v in bed_mm.items() if v > BED_RUN_LOOK_MM)
-            + " of backing-coloured pixels the trace calls page -- bed, or ink "
-              "to the trim. LOOK AT")
+            + " of backing-coloured pixels the trace calls page -- bed, ink to the "
+              f"trim, or the facing page; the numbers say: {says}. LOOK AT")
     if source != "logo":
         notes.append("ANCHOR from the page edges (fold + bottom trim): the "
                      "wordmark was not found")
