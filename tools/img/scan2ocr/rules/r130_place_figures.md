@@ -320,9 +320,40 @@ via shell I/O (`cat source.txt`), then read back the result to verify.
 - **`data-checksummer` exists and this rule never mentioned it.** SH8602 uses
   it 9 times; 8611 and 8612 never do.
 
-  **THE PRINT DECIDES, NOT THE ISSUE'S HABIT.** A listing whose print carries
-  Checksummer sums gets `data-checksummer="<1|2|3>"`, whichever version the
-  article names; a listing printed without sums does not. The attribute adds
+  **IT IS DECIDED ISSUE BY ISSUE, NOT FILE BY FILE.** Owner, 2026-11-18: *"we
+  need to mirror what the magazine did, but 1. issue by issue, not file by
+  file and 2. no checksummer for everything that isnt pure basic v2 … 8404
+  didnt have a checksummer, it started appearing in 8501. AND we need to match
+  the checksummer version"*. An issue either ran the Checksummer or it did not;
+  within an issue **every eligible listing takes the tag**, and the earlier
+  wording here — *the print decides, not the issue's habit* — is withdrawn.
+
+  **ELIGIBLE MEANS PURE BASIC V2.** No Simons' BASIC, no BASIC 3.5 (C 16,
+  Plus/4), no BASIC 7.0 (C 128), no other extension — those get no tag however
+  the issue is set. MSE hexdumps and assembler listings never take one either.
+
+  **IT STARTS AT 8501.** Nothing before it. 8404 and 8412 each carry one stray
+  `data-checksummer="1"`; both are wrong and come out.
+
+  **THE VERSION IS IN THE ISSUE'S OWN HTML** — the `data-name` of the
+  Checksummer program the issue ships:
+
+  | the issue ships | version | issues |
+  |---|---|---|
+  | `Checksummer 64`, `Checksummer VC 20` (no V) | **1** | 8501, 8502, SH8501 |
+  | `Neuer Checksummer (C 64)`, `Checksummer (C 64)`, `Checksummer (VC 20)` | **2** | 8503-8507, SH8502 |
+  | `Checksummer 64 V3`, `Checksummer V3`, `Checksummer VC 20 V3`, `Checksummer 20 V3` | **3** | 8508 onward, SH8503 onward |
+
+  **`Checksummer 128` and `Checksummer VC 20` name a MACHINE, not a version** —
+  do not read the 128 or the 20 as a version number. A C 128 listing is BASIC
+  7.0 and therefore takes no tag at all.
+
+  MEASURED over the corpus, 2026-11-18: **1,529 BASIC listings, 432 tagged,
+  1,097 not — 28 %.** The distribution is bimodal and tracks the BUILD, not the
+  magazine: an issue is either 52-100 % or 0-6 %, with 8508 through 8612 a run
+  of seventeen monthlies at 0 % (about 300 listings). Stray single tags sit in
+  8610, 8701, SH10, SH8504, SH8505, SH8507 and SH8603, and a stray **v1** tag
+  sits in SH8506, SH8602 and SH8605, all of which are v3 issues. The attribute adds
   the reader's toggle between the petcat text and the Checksummer rendering,
   which is the form the page printed and the form a reader typed from — so
   leaving it off a listing the magazine printed WITH sums drops a printed
